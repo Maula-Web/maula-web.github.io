@@ -27,10 +27,48 @@ class DataService {
         await this.migrateCollection('members', 'maulas_members');
         await this.migrateCollection('jornadas', 'maulas_jornadas');
         await this.migrateCollection('pronosticos', 'maulas_pronosticos');
-        // Config usually has multiple keys, treat special or just 'scoring_config'
-        // Logs
         await this.migrateCollection('logs', 'maulas_logs');
         await this.migrateCollection('docs', 'maulas_docs');
+
+        // CHECK IF EMPTY AFTER MIGRATION (Crucial for new deployments)
+        const memSnap = await this.db.collection('members').limit(1).get();
+        if (memSnap.empty) {
+            console.log("Database empty. Seeding defaults...");
+            await this.seedDefaults();
+        }
+    }
+
+    async seedDefaults() {
+        const names = [
+            "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
+            "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
+            "Juan Antonio", "Juanjo", "Luismi", "Marcelo", "Martín",
+            "Rafa", "Ramón", "Raúl Romera", "Samuel"
+        ];
+
+        const batch = this.db.batch();
+        let id = 1;
+
+        for (const name of names) {
+            // Generate email: remove spaces, lowercase, remove accents
+            const cleanName = name.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+                .replace(/[^a-z0-9]/g, ""); // Remove non-alphanumeric
+
+            const email = `${cleanName}@maulas.com`;
+
+            const docRef = this.db.collection('members').doc(String(id));
+            batch.set(docRef, {
+                id: id,
+                name: name,
+                email: email,
+                phone: '',
+                joinedDate: new Date().toISOString()
+            });
+            id++;
+        }
+        await batch.commit();
+        console.log("Seeded default members successfully.");
     }
 
     async migrateCollection(colName, localKey) {
