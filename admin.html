@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEÑA MAULAS - Administración</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- DB Config -->
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            /* 3 columns */
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: start;
+        }
+
+        .config-card,
+        .logs-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #546e7a;
+            /* Gray theme */
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.2rem;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .form-row input {
+            width: 60px;
+            text-align: center;
+            padding: 2px;
+        }
+
+        .log-list {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            margin-top: 0.5rem;
+        }
+
+        .log-item {
+            padding: 0.3rem;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 0.8rem;
+        }
+
+        /* Gray Theme Overrides */
+        h1,
+        h2,
+        h3 {
+            color: #546e7a;
+            margin-top: 0;
+            font-size: 1.1rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        .btn-action {
+            background-color: #546e7a;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .btn-action:hover {
+            background-color: #455a64;
+        }
+
+        .page-body {
+            background-color: #f5f5f5 !important;
+        }
+
+        /* Light gray bg */
+    </style>
+</head>
+
+<body class="page-body">
+
+    <div class="main-container" style="padding:1rem;">
+        <header class="header-actions"
+            style="border-bottom: 2px solid #546e7a; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <a href="index.html" class="btn-action"
+                        style="text-decoration:none; display:inline-block; color:white;">←
+                        Volver</a>
+                    <h1 class="page-title" style="margin:0; color:#546e7a;">Administración</h1>
+                </div>
+                <div>
+                    <button onclick="Auth.logout()" class="btn-action" style="background:#c62828;">Cerrar
+                        Sesión</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="admin-grid">
+            <!-- 1. Password & Docs (Left Column) -->
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div class="config-card">
+                    <h2>🔐 Seguridad</h2>
+                    <form id="pwd-form" style="font-size:0.9rem;">
+                        <label style="display:block; margin-bottom:0.3rem;">Nueva Contraseña Maestra:</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="new-pwd" placeholder="Nueva..." style="flex:1; padding:4px;"
+                                required>
+                            <button type="submit" class="btn-action">Cambiar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="config-card">
+                    <h2>📂 Documentación</h2>
+                    <div style="display:flex; gap:5px; margin-bottom:0.5rem;">
+                        <input type="file" id="doc-file-input" style="display:none;"
+                            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                        <button type="button" onclick="document.getElementById('doc-file-input').click()"
+                            class="btn-action" style="background:#0288d1; flex:1;">Seleccionar</button>
+                        <button id="btn-upload-doc" class="btn-action" disabled>Subir</button>
+                    </div>
+                    <ul id="doc-list"
+                        style="list-style:none; padding:0; border:1px solid #eee; border-radius:4px; max-height:150px; overflow-y:auto; font-size:0.85rem;">
+                        <!-- Doc Items -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 2. Config (Middle Column) -->
+            <div class="config-card">
+                <h2>⚙️ Puntuaciones</h2>
+                <form id="config-form">
+                    <h3 style="font-size:0.9rem; margin-bottom:0.5rem; color:#444;">Bonificaciones</h3>
+                    <div class="form-row"><label>15 Aciertos</label> <input type="number" id="bonus15"></div>
+                    <div class="form-row"><label>14 Aciertos</label> <input type="number" id="bonus14"></div>
+                    <div class="form-row"><label>13 Aciertos</label> <input type="number" id="bonus13"></div>
+                    <div class="form-row"><label>12 Aciertos</label> <input type="number" id="bonus12"></div>
+                    <div class="form-row"><label>11 Aciertos</label> <input type="number" id="bonus11"></div>
+                    <div class="form-row"><label>10 Aciertos</label> <input type="number" id="bonus10"></div>
+
+                    <h3 style="font-size:0.9rem; margin-bottom:0.5rem; margin-top:0.8rem; color:#444;">Penalizaciones
+                    </h3>
+                    <div class="form-row"><label>3 Aciertos</label> <input type="number" id="penalty3"></div>
+                    <div class="form-row"><label>2 Aciertos</label> <input type="number" id="penalty2"></div>
+                    <div class="form-row"><label>1 Aciertos</label> <input type="number" id="penalty1"></div>
+                    <div class="form-row"><label>0 Aciertos</label> <input type="number" id="penalty0"></div>
+
+                    <button type="submit" class="btn-action" style="width:100%; margin-top:0.5rem;">💾 Guardar</button>
+                    <div id="save-msg"
+                        style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
+                        ¡Guardado!</div>
+                </form>
+            </div>
+
+            <!-- 3. Logs (Right Column) -->
+            <div class="logs-card">
+                <h2>📜 Historial</h2>
+                <div class="log-list" id="log-container">
+                    <!-- JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/scoring.js"></script>
+    <script>
+        // Inline JS for Admin Logic specifically
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            loadLogs();
+            loadDocuments();
+
+            document.getElementById('config-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveConfig();
+            });
+
+            document.getElementById('pwd-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const pwd = document.getElementById('new-pwd').value;
+                if (pwd) {
+                    Auth.changePassword(pwd);
+                    document.getElementById('new-pwd').value = '';
+                }
+            });
+
+
+            // Doc Upload logic
+            const fileInput = document.getElementById('doc-file-input');
+            const uploadBtn = document.getElementById('btn-upload-doc');
+
+            // ENABLE BUTTON WHEN FILE SELECTED
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Subir (' + fileInput.files[0].name + ')';
+                } else {
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = 'Subir';
+                }
+            });
+
+            uploadBtn.addEventListener('click', () => {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const docs = JSON.parse(localStorage.getItem('maulas_docs')) || [];
+                    docs.push({
+                        name: file.name,
+                        type: file.type,
+                        date: new Date().toISOString(),
+                        content: e.target.result // Base64
+                    });
+                    localStorage.setItem('maulas_docs', JSON.stringify(docs));
+                    loadDocuments();
+                    fileInput.value = '';
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = 'Subir';
+                    alert('Documento subido correctamente');
+                    Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Subió documento: ' + file.name);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function loadDocuments() {
+            const list = document.getElementById('doc-list');
+            const docs = JSON.parse(localStorage.getItem('maulas_docs')) || [];
+
+            // Default Statutes if empty
+            if (docs.length === 0 && !localStorage.getItem('maulas_docs_seeded')) {
+                docs.push({
+                    name: 'Estatutos Peña Maulas.txt',
+                    type: 'text/plain',
+                    date: new Date().toISOString(),
+                    isDefault: true,
+                    content: 'data:text/plain;base64,' + btoa('REGLAMENTO OFICIAL PEÑA MAULAS...') // Mock data
+                });
+                localStorage.setItem('maulas_docs', JSON.stringify(docs));
+                localStorage.setItem('maulas_docs_seeded', 'true');
+            }
+
+            if (docs.length === 0) {
+                list.innerHTML = '<li style="padding:1rem; color:#999; text-align:center;">No hay documentos.</li>';
+                return;
+            }
+
+            list.innerHTML = '';
+            docs.forEach((doc, idx) => {
+                const li = document.createElement('li');
+                li.style.padding = '0.5rem';
+                li.style.borderBottom = '1px solid #f5f5f5';
+                li.style.display = 'flex';
+                li.style.justifyContent = 'space-between';
+                li.style.alignItems = 'center';
+
+                li.innerHTML = `
+                    <span>${doc.name} <small style="color:#888;">(${new Date(doc.date).toLocaleDateString()})</small></span>
+                    <div>
+                        <button onclick="viewDoc(${idx})" style="padding:4px 8px; background:#4caf50; color:white; border:none; border-radius:4px; cursor:pointer;">Ver/Imprimir</button>
+                        ${!doc.isDefault ? `<button onclick="deleteDoc(${idx})" style="padding:4px 8px; background:#f44336; color:white; border:none; border-radius:4px; cursor:pointer; margin-left:5px;">Borrar</button>` : ''}
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function viewDoc(idx) {
+            const docs = JSON.parse(localStorage.getItem('maulas_docs'));
+            const doc = docs[idx];
+
+            // Open in new tab (Base64)
+            const win = window.open();
+            if (doc.type.startsWith('image/')) {
+                win.document.write(`<img src="${doc.content}" style="max-width:100%;">`);
+            } else {
+                // Decode base64 if needed or iframe
+                win.document.write(`<iframe src="${doc.content}" style="width:100%; height:100vh; border:none;"></iframe>`);
+            }
+        }
+
+        function deleteDoc(idx) {
+            if (!confirm('¿Borrar este documento?')) return;
+            const docs = JSON.parse(localStorage.getItem('maulas_docs'));
+            const docName = docs[idx].name;
+            docs.splice(idx, 1);
+            localStorage.setItem('maulas_docs', JSON.stringify(docs));
+            loadDocuments();
+            Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Borró documento: ' + docName);
+        }
+
+        function loadConfig() {
+            const rules = ScoringSystem.getConfig();
+            console.log("Loading rules:", rules);
+            for (const [key, val] of Object.entries(rules)) {
+
+                const el = document.getElementById(key);
+                if (el) el.value = val;
+            }
+        }
+
+        function saveConfig() {
+            const newRules = {};
+            const inputs = document.querySelectorAll('#config-form input');
+            inputs.forEach(inp => {
+                newRules[inp.id] = parseInt(inp.value);
+            });
+            ScoringSystem.saveConfig(newRules);
+
+            const msg = document.getElementById('save-msg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2000);
+
+            Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Actualizó Reglas Puntuación');
+        }
+
+        function loadLogs() {
+            const logs = JSON.parse(localStorage.getItem('maulas_logs')) || [];
+            const container = document.getElementById('log-container');
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="padding:1rem; text-align:center; color:#999;">No hay registros.</div>';
+                return;
+            }
+
+            let html = '';
+            logs.forEach(log => {
+                const date = new Date(log.date).toLocaleString();
+                html += `
+                    <div class="log-item">
+                        <div style="font-weight:bold;">${log.user} <span style="font-weight:normal; color:#444;">- ${log.action}</span></div>
+                        <div class="log-time">${date}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+
+</html>
