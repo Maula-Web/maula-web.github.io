@@ -185,11 +185,47 @@ const CloudSeeder = {
 
             await dbService.save('jornadas', jornadaObj);
         }
+
+        // FUTURE GENERATION (From Dec 2025 to May 2026)
+        console.log("Seeding Future Jornadas...");
+        let futureDate = new Date(2025, 11, 14); // Dec 14
+        let futureNum = 27; // Continue numbering
+        const seasonEnd = new Date(2026, 4, 30);
+
+        while (futureDate <= seasonEnd) {
+            let cleanMatches = Array(15).fill(null).map(() => ({ home: '', away: '', result: '' }));
+            const isXmas = (futureDate.getMonth() === 11 && futureDate.getDate() > 21) || (futureDate.getMonth() === 0 && futureDate.getDate() < 4);
+
+            if (!isXmas) {
+                const dStr = futureDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                const jObj = {
+                    id: Date.now() + futureNum + Math.floor(Math.random() * 100000), // Unique ID
+                    number: futureNum,
+                    season: '2025-2026',
+                    date: dStr,
+                    matches: cleanMatches,
+                    active: true
+                };
+
+                await dbService.save('jornadas', jObj);
+                futureNum++;
+            }
+            futureDate.setDate(futureDate.getDate() + 7); // Next Sunday
+        }
     },
 
     seedPronosticos: async function (dbService) {
+        // Wait for HISTORICAL_DATA (up to 5s)
+        let attempts = 0;
+        while (!window.HISTORICAL_DATA && attempts < 10) {
+            await new Promise(r => setTimeout(r, 500));
+            attempts++;
+        }
+
         if (!window.HISTORICAL_DATA) {
             console.warn("HISTORICAL_DATA not found. Skipping predictions.");
+            alert("AVISO: No se encontraron los pronósticos históricos (data_loader.js no cargó a tiempo). Inténtalo de nuevo.");
             return;
         }
 
