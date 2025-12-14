@@ -112,6 +112,12 @@
             </div>
         </header>
 
+        <!-- Manual Seed Button (Static) -->
+        <button id="btn-seed-data"
+            style="background:#d32f2f; color:white; border:none; padding:15px; margin: 20px 0; border-radius:4px; font-weight:bold; width:100%; font-size:1.1rem; cursor:pointer; display:block;">
+            ⚠️ RECARGAR DATOS FÁBRICA
+        </button>
+
         <div class="admin-grid">
             <!-- 1. Password & Docs (Left Column) -->
             <div style="display:flex; flex-direction:column; gap:1rem;">
@@ -248,10 +254,8 @@
                 reader.readAsDataURL(file);
             });
 
-            // --- NEW: FORCE SEED BUTTON (Debug) ---
-            const btnSeed = document.createElement('button');
-            btnSeed.textContent = "⚠️ RECARGAR DATOS FÁBRICA";
-            btnSeed.style.cssText = "background:#d32f2f; color:white; border:none; padding:15px; margin: 20px 0; border-radius:4px; font-weight:bold; width:100%; font-size:1.1rem; cursor:pointer;";
+            // --- FORCE SEED BUTTON LOGIC ---
+            const btnSeed = document.getElementById('btn-seed-data');
             btnSeed.onclick = async () => {
                 if (confirm("¿Seguro? Esto intentará cargar los datos históricos si faltan. Se generarán las jornadas futuras y se cargarán los pronósticos anteriores.")) {
                     btnSeed.disabled = true;
@@ -288,14 +292,7 @@
                     }
                 }
             };
-            // Insert BEFORE the grid so it's very visible
-            const container = document.querySelector('.main-container');
-            const grid = document.querySelector('.admin-grid');
-            if (container && grid) {
-                container.insertBefore(btnSeed, grid);
-            } else {
-                document.body.appendChild(btnSeed); // Fallback
-            }
+
         });
 
         async function loadDocuments() {
