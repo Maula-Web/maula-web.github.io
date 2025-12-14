@@ -30,12 +30,37 @@ class DataService {
         await this.migrateCollection('logs', 'maulas_logs');
         await this.migrateCollection('docs', 'maulas_docs');
 
-        // CHECK IF EMPTY AFTER MIGRATION (Crucial for new deployments)
+        // 1. Members Check
         const memSnap = await this.db.collection('members').limit(1).get();
         if (memSnap.empty) {
-            console.log("Database empty. Seeding defaults...");
+            console.log("DB: Seeding defaults...");
             await this.seedDefaults();
         }
+
+        // 2. Jornadas/Data Check (For initial fill from static)
+        const jorSnap = await this.db.collection('jornadas').limit(1).get();
+        if (jorSnap.empty) {
+            console.log("DB: Seeding FULL DATA from static files...");
+            // Load scripts dynamically if not present
+            if (!window.CloudSeeder) {
+                await this.loadScript('js/data_loader.js');
+                await this.loadScript('js/cloud-seeder.js');
+            }
+            if (window.CloudSeeder) {
+                await window.CloudSeeder.run(this);
+                alert("¡Datos iniciales cargados (Jornadas y Pronósticos)!");
+            }
+        }
+    }
+
+    loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
     }
 
     async seedDefaults() {
