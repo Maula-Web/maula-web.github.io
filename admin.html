@@ -183,9 +183,14 @@
     <script src="js/scoring.js"></script>
     <script>
         // Inline JS for Admin Logic specifically
-        document.addEventListener('DOMContentLoaded', () => {
-            loadConfig();
-            loadLogs();
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Init
+            if (window.DataService) await window.DataService.init();
+
+            await loadConfig();
+            await loadLogs();
+            // Docs currently local only migration in simple demo, let's keep local or migrate basics.
+            // For simplicity in this step, let's focus on Config and Logs which are crucial.
             loadDocuments();
 
             document.getElementById('config-form').addEventListener('submit', (e) => {
@@ -223,41 +228,63 @@
                 if (!file) return;
 
                 const reader = new FileReader();
-                reader.onload = function (e) {
-                    const docs = JSON.parse(localStorage.getItem('maulas_docs')) || [];
-                    docs.push({
+                reader.onload = async function (e) {
+                    const docData = {
                         name: file.name,
                         type: file.type,
                         date: new Date().toISOString(),
                         content: e.target.result // Base64
-                    });
-                    localStorage.setItem('maulas_docs', JSON.stringify(docs));
+                    };
+
+                    await window.DataService.save('docs', docData);
+
                     loadDocuments();
                     fileInput.value = '';
                     uploadBtn.disabled = true;
                     uploadBtn.textContent = 'Subir';
                     alert('Documento subido correctamente');
-                    Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Subió documento: ' + file.name);
+                    await Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Subió documento: ' + file.name);
                 };
                 reader.readAsDataURL(file);
             });
+
+            // --- NEW: FORCE SEED BUTTON (Debug) ---
+            const btnSeed = document.createElement('button');
+            btnSeed.textContent = "⚠️ RECARGAR DATOS FÁBRICA";
+            btnSeed.style.cssText = "background:red; color:white; border:none; padding:10px; margin-top:20px; border-radius:4px; font-weight:bold;";
+            btnSeed.onclick = async () => {
+                if (confirm("¿Seguro? Esto intentará cargar los datos históricos si faltan.")) {
+                    if (!window.CloudSeeder) {
+                        // Load scripts dynamically if not present
+                        const s = document.createElement('script');
+                        s.src = 'js/data_loader.js';
+                        document.head.appendChild(s);
+                        const s2 = document.createElement('script');
+                        s2.src = 'js/cloud-seeder.js';
+                        document.head.appendChild(s2);
+
+                        setTimeout(async () => {
+                            if (window.CloudSeeder) {
+                                await window.CloudSeeder.run(window.DataService);
+                                alert("Proceso finalizado. Refresca la página.");
+                            } else {
+                                alert("Error cargando scripts. Espera unos segundos e intenta de nuevo.");
+                            }
+                        }, 2000);
+                    } else {
+                        await window.CloudSeeder.run(window.DataService);
+                        alert("Proceso finalizado. Refresca la página.");
+                    }
+                }
+            };
+            document.querySelector('.admin-grid').after(btnSeed);
         });
 
-        function loadDocuments() {
+        async function loadDocuments() {
             const list = document.getElementById('doc-list');
-            const docs = JSON.parse(localStorage.getItem('maulas_docs')) || [];
-
-            // Default Statutes if empty
-            if (docs.length === 0 && !localStorage.getItem('maulas_docs_seeded')) {
-                docs.push({
-                    name: 'Estatutos Peña Maulas.txt',
-                    type: 'text/plain',
-                    date: new Date().toISOString(),
-                    isDefault: true,
-                    content: 'data:text/plain;base64,' + btoa('REGLAMENTO OFICIAL PEÑA MAULAS...') // Mock data
-                });
-                localStorage.setItem('maulas_docs', JSON.stringify(docs));
-                localStorage.setItem('maulas_docs_seeded', 'true');
+            let docs = [];
+            if (window.DataService) {
+                docs = await window.DataService.getAll('docs');
             }
 
             if (docs.length === 0) {
@@ -266,7 +293,7 @@
             }
 
             list.innerHTML = '';
-            docs.forEach((doc, idx) => {
+            docs.forEach((doc) => {
                 const li = document.createElement('li');
                 li.style.padding = '0.5rem';
                 li.style.borderBottom = '1px solid #f5f5f5';
@@ -277,17 +304,18 @@
                 li.innerHTML = `
                     <span>${doc.name} <small style="color:#888;">(${new Date(doc.date).toLocaleDateString()})</small></span>
                     <div>
-                        <button onclick="viewDoc(${idx})" style="padding:4px 8px; background:#4caf50; color:white; border:none; border-radius:4px; cursor:pointer;">Ver/Imprimir</button>
-                        ${!doc.isDefault ? `<button onclick="deleteDoc(${idx})" style="padding:4px 8px; background:#f44336; color:white; border:none; border-radius:4px; cursor:pointer; margin-left:5px;">Borrar</button>` : ''}
+                        <button onclick="viewDoc('${doc.id}')" style="padding:4px 8px; background:#4caf50; color:white; border:none; border-radius:4px; cursor:pointer;">Ver</button>
+                        <button onclick="deleteDoc('${doc.id}', '${doc.name}')" style="padding:4px 8px; background:#f44336; color:white; border:none; border-radius:4px; cursor:pointer; margin-left:5px;">Borrar</button>
                     </div>
                 `;
                 list.appendChild(li);
             });
         }
 
-        function viewDoc(idx) {
-            const docs = JSON.parse(localStorage.getItem('maulas_docs'));
-            const doc = docs[idx];
+        async function viewDoc(id) {
+            const docs = await window.DataService.getAll('docs');
+            const doc = docs.find(d => d.id == id);
+            if (!doc) return;
 
             // Open in new tab (Base64)
             const win = window.open();
@@ -299,17 +327,17 @@
             }
         }
 
-        function deleteDoc(idx) {
+        async function deleteDoc(id, name) {
             if (!confirm('¿Borrar este documento?')) return;
-            const docs = JSON.parse(localStorage.getItem('maulas_docs'));
-            const docName = docs[idx].name;
-            docs.splice(idx, 1);
-            localStorage.setItem('maulas_docs', JSON.stringify(docs));
+
+            await window.DataService.delete('docs', id);
+
             loadDocuments();
-            Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Borró documento: ' + docName);
+            Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Borró documento: ' + name);
         }
 
-        function loadConfig() {
+        async function loadConfig() {
+            if (window.DataService) await ScoringSystem.init(); // Ensure loaded
             const rules = ScoringSystem.getConfig();
             console.log("Loading rules:", rules);
             for (const [key, val] of Object.entries(rules)) {
@@ -319,13 +347,13 @@
             }
         }
 
-        function saveConfig() {
+        async function saveConfig() {
             const newRules = {};
             const inputs = document.querySelectorAll('#config-form input');
             inputs.forEach(inp => {
                 newRules[inp.id] = parseInt(inp.value);
             });
-            ScoringSystem.saveConfig(newRules);
+            await ScoringSystem.saveConfig(newRules);
 
             const msg = document.getElementById('save-msg');
             msg.style.display = 'block';
@@ -334,8 +362,14 @@
             Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Actualizó Reglas Puntuación');
         }
 
-        function loadLogs() {
-            const logs = JSON.parse(localStorage.getItem('maulas_logs')) || [];
+        async function loadLogs() {
+            let logs = [];
+            if (window.DataService) {
+                logs = await window.DataService.getAll('logs');
+            }
+            // Sort valid date descending
+            logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
             const container = document.getElementById('log-container');
 
             if (logs.length === 0) {
