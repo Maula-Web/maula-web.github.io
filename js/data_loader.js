@@ -1,4 +1,4 @@
-const HISTORICAL_DATA = [
+window.HISTORICAL_DATA = [
   {
     "jornada_num": 1,
     "predictions": {
