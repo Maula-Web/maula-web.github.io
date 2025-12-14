@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Peña Maulas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .manual-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .cover {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .cover img {
+            max-width: 250px;
+            margin-bottom: 1rem;
+        }
+
+        .cover h1 {
+            color: var(--primary-blue);
+            font-size: 2.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .cover h2 {
+            color: #666;
+            font-weight: normal;
+            font-size: 1.2rem;
+        }
+
+        h2.section-title {
+            color: var(--primary-purple);
+            border-bottom: 2px solid var(--primary-gold);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .manual-content p {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 1rem;
+        }
+
+        .manual-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .manual-content li {
+            margin-bottom: 0.5rem;
+            color: #444;
+        }
+
+        .note {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .warning {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .main-container {
+                padding: 0;
+            }
+
+            .manual-container {
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+            }
+
+            h2.section-title {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body style="background-color: #f5f5f5; padding-top: 2rem; padding-bottom: 2rem;">
+
+    <!-- Action Bar -->
+    <div class="no-print" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button onclick="window.print()" class="btn-action"
+            style="background: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+            🖨️ Imprimir / Guardar como PDF
+        </button>
+        <a href="index.html" class="btn-action" style="background: var(--primary-blue); text-decoration: none;">
+            🏠 Ir a Inicio
+        </a>
+    </div>
+
+    <div class="manual-container">
+
+        <!-- COVER -->
+        <div class="cover">
+            <img src="LOGOTIPO_MAULA.JPG" alt="Logotipo Maulas">
+            <h1>MANUAL DE USUARIO</h1>
+            <h2>Peña Quinielista "Los Maulas"</h2>
+            <br>
+            <p style="font-size: 0.9rem; color: #888;">Temporada 2025-2026 | Versión 1.0</p>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="manual-content">
+
+            <h2 class="section-title">1. Introducción</h2>
+            <p>
+                Bienvenido a la aplicación oficial de gestión de la Peña "Los Maulas". Esta herramienta permite a todos
+                los socios realizar sus pronósticos semanales, consultar los resultados en tiempo real y seguir la
+                clasificación general de la temporada de forma sencilla y transparente.
+            </p>
+
+            <h2 class="section-title">2. Acceso a la Aplicación</h2>
+            <p>Para acceder al sistema es necesario identificarse:</p>
+            <ul>
+                <li><strong>Usuario:</strong> Su correo electrónico personal (formato: <code>nombre@maulas.com</code>).
+                </li>
+                <li><strong>Contraseña:</strong> La contraseña maestra de la peña (<code>_Est4tuTo5M4uLAs!</code>).</li>
+            </ul>
+            <div class="note">
+                <strong>Nota:</strong> Si es la primera vez que entras, consulta al administrador para saber tu correo
+                asignado.
+            </div>
+
+            <h2 class="section-title">3. Panel de Inicio</h2>
+            <p>Al entrar verás el "Cuadro de Mandos" o Dashboard, que te ofrece la información más relevante de un
+                vistazo:</p>
+            <ul>
+                <li><strong>Líder Actual:</strong> El socio que encabeza la clasificación general.</li>
+                <li><strong>Próxima Jornada:</strong> Fecha de la siguiente quiniela.</li>
+                <li><strong>Roles Especiales:</strong>
+                    <ul>
+                        <li>👑 <strong>Columnas de Dobles:</strong> Socio encargado de decidir los dobles/triples.</li>
+                        <li>🧊 <strong>Sella la Quiniela (Maula):</strong> Socio encargado de la gestión física del
+                            boleto.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2 class="section-title">4. Realizar Pronósticos</h2>
+            <p>La función principal de la web. Sigue estos pasos:</p>
+            <ol>
+                <li>Ve a la sección <strong>PRONÓSTICOS</strong>.</li>
+                <li>Selecciona tu <strong>Nombre</strong> y la <strong>Jornada</strong> activa en los desplegables.</li>
+                <li>Aparecerá el boleto con los 15 partidos.</li>
+                <li>Marca <strong>1, X o 2</strong> para cada encuentro.</li>
+                <li>Pulsa el botón <strong>💾 Guardar Pronóstico</strong>.</li>
+            </ol>
+            <div class="warning">
+                <strong>⚠️ Importante:</strong>
+                <ul>
+                    <li>Existe una <strong>Fecha Límite</strong> (normalmente jueves a las 17:00h). Si guardas tarde, el
+                        sistema marcará tu pronóstico como "LATE" (Retrasado) y podrías ser penalizado.</li>
+                    <li>Si la jornada está <strong>Cerrada (Bloqueada)</strong>, no podrás guardar cambios.</li>
+                </ul>
+            </div>
+
+            <h2 class="section-title">5. Consultar Resultados</h2>
+            <p>Aquí puedes ver qué tal le ha ido a la peña en cada jornada.</p>
+            <ul>
+                <li>Se muestra una tabla gigante con todos los partidos y lo que pronosticó cada socio.</li>
+                <li><strong>Código de Colores:</strong>
+                    <ul>
+                        <li><span style="background:#e8f5e9; padding:2px 5px;">Azul/Verde:</span> Aciertos destacados.
+                        </li>
+                        <li><span style="background:#ffebee; padding:2px 5px;">Rojo:</span> Fallos o baja puntuación.
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Puntuaciones:</strong> Debajo de cada acierto verás los puntos obtenidos, incluyendo
+                    Bonificaciones (por 10+ aciertos) o Penalizaciones (por &lt;10 aciertos).</li>
+            </ul>
+
+            <h2 class="section-title">6. Resumen de Temporada</h2>
+            <p>Para los amantes de las estadísticas.</p>
+            <ul>
+                <li><strong>Gráfica de Evolución:</strong> Visualiza tu trayectoria comparada con otros socios a lo
+                    largo de las semanas.</li>
+                <li><strong>Clasificación General:</strong> Tabla ordenada con los puntos totales acumulados y medallas
+                    para el podio (Oro, Plata, Bronce).</li>
+            </ul>
+
+            <h2 class="section-title">7. Otras Secciones</h2>
+            <ul>
+                <li><strong>Jornadas:</strong> Calendario oficial con todos los partidos.</li>
+                <li><strong>Socios:</strong> Listado de los miembros activos.</li>
+                <li><strong>Administración:</strong> (Solo Administrador) Zona restringida para configurar reglas.</li>
+            </ul>
+
+        </div>
+
+        <div
+            style="border-top: 1px solid #eee; margin-top: 3rem; padding-top: 1rem; text-align: center; color: #999; font-size: 0.8rem;">
+            Documento generado para Peña Maulas - 2025
+        </div>
+
+    </div>
+
+</body>
+
+</html>
