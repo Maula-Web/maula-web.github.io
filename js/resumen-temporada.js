@@ -1,10 +1,8 @@
 class ResumenManager {
     constructor() {
-        this.members = JSON.parse(localStorage.getItem('maulas_members')) || [];
-        this.jornadas = JSON.parse(localStorage.getItem('maulas_jornadas')) || [];
-        this.pronosticos = JSON.parse(localStorage.getItem('maulas_pronosticos')) || [];
-        // Ensure we have sorted jornadas
-        this.jornadas.sort((a, b) => a.number - b.number);
+        this.members = [];
+        this.jornadas = [];
+        this.pronosticos = [];
 
         // Selection state
         this.selectedMembers = new Set();
@@ -13,10 +11,40 @@ class ResumenManager {
         this.init();
     }
 
-    init() {
+    async init() {
+        if (window.DataService) await window.DataService.init();
+
+        this.members = await window.DataService.getAll('members');
+        this.jornadas = await window.DataService.getAll('jornadas');
+        this.pronosticos = await window.DataService.getAll('pronosticos');
+
+        // Ensure we have sorted jornadas
+        this.jornadas.sort((a, b) => a.number - b.number);
+
         this.createModal();
         this.renderTotalsList();
-        this.renderChart();
+
+        // Auto select top 4 logic moved here to ensure data is ready
+        this.autoSelectTop4();
+    }
+
+    autoSelectTop4() {
+        // Simple delay to ensure DOM render if needed, though sequential it should be mostly fine.
+        // But renderTotalsList modifies innerHTML, which is synchronous.
+        const inputs = document.querySelectorAll('#rankings-table-wrapper input[type="checkbox"]');
+        let count = 0;
+        inputs.forEach(inp => {
+            if (count < 4) {
+                inp.checked = true;
+                const onChangeAttr = inp.getAttribute('onchange');
+                const idMatch = onChangeAttr && onChangeAttr.match(/toggleSelection\((\d+)/);
+                if (idMatch) {
+                    this.selectedMembers.add(parseInt(idMatch[1]));
+                }
+                count++;
+            }
+        });
+        if (inputs.length > 0) this.renderChart();
     }
 
     createModal() {
@@ -344,24 +372,6 @@ class ResumenManager {
 
 const app = new ResumenManager();
 // Wait for DOM to select defaults
-setTimeout(() => {
-    // Select top 4 default
-    const inputs = document.querySelectorAll('input[type="checkbox"]');
-    let count = 0;
-    inputs.forEach(inp => {
-        if (count < 4) {
-            // Manually add to set and check
-            inp.checked = true;
-            // Parse ID
-            const onChangeAttr = inp.getAttribute('onchange');
-            const idMatch = onChangeAttr.match(/toggleSelection\((\d+)/);
-            if (idMatch) {
-                app.selectedMembers.add(parseInt(idMatch[1]));
-            }
-            count++;
-        }
-    });
-    app.renderChart();
-}, 500);
+
 
 window.app = app;

@@ -1,14 +1,13 @@
-# CÓMO ARREGLAR "DATOS A CERO"
+# SOLUCIÓN: RESUMEN Y PANEL DE INICIO
 
-El problema es técnico: Los datos se subieron con un formato antiguo que la nueva web no entiende ("predictions" vs "selection").
-He corregido el script de carga. Al pulsar el botón rojo de nuevo, se sobrescribirán los datos malos con los buenos.
+He detectado que "Resumen Temporada" y el "Panel de Inicio" tampoco estaban conectados a la Nube, por lo que no veían los datos cargados.
 
-### Pasos
-1. Haz **Commit** y **Push** en GitHub Desktop (asegúrate de que marcas todo).
-2. Ve a la web -> Administración.
-3. **PULSA DE NUEVO EL BOTÓN ROJO "RECARGAR DATOS FÁBRICA"**.
-   - Esto es CRUCIAL. Necesitamos que borre la versión vieja y ponga la nueva.
-4. Espera a que termine.
-5. Ve a **Resultados**. Ahora sí deberían salir números y no ceros.
+He actualizado ambas páginas. Ahora todas las secciones de la web leen los mismos datos de la Nube.
 
-Nota: Si ves filas duplicadas o raro, es normal tras varios intentos. Lo ideal sería limpiar la base de datos, pero el botón "Recargar" debería corregir los IDs para que coincidan (Jornada 1 = ID 1).
+### Qué hacer
+1. **Commit** y **Push** en GitHub Desktop.
+2. Abre tu web.
+3. **IMPORTANTE**: Pulsa `Control + F5` para asegurar que se carga el nuevo código.
+4. Verifica:
+   - **Inicio**: Deben salir tarjetas con datos (Socios, Jornadas jugadas, Líder...).
+   - **Resumen Temporada**: Debe salir la gráfica y la tabla de clasificación.

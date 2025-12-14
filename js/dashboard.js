@@ -1,12 +1,18 @@
 class DashboardManager {
     constructor() {
-        this.members = JSON.parse(localStorage.getItem('maulas_members')) || [];
-        this.jornadas = JSON.parse(localStorage.getItem('maulas_jornadas')) || [];
-        this.pronosticos = JSON.parse(localStorage.getItem('maulas_pronosticos')) || [];
+        this.members = [];
+        this.jornadas = [];
+        this.pronosticos = [];
         this.init();
     }
 
-    init() {
+    async init() {
+        if (window.DataService) await window.DataService.init();
+
+        this.members = await window.DataService.getAll('members');
+        this.jornadas = await window.DataService.getAll('jornadas');
+        this.pronosticos = await window.DataService.getAll('pronosticos');
+
         this.renderStats();
     }
 
