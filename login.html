@@ -126,18 +126,33 @@
             }
         }
 
-        document.getElementById('login-form').addEventListener('submit', function (e) {
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
             const errorDiv = document.getElementById('error-msg');
+            const btn = e.target.querySelector('button');
 
-            if (Auth.login(email, pass)) {
-                // Redirect
-                window.location.href = 'index.html';
-            } else {
-                errorDiv.textContent = 'Credenciales inválidas. Verifica tu correo y contraseña.';
+            errorDiv.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = "Verificando...";
+
+            try {
+                const success = await Auth.login(email, pass);
+                if (success) {
+                    window.location.href = 'index.html';
+                } else {
+                    errorDiv.textContent = 'Credenciales inválidas. Verifica correo y contraseña.';
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = "Entrar";
+                }
+            } catch (err) {
+                console.error(err);
+                errorDiv.textContent = 'Error de conexión. Inténtalo de nuevo.';
                 errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = "Entrar";
             }
         });
     </script>
