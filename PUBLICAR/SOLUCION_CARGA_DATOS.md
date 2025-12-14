@@ -1,22 +1,18 @@
-# CÓMO CARGAR TODOS LOS DATOS (FINAL)
+# CÓMO ARREGLAR LA CARGA DE DATOS (ULTIMA OPCIÓN)
 
-He actualizado la herramienta de carga para incluir **las jornadas futuras** (que faltaban) y asegurar que los pronósticos históricos (resultados) se carguen bien.
+Si el botón rojo seguía sin salir, era porque los cambios de GitHub a veces tardan unos minutos en llegar a Internet. Para arreglarlo definitivamente, lo he puesto "fijo" en la página, así que **tiene que salir por fuerza**.
 
-### 1. Subir cambios obligatorios (GitHub Desktop)
+### 1. Subir cambios (GitHub Desktop)
 1. Abre **GitHub Desktop**.
-2. Resumen: "Arreglo Final Carga Datos".
+2. Resumen: "Botón Carga Estático".
 3. Pulsa **Commit to main**.
 4. Pulsa **Push origin**.
 5. Espera 2 minutos.
 
 ### 2. Forzar la carga
-1. Entra en tu web -> Gestión Admin.
-2. Ahora verás el BOTÓN ROJO mucho más grande y visible, justo debajo del título "Administración".
-3. **Púlsalo**.
-4. Te pedirá confirmación. Acepta.
-5. El botón pondrá "Cargando scripts..." y luego "Subiendo datos...".
-6. **ESPERA** hasta que salga una alerta diciendo que ha terminado.
+1. Entra en tu web -> Administración.
+2. Si NO ves el botón rojo, refresca la página varias veces o vacía la caché (`Control + F5`).
+3. Cuando lo veas, **Púlsalo**.
+4. Espera pacientemente a que te diga "Finalizado con Éxito".
 
-Cuando veas "Proceso finalizado con Éxito", la página se recargará y ya deberías tener:
-*   Todas las jornadas hasta final de temporada.
-*   Todos los resultados y pronósticos pasados.
+Con esto tendrás la temporada completa (hasta Mayo 2026) y todos los resultados antiguos.
