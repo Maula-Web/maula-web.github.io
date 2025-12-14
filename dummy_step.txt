@@ -1,0 +1,41 @@
+.sidebar-menu {
+  width: 280px;
+  background-color: var(--dark-purple);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+}
+
+.sidebar-menu a {
+  display: block;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sidebar-menu a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-socios { background-color: var(--primary-green); color: white; }
+.btn-jornadas { background-color: #1976d2; color: white; }
+.btn-pronosticos { background-color: #d32f2f; color: white; }
+.btn-resultados { background-color: #7b1fa2; color: white; }
+.btn-resumen { background-color: #f57c00; color: white; }
+
+.main-content {
+  margin-left: 280px;
+  padding: 2rem;
+}
