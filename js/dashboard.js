@@ -32,9 +32,10 @@ class DashboardManager {
         const season = "2025-2026";
 
         // 3. Jornadas Jugadas (Completed)
-        // A jornada is considered played if it has matches and the first match has a result.
+        // A jornada is considered played if it has matches AND first match has result AND it is a Sunday.
         const playedJornadas = this.jornadas.filter(j => {
-            return j.matches && j.matches[0] && j.matches[0].result !== '';
+            const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
+            return hasResult && this.isValidJornadaDate(j.date);
         }).sort((a, b) => a.number - b.number);
 
         const playedCount = playedJornadas.length;
@@ -75,7 +76,7 @@ class DashboardManager {
                     }
                 }
 
-                // HARDCODED SCORING RULES (Match Resultados.js)
+                // HARDCODED SCORING RULES
                 let points = 0;
                 let bonus = 0;
 
@@ -160,36 +161,14 @@ class DashboardManager {
 
         let deadlineHtml = "";
         if (nextJornadaData && nextJornadaData.date) {
-            const months = {
-                'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
-                'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
-            };
+            const matchDate = this.parseDateString(nextJornadaData.date);
 
-            let deadline = null;
-            const lowerDate = nextJornadaData.date.toLowerCase();
+            if (matchDate) {
+                // Deadline: Thursday 17:00 implies -3 days from Sunday
+                const deadline = new Date(matchDate);
+                deadline.setDate(matchDate.getDate() - 3);
+                deadline.setHours(17, 0, 0, 0);
 
-            if (lowerDate.includes(' de ')) {
-                const parts = lowerDate.split(' de ');
-                if (parts.length === 3) {
-                    const day = parseInt(parts[0]);
-                    const month = months[parts[1]];
-                    const year = parseInt(parts[2]);
-                    const matchDate = new Date(year, month, day);
-                    deadline = new Date(matchDate);
-                    deadline.setDate(matchDate.getDate() - 3);
-                    deadline.setHours(17, 0, 0, 0);
-                }
-            } else if (lowerDate.includes('/')) {
-                const parts = lowerDate.split('/');
-                if (parts.length === 3) {
-                    const matchDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                    deadline = new Date(matchDate);
-                    deadline.setDate(matchDate.getDate() - 3);
-                    deadline.setHours(17, 0, 0, 0);
-                }
-            }
-
-            if (deadline) {
                 this.startCountdown(deadline);
                 deadlineHtml = `
                     <div style="margin-top:1.5rem; background:#fff3e0; padding:1rem; border-radius:8px; border:1px solid #ffe0b2;">
@@ -307,12 +286,48 @@ class DashboardManager {
 
     getNextJornadaData() {
         return this.jornadas
-            .filter(j => j.active)
+            .filter(j => j.active && this.isValidJornadaDate(j.date))
             .sort((a, b) => a.number - b.number)
             .find(j => {
                 const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
                 return filled < 15;
             });
+    }
+
+    // Helper: Parse date string to Date object
+    parseDateString(dateStr) {
+        if (!dateStr) return null;
+        try {
+            const lowerDate = dateStr.toLowerCase();
+            if (lowerDate.includes('/')) {
+                const parts = lowerDate.split('/');
+                if (parts.length === 3) {
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            } else {
+                const months = {
+                    'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+                    'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+                };
+                const clean = lowerDate.replace(/\(.*\)/, '').replace(/ de /g, ' ').trim();
+                const parts = clean.split(' ');
+                if (parts.length >= 3) {
+                    const day = parseInt(parts[0]);
+                    const year = parseInt(parts[parts.length - 1]);
+                    const monthStr = parts[1];
+                    if (months.hasOwnProperty(monthStr)) {
+                        return new Date(year, months[monthStr], day);
+                    }
+                }
+            }
+        } catch (e) { return null; }
+        return null;
+    }
+
+    isValidJornadaDate(dateStr) {
+        const d = this.parseDateString(dateStr);
+        if (!d || isNaN(d.getTime())) return false;
+        return d.getDay() === 0; // 0 = Sunday
     }
 }
 

@@ -347,6 +347,21 @@ class JornadaManager {
 
     saveJornada(e) {
         e.preventDefault();
+
+        // VALIDATE DATE IS SUNDAY
+        const dateStr = this.inpDate.value;
+        const dateObj = this.parseDateString(dateStr);
+
+        if (!dateObj || isNaN(dateObj.getTime())) {
+            alert('Formato de fecha inválido. Usa "dd/mm/yyyy" o "dd de mes de yyyy".');
+            return;
+        }
+
+        if (dateObj.getDay() !== 0) {
+            alert('REGLA MAULA: Las jornadas solo pueden ser en DOMINGO.');
+            return;
+        }
+
         const matchRows = this.matchesContainer.querySelectorAll('.match-row');
         const matches = [];
         matchRows.forEach(row => {
@@ -363,7 +378,7 @@ class JornadaManager {
             id: this.currentJornadaId || Date.now(),
             number: parseInt(this.modalTitleNum.textContent) || (this.jornadas.length + 1),
             season: '2025-2026',
-            date: this.inpDate.value,
+            date: dateStr,
             matches: matches,
             active: true
         };
@@ -388,6 +403,37 @@ class JornadaManager {
             this.btnSave.innerHTML = originalText;
             this.btnSave.disabled = false;
         }, 1500);
+    }
+
+    parseDateString(dateStr) {
+        if (!dateStr || dateStr.toLowerCase() === 'por definir') return null;
+
+        try {
+            // Try standard "24/08/2025"
+            if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            }
+
+            // Try "24 de agosto de 2025"
+            const clean = dateStr.replace(/\(.*\)/, '').replace(/ de /g, ' ').trim();
+            const parts = clean.split(' ');
+            if (parts.length >= 3) {
+                const day = parseInt(parts[0]);
+                const year = parseInt(parts[parts.length - 1]);
+                const monthStr = parts[1].toLowerCase();
+                const months = {
+                    'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+                    'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+                };
+                if (months.hasOwnProperty(monthStr)) {
+                    return new Date(year, months[monthStr], day);
+                }
+            }
+        } catch (e) { return null; }
+        return null;
     }
 
     async deleteCurrentJornada() {
