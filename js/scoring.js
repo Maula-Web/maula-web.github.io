@@ -2,14 +2,9 @@ const ScoringSystem = {
     // Default Rules
     defaults: {
         bonus15: 30, // Pleno
-        bonus14: 15, // 14 Aciertos (updated based on code found in resultados.js)
-        bonus13: 10, // Wait, logic in code was (hits >= 14 -> 30, 13->15, 12->10, 11->5, 10->3)
-        bonus12: 5,  // Mistake in my thought? checking code: 
-        // line 136: hits>=14 -> 30
-        // line 137: hits==13 -> 15
-        // line 138: hits==12 -> 10
-        // line 139: hits==11 -> 5
-        // line 140: hits==10 -> 3
+        bonus14: 30, // 14 Aciertos (Matches Resultados.js: hits >= 14 -> 30)
+        bonus13: 15, // 13 Aciertos (Matches Resultados.js: hits === 13 -> 15)
+        bonus12: 10, // 12 Aciertos (Matches Resultados.js: hits === 12 -> 10)
         bonus11: 5,
         bonus10: 3,
 
@@ -21,13 +16,13 @@ const ScoringSystem = {
     },
 
     getConfig: function () {
-        const stored = JSON.parse(localStorage.getItem('maulas_rules'));
+        const stored = JSON.parse(localStorage.getItem('maulas_rules_v2'));
         if (stored) return { ...this.defaults, ...stored };
         return this.defaults;
     },
 
     saveConfig: function (newConfig) {
-        localStorage.setItem('maulas_rules', JSON.stringify(newConfig));
+        localStorage.setItem('maulas_rules_v2', JSON.stringify(newConfig));
     },
 
     calculateScore: function (hits) {
@@ -56,8 +51,8 @@ const ScoringSystem = {
         // This contradicts '14->15'. 
         // I will implement granularly.
 
-        if (hits >= 15) bonus = parseInt(rules.bonus15 || 30);
-        else if (hits === 14) bonus = parseInt(rules.bonus14 || 30); // If config differentiates, good.
+        if (hits >= 15) bonus = parseInt(rules.bonus15);
+        else if (hits === 14) bonus = parseInt(rules.bonus14);
         else if (hits === 13) bonus = parseInt(rules.bonus13);
         else if (hits === 12) bonus = parseInt(rules.bonus12);
         else if (hits === 11) bonus = parseInt(rules.bonus11);
