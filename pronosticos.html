@@ -78,6 +78,33 @@
             <!-- 15 Rows Populated by JS -->
         </div>
 
+        <!-- Doubles Container (Extra) -->
+        <div id="doubles-section" class="hidden"
+            style="margin-top: 2rem; border-top: 2px dashed #ddd; padding-top: 1rem;">
+            <div
+                style="background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div>
+                    <h2 style="margin:0; font-size: 1.2rem; display:flex; align-items:center; gap:10px;">🏆 Quiniela
+                        Múltiple (Dobles)</h2>
+                    <p style="margin:5px 0 0 0; font-size: 0.9rem; opacity: 0.9;">¡Enhorabuena! Tienes derecho a
+                        rellenar esta quiniela extra.</p>
+                </div>
+                <div
+                    style="text-align: right; font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 4px;">
+                    <div>Límite: <strong>7 Dobles</strong> O <strong>4 Triples</strong></div>
+                    <div id="doubles-counter" style="font-weight: bold; margin-top: 5px; color: #ffeb3b;">Usado: 0
+                        Dobles, 0 Triples</div>
+                </div>
+            </div>
+
+            <div id="doubles-container" class="quiniela-grid">
+                <!-- Matches populated by JS -->
+            </div>
+            <button id="btn-save-doubles" class="btn-primary"
+                style="width:100%; margin-top:1rem; background-color: #6a1b9a;">💾 Guardar Quiniela de Dobles</button>
+            <div id="doubles-status" style="text-align:center; margin-top:0.5rem; font-weight:bold;"></div>
+        </div>
+
         <!-- Summary Table Section -->
         <div class="summary-section"
             style="margin-top: 3rem; border-top: 2px solid var(--input-border); padding-top: 2rem;">

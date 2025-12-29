@@ -207,3 +207,50 @@ const AppUtils = {
 };
 
 window.AppUtils = AppUtils;
+
+/**
+ * Global UI Features (Clock)
+ * Injected automatically since utils.js is present on all pages.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Create Clock Element
+    const clockId = 'maulas-global-clock';
+    if (!document.getElementById(clockId)) {
+        const clockDiv = document.createElement('div');
+        clockDiv.id = clockId;
+        clockDiv.style.position = 'fixed';
+        clockDiv.style.bottom = '10px';
+        clockDiv.style.right = '10px';
+        clockDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+        clockDiv.style.color = '#fff';
+        clockDiv.style.padding = '5px 10px';
+        clockDiv.style.borderRadius = '5px';
+        clockDiv.style.fontFamily = 'monospace';
+        clockDiv.style.fontSize = '0.9rem';
+        clockDiv.style.zIndex = '9999';
+        clockDiv.style.pointerEvents = 'none'; // Click through
+        clockDiv.style.userSelect = 'none';
+        clockDiv.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
+        document.body.appendChild(clockDiv);
+
+        // Update Function
+        const updateClock = () => {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            // Get User Name
+            let userName = 'Invitado';
+            try {
+                const u = JSON.parse(sessionStorage.getItem('maulas_user'));
+                if (u && u.name) userName = u.name;
+            } catch (e) { }
+
+            clockDiv.innerHTML = `<span style="color:#ffd54f; font-weight:bold; margin-right:10px;">👤 ${userName}</span> ${dateStr} ${timeStr}`;
+        };
+
+        // Start
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
+});

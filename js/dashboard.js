@@ -58,6 +58,7 @@ class DashboardManager {
         // Process all played jornadas
         playedJornadas.forEach((jornada, index) => {
             const jornadaResults = [];
+            const jDate = AppUtils.parseDate(jornada.date);
 
             this.members.forEach(member => {
                 const p = this.pronosticos.find(pr => (pr.jornadaId === jornada.id || pr.jId === jornada.id) && (pr.memberId === member.id || pr.mId === member.id));
@@ -75,11 +76,11 @@ class DashboardManager {
                     const sel = p.selection || p.forecasts || [];
                     const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
 
-                    let ev = ScoringSystem.evaluateForecast(sel, officialResults);
+                    let ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
 
                     if (isLate && !isPardoned) {
                         hits = 0;
-                        points = ScoringSystem.calculateScore(0);
+                        points = ScoringSystem.calculateScore(0, jDate);
                         bonus = points;
                     } else {
                         hits = ev.hits;

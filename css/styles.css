@@ -839,3 +839,27 @@ tbody td {
     margin: 0 6px;
     vertical-align: middle;
 }
+/* Doubles Prediction Buttons */
+.btn-prediction {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+    transition: all 0.2s;
+}
+.btn-prediction.active {
+    background: #6a1b9a;
+    color: white;
+    border-color: #4a148c;
+}
+.btn-prediction:hover:not(:disabled) {
+    background: #e1bee7;
+    color: #4a148c;
+}
+.btn-prediction:disabled {
+    opacity: 0.6;
+    cursor: default;
+}

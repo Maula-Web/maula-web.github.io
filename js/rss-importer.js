@@ -217,9 +217,14 @@ class RSSImporter {
                 return;
             }
 
+            // Parse Prize Info
+            const minHitsToWin = this.parseMinPrize(description);
+            console.log(`DEBUG: Item ${index + 1}: Min Hits to Win = ${minHitsToWin}`);
+
             results.push({
                 date: `${day} ${monthName} ${year}`,
                 matches: matches,
+                minHitsToWin: minHitsToWin,
                 rawDescription: description
             });
         });
@@ -227,6 +232,52 @@ class RSSImporter {
         console.log('DEBUG: Total results parsed:', results.length);
 
         return results;
+    }
+
+    /**
+     * Parse description to find minimum hits category with Prize > 0
+     * Examples lines: "5ª (10 Aciertos) : 12.000 Apuestas : 1,50 Euros"
+     */
+    parseMinPrize(description) {
+        // Default to a high number (safe fallback)
+        let minHits = 15;
+
+        // Normalize
+        const text = description.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+
+        // Regex to find: (XX Aciertos) ... : (X.XXX,XX) Euros
+        // Be flexible with spacing and colons
+        // Looking for patterns like: "10 Aciertos" followed eventually by "Euros"
+        // Let's split by delimiter showing categories usually separated by <br> or similar in HTML, 
+        // but here we have raw text potentially. The generic splitter is usually "Categoría" or just look for all matches.
+
+        const regex = /(\d{1,2})\s*Aciertos.*?:.*?([\d\.,]+)\s*Euros/gi;
+        let match;
+
+        while ((match = regex.exec(text)) !== null) {
+            const hits = parseInt(match[1]);
+            const prizeStr = match[2]; // "1.234,50" or "0,00"
+
+            // Clean prize string to number
+            const prizeVal = parseFloat(prizeStr.replace(/\./g, '').replace(',', '.'));
+
+            if (prizeVal > 0) {
+                if (hits < minHits) minHits = hits;
+            }
+        }
+
+        // If we found nothing standard, assume standard 10 hits if not explicit 0 found? 
+        // No, safer to default to 15 (winner only) if we can't confirm money.
+        // But user said: "A veces los acertantes de 10 no tienen premio".
+        // This implies usually they DO. 
+        // If parsing fails completely, maybe default to 10? 
+        // Let's default to standard logic: 
+        // If no parsing success -> Default to 10 (optimistic) or 15 (safe)? 
+        // Given user wants rights to depend on this, "Default 10" is better UX, but "Default 15" prevents errors.
+        // Let's stick to 15 as initial value, but if loop runs and finds winners for 14, 13... it updates.
+        // If it doesn't find information about 10, it stays at lowest found (e.g. 11).
+
+        return minHits;
     }
 
     /**

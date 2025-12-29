@@ -54,6 +54,7 @@ class ResultsManager {
 
         finishedJornadas.forEach(j => {
             const officialResults = j.matches.map(m => m.result);
+            const jDate = AppUtils.parseDate(j.date);
 
             // Track min/max for coloring
             let maxScore = -Infinity;
@@ -75,12 +76,12 @@ class ResultsManager {
                     isLate = p.late || false;
                     isPardoned = p.pardoned || false;
 
-                    let ev = ScoringSystem.evaluateForecast(p.selection, officialResults);
+                    let ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
 
                     // Late Logic: If late and NOT pardoned -> Hits = 0 -> Recalculate Score
                     if (isLate && !isPardoned) {
                         hits = 0;
-                        points = ScoringSystem.calculateScore(0);
+                        points = ScoringSystem.calculateScore(0, jDate);
                         bonus = points; // points - hits(0)
                     } else {
                         hits = ev.hits;

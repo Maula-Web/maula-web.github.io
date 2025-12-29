@@ -1,55 +1,71 @@
 const ScoringSystem = {
-    // Default Rules
+    // Default Rules (Fallback)
     defaults: {
-        bonus15: 30, // Pleno
-        bonus14: 30, // 14 Aciertos (Matches Resultados.js: hits >= 14 -> 30)
-        bonus13: 15, // 13 Aciertos (Matches Resultados.js: hits === 13 -> 15)
-        bonus12: 10, // 12 Aciertos (Matches Resultados.js: hits === 12 -> 10)
+        bonus15: 30,
+        bonus14: 30,
+        bonus13: 15,
+        bonus12: 10,
         bonus11: 5,
         bonus10: 3,
-
-        // Penalties (explicit negative values)
         penalty3: -1,
         penalty2: -2,
         penalty1: -3,
         penalty0: -5
     },
 
-    getConfig: function () {
-        const stored = JSON.parse(localStorage.getItem('maulas_rules_v2'));
-        if (stored) return { ...this.defaults, ...stored };
-        return this.defaults;
+    init: function () {
+        // Migration: Check if old v2 exists and history doesn't
+        if (localStorage.getItem('maulas_rules_v2') && !localStorage.getItem('maulas_rules_history')) {
+            const old = JSON.parse(localStorage.getItem('maulas_rules_v2'));
+            const history = [
+                { date: '2024-01-01T00:00:00.000Z', rules: { ...this.defaults, ...old } }
+            ];
+            localStorage.setItem('maulas_rules_history', JSON.stringify(history));
+        }
     },
 
-    saveConfig: function (newConfig) {
-        localStorage.setItem('maulas_rules_v2', JSON.stringify(newConfig));
+    getHistory: function () {
+        const h = localStorage.getItem('maulas_rules_history');
+        if (h) return JSON.parse(h);
+        // If nothing, return default history starting "forever ago"
+        return [{ date: '2000-01-01T00:00:00.000Z', rules: this.defaults }];
     },
 
-    calculateScore: function (hits) {
-        if (hits < 0) return 0; // Not played
+    // Get rules active for a specific date (Date object or ISO string)
+    // If no date provided, returns currently active rules (latest)
+    getConfig: function (targetDate) {
+        const history = this.getHistory();
 
-        const rules = this.getConfig();
+        // Sort history descending by date
+        history.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (!targetDate) {
+            return history[0].rules; // Latest
+        }
+
+        const t = new Date(targetDate).getTime();
+
+        // Find the first rule set where activeDate <= targetDate
+        const match = history.find(entry => new Date(entry.date).getTime() <= t);
+
+        return match ? match.rules : history[history.length - 1].rules; // Fallback to oldest if target is very old
+    },
+
+    saveConfig: function (newRules) {
+        const history = this.getHistory();
+        // Add new entry with current timestamp
+        history.push({
+            date: new Date().toISOString(),
+            rules: newRules
+        });
+        localStorage.setItem('maulas_rules_history', JSON.stringify(history));
+    },
+
+    calculateScore: function (hits, targetDate) {
+        if (hits < 0) return 0;
+
+        const rules = this.getConfig(targetDate);
         let bonus = 0;
-
-        if (hits >= 15) bonus = rules.bonus15; // Usually 15 is max hits physically posible?
-        else if (hits === 14) bonus = rules.bonus14; // Actually logic says hits >= 14 is bonus 30? No, standard quiniela 15 matches. 
-        // If you hit 14 matches + Pleno? 
-        // Code: `if (hits >= 14) bonus = 30` -> This merges 14 and 15 into same bonus?
-        // Let's refine based on user likely intent (15 unique, 14 unique).
-        // If code said >=14, maybe they treat 14 and 15 same? 
-        // Let's stick to strict buckets for clarity in Admin.
-
-        // Re-reading code:
-        // if (hits >= 14) bonus = 30;
-        // else if (hits === 13) bonus = 15; ...
-        // So 14 and 15 get 30.
-
-        if (hits >= 14) bonus = parseInt(rules.bonus14); // Use bucket 'bonus14' for >=14 for now, or create bonus15?
-        // Let's create specific buckets in defaults.
-        // My defaults had bonus15=30, bonus14=15.
-        // Code was: hits >= 14 -> 30.
-        // This contradicts '14->15'. 
-        // I will implement granularly.
 
         if (hits >= 15) bonus = parseInt(rules.bonus15);
         else if (hits === 14) bonus = parseInt(rules.bonus14);
@@ -66,15 +82,18 @@ const ScoringSystem = {
     },
 
     // Returns { hits, points, bonus }
-    evaluateForecast: function (forecastSelection, officialResults) {
+    evaluateForecast: function (forecastSelection, officialResults, targetDate) {
         let hits = 0;
         forecastSelection.forEach((sel, idx) => {
             if (sel && sel === officialResults[idx]) hits++;
         });
 
-        const points = this.calculateScore(hits);
+        const points = this.calculateScore(hits, targetDate);
         const bonus = points - hits;
 
         return { hits, points, bonus };
     }
 };
+
+ScoringSystem.init(); // Run migration immediately on load
+

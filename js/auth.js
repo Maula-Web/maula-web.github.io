@@ -107,16 +107,7 @@ const Auth = {
             }
         }
 
-        // Also inject Admin link if not present
-        if (sidebar && !document.getElementById('btn-admin-link')) {
-            const btn = document.createElement('a');
-            btn.href = "admin.html";
-            btn.id = "btn-admin-link";
-            btn.textContent = "ADMINISTRACIÓN";
-            btn.className = "btn-primary";
-            btn.style.backgroundColor = "#455a64";
-            sidebar.insertBefore(btn, sidebar.lastChild); // Before logout
-        }
+
     }
 };
 

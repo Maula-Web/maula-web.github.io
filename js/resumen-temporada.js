@@ -83,6 +83,7 @@ class ResumenManager {
 
         activeJornadas.forEach(j => {
             const officialResults = j.matches.map(m => m.result);
+            const jDate = AppUtils.parseDate(j.date);
 
             this.members.forEach(m => {
                 const p = this.pronosticos.find(pred => (pred.jId === j.id || pred.jornadaId === j.id) && (pred.mId === m.id || pred.memberId === m.id));
@@ -95,9 +96,9 @@ class ResumenManager {
                     const isPardoned = p.pardoned;
 
                     if (isLate && !isPardoned) {
-                        points = 0;
+                        points = ScoringSystem.calculateScore(0, jDate);
                     } else {
-                        const ev = ScoringSystem.evaluateForecast(sel, officialResults);
+                        const ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
                         points = ev.points;
                         hits = ev.hits;
                     }
