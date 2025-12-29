@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PEÑA MAULAS - Jornadas</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -29,6 +30,10 @@
             </div>
 
             <div class="action-buttons">
+                <button id="btn-import-pdf" class="btn-action" style="background: #e65100; color: white;"
+                    onclick="startPDFImport()">
+                    📄 Importar Partidos
+                </button>
                 <button id="btn-import-rss" class="btn-action" style="background: var(--primary-green); color: white;"
                     onclick="startRSSImport()">
                     📥 Importar Resultados RSS
@@ -107,6 +112,7 @@
 
     <script src="js/data_loader.js"></script>
     <script src="js/rss-importer.js"></script>
+    <script src="js/pdf-importer.js"></script>
     <script src="js/jornadas.js"></script>
 
     <script>
