@@ -16,7 +16,9 @@ class ResumenManager {
 
         this.members = await window.DataService.getAll('members');
         this.jornadas = await window.DataService.getAll('jornadas');
+        this.jornadas = await window.DataService.getAll('jornadas');
         this.pronosticos = await window.DataService.getAll('pronosticos');
+        this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
 
         // Ensure we have sorted jornadas
         this.jornadas.sort((a, b) => a.number - b.number);
@@ -133,8 +135,11 @@ class ResumenManager {
             .sort((a, b) => b.points - a.points);
 
         let html = `
-            <div style="text-align:center; padding:0.5rem; color:#666; font-size:0.9rem;">
-                Selecciona hasta 4 socios para comparar en la gráfica.
+            <div style="text-align:center; padding:0.5rem; color:#666; font-size:0.9rem; display:flex; justify-content:space-between; align-items:center;">
+                <span>Selecciona hasta 4 socios para comparar en la gráfica.</span>
+                <button onclick="window.app.renderDoublesList()" style="background:#6a1b9a; color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-weight:bold; font-size:0.8rem;">
+                    🏆 Ver Quinielas de Dobles
+                </button>
             </div>
             <table class="rankings-table" style="width:100%; max-width:700px; margin:0 auto; background:white; border-radius:8px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
                 <thead style="background:var(--primary-purple); color:white;">
@@ -621,6 +626,32 @@ class ResumenManager {
             matchesHtml += '</tbody></table>';
         }
 
+        // Check for Doubles in this Jornada
+        const doublesP = this.pronosticosExtra.find(p =>
+            (p.jId == pointData.jornadaId || p.jornadaId == pointData.jornadaId) &&
+            (p.mId == pointData.memberId || p.memberId == pointData.memberId)
+        );
+
+        if (doublesP && jornada.matches) {
+            const officialResults = jornada.matches.map(m => m.result);
+            const dSel = doublesP.selection || [];
+            let hits = 0;
+            dSel.forEach((sel, idx) => {
+                const res = officialResults[idx];
+                if (res && sel && sel.includes(res)) hits++;
+            });
+
+            matchesHtml += `
+                <div style="margin-top:1rem; background:#f3e5f5; padding:0.5rem; border-radius:6px; border:1px dashed #6a1b9a;">
+                    <strong style="color:#6a1b9a;">🏆 Quiniela de Dobles Jugada:</strong> 
+                    <span style="font-weight:bold; font-size:1.1rem; margin-left:10px;">${hits} Aciertos</span>
+                    <div style="font-size:0.75rem; color:#555; margin-top:4px;">
+                        Pronósticos: ${dSel.slice(0, 14).join(', ') || 'N/A'} (P15: ${dSel[14] || '-'})
+                    </div>
+                </div>
+            `;
+        }
+
         // Prepare data for renderStatsHTML
         const jornadaData = {
             matchesHtml: matchesHtml,
@@ -631,6 +662,85 @@ class ResumenManager {
         };
 
         this.renderStatsHTML(memberName, stats, jornadaData);
+    }
+
+    renderDoublesList() {
+        const modal = document.getElementById('detail-modal');
+        const content = document.getElementById('modal-detail-content');
+        const title = document.getElementById('modal-detail-title');
+
+        if (!modal || !content) return;
+
+        title.textContent = "Histórico de Quinielas de Dobles";
+
+        // Gather all doubles
+        const doublesData = [];
+        this.pronosticosExtra.forEach((p) => {
+            const m = this.members.find(mem => mem.id == (p.mId || p.memberId));
+            const j = this.jornadas.find(jor => jor.id == (p.jId || p.jornadaId));
+
+            if (m && j) {
+                // Evaluate
+                const officialResults = j.matches ? j.matches.map(mat => mat.result) : [];
+                let hits = 0;
+                const sel = p.selection || [];
+                if (officialResults.length > 0) {
+                    sel.forEach((s, idx) => {
+                        const res = officialResults[idx];
+                        if (res && s && s.includes(res)) hits++;
+                    });
+                }
+
+                doublesData.push({
+                    jornadaNum: j.number,
+                    memberName: m.name,
+                    hits: hits,
+                    selection: sel,
+                    date: p.date
+                });
+            }
+        });
+
+        doublesData.sort((a, b) => b.jornadaNum - a.jornadaNum);
+
+        let html = `
+            <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                <thead>
+                    <tr style="background:#6a1b9a; color:white;">
+                        <th style="padding:8px;">Jornada</th>
+                        <th style="padding:8px; text-align:left;">Socio</th>
+                        <th style="padding:8px; text-align:center;">Aciertos</th>
+                        <th style="padding:8px; text-align:left;">Pronóstico</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        if (doublesData.length === 0) {
+            html += `<tr><td colspan="4" style="padding:1rem; text-align:center; color:#777;">Aún no se han jugado quinielas de dobles.</td></tr>`;
+        } else {
+            doublesData.forEach(d => {
+                html += `
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:8px; text-align:center; font-weight:bold;">J${d.jornadaNum}</td>
+                        <td style="padding:8px;">${d.memberName}</td>
+                        <td style="padding:8px; text-align:center;">
+                            <span style="background:${d.hits >= 10 ? '#e8f5e9' : '#f3e5f5'}; color:${d.hits >= 10 ? '#2e7d32' : '#6a1b9a'}; padding:2px 8px; border-radius:12px; font-weight:bold;">
+                                ${d.hits}
+                            </span>
+                        </td>
+                         <td style="padding:8px; font-size:0.75rem; color:#555; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            ${d.selection.join(', ')}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += '</tbody></table>';
+
+        content.innerHTML = html;
+        modal.classList.add('active');
     }
 }
 

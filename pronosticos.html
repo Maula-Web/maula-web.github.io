@@ -64,45 +64,63 @@
                 </select>
             </div>
 
-            <div id="deadline-info"
-                style="align-self: flex-end; padding-bottom: 0.8rem; color: #666; font-size: 0.9rem;">
+            <div id="deadline-info" style="align-self: center; color: #666; font-size: 0.9rem; margin-right: 1rem;">
                 <!-- Filled by JS -->
+            </div>
+
+            <!-- New Location for Doubles Info -->
+            <div id="doubles-info-header" class="hidden"
+                style="background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; padding: 0.3rem 0.6rem; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin-left: auto; position: relative; z-index: 10;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:0.9rem;">🏆</span>
+                    <strong>Dobles</strong>
+                </div>
+                <div style="width: 1px; height: 14px; background: rgba(255,255,255,0.3);"></div>
+                <div>
+                    <span>Max: <strong>7D</strong>/<strong>4T</strong></span>
+                </div>
+                <div id="doubles-counter"
+                    style="font-weight: bold; color: #ffeb3b; background: rgba(0,0,0,0.2); padding: 1px 5px; border-radius: 4px;">
+                    0D, 0T
+                </div>
             </div>
         </div>
 
         <!-- Notification Area -->
         <div id="status-message" style="margin-bottom: 1rem; text-align: center; font-weight: 500;"></div>
 
-        <!-- Forecast Grid (Hidden until selection) -->
-        <div id="forecast-container" class="quiniela-grid hidden">
-            <!-- 15 Rows Populated by JS -->
-        </div>
+        <!-- Cost Info (Penalty for '1's) -->
+        <div id="cost-info" style="margin-bottom: 1rem; text-align: center; font-size: 0.9rem;"></div>
 
-        <!-- Doubles Container (Extra) -->
-        <div id="doubles-section" class="hidden"
-            style="margin-top: 2rem; border-top: 2px dashed #ddd; padding-top: 1rem;">
-            <div
-                style="background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <div>
-                    <h2 style="margin:0; font-size: 1.2rem; display:flex; align-items:center; gap:10px;">🏆 Quiniela
-                        Múltiple (Dobles)</h2>
-                    <p style="margin:5px 0 0 0; font-size: 0.9rem; opacity: 0.9;">¡Enhorabuena! Tienes derecho a
-                        rellenar esta quiniela extra.</p>
-                </div>
-                <div
-                    style="text-align: right; font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 4px;">
-                    <div>Límite: <strong>7 Dobles</strong> O <strong>4 Triples</strong></div>
-                    <div id="doubles-counter" style="font-weight: bold; margin-top: 5px; color: #ffeb3b;">Usado: 0
-                        Dobles, 0 Triples</div>
-                </div>
+        <div id="main-pronosticos-wrapper" style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
+
+            <!-- LEFT: Forecast Grid (Normal) -->
+            <div id="forecast-container" class="quiniela-grid hidden" style="flex: 2; min-width: 500px;">
+                <!-- 15 Rows Populated by JS -->
             </div>
 
-            <div id="doubles-container" class="quiniela-grid">
-                <!-- Matches populated by JS -->
+            <!-- RIGHT: Doubles Container (Extra) - Hidden by default -->
+            <div id="doubles-section" class="hidden"
+                style="flex: 1; min-width: 320px; background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                <!-- Header moved to bottom for alignment -->
+
+                <button id="btn-copy-forecast" class="btn-action"
+                    style="width:100%; margin-bottom: 0.5rem; background: #e0e0e0; color: #333; font-size: 0.85rem; justify-content: center; border: 1px solid #ccc;">
+                    📋 Copiar Quiniela Base
+                </button>
+
+                <div id="doubles-container" class="quiniela-grid" style="gap: 5px;">
+                    <!-- Matches populated by JS -->
+                </div>
+                <button id="btn-save-doubles" class="btn-primary"
+                    style="width:100%; margin-top:1rem; background-color: #6a1b9a; padding: 0.8rem; font-size: 0.9rem;">💾
+                    Guardar Dobles</button>
+                <div id="doubles-status"
+                    style="text-align:center; margin-top:0.5rem; font-weight:bold; font-size: 0.8rem;"></div>
+
+                <!-- Info moved to header -->
             </div>
-            <button id="btn-save-doubles" class="btn-primary"
-                style="width:100%; margin-top:1rem; background-color: #6a1b9a;">💾 Guardar Quiniela de Dobles</button>
-            <div id="doubles-status" style="text-align:center; margin-top:0.5rem; font-weight:bold;"></div>
+
         </div>
 
         <!-- Summary Table Section -->

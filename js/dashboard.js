@@ -11,7 +11,9 @@ class DashboardManager {
 
         this.members = await window.DataService.getAll('members');
         this.jornadas = await window.DataService.getAll('jornadas');
+        this.jornadas = await window.DataService.getAll('jornadas');
         this.pronosticos = await window.DataService.getAll('pronosticos');
+        this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
 
         // Ensure Rules are loaded
         if (window.ScoringSystem && window.ScoringSystem.getConfig) {
@@ -44,6 +46,7 @@ class DashboardManager {
 
         // 4. Calculate Scores & Find Leader
         const memberStats = {};
+        const history = {}; // Track history for tie-breaks
         this.members.forEach(m => {
             memberStats[m.id] = {
                 id: m.id,
@@ -51,6 +54,7 @@ class DashboardManager {
                 totalPoints: 0,
                 totalHits: 0
             };
+            history[m.id] = [];
         });
 
         let lastJornadaInfo = null;
@@ -67,14 +71,31 @@ class DashboardManager {
                 let points = 0;
                 let bonus = 0;
                 let isLate = false;
+                let isPardoned = false;
                 let hasPronostico = false;
+                let isPig15 = false;
+                let pigHit = false;
 
                 if (p) {
                     hasPronostico = true;
                     isLate = p.late || false;
-                    const isPardoned = p.pardoned || false;
+                    isPardoned = p.pardoned || false;
                     const sel = p.selection || p.forecasts || [];
                     const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
+
+                    // Check for PIG (Pleno al 15 is index 14)
+                    const pigTeams = ['Real Madrid', 'At. Madrid', 'Barcelona', 'FC Barcelona', 'Atlético de Madrid'];
+                    const match15 = jornada.matches && jornada.matches[14];
+
+                    if (match15) {
+                        const home = match15.home || '';
+                        const away = match15.away || '';
+                        const isHomePig = pigTeams.some(t => home.includes(t));
+                        const isAwayPig = pigTeams.some(t => away.includes(t));
+                        if (isHomePig && isAwayPig) {
+                            isPig15 = true;
+                        }
+                    }
 
                     let ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
 
@@ -86,6 +107,19 @@ class DashboardManager {
                         hits = ev.hits;
                         points = ev.points;
                         bonus = ev.bonus;
+
+                        // Exclude PIG from classification if it's Pleno al 15
+                        if (isPig15) {
+                            // Check if user hit the PIG (Match 15)
+                            // sel[14] is the forecast, officialResults[14] is the result
+                            if (sel[14] && sel[14] === officialResults[14]) {
+                                pigHit = true;
+                                // Remove this hit from classification stats
+                                hits = Math.max(0, hits - 1);
+                                // Recalculate points without this hit
+                                points = ScoringSystem.calculateScore(hits, jDate);
+                            }
+                        }
                     }
                 } else {
                     hits = -1;
@@ -94,12 +128,19 @@ class DashboardManager {
 
                 jornadaResults.push({
                     memberId: member.id,
+                    name: member.name + (member.surname ? ' ' + member.surname : ''),
                     hits: hits,
                     points: points,
                     isLate: isLate,
+                    isPardoned: isPardoned,
                     hasPronostico: hasPronostico,
+                    pigHit: pigHit, // Store pig status
+                    isPig15: isPig15, // Store if this row belongs to a PIG jornada
                     runningTotal: 0
                 });
+
+                // Add to history
+                history[member.id].push({ hits: hits, points: points });
             });
 
             // Update Totals
@@ -113,7 +154,7 @@ class DashboardManager {
 
             // Check if this is the last played jornada to determine Winner/User
             if (index === playedJornadas.length - 1) {
-                lastJornadaInfo = this.calculateJornadaOutcome(jornada, jornadaResults, memberStats);
+                lastJornadaInfo = this.calculateJornadaOutcome(jornada, jornadaResults, memberStats, history);
             }
         });
 
@@ -137,6 +178,20 @@ class DashboardManager {
             winnerText = lastJornadaInfo.winnerName;
             loserText = lastJornadaInfo.loserName;
 
+            let pigHtml = "";
+            if (lastJornadaInfo.isPig) {
+                const acertantes = lastJornadaInfo.pigAcertantes.join(", ");
+                const fallantes = lastJornadaInfo.pigFallantes.join(", ");
+
+                pigHtml = `
+                    <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
+                        <div style="font-size:0.9rem; margin-bottom:0.3rem;"><strong>🐽 PIG (Pleno al 15)</strong></div>
+                        <div style="font-size:0.85rem; color:#2e7d32;">✅ ${acertantes || 'Ninguno'}</div>
+                        <div style="font-size:0.85rem; color:#c62828;">❌ ${fallantes || 'Ninguno'}</div>
+                    </div>
+                `;
+            }
+
             nextRolesHtml = `
                 <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
                     <div style="margin-bottom:0.5rem;">
@@ -147,6 +202,8 @@ class DashboardManager {
                         <span style="font-size:1.2rem;">🥛</span> 
                         <strong>Sella la Quiniela por Maula:</strong> <span style="color:var(--danger); font-weight:bold;">${loserText}</span>
                     </div>
+                    ${pigHtml}
+                    ${lastJornadaInfo.doublesHtml || ''}
                 </div>
             `;
         }
@@ -246,42 +303,150 @@ class DashboardManager {
         this.countdownInterval = setInterval(update, 1000);
     }
 
-    calculateJornadaOutcome(jornada, results, memberStats) {
+    calculateJornadaOutcome(jornada, results, memberStats, history) {
         // --- FIND WINNER ---
-        // Criteria: 1. Most Hits. 2. Tie-break: Higher Accumulated Score (runningTotal).
-        let sortedForWinner = [...results].sort((a, b) => {
-            if (b.hits !== a.hits) return b.hits - a.hits; // Max hits first
-            return b.runningTotal - a.runningTotal; // Max total points first
-        });
-        const winner = memberStats[sortedForWinner[0].memberId];
+        // 1. Filter by Max Hits
+        const maxHits = Math.max(...results.map(r => r.hits));
+        let winnerCandidates = results.filter(r => r.hits === maxHits);
+
+        // 2. Tie-break: Recursive History Check (Hits)
+        if (winnerCandidates.length > 1) {
+            winnerCandidates = this.resolveTie(winnerCandidates, history, 'hits', 'max');
+        }
+
+        // 3. Final Fallback (if still tied): Lower Accumulated Score (Underdog)
+        winnerCandidates.sort((a, b) => a.runningTotal - b.runningTotal);
+        const winner = memberStats[winnerCandidates[0].memberId];
+
 
         // --- FIND LOSER (MAULA) ---
         let maulaCandidates = [];
 
-        // Condition A: Missing or Late with no prize
+        // Condition A: Missing or Late (Unpardoned) with no prize
         const prizeThreshold = 10;
         const offenders = results.filter(r =>
-            !r.hasPronostico || (r.isLate && r.hits < prizeThreshold)
+            !r.hasPronostico || (r.isLate && !r.isPardoned && r.hits < prizeThreshold)
         );
 
         if (offenders.length > 0) {
             maulaCandidates = offenders;
         } else {
-            // Condition B: Lowest Score
+            // Condition B: Lowest Score in this Jornada
             const minPoints = Math.min(...results.map(r => r.points));
             maulaCandidates = results.filter(r => r.points === minPoints);
         }
 
-        // Sort candidates by Running Total ASC (Lower total score is 'worse' -> Maula)
+        // Tie-break: Recursive History Check (Points) - User said "same way but looking for lower score"
+        if (maulaCandidates.length > 1) {
+            // For Loser, we look for MIN points in history to break tie?
+            // "El perdedor se calcula de la misma forma pero buscando al socio que haya obtenido una puntuación menor"
+            // This implies filtering for MIN points in previous jornadas.
+            maulaCandidates = this.resolveTie(maulaCandidates, history, 'points', 'min');
+        }
+
+        // Final Fallback: Lower Running Total
         maulaCandidates.sort((a, b) => a.runningTotal - b.runningTotal);
 
         const loserId = maulaCandidates[0].memberId;
         const loser = memberStats[loserId];
 
+        // Pig Stats for this Jornada
+        const isPig = results.some(r => r.isPig15);
+        let pigAcertantes = [];
+        let pigFallantes = [];
+        if (isPig) {
+            pigAcertantes = results.filter(r => r.pigHit).map(r => r.name);
+            pigFallantes = results.filter(r => !r.pigHit && r.hasPronostico).map(r => r.name);
+        }
+
+        // --- DOUBLES EVALUATION ---
+        // Evaluate doubles forecasts for THIS jornada (played by winners of previous)
+        let doublesHtml = '';
+        const doublesResults = [];
+        const doublesForecasts = this.pronosticosExtra.filter(p => p.jId === jornada.id || p.jornadaId === jornada.id);
+
+        if (doublesForecasts.length > 0) {
+            const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
+            const jDate = AppUtils.parseDate(jornada.date);
+
+            doublesForecasts.forEach(df => {
+                const mId = df.mId || df.memberId;
+                const member = memberStats[mId];
+                if (!member) return;
+
+                const selection = df.selection || [];
+                // Evaluate: Hit if result is IN the selection string (e.g. "1X" includes "1")
+                let hits = 0;
+                selection.forEach((sel, idx) => {
+                    const res = officialResults[idx];
+                    if (res && sel && sel.includes(res)) {
+                        hits++;
+                    }
+                });
+
+                doublesResults.push({ name: member.name, hits: hits });
+            });
+        }
+
+        if (doublesResults.length > 0) {
+            const items = doublesResults.map(r => `${r.name}: <strong>${r.hits}</strong>`).join(', ');
+            doublesHtml = `
+                    <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
+                        <div style="font-size:0.9rem; margin-bottom:0.3rem; color: #6a1b9a;"><strong>🏆 Quinielas de Dobles</strong></div>
+                        <div style="font-size:0.85rem; color:#333;">${items}</div>
+                    </div>
+            `;
+        }
+
+
         return {
             winnerName: winner.name,
-            loserName: loser.name
+            loserName: loser.name,
+            isPig: isPig,
+            pigAcertantes: pigAcertantes,
+            pigFallantes: pigFallantes,
+            doublesHtml: doublesHtml
         };
+    }
+
+    resolveTie(candidates, history, metric, goal) {
+        // We start looking back from the entry BEFORE the current one.
+        // Since history is pushed in sync with playedJornadas, the current jornada is at index (length - 1).
+        // So we start at (length - 2).
+
+        // Assume all candidates have same history length.
+        const sampleId = candidates[0].memberId;
+        const historyLen = history[sampleId].length;
+
+        let index = historyLen - 2; // Start from previous jornada
+        let currentCandidates = [...candidates];
+
+        while (currentCandidates.length > 1 && index >= 0) {
+            // Get values for this historical jornada
+            const values = currentCandidates.map(c => {
+                const hist = history[c.memberId][index];
+                return {
+                    id: c.memberId,
+                    val: hist ? (metric === 'hits' ? hist.hits : hist.points) : 0
+                };
+            });
+
+            // Find target value (Max or Min)
+            let target;
+            if (goal === 'max') {
+                target = Math.max(...values.map(v => v.val));
+            } else {
+                target = Math.min(...values.map(v => v.val));
+            }
+
+            // Filter survivors
+            const survivors = values.filter(v => v.val === target).map(v => v.id);
+            currentCandidates = currentCandidates.filter(c => survivors.includes(c.memberId));
+
+            index--;
+        }
+
+        return currentCandidates;
     }
 
     getNextJornadaData() {
