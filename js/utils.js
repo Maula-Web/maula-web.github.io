@@ -129,9 +129,8 @@ const AppUtils = {
      */
     getTeamLogo(teamName) {
         if (!teamName) return '';
-        const t = teamName.toLowerCase().trim(); // Use raw lower for mapping keys to match existing logic
+        const t = teamName.toLowerCase().trim();
 
-        // Map copied and optimized from jornadas.js
         const map = {
             'alavés': 'escudos/primera/Escudo-Deportivo-Alavés-S.A.D..jpg',
             'alaves': 'escudos/primera/Escudo-Deportivo-Alavés-S.A.D..jpg',
@@ -139,19 +138,20 @@ const AppUtils = {
             'almería': 'escudos/segunda/ALMERIA.jpg',
             'athletic club': 'escudos/primera/ATHLETIC_BILBAO-150x150.jpg',
             'athletic': 'escudos/primera/ATHLETIC_BILBAO-150x150.jpg',
-            'at. madrid': 'escudos/primera/ATLÉTICO_MADRID-150x150.jpg',
             'atlético de madrid': 'escudos/primera/ATLÉTICO_MADRID-150x150.jpg',
+            'at. madrid': 'escudos/primera/ATLÉTICO_MADRID-150x150.jpg',
             'atlético': 'escudos/primera/ATLÉTICO_MADRID-150x150.jpg',
             'barcelona': 'escudos/primera/BARCELONA-150x150.jpg',
-            'betis': 'escudos/primera/REAL-BETIS-150x150.jpg',
             'real betis': 'escudos/primera/REAL-BETIS-150x150.jpg',
-            'celta': 'escudos/primera/CELTA-150x150.jpg',
+            'betis': 'escudos/primera/REAL-BETIS-150x150.jpg',
             'celta de vigo': 'escudos/primera/CELTA-150x150.jpg',
+            'celta': 'escudos/primera/CELTA-150x150.jpg',
             'elche': 'escudos/primera/ELCHE-150x150.jpg',
             'espanyol': 'escudos/primera/ESPANYOL-150x150.jpg',
             'getafe': 'escudos/primera/GETAFE-150x150.jpg',
             'girona': 'escudos/primera/Escudo-Girona-FC-2022.jpg',
             'las palmas': 'escudos/segunda/LAS-PALMAS-150x150.jpg',
+            'ud las palmas': 'escudos/segunda/LAS-PALMAS-150x150.jpg',
             'levante': 'escudos/primera/LEVANTE-150x150.jpg',
             'mallorca': 'escudos/primera/MALLORCA-150x150.jpg',
             'osasuna': 'escudos/primera/OSASUNA-150x150.jpg',
@@ -161,25 +161,20 @@ const AppUtils = {
             'real sociedad': 'escudos/primera/REAL-SOCIEDAD-150x150.jpg',
             'sevilla': 'escudos/primera/SEVILLA-150x150.jpg',
             'valencia': 'escudos/primera/VALENCIA-150x150.jpg',
-            'valladolid': 'escudos/segunda/Escudo-Real-Valladolid-CF.jpg',
             'real valladolid': 'escudos/segunda/Escudo-Real-Valladolid-CF.jpg',
+            'valladolid': 'escudos/segunda/Escudo-Real-Valladolid-CF.jpg',
             'villarreal': 'escudos/primera/VILLARREAL-150x150.jpg',
-
-            // Segunda A / B etc ...
             'albacete': 'escudos/segunda/ALBACETE-150x150.jpg',
             'andorra': 'escudos/segunda/ANDORRA-150x150.jpg',
             'burgos': 'escudos/segunda/BURGOS-150x150.jpg',
             'cádiz': 'escudos/segunda/CADIZ-150x150.jpg',
             'cadiz': 'escudos/segunda/CADIZ-150x150.jpg',
             'castellón': 'escudos/segunda/CASTELLON-150x150.jpg',
-            'castellon': 'escudos/segunda/CASTELLON-150x150.jpg',
             'ceuta': 'escudos/segunda/Escudo-AgD-Ceuta-FC-150x150.jpg',
             'córdoba': 'escudos/segunda/CORDOBA-150x150.jpg',
             'cordoba': 'escudos/segunda/CORDOBA-150x150.jpg',
             'cultural leonesa': 'escudos/segunda/CULTURAL-150x150.jpg',
-            'cultural': 'escudos/segunda/CULTURAL-150x150.jpg',
             'deportivo': 'escudos/segunda/DEPORTIVO-150x150.jpg',
-            'depor': 'escudos/segunda/DEPORTIVO-150x150.jpg',
             'eibar': 'escudos/segunda/EIBAR-150x150.jpg',
             'granada': 'escudos/segunda/GRANADA-150x150.jpg',
             'huesca': 'escudos/segunda/HUESCA-150x150.jpg',
@@ -190,19 +185,21 @@ const AppUtils = {
             'mirandés': 'escudos/segunda/MIRANDES-150x150.jpg',
             'mirandes': 'escudos/segunda/MIRANDES-150x150.jpg',
             'racing santander': 'escudos/segunda/REAL-RACING-150x150.jpg',
-            'racing de santander': 'escudos/segunda/REAL-RACING-150x150.jpg',
-            'racing': 'escudos/segunda/REAL-RACING-150x150.jpg',
-            'r. oviedo': 'escudos/primera/REAL-OVIEDO-150x150.jpg',
             'real oviedo': 'escudos/primera/REAL-OVIEDO-150x150.jpg',
             'oviedo': 'escudos/primera/REAL-OVIEDO-150x150.jpg',
-            'sporting': 'escudos/segunda/REAL-SPORTING-150x150.jpg',
             'real sporting': 'escudos/segunda/REAL-SPORTING-150x150.jpg',
-            'r. zaragoza': 'escudos/segunda/REAL-ZARAGOZA-150x150.jpg',
+            'sporting': 'escudos/segunda/REAL-SPORTING-150x150.jpg',
             'real zaragoza': 'escudos/segunda/REAL-ZARAGOZA-150x150.jpg',
             'zaragoza': 'escudos/segunda/REAL-ZARAGOZA-150x150.jpg'
         };
 
-        return map[t] || '';
+        // 1. Direct match
+        if (map[t]) return map[t];
+
+        // 2. Fuzzy match (contains unique keyword)
+        const entries = Object.entries(map);
+        const fuzzyMatch = entries.find(([key]) => t.includes(key) || key.includes(t));
+        return fuzzyMatch ? fuzzyMatch[1] : '';
     }
 };
 

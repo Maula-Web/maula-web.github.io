@@ -15,18 +15,7 @@ class PronosticoManager {
         this.init();
     }
 
-    async init() {
-        if (window.DataService) await window.DataService.init();
 
-        this.members = await window.DataService.getAll('members');
-        this.jornadas = await window.DataService.getAll('jornadas');
-        this.pronosticos = await window.DataService.getAll('pronosticos');
-
-        this.cacheDOM();
-        this.populateDropdowns();
-        this.renderSummaryTable(); // Initial render
-        this.bindEvents();
-    }
 
 
     cacheDOM() {
@@ -45,7 +34,7 @@ class PronosticoManager {
         this.btnSaveDoubles = document.getElementById('btn-save-doubles');
         this.btnCopyForecast = document.getElementById('btn-copy-forecast');
         this.doublesStatus = document.getElementById('doubles-status');
-        this.doublesInfoHeader = document.getElementById('doubles-info-header');
+        this.doublesInfoHeader = document.getElementById('doubles-status-card');
 
         // Summary Table Elements
         this.summaryTable = document.getElementById('forecast-summary-table');
@@ -152,7 +141,6 @@ class PronosticoManager {
         this.container.classList.add('hidden');
         this.container.classList.add('hidden');
         if (this.doublesSection) this.doublesSection.classList.add('hidden'); // Hide doubles by default
-        if (this.doublesInfoHeader) this.doublesInfoHeader.classList.add('hidden'); // Hide info header default
         this.btnSave.style.display = 'none';
         this.statusMsg.textContent = '';
         this.deadlineInfo.textContent = '';
@@ -241,15 +229,14 @@ class PronosticoManager {
             if (eligibility.eligible) {
                 this.renderDoublesForm(jornada, isLocked);
 
-                // If Doubles Section Exists, show it
                 if (this.doublesSection) {
                     this.doublesSection.classList.remove('hidden');
-                    // Update Title or Description if needed based on reason (Winner vs Prize)
-                    // e.g. "Ganador Jornada Anterior" vs "Premiado Jornada Anterior"
                 }
                 if (this.doublesInfoHeader) {
-                    this.doublesInfoHeader.classList.remove('hidden');
+                    this.doublesInfoHeader.style.display = 'flex';
                 }
+                // Initial update of counters in case of saved data
+                this.updateDoublesCounters();
             }
         }
     }
@@ -412,14 +399,12 @@ class PronosticoManager {
         this.doublesCounter.textContent = `Usado: ${doubles} Dobles, ${triples} Triples`;
 
         // Visual Warning
-        const isValid = (doubles <= 7 && triples === 0) || (doubles === 0 && triples <= 4);
-        // Is mixed allowed? "7D o 4T". Usually implies distinct reduction types.
-        // If they mix, it's not a standard reduction usually supported by this simple rule.
-        // I'll stick to strict XOR for now.
+        // Strict Rules: Exactly 7 Doubles OR Exactly 4 Triples
+        const isValid = (doubles === 7 && triples === 0) || (doubles === 0 && triples === 4);
 
         if (!isValid) {
             this.doublesCounter.style.color = '#ff5252'; // Red
-            this.doublesCounter.innerHTML += ' (Inválido: Elige solo Dobles (max 7) o solo Triples (max 4))';
+            this.doublesCounter.innerHTML += '<br><span style="font-size:0.7rem;">(Error: Deben ser EXACTAMENTE 7 Dobles o 4 Triples)</span>';
         } else {
             this.doublesCounter.style.color = '#ffeb3b'; // Yellow
         }
@@ -428,7 +413,7 @@ class PronosticoManager {
 
     async saveDoubles() {
         if (!this.updateDoublesCounters()) {
-            alert('La combinación no es válida. \nReglas: Máximo 7 Dobles (sin triples) O Máximo 4 Triples (sin dobles).');
+            alert('La combinación no es válida. \n\nPara poder guardar, debes seleccionar EXACTAMENTE:\n- 7 Dobles (y 0 Triples)\nO bien\n- 4 Triples (y 0 Dobles)');
             return;
         }
 
@@ -568,26 +553,16 @@ class PronosticoManager {
             this.selMember.appendChild(opt);
         });
 
-        const sortedJornadas = [...this.jornadas].sort((a, b) => a.number - b.number);
-        const now = new Date();
+        // Filter journeys that have matches informed (at least one team name set)
+        const informedJornadas = this.jornadas.filter(j => {
+            if (!j.active || !j.matches) return false;
+            return j.matches.some(m => m.home && m.home.trim() !== '');
+        });
+
+        // Sort by number descending (most recent first)
+        const sortedJornadas = informedJornadas.sort((a, b) => b.number - a.number);
 
         sortedJornadas.forEach(j => {
-            if (!j.active) return;
-
-            // Filter: Only show jornadas on Sunday
-            const dateObj = AppUtils.parseDate(j.date);
-            if (!dateObj) return;
-            if (!AppUtils.isSunday(dateObj)) return; // 0 = Sunday
-
-            // Locked check
-
-            const closeDate = new Date(dateObj.getTime());
-            closeDate.setDate(closeDate.getDate() + 2);
-            closeDate.setHours(23, 59, 59);
-
-            // Removed closeDate check to allow viewing past forecasts
-            /* if (now > closeDate) return; */
-
             const opt = document.createElement('option');
             opt.value = j.id;
             opt.textContent = `Jornada ${j.number} - ${j.date}`;
@@ -1403,18 +1378,16 @@ class PronosticoManager {
             if (active === 3) triples++;
         });
 
-        // Rules: 7 Doubles O 4 Triples (Exclusive?) 
-        // Logic says: (doubles <= 7 && triples === 0) || (doubles === 0 && triples <= 4)
-        // If mixed is allowed (e.g. 1 Tripple AND 2 Doubles), constraints are usually complex.
-        // Assuming strict "OR":
-        const isValid = (doubles <= 7 && triples === 0) || (doubles === 0 && triples <= 4);
+        // Rules: Exactly 7 Doubles OR Exactly 4 Triples
+        const isValid = (doubles === 7 && triples === 0) || (doubles === 0 && triples === 4);
 
-        this.doublesCounter.textContent = `${doubles}D, ${triples}T`;
+        this.doublesCounter.textContent = `${doubles} Dobles, ${triples} Triples`;
 
         if (!isValid) {
             this.doublesCounter.style.color = '#ff5252'; // Red
             this.doublesCounter.style.backgroundColor = '#ffebee';
             this.doublesCounter.style.border = "1px solid red";
+            this.doublesCounter.innerHTML += '<br><span style="font-size:0.7rem;">(Error: Deben ser EXACTAMENTE 7 Dobles o 4 Triples)</span>';
         } else {
             this.doublesCounter.style.color = '#ffeb3b'; // Yellow
             this.doublesCounter.style.backgroundColor = 'rgba(0,0,0,0.2)';
@@ -1425,7 +1398,7 @@ class PronosticoManager {
 
     async saveDoubles() {
         if (!this.updateDoublesCounters()) {
-            alert('La combinación no es válida. \nReglas: Máximo 7 Dobles (sin triples) O Máximo 4 Triples (sin dobles).');
+            alert('La combinación no es válida. \n\nPara poder guardar, debes seleccionar EXACTAMENTE:\n- 7 Dobles (y 0 Triples)\nO bien\n- 4 Triples (y 0 Dobles)');
             return;
         }
 

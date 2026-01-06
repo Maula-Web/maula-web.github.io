@@ -16,6 +16,7 @@ class JornadaManager {
 
         this.renderGrid();
         this.checkForUpdates();
+        this.populateTeamsCache();
     }
 
     async loadData() {
@@ -58,6 +59,7 @@ class JornadaManager {
         this.modalTitleNum = document.getElementById('modal-jornada-num');
         this.inpId = document.getElementById('inp-jornada-id');
         this.inpDate = document.getElementById('inp-date');
+        this.teamsCache = [];
     }
 
     bindEvents() {
@@ -122,6 +124,48 @@ class JornadaManager {
             `;
             this.grid.appendChild(card);
         });
+    }
+
+    populateTeamsCache() {
+        const teams = new Set();
+        const commonTeams = [
+            'Real Madrid', 'Barcelona', 'Atlético de Madrid', 'Sevilla', 'Real Betis',
+            'Real Sociedad', 'Athletic Club', 'Valencia', 'Villarreal', 'Girona', 'Osasuna',
+            'Celta de Vigo', 'Mallorca', 'Rayo Vallecano', 'Getafe', 'Alavés', 'UD Las Palmas', 'Leganés',
+            'Espanyol', 'Real Valladolid', 'Racing Santander', 'Eibar', 'Real Oviedo', 'Real Sporting',
+            'Real Zaragoza', 'Burgos', 'Mirandés', 'Levante', 'Tenerife', 'Huesca', 'Albacete',
+            'Cartagena', 'Ferrol', 'Castellón', 'Córdoba', 'Málaga'
+        ];
+
+        commonTeams.forEach(t => teams.add(AppUtils.formatTeamName(t)));
+        this.jornadas.forEach(j => {
+            if (j.matches) {
+                j.matches.forEach(m => {
+                    if (m.home) teams.add(AppUtils.formatTeamName(m.home));
+                    if (m.away) teams.add(AppUtils.formatTeamName(m.away));
+                });
+            }
+        });
+        this.teamsCache = Array.from(teams).sort();
+    }
+
+    handleAutoFill(input, event) {
+        // Skip if deleting or value is empty
+        if (event.inputType === 'deleteContentBackward' || !input.value) return;
+
+        const val = input.value.toLowerCase();
+        // User says: "when it's resolved and no more possibilities"
+        // We look for teams starting with current text
+        const matches = this.teamsCache.filter(t => t.toLowerCase().startsWith(val));
+
+        if (matches.length === 1) {
+            const suggestion = matches[0];
+            const originalLength = input.value.length;
+            input.value = suggestion;
+
+            // Select the added part so user can keep typing if they want
+            input.setSelectionRange(originalLength, suggestion.length);
+        }
     }
 
     // ... (openModalView, openModalNew, fillModalData remain same)
@@ -210,10 +254,10 @@ class JornadaManager {
                 <input type="text" placeholder="Res" class="inp-res" value="${m.result || ''}" style="flex:0.5; text-align:center; font-weight:bold; color:var(--primary-green); min-width:40px;" maxlength="3">
             `;
 
-            // Add listeners for dynamic logo updates
             const inpHome = row.querySelector('.inp-home');
             const imgHome = row.querySelector('.home-logo-img');
             inpHome.addEventListener('input', (e) => {
+                this.handleAutoFill(inpHome, e); // Suggest and fill
                 if (utilsAvailable) {
                     const src = AppUtils.getTeamLogo(e.target.value);
                     imgHome.src = src;
@@ -224,6 +268,7 @@ class JornadaManager {
             const inpAway = row.querySelector('.inp-away');
             const imgAway = row.querySelector('.away-logo-img');
             inpAway.addEventListener('input', (e) => {
+                this.handleAutoFill(inpAway, e); // Suggest and fill
                 if (utilsAvailable) {
                     const src = AppUtils.getTeamLogo(e.target.value);
                     imgAway.src = src;
