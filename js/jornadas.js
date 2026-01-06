@@ -59,6 +59,7 @@ class JornadaManager {
         this.modalTitleNum = document.getElementById('modal-jornada-num');
         this.inpId = document.getElementById('inp-jornada-id');
         this.inpDate = document.getElementById('inp-date');
+        this.inpMinHits = document.getElementById('inp-min-hits');
         this.teamsCache = [];
     }
 
@@ -201,6 +202,7 @@ class JornadaManager {
         this.modalTitleNum.textContent = jornada.number;
         this.inpId.value = jornada.id || '';
         this.inpDate.value = jornada.date;
+        if (this.inpMinHits) this.inpMinHits.value = jornada.minHitsToWin || 10;
         this.renderMatches(jornada.matches);
     }
 
@@ -336,6 +338,7 @@ class JornadaManager {
             number: parseInt(this.modalTitleNum.textContent) || (this.jornadas.length + 1),
             season: '2025-2026',
             date: dateStr,
+            minHitsToWin: parseInt(this.inpMinHits.value) || 10,
             matches: matches,
             active: true
         };

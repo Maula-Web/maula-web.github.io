@@ -58,6 +58,8 @@ class DashboardManager {
         });
 
         let lastJornadaInfo = null;
+        let totalSeasonPrizes = 0;
+        let totalSeasonMoney = 0;
 
         // Process all played jornadas
         playedJornadas.forEach((jornada, index) => {
@@ -141,6 +143,16 @@ class DashboardManager {
 
                 // Add to history
                 history[member.id].push({ hits: hits, points: points });
+
+                // Accumulate season prizes
+                const jMinHits = jornada.minHitsToWin || 10;
+                if (hits >= jMinHits && hasPronostico) {
+                    totalSeasonPrizes++;
+                    // Calculate money if rates exist
+                    if (jornada.prizeRates && jornada.prizeRates[hits]) {
+                        totalSeasonMoney += jornada.prizeRates[hits];
+                    }
+                }
             });
 
             // Update Totals
@@ -173,6 +185,7 @@ class DashboardManager {
         let winnerText = "-";
         let loserText = "-";
         let nextRolesHtml = "";
+        let lastJornadaPrizesHtml = "";
 
         if (lastJornadaInfo) {
             winnerText = lastJornadaInfo.winnerName;
@@ -204,6 +217,53 @@ class DashboardManager {
                     </div>
                     ${pigHtml}
                     ${lastJornadaInfo.doublesHtml || ''}
+                </div>
+            `;
+
+            // Last Jornada Prizes
+            const lastJNum = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : 0;
+            const lastJDate = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].date : '';
+
+            let prizesList = "";
+            if (lastJornadaInfo.prizeWinners && lastJornadaInfo.prizeWinners.length > 0) {
+                prizesList = lastJornadaInfo.prizeWinners.map(pw => `
+                    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f5f5f5;">
+                        <span style="font-weight:500;">${pw.name}</span>
+                        <span style="background:var(--primary-green); color:white; padding:0 8px; border-radius:10px; font-weight:bold; font-size:0.85rem;">${pw.hits} aciertos</span>
+                    </div>
+                `).join('');
+            } else {
+                prizesList = `<div style="color:#888; font-style:italic;">No hubo socios con premio (${lastJornadaInfo.minHitsToWin} aciertos)</div>`;
+            }
+
+            lastJornadaPrizesHtml = `
+                <div class="stat-wide-card" style="border-left: 4px solid var(--primary-green); padding: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <!-- Column 1: Weekly -->
+                        <div style="text-align: left; border-right: 1px solid #eee; padding-right: 1.5rem;">
+                            <h3 style="color:var(--primary-green); font-weight:bold; font-size:1rem; margin-bottom:0.8rem; margin-top:0;">🏆 PREMIOS SEMANALES (J. ${lastJNum})</h3>
+                            <div style="font-size:0.85rem; color:#666; margin-bottom:0.8rem;">Socios con ${lastJornadaInfo.minHitsToWin}+ aciertos:</div>
+                            ${prizesList}
+                            <div style="margin-top: 1rem; font-weight: bold; color: var(--primary-green); font-size: 1.1rem;">
+                                Total Semana: ${lastJornadaInfo.totalMoney.toFixed(2)}€
+                            </div>
+                        </div>
+                        
+                        <!-- Column 2: Seasonal -->
+                        <div style="text-align: left;">
+                            <h3 style="color:var(--primary-blue); font-weight:bold; font-size:1rem; margin-bottom:0.8rem; margin-top:0;">📊 RESUMEN TEMPORADA</h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                                <div>
+                                    <div style="font-size: 0.85rem; color: #666;">Total Pronósticos con Premio:</div>
+                                    <div style="font-size: 1.4rem; font-weight: bold; color: var(--primary-green);">${totalSeasonPrizes}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.85rem; color: #666;">Total Recaudado en Premios:</div>
+                                    <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-blue);">${totalSeasonMoney.toFixed(2)}€</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -259,6 +319,9 @@ class DashboardManager {
                 <div class="stat-value" style="color:var(--primary-gold); font-size:1.4rem;">${leaderName}</div>
                 <div style="font-size:1.1rem; color:#555; font-weight:bold; margin-top:0.2rem;">${leaderPoints} pts</div>
             </div>
+            
+            ${lastJornadaPrizesHtml}
+
             <div class="stat-wide-card">
                 <h3 style="color:var(--dark-purple); font-weight:bold; font-size:1.1rem; margin-bottom:0.5rem;">PRÓXIMA JORNADA</h3>
                 <div style="font-size:1.2rem; margin-bottom:1rem;">${nextJornadaLabel}</div>
@@ -399,13 +462,26 @@ class DashboardManager {
         }
 
 
+        // --- PRIZE WINNERS ---
+        const minHitsToWin = jornada.minHitsToWin || 10;
+        const prizeWinners = results
+            .filter(r => r.hits >= minHitsToWin && r.hasPronostico)
+            .sort((a, b) => b.hits - a.hits)
+            .map(r => ({ name: r.name, hits: r.hits }));
+
         return {
             winnerName: winner.name,
             loserName: loser.name,
             isPig: isPig,
             pigAcertantes: pigAcertantes,
             pigFallantes: pigFallantes,
-            doublesHtml: doublesHtml
+            doublesHtml: doublesHtml,
+            prizeWinners: prizeWinners,
+            minHitsToWin: minHitsToWin,
+            totalMoney: prizeWinners.reduce((sum, pw) => {
+                const rate = (jornada.prizeRates && jornada.prizeRates[pw.hits]) || 0;
+                return sum + rate;
+            }, 0)
         };
     }
 

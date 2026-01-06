@@ -218,13 +218,13 @@ class RSSImporter {
             }
 
             // Parse Prize Info
-            const minHitsToWin = this.parseMinPrize(description);
-            console.log(`DEBUG: Item ${index + 1}: Min Hits to Win = ${minHitsToWin}`);
+            const prizeInfo = this.parsePrizeRates(description);
 
             results.push({
                 date: `${day} ${monthName} ${year}`,
                 matches: matches,
-                minHitsToWin: minHitsToWin,
+                minHitsToWin: prizeInfo.minHits,
+                prizeRates: prizeInfo.rates,
                 rawDescription: description
             });
         });
@@ -235,49 +235,42 @@ class RSSImporter {
     }
 
     /**
-     * Parse description to find minimum hits category with Prize > 0
-     * Examples lines: "5ª (10 Aciertos) : 12.000 Apuestas : 1,50 Euros"
+     * Parse description to extract prize amounts for each category
+     * Returns { minHits, rates: { "10": 1.5, "11": 5.2, ... } }
      */
-    parseMinPrize(description) {
-        // Default to a high number (safe fallback)
+    parsePrizeRates(description) {
         let minHits = 15;
+        const rates = {};
 
         // Normalize
         const text = description.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
 
-        // Regex to find: (XX Aciertos) ... : (X.XXX,XX) Euros
-        // Be flexible with spacing and colons
-        // Looking for patterns like: "10 Aciertos" followed eventually by "Euros"
-        // Let's split by delimiter showing categories usually separated by <br> or similar in HTML, 
-        // but here we have raw text potentially. The generic splitter is usually "Categoría" or just look for all matches.
-
-        const regex = /(\d{1,2})\s*Aciertos.*?:.*?([\d\.,]+)\s*Euros/gi;
+        // 1. Standard categories (10 to 14 hits)
+        // Format: "1ª (14 Aciertos) 1 793.436,76 €"
+        // We match "XX Aciertos", then anything that isn't a Euro symbol, 
+        // and capture the last numeric-looking group before the currency.
+        const regexHits = /(\d{1,2})\s*Aciertos\)[^€E]*?\s+([\d\.,]+)\s*(?:Euros|€)/gi;
         let match;
-
-        while ((match = regex.exec(text)) !== null) {
+        while ((match = regexHits.exec(text)) !== null) {
             const hits = parseInt(match[1]);
-            const prizeStr = match[2]; // "1.234,50" or "0,00"
-
-            // Clean prize string to number
-            const prizeVal = parseFloat(prizeStr.replace(/\./g, '').replace(',', '.'));
-
+            const prizeVal = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
             if (prizeVal > 0) {
+                rates[hits] = prizeVal;
                 if (hits < minHits) minHits = hits;
             }
         }
 
-        // If we found nothing standard, assume standard 10 hits if not explicit 0 found? 
-        // No, safer to default to 15 (winner only) if we can't confirm money.
-        // But user said: "A veces los acertantes de 10 no tienen premio".
-        // This implies usually they DO. 
-        // If parsing fails completely, maybe default to 10? 
-        // Let's default to standard logic: 
-        // If no parsing success -> Default to 10 (optimistic) or 15 (safe)? 
-        // Given user wants rights to depend on this, "Default 10" is better UX, but "Default 15" prevents errors.
-        // Let's stick to 15 as initial value, but if loop runs and finds winners for 14, 13... it updates.
-        // If it doesn't find information about 10, it stays at lowest found (e.g. 11).
+        // 2. Pleno al 15
+        // Format: "Pleno al 15 0 0,00 €"
+        const regexP15 = /Pleno\s+al\s+15[^€E]*?\s+([\d\.,]+)\s*(?:Euros|€)/gi;
+        const matchP15 = regexP15.exec(text);
+        if (matchP15) {
+            const prizeVal = parseFloat(matchP15[1].replace(/\./g, '').replace(',', '.'));
+            if (prizeVal > 0) rates[15] = prizeVal;
+        }
 
-        return minHits;
+        console.log(`DEBUG: Parsed prize rates:`, rates);
+        return { minHits, rates };
     }
 
     /**
@@ -335,12 +328,12 @@ class RSSImporter {
             console.log(`DEBUG: RSS date "${rssJornada.date}" -> DB match:`, dbJornada ? `Jornada ${dbJornada.number}` : 'NO MATCH');
 
             if (dbJornada) {
-                // Check if results are already filled
+                // Check if results or prize info are already filled
                 const hasResults = dbJornada.matches && dbJornada.matches.some(m => m.result && m.result !== '');
+                const hasPrizeInfo = dbJornada.prizeRates && Object.keys(dbJornada.prizeRates).length > 0;
 
-                console.log(`DEBUG: Jornada ${dbJornada.number} hasResults:`, hasResults);
-
-                if (!hasResults) {
+                // We import if it doesn't have results OR if it doesn't have complete prize info yet
+                if (!hasResults || !hasPrizeInfo) {
                     // Check if teams match (at least some of them)
                     const teamsMatch = this.checkTeamsMatch(dbJornada, rssJornada);
 
@@ -351,6 +344,8 @@ class RSSImporter {
                         rssDate: rssJornada.date,
                         rssMatches: rssJornada.matches,
                         dbMatches: dbJornada.matches,
+                        minHitsToWin: rssJornada.minHitsToWin,
+                        prizeRates: rssJornada.prizeRates,
                         teamsMatch: teamsMatch,
                         confidence: teamsMatch ? 'high' : 'low'
                     });
@@ -375,13 +370,18 @@ class RSSImporter {
 
         console.log(`DEBUG: Parsed RSS date "${rssDateStr}" -> ${rssDate.toDateString()}`);
 
-        // Find jornada with matching date
+        // Improved Matching: Date +/- 2 days AND team check
         for (const jornada of this.jornadas) {
             const jornadaDate = AppUtils.parseDate(jornada.date);
             if (jornadaDate) {
-                const matches = this.isSameDate(rssDate, jornadaDate);
-                if (matches) {
-                    console.log(`DEBUG: ✓ MATCH! RSS "${rssDateStr}" matches DB Jornada ${jornada.number} "${jornada.date}"`);
+                const diffDays = Math.abs(rssDate - jornadaDate) / (1000 * 60 * 60 * 24);
+
+                // If same day, high confidence
+                if (diffDays === 0) return jornada;
+
+                // If within 2 days, only match if it's the closest one or we have no other
+                // But let's actually let findJornadasToImport handle the team check
+                if (diffDays <= 2.1) {
                     return jornada;
                 }
             }
@@ -440,6 +440,10 @@ class RSSImporter {
                     jornada.matches[i].result = item.rssMatches[i].result;
                 }
             }
+
+            // Update minimum hits and rates if available
+            if (item.minHitsToWin) jornada.minHitsToWin = item.minHitsToWin;
+            if (item.prizeRates) jornada.prizeRates = item.prizeRates;
 
             // Save to database
             if (window.DataService) {

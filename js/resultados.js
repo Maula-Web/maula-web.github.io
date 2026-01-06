@@ -47,8 +47,9 @@ class ResultsManager {
                 grandTotal: 0,
                 baseTotal: 0,
                 bonusTotal: 0,
+                prizeTotal: 0,
                 unpardonedLates: 0, // Track validation if needed
-                jornadaData: {} // { jId: { hits, score, bonus, isLate, isPardoned } }
+                jornadaData: {} // { jId: { hits, score, bonus, prize, isLate, isPardoned } }
             };
         });
 
@@ -95,13 +96,20 @@ class ResultsManager {
                     bonus = 0;
                 }
 
+                // Calculate Prize Money
+                let prize = 0;
+                if (hits >= (j.minHitsToWin || 10)) {
+                    prize = (j.prizeRates && j.prizeRates[hits]) || 0;
+                }
+
                 // Store
-                memberStats[m.id].jornadaData[j.id] = { hits, points, bonus, isLate, isPardoned };
+                memberStats[m.id].jornadaData[j.id] = { hits, points, bonus, prize, isLate, isPardoned };
 
                 if (hits !== -1) {
                     memberStats[m.id].grandTotal += points;
                     memberStats[m.id].baseTotal += hits;
                     memberStats[m.id].bonusTotal += bonus;
+                    memberStats[m.id].prizeTotal += prize;
 
                     // Max/Min tracking (only for played)
                     if (points > maxScore) maxScore = points;
@@ -166,6 +174,15 @@ class ResultsManager {
         });
         theadHtml += `</tr>`;
 
+        // 5. Total Prizes Money
+        theadHtml += `<tr class="summary-row" style="border-bottom:3px solid var(--primary-purple); position:sticky; top:190px; z-index:2;">
+                        <td style="position:sticky; left:0; z-index:3; background:#c8e6c9; border-right:2px solid #ddd;">Premios (€)</td>`;
+        sortedMembers.forEach(m => {
+            const val = memberStats[m.id].prizeTotal;
+            theadHtml += `<td style="color:#2e7d32; font-weight:bold; background:#e8f5e9; font-size:1.1rem;">${val.toFixed(2)}€</td>`;
+        });
+        theadHtml += `</tr>`;
+
         theadHtml += `</thead>`;
 
         // TBody
@@ -196,9 +213,14 @@ class ResultsManager {
                         cellHtml += `<div style="font-size:0.8rem; font-weight:bold; color:${bColor};">${bSign}${data.bonus}</div>`;
                     }
 
+                    if (data.prize > 0) {
+                        cellHtml += `<div style="font-size:0.85rem; font-weight:bold; color:#1b5e20; margin-top:2px;">${data.prize.toFixed(2)}€</div>`;
+                    }
+
                     // Details tooltip
                     const bonusText = data.bonus !== 0 ? (data.bonus > 0 ? `+${data.bonus}` : `${data.bonus}`) : '0';
-                    const title = `Puntos Totales: ${data.points}\n(Aciertos: ${data.hits} + Bonus: ${bonusText})`;
+                    const prizeText = data.prize > 0 ? `\nPremio: ${data.prize.toFixed(2)}€` : '';
+                    const title = `Puntos Totales: ${data.points}\n(Aciertos: ${data.hits} + Bonus: ${bonusText})${prizeText}`;
 
                     // Add wrapper for tooltip
                     cellHtml = `<div title="${title}">${cellHtml}</div>`;

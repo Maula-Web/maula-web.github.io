@@ -20,8 +20,8 @@ class ResumenManager {
         this.pronosticos = await window.DataService.getAll('pronosticos');
         this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
 
-        // Ensure we have sorted jornadas
         this.jornadas.sort((a, b) => a.number - b.number);
+        this.data = this.calculateData();
 
         this.createModal();
         this.renderTotalsList();
@@ -78,7 +78,8 @@ class ResumenManager {
             stats[m.id] = {
                 name: m.name,
                 points: 0,
-                history: []
+                history: [],
+                prizes: []
             };
         });
 
@@ -89,6 +90,7 @@ class ResumenManager {
         activeJornadas.forEach(j => {
             const officialResults = j.matches.map(m => m.result);
             const jDate = AppUtils.parseDate(j.date);
+            const minHits = j.minHitsToWin || 10;
 
             this.members.forEach(m => {
                 const p = this.pronosticos.find(pred => (pred.jId === j.id || pred.jornadaId === j.id) && (pred.mId === m.id || pred.memberId === m.id));
@@ -106,6 +108,16 @@ class ResumenManager {
                         const ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
                         points = ev.points;
                         hits = ev.hits;
+
+                        // Identify Prize
+                        if (hits >= minHits) {
+                            const money = (j.prizeRates && j.prizeRates[hits]) || 0;
+                            stats[m.id].prizes.push({
+                                jornadaNum: j.number,
+                                hits: hits,
+                                money: money
+                            });
+                        }
                     }
                 }
 
@@ -167,7 +179,11 @@ class ResumenManager {
                         <input type="checkbox" onchange="window.app.toggleSelection(${r.id}, this)" ${isChecked}>
                     </td>
                     <td style="padding:1rem; text-align:center;">${medal || (idx + 1)}</td>
-                    <td style="padding:1rem; font-weight:bold;">${r.name}</td>
+                    <td style="padding:1rem; font-weight:bold;">
+                        <a href="javascript:void(0)" onclick="window.app.showMemberSummary(${r.id}, '${r.name.replace(/'/g, "\\'")}')" style="color:var(--primary-purple); text-decoration:none; border-bottom:1px dashed var(--primary-purple);">
+                            ${r.name}
+                        </a>
+                    </td>
                     <td style="padding:1rem; text-align:right; font-size:1.2rem; color:var(--primary-purple); font-weight:bold;">${r.points}</td>
                 </tr>
             `;
@@ -279,7 +295,8 @@ class ResumenManager {
             hitsByMatch: Array(14).fill(0),
             totalByMatch: Array(14).fill(0),
             teamStats: {},
-            jornadaPerformance: {} // { jornadaNum: { hits: 0, total: 0 } }
+            jornadaPerformance: {}, // { jornadaNum: { hits: 0, total: 0 } }
+            memberId: memberId
         };
 
         // Process all played jornadas
@@ -339,6 +356,11 @@ class ResumenManager {
     renderGlobalStats() {
         const stats = this.calculateMemberStats(null);
         this.renderStatsHTML("PEÑA COMPLETA", stats, null);
+    }
+
+    showMemberSummary(id, name) {
+        const stats = this.calculateMemberStats(id);
+        this.renderStatsHTML(name, stats, null);
     }
 
     renderStatsHTML(titleName, stats, jornadaData = null) {
@@ -556,6 +578,8 @@ class ResumenManager {
                             </div>
                         </div>
 
+                        ${this.renderPrizesHTML(stats.memberId)}
+
                         <div style="background:#f1f8e9; padding:1rem; border-radius:8px; border-left:4px solid #7cb342;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
                                 <h5 style="margin:0; font-size:0.8rem; color:#33691e; text-transform:uppercase;">RENDIMIENTO POR JORNADA</h5>
@@ -741,6 +765,44 @@ class ResumenManager {
 
         content.innerHTML = html;
         modal.classList.add('active');
+    }
+
+    renderPrizesHTML(memberId) {
+        if (!memberId || !this.data.stats[memberId]) return '';
+
+        const prizes = this.data.stats[memberId].prizes || [];
+        if (prizes.length === 0) {
+            return `
+                <div style="background:#f5f5f5; padding:0.8rem; border-radius:8px; border-left:4px solid #9e9e9e;">
+                    <h5 style="margin:0; font-size:0.8rem; color:#616161; text-transform:uppercase;">🏆 PREMIOS OBTENIDOS</h5>
+                    <p style="margin:0.5rem 0 0 0; font-size:0.8rem; color:#757575; font-style:italic;">Aún no se han obtenido premios esta temporada.</p>
+                </div>
+            `;
+        }
+
+        const itemsHtml = prizes.map(p => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid #eee;">
+                <span style="font-weight:600; font-size:0.85rem;">Jornada ${p.jornadaNum}</span>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="background:#e8f5e9; color:#2e7d32; font-weight:bold; padding:2px 8px; border-radius:10px; font-size:0.75rem;">${p.hits} aciertos</span>
+                    <span style="color:var(--primary-blue); font-weight:bold; font-size:0.85rem;">${p.money > 0 ? p.money.toFixed(2) + '€' : '-'}</span>
+                </div>
+            </div>
+        `).join('');
+
+        const totalMoney = prizes.reduce((s, p) => s + p.money, 0);
+
+        return `
+            <div style="background:#e8f5e9; padding:0.8rem; border-radius:8px; border-left:4px solid #2e7d32;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <h5 style="margin:0; font-size:0.8rem; color:#1b5e20; text-transform:uppercase;">🏆 PREMIOS OBTENIDOS</h5>
+                    <span style="font-size:0.85rem; font-weight:bold; color:var(--primary-blue);">Total: ${totalMoney.toFixed(2)}€</span>
+                </div>
+                <div style="max-height:120px; overflow-y:auto; padding-right:5px;">
+                    ${itemsHtml}
+                </div>
+            </div>
+        `;
     }
 }
 

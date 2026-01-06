@@ -55,6 +55,13 @@ class PronosticoManager {
         this.stickyScrollContainer = document.getElementById('sticky-scrollbar-container');
         this.stickyScrollContent = document.getElementById('sticky-scrollbar-content');
 
+        // New View Jornada Elements
+        this.btnViewJornada = document.getElementById('btn-view-jornada');
+        this.viewJornadaModal = document.getElementById('view-jornada-modal');
+        this.viewJornadaTitle = document.getElementById('view-jornada-title');
+        this.viewJornadaContent = document.getElementById('view-jornada-content');
+        this.btnCloseViewJornada = document.getElementById('btn-close-view-jornada');
+
         this.btnToggleSummary = document.getElementById('btn-toggle-summary');
         if (this.btnToggleSummary) {
             this.btnToggleSummary.addEventListener('click', () => {
@@ -116,6 +123,21 @@ class PronosticoManager {
         // Doubles Save
         if (this.btnSaveDoubles) this.btnSaveDoubles.addEventListener('click', () => this.saveDoubles());
         if (this.btnCopyForecast) this.btnCopyForecast.addEventListener('click', () => this.handleCopyForecast());
+
+        // View Jornada Actions
+        if (this.btnViewJornada) this.btnViewJornada.addEventListener('click', () => this.showJornadaForecasts());
+        if (this.btnCloseViewJornada) this.btnCloseViewJornada.addEventListener('click', () => {
+            this.viewJornadaModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+        if (this.viewJornadaModal) {
+            this.viewJornadaModal.addEventListener('click', (e) => {
+                if (e.target === this.viewJornadaModal) {
+                    this.viewJornadaModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            });
+        }
 
         window.addEventListener('resize', () => this.updateStickyScrollbar());
     }
@@ -239,6 +261,82 @@ class PronosticoManager {
                 this.updateDoublesCounters();
             }
         }
+    }
+
+    async showJornadaForecasts() {
+        if (!this.currentJornadaId) {
+            alert('Por favor, selecciona una jornada primero.');
+            return;
+        }
+
+        const jornada = this.jornadas.find(j => j.id === this.currentJornadaId);
+        if (!jornada || !jornada.matches) return;
+
+        this.viewJornadaTitle.textContent = `Quiniela Colectiva - Jornada ${jornada.number}`;
+        this.viewJornadaContent.innerHTML = '<div style="text-align:center; padding:2rem;">Cargando pronósticos...</div>';
+        this.viewJornadaModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Get all forecasts for this jornada
+        const jForecasts = this.pronosticos.filter(p => p.jId === this.currentJornadaId || p.jornadaId === this.currentJornadaId);
+        const jExtra = this.pronosticosExtra.find(p => p.jId === this.currentJornadaId);
+
+        // Grid Style: 
+        // 1 column for match info
+        // X columns for members (max possible)
+        // 1 column for Doubles
+        const sortedMembers = [...this.members].sort((a, b) => a.id - b.id);
+
+        // Build table
+        let html = `
+            <div style="flex:1; overflow:hidden; border:1px solid #ddd; border-radius:8px;">
+                <table style="width:100%; height:100%; border-collapse:collapse; background:white; font-size:0.75rem; table-layout: fixed;">
+                    <thead>
+                        <tr style="background:#4a148c; color:white;">
+                            <th style="width:180px; padding:6px; border:1px solid #6a1b9a; text-align:left;">Partido</th>`;
+
+        sortedMembers.forEach(m => {
+            html += `<th style="padding:4px; border:1px solid #6a1b9a; text-align:center; word-break: break-all; font-size:0.65rem;">${m.name}<br>${m.surname || ''}</th>`;
+        });
+
+        html += `<th style="width:70px; padding:4px; border:1px solid #6a1b9a; text-align:center; background:#ffeb3b; color:#000; font-weight:bold;">DOBLES</th>`;
+        html += `</tr></thead><tbody>`;
+
+        jornada.matches.forEach((match, idx) => {
+            const displayIdx = idx === 14 ? 'P15' : idx + 1;
+            const isP15 = idx === 14;
+            // Draw lines for blocks (4-5, 8-9, etc)
+            const borderStyle = [3, 7, 10, 13].includes(idx) ? 'border-bottom: 2px solid #555;' : 'border-bottom: 1px solid #eee;';
+            const rowBg = idx % 2 === 0 ? 'background:#fff;' : 'background:#fafafa;';
+
+            html += `<tr style="${rowBg} ${borderStyle}">
+                <td style="padding:4px 8px; border-left:1px solid #ddd; border-right:1px solid #ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <span style="font-weight:900; color:#4a148c; margin-right:4px;">${displayIdx}.</span> 
+                    <span style="font-size:0.7rem;">${match.home} - ${match.away}</span>
+                </td>`;
+
+            sortedMembers.forEach(m => {
+                const f = jForecasts.find(p => (p.mId === m.id || p.memberId === m.id));
+                const sign = f ? f.selection[idx] : '-';
+                const signColor = sign === '1' ? '#1976d2' : sign === 'X' ? '#757575' : sign === '2' ? '#d32f2f' : '#ccc';
+
+                html += `<td style="padding:2px; border-right:1px solid #ddd; text-align:center;">
+                    <span style="font-weight:bold; color:${signColor}; font-size:0.9rem;">${sign || '-'}</span>
+                </td>`;
+            });
+
+            // Doubles
+            const extraSign = jExtra ? jExtra.selection[idx] : '-';
+            html += `<td style="padding:2px; border-right:1px solid #ddd; text-align:center; background:#fff9c4; font-weight:900; color:#000; font-size:1rem;">${extraSign || '-'}</td>`;
+            html += `</tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+        html += `<div style="margin-top:8px; padding:8px; background:#f3e5f5; border-radius:4px; font-size:0.75rem; border-left:4px solid #6a1b9a; color:#4a148c; display:flex; justify-content:space-between; align-items:center;">
+            <span><strong>💡 Tip:</strong> Esta vista está optimizada para copiar directamente al boleto oficial. Los bloques coinciden con las filas del boleto.</span>
+            <span style="font-weight:bold;">Total Socios: ${sortedMembers.length}</span>
+        </div>`;
+        this.viewJornadaContent.innerHTML = html;
     }
 
     checkEligibility(currentJornadaNum, memberId) {
