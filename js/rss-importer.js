@@ -225,6 +225,7 @@ class RSSImporter {
                 matches: matches,
                 minHitsToWin: prizeInfo.minHits,
                 prizeRates: prizeInfo.rates,
+                hasBote: prizeInfo.hasBote, // Added this
                 rawDescription: description
             });
         });
@@ -241,14 +242,17 @@ class RSSImporter {
     parsePrizeRates(description) {
         let minHits = 15;
         const rates = {};
+        let hasBote = false;
 
         // Normalize
         const text = description.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
 
+        // Check for explicit "Bote" mention
+        if (text.toLowerCase().includes('bote') || text.toLowerCase().includes('jackpot')) {
+            hasBote = true;
+        }
+
         // 1. Standard categories (10 to 14 hits)
-        // Format: "1ª (14 Aciertos) 1 793.436,76 €"
-        // We match "XX Aciertos", then anything that isn't a Euro symbol, 
-        // and capture the last numeric-looking group before the currency.
         const regexHits = /(\d{1,2})\s*Aciertos\)[^€E]*?\s+([\d\.,]+)\s*(?:Euros|€)/gi;
         let match;
         while ((match = regexHits.exec(text)) !== null) {
@@ -261,16 +265,23 @@ class RSSImporter {
         }
 
         // 2. Pleno al 15
-        // Format: "Pleno al 15 0 0,00 €"
-        const regexP15 = /Pleno\s+al\s+15[^€E]*?\s+([\d\.,]+)\s*(?:Euros|€)/gi;
+        // Format: "Pleno al 15 0 0,00 €" or "Pleno al 15: 0 (0,00 €)"
+        // If "Pleno al 15" has 0 beneficiaries, it's a bote.
+        const regexP15 = /Pleno\s+al\s+15[^\d]*(\d+)[^€E]*?\s+([\d\.,]+)\s*(?:Euros|€)/gi;
         const matchP15 = regexP15.exec(text);
         if (matchP15) {
-            const prizeVal = parseFloat(matchP15[1].replace(/\./g, '').replace(',', '.'));
-            if (prizeVal > 0) rates[15] = prizeVal;
+            const winners = parseInt(matchP15[1]);
+            const prizeVal = parseFloat(matchP15[2].replace(/\./g, '').replace(',', '.'));
+            if (prizeVal > 0) {
+                rates[15] = prizeVal;
+            }
+            if (winners === 0) {
+                hasBote = true;
+            }
         }
 
-        console.log(`DEBUG: Parsed prize rates:`, rates);
-        return { minHits, rates };
+        console.log(`DEBUG: Parsed prize rates:`, rates, 'Has Bote:', hasBote);
+        return { minHits, rates, hasBote };
     }
 
     /**
@@ -332,24 +343,24 @@ class RSSImporter {
                 const hasResults = dbJornada.matches && dbJornada.matches.some(m => m.result && m.result !== '');
                 const hasPrizeInfo = dbJornada.prizeRates && Object.keys(dbJornada.prizeRates).length > 0;
 
-                // We import if it doesn't have results OR if it doesn't have complete prize info yet
-                if (!hasResults || !hasPrizeInfo) {
-                    // Check if teams match (at least some of them)
-                    const teamsMatch = this.checkTeamsMatch(dbJornada, rssJornada);
+                // WE ALWAYS allow re-importing if results exist, to update prize info or bote status
+                // Previously it skipped if results were present.
+                // Check if teams match (at least some of them)
+                const teamsMatch = this.checkTeamsMatch(dbJornada, rssJornada);
 
-                    toImport.push({
-                        jornadaId: dbJornada.id,
-                        jornadaNumber: dbJornada.number,
-                        jornadaDate: dbJornada.date,
-                        rssDate: rssJornada.date,
-                        rssMatches: rssJornada.matches,
-                        dbMatches: dbJornada.matches,
-                        minHitsToWin: rssJornada.minHitsToWin,
-                        prizeRates: rssJornada.prizeRates,
-                        teamsMatch: teamsMatch,
-                        confidence: teamsMatch ? 'high' : 'low'
-                    });
-                }
+                toImport.push({
+                    jornadaId: dbJornada.id,
+                    jornadaNumber: dbJornada.number,
+                    jornadaDate: dbJornada.date,
+                    rssDate: rssJornada.date,
+                    rssMatches: rssJornada.matches,
+                    dbMatches: dbJornada.matches,
+                    minHitsToWin: rssJornada.minHitsToWin,
+                    prizeRates: rssJornada.prizeRates,
+                    hasBote: rssJornada.hasBote,
+                    teamsMatch: teamsMatch,
+                    confidence: teamsMatch ? 'high' : 'low'
+                });
             }
         }
 
@@ -444,6 +455,7 @@ class RSSImporter {
             // Update minimum hits and rates if available
             if (item.minHitsToWin) jornada.minHitsToWin = item.minHitsToWin;
             if (item.prizeRates) jornada.prizeRates = item.prizeRates;
+            if (item.hasBote !== undefined) jornada.hasBote = item.hasBote; // Added this
 
             // Save to database
             if (window.DataService) {

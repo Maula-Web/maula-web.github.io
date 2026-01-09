@@ -301,34 +301,54 @@ class DashboardManager {
             }
         }
 
-        statsContainer.innerHTML = `
-            <div class="stat-card">
-                <h3>Temporada</h3>
-                <div class="stat-value" style="font-size:1.5rem;">${season}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Socios Activos</h3>
-                <div class="stat-value">${activeMembers}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Jornadas Jugadas</h3>
-                <div class="stat-value">${playedCount}</div>
-            </div>
-            <div class="stat-card highlight-card">
-                <h3>Líder Actual</h3>
-                <div class="stat-value" style="color:var(--primary-gold); font-size:1.4rem;">${leaderName}</div>
-                <div style="font-size:1.1rem; color:#555; font-weight:bold; margin-top:0.2rem;">${leaderPoints} pts</div>
-            </div>
-            
-            ${lastJornadaPrizesHtml}
+        const lastPlayedJ = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1] : null;
+        const hasUpcomingBote = lastPlayedJ && lastPlayedJ.hasBote;
 
-            <div class="stat-wide-card">
-                <h3 style="color:var(--dark-purple); font-weight:bold; font-size:1.1rem; margin-bottom:0.5rem;">PRÓXIMA JORNADA</h3>
-                <div style="font-size:1.2rem; margin-bottom:1rem;">${nextJornadaLabel}</div>
-                ${nextRolesHtml}
-                ${deadlineHtml}
-            </div>
-        `;
+        let boteBadgeHtml = "";
+        if (hasUpcomingBote) {
+            boteBadgeHtml = `
+                    <div style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #fff; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255,152,0,0.4); animation: pulse 2s infinite;">
+                        <span>💰</span> ¡HAY BOTE PARA ESTA JORNADA! <span>💰</span>
+                    </div>
+                    <style>
+                        @keyframes pulse {
+                            0% { transform: scale(1); }
+                            50% { transform: scale(1.03); }
+                            100% { transform: scale(1); }
+                        }
+                    </style>
+                `;
+        }
+
+        statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <h3>Temporada</h3>
+                    <div class="stat-value" style="font-size:1.5rem;">${season}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Socios Activos</h3>
+                    <div class="stat-value">${activeMembers}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Jornadas Jugadas</h3>
+                    <div class="stat-value">${playedCount}</div>
+                </div>
+                <div class="stat-card highlight-card">
+                    <h3>Líder Actual</h3>
+                    <div class="stat-value" style="color:var(--primary-gold); font-size:1.4rem;">${leaderName}</div>
+                    <div style="font-size:1.1rem; color:#555; font-weight:bold; margin-top:0.2rem;">${leaderPoints} pts</div>
+                </div>
+                
+                ${lastJornadaPrizesHtml}
+    
+                <div class="stat-wide-card">
+                    <h3 style="color:var(--dark-purple); font-weight:bold; font-size:1.1rem; margin-bottom:0.5rem;">PRÓXIMA JORNADA</h3>
+                    ${boteBadgeHtml}
+                    <div style="font-size:1.2rem; margin-bottom:1rem;">${nextJornadaLabel}</div>
+                    ${nextRolesHtml}
+                    ${deadlineHtml}
+                </div>
+            `;
     }
 
     startCountdown(deadline) {

@@ -1,13 +1,13 @@
 
 OK - EN LA HOJA RESUMEN TEMPORADA, INCLUIR UN PEQUEÑO ESTUDIO DE CADA SOCIO. VER POR ESTADISTICA, QUE PARTIDOS(Nº) FALLA MÁS, QUE EQUIPOS FALLA MÁS, QUÉ EQUIPOS ACIERTA MÁS Y QUÉ PARTIDO(Nº) ACIERTA MÁS
 
-Quiero hacer un pequeño estudio estadístico de cada socio.
-Quiero que con todos los datos que se van guardando jornada tras jornada, analices para cada socio qué nº de partido en cada pronóstico es el que acierta y el que más falla. Haz lo mismo con cada equipo, ver cuál es que mas acierta y el que más falla. Intenta analizar si acierta más al principio o al final de cada mes o no hay un patrón. Esta información se mostrará a la derecha del resumen de una jornada mostrado en la hoja Resumen de Temporada. Cuando se pinche en un punto de la gráfica, se mostrará la información de esa jornada tal y como se está haciendo ahora y además esta pequeña estadística a la derecha de la información de la jornada. Este estudio de cada socio se debe ir actualizando con la nueva información obtenida tras cada jornada.
+OK Quiero hacer un pequeño estudio estadístico de cada socio.
+OK Quiero que con todos los datos que se van guardando jornada tras jornada, analices para cada socio qué nº de partido en cada pronóstico es el que acierta y el que más falla. Haz lo mismo con cada equipo, ver cuál es que mas acierta y el que más falla. Intenta analizar si acierta más al principio o al final de cada mes o no hay un patrón. Esta información se mostrará a la derecha del resumen de una jornada mostrado en la hoja Resumen de Temporada. Cuando se pinche en un punto de la gráfica, se mostrará la información de esa jornada tal y como se está haciendo ahora y además esta pequeña estadística a la derecha de la información de la jornada. Este estudio de cada socio se debe ir actualizando con la nueva información obtenida tras cada jornada.
 
   
 OK - AL RELLENAR EL PRONÓSTICO, TENER AL LADO EL PRONOSTICO DEL RESTO DE SOCIOS 
 
-Haz que se muestren todos los pronosticos de una vez sin tener que hacer scroll lateral. A la derecha del todo muestra un procentaje de cada signo marcado por todos los socios.
+OK Haz que se muestren todos los pronosticos de una vez sin tener que hacer scroll lateral. A la derecha del todo muestra un procentaje de cada signo marcado por todos los socios.
 
 Calcular una quiniela en base a las victorias de cada equipo en las jornadas anteriores.
 
@@ -21,6 +21,7 @@ Calcular una quiniela en base a las victorias de cada equipo en las jornadas ant
 
 - OK IMPLEMENTAR AVISO DE SUPLEMENTO POR Nº DE UNOS.
 
-- TERMINAR SISTEMA DE DOBLES. ¿DÓNDE SE MUESTRAN LOS RESULTADOS?
+- OK TERMINAR SISTEMA DE DOBLES. ¿DÓNDE SE MUESTRAN LOS RESULTADOS?
 
-
+- COLUMNA PROPUESTA POR EL SISTEMA:En la misma tabla de ver pronósticos, me gustaría incluir una columna calculada. Esta columna se basará en los aciertos históricos de cada socio. Es decir, cada partido tendrá en cuenta qué socio acierta más ese número de partido y lo rellenará con el sigo marcado por ese socio en esa jornada. Si no hay un socio que destaque en ese partido se analizará qué socios aciertan más ese partido y se rellenará con el signo marcado por la mayoría de socios. Si hubiera un empate en el número de socios que marcan dos o tres signos distintos se rellenará con el signo marcado por el socio que participe en este empate que esté mejor situado en la clasificación.
+Esta columna, aparecerá al abrir la ventana Ver pronósticos y sólo cuando los pronósticos de todos los socios estén rellenos para esa jornada. También se calcularán los aciertos obtenidos para esta columna. De esta manera podremos aprovechar toda la información generada por la Peña para intentar conseguir una columna "perfecta".
