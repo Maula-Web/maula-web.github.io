@@ -1245,7 +1245,7 @@ class PronosticoManager {
 
             // Adjusted layout to be more compact
             row.innerHTML = `
-                < div class="p-match-info" style = "flex: 2; min-width: 0; border: none; padding-right: 5px;" >
+                <div class="p-match-info" style="flex: 2; min-width: 0; border: none; padding-right: 5px;">
                     <div style="display:flex; align-items:center; gap:5px;">
                         <span style="font-weight:bold; color:var(--primary-green); font-size: 0.8rem; width: 22px;">${displayIdx}</span>
                         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:2px;">
@@ -1259,7 +1259,7 @@ class PronosticoManager {
                             </div>
                         </div>
                     </div>
-                </div >
+                </div>
 
                 <div class="prediction-inputs" data-idx="${idx}" style="flex: 0 0 auto; display:flex; gap:3px; align-items:center;">
                     ${isP15 ? this.renderP15Inputs(idx, selections[idx], isLocked) : this.renderMultiSelectButtons(idx, selections[idx], isLocked)}
@@ -1289,10 +1289,10 @@ class PronosticoManager {
             // Use same styles as chk-option but slightly smaller for side panel
             const activeStyle = isSelected ? 'background-color:var(--primary-green); color:white; border-color:var(--primary-green);' : '';
 
-            html += `< div class="chk-option ${isSelected ? 'selected' : ''}"
-            style = "width:30px; height:30px; font-size:0.9rem; ${activeStyle}"
-            onclick = "window.app.handleDoubleToggle(this, ${idx}, '${opt}', ${isP15})" 
-                        ${disabled ? 'disabled' : ''}> ${opt}</div > `;
+            html += `<div class="chk-option ${isSelected ? 'selected' : ''}"
+            style="width:30px; height:30px; font-size:0.9rem; ${activeStyle}"
+            onclick="window.app.handleDoubleToggle(this, ${idx}, '${opt}', ${isP15})" 
+                        ${disabled ? 'disabled' : ''}>${opt}</div>`;
         });
         return html;
     }
@@ -1303,24 +1303,24 @@ class PronosticoManager {
         const options = ['0', '1', '2', 'M'];
 
         const renderGroup = (team, selected) => {
-            let html = `< div style = "display:flex; gap:1px; margin-right:4px;" > `;
+            let html = `<div style="display:flex; gap:1px; margin-right:4px;">`;
             options.forEach(opt => {
                 const isSel = opt === selected;
                 const style = isSel ? 'background-color:#6a1b9a; color:white; border-color:#6a1b9a;' : 'font-size:0.75rem; padding:0;';
-                html += `< div class="p15-option ${isSel ? 'selected' : ''}"
-            data - team="${team}" data - val="${opt}"
-            style = "width:20px; height:20px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; cursor:pointer; ${style}"
-            onclick = "window.app.handleP15Toggle(this, ${idx}, '${team}', '${opt}')" 
-                        ${disabled ? 'disabled' : ''}> ${opt}</div > `;
+                html += `<div class="p15-option ${isSel ? 'selected' : ''}"
+            data-team="${team}" data-val="${opt}"
+            style="width:20px; height:20px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; cursor:pointer; ${style}"
+            onclick="window.app.handleP15Toggle(this, ${idx}, '${team}', '${opt}')" 
+                        ${disabled ? 'disabled' : ''}>${opt}</div>`;
             });
-            html += `</div > `;
+            html += `</div>`;
             return html;
         };
 
-        return `< div style = "display:flex; flex-direction:column; gap:2px;" >
+        return `<div style="display:flex; flex-direction:column; gap:2px;">
                 ${renderGroup('home', hVal)}
                     ${renderGroup('away', aVal)}
-                </div > `;
+                </div>`;
     }
 
     handleP15Toggle(btn, idx, team, val) {
@@ -1427,7 +1427,7 @@ class PronosticoManager {
                     missing = true;
                     selection.push('');
                 } else {
-                    selection.push(`${homeMsg.dataset.val} -${awayMsg.dataset.val} `);
+                    selection.push(`${homeMsg.dataset.val}-${awayMsg.dataset.val}`);
                 }
             } else {
                 const btns = row.querySelectorAll('.chk-option.selected');
@@ -1450,7 +1450,7 @@ class PronosticoManager {
         }
 
         const data = {
-            id: `${this.currentJornadaId}_${this.currentMemberId} `,
+            id: `${this.currentJornadaId}_${this.currentMemberId}`,
             jId: this.currentJornadaId,
             mId: this.currentMemberId,
             selection: selection,
