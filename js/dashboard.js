@@ -205,20 +205,47 @@ class DashboardManager {
                 `;
             }
 
-            nextRolesHtml = `
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
-                    <div style="margin-bottom:0.5rem;">
-                        <span style="font-size:1.2rem;">🍺</span> 
-                        <strong>Columnas de Dobles:</strong> <span style="color:var(--primary-blue); font-weight:bold;">${winnerText}</span>
+            // Check if next jornada is in progress (has some but not all results)
+            const nextJornadaData = this.getNextJornadaData();
+            let isNextJornadaInProgress = false;
+
+            if (nextJornadaData && nextJornadaData.matches) {
+                const matchesWithResults = nextJornadaData.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length;
+                isNextJornadaInProgress = matchesWithResults > 0 && matchesWithResults < 15;
+            }
+
+            // Only show winner/loser if next jornada is NOT in progress
+            if (isNextJornadaInProgress) {
+                nextRolesHtml = `
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
+                        <div style="padding: 1rem; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+                            <div style="font-size: 0.95rem; color: #e65100; font-weight: 600; margin-bottom: 0.5rem;">
+                                ⏳ Jornada en curso
+                            </div>
+                            <div style="font-size: 0.85rem; color: #666;">
+                                Los roles de "Columnas de Dobles" y "Sella la Quiniela" se mostrarán cuando finalice la jornada.
+                            </div>
+                        </div>
+                        ${pigHtml}
+                        ${lastJornadaInfo.doublesHtml || ''}
                     </div>
-                    <div>
-                        <span style="font-size:1.2rem;">🥛</span> 
-                        <strong>Sella la Quiniela por Maula:</strong> <span style="color:var(--danger); font-weight:bold;">${loserText}</span>
+                `;
+            } else {
+                nextRolesHtml = `
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
+                        <div style="margin-bottom:0.5rem;">
+                            <span style="font-size:1.2rem;">🍺</span> 
+                            <strong>Columnas de Dobles:</strong> <span style="color:var(--primary-blue); font-weight:bold;">${winnerText}</span>
+                        </div>
+                        <div>
+                            <span style="font-size:1.2rem;">🥛</span> 
+                            <strong>Sella la Quiniela por Maula:</strong> <span style="color:var(--danger); font-weight:bold;">${loserText}</span>
+                        </div>
+                        ${pigHtml}
+                        ${lastJornadaInfo.doublesHtml || ''}
                     </div>
-                    ${pigHtml}
-                    ${lastJornadaInfo.doublesHtml || ''}
-                </div>
-            `;
+                `;
+            }
 
             // Last Jornada Prizes
             const lastJNum = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : 0;

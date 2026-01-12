@@ -1079,7 +1079,8 @@ class PronosticoManager {
             return { eligible: false };
         }
 
-        // 3. CALCULAR DATOS DE TODOS LOS SOCIOS (TABLA DE VERDAD)
+        // 3. CALCULAR DATOS DE TODOS LOS SOCIOS PARA LA JORNADA PREVIA
+        const prizeThreshold = prevJornada.minHitsToWin || 10;
         const leaderboard = this.members.map(m => {
             const p = this.pronosticos.find(pred => {
                 const pJid = String(pred.jId || pred.jornadaId || '');
@@ -1088,47 +1089,131 @@ class PronosticoManager {
             });
 
             if (!p || !p.selection) {
-                return { id: String(m.id), name: m.name, points: -5, hits: 0, date: '9999-99-99' };
+                return { id: String(m.id), name: m.name, points: -5, hits: 0, isLate: false, isPardoned: false };
             }
 
             const isLate = p.late && !p.pardoned;
+            const isPardoned = p.pardoned || false;
+
             if (isLate) {
-                return { id: String(m.id), name: m.name, points: ScoringSystem.calculateScore(0, jDate), hits: 0, date: p.timestamp || p.date || '9999-99-99' };
+                return { id: String(m.id), name: m.name, points: ScoringSystem.calculateScore(0, jDate), hits: 0, isLate: true, isPardoned: false };
             }
 
             const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
-            return { id: String(m.id), name: m.name, points: ev.points, hits: ev.hits, date: p.timestamp || p.date || '9999-99-99' };
+            return { id: String(m.id), name: m.name, points: ev.points, hits: ev.hits, isLate: p.late || false, isPardoned: isPardoned };
         });
 
-        // 4. APLICAR SISTEMA DE DESEMPATE ESTRICTO
-        // 1º Puntos (Desc), 2º Hits (Desc), 3º Fecha (Asc - el más rápido)
-        leaderboard.sort((a, b) => {
-            if (b.points !== a.points) return b.points - a.points;
-            if (b.hits !== a.hits) return b.hits - a.hits;
-            return new Date(a.date) - new Date(b.date);
+        // 4. FILTRAR CANDIDATOS ELEGIBLES: excluir tarde sin premio ni perdón
+        const eligibleForWinner = leaderboard.filter(l => {
+            // Can compete if: not late, OR late but pardoned, OR late but got prize
+            if (!l.isLate) return true;
+            if (l.isPardoned) return true;
+            if (l.hits >= prizeThreshold) return true;
+            return false;
         });
 
-        console.log(`-- - RANKING DESEMPATE J${prevJornada.number} PARA J${currentJornadaNum} --- `);
-        console.table(leaderboard.map(e => ({ Socio: e.name, Puntos: e.points, Aciertos: e.hits, Fecha: e.date })));
-
-        // 5. El ganador es el primero de la lista (siempre que tenga puntos aceptables)
-        let absoluteWinnerId = null;
-        if (leaderboard[0] && leaderboard[0].points > -5) {
-            absoluteWinnerId = leaderboard[0].id;
-            console.log(`🏆 GANADOR ÚNICO J${prevJornada.number}: ${leaderboard[0].name} `);
+        if (eligibleForWinner.length === 0) {
+            console.log(`DOUBLES: Ningún socio elegible en J${prevJornada.number}`);
+            return { eligible: false };
         }
 
-        // 6. Verificación para el socio actual
+        // 5. ENCONTRAR MÁXIMO DE PUNTOS
+        const maxPoints = Math.max(...eligibleForWinner.map(l => l.points));
+        let winnerCandidates = eligibleForWinner.filter(l => l.points === maxPoints);
+
+        console.log(`DOUBLES: J${prevJornada.number} - Candidatos con ${maxPoints} puntos:`, winnerCandidates.map(c => c.name));
+
+        // 6. DESEMPATE RECURSIVO SI HAY EMPATE
+        if (winnerCandidates.length > 1) {
+            console.log(`DOUBLES: Empate detectado, aplicando desempate recursivo...`);
+            winnerCandidates = this.resolveTieEligibility(winnerCandidates, prevJornada.number);
+        }
+
+        // 7. El ganador es el primero de la lista
+        let absoluteWinnerId = null;
+        if (winnerCandidates.length > 0 && winnerCandidates[0].points > -5) {
+            absoluteWinnerId = winnerCandidates[0].id;
+            console.log(`🏆 GANADOR ÚNICO J${prevJornada.number}: ${winnerCandidates[0].name} (${winnerCandidates[0].points} pts)`);
+        }
+
+        // 8. Verificación para el socio actual
         const isEligible = absoluteWinnerId && String(memberId) === String(absoluteWinnerId);
 
         if (isEligible) {
-            console.log(`✅ ACCESO CONCEDIDO A DOBLES`);
+            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name}`);
         }
 
         return {
             eligible: isEligible,
             reason: isEligible ? 'winner' : 'not_winner'
         };
+    }
+
+    /**
+     * Desempate recursivo: mira jornadas anteriores hasta encontrar un único ganador
+     */
+    resolveTieEligibility(candidates, currentJornadaNum) {
+        const sortedJornadas = [...this.jornadas].sort((a, b) => a.number - b.number);
+        let currentCandidates = [...candidates];
+
+        // Empezar desde la jornada anterior a currentJornadaNum
+        let checkJornadaNum = currentJornadaNum - 1;
+
+        while (currentCandidates.length > 1 && checkJornadaNum >= 1) {
+            const checkJornada = sortedJornadas.find(j => j.number === checkJornadaNum);
+
+            if (!checkJornada || !checkJornada.matches) {
+                checkJornadaNum--;
+                continue;
+            }
+
+            const officialResults = checkJornada.matches.map(m => m.result);
+            const resultsFound = officialResults.filter(r => r && r !== '-').length;
+
+            if (resultsFound < 14) {
+                checkJornadaNum--;
+                continue;
+            }
+
+            const jDate = AppUtils.parseDate(checkJornada.date);
+
+            // Calcular puntos de cada candidato en esta jornada histórica
+            const historicalScores = currentCandidates.map(candidate => {
+                const p = this.pronosticos.find(pred => {
+                    const pJid = String(pred.jId || pred.jornadaId || '');
+                    const pMid = String(pred.mId || pred.memberId || '');
+                    return pJid === String(checkJornada.id) && pMid === String(candidate.id);
+                });
+
+                let points = -5;
+                if (p && p.selection) {
+                    const isLate = p.late && !p.pardoned;
+                    if (isLate) {
+                        points = ScoringSystem.calculateScore(0, jDate);
+                    } else {
+                        const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
+                        points = ev.points;
+                    }
+                }
+
+                return { id: candidate.id, name: candidate.name, points: points };
+            });
+
+            // Encontrar el máximo de puntos en esta jornada histórica
+            const maxHistoricalPoints = Math.max(...historicalScores.map(s => s.points));
+            const survivors = historicalScores.filter(s => s.points === maxHistoricalPoints);
+
+            console.log(`DOUBLES: Desempate en J${checkJornadaNum} - Max puntos: ${maxHistoricalPoints}, Supervivientes:`, survivors.map(s => s.name));
+
+            // Filtrar candidatos que sobreviven
+            currentCandidates = currentCandidates.filter(c =>
+                survivors.some(s => s.id === c.id)
+            );
+
+            checkJornadaNum--;
+        }
+
+        return currentCandidates;
     }
 
     renderDoublesForm(jornada, isLocked) {

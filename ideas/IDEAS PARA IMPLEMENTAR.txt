@@ -25,3 +25,6 @@ Calcular una quiniela en base a las victorias de cada equipo en las jornadas ant
 
 - COLUMNA PROPUESTA POR EL SISTEMA:En la misma tabla de ver pronósticos, me gustaría incluir una columna calculada. Esta columna se basará en los aciertos históricos de cada socio. Es decir, cada partido tendrá en cuenta qué socio acierta más ese número de partido y lo rellenará con el sigo marcado por ese socio en esa jornada. Si no hay un socio que destaque en ese partido se analizará qué socios aciertan más ese partido y se rellenará con el signo marcado por la mayoría de socios. Si hubiera un empate en el número de socios que marcan dos o tres signos distintos se rellenará con el signo marcado por el socio que participe en este empate que esté mejor situado en la clasificación.
 Esta columna, aparecerá al abrir la ventana Ver pronósticos y sólo cuando los pronósticos de todos los socios estén rellenos para esa jornada. También se calcularán los aciertos obtenidos para esta columna. De esta manera podremos aprovechar toda la información generada por la Peña para intentar conseguir una columna "perfecta".
+
+
+Quiero que analices la web (no cambies nada) y me digas si es posible hacer que se adapte a diferentes dispositivos. Que reconozca si se está navegando desde un móvil, tablet o PC y que el diseño se adapte a cada dispositivo, para facilitar el uso
