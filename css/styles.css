@@ -66,6 +66,7 @@
     --login-card-bg: #ffffff;
     --login-btn-bg: var(--primary-green);
     --login-text: #333333;
+    --login-label: #555555;
 }
 
 [data-theme="dark"] {
@@ -137,6 +138,7 @@
     --login-card-bg: #2d2d2d;
     --login-btn-bg: var(--primary-green);
     --login-text: #ffffff;
+    --login-label: #cccccc;
 }
 
 body {

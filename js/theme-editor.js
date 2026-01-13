@@ -57,7 +57,8 @@ const ThemeEditor = {
             { id: '--login-bg', label: 'Fondo Pantalla' },
             { id: '--login-card-bg', label: 'Fondo Tarjeta' },
             { id: '--login-btn-bg', label: 'Fondo Botón' },
-            { id: '--login-text', label: 'Color Texto' }
+            { id: '--login-text', label: 'Color Título' },
+            { id: '--login-label', label: 'Color Etiquetas (Labels)' }
         ]
     },
 
