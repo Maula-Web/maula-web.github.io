@@ -7,9 +7,34 @@ const Auth = {
             window.location.href = 'login.html';
         } else {
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => this.injectLogout());
+                document.addEventListener('DOMContentLoaded', () => {
+                    this.injectLogout();
+                    this.applySavedTheme();
+                });
             } else {
                 this.injectLogout();
+                this.applySavedTheme();
+            }
+        }
+    },
+
+    async applySavedTheme() {
+        if (window.DataService) {
+            try {
+                if (!window.DataService.db) await window.DataService.init();
+                const config = await window.DataService.getAll('config');
+                const themeDoc = config.find(c => c.id === 'theme');
+                if (themeDoc) {
+                    console.log("Auth: Applying custom theme from cloud...");
+                    const root = document.documentElement;
+                    Object.entries(themeDoc).forEach(([key, value]) => {
+                        if (key.startsWith('--')) {
+                            root.style.setProperty(key, value);
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn("Auth: Could not load custom theme", e);
             }
         }
     },
@@ -74,40 +99,58 @@ const Auth = {
     },
 
     injectLogout: function () {
-        if (window.location.pathname.includes('admin.html')) return; // Don't inject in admin
+        if (window.location.pathname.includes('login.html')) return;
 
-        // Add a logout link/button to the corner or sidebar
-        // Try sidebar first
-        const sidebar = document.querySelector('.sidebar-menu');
-        if (sidebar) {
-            if (!document.getElementById('btn-logout-sidebar')) {
-                const btn = document.createElement('a');
-                btn.href = "#";
-                btn.id = "btn-logout-sidebar";
-                btn.textContent = "CERRAR SESIÓN";
-                btn.className = "btn-primary";
-                btn.style.backgroundColor = "#000000";
-                btn.style.marginTop = "auto"; // Push to bottom
-                btn.onclick = (e) => {
-                    e.preventDefault();
-                    this.logout();
-                };
-                sidebar.appendChild(btn);
-            }
-        } else {
-            // Fallback for pages without sidebar (maybe admin?)
-            const header = document.querySelector('.header-actions');
-            if (header && !document.getElementById('btn-logout-header')) {
-                const btn = document.createElement('button');
-                btn.id = "btn-logout-header";
-                btn.textContent = "Cerrar Sesión";
-                btn.style.marginLeft = "10px";
-                btn.onclick = () => this.logout();
-                header.appendChild(btn);
-            }
+        // Path current
+        const path = window.location.pathname;
+        const page = path.split('/').pop() || 'index.html';
+
+        // 1. Ensure Header (sidebar-menu) exists on all pages
+        let sidebar = document.querySelector('.sidebar-menu');
+        if (!sidebar) {
+            sidebar = document.createElement('div');
+            sidebar.className = 'sidebar-menu';
+
+            // Reconstruct the full menu with logo
+            sidebar.innerHTML = `
+                <div class="header-logo" onclick="window.location.href='index.html'" style="cursor:pointer">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Logotipo Peña Maulas">
+                </div>
+                <a href="socios.html" class="btn-primary btn-socios ${page === 'socios.html' ? 'active' : ''}">SOCIOS</a>
+                <a href="jornadas.html" class="btn-primary btn-jornadas ${page === 'jornadas.html' ? 'active' : ''}">JORNADAS</a>
+                <a href="pronosticos.html" class="btn-primary btn-pronosticos ${page === 'pronosticos.html' ? 'active' : ''}">PRONÓSTICOS</a>
+                <a href="resultados.html" class="btn-primary btn-resultados ${page === 'resultados.html' ? 'active' : ''}">RESULTADOS</a>
+                <a href="resumen-temporada.html" class="btn-primary btn-resumen ${page === 'resumen-temporada.html' ? 'active' : ''}">RESUMEN TEMPORADA</a>
+                <a href="admin.html" class="btn-primary btn-admin ${page === 'admin.html' ? 'active' : ''}">ADMINISTRACIÓN</a>
+                <a href="theme-editor.html" class="btn-primary ${page === 'theme-editor.html' ? 'active' : ''}" style="color:var(--primary-gold); border-color:var(--primary-gold);">IDENTIDAD VISUAL</a>
+            `;
+            document.body.prepend(sidebar);
         }
 
+        // 2. Ensure Multicolour Separator exists
+        if (!document.querySelector('.header-separator')) {
+            const separator = document.createElement('div');
+            separator.className = 'header-separator';
+            document.body.insertBefore(separator, sidebar.nextSibling);
+        }
 
+        // 3. Inject Logout Button
+        if (!document.getElementById('btn-logout-sidebar')) {
+            const btn = document.createElement('a');
+            btn.href = "#";
+            btn.id = "btn-logout-sidebar";
+            btn.textContent = "CERRAR SESIÓN";
+            btn.className = "btn-primary";
+            btn.onclick = (e) => {
+                e.preventDefault();
+                this.logout();
+            };
+            sidebar.appendChild(btn);
+        }
+
+        // 4. Remove redundant "Volver" buttons if they exist
+        const backBtns = document.querySelectorAll('.btn-back');
+        backBtns.forEach(b => b.style.display = 'none');
     }
 };
 

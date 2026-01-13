@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Colores - Peña Maulas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .config-container {
+            max-width: 1000px;
+            margin: 100px auto 40px;
+            padding: 2rem;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .config-card {
+            background: var(--modal-bg);
+            border: var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .config-card h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--primary-gold);
+            padding-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .color-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .color-row label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .color-row input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .color-row input[type="text"] {
+            width: 80px;
+            padding: 4px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .actions-bar {
+            position: sticky;
+            bottom: 20px;
+            background: var(--modal-bg);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            border: var(--glass-border);
+            margin-top: 2rem;
+        }
+
+        .btn-theme {
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-save {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-reset {
+            background: var(--danger);
+            color: white;
+        }
+
+        .preview-pane {
+            grid-column: 1 / -1;
+            background: var(--main-bg);
+            border: var(--glass-border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .preview-sample {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .sample-box {
+            padding: 1rem;
+            border-radius: 8px;
+            min-width: 120px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body class="page-body">
+    <div class="config-container">
+        <header class="page-header">
+            <h1 class="page-title">Configuración de Identidad Visual</h1>
+            <p style="color: var(--text-secondary)">Modifica los colores de la peña en tiempo real. Los cambios se
+                guardarán en la nube para todos los usuarios.</p>
+        </header>
+
+        <div class="config-grid">
+            <!-- Preview Section -->
+            <div class="preview-pane">
+                <h2>Vista Previa de Colores de Página</h2>
+                <div class="preview-sample">
+                    <div class="sample-box" style="background: var(--primary-green)">SOCIOS</div>
+                    <div class="sample-box" style="background: var(--primary-blue)">JORNADAS</div>
+                    <div class="sample-box" style="background: var(--primary-red)">PRONÓSTICOS</div>
+                    <div class="sample-box" style="background: var(--primary-purple)">RESULTADOS</div>
+                    <div class="sample-box" style="background: var(--primary-orange)">RESUMEN</div>
+                </div>
+            </div>
+
+            <!-- UI Colors -->
+            <div class="config-card">
+                <h2>Interfaz General</h2>
+                <div class="color-group" id="group-ui">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+            <!-- Socios Colors -->
+            <div class="config-card">
+                <h2>Socios</h2>
+                <div class="color-group" id="group-socios"></div>
+            </div>
+
+            <!-- Jornadas Colors -->
+            <div class="config-card">
+                <h2>Jornadas</h2>
+                <div class="color-group" id="group-jornadas"></div>
+            </div>
+
+            <!-- Pronósticos Colors -->
+            <div class="config-card">
+                <h2>Pronósticos</h2>
+                <div class="color-group" id="group-pronosticos"></div>
+            </div>
+
+            <!-- Resultados Colors -->
+            <div class="config-card">
+                <h2>Resultados</h2>
+                <div class="color-group" id="group-resultados"></div>
+            </div>
+
+            <!-- Resumen Colors -->
+            <div class="config-card">
+                <h2>Resumen Temporada</h2>
+                <div class="color-group" id="group-resumen"></div>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+            <button class="btn-theme btn-reset" onclick="ThemeEditor.reset()">RESETEAR VALORES</button>
+            <button class="btn-theme btn-save" onclick="ThemeEditor.save()">GUARDAR EN LA NUBE</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- App Logic -->
+    <script src="js/db-service.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/theme-editor.js"></script>
+</body>
+
+</html>

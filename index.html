@@ -25,51 +25,82 @@
         }
 
         .stat-card {
-            background: var(--card-bg);
+            background: rgba(45, 45, 45, 0.8);
+            /* Glassmorphism effect */
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             text-align: center;
-            border: var(--glass-border);
-            transition: transform 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .stat-card h3 {
             margin: 0 0 1rem 0;
-            font-size: 1rem;
-            color: var(--text-light);
+            font-size: 0.95rem;
+            color: #ffffff;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .stat-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary-blue);
-            text-shadow: 0 0 10px rgba(41, 182, 246, 0.3);
+            font-size: 3.2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
         }
 
-        .highlight-card {
-            border-bottom: 4px solid var(--primary-gold);
+        /* Neon Glows for values */
+        .stat-card[style*="border-bottom: 4px solid var(--primary-blue)"] .stat-value {
+            color: var(--primary-blue);
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+        }
+
+        .stat-card[style*="border-bottom: 4px solid var(--primary-green)"] .stat-value {
+            color: var(--primary-green);
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+        }
+
+        .stat-card[style*="border-bottom: 4px solid var(--primary-red)"] .stat-value {
+            color: var(--primary-red);
+            text-shadow: 0 0 15px rgba(255, 61, 0, 0.6);
+        }
+
+        .stat-card[style*="border-bottom: 4px solid var(--primary-purple)"] .stat-value {
+            color: var(--primary-purple);
+            text-shadow: 0 0 15px rgba(245, 0, 255, 0.6);
+        }
+
+        .stat-card[style*="border-bottom: 4px solid var(--primary-orange)"] .stat-value {
+            color: var(--primary-orange);
+            text-shadow: 0 0 15px rgba(255, 145, 0, 0.6);
         }
 
         .stat-wide-card {
             grid-column: 1 / -1;
-            background: var(--card-bg);
-            padding: 1.5rem;
+            background: rgba(35, 35, 35, 0.9);
+            padding: 2rem;
             border-radius: 12px;
-            border: var(--glass-border);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            color: #ffffff;
         }
 
         .stat-wide-card h3 {
-            margin-top: 0;
-            color: var(--text-secondary);
+            color: #ffffff !important;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -78,27 +109,28 @@
     <script src="js/auth.js"></script>
     <script src="js/scoring.js"></script>
 
-    <!-- Sidebar Menu on the Left -->
+    <!-- Sidebar Menu (Header) -->
     <div class="sidebar-menu">
+        <div class="header-logo">
+            <img src="LOGO_MAULAS.png?v=2" alt="Logotipo Peña Maulas">
+        </div>
         <a href="socios.html" class="btn-primary btn-socios">SOCIOS</a>
         <a href="jornadas.html" class="btn-primary btn-jornadas">JORNADAS</a>
         <a href="pronosticos.html" class="btn-primary btn-pronosticos">PRONÓSTICOS</a>
         <a href="resultados.html" class="btn-primary btn-resultados">RESULTADOS</a>
         <a href="resumen-temporada.html" class="btn-primary btn-resumen">RESUMEN TEMPORADA</a>
-        <a href="admin.html" class="btn-primary btn-admin"
-            style="margin-top:auto; background-color: #546e7a;">ADMINISTRACIÓN</a>
+        <a href="admin.html" class="btn-primary btn-admin">ADMINISTRACIÓN</a>
     </div>
 
+    <!-- Header Separator -->
+    <div class="header-separator"></div>
+
     <!-- Main Content Area -->
-    <div style="margin-left: 280px; padding: 2rem; width: calc(100% - 280px); box-sizing: border-box;">
+    <div
+        style="width: 100%; max-width: 1400px; margin: 0 auto; padding: 1rem; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;">
 
-        <!-- Logo in the Center -->
-        <div class="logo-container"
-            style="position:relative; left:0; transform:none; margin: 0 auto 2rem auto; max-width: 250px;">
-            <img src="LOGOTIPO_MAULA.JPG" alt="Logotipo Peña Maulas" class="main-logo" style="width:100%; height:auto;">
-        </div>
-
-        <div id="dashboard-stats" class="dashboard-stats">
+        <!-- Stats Grid -->
+        <div id="dashboard-stats" class="dashboard-stats" style="width: 100%;">
             <!-- Populated by JS -->
             <p style="text-align:center; width:100%; color:#888;">Cargando resumen...</p>
         </div>

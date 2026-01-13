@@ -140,16 +140,16 @@ class ResultsManager {
 
         sortedMembers.forEach(m => {
             // Apply equal sizing
-            theadHtml += `<th style="z-index:2; width:80px; min-width:80px; vertical-align:middle; padding:10px 2px; word-wrap: break-word; white-space: normal;">
+            theadHtml += `<th style="z-index:2; width:80px; min-width:80px; vertical-align:middle; padding:10px 2px; word-wrap: break-word; white-space: normal; background-color: var(--primary-purple);">
                             <div style="font-weight:bold; line-height:1.2; font-size:0.95rem;">${m.name}</div>
-                            <div style="font-size:0.7rem; font-weight:normal; color:#e0f2f1; opacity:0.8;">ID: ${m.id}</div>
+                            <div style="font-size:0.7rem; font-weight:normal; color:#eceff1; opacity:0.8;">ID: ${m.id}</div>
                           </th>`;
         });
         theadHtml += `</tr>`;
 
         // 2. Grand Total (Sticky below names)
         theadHtml += `<tr class="total-row" style="position:sticky; top:60px; z-index:2;">
-                        <td style="position:sticky; left:0; z-index:3; background-color:#e1bee7; border-right:2px solid #ddd;">TOTAL PUNTOS</td>`;
+                        <td style="position:sticky; left:0; z-index:3; background-color:#cfd8dc; border-right:2px solid #ddd;">TOTAL PUNTOS</td>`;
         sortedMembers.forEach(m => {
             theadHtml += `<td class="accumulated-score" style="font-size: 1.6rem;">${memberStats[m.id].grandTotal}</td>`;
         });
@@ -157,20 +157,20 @@ class ResultsManager {
 
         // 3. Base Hits
         theadHtml += `<tr class="summary-row" style="position:sticky; top:110px; z-index:2;">
-                        <td style="position:sticky; left:0; z-index:3; background:#e1bee7; border-right:2px solid #ddd;">Aciertos Base</td>`;
+                        <td style="position:sticky; left:0; z-index:3; background:#cfd8dc; border-right:2px solid #ddd;">Aciertos Base</td>`;
         sortedMembers.forEach(m => {
-            theadHtml += `<td style="color:#555; background:#f3e5f5;">${memberStats[m.id].baseTotal}</td>`;
+            theadHtml += `<td style="color:#333; background:#f5f5f5;">${memberStats[m.id].baseTotal}</td>`;
         });
         theadHtml += `</tr>`;
 
         // 4. Bonus/Penalties
         theadHtml += `<tr class="summary-row" style="border-bottom:2px solid #ddd; position:sticky; top:150px; z-index:2;">
-                        <td style="position:sticky; left:0; z-index:3; background:#e1bee7; border-right:2px solid #ddd;">Bonus / Penal.</td>`;
+                        <td style="position:sticky; left:0; z-index:3; background:#cfd8dc; border-right:2px solid #ddd;">Bonus / Penal.</td>`;
         sortedMembers.forEach(m => {
             const val = memberStats[m.id].bonusTotal;
-            const color = val >= 0 ? '#7b1fa2' : '#c62828'; // Morado para positivo, rojo oscuro para negativo
+            const color = val >= 0 ? '#455a64' : '#c62828'; // Azul grisáceo para positivo
             const sign = val > 0 ? '+' : '';
-            theadHtml += `<td style="color:${color}; font-weight:bold; background:#f3e5f5;">${sign}${val}</td>`;
+            theadHtml += `<td style="color:${color}; font-weight:bold; background:#f5f5f5;">${sign}${val}</td>`;
         });
         theadHtml += `</tr>`;
 
@@ -192,8 +192,8 @@ class ResultsManager {
         finishedJornadas.forEach(j => {
             tbodyHtml += `<tr>`;
             tbodyHtml += `<td style="font-size:0.9rem; border-right:2px solid #ddd;">
-                            <div style="font-weight:bold;">Jornada ${j.number}</div>
-                            <div style="color:#777; font-size:0.8rem;">${j.date}</div>
+                            <div style="font-weight:bold; color:#333;">Jornada ${j.number}</div>
+                            <div style="color:#455a64; font-size:0.8rem;">${j.date}</div>
                           </td>`;
 
             sortedMembers.forEach(m => {

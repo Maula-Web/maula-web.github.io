@@ -2,35 +2,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* Socios - Green */
-    --primary-green: #2e7d32;
+    /* Socios - Professional Green (Muted) */
+    --primary-green: #2ebd59;
     --dark-green: #1b5e20;
-    --pastel-bg-green: #e8f5e9;
-    --pastel-accent-green: #a5d6a7;
+    --pastel-bg-green: #0a1f13;
+    --pastel-accent-green: #1b5e20;
 
-    /* Jornadas - Blue */
-    --primary-blue: rgb(43, 87, 136);
-    --dark-blue: rgb(30, 60, 95);
-    --pastel-bg-blue: #e3f2fd;
-    --pastel-accent-blue: #90caf9;
+    /* Jornadas - Saturated/Darker Blue */
+    --primary-blue: #1565c0;
+    --dark-blue: #0d47a1;
+    --pastel-bg-blue: #0a1929;
+    --pastel-accent-blue: #1565c0;
 
-    /* Pronósticos - Red */
-    --primary-red: rgb(195, 0, 0);
-    --dark-red: rgb(140, 0, 0);
-    --pastel-bg-red: #ffebee;
-    --pastel-accent-red: #ef9a9a;
+    /* Pronósticos - Laser Red */
+    --primary-red: #ff3d00;
+    --dark-red: #dd2c00;
+    --pastel-bg-red: #2a0b0e;
+    --pastel-accent-red: #b71c1c;
 
-    /* Resultados - Purple */
-    --primary-purple: rgb(96, 14, 122);
-    --dark-purple: rgb(65, 10, 85);
-    --pastel-bg-purple: #f3e5f5;
-    --pastel-accent-purple: #ce93d8;
+    /* Resultados - Cyber Purple */
+    --primary-purple: #f500ff;
+    --dark-purple: #d500f9;
+    --pastel-bg-purple: #1a0a24;
+    --pastel-accent-purple: #7b1fa2;
 
-    /* Resumen Temporada - Orange */
-    --primary-orange: rgb(244, 129, 0);
-    --dark-orange: rgb(200, 100, 0);
-    --pastel-bg-orange: #fff3e0;
-    --pastel-accent-orange: #ffb74d;
+    /* Resumen Temporada - Neon Orange */
+    --primary-orange: #ff9100;
+    --dark-orange: #ff6d00;
+    --pastel-bg-orange: #2a1200;
+    --pastel-accent-orange: #ef6c00;
+
+    /* Gold for Leader */
+    --primary-gold: #ffd700;
 
     /* Common */
     --pastel-bg: #e8f5e9;
@@ -57,15 +60,15 @@
 [data-theme="dark"] {
     /* Tech/Dark Mode Palette */
 
-    /* Socios - Neon Green */
-    --primary-green: #00e676;
-    --dark-green: #00a854;
+    /* Socios - Professional Green */
+    --primary-green: #2ebd59;
+    --dark-green: #1b5e20;
     --pastel-bg-green: #0a1f13;
     --pastel-accent-green: #1b5e20;
 
-    /* Jornadas - Electric Blue */
-    --primary-blue: #29b6f6;
-    --dark-blue: #0288d1;
+    /* Jornadas - Darker Blue */
+    --primary-blue: #1565c0;
+    --dark-blue: #0d47a1;
     --pastel-bg-blue: #0a1929;
     --pastel-accent-blue: #1565c0;
 
@@ -75,11 +78,11 @@
     --pastel-bg-red: #2a0b0e;
     --pastel-accent-red: #b71c1c;
 
-    /* Resultados - Cyber Purple */
-    --primary-purple: #e040fb;
-    --dark-purple: #aa00ff;
-    --pastel-bg-purple: #1a0a24;
-    --pastel-accent-purple: #7b1fa2;
+    /* Resultados - Dark Blue Gray (Replacing Fuchsia) */
+    --primary-purple: #455a64;
+    --dark-purple: #37474f;
+    --pastel-bg-purple: #1a232e;
+    --pastel-accent-purple: #607d8b;
 
     /* Resumen Temporada - Neon Orange */
     --primary-orange: #ff9100;
@@ -99,20 +102,18 @@
     --text-light: #94a3b8;
     /* Slate 400 */
 
+    /* Glass / Dark UI Elements */
     --card-bg: rgba(30, 41, 59, 0.7);
-    /* Glassy dark */
-    --main-bg: #0f172a;
-    --modal-bg: #1e293b;
-    --input-bg: #0f172a;
+    --main-bg: #1a1a1a;
+    --modal-bg: #2d2d2d;
+    --input-bg: #1e293b;
     --input-border: #334155;
-
     --text-main: #f1f5f9;
     --text-secondary: #cbd5e1;
-
-    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -168,89 +169,183 @@ body {
 
 /* Home Page Styles */
 .home-body {
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-/* Sidebar Menu Container */
-.sidebar-menu {
-    position: fixed;
-    top: 50%;
-    left: 5%;
-    transform: translateY(-50%);
-    z-index: 10;
+    background-color: #1a1a1a !important;
+    /* Dark gray background */
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    padding-top: 80px;
+    /* Space for the header + separator */
+    color: #e0e0e0;
+}
+
+/* Header Separator */
+.header-separator {
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-green), var(--primary-blue), var(--primary-red), var(--primary-purple), var(--primary-orange));
+    position: fixed;
+    top: 70px;
+    /* Right below the 70px header */
+    left: 0;
+    z-index: 1999;
+}
+
+/* Main Navigation Header (Versus.es inspired) */
+.sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background-color: #000000;
+    /* Deep black like Versus */
+    z-index: 2000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    /* Align logo to the left */
+    gap: 1rem;
+    padding: 0 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid #333;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    margin-right: auto;
+    /* Push links to the right or center */
+    height: 100%;
+}
+
+.header-logo img {
+    height: 50px;
+    /* Adapted size for header */
+    width: auto;
+    object-fit: contain;
 }
 
 .btn-primary {
-    color: white;
-    padding: 1rem 2rem;
-    border-radius: 8px;
+    color: #ffffff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    /* More angular, modern like Versus */
     text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
-    border: 2px solid transparent;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    border: none;
     cursor: pointer;
     text-align: center;
-    min-width: 180px;
+    min-width: 120px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Specific button colors for main page */
 .btn-socios {
-    background-color: var(--dark-green);
+    background-color: transparent;
 }
 
-.btn-socios:hover {
-    background-color: var(--primary-green);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+.btn-socios:hover,
+.btn-socios.active {
+    color: var(--primary-green) !important;
+    transform: scale(1.05);
 }
 
 .btn-jornadas {
-    background-color: var(--dark-blue);
+    background-color: transparent;
 }
 
 .btn-jornadas:hover {
-    background-color: var(--primary-blue);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    color: var(--primary-blue);
+    transform: scale(1.05);
 }
 
 .btn-pronosticos {
-    background-color: var(--dark-red);
+    background-color: transparent;
 }
 
 .btn-pronosticos:hover {
-    background-color: var(--primary-red);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    color: var(--primary-red);
+    transform: scale(1.05);
 }
 
 .btn-resultados {
-    background-color: var(--dark-purple);
+    background-color: transparent;
 }
 
 .btn-resultados:hover {
-    background-color: var(--primary-purple);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    color: var(--primary-purple);
+    transform: scale(1.05);
 }
 
 .btn-resumen {
-    background-color: var(--dark-orange);
+    background-color: var(--primary-orange);
+    color: #000;
 }
 
 .btn-resumen:hover {
-    background-color: var(--primary-orange);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    background-color: #ffd600;
+    /* Bright highlight like Versus registration */
+    transform: scale(1.05);
+}
+
+.btn-admin {
+    background-color: #333;
+    font-size: 0.85rem;
+}
+
+.btn-admin:hover,
+.btn-admin.active {
+    background-color: #555;
+    transform: scale(1.05);
+}
+
+/* Active states with colors */
+.btn-socios.active {
+    color: var(--primary-green) !important;
+    border-bottom: 2px solid var(--primary-green);
+}
+
+.btn-jornadas.active {
+    color: var(--primary-blue) !important;
+    border-bottom: 2px solid var(--primary-blue);
+}
+
+.btn-pronosticos.active {
+    color: var(--primary-red) !important;
+    border-bottom: 2px solid var(--primary-red);
+}
+
+.btn-resultados.active {
+    color: var(--primary-purple) !important;
+    border-bottom: 2px solid var(--primary-purple);
+}
+
+.btn-resumen.active {
+    background-color: #ffd600 !important;
+    color: #000 !important;
+}
+
+/* Logout button specifically (injected via auth.js) */
+#btn-logout-sidebar {
+    background-color: #000 !important;
+    border: 1px solid #444 !important;
+}
+
+#btn-logout-sidebar:hover {
+    background-color: #d32f2f !important;
+    /* Visual cue for logout */
+    border-color: #d32f2f !important;
+    transform: scale(1.05);
 }
 
 .logo-container {
@@ -275,12 +370,13 @@ body {
 
 /* Page Common Styles */
 .page-body {
-    background-color: var(--pastel-bg);
-    padding: 1rem;
-    color: var(--text-dark);
+    background-color: #1a1a1a;
+    padding: 0;
+    /* Header handles padding */
+    padding-top: 80px;
+    /* Room for header + separator */
+    color: #f1f5f9;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 /* Page-specific backgrounds */
@@ -429,33 +525,32 @@ body {
 }
 
 .main-container {
-    width: 98%;
-    max-width: none;
-    margin: 0 auto;
-    background-color: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: var(--glass-border);
+    max-width: 1400px;
+    margin: 1rem auto;
+    background: #232323;
+    padding: 2.5rem;
     border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: var(--shadow-md);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .header-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--pastel-accent);
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .page-title {
-    font-size: 2rem;
-    color: var(--primary-green);
-    font-weight: 700;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .action-buttons {
@@ -581,7 +676,86 @@ body {
     flex-direction: column;
     gap: 0.5rem;
     max-width: 100%;
+
     /* Full width as requested */
+    /* Socios Email specific */
+    .socios-page tbody td:nth-child(3) {
+        color: #2ebd59;
+        opacity: 0.85;
+        /* Dimm it slightly */
+    }
+
+    .socios-page .btn-add,
+    .jornadas-page #btn-import-rss {
+        background-color: #2ebd59 !important;
+        color: white !important;
+    }
+
+    .jornadas-page #btn-new-jornada {
+        background-color: #0d47a1 !important;
+        /* Slightly darker blue */
+        color: white !important;
+    }
+
+    .jornadas-page .page-title {
+        color: #1565c0 !important;
+    }
+
+    /* Pronosticos Page Styles */
+    .pronosticos-page .page-title {
+        color: var(--primary-red);
+    }
+
+    .pronosticos-page #btn-view-jornada {
+        background: var(--primary-orange) !important;
+        color: white !important;
+    }
+
+    .pronosticos-page #lbl-correction {
+        color: #ffffff !important;
+    }
+
+    .pronosticos-page .summary-section h2 {
+        color: #ffffff !important;
+    }
+
+    /* Summary Table Special Styles */
+    .pronosticos-page #summary-container table {
+        background: white !important;
+        color: #333 !important;
+    }
+
+    .pronosticos-page #summary-container thead th {
+        background: #f5f5f5 !important;
+        color: #333 !important;
+        border-bottom: 2px solid #ddd !important;
+    }
+
+    .pronosticos-page #summary-container tbody tr:nth-child(even) {
+        background: #f9f9f9 !important;
+    }
+
+    .pronosticos-page #summary-container tbody tr:nth-child(odd) {
+        background: #ffffff !important;
+    }
+
+    .pronosticos-page #summary-container tbody td {
+        border-bottom: 1px solid #eee !important;
+        color: #333 !important;
+    }
+
+    /* Blue for Jornada number */
+    .pronosticos-page #summary-container tbody td:first-child {
+        color: #1565c0 !important;
+        font-weight: bold;
+    }
+
+    /* Orange for late forecasts */
+    .pronosticos-page .late-forecast {
+        color: var(--primary-orange) !important;
+        font-weight: bold;
+    }
+
     margin: 0 auto;
 }
 
@@ -664,16 +838,13 @@ body {
     font-size: 0.8rem;
 }
 
-/* Tables */
+/* Tables Styling */
 .members-list-container,
 .table-container {
-    flex: 1;
-    overflow-x: auto;
-    background: var(--card-bg);
-    border: var(--glass-border);
+    background: #1a1a1a;
     border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    padding: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 table {
@@ -682,18 +853,26 @@ table {
 }
 
 thead th {
-    background: var(--pastel-bg);
-    color: var(--primary-green);
-    text-align: left;
+    background-color: #2d2d2d;
+    color: #ffffff;
     padding: 1rem;
-    font-weight: 600;
-    border-radius: 6px;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #3d3d3d;
 }
 
 tbody td {
     padding: 1rem;
-    border-bottom: 1px solid var(--input-border);
-    color: var(--text-main);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: #cbd5e1;
+    font-size: 0.95rem;
+}
+
+tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .jornadas-grid {
@@ -805,11 +984,60 @@ tbody td {
     font-size: 1rem;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
+/* Modals */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+}
+
+.modal {
+    background: #2d2d2d !important;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    border-radius: 16px;
+}
+
+.modal h2 {
+    color: #ffffff;
+    font-weight: 800;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Forms in Dark Mode */
+.form-group label {
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+select,
+textarea {
+    background-color: #1a1a1a !important;
+    border: 1px solid #3d3d3d !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+    padding: 0.8rem;
+    font-family: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-blue) !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.2);
+}
+
+.modal-actions .btn-action[style*="background: #f5f5f5"] {
+    background: #3d3d3d !important;
+    color: #ffffff !important;
+    border: none;
 }
 
 .delete-btn {
@@ -903,11 +1131,35 @@ tbody td {
     border: 3px solid var(--card-bg);
 }
 
-/* Ensure visibility on Firefox */
-.pronosticos-page .table-container,
-#sticky-scrollbar-container {
-    scrollbar-width: auto;
-    scrollbar-color: var(--primary-red) var(--pastel-bg-red);
+/* Results Matrix Dark Graying */
+.resultados-page .results-table td,
+.resultados-page .results-table th {
+    color: #333 !important;
+    /* Dark gray for texts */
+}
+
+/* Admin Page visibility */
+.page-body.admin-page td,
+.page-body.admin-page span,
+.page-body.admin-page div {
+    color: #333 !important;
+}
+
+.admin-grid .config-card,
+.admin-grid .logs-card {
+    color: #333 !important;
+}
+
+.admin-grid input,
+.admin-grid select {
+    color: #333 !important;
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+}
+
+/* Chart Titles color fix */
+.dashboard-card .card-title {
+    color: #ffffff;
 }
 
 /* Responsive Design */
@@ -952,10 +1204,36 @@ tbody td {
     }
 
     /* Content below sidebar on landing */
+    .home-body div[style*="margin-left: 280px"],
     .home-body div[style*="margin-left: 280px"] {
         margin-left: 0 !important;
         width: 100% !important;
-        padding: 1rem 0 !important;
+        padding: 1rem !important;
+    }
+
+    .sidebar-menu {
+        height: auto;
+        padding: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .header-logo {
+        width: 100%;
+        justify-content: center;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .header-logo img {
+        height: 40px;
+    }
+
+    .sidebar-menu .btn-primary {
+        min-width: 100px;
+        font-size: 0.7rem;
+        padding: 0.5rem;
     }
 
     .main-logo {

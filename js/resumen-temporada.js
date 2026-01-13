@@ -180,11 +180,11 @@ class ResumenManager {
                     </td>
                     <td style="padding:1rem; text-align:center;">${medal || (idx + 1)}</td>
                     <td style="padding:1rem; font-weight:bold;">
-                        <a href="javascript:void(0)" onclick="window.app.showMemberSummary(${r.id}, '${r.name.replace(/'/g, "\\'")}')" style="color:var(--primary-purple); text-decoration:none; border-bottom:1px dashed var(--primary-purple);">
+                        <a href="javascript:void(0)" onclick="window.app.showMemberSummary(${r.id}, '${r.name.replace(/'/g, "\\'")}')" style="color:#ffb300; text-decoration:none; border-bottom:1px dashed #ffb300;">
                             ${r.name}
                         </a>
                     </td>
-                    <td style="padding:1rem; text-align:right; font-size:1.2rem; color:var(--primary-purple); font-weight:bold;">${r.points}</td>
+                    <td style="padding:1rem; text-align:right; font-size:1.2rem; color:#ffb300; font-weight:bold;">${r.points}</td>
                 </tr>
             `;
         });
@@ -391,16 +391,16 @@ class ResumenManager {
             const relColor = reliability > 70 ? '#2e7d32' : reliability > 40 ? '#f57f17' : '#9e9e9e';
 
             return `
-                <div style="border-bottom:1px solid #f0f0f0; padding:6px 0;">
+                <div style="border-bottom:1px solid rgba(21, 101, 192, 0.1); padding:6px 0;">
                     <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:2px;">
-                        <span style="font-weight:600;">${t.name}</span>
+                        <span style="font-weight:600; color:#1565c0;">${t.name}</span>
                         <span style="font-weight:bold; color:${t.rate >= 50 ? '#2e7d32' : '#d84315'}">${t.rate.toFixed(0)}%</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <div style="flex:1; height:4px; background:#eee; border-radius:2px; overflow:hidden;">
-                            <div style="height:100%; width:${t.rate}%; background:${t.rate >= 50 ? '#81c784' : '#ef9a9a'};"></div>
+                        <div style="flex:1; height:4px; background:rgba(21, 101, 192, 0.1); border-radius:2px; overflow:hidden;">
+                            <div style="height:100%; width:${t.rate}%; background:${t.rate >= 50 ? '#1976d2' : '#ef9a9a'};"></div>
                         </div>
-                        <span style="font-size:0.6rem; color:#888; white-space:nowrap;">${t.total} matches</span>
+                        <span style="font-size:0.6rem; color:#1565c0; opacity: 0.8; white-space:nowrap;">${t.total} matches</span>
                         <div title="Fiabilidad estadística" style="width:8px; height:8px; border-radius:50%; background:${relColor};"></div>
                     </div>
                 </div>
@@ -427,8 +427,8 @@ class ResumenManager {
                 isWorst ? 'background:#ffebee; font-weight:bold; border-left:3px solid #d32f2f; padding-left:4px;' : '';
 
             return `
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0; border-bottom:1px solid #f0f0f0; ${style}">
-                    <span>Partido #${idx + 1} ${isBest ? '⭐' : isWorst ? '🚩' : ''}</span>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0; border-bottom:1px solid rgba(255, 179, 0, 0.2); ${style}">
+                    <span style="color:#ffb300;">Partido #${idx + 1} ${isBest ? '⭐' : isWorst ? '🚩' : ''}</span>
                     <span style="color:${rate >= 50 ? '#2e7d32' : '#d84315'}">${rate.toFixed(0)}%</span>
                 </div>
             `;
@@ -562,8 +562,8 @@ class ResumenManager {
 
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                             <!-- MATCH STATS -->
-                            <div style="background:#fff8e1; padding:0.8rem; border-radius:8px; border-top:4px solid #ffb300;">
-                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:#8d6e63; text-transform:uppercase;">ACIERTO POR PARTIDO</h5>
+                            <div style="background:#fffde7; padding:0.8rem; border-radius:8px; border-top:4px solid #ffb300;">
+                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:#ffb300; text-transform:uppercase; font-weight: 800;">ACIERTO POR PARTIDO</h5>
                                 <div style="max-height:150px; overflow-y:auto; padding-right:5px;">
                                     ${matchResultsHtml}
                                 </div>
@@ -571,7 +571,7 @@ class ResumenManager {
 
                             <!-- TEAM STATS -->
                             <div style="background:#e3f2fd; padding:0.8rem; border-radius:8px; border-top:4px solid #1976d2;">
-                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:#1565c0; text-transform:uppercase;">ACIERTO POR EQUIPOS</h5>
+                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:#1976d2; text-transform:uppercase; font-weight: 800;">ACIERTO POR EQUIPOS</h5>
                                 <div style="max-height:150px; overflow-y:auto; padding-right:5px;">
                                     ${teamResultsHtml}
                                 </div>
@@ -598,8 +598,8 @@ class ResumenManager {
                         </div>
                     </div>
                 </div>
-            </div>
-        `;
+            </div >
+            `;
         detailSection.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -617,7 +617,7 @@ class ResumenManager {
         let matchesHtml = '';
         if (jornada && jornada.matches) {
             matchesHtml = `
-                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+            < table style = "width:100%; border-collapse:collapse; font-size:0.85rem;" >
                     <thead>
                         <tr style="background:#546e7a; color:white;">
                             <th style="padding:4px;">#</th>
@@ -647,7 +647,7 @@ class ResumenManager {
                     </tr>
                 `;
             });
-            matchesHtml += '</tbody></table>';
+            matchesHtml += '</tbody></table > ';
         }
 
         // Check for Doubles in this Jornada
@@ -730,7 +730,7 @@ class ResumenManager {
         let html = `
             <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
                 <thead>
-                    <tr style="background:#6a1b9a; color:white;">
+                    <tr style="background:#f48100; color:white;">
                         <th style="padding:8px;">Jornada</th>
                         <th style="padding:8px; text-align:left;">Socio</th>
                         <th style="padding:8px; text-align:center;">Aciertos</th>
@@ -749,11 +749,11 @@ class ResumenManager {
                         <td style="padding:8px; text-align:center; font-weight:bold;">J${d.jornadaNum}</td>
                         <td style="padding:8px;">${d.memberName}</td>
                         <td style="padding:8px; text-align:center;">
-                            <span style="background:${d.hits >= 10 ? '#e8f5e9' : '#f3e5f5'}; color:${d.hits >= 10 ? '#2e7d32' : '#6a1b9a'}; padding:2px 8px; border-radius:12px; font-weight:bold;">
+                            <span style="background:${d.hits >= 10 ? '#e8f5e9' : '#fff3e0'}; color:${d.hits >= 10 ? '#2e7d32' : '#f48100'}; padding:2px 8px; border-radius:12px; font-weight:bold;">
                                 ${d.hits}
                             </span>
                         </td>
-                         <td style="padding:8px; font-size:0.75rem; color:#555; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                         <td style="padding:8px; font-size:0.75rem; color:#fff; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                             ${d.selection.join(', ')}
                         </td>
                     </tr>

@@ -28,3 +28,17 @@ Esta columna, aparecerá al abrir la ventana Ver pronósticos y sólo cuando los
 
 
 Quiero que analices la web (no cambies nada) y me digas si es posible hacer que se adapte a diferentes dispositivos. Que reconozca si se está navegando desde un móvil, tablet o PC y que el diseño se adapte a cada dispositivo, para facilitar el uso
+
+
+En la hoja de Gestión de Socios el color del correo electrónico de los socios es demasiado brillante, apágalo un poco. El color que pongas en ese texto lo vas a poner tambien en el boton "ALTA DE NUEVOS SOCÇIOS" manteniendo el texto del botón en color blanco.
+Ese mismo color verde lo pondrás en el botón Importar resultados RSS de la hoja Jornadas, manteniendo el texto en blanco. El color azul del botón Nueva Jornada debe ser un poco más oscuro manteniendo el texto en blanco. El color azul clareo de la numeración de cada jornada tendrá el mismo color azul que le pongas al boton Nueva jornada.
+El título de la hoja JORNADAS tendrá ese mismo azul y la fecha y la hora de debajo de ese texto tiene que ser un poquito más claro.
+El color del número de jornada en la columna jornada de la  hoja Pronósticos, será el mismo azul que el botón Nueva Jornada. El texto "Resumen de Pronósticos" ponlo en blanco. Los colores de las columnas ahora alternan entre verde muy claro y gris oscuro. Haz que alternen entre gris claro y blanco. EL texto de la tabla será en color gris oscuro excepto los pronósticos sellados tarde que irán con el mismo color naranja que el título Pronósticos.
+El botón Ver Pronósticos cambialo a Naranja y el texto modo correción ponlo en blanco.
+Dentro de la ventana Ver pronósticos vamos a cambiar los  colores morados a colores naranjas. El color marron oscuro de la la primera fila, cambialo a gris claro manteniendo el color del texto. La hoja resultados ahora utiliza un color fucsia demasiado brillante. Vamos a cambiarlo por azul grisáceo oscuro y adaptar los colores fucsia a este nuevo color. Los textos de los resultados son de un gris demasiado claro. Ponlos en grsi oscuro.
+En la hoja resumen de temporada los nombres en la tabla de clasificación que ahora están en color fucsia, cambialos al mismo color amarillo que tiene el título de la hoja.
+El texto de las ventanas ACIERTO POR PARTIDO Y ACIERTO POR EQUIPOS No se ve. Cambialo al mismo color que el título de cada una de estas ventanas.
+La ventana de ver quiniela de dobles Tienen el color de los signos del pronóstico demasiado oscuro. Ponlo en blanco.
+En la hoja administración Los textos de las tablas son demasiado claros y no se ven. Ponlos en gris oscuro.
+Quiero que crees una herramienta (dentro o fuera de la web, lo que mejor funcione) que me permita cambiar los colores de los distintos elementos de la web. Una posibilidad podría ser que me pases un listado de elementos diciendome lo que es y su color actual y que desde un selector de color yo decida qué color nuevo utilizar para cada elemento.
+Esta herramiento se podrá utilizar en un futuro si decidimos cambiar el aspecto de la web.

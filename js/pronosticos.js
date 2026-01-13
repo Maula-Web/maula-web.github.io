@@ -893,12 +893,12 @@ class PronosticoManager {
 
             // Build Enhanced Table (Much LARGER as requested)
             let html = `
-                <table style="border-collapse: collapse; font-size: 1.05rem; background: #fff; width: auto; min-width: 95%; margin-bottom: 40px; border: 3px solid #673ab7; border-radius: 8px; overflow: hidden;">
-                    <thead style="background: #f3e5f5; position: sticky; top: 0; z-index: 10;">
+                <table style="border-collapse: collapse; font-size: 1.05rem; background: #fff; width: auto; min-width: 95%; margin-bottom: 40px; border: 3px solid var(--primary-orange); border-radius: 8px; overflow: hidden;">
+                    <thead style="background: #e0e0e0; position: sticky; top: 0; z-index: 10;">
                         <tr>
-                            <th style="border: 1px solid #ccc; padding: 15px; min-width: 50px; color: #4a148c; font-size: 1.1rem;">#</th>
-                            <th style="border: 1px solid #ccc; padding: 15px; text-align: right; min-width: 200px; color: #4a148c; font-size: 1.1rem;">Local</th>
-                            <th style="border: 1px solid #ccc; padding: 15px; text-align: left; min-width: 200px; color: #4a148c; font-size: 1.1rem;">Visitante</th>
+                            <th style="border: 1px solid #ccc; padding: 15px; min-width: 50px; color: #333; font-size: 1.1rem;">#</th>
+                            <th style="border: 1px solid #ccc; padding: 15px; text-align: right; min-width: 200px; color: #333; font-size: 1.1rem;">Local</th>
+                            <th style="border: 1px solid #ccc; padding: 15px; text-align: left; min-width: 200px; color: #333; font-size: 1.1rem;">Visitante</th>
             `;
 
             // Member Columns
@@ -908,7 +908,7 @@ class PronosticoManager {
 
             // Doubles Columns at the end
             allDoubles.forEach(() => {
-                html += `<th style="border: 2px solid #673ab7; padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 60px; min-width: 60px; font-size: 1rem; color: #fff; background: #673ab7; font-weight: bold; letter-spacing: 1px; white-space: nowrap;">Quiniela Dobles</th>`;
+                html += `<th style="border: 2px solid var(--primary-orange); padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 60px; min-width: 60px; font-size: 1rem; color: #fff; background: var(--primary-orange); font-weight: bold; letter-spacing: 1px; white-space: nowrap;">Quiniela Dobles</th>`;
             });
 
             // "COLUMNA PERFECTA" Logic
@@ -931,13 +931,13 @@ class PronosticoManager {
 
             jornada.matches.forEach((match, idx) => {
                 const displayIdx = idx === 14 ? 'P15' : idx + 1;
-                const rowStyle = [3, 7, 10, 13].includes(idx) ? 'border-bottom: 4px solid #673ab7;' : 'border-bottom: 1px solid #ddd;';
-                const bgColor = idx % 2 === 0 ? '#fff' : '#fcfaff';
+                const rowStyle = [3, 7, 10, 13].includes(idx) ? 'border-bottom: 4px solid var(--primary-orange);' : 'border-bottom: 1px solid #ddd;';
+                const bgColor = idx % 2 === 0 ? '#fff' : '#f5f5f5';
 
                 const officialResult = match.result || null;
 
                 html += `<tr style="background: ${bgColor}; ${rowStyle}">
-                    <td style="border: 1px solid #ccc; padding: 10px; text-align: center; font-weight: bold; color: #673ab7; font-size: 1.1rem;">${displayIdx}</td>
+                    <td style="border: 1px solid #ccc; padding: 10px; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: 1.1rem;">${displayIdx}</td>
                     <td style="border: 1px solid #ccc; padding: 10px 20px; text-align: right; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
                     <td style="border: 1px solid #ccc; padding: 10px 20px; text-align: left; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
                 `;
@@ -970,7 +970,7 @@ class PronosticoManager {
                 // Doubles Forecasts (Extra columns)
                 allDoubles.forEach((db, dbIdx) => {
                     let sign = '-';
-                    let cellStyle = 'border: 2px solid #673ab7; padding: 8px; text-align: center; width: 60px; min-width: 60px; font-weight: 900; font-size: 1.3rem; color: #4a148c; background: #f3e5f5;';
+                    let cellStyle = 'border: 2px solid var(--primary-orange); padding: 8px; text-align: center; width: 60px; min-width: 60px; font-weight: 900; font-size: 1.3rem; color: #fff; background: var(--primary-orange);';
 
                     if (db.selection && db.selection[idx]) {
                         sign = db.selection[idx];
@@ -1306,7 +1306,7 @@ class PronosticoManager {
             let html = `<div style="display:flex; gap:1px; margin-right:4px;">`;
             options.forEach(opt => {
                 const isSel = opt === selected;
-                const style = isSel ? 'background-color:#6a1b9a; color:white; border-color:#6a1b9a;' : 'font-size:0.75rem; padding:0;';
+                const style = isSel ? 'background-color:var(--primary-orange); color:white; border-color:var(--primary-orange);' : 'font-size:0.75rem; padding:0;';
                 html += `<div class="p15-option ${isSel ? 'selected' : ''}"
             data-team="${team}" data-val="${opt}"
             style="width:20px; height:20px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; cursor:pointer; ${style}"
@@ -1335,9 +1335,9 @@ class PronosticoManager {
         });
 
         btn.classList.add('selected');
-        btn.style.backgroundColor = '#6a1b9a';
+        btn.style.backgroundColor = 'var(--primary-orange)';
         btn.style.color = 'white';
-        btn.style.borderColor = '#6a1b9a';
+        btn.style.borderColor = 'var(--primary-orange)';
     }
 
     handleDoubleToggle(btn, idx, sign, isP15) {
