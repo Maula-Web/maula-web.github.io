@@ -1,20 +1,24 @@
 const Auth = {
     async checkContext() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.applySavedTheme();
+                if (!window.location.pathname.includes('login.html')) {
+                    this.injectLogout();
+                }
+            });
+        } else {
+            this.applySavedTheme();
+            if (!window.location.pathname.includes('login.html')) {
+                this.injectLogout();
+            }
+        }
+
         if (window.location.pathname.includes('login.html')) return;
 
         const user = sessionStorage.getItem('maulas_user');
         if (!user) {
             window.location.href = 'login.html';
-        } else {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.injectLogout();
-                    this.applySavedTheme();
-                });
-            } else {
-                this.injectLogout();
-                this.applySavedTheme();
-            }
         }
     },
 

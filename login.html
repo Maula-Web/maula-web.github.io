@@ -12,25 +12,32 @@
     <!-- DB Config -->
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
+    <script>
+        // Simple theme auto-detect for login
+        const savedTheme = localStorage.getItem('maulas_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
     <style>
         body {
-            background-color: var(--dark-purple, #4a148c);
+            background-color: var(--login-bg);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s;
         }
 
         .login-card {
-            background: white;
+            background: var(--login-card-bg);
             padding: 2.5rem;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
             text-align: center;
+            transition: background 0.3s;
         }
 
         .login-logo {
@@ -48,29 +55,32 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #555;
+            color: var(--login-text);
+            opacity: 0.8;
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--input-border);
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 1rem;
+            background: var(--input-bg);
+            color: var(--text-main);
         }
 
         button {
             width: 100%;
             padding: 12px;
-            background-color: var(--primary-green, #2e7d32);
+            background-color: var(--login-btn-bg);
             color: white;
             border: none;
             border-radius: 6px;
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
 
         button:hover {
@@ -90,8 +100,9 @@
 
     <div class="login-card">
         <img src="LOGOTIPO_MAULA.JPG" alt="Maulas" class="login-logo">
-        <h2 style="margin-top:0; color:#333;">Acceso Socios</h2>
-        <p style="color:#777; margin-bottom:2rem;">Introduce tus credenciales para continuar</p>
+        <h2 style="margin-top:0; color:var(--login-text);">Acceso Socios</h2>
+        <p style="color:var(--login-text); opacity:0.7; margin-bottom:2rem;">Introduce tus credenciales para continuar
+        </p>
 
         <form id="login-form">
             <div class="form-group">

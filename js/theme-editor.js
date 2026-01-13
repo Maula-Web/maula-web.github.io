@@ -32,6 +32,12 @@ const ThemeEditor = {
             { id: '--primary-orange', label: 'Naranja Primario' },
             { id: '--dark-orange', label: 'Naranja Oscuro' },
             { id: '--pastel-bg-orange', label: 'Fondo Muted' }
+        ],
+        'acceso': [
+            { id: '--login-bg', label: 'Fondo Pantalla' },
+            { id: '--login-card-bg', label: 'Fondo Tarjeta' },
+            { id: '--login-btn-bg', label: 'Fondo Botón' },
+            { id: '--login-text', label: 'Color Texto' }
         ]
     },
 
