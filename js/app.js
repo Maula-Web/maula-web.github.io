@@ -76,10 +76,10 @@ class MemberManager {
             }
 
             tr.innerHTML = `
-                <td>${member.id}</td>
-                <td>${member.name}</td>
-                <td><a href="mailto:${member.email}" style="color:var(--primary-green)">${member.email}</a></td>
-                <td>${member.phone || '-'}</td>
+                <td class="table-socio-id">${member.id}</td>
+                <td class="table-socio-name">${member.name}</td>
+                <td class="table-socio-email"><a href="mailto:${member.email}" style="color:inherit; text-decoration:none;">${member.email}</a></td>
+                <td class="table-socio-phone">${member.phone || '-'}</td>
                 <td class="action-cell">${actionHtml}</td>
             `;
             this.tableBody.appendChild(tr);

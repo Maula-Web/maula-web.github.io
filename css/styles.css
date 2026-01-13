@@ -9,6 +9,28 @@
     --pastel-bg-green: #0a1f13;
     --pastel-accent-green: #1b5e20;
 
+    /* Socios Detailed Config */
+    --socios-title: var(--primary-green);
+    --socios-card-bg: var(--card-bg);
+
+    --socios-btn-new-bg: var(--primary-green);
+    --socios-btn-new-text: #ffffff;
+    --socios-btn-import-bg: var(--primary-blue);
+    --socios-btn-import-text: #ffffff;
+    --socios-btn-delete-bg: var(--danger);
+    --socios-btn-delete-text: #ffffff;
+
+    --socios-field-id-label: #555;
+    --socios-field-id-value: #333;
+    --socios-field-name-label: #555;
+    --socios-field-name-value: #333;
+    --socios-field-email-label: #555;
+    --socios-field-email-value: #333;
+    --socios-field-phone-label: #555;
+    --socios-field-phone-value: #333;
+    --socios-field-action-label: #555;
+    --socios-field-action-text: #333;
+
     /* Jornadas - Saturated/Darker Blue */
     --primary-blue: #1565c0;
     --dark-blue: #0d47a1;
@@ -16,6 +38,8 @@
     --pastel-accent-blue: #1565c0;
 
     /* Jornadas Detailed Config */
+    --jornada-card-bg: var(--card-bg);
+    --jornada-card-bg-active: var(--card-bg);
     --jornada-card-number: var(--primary-green);
     --jornada-card-season: #555555;
     --jornada-status-finished: #2e7d32;
@@ -100,6 +124,27 @@
     --dark-green: #1b5e20;
     --pastel-bg-green: #0a1f13;
     --pastel-accent-green: #1b5e20;
+    /* Socios Detailed Config (Dark) */
+    --socios-title: var(--primary-green);
+    --socios-card-bg: var(--card-bg);
+
+    --socios-btn-new-bg: var(--primary-green);
+    --socios-btn-new-text: #ffffff;
+    --socios-btn-import-bg: var(--primary-blue);
+    --socios-btn-import-text: #ffffff;
+    --socios-btn-delete-bg: var(--danger);
+    --socios-btn-delete-text: #ffffff;
+
+    --socios-field-id-label: #ccc;
+    --socios-field-id-value: #fff;
+    --socios-field-name-label: #ccc;
+    --socios-field-name-value: #fff;
+    --socios-field-email-label: #ccc;
+    --socios-field-email-value: #fff;
+    --socios-field-phone-label: #ccc;
+    --socios-field-phone-value: #fff;
+    --socios-field-action-label: #ccc;
+    --socios-field-action-text: #fff;
 
     /* Jornadas - Darker Blue */
     --primary-blue: #1565c0;
@@ -108,6 +153,8 @@
     --pastel-accent-blue: #1565c0;
 
     /* Jornadas Detailed Config (Dark) */
+    --jornada-card-bg: var(--card-bg);
+    --jornada-card-bg-active: var(--pastel-accent);
     --jornada-card-number: var(--primary-green);
     --jornada-card-season: #aaaaaa;
     --jornada-status-finished: #66bb6a;
@@ -914,7 +961,64 @@ body {
     font-size: 0.8rem;
 }
 
-/* Tables Styling */
+/* Socios Specifics */
+.members-list-container {
+    background: var(--socios-card-bg) !important;
+}
+
+.page-title.socios-title {
+    color: var(--socios-title) !important;
+}
+
+.btn-add-socio {
+    background-color: var(--socios-btn-new-bg) !important;
+    color: var(--socios-btn-new-text) !important;
+}
+
+.btn-remove-socio {
+    background-color: var(--socios-btn-delete-bg) !important;
+    color: var(--socios-btn-delete-text) !important;
+    border-color: var(--socios-btn-delete-bg) !important;
+}
+
+.table-socio-id {
+    color: var(--socios-field-id-value) !important;
+}
+
+.table-socio-name {
+    color: var(--socios-field-name-value) !important;
+    font-weight: 600;
+}
+
+.table-socio-email {
+    color: var(--socios-field-email-value) !important;
+}
+
+.table-socio-phone {
+    color: var(--socios-field-phone-value) !important;
+}
+
+.table-socio-header-id {
+    color: var(--socios-field-id-label) !important;
+}
+
+.table-socio-header-name {
+    color: var(--socios-field-name-label) !important;
+}
+
+.table-socio-header-email {
+    color: var(--socios-field-email-label) !important;
+}
+
+.table-socio-header-phone {
+    color: var(--socios-field-phone-label) !important;
+}
+
+.table-socio-header-action {
+    color: var(--socios-field-action-label) !important;
+}
+
+/* Tables Styling generic - fallback */
 .members-list-container,
 .table-container {
     background: #1a1a1a;
@@ -959,7 +1063,7 @@ tbody tr:hover {
 }
 
 .jornada-card {
-    background: var(--card-bg);
+    background: var(--jornada-card-bg);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow-sm);
@@ -971,6 +1075,7 @@ tbody tr:hover {
 .jornada-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-md);
+    background: var(--jornada-card-bg-active);
     border-color: var(--pastel-accent);
 }
 
