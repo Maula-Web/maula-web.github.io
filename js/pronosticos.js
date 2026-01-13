@@ -740,13 +740,16 @@ class PronosticoManager {
         // 2. Build Header
         const headerRow = document.createElement('tr');
         // Sticky first column header
-        headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:10; padding:1rem; background:var(--card-bg); border-bottom:2px solid var(--input-border); min-width:120px;">Jornada</th>';
+        headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:10; padding:1rem; background:var(--pronosticos-table-head-row-bg); color:var(--pronosticos-table-head-row-text); border-bottom:2px solid var(--input-border); min-width:120px;">Jornada</th>';
 
         sortedMembers.forEach((m, index) => {
             // Zebra striping for columns in header too
-            const bg = index % 2 !== 0 ? 'background-color: var(--pastel-bg);' : 'background-color: var(--card-bg);';
-            const color = 'color: var(--text-main);';
-            headerRow.innerHTML += `<th style="padding:1rem; min-width:140px; text-align:center; border-bottom:2px solid var(--input-border); ${bg} ${color}">${m.name}</th>`;
+            const colBg = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-bg)' : 'var(--pronosticos-table-col-odd-bg)';
+            const colText = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-text)' : 'var(--pronosticos-table-col-odd-text)';
+
+            // Note: We use the column color for headers too to maintain the "column" look, 
+            // but the text color comes from the header config
+            headerRow.innerHTML += `<th style="padding:1rem; min-width:140px; text-align:center; border-bottom:2px solid var(--input-border); background-color: var(--pronosticos-table-head-col-bg); color: var(--pronosticos-table-head-col-text);">${m.name}</th>`;
         });
         thead.appendChild(headerRow);
 
@@ -778,19 +781,20 @@ class PronosticoManager {
             } catch (e) { }
 
             // First col sticky
-            row.innerHTML = `<td style="font-weight:bold; position:sticky; left:0; background:var(--card-bg); z-index:5; border-right:2px solid var(--input-border); padding:0.8rem;">
-                <div style="font-size:1.1em; color:var(--primary-blue);">J${j.number}</div>
-                <div style="font-size:0.75em; color:var(--text-secondary); margin-top:4px;">${dateFormatted}</div>
+            row.innerHTML = `<td style="font-weight:bold; position:sticky; left:0; background:var(--pronosticos-table-head-row-bg); color:var(--pronosticos-table-head-row-text); z-index:5; border-right:2px solid var(--input-border); padding:0.8rem;">
+                <div style="font-size:1.1em; color:inherit;">J${j.number}</div>
+                <div style="font-size:0.75em; opacity:0.8; margin-top:4px;">${dateFormatted}</div>
             </td>`;
 
             sortedMembers.forEach((m, index) => {
                 const p = this.pronosticos.find(pr => pr.jId === j.id && pr.mId === m.id);
 
-                // Zebra striping logic: Alternate column backgrounds
-                let colBg = index % 2 !== 0 ? 'background-color: var(--pastel-bg);' : 'background-color: transparent;';
+                // Alternating column colors
+                const colBg = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-bg)' : 'var(--pronosticos-table-col-odd-bg)';
+                const colText = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-text)' : 'var(--pronosticos-table-col-odd-text)';
 
                 let cellContent = '-';
-                let cellStyle = `text-align:center; vertical-align:middle; padding:0.6rem; border-bottom:1px solid var(--input-border); ${colBg} cursor:pointer; transition:background-color 0.2s;`;
+                let cellStyle = `text-align:center; vertical-align:middle; padding:0.6rem; border-bottom:1px solid var(--input-border); background-color:${colBg}; color:${colText}; cursor:pointer; transition:background-color 0.2s;`;
                 let textStyle = '';
 
                 if (p && p.selection) {
@@ -798,26 +802,22 @@ class PronosticoManager {
                     const selection14 = p.selection.slice(0, 14);
 
                     // Create compact string: "1X2111..."
-                    // Convert nulls to "-"
                     const summary = selection14.map(s => s || '-').join('');
 
                     // Status Check
                     if (p.late) {
-                        // Late: Orange accent
-                        textStyle = 'color: #e65100; font-weight:bold;';
+                        textStyle = 'color: var(--pronosticos-status-late-text); font-weight:bold;';
                         cellContent = `<div style="font-family:monospace; font-size:0.95rem; letter-spacing:2px; white-space:nowrap; ${textStyle}" title="Enviado con retraso">${summary}</div>`;
                     } else {
-                        // OK: Normal text (or green)
-                        textStyle = 'color: var(--text-main); font-weight:500;';
+                        textStyle = 'font-weight:500;';
                         cellContent = `<div style="font-family:monospace; font-size:0.95rem; letter-spacing:2px; white-space:nowrap; ${textStyle}">${summary}</div>`;
                     }
                 } else {
-                    // Missing
-                    textStyle = 'color: #e57373; font-weight:bold;';
+                    textStyle = 'color: var(--danger); font-weight:bold;';
                     cellContent = `<span style="${textStyle}">-</span>`;
                 }
 
-                row.innerHTML += `<td class="summary-cell" data-jid="${j.id}" data-mid="${m.id}" style="${cellStyle}" onmouseover="this.style.backgroundColor='#e3f2fd'" onmouseout="this.style.backgroundColor='${colBg.includes('transparent') ? 'transparent' : 'var(--pastel-bg)'}'">${cellContent}</td>`;
+                row.innerHTML += `<td class="summary-cell" data-jid="${j.id}" data-mid="${m.id}" style="${cellStyle}" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='none'">${cellContent}</td>`;
             });
 
             tbody.appendChild(row);
