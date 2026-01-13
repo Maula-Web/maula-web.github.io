@@ -15,6 +15,16 @@
     --pastel-bg-blue: #0a1929;
     --pastel-accent-blue: #1565c0;
 
+    /* Jornadas Detailed Config */
+    --jornada-card-number: var(--primary-green);
+    --jornada-card-season: #555555;
+    --jornada-status-finished: #2e7d32;
+    --jornada-status-pending: #f57f17;
+    --jornada-date-bg: #f5f5f5;
+    --jornada-date-text: #555555;
+    --jornada-empty-bg: #f9f9f9;
+    --jornada-header-time: #666666;
+
     /* Pronósticos - Laser Red */
     --primary-red: #ff3d00;
     --dark-red: #dd2c00;
@@ -96,6 +106,16 @@
     --dark-blue: #0d47a1;
     --pastel-bg-blue: #0a1929;
     --pastel-accent-blue: #1565c0;
+
+    /* Jornadas Detailed Config (Dark) */
+    --jornada-card-number: var(--primary-green);
+    --jornada-card-season: #aaaaaa;
+    --jornada-status-finished: #66bb6a;
+    --jornada-status-pending: #ffa726;
+    --jornada-date-bg: #333333;
+    --jornada-date-text: #cccccc;
+    --jornada-empty-bg: #2d2d2d;
+    --jornada-header-time: #aaaaaa;
 
     /* Pronósticos - Laser Red */
     --primary-red: #ff5252;
@@ -964,16 +984,49 @@ tbody tr:hover {
 .jornada-number {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--primary-green);
+    color: var(--jornada-card-number);
 }
 
 .jornada-date {
     font-size: 0.9rem;
-    color: var(--text-light);
-    background: #f5f5f5;
+    color: var(--jornada-date-text);
+    background: var(--jornada-date-bg);
     padding: 4px 8px;
     border-radius: 6px;
 }
+
+/* New Jornada Classes */
+.jornada-season {
+    font-size: 0.9rem;
+    color: var(--jornada-card-season);
+}
+
+.jornada-status-finished {
+    color: var(--jornada-status-finished) !important;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.jornada-status-pending {
+    color: var(--jornada-status-pending) !important;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.jornada-empty {
+    opacity: 0.6;
+    background-color: var(--jornada-empty-bg) !important;
+    border: 1px dashed #ccc !important;
+}
+
+.header-time-text {
+    display: block;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--jornada-header-time) !important;
+    margin-top: 0.2rem;
+}
+
 
 /* Modal Styles */
 .modal-overlay {

@@ -30,7 +30,9 @@ class JornadaManager {
             // Capitalize first letter
             const finalStr = str.charAt(0).toUpperCase() + str.slice(1);
             if (document.getElementById('current-datetime')) {
-                document.getElementById('current-datetime').textContent = finalStr;
+                const el = document.getElementById('current-datetime');
+                el.textContent = finalStr;
+                el.className = 'header-time-text'; // Apply configurable class
             }
         };
         updateTime();
@@ -107,9 +109,8 @@ class JornadaManager {
             const statusText = filledMatches === 15 ? 'Finalizada' : (filledMatches > 0 ? 'En Juego' : 'Pendiente');
 
             if (!hasTeams) {
-                card.style.opacity = '0.6';
-                card.style.backgroundColor = '#f9f9f9';
-                card.style.border = '1px dashed #ccc';
+                // Using class for configurable empty state opacity/bg/border
+                card.classList.add('jornada-empty');
             }
 
             card.innerHTML = `
@@ -118,8 +119,8 @@ class JornadaManager {
                     <span class="jornada-date">${j.date}</span>
                 </div>
                 <div style="font-size:0.9rem; color:#555;">
-                    <div>${j.season}</div>
-                    <div style="color:${statusColor}; font-weight:500; margin-top:0.5rem;">${statusText}</div>
+                    <div class="jornada-season">${j.season}</div>
+                    <div class="${filledMatches === 15 ? 'jornada-status-finished' : 'jornada-status-pending'}">${statusText}</div>
                     ${!hasTeams ? '<div style="font-size:0.8rem; color:#999; margin-top:0.2rem;">(Sin partidos definidos)</div>' : ''}
                 </div>
             `;

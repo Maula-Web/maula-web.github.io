@@ -35,7 +35,15 @@ const ThemeEditor = {
             { id: '--dark-blue', label: 'Azul Oscuro' },
             { id: '--pastel-bg-blue', label: 'Fondo Muted' },
             { id: '--pastel-accent-blue', label: 'Acento Muted' },
-            { id: '--jornadas-text', label: 'Texto General Página' }
+            { id: '--jornadas-text', label: 'Texto General Página' },
+            { id: '--jornada-card-number', label: 'Título Jornada (Color)' },
+            { id: '--jornada-card-season', label: 'Temporada (Color)' },
+            { id: '--jornada-status-finished', label: 'Estado Finalizada (Verde)' },
+            { id: '--jornada-status-pending', label: 'Estado Pendiente (Naranja)' },
+            { id: '--jornada-date-bg', label: 'Fondo Badge Fecha' },
+            { id: '--jornada-date-text', label: 'Texto Badge Fecha' },
+            { id: '--jornada-empty-bg', label: 'Fondo Tarjeta Vacía' },
+            { id: '--jornada-header-time', label: 'Texto Fecha Cabecera' }
         ],
         'pronosticos': [
             { id: '--primary-red', label: 'Rojo Primario' },
