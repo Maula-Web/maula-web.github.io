@@ -146,6 +146,43 @@
                 guardarán en la nube para todos los usuarios.</p>
         </header>
 
+        <!-- Management Section -->
+        <div class="config-card" style="margin-bottom: 2rem; border: 2px solid var(--primary-gold);">
+            <h2>Gestión de Temas</h2>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary);">Guarda tus configuraciones favoritas o carga
+                una existente.</p>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1.5rem;">
+                <!-- Save New -->
+                <div style="flex: 1; min-width: 250px;">
+                    <label style="display:block; margin-bottom:0.5rem; font-weight:bold;">Guardar Actual como
+                        Nuevo:</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="new-preset-name" placeholder="Nombre (ej: Navidad 2025)" style="flex:1;">
+                        <button class="btn-theme"
+                            style="background:var(--primary-blue); color:white; padding:0.5rem 1rem;"
+                            onclick="ThemeEditor.savePreset()">Guardar Preset</button>
+                    </div>
+                </div>
+
+                <!-- Load Existing -->
+                <div style="flex: 1; min-width: 250px;">
+                    <label style="display:block; margin-bottom:0.5rem; font-weight:bold;">Cargar Tema Existente:</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select id="preset-select"
+                            style="flex:1; padding:0.5rem; border-radius:4px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-main);">
+                            <option value="">Cargando...</option>
+                        </select>
+                        <button class="btn-theme"
+                            style="background:var(--input-border); color:var(--text-main); padding:0.5rem 1rem;"
+                            onclick="ThemeEditor.loadSelectedPreset()">Cargar</button>
+                        <button class="btn-theme" style="background:var(--danger); color:white; padding:0.5rem 1rem;"
+                            onclick="ThemeEditor.deleteSelectedPreset()">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="config-grid">
             <!-- Preview Section -->
             <div class="preview-pane">
@@ -161,10 +198,20 @@
 
             <!-- UI Colors -->
             <div class="config-card">
-                <h2>Interfaz General</h2>
-                <div class="color-group" id="group-ui">
-                    <!-- Dynamic content -->
-                </div>
+                <h2>Interfaz General (Fondos y Textos)</h2>
+                <div class="color-group" id="group-ui"></div>
+            </div>
+
+            <!-- Tablas Colors -->
+            <div class="config-card">
+                <h2>Tablas y Listados</h2>
+                <div class="color-group" id="group-tablas"></div>
+            </div>
+
+            <!-- Status Colors -->
+            <div class="config-card">
+                <h2>Estados y Alertas</h2>
+                <div class="color-group" id="group-status"></div>
             </div>
 
             <!-- Socios Colors -->
@@ -205,8 +252,9 @@
         </div>
 
         <div class="actions-bar">
-            <button class="btn-theme btn-reset" onclick="ThemeEditor.reset()">RESETEAR VALORES</button>
-            <button class="btn-theme btn-save" onclick="ThemeEditor.save()">GUARDAR EN LA NUBE</button>
+            <button class="btn-theme btn-reset" onclick="ThemeEditor.reset()">RESETEAR A FÁBRICA</button>
+            <button class="btn-theme btn-save" onclick="ThemeEditor.applyTrace()"
+                style="background: var(--primary-gold); color: black;">★ APLICAR A TODA LA WEB ★</button>
         </div>
     </div>
 

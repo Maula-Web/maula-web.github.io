@@ -1,37 +1,57 @@
 const ThemeEditor = {
+    // Definición completa de todas las variables configurables
     groups: {
         'ui': [
-            { id: '--main-bg', label: 'Fondo Aplicación' },
-            { id: '--modal-bg', label: 'Fondo Tarjetas/Modales' },
+            { id: '--main-bg', label: 'Fondo Principal' },
+            { id: '--modal-bg', label: 'Fondo Ventanas/Modales' },
+            { id: '--card-bg', label: 'Fondo Tarjetas (Stats)' },
             { id: '--text-main', label: 'Texto Principal' },
             { id: '--text-secondary', label: 'Texto Secundario' },
             { id: '--input-bg', label: 'Fondo de Inputs' },
-            { id: '--input-border', label: 'Borde de Inputs' }
+            { id: '--input-border', label: 'Borde de Inputs' },
+            { id: '--glass-border', label: 'Borde Cristal/Transparente' },
+            { id: '--pastel-card', label: 'Fondo Tarjetas Tenues' }
+        ],
+        'tablas': [
+            { id: '--table-bg', label: 'Fondo Tabla' },
+            { id: '--table-header-bg', label: 'Fondo Cabecera/Par' },
+            { id: '--table-text', label: 'Texto e Iconos' },
+            { id: '--table-border', label: 'Borde Divisor' }
+        ],
+        'status': [
+            { id: '--danger', label: 'Color Error/Eliminar' },
+            { id: '--warning', label: 'Color Aviso/Pendiente' },
+            { id: '--primary-gold', label: 'Color Oro/Líder' }
         ],
         'socios': [
             { id: '--primary-green', label: 'Verde Primario' },
             { id: '--dark-green', label: 'Verde Oscuro' },
-            { id: '--pastel-bg-green', label: 'Fondo Muted' }
+            { id: '--pastel-bg-green', label: 'Fondo Muted' },
+            { id: '--pastel-accent-green', label: 'Acento Muted' }
         ],
         'jornadas': [
             { id: '--primary-blue', label: 'Azul Primario' },
             { id: '--dark-blue', label: 'Azul Oscuro' },
-            { id: '--pastel-bg-blue', label: 'Fondo Muted' }
+            { id: '--pastel-bg-blue', label: 'Fondo Muted' },
+            { id: '--pastel-accent-blue', label: 'Acento Muted' }
         ],
         'pronosticos': [
             { id: '--primary-red', label: 'Rojo Primario' },
             { id: '--dark-red', label: 'Rojo Oscuro' },
-            { id: '--pastel-bg-red', label: 'Fondo Muted' }
+            { id: '--pastel-bg-red', label: 'Fondo Muted' },
+            { id: '--pastel-accent-red', label: 'Acento Muted' }
         ],
         'resultados': [
             { id: '--primary-purple', label: 'Color Primario' },
             { id: '--dark-purple', label: 'Color Oscuro' },
-            { id: '--pastel-bg-purple', label: 'Fondo Muted' }
+            { id: '--pastel-bg-purple', label: 'Fondo Muted' },
+            { id: '--pastel-accent-purple', label: 'Acento Muted' }
         ],
         'resumen': [
             { id: '--primary-orange', label: 'Naranja Primario' },
             { id: '--dark-orange', label: 'Naranja Oscuro' },
-            { id: '--pastel-bg-orange', label: 'Fondo Muted' }
+            { id: '--pastel-bg-orange', label: 'Fondo Muted' },
+            { id: '--pastel-accent-orange', label: 'Acento Muted' }
         ],
         'acceso': [
             { id: '--login-bg', label: 'Fondo Pantalla' },
@@ -45,7 +65,10 @@ const ThemeEditor = {
         if (window.DataService) await window.DataService.init();
 
         this.renderGroups();
+        // Primero cargamos los valores actuales de la web (CSS o tema activo)
         this.loadCurrentValues();
+        // Luego cargamos la lista de presets guardados en la nube
+        this.loadPresetsList();
     },
 
     renderGroups: function () {
@@ -53,13 +76,16 @@ const ThemeEditor = {
             const container = document.getElementById(`group-${groupId}`);
             if (!container) continue;
 
+            container.innerHTML = ''; // Limpiar por si acaso
             vars.forEach(v => {
                 const row = document.createElement('div');
                 row.className = 'color-row';
                 row.innerHTML = `
                     <label>${v.label}</label>
-                    <input type="text" id="text-${v.id}" onchange="ThemeEditor.updateFromText('${v.id}', this.value)">
-                    <input type="color" id="picker-${v.id}" oninput="ThemeEditor.updateVariable('${v.id}', this.value)">
+                    <div style="display:flex; gap:5px; align-items:center;">
+                        <input type="text" id="text-${v.id}" onchange="ThemeEditor.updateFromText('${v.id}', this.value)">
+                        <input type="color" id="picker-${v.id}" oninput="ThemeEditor.updateVariable('${v.id}', this.value)">
+                    </div>
                 `;
                 container.appendChild(row);
             });
@@ -78,6 +104,12 @@ const ThemeEditor = {
                 if (val.startsWith('rgb')) {
                     val = this.rgbToHex(val);
                 }
+                // Handle transparent or keywords decently (default to white/black if needed)
+                if (!val.startsWith('#')) {
+                    // Si es transparent o inherit, lo dejamos? El color input no lo soporta bien.
+                    // Ponemos negro por defecto si falla
+                    if (val === 'transparent') val = '#ffffff';
+                }
 
                 const picker = document.getElementById(`picker-${v.id}`);
                 const text = document.getElementById(`text-${v.id}`);
@@ -95,6 +127,7 @@ const ThemeEditor = {
 
     updateFromText: function (id, val) {
         if (!val.startsWith('#')) val = '#' + val;
+        // Basic hex validation
         if (/^#[0-9A-F]{6}$/i.test(val)) {
             this.updateVariable(id, val);
             const picker = document.getElementById(`picker-${id}`);
@@ -111,29 +144,138 @@ const ThemeEditor = {
         }).join("");
     },
 
-    save: async function () {
+    // --- LOGICA DE PERSISTENCIA Y PRESETS ---
+
+    getFormValues: function () {
         const themeData = {};
         for (const vars of Object.values(this.groups)) {
             vars.forEach(v => {
-                themeData[v.id] = document.getElementById(`picker-${v.id}`).value;
+                const el = document.getElementById(`picker-${v.id}`);
+                if (el) themeData[v.id] = el.value;
             });
         }
+        return themeData;
+    },
+
+    // 1. Guardar como Preset (Nuevo Tema)
+    savePreset: async function () {
+        const nameInput = document.getElementById('new-preset-name');
+        const name = nameInput.value.trim();
+
+        if (!name) {
+            alert('Por favor, escribe un nombre para el nuevo tema.');
+            return;
+        }
+
+        const themeData = this.getFormValues();
+        // ID safe string
+        const safeId = 'preset_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+        const presetData = {
+            id: safeId,
+            name: name,
+            type: 'preset', // Flag to distinguish from the active theme
+            ...themeData
+        };
 
         try {
-            // Save to a special document in Firestore
-            await window.DataService.save('config', { id: 'theme', ...themeData });
-            alert('Configuración de colores guardada correctamente. Se aplicará a todos los usuarios al recargar.');
+            await window.DataService.save('config', presetData);
+            alert(`Tema "${name}" guardado correctamente.`);
+            nameInput.value = '';
+            this.loadPresetsList(); // Recargar dropdown
         } catch (e) {
             console.error(e);
-            alert('Error al guardar en la nube.');
+            alert('Error al guardar el tema.');
+        }
+    },
+
+    // 2. Cargar lista de Presets en el Dropdown
+    loadPresetsList: async function () {
+        const select = document.getElementById('preset-select');
+        select.innerHTML = '<option value="">-- Seleccionar Tema --</option>';
+
+        try {
+            const configDocs = await window.DataService.getAll('config');
+            // Filter only presets
+            const presets = configDocs.filter(doc => doc.type === 'preset' || doc.id.startsWith('preset_'));
+
+            presets.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name || p.id;
+                select.appendChild(opt);
+            });
+        } catch (e) {
+            console.warn("Error cargando lista de temas", e);
+        }
+    },
+
+    // 3. Aplicar un Preset (lo lee de la nube y rellena los inputs y la vista)
+    loadSelectedPreset: async function () {
+        const select = document.getElementById('preset-select');
+        const id = select.value;
+        if (!id) return;
+
+        try {
+            // No tenemos un getById directo expuesto, así que usaremos getAll y find
+            // Ojo: DataService normalmente tiene getById? Vamos a chequear, sino getAll
+            // El usuario tiene getAll en auth.js, usaremos ese pattern.
+            const configDocs = await window.DataService.getAll('config');
+            const preset = configDocs.find(d => d.id === id);
+
+            if (preset) {
+                // Aplicar valores
+                Object.entries(preset).forEach(([key, val]) => {
+                    if (key.startsWith('--')) {
+                        this.updateVariable(key, val); // Actualiza CSS y Inputs
+                        // Forzar update visual del picker color
+                        const picker = document.getElementById(`picker-${key}`);
+                        if (picker) picker.value = val;
+                    }
+                });
+                alert(`Tema "${preset.name}" cargado. Recuerda pulsar "APLICAR A TODA LA WEB" si quieres que sea el definitivo.`);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error cargando el tema.');
+        }
+    },
+
+    // 4. Eliminar Preset
+    deleteSelectedPreset: async function () {
+        const select = document.getElementById('preset-select');
+        const id = select.value;
+        if (!id) return;
+
+        if (confirm('¿Seguro que quieres eliminar este tema guardado?')) {
+            try {
+                await window.DataService.delete('config', id);
+                alert('Tema eliminado.');
+                this.loadPresetsList();
+            } catch (e) {
+                console.error(e);
+                alert('Error al eliminar.');
+            }
+        }
+    },
+
+    // 5. Guardar como TEMA ACTIVO (Global) - Lo que antes era "Guardar en la Nube"
+    applyTrace: async function () {
+        const themeData = this.getFormValues();
+        try {
+            await window.DataService.save('config', { id: 'theme', ...themeData });
+            alert('¡Tema aplicado! Ahora todos los usuarios verán estos colores.');
+        } catch (e) {
+            console.error(e);
+            alert('Error al aplicar tema global.');
         }
     },
 
     reset: async function () {
-        if (confirm('¿Estás seguro de que quieres volver a los colores por defecto? (Se borrará la configuración de la nube)')) {
+        if (confirm('¿Estás seguro de que quieres volver a los colores originales por defecto? Se borrará la configuración activa.')) {
             try {
                 if (window.DataService) await window.DataService.delete('config', 'theme');
-                alert('Configuración personalizada eliminada. Los colores volverán a los originales del archivo CSS.');
+                alert('Configuración personalizada eliminada. Recargando...');
                 window.location.reload();
             } catch (e) {
                 console.warn(e);
