@@ -739,6 +739,33 @@ body {
     background: var(--pronosticos-selection-card-bg) !important;
 }
 
+.pronosticos-doubles-card {
+    background: var(--pronosticos-card-bg) !important;
+    border: 1px solid var(--pronosticos-select-border);
+    /* Matches input border */
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+    flex: 1;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#btn-copy-forecast {
+    background: var(--input-bg);
+    /* Or specific copy var if asked */
+    color: var(--text-secondary);
+    border: 1px solid var(--input-border);
+    justify-content: center;
+}
+
+#btn-save-doubles {
+    justify-content: center;
+    width: 100%;
+}
+
 /* Resultados page color overrides */
 .resultados-page .page-title {
     color: var(--primary-purple);
