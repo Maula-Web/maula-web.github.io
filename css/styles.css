@@ -10,6 +10,7 @@
     --pastel-accent-green: #1b5e20;
 
     /* Socios Detailed Config */
+    --socios-main-card-bg: var(--card-bg);
     --socios-title: var(--primary-green);
     --socios-card-bg: var(--card-bg);
 
@@ -19,6 +20,8 @@
     --socios-btn-import-text: #ffffff;
     --socios-btn-delete-bg: var(--danger);
     --socios-btn-delete-text: #ffffff;
+    --socios-btn-edit-bg: #fdd835;
+    --socios-btn-edit-text: #333333;
 
     --socios-field-id-label: #555;
     --socios-field-id-value: #333;
@@ -38,6 +41,7 @@
     --pastel-accent-blue: #1565c0;
 
     /* Jornadas Detailed Config */
+    --jornadas-main-card-bg: var(--card-bg);
     --jornada-card-bg: var(--card-bg);
     --jornada-card-bg-active: var(--card-bg);
     --jornada-card-number: var(--primary-green);
@@ -54,6 +58,24 @@
     --dark-red: #dd2c00;
     --pastel-bg-red: #2a0b0e;
     --pastel-accent-red: #b71c1c;
+
+    /* Pronosticos Detailed Config */
+    --pronosticos-main-card-bg: var(--card-bg);
+    --pronosticos-card-bg: var(--card-bg);
+    --pronosticos-btn-bg: #673ab7;
+    --pronosticos-btn-text: #ffffff;
+    --pronosticos-select-bg: var(--input-bg);
+    --pronosticos-select-text: var(--text-main);
+    --pronosticos-select-border: var(--input-border);
+    --pronosticos-scroll-thumb: var(--primary-red);
+    --pronosticos-scroll-track: var(--pastel-bg-red);
+    --pronosticos-table-header-bg: #f5f5f5;
+    --pronosticos-table-header-text: var(--primary-green);
+    --pronosticos-table-row-bg: var(--card-bg);
+    --pronosticos-table-row-text: var(--text-main);
+    /* status badges use base colors, but let's expose late */
+    --pronosticos-status-late-bg: #fff3e0;
+    --pronosticos-status-late-text: #f57f17;
 
     /* Resultados - Cyber Purple */
     --primary-purple: #f500ff;
@@ -125,6 +147,7 @@
     --pastel-bg-green: #0a1f13;
     --pastel-accent-green: #1b5e20;
     /* Socios Detailed Config (Dark) */
+    --socios-main-card-bg: var(--card-bg);
     --socios-title: var(--primary-green);
     --socios-card-bg: var(--card-bg);
 
@@ -134,6 +157,8 @@
     --socios-btn-import-text: #ffffff;
     --socios-btn-delete-bg: var(--danger);
     --socios-btn-delete-text: #ffffff;
+    --socios-btn-edit-bg: #fdd835;
+    --socios-btn-edit-text: #333333;
 
     --socios-field-id-label: #ccc;
     --socios-field-id-value: #fff;
@@ -153,6 +178,7 @@
     --pastel-accent-blue: #1565c0;
 
     /* Jornadas Detailed Config (Dark) */
+    --jornadas-main-card-bg: var(--card-bg);
     --jornada-card-bg: var(--card-bg);
     --jornada-card-bg-active: var(--pastel-accent);
     --jornada-card-number: var(--primary-green);
@@ -169,6 +195,23 @@
     --dark-red: #d32f2f;
     --pastel-bg-red: #2a0b0e;
     --pastel-accent-red: #b71c1c;
+
+    /* Pronosticos Detailed Config (Dark) */
+    --pronosticos-main-card-bg: var(--card-bg);
+    --pronosticos-card-bg: var(--card-bg);
+    --pronosticos-btn-bg: #673ab7;
+    --pronosticos-btn-text: #ffffff;
+    --pronosticos-select-bg: var(--input-bg);
+    --pronosticos-select-text: var(--text-main);
+    --pronosticos-select-border: var(--input-border);
+    --pronosticos-scroll-thumb: var(--primary-red);
+    --pronosticos-scroll-track: var(--pastel-bg-red);
+    --pronosticos-table-header-bg: #2d2d2d;
+    --pronosticos-table-header-text: var(--primary-green);
+    --pronosticos-table-row-bg: var(--card-bg);
+    --pronosticos-table-row-text: var(--text-main);
+    --pronosticos-status-late-bg: #fff3e0;
+    --pronosticos-status-late-text: #f57f17;
 
     /* Resultados - Dark Blue Gray (Replacing Fuchsia) */
     --primary-purple: #455a64;
@@ -598,9 +641,22 @@ body {
     color: var(--primary-red);
 }
 
+/* Main Containers per page */
+.page-body.socios-page .main-container {
+    background: var(--socios-main-card-bg);
+}
+
+.page-body.jornadas-page .main-container {
+    background: var(--jornadas-main-card-bg);
+}
+
+.page-body.pronosticos-page .main-container {
+    background: var(--pronosticos-main-card-bg);
+}
+
 .pronosticos-page thead th {
-    background: var(--pastel-bg-red);
-    color: var(--primary-red);
+    background: var(--pronosticos-table-header-bg);
+    color: var(--pronosticos-table-header-text);
 }
 
 /* Resultados page color overrides */
@@ -655,6 +711,26 @@ body {
     border-radius: 12px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.socios-page .main-container {
+    background: var(--socios-main-card-bg);
+}
+
+.jornadas-page .main-container {
+    background: var(--jornadas-main-card-bg);
+}
+
+.pronosticos-page .main-container {
+    background: var(--pronosticos-main-card-bg);
+}
+
+.resultados-page .main-container {
+    background: var(--resultados-main-card-bg);
+}
+
+.resumen-page .main-container {
+    background: var(--resumen-main-card-bg);
 }
 
 .header-actions {
@@ -754,6 +830,17 @@ body {
 }
 
 /* Pronosticos Specific */
+.pronosticos-page .btn-action {
+    background-color: var(--pronosticos-btn-bg) !important;
+    color: var(--pronosticos-btn-text) !important;
+}
+
+.pronosticos-page select {
+    background-color: var(--pronosticos-select-bg) !important;
+    color: var(--pronosticos-select-text) !important;
+    border-color: var(--pronosticos-select-border) !important;
+}
+
 .selection-bar {
     display: flex;
     gap: 0.5rem;
@@ -945,12 +1032,13 @@ body {
 
 /* Status Badges */
 .badge-late {
-    background-color: #fff3e0;
-    color: #f57f17;
+    background-color: var(--pronosticos-status-late-bg);
+    color: var(--pronosticos-status-late-text);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.8rem;
-    border: 1px solid #ffe0b2;
+    border: 1px solid var(--pronosticos-status-late-bg);
+    /* Use same or slight darker if we had one */
 }
 
 .badge-locked {
@@ -1019,6 +1107,25 @@ body {
 }
 
 /* Tables Styling generic - fallback */
+.pronosticos-page .table-container {
+    background: var(--pronosticos-card-bg);
+}
+
+.pronosticos-page thead th {
+    background: var(--pronosticos-table-header-bg);
+    color: var(--pronosticos-table-header-text);
+}
+
+.pronosticos-page tbody td {
+    background: var(--pronosticos-table-row-bg);
+    color: var(--pronosticos-table-row-text);
+}
+
+/* Make alternating columns? Or just cells */
+/* User asked for alternating columns/rows */
+/* For now, just base table styling here matching what they want controlled */
+
+/* Tables */
 .members-list-container,
 .table-container {
     background: #1a1a1a;
@@ -1266,8 +1373,8 @@ textarea:focus {
 }
 
 .edit-btn {
-    background-color: #fffde7;
-    color: #f57f17;
+    background-color: var(--socios-btn-edit-bg);
+    color: var(--socios-btn-edit-text);
     border: none;
     padding: 6px 12px;
     border-radius: 6px;
@@ -1334,15 +1441,27 @@ textarea:focus {
 
 .pronosticos-page .table-container::-webkit-scrollbar-track,
 #sticky-scrollbar-container::-webkit-scrollbar-track {
-    background: var(--pastel-bg-red);
+    background: var(--pronosticos-scroll-track);
     border-radius: 10px;
 }
 
 .pronosticos-page .table-container::-webkit-scrollbar-thumb,
 #sticky-scrollbar-container::-webkit-scrollbar-thumb {
-    background: var(--primary-red);
+    background: var(--pronosticos-scroll-thumb);
     border-radius: 10px;
-    border: 3px solid var(--card-bg);
+    border: 3px solid var(--pronosticos-card-bg);
+}
+
+.pronosticos-page .table-container::-webkit-scrollbar-thumb:hover,
+#sticky-scrollbar-container::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-red);
+}
+
+/* Ensure visibility on Firefox */
+.pronosticos-page .table-container,
+#sticky-scrollbar-container {
+    scrollbar-width: auto;
+    scrollbar-color: var(--pronosticos-scroll-thumb) var(--pronosticos-scroll-track);
 }
 
 /* Results Matrix Dark Graying */

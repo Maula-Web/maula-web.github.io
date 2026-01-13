@@ -46,7 +46,10 @@ const ThemeEditor = {
             { id: '--socios-field-phone-label', label: 'Label Teléfono' },
             { id: '--socios-field-phone-value', label: 'Valor Teléfono' },
             { id: '--socios-field-action-label', label: 'Label Acción' },
-            { id: '--socios-field-action-text', label: 'Texto Acción (Editar)' }
+            { id: '--socios-field-action-text', label: 'Texto Acción (Editar)' },
+            { id: '--socios-btn-edit-bg', label: 'Botón Modificar (Fondo)' },
+            { id: '--socios-btn-edit-text', label: 'Botón Modificar (Texto)' },
+            { id: '--socios-main-card-bg', label: 'Fondo Contenedor Principal' }
         ],
         'jornadas': [
             { id: '--primary-blue', label: 'Azul Primario' },
@@ -54,6 +57,7 @@ const ThemeEditor = {
             { id: '--pastel-bg-blue', label: 'Fondo Muted' },
             { id: '--pastel-accent-blue', label: 'Acento Muted' },
             { id: '--jornadas-text', label: 'Texto General Página' },
+            { id: '--jornadas-main-card-bg', label: 'Fondo Contenedor Principal' },
             { id: '--jornada-card-bg', label: 'Fondo Tarjeta Jornada' },
             { id: '--jornada-card-bg-active', label: 'Fondo Tarjeta Activa' },
             { id: '--jornada-card-number', label: 'Título Jornada (Color)' },
@@ -70,7 +74,22 @@ const ThemeEditor = {
             { id: '--dark-red', label: 'Rojo Oscuro' },
             { id: '--pastel-bg-red', label: 'Fondo Muted' },
             { id: '--pastel-accent-red', label: 'Acento Muted' },
-            { id: '--pronosticos-text', label: 'Texto General Página' }
+            { id: '--pronosticos-text', label: 'Texto General Página' },
+            { id: '--pronosticos-main-card-bg', label: 'Fondo Contenedor Principal' },
+            { id: '--pronosticos-card-bg', label: 'Fondo Tarjetas Internas' },
+            { id: '--pronosticos-btn-bg', label: 'Fondo Botones' },
+            { id: '--pronosticos-btn-text', label: 'Texto Botones' },
+            { id: '--pronosticos-select-bg', label: 'Fondo Desplegables' },
+            { id: '--pronosticos-select-text', label: 'Texto Desplegables' },
+            { id: '--pronosticos-select-border', label: 'Borde Desplegables' },
+            { id: '--pronosticos-scroll-thumb', label: 'Barra Deslizante (Mando)' },
+            { id: '--pronosticos-scroll-track', label: 'Barra Deslizante (Carril)' },
+            { id: '--pronosticos-table-header-bg', label: 'Fondo Títulos Tabla' },
+            { id: '--pronosticos-table-header-text', label: 'Texto Títulos Tabla' },
+            { id: '--pronosticos-table-row-bg', label: 'Fondo Filas Tabla' },
+            { id: '--pronosticos-table-row-text', label: 'Texto Filas Tabla' },
+            { id: '--pronosticos-status-late-bg', label: 'Fondo Aviso Tarde' },
+            { id: '--pronosticos-status-late-text', label: 'Texto Aviso Tarde' }
         ],
         'resultados': [
             { id: '--primary-purple', label: 'Color Primario' },
