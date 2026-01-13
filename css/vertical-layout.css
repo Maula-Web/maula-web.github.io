@@ -23,8 +23,8 @@ body.layout-vertical .header-logo {
 
 body.layout-vertical .header-logo img {
     height: auto;
-    width: 120px;
-    max-height: 120px;
+    width: 180px;
+    max-height: 180px;
 }
 
 body.layout-vertical .btn-primary {
