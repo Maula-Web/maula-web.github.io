@@ -126,9 +126,20 @@ const Auth = {
                 <a href="resultados.html" class="btn-primary btn-resultados ${page === 'resultados.html' ? 'active' : ''}">RESULTADOS</a>
                 <a href="resumen-temporada.html" class="btn-primary btn-resumen ${page === 'resumen-temporada.html' ? 'active' : ''}">RESUMEN TEMPORADA</a>
                 <a href="admin.html" class="btn-primary btn-admin ${page === 'admin.html' ? 'active' : ''}">ADMINISTRACIÓN</a>
-                <a href="theme-editor.html" class="btn-primary ${page === 'theme-editor.html' ? 'active' : ''}" style="color:var(--primary-gold); border-color:var(--primary-gold);">IDENTIDAD VISUAL</a>
+                <a href="theme-editor.html" class="btn-primary btn-theme-editor ${page === 'theme-editor.html' ? 'active' : ''}" style="color:var(--primary-gold); border-color:var(--primary-gold);">IDENTIDAD VISUAL</a>
             `;
             document.body.prepend(sidebar);
+        } else {
+            // If sidebar exists but doesn't have the new button, add it
+            if (!sidebar.querySelector('a[href="theme-editor.html"]')) {
+                const themeBtn = document.createElement('a');
+                themeBtn.href = "theme-editor.html";
+                themeBtn.className = `btn-primary btn-theme-editor ${page === 'theme-editor.html' ? 'active' : ''}`;
+                themeBtn.style.color = "var(--primary-gold)";
+                themeBtn.style.borderColor = "var(--primary-gold)";
+                themeBtn.textContent = "IDENTIDAD VISUAL";
+                sidebar.appendChild(themeBtn);
+            }
         }
 
         // 2. Ensure Multicolour Separator exists
