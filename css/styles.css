@@ -188,7 +188,7 @@ body {
     align-items: center;
     justify-content: flex-start;
     position: relative;
-    padding-top: 80px;
+    padding-top: 100px;
     /* Space for the header + separator */
     color: #e0e0e0;
 }
@@ -199,8 +199,8 @@ body {
     height: 4px;
     background: linear-gradient(to right, var(--primary-green), var(--primary-blue), var(--primary-red), var(--primary-purple), var(--primary-orange));
     position: fixed;
-    top: 70px;
-    /* Right below the 70px header */
+    top: 90px;
+    /* Right below the 90px header */
     left: 0;
     z-index: 1999;
 }
@@ -211,7 +211,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 70px;
+    height: 90px;
     background-color: #000000;
     /* Deep black like Versus */
     z-index: 2000;
@@ -235,7 +235,7 @@ body {
 }
 
 .header-logo img {
-    height: 50px;
+    height: 70px;
     /* Adapted size for header */
     width: auto;
     object-fit: contain;
@@ -243,12 +243,12 @@ body {
 
 .btn-primary {
     color: #ffffff;
-    padding: 0.6rem 1.2rem;
+    padding: 0.8rem 1.5rem;
     border-radius: 4px;
     /* More angular, modern like Versus */
     text-decoration: none;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 1rem;
     letter-spacing: 0.5px;
     transition: all 0.2s ease;
     border: none;
