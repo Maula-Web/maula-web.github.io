@@ -27,31 +27,36 @@ const ThemeEditor = {
             { id: '--primary-green', label: 'Verde Primario' },
             { id: '--dark-green', label: 'Verde Oscuro' },
             { id: '--pastel-bg-green', label: 'Fondo Muted' },
-            { id: '--pastel-accent-green', label: 'Acento Muted' }
+            { id: '--pastel-accent-green', label: 'Acento Muted' },
+            { id: '--socios-text', label: 'Texto General Página' }
         ],
         'jornadas': [
             { id: '--primary-blue', label: 'Azul Primario' },
             { id: '--dark-blue', label: 'Azul Oscuro' },
             { id: '--pastel-bg-blue', label: 'Fondo Muted' },
-            { id: '--pastel-accent-blue', label: 'Acento Muted' }
+            { id: '--pastel-accent-blue', label: 'Acento Muted' },
+            { id: '--jornadas-text', label: 'Texto General Página' }
         ],
         'pronosticos': [
             { id: '--primary-red', label: 'Rojo Primario' },
             { id: '--dark-red', label: 'Rojo Oscuro' },
             { id: '--pastel-bg-red', label: 'Fondo Muted' },
-            { id: '--pastel-accent-red', label: 'Acento Muted' }
+            { id: '--pastel-accent-red', label: 'Acento Muted' },
+            { id: '--pronosticos-text', label: 'Texto General Página' }
         ],
         'resultados': [
             { id: '--primary-purple', label: 'Color Primario' },
             { id: '--dark-purple', label: 'Color Oscuro' },
             { id: '--pastel-bg-purple', label: 'Fondo Muted' },
-            { id: '--pastel-accent-purple', label: 'Acento Muted' }
+            { id: '--pastel-accent-purple', label: 'Acento Muted' },
+            { id: '--resultados-text', label: 'Texto General Página' }
         ],
         'resumen': [
             { id: '--primary-orange', label: 'Naranja Primario' },
             { id: '--dark-orange', label: 'Naranja Oscuro' },
             { id: '--pastel-bg-orange', label: 'Fondo Muted' },
-            { id: '--pastel-accent-orange', label: 'Acento Muted' }
+            { id: '--pastel-accent-orange', label: 'Acento Muted' },
+            { id: '--resumen-text', label: 'Texto General Página' }
         ],
         'acceso': [
             { id: '--login-bg', label: 'Fondo Pantalla' },

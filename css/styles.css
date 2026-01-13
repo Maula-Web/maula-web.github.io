@@ -36,6 +36,13 @@
     /* Gold for Leader */
     --primary-gold: #ffd700;
 
+    /* Section Specific Texts (defaults) */
+    --socios-text: #1b1b1b;
+    --jornadas-text: #1b1b1b;
+    --pronosticos-text: #1b1b1b;
+    --resultados-text: #1b1b1b;
+    --resumen-text: #1b1b1b;
+
     /* Common */
     --pastel-bg: #e8f5e9;
     --pastel-card: #ffffff;
@@ -107,6 +114,13 @@
     --dark-orange: #e65100;
     --pastel-bg-orange: #2a1200;
     --pastel-accent-orange: #ef6c00;
+
+    /* Section Specific Texts (Dark) */
+    --socios-text: #f8fafc;
+    --jornadas-text: #f8fafc;
+    --pronosticos-text: #f8fafc;
+    --resultados-text: #f8fafc;
+    --resumen-text: #f8fafc;
 
     /* Common Dark */
     --pastel-bg: #0f172a;
@@ -419,22 +433,27 @@ body {
 /* Page-specific backgrounds */
 .page-body.socios-page {
     background-color: var(--pastel-bg-green);
+    color: var(--socios-text);
 }
 
 .page-body.jornadas-page {
     background-color: var(--pastel-bg-blue);
+    color: var(--jornadas-text);
 }
 
 .page-body.pronosticos-page {
     background-color: var(--pastel-bg-red);
+    color: var(--pronosticos-text);
 }
 
 .page-body.resultados-page {
     background-color: var(--pastel-bg-purple);
+    color: var(--resultados-text);
 }
 
 .page-body.resumen-page {
     background-color: var(--pastel-bg-orange);
+    color: var(--resumen-text);
 }
 
 /* Jornadas page color overrides */
