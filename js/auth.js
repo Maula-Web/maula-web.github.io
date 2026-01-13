@@ -3,12 +3,14 @@ const Auth = {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 this.applySavedTheme();
+                this.applyLayoutPreference();
                 if (!window.location.pathname.includes('login.html')) {
                     this.injectLogout();
                 }
             });
         } else {
             this.applySavedTheme();
+            this.applyLayoutPreference();
             if (!window.location.pathname.includes('login.html')) {
                 this.injectLogout();
             }
@@ -19,6 +21,15 @@ const Auth = {
         const user = sessionStorage.getItem('maulas_user');
         if (!user) {
             window.location.href = 'login.html';
+        }
+    },
+
+    applyLayoutPreference() {
+        const isVertical = localStorage.getItem('maulas_layout') === 'vertical';
+        if (isVertical) {
+            document.body.classList.add('layout-vertical');
+        } else {
+            document.body.classList.remove('layout-vertical');
         }
     },
 

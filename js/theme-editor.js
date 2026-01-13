@@ -66,10 +66,33 @@ const ThemeEditor = {
         if (window.DataService) await window.DataService.init();
 
         this.renderGroups();
-        // Primero cargamos los valores actuales de la web (CSS o tema activo)
+        // Primero cargamos los valores actuales (colores)
         this.loadCurrentValues();
-        // Luego cargamos la lista de presets guardados en la nube
+        // Cargar layout activo
+        this.loadActiveLayout();
+        // Luego cargamos la lista de presets
         this.loadPresetsList();
+    },
+
+    loadActiveLayout: function () {
+        // Check cloud config or local storage? Let's check DOM state first based on auth.js application
+        // actually auth.js isn't updated yet. Let's make this tool control it.
+        const isVertical = localStorage.getItem('maulas_layout') === 'vertical';
+        if (isVertical) {
+            document.body.classList.add('layout-vertical');
+        } else {
+            document.body.classList.remove('layout-vertical');
+        }
+    },
+
+    toggleLayout: function () {
+        document.body.classList.toggle('layout-vertical');
+        const isVertical = document.body.classList.contains('layout-vertical');
+        localStorage.setItem('maulas_layout', isVertical ? 'vertical' : 'horizontal');
+
+        // Update button text if needed, but for now we just toggle class
+        // Optional: Save to cloud if "Apply to All" is clicked?
+        // Let's add it to the form values so it gets saved with the theme!
     },
 
     renderGroups: function () {
