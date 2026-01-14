@@ -42,3 +42,10 @@ La ventana de ver quiniela de dobles Tienen el color de los signos del pronósti
 En la hoja administración Los textos de las tablas son demasiado claros y no se ven. Ponlos en gris oscuro.
 Quiero que crees una herramienta (dentro o fuera de la web, lo que mejor funcione) que me permita cambiar los colores de los distintos elementos de la web. Una posibilidad podría ser que me pases un listado de elementos diciendome lo que es y su color actual y que desde un selector de color yo decida qué color nuevo utilizar para cada elemento.
 Esta herramiento se podrá utilizar en un futuro si decidimos cambiar el aspecto de la web.
+
+
+
+
+
+Las tarjetas principales de cada hoja (las que cotienen todos los elementos) tienen un sombreado. Coloca controles en identidad visual para todos los apartados en los que se puedan activar o desactivar ese sombreado.
+Crea también una sección para colocar los controles de color de la hoja principal. Pon controles de color para todos los elementos de tarjetas, textos y de cualquier otro tipo.

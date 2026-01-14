@@ -130,6 +130,17 @@
     --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
+    /* Shadow Toggles */
+    --main-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    /* Dashboard (Hoja Principal) */
+    --dash-card-bg: rgba(45, 45, 45, 0.8);
+    --dash-card-title: #ffffff;
+    --dash-card-value: #ffffff;
+    --dash-wide-bg: rgba(35, 35, 35, 0.9);
+    --dash-wide-text: #ffffff;
+
     /* UI Elements */
     --card-bg: #ffffff;
     --main-bg: #ffffff;
@@ -292,13 +303,23 @@
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
 
     --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+
+    /* Shadow Toggles (Dark) */
+    --main-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
 
     --table-bg: #1e293b;
     --table-header-bg: #2d3748;
     --table-text: #f8fafc;
     --table-border: #334155;
+
+    /* Dashboard (Hoja Principal) Dark */
+    --dash-card-bg: rgba(30, 41, 59, 0.8);
+    --dash-card-title: #f1f5f9;
+    --dash-card-value: #ffffff;
+    --dash-wide-bg: rgba(15, 23, 42, 0.9);
+    --dash-wide-text: #f1f5f9;
 
     /* Login Page Dark */
     --login-bg: #1a1a1a;
@@ -337,7 +358,7 @@ body {
     cursor: pointer;
     z-index: 1000;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--card-shadow);
 }
 
 [data-theme="dark"] .theme-toggle-btn {
@@ -745,7 +766,7 @@ body {
     /* Matches input border */
     border-radius: 12px;
     padding: 1rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--card-shadow);
     flex: 1;
     min-width: 320px;
     display: flex;
@@ -816,7 +837,7 @@ body {
     background: #232323;
     padding: 2.5rem;
     border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    box-shadow: var(--main-shadow);
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -916,7 +937,7 @@ body {
     background-color: var(--dark-green);
     color: white;
     transform: translateX(-3px);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--card-shadow);
 }
 
 /* Utilities */
@@ -957,7 +978,7 @@ body {
     padding: 0.5rem 1rem;
     /* Much smaller height */
     border-radius: 12px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--card-shadow);
     flex-wrap: wrap;
     align-items: center;
 }
@@ -1280,7 +1301,7 @@ tbody tr:hover {
     background: var(--jornada-card-bg);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--card-shadow);
     border: 1px solid var(--input-border);
     transition: all 0.3s ease;
     cursor: pointer;

@@ -12,6 +12,17 @@ const ThemeEditor = {
             { id: '--glass-border', label: 'Borde Cristal/Transparente' },
             { id: '--pastel-card', label: 'Fondo Tarjetas Tenues' }
         ],
+        'sombras': [
+            { id: '--main-shadow', label: 'Sombra Contenedor Principal', type: 'toggle', onValue: '0 20px 50px rgba(0,0,0,0.8)' },
+            { id: '--card-shadow', label: 'Sombra Tarjetas Secundarias', type: 'toggle', onValue: '0 4px 6px -1px rgba(0,0,0,0.1)' }
+        ],
+        'dashboard': [
+            { id: '--dash-card-bg', label: 'Fondo Tarjetas Stats' },
+            { id: '--dash-card-title', label: 'Título Stats' },
+            { id: '--dash-card-value', label: 'Valor Stats' },
+            { id: '--dash-wide-bg', label: 'Fondo Tarjeta Ancha' },
+            { id: '--dash-wide-text', label: 'Texto Tarjeta Ancha' }
+        ],
         'tablas': [
             { id: '--table-bg', label: 'Fondo Tabla' },
             { id: '--table-header-bg', label: 'Fondo Cabecera/Par' },
@@ -171,13 +182,24 @@ const ThemeEditor = {
             vars.forEach(v => {
                 const row = document.createElement('div');
                 row.className = 'color-row';
-                row.innerHTML = `
-                    <label>${v.label}</label>
-                    <div style="display:flex; gap:5px; align-items:center;">
-                        <input type="text" id="text-${v.id}" onchange="ThemeEditor.updateFromText('${v.id}', this.value)">
-                        <input type="color" id="picker-${v.id}" oninput="ThemeEditor.updateVariable('${v.id}', this.value)">
-                    </div>
-                `;
+
+                if (v.type === 'toggle') {
+                    row.innerHTML = `
+                        <label>${v.label}</label>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="checkbox" id="check-${v.id}" onchange="ThemeEditor.updateToggle('${v.id}', this.checked, '${v.onValue}')">
+                            <span style="font-size:0.8rem; color:var(--text-secondary)">Activar</span>
+                        </div>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <label>${v.label}</label>
+                        <div style="display:flex; gap:5px; align-items:center;">
+                            <input type="text" id="text-${v.id}" onchange="ThemeEditor.updateFromText('${v.id}', this.value)">
+                            <input type="color" id="picker-${v.id}" oninput="ThemeEditor.updateVariable('${v.id}', this.value)">
+                        </div>
+                    `;
+                }
                 container.appendChild(row);
             });
         }
@@ -191,21 +213,26 @@ const ThemeEditor = {
             vars.forEach(v => {
                 let val = styles.getPropertyValue(v.id).trim();
 
-                // Convert to Hex if it's RGB
-                if (val.startsWith('rgb')) {
-                    val = this.rgbToHex(val);
-                }
-                // Handle transparent or keywords decently (default to white/black if needed)
-                if (!val.startsWith('#')) {
-                    // Si es transparent o inherit, lo dejamos? El color input no lo soporta bien.
-                    // Ponemos negro por defecto si falla
-                    if (val === 'transparent') val = '#ffffff';
-                }
+                if (v.type === 'toggle') {
+                    const check = document.getElementById(`check-${v.id}`);
+                    if (check) check.checked = (val !== 'none' && val !== '');
+                } else {
+                    // Convert to Hex if it's RGB
+                    if (val.startsWith('rgb')) {
+                        val = this.rgbToHex(val);
+                    }
+                    // Handle transparent or keywords decently (default to white/black if needed)
+                    if (!val.startsWith('#')) {
+                        if (val === 'transparent') val = '#ffffff';
+                        // If it's rgba or something, rgbToHex should handle it or we default
+                        if (!val.startsWith('#')) val = '#000000';
+                    }
 
-                const picker = document.getElementById(`picker-${v.id}`);
-                const text = document.getElementById(`text-${v.id}`);
-                if (picker) picker.value = val;
-                if (text) text.value = val;
+                    const picker = document.getElementById(`picker-${v.id}`);
+                    const text = document.getElementById(`text-${v.id}`);
+                    if (picker) picker.value = val;
+                    if (text) text.value = val;
+                }
             });
         }
     },
@@ -219,11 +246,16 @@ const ThemeEditor = {
     updateFromText: function (id, val) {
         if (!val.startsWith('#')) val = '#' + val;
         // Basic hex validation
-        if (/^#[0-9A-F]{6}$/i.test(val)) {
+        if (/^#[0-9A-F]{3,8}$/i.test(val)) {
             this.updateVariable(id, val);
             const picker = document.getElementById(`picker-${id}`);
             if (picker) picker.value = val;
         }
+    },
+
+    updateToggle: function (id, isChecked, onValue) {
+        const val = isChecked ? onValue : 'none';
+        document.documentElement.style.setProperty(id, val);
     },
 
     rgbToHex: function (rgb) {
@@ -239,10 +271,15 @@ const ThemeEditor = {
 
     getFormValues: function () {
         const themeData = {};
-        for (const vars of Object.values(this.groups)) {
+        for (const [groupId, vars] of Object.entries(this.groups)) {
             vars.forEach(v => {
-                const el = document.getElementById(`picker-${v.id}`);
-                if (el) themeData[v.id] = el.value;
+                if (v.type === 'toggle') {
+                    const el = document.getElementById(`check-${v.id}`);
+                    if (el) themeData[v.id] = el.checked ? v.onValue : 'none';
+                } else {
+                    const el = document.getElementById(`picker-${v.id}`);
+                    if (el) themeData[v.id] = el.value;
+                }
             });
         }
         return themeData;
@@ -318,10 +355,16 @@ const ThemeEditor = {
                 // Aplicar valores
                 Object.entries(preset).forEach(([key, val]) => {
                     if (key.startsWith('--')) {
-                        this.updateVariable(key, val); // Actualiza CSS y Inputs
-                        // Forzar update visual del picker color
+                        document.documentElement.style.setProperty(key, val);
+
+                        // Actualizar UI
                         const picker = document.getElementById(`picker-${key}`);
+                        const text = document.getElementById(`text-${key}`);
+                        const check = document.getElementById(`check-${key}`);
+
                         if (picker) picker.value = val;
+                        if (text) text.value = val;
+                        if (check) check.checked = (val !== 'none' && val !== '');
                     }
                 });
                 alert(`Tema "${preset.name}" cargado. Recuerda pulsar "APLICAR A TODA LA WEB" si quieres que sea el definitivo.`);
