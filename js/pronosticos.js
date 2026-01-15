@@ -324,11 +324,6 @@ class PronosticoManager {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
             const row = document.createElement('div');
             row.className = 'pronostico-row';
-            row.style.display = "flex";
-            row.style.alignItems = "center";
-            row.style.gap = "15px";
-            row.style.padding = "10px";
-            row.style.borderBottom = "1px solid #f0f0f0";
 
             let disabledStr = isLocked ? 'style="pointer-events:none; opacity:0.6;"' : '';
             if (disabledStr === '' && this.correctionMode && isLockedRef) {
@@ -360,7 +355,7 @@ class PronosticoManager {
                 return `
                     <div title="${member.name} ${member.surname || ''}: ${sign}" 
                          style="display:flex; justify-content:center; align-items:center; min-width:18px; height: 22px; cursor:default;">
-                        <span style="font-size:0.7rem; font-weight:bold; color:${signColor}; border:1px solid ${signColor}; border-radius:3px; padding:0 4px; background:white; line-height:1;">${sign}</span>
+                         <span style="font-size:0.7rem; font-weight:bold; color:${signColor}; border:1px solid ${signColor}; border-radius:3px; padding:0 4px; background:white; line-height:1;">${sign}</span>
                     </div>
                 `;
             }).join('');
@@ -377,36 +372,36 @@ class PronosticoManager {
             }
 
             row.innerHTML = `
-                <div class="p-match-info" style="flex: 0 0 420px; min-width: 420px; border-right: 1px solid #eee; margin-right: 5px; padding-right: 10px;">
-                    <span style="font-weight:bold; color:var(--primary-green); width:25px; font-size: 0.9rem;">${displayIdx}</span>
+                <div class="p-match-info">
+                    <span class="match-display-idx" style="font-weight:bold; color:var(--primary-green); width:25px; font-size: 0.9rem;">${displayIdx}</span>
                     
-                    <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:5px;">
-                        <span style="font-size:0.95rem; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${match.home}</span>
+                    <div class="match-team home-team">
+                        <span class="team-name">${match.home}</span>
                         <img src="${homeLogo}" class="team-logo" style="width:24px; height:24px; object-fit:contain;" onerror="this.style.display='none'">
                     </div>
 
-                    <span style="margin:0 8px; color:#aaa;">-</span>
+                    <span class="match-vs-separator" style="margin:0 8px; color:#aaa;">-</span>
 
-                    <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:5px;">
+                    <div class="match-team away-team">
                         <img src="${awayLogo}" class="team-logo" style="width:24px; height:24px; object-fit:contain;" onerror="this.style.display='none'">
-                        <span style="font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${match.away}</span>
+                        <span class="team-name">${match.away}</span>
                     </div>
                 </div>
 
-                <div class="p-others" style="flex: 1; display:flex; gap:2px; padding:4px; background:transparent; border:none; min-height:36px; align-items:center; justify-content: flex-start; flex-wrap: nowrap; overflow: visible;">
+                <div class="p-others">
                     ${othersHtml || '<span style="font-size:0.65rem; color:#bbb; font-style:italic;">-</span>'}
                 </div>
 
-                <div class="p-options" ${disabledStr} data-idx="${idx}" style="flex: 0.6; display:flex; justify-content:center; gap:4px;">
-                    <div class="chk-option ${val === '1' ? 'selected' : ''}" style="width:28px; height:28px; font-size:0.8rem;" onclick="window.app.selectOption(this, '1')">1</div>
-                    <div class="chk-option ${val === 'X' ? 'selected' : ''}" style="width:28px; height:28px; font-size:0.8rem;" onclick="window.app.selectOption(this, 'X')">X</div>
-                    <div class="chk-option ${val === '2' ? 'selected' : ''}" style="width:28px; height:28px; font-size:0.8rem;" onclick="window.app.selectOption(this, '2')">2</div>
+                <div class="p-options" ${disabledStr} data-idx="${idx}">
+                    <div class="chk-option ${val === '1' ? 'selected' : ''}" onclick="window.app.selectOption(this, '1')">1</div>
+                    <div class="chk-option ${val === 'X' ? 'selected' : ''}" onclick="window.app.selectOption(this, 'X')">X</div>
+                    <div class="chk-option ${val === '2' ? 'selected' : ''}" onclick="window.app.selectOption(this, '2')">2</div>
                 </div>
 
-                <div id="consensus-${idx}" class="p-percentages" style="flex: 0.6; min-width: 75px; display:flex; flex-direction:column; justify-content:center; padding-left:10px; font-size:0.7rem; border-left: 1px solid #eee;">
-                    <div style="display:flex; justify-content:space-between; color:#1976d2; line-height: 1;"><span>1:</span> <b>${p1}%</b></div>
-                    <div style="display:flex; justify-content:space-between; color:#757575; line-height: 1;"><span>X:</span> <b>${pX}%</b></div>
-                    <div style="display:flex; justify-content:space-between; color:#d32f2f; line-height: 1;"><span>2:</span> <b>${p2}%</b></div>
+                <div id="consensus-${idx}" class="p-percentages">
+                    <div class="perc-row perc-1"><span>1:</span> <b>${p1}%</b></div>
+                    <div class="perc-row perc-X"><span>X:</span> <b>${pX}%</b></div>
+                    <div class="perc-row perc-2"><span>2:</span> <b>${p2}%</b></div>
                 </div>
             `;
             this.container.appendChild(row);
@@ -481,9 +476,9 @@ class PronosticoManager {
         const consensusBox = document.getElementById(`consensus-${idx}`);
         if (consensusBox) {
             consensusBox.innerHTML = `
-                <div style="display:flex; justify-content:space-between; color:#1976d2;"><span>1:</span> <b>${s1}%</b></div>
-                <div style="display:flex; justify-content:space-between; color:#757575;"><span>X:</span> <b>${sX}%</b></div>
-                <div style="display:flex; justify-content:space-between; color:#d32f2f;"><span>2:</span> <b>${s2}%</b></div>
+                <div class="perc-row perc-1"><span>1:</span> <b>${s1}%</b></div>
+                <div class="perc-row perc-X"><span>X:</span> <b>${sX}%</b></div>
+                <div class="perc-row perc-2"><span>2:</span> <b>${s2}%</b></div>
             `;
         }
     }
@@ -1229,39 +1224,31 @@ class PronosticoManager {
         jornada.matches.forEach((match, idx) => {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
             const row = document.createElement('div');
-            row.className = 'pronostico-row';
-            // Force exact same inline styling as Main Forecast
-            row.style.display = "flex";
-            row.style.alignItems = "center";
-            row.style.gap = "15px";
-            row.style.padding = "10px";
-            row.style.borderBottom = "1px solid #f0f0f0";
-
+            row.className = 'pronostico-row doubles-row';
 
             const homeLogo = AppUtils.getTeamLogo(match.home);
             const awayLogo = AppUtils.getTeamLogo(match.away);
 
             const isP15 = idx === 14;
 
-            // Adjusted layout to be more compact
             row.innerHTML = `
-                <div class="p-match-info" style="flex: 2; min-width: 0; border: none; padding-right: 5px;">
-                    <div style="display:flex; align-items:center; gap:5px;">
-                        <span style="font-weight:bold; color:var(--primary-green); font-size: 0.8rem; width: 22px;">${displayIdx}</span>
-                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:2px;">
-                            <div style="display:flex; align-items:center; gap:5px;">
+                <div class="p-match-info">
+                    <div class="match-team home-team">
+                        <span class="match-display-idx" style="font-weight:bold; color:var(--primary-green); font-size: 0.8rem; width: 22px;">${displayIdx}</span>
+                        <div class="team-info-stacked">
+                            <div class="team-line">
                                 <img src="${homeLogo}" class="team-logo" style="width:16px; height:16px; object-fit:contain;" onerror="this.style.display='none'">
-                                    <span style="font-size:0.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${match.home}</span>
+                                <span class="team-name" style="font-size:0.8rem;">${match.home}</span>
                             </div>
-                            <div style="display:flex; align-items:center; gap:5px;">
+                            <div class="team-line">
                                 <img src="${awayLogo}" class="team-logo" style="width:16px; height:16px; object-fit:contain;" onerror="this.style.display='none'">
-                                    <span style="font-size:0.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${match.away}</span>
+                                <span class="team-name" style="font-size:0.8rem;">${match.away}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="prediction-inputs" data-idx="${idx}" style="flex: 0 0 auto; display:flex; gap:3px; align-items:center;">
+                <div class="prediction-inputs" data-idx="${idx}">
                     ${isP15 ? this.renderP15Inputs(idx, selections[idx], isLocked) : this.renderMultiSelectButtons(idx, selections[idx], isLocked)}
                 </div>
             `;
@@ -1303,13 +1290,11 @@ class PronosticoManager {
         const options = ['0', '1', '2', 'M'];
 
         const renderGroup = (team, selected) => {
-            let html = `<div style="display:flex; gap:1px; margin-right:4px;">`;
+            let html = `<div class="p15-options-group">`;
             options.forEach(opt => {
                 const isSel = opt === selected;
-                const style = isSel ? 'background-color:var(--primary-orange); color:white; border-color:var(--primary-orange);' : 'font-size:0.75rem; padding:0;';
                 html += `<div class="p15-option ${isSel ? 'selected' : ''}"
             data-team="${team}" data-val="${opt}"
-            style="width:20px; height:20px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; cursor:pointer; ${style}"
             onclick="window.app.handleP15Toggle(this, ${idx}, '${team}', '${opt}')" 
                         ${disabled ? 'disabled' : ''}>${opt}</div>`;
             });
@@ -1317,7 +1302,7 @@ class PronosticoManager {
             return html;
         };
 
-        return `<div style="display:flex; flex-direction:column; gap:2px;">
+        return `<div class="p15-grid">
                 ${renderGroup('home', hVal)}
                     ${renderGroup('away', aVal)}
                 </div>`;
