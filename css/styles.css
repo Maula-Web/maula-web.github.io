@@ -135,11 +135,23 @@
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     /* Dashboard (Hoja Principal) */
-    --dash-card-bg: rgba(45, 45, 45, 0.8);
-    --dash-card-title: #ffffff;
-    --dash-card-value: #ffffff;
-    --dash-wide-bg: rgba(35, 35, 35, 0.9);
-    --dash-wide-text: #ffffff;
+    --dash-bg: #f8f9fa;
+    --dash-card-bg: #ffffff;
+    --dash-card-title: #555555;
+    --dash-card-value: #1b1b1b;
+    --dash-wide-bg: #ffffff;
+    --dash-wide-text: #1b1b1b;
+    --dash-clock-bg: #fff3e0;
+    --dash-clock-text: #333333;
+    --dash-clock-title: #e65100;
+    --dash-bote-bg: #ff9800;
+    --dash-bote-text: #ffffff;
+    --dash-winner-label: #1b1b1b;
+    --dash-winner-name: #1565c0;
+    --dash-loser-label: #1b1b1b;
+    --dash-loser-name: #d32f2f;
+    --dash-doubles-label: #6a1b9a;
+    --dash-doubles-value: #333333;
 
     /* UI Elements */
     --card-bg: #ffffff;
@@ -2257,6 +2269,154 @@ textarea:focus {
 }
 
 
+
+/* Dashboard Styles */
+.home-body {
+    background-color: var(--dash-bg) !important;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 0 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.stat-card {
+    background: var(--dash-card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: var(--dash-card-title);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 700;
+}
+
+.stat-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: var(--dash-card-value);
+}
+
+.stat-wide-card {
+    grid-column: 1 / -1;
+    background: var(--dash-wide-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--main-shadow);
+    color: var(--dash-wide-text);
+}
+
+.stat-wide-card h3 {
+    color: var(--dash-wide-text) !important;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 1.2rem;
+}
+
+#countdown-timer {
+    color: var(--dash-clock-text) !important;
+}
+
+.deadline-container {
+    background: var(--dash-clock-bg) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.deadline-title {
+    color: var(--dash-clock-title) !important;
+}
+
+.bote-badge {
+    background: var(--dash-bote-bg) !important;
+    color: var(--dash-bote-text) !important;
+}
+
+.role-label {
+    color: var(--dash-winner-label);
+}
+
+.role-winner {
+    color: var(--dash-winner-name) !important;
+}
+
+.role-loser {
+    color: var(--dash-loser-name) !important;
+}
+
+.doubles-label {
+    color: var(--dash-doubles-label) !important;
+}
+
+/* Dashboard Mobile Mode */
+body.mobile-mode .dashboard-stats {
+    padding: 0 0.8rem !important;
+    gap: 0.6rem !important;
+    grid-template-columns: 1fr 1fr !important;
+    margin-top: 1rem !important;
+}
+
+body.mobile-mode .stat-card {
+    padding: 0.8rem !important;
+    border-radius: 8px !important;
+}
+
+body.mobile-mode .stat-card h3 {
+    font-size: 0.65rem !important;
+    margin-bottom: 0.4rem !important;
+}
+
+body.mobile-mode .stat-value {
+    font-size: 1.6rem !important;
+    margin-bottom: 0.1rem !important;
+}
+
+body.mobile-mode .stat-wide-card {
+    padding: 1.2rem !important;
+    border-radius: 10px !important;
+}
+
+body.mobile-mode .stat-wide-card h3 {
+    font-size: 0.9rem !important;
+}
+
+body.mobile-mode #countdown-timer {
+    font-size: 1.6rem !important;
+}
+
+body.mobile-mode .bote-badge {
+    padding: 0.6rem !important;
+    font-size: 0.9rem !important;
+}
+
+body.mobile-mode .stat-wide-card>div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+}
+
+body.mobile-mode .stat-wide-card div[style*="border-right"] {
+    border-right: none !important;
+    border-bottom: 1px solid #eee;
+    padding-right: 0 !important;
+    padding-bottom: 1rem !important;
+}
 
 /* Consolidated Ultra-Compact Mobile Layout */
 body.mobile-mode {

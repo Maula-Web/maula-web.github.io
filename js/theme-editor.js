@@ -17,11 +17,22 @@ const ThemeEditor = {
             { id: '--card-shadow', label: 'Sombra Tarjetas Secundarias', type: 'toggle', onValue: '0 4px 6px -1px rgba(0,0,0,0.1)' }
         ],
         'dashboard': [
+            { id: '--dash-bg', label: 'Fondo Dashboard' },
             { id: '--dash-card-bg', label: 'Fondo Tarjetas Stats' },
             { id: '--dash-card-title', label: 'Título Stats' },
             { id: '--dash-card-value', label: 'Valor Stats' },
             { id: '--dash-wide-bg', label: 'Fondo Tarjeta Ancha' },
-            { id: '--dash-wide-text', label: 'Texto Tarjeta Ancha' }
+            { id: '--dash-wide-text', label: 'Texto Tarjeta Ancha' },
+            { id: '--dash-clock-bg', label: 'Fondo Cuenta Atrás' },
+            { id: '--dash-clock-text', label: 'Texto Reloj' },
+            { id: '--dash-clock-title', label: 'Texto Título Reloj' },
+            { id: '--dash-bote-bg', label: 'Fondo Badge Bote' },
+            { id: '--dash-bote-text', label: 'Texto Badge Bote' },
+            { id: '--dash-winner-label', label: 'Label Ganador Quiniela' },
+            { id: '--dash-winner-name', label: 'Nombre Ganador Quiniela' },
+            { id: '--dash-loser-label', label: 'Label Perdedor (Maula)' },
+            { id: '--dash-loser-name', label: 'Nombre Perdedor (Maula)' },
+            { id: '--dash-doubles-label', label: 'Título Quiniela Dobles' }
         ],
         'tablas': [
             { id: '--table-bg', label: 'Fondo Tabla' },

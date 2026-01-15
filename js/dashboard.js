@@ -235,11 +235,11 @@ class DashboardManager {
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
                         <div style="margin-bottom:0.5rem;">
                             <span style="font-size:1.2rem;">🍺</span> 
-                            <strong>Columnas de Dobles:</strong> <span style="color:var(--primary-blue); font-weight:bold;">${winnerText}</span>
+                            <strong class="role-label">Columnas de Dobles:</strong> <span class="role-winner" style="font-weight:bold;">${winnerText}</span>
                         </div>
                         <div>
                             <span style="font-size:1.2rem;">🥛</span> 
-                            <strong>Sella la Quiniela por Maula:</strong> <span style="color:var(--danger); font-weight:bold;">${loserText}</span>
+                            <strong class="role-label">Sella la Quiniela por Maula:</strong> <span class="role-loser" style="font-weight:bold;">${loserText}</span>
                         </div>
                         ${pigHtml}
                         ${lastJornadaInfo.doublesHtml || ''}
@@ -315,11 +315,11 @@ class DashboardManager {
                 const dateFormatted = deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
 
                 deadlineHtml = `
-                    <div style="margin-top:1.5rem; background:#fff3e0; padding:1rem; border-radius:8px; border:1px solid #ffe0b2;">
-                        <div style="color:#e65100; font-weight:bold; margin-bottom:0.5rem; font-size:0.9rem;">
+                    <div class="deadline-container" style="margin-top:1.5rem; padding:1rem; border-radius:8px;">
+                        <div class="deadline-title" style="font-weight:bold; margin-bottom:0.5rem; font-size:0.9rem;">
                             ⏳ Límite para rellenar: ${dayName} ${dateFormatted} 17:00h
                         </div>
-                        <div id="countdown-timer" style="font-size:2.2rem; font-weight:800; color:#333; font-family:monospace;">
+                        <div id="countdown-timer" style="font-size:2.2rem; font-weight:800; font-family:monospace;">
                             --:--:--:--
                         </div>
                          <div style="font-size:0.75rem; color:#666; margin-top:0.2rem;">días hrs min seg</div>
@@ -334,7 +334,7 @@ class DashboardManager {
         let boteBadgeHtml = "";
         if (hasUpcomingBote) {
             boteBadgeHtml = `
-                    <div style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #fff; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255,152,0,0.4); animation: pulse 2s infinite;">
+                    <div class="bote-badge" style="padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255,152,0,0.4); animation: pulse 2s infinite;">
                         <span>💰</span> ¡HAY BOTE PARA ESTA JORNADA! <span>💰</span>
                     </div>
                     <style>
@@ -502,7 +502,7 @@ class DashboardManager {
             const items = doublesResults.map(r => `${r.name}: <strong>${r.hits}</strong>`).join(', ');
             doublesHtml = `
                     <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
-                        <div style="font-size:0.9rem; margin-bottom:0.3rem; color: #6a1b9a;"><strong>🏆 Quinielas de Dobles</strong></div>
+                        <div class="doubles-label" style="font-size:0.9rem; margin-bottom:0.3rem;"><strong>🏆 Quinielas de Dobles</strong></div>
                         <div style="font-size:0.85rem; color:#333;">${items}</div>
                     </div>
             `;
