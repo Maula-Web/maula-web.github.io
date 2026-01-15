@@ -4,6 +4,7 @@ const Auth = {
             document.addEventListener('DOMContentLoaded', () => {
                 this.applySavedTheme();
                 this.applyLayoutPreference();
+                this.handleResponsive();
                 if (!window.location.pathname.includes('login.html')) {
                     this.injectLogout();
                 }
@@ -11,6 +12,7 @@ const Auth = {
         } else {
             this.applySavedTheme();
             this.applyLayoutPreference();
+            this.handleResponsive();
             if (!window.location.pathname.includes('login.html')) {
                 this.injectLogout();
             }
@@ -28,9 +30,26 @@ const Auth = {
         const isVertical = localStorage.getItem('maulas_layout') === 'vertical';
         if (isVertical) {
             document.body.classList.add('layout-vertical');
-        } else {
-            document.body.classList.remove('layout-vertical');
         }
+    },
+
+    handleResponsive() {
+        const updateClasses = () => {
+            const w = window.innerWidth;
+            const body = document.body;
+            body.classList.remove('mobile-mode', 'tablet-mode', 'desktop-mode');
+
+            if (w < 850) {
+                body.classList.add('mobile-mode');
+            } else if (w < 1200) {
+                body.classList.add('tablet-mode');
+            } else {
+                body.classList.add('desktop-mode');
+            }
+        };
+
+        updateClasses();
+        window.addEventListener('resize', updateClasses);
     },
 
     async applySavedTheme() {
