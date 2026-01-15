@@ -2257,9 +2257,9 @@ textarea:focus {
 
 
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .page-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem !important;
     }
 
     .stat-value {
@@ -2273,7 +2273,79 @@ textarea:focus {
     /* Reduce table padding */
     thead th,
     tbody td {
-        padding: 0.6rem;
+        padding: 0.5rem;
+    }
+
+    /* Hide extra info to avoid horizontal scroll */
+    .p-others,
+    .p-percentages,
+    .no-others {
+        display: none !important;
+    }
+
+    .pronostico-row {
+        grid-template-areas: "info options" !important;
+        grid-template-columns: 1fr auto !important;
+        padding: 0.3rem 0.5rem !important;
+        gap: 0.2rem !important;
+    }
+
+    .p-match-info {
+        gap: 4px !important;
+        font-size: 0.75rem !important;
+        margin-right: 5px !important;
+    }
+
+    .p-match-num {
+        min-width: 15px !important;
+        font-size: 0.75rem !important;
+        width: auto !important;
+    }
+
+    .p-match-info .team-name {
+        max-width: 65px !important;
+    }
+
+    .p-options {
+        gap: 3px !important;
+    }
+
+    .p-options .chk-option {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 0.65rem !important;
+    }
+
+    .main-container {
+        padding: 0.4rem !important;
+    }
+
+    .header-actions {
+        gap: 0.2rem !important;
+    }
+
+    .selection-bar {
+        gap: 0.2rem !important;
+        padding: 0.1rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+
+    .dropdown-group select {
+        padding: 0.3rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    .dropdown-group label {
+        font-size: 0.65rem !important;
+    }
+
+    #deadline-info {
+        font-size: 0.7rem !important;
+    }
+
+    .p-divider {
+        margin: 2px 0 !important;
+        height: 1px !important;
     }
 }
 
