@@ -1398,6 +1398,32 @@ body {
 .members-list-container,
 .table-container {
     background: #1a1a1a;
+
+    /* Pronosticos Page Layout */
+    .pronosticos-main-layout {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .pronosticos-left-column {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 0;
+    }
+
+    .selection-bar {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 0px;
+        width: 100%;
+    }
+
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1995,98 +2021,180 @@ textarea:focus {
     }
 
     .header-actions {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem !important;
+        margin-bottom: 0.2rem !important;
+        padding: 0 !important;
     }
 
     .page-title {
-        font-size: 1.5rem;
+        font-size: 1.2rem !important;
+        margin: 0 !important;
+    }
+
+    .header-actions div:first-child {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
     }
 
     .action-buttons {
-        width: 100%;
-        flex-wrap: wrap;
+        width: auto !important;
+        flex: none !important;
     }
 
     .btn-action {
-        flex: 1;
-        justify-content: center;
-        font-size: 0.8rem;
-        padding: 0.6rem 1rem;
+        flex: 0 0 auto !important;
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.7rem !important;
+        min-height: auto !important;
+    }
+
+    .pronosticos-main-layout {
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .pronosticos-left-column {
+        gap: 0.2rem;
     }
 
     /* Selection Bar Mobile */
     .selection-bar {
-        gap: 0.5rem;
-        padding: 0.5rem;
+        gap: 0.4rem;
+        padding: 0.2rem 0.4rem;
+        margin-bottom: 0.2rem;
     }
 
     .dropdown-group {
-        flex: 1 1 100%;
+        flex: 1 1 45%;
+    }
+
+    .dropdown-group label {
+        margin-bottom: 1px;
+        font-size: 0.7rem;
+    }
+
+    .dropdown-group select {
+        padding: 0.4rem;
+        font-size: 0.8rem;
     }
 
     #deadline-info {
         text-align: center;
         width: 100%;
+        font-size: 0.75rem;
+        margin-top: 0;
+    }
+
+    #status-message:empty,
+    #cost-info:empty {
+        display: none;
+    }
+
+    #status-message,
+    #cost-info {
+        margin: 2px 0 !important;
+        font-size: 0.8rem !important;
+        line-height: 1.1;
+    }
+
+    .p-divider {
+        margin: 4px 0;
     }
 
     /* Forecast Grid Mobile */
+    /* Compact Forecast Row Grid */
     .pronostico-row {
         height: auto;
-        flex-direction: column;
-        padding: 1rem;
-        gap: 0.8rem;
-        align-items: stretch;
+        display: grid;
+        grid-template-areas:
+            "info options"
+            "others others"
+            "perc perc";
+        grid-template-columns: 1fr auto;
+        padding: 0.4rem 0.6rem;
+        gap: 0.2rem;
+        align-items: center;
     }
 
     .p-match-info {
-        flex: 1;
-        min-width: 0;
-        padding-right: 0;
-        border-right: none;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 0.5rem;
-        flex-direction: column;
-        gap: 0.5rem;
-        white-space: normal;
+        grid-area: info;
+        flex-direction: row !important;
+        align-items: center;
+        gap: 8px;
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+        overflow: hidden;
+    }
+
+    .p-match-num {
+        font-weight: bold;
+        color: var(--primary-green);
+        min-width: 20px;
     }
 
     .p-match-info .match-team {
         display: flex !important;
-        justify-content: space-between !important;
-        width: 100%;
-        text-align: left !important;
+        flex-direction: row !important;
+        align-items: center;
+        gap: 4px;
+        justify-content: flex-start !important;
+        width: auto !important;
+    }
+
+    .p-match-info .team-name {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .p-match-info .team-logo {
+        width: 18px !important;
+        height: 18px !important;
     }
 
     .p-match-info .match-vs-separator {
-        display: none;
-    }
-
-    .p-others {
-        flex: none;
-        flex-wrap: wrap;
-        justify-content: center;
-        border-bottom: 1px dashed var(--input-border);
-        padding-bottom: 0.5rem;
+        display: inline !important;
+        color: #ccc;
+        font-size: 0.8rem;
     }
 
     .p-options {
-        flex: none;
-        justify-content: space-around;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #eee;
+        grid-area: options;
+        padding: 0;
+        border-bottom: none;
+        gap: 4px;
+    }
+
+    .p-options .chk-option {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .p-others {
+        grid-area: others;
+        justify-content: flex-start;
+        padding: 4px 0;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 4px;
+        border-bottom: none;
+        min-height: auto;
     }
 
     .p-percentages {
-        flex: none;
-        min-width: 0;
-        border-left: none;
-        padding-left: 0;
-        flex-direction: row;
-        gap: 1rem;
-        justify-content: center;
-        font-size: 0.8rem;
+        grid-area: perc;
+        padding-top: 4px;
+        border-top: 1px dashed #eee;
+        justify-content: flex-start;
+        gap: 1.5rem;
     }
 
     .main-logo {
@@ -2167,4 +2275,59 @@ textarea:focus {
     tbody td {
         padding: 0.6rem;
     }
+}
+
+/* Forecast Elements */
+.p-match-num {
+    font-weight: bold;
+    color: var(--primary-green);
+    width: 25px;
+    font-size: 0.9rem;
+}
+
+.others-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 18px;
+    height: 22px;
+    cursor: default;
+}
+
+.others-item span {
+    font-size: 0.75rem;
+    font-weight: 800;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 0 4px;
+    background: white;
+    line-height: 1.1;
+}
+
+.others-item[data-sign='1'] span {
+    color: #1976d2;
+    border-color: #1976d2;
+}
+
+.others-item[data-sign='X'] span {
+    color: #757575;
+    border-color: #757575;
+}
+
+.others-item[data-sign='2'] span {
+    color: #d32f2f;
+    border-color: #d32f2f;
+}
+
+.p-divider {
+    height: 1px;
+    background-color: #ddd;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.no-others {
+    font-size: 0.65rem;
+    color: #bbb;
+    font-style: italic;
 }

@@ -350,12 +350,9 @@ class PronosticoManager {
                 const sign = of.selection[idx];
                 if (!sign) return '';
 
-                const signColor = sign === '1' ? '#1976d2' : sign === 'X' ? '#757575' : '#d32f2f';
-
                 return `
-                    <div title="${member.name} ${member.surname || ''}: ${sign}" 
-                         style="display:flex; justify-content:center; align-items:center; min-width:18px; height: 22px; cursor:default;">
-                         <span style="font-size:0.7rem; font-weight:bold; color:${signColor}; border:1px solid ${signColor}; border-radius:3px; padding:0 4px; background:white; line-height:1;">${sign}</span>
+                    <div class="others-item" title="${member.name} ${member.surname || ''}: ${sign}" data-sign="${sign}">
+                         <span>${sign}</span>
                     </div>
                 `;
             }).join('');
@@ -373,23 +370,20 @@ class PronosticoManager {
 
             row.innerHTML = `
                 <div class="p-match-info">
-                    <span class="match-display-idx" style="font-weight:bold; color:var(--primary-green); width:25px; font-size: 0.9rem;">${displayIdx}</span>
-                    
+                    <span class="p-match-num">${displayIdx}</span>
                     <div class="match-team home-team">
                         <span class="team-name">${match.home}</span>
-                        <img src="${homeLogo}" class="team-logo" style="width:24px; height:24px; object-fit:contain;" onerror="this.style.display='none'">
+                        <img src="${homeLogo}" class="team-logo" onerror="this.style.display='none'">
                     </div>
-
-                    <span class="match-vs-separator" style="margin:0 8px; color:#aaa;">-</span>
-
+                    <span class="match-vs-separator">-</span>
                     <div class="match-team away-team">
-                        <img src="${awayLogo}" class="team-logo" style="width:24px; height:24px; object-fit:contain;" onerror="this.style.display='none'">
+                        <img src="${awayLogo}" class="team-logo" onerror="this.style.display='none'">
                         <span class="team-name">${match.away}</span>
                     </div>
                 </div>
 
                 <div class="p-others">
-                    ${othersHtml || '<span style="font-size:0.65rem; color:#bbb; font-style:italic;">-</span>'}
+                    ${othersHtml || '<span class="no-others">-</span>'}
                 </div>
 
                 <div class="p-options" ${disabledStr} data-idx="${idx}">
@@ -409,9 +403,7 @@ class PronosticoManager {
             // Add Dividers: 4-5 (idx 3), 8-9 (idx 7), 11-12 (idx 10), 14-15 (idx 13)
             if ([3, 7, 10, 13].includes(idx)) {
                 const divider = document.createElement('div');
-                divider.style.height = "2px";
-                divider.style.backgroundColor = "#ccc";
-                divider.style.margin = "5px 0";
+                divider.className = "p-divider";
                 this.container.appendChild(divider);
             }
         });
