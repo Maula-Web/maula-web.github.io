@@ -734,17 +734,16 @@ class PronosticoManager {
 
         // 2. Build Header
         const headerRow = document.createElement('tr');
-        // Sticky first column header
-        headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:10; padding:1rem; background:var(--pronosticos-table-head-row-bg); color:var(--pronosticos-table-head-row-text); border-bottom:2px solid var(--input-border); min-width:120px;">Jornada</th>';
+        const stickyTh = document.createElement('th');
+        stickyTh.className = 'summary-sticky-col summary-header-cell';
+        stickyTh.textContent = 'Jornada';
+        headerRow.appendChild(stickyTh);
 
         sortedMembers.forEach((m, index) => {
-            // Zebra striping for columns in header too
-            const colBg = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-bg)' : 'var(--pronosticos-table-col-odd-bg)';
-            const colText = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-text)' : 'var(--pronosticos-table-col-odd-text)';
-
-            // Note: We use the column color for headers too to maintain the "column" look, 
-            // but the text color comes from the header config
-            headerRow.innerHTML += `<th style="padding:1rem; min-width:140px; text-align:center; border-bottom:2px solid var(--input-border); background-color: var(--pronosticos-table-head-col-bg); color: var(--pronosticos-table-head-col-text);">${m.name}</th>`;
+            const th = document.createElement('th');
+            th.className = 'summary-header-cell';
+            th.textContent = m.name;
+            headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
 
@@ -776,43 +775,43 @@ class PronosticoManager {
             } catch (e) { }
 
             // First col sticky
-            row.innerHTML = `<td style="font-weight:bold; position:sticky; left:0; background:var(--pronosticos-table-head-row-bg); color:var(--pronosticos-table-head-row-text); z-index:5; border-right:2px solid var(--input-border); padding:0.8rem;">
-                <div style="font-size:1.1em; color:inherit;">J${j.number}</div>
-                <div style="font-size:0.75em; opacity:0.8; margin-top:4px;">${dateFormatted}</div>
-            </td>`;
+            const stickyTd = document.createElement('td');
+            stickyTd.className = 'summary-sticky-col summary-jornada-info';
+            stickyTd.innerHTML = `
+                <div class="summary-j-num">J${j.number}</div>
+                <div class="summary-j-date">${dateFormatted}</div>
+            `;
+            row.appendChild(stickyTd);
 
             sortedMembers.forEach((m, index) => {
                 const p = this.pronosticos.find(pr => pr.jId === j.id && pr.mId === m.id);
-
-                // Alternating column colors
-                const colBg = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-bg)' : 'var(--pronosticos-table-col-odd-bg)';
-                const colText = index % 2 !== 0 ? 'var(--pronosticos-table-col-even-text)' : 'var(--pronosticos-table-col-odd-text)';
+                const isEven = index % 2 !== 0;
 
                 let cellContent = '-';
-                let cellStyle = `text-align:center; vertical-align:middle; padding:0.6rem; border-bottom:1px solid var(--input-border); background-color:${colBg}; color:${colText}; cursor:pointer; transition:background-color 0.2s;`;
+                let cellClass = `summary-cell ${isEven ? 'col-even' : 'col-odd'}`;
                 let textStyle = '';
 
                 if (p && p.selection) {
-                    // Extract only first 14 matches (exclude Pleno/15)
                     const selection14 = p.selection.slice(0, 14);
-
-                    // Create compact string: "1X2111..."
                     const summary = selection14.map(s => s || '-').join('');
 
-                    // Status Check
                     if (p.late) {
-                        textStyle = 'color: var(--pronosticos-status-late-text); font-weight:bold;';
-                        cellContent = `<div style="font-family:monospace; font-size:0.95rem; letter-spacing:2px; white-space:nowrap; ${textStyle}" title="Enviado con retraso">${summary}</div>`;
+                        cellContent = `<div class="summary-forecast late" title="Enviado con retraso">${summary}</div>`;
                     } else {
-                        textStyle = 'font-weight:500;';
-                        cellContent = `<div style="font-family:monospace; font-size:0.95rem; letter-spacing:2px; white-space:nowrap; ${textStyle}">${summary}</div>`;
+                        cellContent = `<div class="summary-forecast">${summary}</div>`;
                     }
                 } else {
-                    textStyle = 'color: var(--danger); font-weight:bold;';
-                    cellContent = `<span style="${textStyle}">-</span>`;
+                    cellContent = `<span class="summary-no-data">-</span>`;
                 }
 
-                row.innerHTML += `<td class="summary-cell" data-jid="${j.id}" data-mid="${m.id}" style="${cellStyle}" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='none'">${cellContent}</td>`;
+                const td = document.createElement('td');
+                td.className = cellClass;
+                td.dataset.jid = j.id;
+                td.dataset.mid = m.id;
+                td.innerHTML = cellContent;
+                td.onmouseover = function () { this.style.filter = 'brightness(0.9)'; };
+                td.onmouseout = function () { this.style.filter = 'none'; };
+                row.appendChild(td);
             });
 
             tbody.appendChild(row);

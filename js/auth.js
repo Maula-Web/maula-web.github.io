@@ -131,6 +131,11 @@ const Auth = {
                 <div class="header-logo" onclick="window.location.href='index.html'" style="cursor:pointer">
                     <img src="LOGO_MAULAS.png?v=2" alt="Logotipo Peña Maulas">
                 </div>
+                <div class="menu-toggle" id="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
                 <a href="socios.html" class="btn-primary btn-socios ${page === 'socios.html' ? 'active' : ''}">SOCIOS</a>
                 <a href="jornadas.html" class="btn-primary btn-jornadas ${page === 'jornadas.html' ? 'active' : ''}">JORNADAS</a>
                 <a href="pronosticos.html" class="btn-primary btn-pronosticos ${page === 'pronosticos.html' ? 'active' : ''}">PRONÓSTICOS</a>
@@ -177,6 +182,28 @@ const Auth = {
         // 4. Remove redundant "Volver" buttons if they exist
         const backBtns = document.querySelectorAll('.btn-back');
         backBtns.forEach(b => b.style.display = 'none');
+
+        // 5. Mobile Toggle Event
+        const toggle = document.getElementById('mobile-menu-toggle');
+        if (toggle) {
+            toggle.onclick = (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('active');
+                if (sidebar.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            };
+        }
+
+        // Close menu when clicking a link
+        sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
     }
 };
 

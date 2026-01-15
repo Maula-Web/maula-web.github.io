@@ -59,21 +59,32 @@ body.layout-vertical .main-container {
 /* Mobile check: on small screens, vertical layout might need to revert or behave differently */
 @media (max-width: 768px) {
     body.layout-vertical .sidebar-menu {
-        width: 100%;
-        height: auto;
-        position: relative;
+        /* These will be mostly inherited from styles.css now */
+        width: 100% !important;
+        height: 60px !important;
+        flex-direction: row !important;
+        padding: 0 1rem !important;
+        border-right: none !important;
+    }
+
+    body.layout-vertical .sidebar-menu.active {
+        height: 100vh !important;
+        flex-direction: column !important;
     }
 
     body.layout-vertical .home-body,
     body.layout-vertical .page-body {
-        padding-left: 0;
-        padding-top: 0;
+        padding-left: 0 !important;
+        padding-top: 75px !important;
+    }
+
+    body.layout-vertical .header-logo {
+        margin-bottom: 0 !important;
     }
 
     body.layout-vertical .header-separator {
-        left: 0;
-        width: 100%;
-        top: 0;
-        position: relative;
+        left: 0 !important;
+        top: 60px !important;
+        width: 100% !important;
     }
 }

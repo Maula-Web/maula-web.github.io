@@ -1765,6 +1765,79 @@ textarea:focus {
 }
 
 /* Responsive Design */
+/* Summary Table Refined */
+.summary-header-cell {
+    padding: 1rem;
+    min-width: 140px;
+    text-align: center;
+    border-bottom: 2px solid var(--input-border);
+    background-color: var(--pronosticos-table-head-col-bg);
+    color: var(--pronosticos-table-head-col-text);
+}
+
+.summary-sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--pronosticos-table-head-row-bg) !important;
+    color: var(--pronosticos-table-head-row-text) !important;
+    border-right: 2px solid var(--input-border);
+}
+
+.summary-jornada-info {
+    padding: 0.8rem;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.summary-j-num {
+    font-size: 1.1em;
+}
+
+.summary-j-date {
+    font-size: 0.75em;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+.summary-cell {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.6rem;
+    border-bottom: 1px solid var(--input-border);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.summary-cell.col-even {
+    background-color: var(--pronosticos-table-col-even-bg);
+    color: var(--pronosticos-table-col-even-text);
+}
+
+.summary-cell.col-odd {
+    background-color: var(--pronosticos-table-col-odd-bg);
+    color: var(--pronosticos-table-col-odd-text);
+}
+
+.summary-forecast {
+    font-family: monospace;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.summary-forecast.late {
+    color: var(--pronosticos-status-late-text);
+    font-weight: bold;
+}
+
+.summary-no-data {
+    color: var(--danger);
+    font-weight: bold;
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
     .sidebar-menu {
         left: 2%;
@@ -1787,64 +1860,131 @@ textarea:focus {
         padding: 2rem 1rem;
     }
 
-    .home-body .sidebar-menu {
-        position: static;
-        transform: none;
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.8rem;
-    }
-
-    .home-body .sidebar-menu .btn-primary {
-        flex: 1 1 140px;
-        min-width: 140px;
-        padding: 0.8rem;
-    }
-
-    /* Content below sidebar on landing */
-    .home-body div[style*="margin-left: 280px"],
-    .home-body div[style*="margin-left: 280px"] {
-        margin-left: 0 !important;
-        width: 100% !important;
-        padding: 1rem !important;
-    }
-
+    /* Responsive Navigation (Hamburger Menu) */
     .sidebar-menu {
-        height: auto;
-        padding: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background: #000;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0 1rem !important;
+        z-index: 3000 !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
     .header-logo {
-        width: 100%;
-        justify-content: center;
-        margin-right: 0;
-        margin-bottom: 0.5rem;
+        margin: 0 !important;
+        height: 40px !important;
+        width: auto !important;
     }
 
     .header-logo img {
-        height: 40px;
+        height: 100% !important;
+        width: auto !important;
     }
 
-    .sidebar-menu .btn-primary {
-        min-width: 100px;
-        font-size: 0.7rem;
-        padding: 0.5rem;
+    /* Hide menu items by default on mobile */
+    .sidebar-menu a.btn-primary {
+        display: none !important;
     }
 
-    .main-logo {
-        max-width: 200px;
+    /* Hamburger Toggle Button */
+    .menu-toggle {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 20px;
+        cursor: pointer;
+        z-index: 3002;
     }
 
-    .dashboard-stats {
-        padding: 0;
-        grid-template-columns: 1fr;
+    .menu-toggle span {
+        display: block;
+        width: 100%;
+        height: 3px;
+        background-color: #fff;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+
+    /* Mobile Menu Open State */
+    .sidebar-menu.active {
+        height: 100vh !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        padding-top: 80px !important;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(10px);
+        overflow-y: auto;
+    }
+
+    .sidebar-menu.active a.btn-primary {
+        display: flex !important;
+        width: 80% !important;
+        margin: 0.5rem 0 !important;
+        padding: 1rem !important;
+        font-size: 1rem !important;
+        animation: slideIn 0.3s ease forwards;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Hamburger Animation to 'X' */
+    .sidebar-menu.active .menu-toggle span:nth-child(1) {
+        transform: translateY(8.5px) rotate(45deg);
+    }
+
+    .sidebar-menu.active .menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .sidebar-menu.active .menu-toggle span:nth-child(3) {
+        transform: translateY(-8.5px) rotate(-45deg);
+    }
+
+    .home-body,
+    .page-body {
+        padding-top: 75px !important;
+    }
+
+    .header-separator {
+        position: fixed !important;
+        top: 60px !important;
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 3001 !important;
+    }
+
+    /* Summary Table Mobile */
+    .summary-header-cell {
+        min-width: 110px;
+        padding: 0.8rem 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .summary-forecast {
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+
+    .summary-sticky-col {
+        min-width: 80px;
     }
 
     /* Generic Page Mobile */
@@ -1949,6 +2089,15 @@ textarea:focus {
         font-size: 0.8rem;
     }
 
+    .main-logo {
+        max-width: 200px;
+    }
+
+    .dashboard-stats {
+        padding: 0;
+        grid-template-columns: 1fr;
+    }
+
     /* Doubles Section Mobile */
     #main-content-layout {
         flex-direction: column;
@@ -1971,7 +2120,34 @@ textarea:focus {
     #doubles-status-card>div:last-child {
         align-items: center !important;
     }
+
+    /* Collective Forecast Modal Mobile */
+    #view-jornada-modal .modal-content-wrapper {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+    }
+
+    #view-jornada-content {
+        padding: 5px !important;
+    }
+
+    #view-jornada-content table {
+        font-size: 0.65rem !important;
+    }
+
+    #view-jornada-title {
+        font-size: 0.8rem !important;
+    }
+
+    #sel-modal-jornada {
+        padding: 3px 8px !important;
+        font-size: 0.75rem !important;
+    }
 }
+
+
 
 @media (max-width: 480px) {
     .page-title {
