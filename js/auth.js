@@ -146,7 +146,23 @@ const Auth = {
             `;
             document.body.prepend(sidebar);
         } else {
-            // If sidebar exists but doesn't have the new button, add it
+            // 1. Ensure Menu Toggle exists even if sidebar was hardcoded
+            if (!sidebar.querySelector('.menu-toggle')) {
+                const logo = sidebar.querySelector('.header-logo');
+                if (logo) {
+                    logo.insertAdjacentHTML('afterend', `
+                        <div class="menu-toggle" id="mobile-menu-toggle">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    `);
+                    logo.style.cursor = 'pointer';
+                    logo.onclick = () => window.location.href = 'index.html';
+                }
+            }
+
+            // 2. Ensure Theme Editor button exists
             if (!sidebar.querySelector('a[href="theme-editor.html"]')) {
                 const themeBtn = document.createElement('a');
                 themeBtn.href = "theme-editor.html";

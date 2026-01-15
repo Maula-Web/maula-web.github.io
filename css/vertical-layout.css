@@ -57,7 +57,7 @@ body.layout-vertical .main-container {
 }
 
 /* Mobile check: on small screens, vertical layout might need to revert or behave differently */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     body.layout-vertical .sidebar-menu {
         /* These will be mostly inherited from styles.css now */
         width: 100% !important;
