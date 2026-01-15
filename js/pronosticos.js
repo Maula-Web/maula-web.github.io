@@ -238,7 +238,13 @@ class PronosticoManager {
     }
 
     populateDropdowns() {
-        this.members.forEach(m => {
+        const sortedMembers = [...this.members].sort((a, b) => {
+            const nameA = `${a.name} ${a.surname || ''}`.toLowerCase();
+            const nameB = `${b.name} ${b.surname || ''}`.toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+
+        sortedMembers.forEach(m => {
             const opt = document.createElement('option');
             opt.value = m.id;
             opt.textContent = `${m.name} ${m.surname || ''}`;
