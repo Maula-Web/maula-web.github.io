@@ -10,9 +10,7 @@
         .results-wrapper {
             overflow: auto;
             max-height: 70vh;
-            width: calc(100vw - 140px);
-            /* Use almost full width minus sidebar */
-            max-width: calc(100vw - 140px);
+            max-width: 100%;
             border: 1px solid #eee;
             border-radius: 8px;
             background: var(--resultados-cell-bg);
@@ -45,11 +43,27 @@
             background-color: var(--resultados-cell-alt-bg);
         }
 
-        /* Adjust main container to not add extra padding */
-        .resultados-page .main-container {
-            padding: 1rem 0.5rem !important;
-            max-width: 100vw;
-            overflow: visible;
+        /* Desktop only: Maximize table width */
+        @media (min-width: 1025px) {
+
+            /* Horizontal menu (default) */
+            .results-wrapper {
+                width: calc(100vw - 140px);
+                max-width: calc(100vw - 140px);
+            }
+
+            .resultados-page .main-container {
+                padding: 1rem 0.5rem !important;
+                max-width: 100vw;
+                overflow: visible;
+            }
+
+            /* Vertical menu - account for 250px sidebar */
+            body.layout-vertical .results-wrapper {
+                width: calc(100vw - 300px);
+                /* 250px sidebar + 50px margin */
+                max-width: calc(100vw - 300px);
+            }
         }
 
         /* Sticky Header (Socio Names) */
