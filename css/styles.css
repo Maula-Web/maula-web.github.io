@@ -2517,19 +2517,19 @@ body.mobile-mode #cost-info {
     box-sizing: border-box;
 }
 
-/* Match Row - Packed to Left, Options on Right */
+/* Match Row - Compact for Portrait Mobile */
 body.mobile-mode .pronostico-row {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    padding: 0.25rem 0.3rem !important;
-    gap: 0 !important;
-    /* Managed by children margins */
+    justify-content: space-between !important;
+    padding: 0.3rem 0.4rem !important;
+    gap: 4px !important;
     height: auto !important;
     min-width: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 body.mobile-mode .p-others,
@@ -2544,59 +2544,70 @@ body.mobile-mode .p-match-info {
     align-items: center !important;
     gap: 2px !important;
     font-size: 0.62rem !important;
-    margin-right: 4px !important;
+    margin-right: 0 !important;
     overflow: hidden;
     white-space: nowrap !important;
     flex: 1 1 auto !important;
-    /* Takes available space but can shrink */
+    min-width: 0 !important;
+    /* Allow shrinking */
+    max-width: calc(100% - 90px) !important;
+    /* Reserve space for buttons */
 }
 
 body.mobile-mode .p-match-num {
-    min-width: 14px !important;
-    font-size: 0.65rem !important;
-    margin-right: 4px !important;
+    min-width: 12px !important;
+    font-size: 0.62rem !important;
+    margin-right: 3px !important;
     flex-shrink: 0;
 }
 
 body.mobile-mode .p-match-info .team-name {
-    max-width: none !important;
-    font-size: 0.65rem !important;
+    max-width: 80px !important;
+    /* Limit team name width */
+    font-size: 0.62rem !important;
     white-space: nowrap !important;
-    flex-shrink: 0;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    flex-shrink: 1 !important;
+    /* Allow shrinking */
 }
 
 body.mobile-mode .p-match-info .team-logo {
-    width: 13px !important;
-    height: 13px !important;
+    width: 12px !important;
+    height: 12px !important;
     margin: 0 1px;
     flex-shrink: 0;
 }
 
 body.mobile-mode .p-match-info .match-vs-separator {
-    margin: 0 1px;
-    font-size: 0.6rem;
+    margin: 0 2px;
+    font-size: 0.55rem;
     color: #999;
+    flex-shrink: 0;
 }
 
-/* Forecast Buttons - Guaranteed visibility */
+/* Forecast Buttons - Guaranteed visibility with fixed width */
 body.mobile-mode .p-options {
     display: flex !important;
-    gap: 3px !important;
+    gap: 2px !important;
     flex-shrink: 0 !important;
     /* NEVER shrink these */
-    margin-left: auto;
-    /* Push to right */
-    padding-left: 5px;
+    margin-left: auto !important;
+    padding-left: 4px !important;
+    min-width: 82px !important;
+    /* Guarantee space for 3 buttons */
+    justify-content: flex-end !important;
 }
 
 body.mobile-mode .p-options .chk-option {
-    width: 25px !important;
-    height: 25px !important;
-    font-size: 0.72rem !important;
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.7rem !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    flex-shrink: 0 !important;
 }
 
 body.mobile-mode .p-divider {
