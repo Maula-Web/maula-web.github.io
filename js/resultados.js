@@ -192,8 +192,8 @@ class ResultsManager {
         finishedJornadas.forEach(j => {
             tbodyHtml += `<tr>`;
             tbodyHtml += `<td style="font-size:0.9rem; border-right:2px solid #ddd;">
-                            <div style="font-weight:bold; color:#333;">Jornada ${j.number}</div>
-                            <div style="color:#455a64; font-size:0.8rem;">${j.date}</div>
+                            <div style="font-weight:bold; color:var(--resultados-jornada-number);">Jornada ${j.number}</div>
+                            <div style="color:var(--resultados-jornada-date); font-size:0.8rem;">${j.date}</div>
                           </td>`;
 
             sortedMembers.forEach(m => {
@@ -205,7 +205,7 @@ class ResultsManager {
                 if (data.hits !== -1) {
                     // MAIN CHANGE: Show HITS as main value
                     // If Bonus != 0, show it below.
-                    cellHtml = `<div style="font-size:1.3rem; font-weight:bold;">${data.hits}</div>`;
+                    cellHtml = `<div style="font-size:1.3rem; font-weight:bold; color:var(--resultados-hits-number);">${data.hits}</div>`;
 
                     if (data.bonus !== 0) {
                         const bColor = data.bonus > 0 ? 'var(--resultados-bonus-positive)' : 'var(--resultados-bonus-negative)';

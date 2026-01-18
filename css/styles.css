@@ -124,6 +124,10 @@
     --resultados-prize-text: #1b5e20;
     --resultados-prize-bg: #e8f5e9;
     --resultados-prize-label-bg: #c8e6c9;
+    --resultados-jornada-number: #333333;
+    --resultados-jornada-date: #455a64;
+    --resultados-hits-number: #1b1b1b;
+    --resultados-total-points-text: #7b1fa2;
 
     /* Resumen Temporada - Neon Orange */
     --primary-orange: #ff9100;
@@ -322,6 +326,10 @@
     --resultados-prize-text: #66bb6a;
     --resultados-prize-bg: #1b5e20;
     --resultados-prize-label-bg: #2e7d32;
+    --resultados-jornada-number: #e1bee7;
+    --resultados-jornada-date: #ba68c8;
+    --resultados-hits-number: #ffffff;
+    --resultados-total-points-text: #ba68c8;
 
     /* Resumen Temporada - Neon Orange */
     --primary-orange: #ff9100;

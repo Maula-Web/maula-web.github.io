@@ -153,7 +153,11 @@ const ThemeEditor = {
             { id: '--resultados-bonus-negative', label: 'Color Penalización (-)' },
             { id: '--resultados-prize-text', label: 'Color Texto Premios' },
             { id: '--resultados-prize-bg', label: 'Fondo Celdas Premios' },
-            { id: '--resultados-prize-label-bg', label: 'Fondo Label "Premios"' }
+            { id: '--resultados-prize-label-bg', label: 'Fondo Label "Premios"' },
+            { id: '--resultados-jornada-number', label: 'Texto Número Jornada' },
+            { id: '--resultados-jornada-date', label: 'Texto Fecha Jornada' },
+            { id: '--resultados-hits-number', label: 'Texto Número Aciertos' },
+            { id: '--resultados-total-points-text', label: 'Texto Total Puntos' }
         ],
         'resumen': [
             { id: '--primary-orange', label: 'Naranja Primario' },
