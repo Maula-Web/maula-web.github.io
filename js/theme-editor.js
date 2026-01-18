@@ -14,7 +14,11 @@ const ThemeEditor = {
         ],
         'sombras': [
             { id: '--main-shadow', label: 'Sombra Contenedor Principal', type: 'toggle', onValue: '0 20px 50px rgba(0,0,0,0.8)' },
-            { id: '--card-shadow', label: 'Sombra Tarjetas Secundarias', type: 'toggle', onValue: '0 4px 6px -1px rgba(0,0,0,0.1)' }
+            { id: '--card-shadow', label: 'Sombra Tarjetas Secundarias', type: 'toggle', onValue: '0 4px 6px -1px rgba(0,0,0,0.1)' },
+            { id: '--title-text-shadow', label: 'Sombra Títulos de Página', type: 'toggle', onValue: '0 2px 4px var(--title-shadow-color)' },
+            { id: '--title-shadow-color', label: 'Color Sombra Títulos' },
+            { id: '--main-shadow-color', label: 'Color Sombra Principal' },
+            { id: '--card-shadow-color', label: 'Color Sombra Tarjetas' }
         ],
         'dashboard': [
             { id: '--dash-bg', label: 'Fondo Dashboard' },
@@ -157,7 +161,9 @@ const ThemeEditor = {
             { id: '--resultados-jornada-number', label: 'Texto Número Jornada' },
             { id: '--resultados-jornada-date', label: 'Texto Fecha Jornada' },
             { id: '--resultados-hits-number', label: 'Texto Número Aciertos' },
-            { id: '--resultados-total-points-text', label: 'Texto Total Puntos' }
+            { id: '--resultados-total-points-text', label: 'Texto Total Puntos' },
+            { id: '--resultados-cell-bg', label: 'Fondo Celdas Tabla' },
+            { id: '--resultados-cell-alt-bg', label: 'Fondo Celdas Alternas' }
         ],
         'resumen': [
             { id: '--primary-orange', label: 'Naranja Primario' },

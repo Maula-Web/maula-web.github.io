@@ -9,11 +9,12 @@
     <style>
         .results-wrapper {
             overflow: auto;
-            max-height: 70vh;
+            max-height: calc(100vh - 180px);
+            /* Dynamic based on viewport */
             max-width: 100%;
             border: 1px solid #eee;
             border-radius: 8px;
-            background: white;
+            background: var(--resultados-cell-bg);
             position: relative;
         }
 
@@ -28,13 +29,18 @@
 
         .results-table th,
         .results-table td {
-            padding: 0.4rem 0.6rem;
-            /* Reduced padding */
+            padding: 0.5rem 0.7rem;
+            /* Slightly larger for better readability */
             text-align: center;
             border-bottom: 1px solid #eee;
             border-right: 1px solid #eee;
             white-space: nowrap;
+            background-color: var(--resultados-cell-bg);
             /* Prevent wrapping unless necessary */
+        }
+
+        .results-table tbody tr:nth-child(even) td {
+            background-color: var(--resultados-cell-alt-bg);
         }
 
         /* Sticky Header (Socio Names) */
