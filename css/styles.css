@@ -103,6 +103,28 @@
     --pastel-bg-purple: #1a0a24;
     --pastel-accent-purple: #7b1fa2;
 
+    /* Resultados Table Details */
+    --resultados-header-bg: #f500ff;
+    --resultados-header-text: #ffffff;
+    --resultados-corner-bg: #d500f9;
+    --resultados-sticky-col-bg: #f9f9f9;
+    --resultados-sticky-col-text: #d500f9;
+    --resultados-summary-total-bg: #e1bee7;
+    --resultados-summary-total-text: #1b1b1b;
+    --resultados-summary-row-bg: #f3e5f5;
+    --resultados-summary-row-text: #333333;
+    --resultados-summary-label-bg: #cfd8dc;
+    --resultados-summary-label-text: #1b1b1b;
+    --resultados-winner-bg: #bbdefb;
+    --resultados-winner-text: #1b1b1b;
+    --resultados-loser-bg: #ffcdd2;
+    --resultados-loser-text: #1b1b1b;
+    --resultados-bonus-positive: #2e7d32;
+    --resultados-bonus-negative: #c62828;
+    --resultados-prize-text: #1b5e20;
+    --resultados-prize-bg: #e8f5e9;
+    --resultados-prize-label-bg: #c8e6c9;
+
     /* Resumen Temporada - Neon Orange */
     --primary-orange: #ff9100;
     --dark-orange: #ff6d00;
@@ -278,6 +300,28 @@
     --dark-purple: #37474f;
     --pastel-bg-purple: #1a232e;
     --pastel-accent-purple: #607d8b;
+
+    /* Resultados Table Details (Dark Mode) */
+    --resultados-header-bg: #7b1fa2;
+    --resultados-header-text: #ffffff;
+    --resultados-corner-bg: #6a1b9a;
+    --resultados-sticky-col-bg: #2d2d2d;
+    --resultados-sticky-col-text: #ba68c8;
+    --resultados-summary-total-bg: #4a148c;
+    --resultados-summary-total-text: #ffffff;
+    --resultados-summary-row-bg: #3a2a4a;
+    --resultados-summary-row-text: #e1bee7;
+    --resultados-summary-label-bg: #455a64;
+    --resultados-summary-label-text: #ffffff;
+    --resultados-winner-bg: #1565c0;
+    --resultados-winner-text: #ffffff;
+    --resultados-loser-bg: #c62828;
+    --resultados-loser-text: #ffffff;
+    --resultados-bonus-positive: #66bb6a;
+    --resultados-bonus-negative: #ef5350;
+    --resultados-prize-text: #66bb6a;
+    --resultados-prize-bg: #1b5e20;
+    --resultados-prize-label-bg: #2e7d32;
 
     /* Resumen Temporada - Neon Orange */
     --primary-orange: #ff9100;

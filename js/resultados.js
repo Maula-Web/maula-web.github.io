@@ -136,20 +136,20 @@ class ResultsManager {
         // First col: Fixed width for 'Temporada'
         // Other cols: Auto or equal percentage? 
         // Better: min-width and allow wrap.
-        theadHtml += `<tr><th style="width:120px; min-width:120px; white-space:nowrap; z-index:3; padding:10px; color:white;">Temporada 2025-2026</th>`;
+        theadHtml += `<tr><th style="width:120px; min-width:120px; white-space:nowrap; z-index:3; padding:10px; color:var(--resultados-header-text);">Temporada 2025-2026</th>`;
 
         sortedMembers.forEach(m => {
             // Apply equal sizing
-            theadHtml += `<th style="z-index:2; width:80px; min-width:80px; vertical-align:middle; padding:10px 2px; word-wrap: break-word; white-space: normal; background-color: var(--primary-purple);">
-                            <div style="font-weight:bold; line-height:1.2; font-size:0.95rem;">${m.name}</div>
-                            <div style="font-size:0.7rem; font-weight:normal; color:#eceff1; opacity:0.8;">ID: ${m.id}</div>
+            theadHtml += `<th style="z-index:2; width:80px; min-width:80px; vertical-align:middle; padding:10px 2px; word-wrap: break-word; white-space: normal; background-color: var(--resultados-header-bg);">
+                            <div style="font-weight:bold; line-height:1.2; font-size:0.95rem; color:var(--resultados-header-text);">${m.name}</div>
+                            <div style="font-size:0.7rem; font-weight:normal; color:var(--resultados-header-text); opacity:0.8;">ID: ${m.id}</div>
                           </th>`;
         });
         theadHtml += `</tr>`;
 
         // 2. Grand Total (Sticky below names)
         theadHtml += `<tr class="total-row" style="position:sticky; top:60px; z-index:2;">
-                        <td style="position:sticky; left:0; z-index:3; background-color:#cfd8dc; border-right:2px solid #ddd;">TOTAL PUNTOS</td>`;
+                        <td style="position:sticky; left:0; z-index:3; background-color:var(--resultados-summary-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">TOTAL PUNTOS</td>`;
         sortedMembers.forEach(m => {
             theadHtml += `<td class="accumulated-score" style="font-size: 1.6rem;">${memberStats[m.id].grandTotal}</td>`;
         });
@@ -157,29 +157,29 @@ class ResultsManager {
 
         // 3. Base Hits
         theadHtml += `<tr class="summary-row" style="position:sticky; top:110px; z-index:2;">
-                        <td style="position:sticky; left:0; z-index:3; background:#cfd8dc; border-right:2px solid #ddd;">Aciertos Base</td>`;
+                        <td style="position:sticky; left:0; z-index:3; background:var(--resultados-summary-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">Aciertos Base</td>`;
         sortedMembers.forEach(m => {
-            theadHtml += `<td style="color:#333; background:#f5f5f5;">${memberStats[m.id].baseTotal}</td>`;
+            theadHtml += `<td style="color:var(--resultados-summary-row-text); background:var(--resultados-summary-row-bg);">${memberStats[m.id].baseTotal}</td>`;
         });
         theadHtml += `</tr>`;
 
         // 4. Bonus/Penalties
         theadHtml += `<tr class="summary-row" style="border-bottom:2px solid #ddd; position:sticky; top:150px; z-index:2;">
-                        <td style="position:sticky; left:0; z-index:3; background:#cfd8dc; border-right:2px solid #ddd;">Bonus / Penal.</td>`;
+                        <td style="position:sticky; left:0; z-index:3; background:var(--resultados-summary-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">Bonus / Penal.</td>`;
         sortedMembers.forEach(m => {
             const val = memberStats[m.id].bonusTotal;
-            const color = val >= 0 ? '#455a64' : '#c62828'; // Azul grisáceo para positivo
+            const color = val >= 0 ? 'var(--resultados-bonus-positive)' : 'var(--resultados-bonus-negative)';
             const sign = val > 0 ? '+' : '';
-            theadHtml += `<td style="color:${color}; font-weight:bold; background:#f5f5f5;">${sign}${val}</td>`;
+            theadHtml += `<td style="color:${color}; font-weight:bold; background:var(--resultados-summary-row-bg);">${sign}${val}</td>`;
         });
         theadHtml += `</tr>`;
 
         // 5. Total Prizes Money
         theadHtml += `<tr class="summary-row" style="border-bottom:3px solid var(--primary-purple); position:sticky; top:190px; z-index:2;">
-                        <td style="position:sticky; left:0; z-index:3; background:#c8e6c9; border-right:2px solid #ddd;">Premios (€)</td>`;
+                        <td style="position:sticky; left:0; z-index:3; background:var(--resultados-prize-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">Premios (€)</td>`;
         sortedMembers.forEach(m => {
             const val = memberStats[m.id].prizeTotal;
-            theadHtml += `<td style="color:#2e7d32; font-weight:bold; background:#e8f5e9; font-size:1.1rem;">${val.toFixed(2)}€</td>`;
+            theadHtml += `<td style="color:var(--resultados-prize-text); font-weight:bold; background:var(--resultados-prize-bg); font-size:1.1rem;">${val.toFixed(2)}€</td>`;
         });
         theadHtml += `</tr>`;
 
@@ -208,13 +208,13 @@ class ResultsManager {
                     cellHtml = `<div style="font-size:1.3rem; font-weight:bold;">${data.hits}</div>`;
 
                     if (data.bonus !== 0) {
-                        const bColor = data.bonus > 0 ? 'var(--dark-green)' : 'red';
+                        const bColor = data.bonus > 0 ? 'var(--resultados-bonus-positive)' : 'var(--resultados-bonus-negative)';
                         const bSign = data.bonus > 0 ? '+' : '';
                         cellHtml += `<div style="font-size:0.8rem; font-weight:bold; color:${bColor};">${bSign}${data.bonus}</div>`;
                     }
 
                     if (data.prize > 0) {
-                        cellHtml += `<div style="font-size:0.85rem; font-weight:bold; color:#1b5e20; margin-top:2px;">${data.prize.toFixed(2)}€</div>`;
+                        cellHtml += `<div style="font-size:0.85rem; font-weight:bold; color:var(--resultados-prize-text); margin-top:2px;">${data.prize.toFixed(2)}€</div>`;
                     }
 
                     // Details tooltip
@@ -235,9 +235,9 @@ class ResultsManager {
                     // Let's keep using POINTS for comparison coloring as it reflects the "match outcome".
 
                     if (data.points === j.stats.maxScore) {
-                        cellStyle += 'background-color:#bbdefb;'; // Azul claro en lugar de verde
+                        cellStyle += 'background-color:var(--resultados-winner-bg); color:var(--resultados-winner-text);';
                     } else if (data.points === j.stats.minScore) {
-                        cellStyle += 'background-color:#ffcdd2;'; // Light Red
+                        cellStyle += 'background-color:var(--resultados-loser-bg); color:var(--resultados-loser-text);';
                     }
 
                     // Black/White for 0 Hits/Points logic
