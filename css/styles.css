@@ -1914,12 +1914,15 @@ textarea:focus {
         padding: 0 1rem !important;
         z-index: 3000 !important;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        transition: height 0.3s ease;
     }
 
     .header-logo {
         margin: 0 !important;
         height: 40px !important;
         width: auto !important;
+        z-index: 3003;
+        position: relative;
     }
 
     .header-logo img {
@@ -1935,12 +1938,13 @@ textarea:focus {
     /* Hamburger Toggle Button */
     .menu-toggle {
         display: flex !important;
-        flex-direction: column;
+        flex-direction: column !important;
         justify-content: space-between;
         width: 30px;
         height: 20px;
         cursor: pointer;
-        z-index: 3002;
+        z-index: 3003;
+        position: relative;
     }
 
     .menu-toggle span {
@@ -1955,21 +1959,55 @@ textarea:focus {
     /* Mobile Menu Open State */
     .sidebar-menu.active {
         height: 100vh !important;
+        height: 100dvh !important;
+        /* Dynamic viewport height for mobile browsers */
+        display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
-        padding-top: 80px !important;
-        background: rgba(0, 0, 0, 0.95);
+        align-items: center !important;
+        padding: 70px 1rem 20px 1rem !important;
+        background: rgba(0, 0, 0, 0.98);
         backdrop-filter: blur(10px);
-        overflow-y: auto;
+        overflow-y: auto !important;
+        /* Allow scrolling within menu */
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scrolling on iOS */
+    }
+
+    /* Keep header elements fixed at top when menu is open */
+    .sidebar-menu.active .header-logo,
+    .sidebar-menu.active .menu-toggle {
+        position: fixed;
+        top: 10px;
+    }
+
+    .sidebar-menu.active .header-logo {
+        left: 1rem;
+    }
+
+    .sidebar-menu.active .menu-toggle {
+        right: 1rem;
+        top: 20px;
     }
 
     .sidebar-menu.active a.btn-primary {
         display: flex !important;
-        width: 80% !important;
-        margin: 0.5rem 0 !important;
-        padding: 1rem !important;
+        width: 85% !important;
+        max-width: 400px !important;
+        margin: 0.6rem auto !important;
+        padding: 1.1rem !important;
         font-size: 1rem !important;
         animation: slideIn 0.3s ease forwards;
+        flex-shrink: 0;
+        /* Prevent buttons from shrinking */
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Add bottom padding to last menu item to ensure it's reachable */
+    .sidebar-menu.active a.btn-primary:last-of-type {
+        margin-bottom: 2rem !important;
     }
 
     @keyframes slideIn {
