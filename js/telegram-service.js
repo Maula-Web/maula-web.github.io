@@ -1,12 +1,16 @@
-const TelegramService = {
-    async sendJornadaReport(jId) {
+window.TelegramService = {
+    async sendJornadaReport(jId, manualConfig = null) {
         if (!window.DataService) return;
 
         try {
-            // 1. Get Config
-            const config = await window.DataService.getAll('config');
-            const tg = config.find(c => c.id === 'telegram');
-            if (!tg || !tg.enabled || !tg.token || !tg.chatId) {
+            // 1. Get Config (Priority to manualConfig for testing, then DB)
+            let tg = manualConfig;
+            if (!tg) {
+                const config = await window.DataService.getAll('config');
+                tg = config.find(c => c.id === 'telegram');
+            }
+
+            if (!tg || (!manualConfig && !tg.enabled) || !tg.token || !tg.chatId) {
                 console.log("TelegramService: Disabled or not configured.");
                 return;
             }
@@ -20,7 +24,7 @@ const TelegramService = {
             // 3. Process Data
             const activeJornadas = jornadas.filter(j =>
                 j.active && j.matches && j.matches[0] && j.matches[0].result
-            );
+            ).sort((a, b) => a.number - b.number);
 
             // Calculate GLOBAL Stats
             const globalStats = {};
@@ -93,10 +97,10 @@ const TelegramService = {
 
             // Winner / Loser
             const winner = currentResults[0];
-            const loser = [...currentResults].reverse().find(r => r.hits !== -1);
+            const lastPlayed = [...currentResults].reverse().find(r => r.hits !== -1);
             msg += `\n*🌟 DESTACADOS:*`;
-            msg += `\n🔝 Ganador J${currentJ.number}: *${winner.name}*`;
-            if (loser && loser !== winner) msg += `\n🐢 Farolillo J${currentJ.number}: *${loser.name}*`;
+            if (winner) msg += `\n🔝 Ganador J${currentJ.number}: *${winner.name}*`;
+            if (lastPlayed && lastPlayed !== winner) msg += `\n🐢 Farolillo J${currentJ.number}: *${lastPlayed.name}*`;
 
             // Global Ranking (TOP 5)
             const ranking = Object.values(globalStats).sort((a, b) => b.totalPoints - a.totalPoints);
@@ -108,7 +112,7 @@ const TelegramService = {
             msg += `\n🔗 [Consultar Web Completa](https://peñamaulas.com)`;
 
             // 6. Send
-            await this.sendRaw(tg.token, tg.chatId, msg);
+            return await this.sendRaw(tg.token, tg.chatId, msg);
 
         } catch (e) {
             console.error("TelegramService Error:", e);
