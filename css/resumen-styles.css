@@ -17,11 +17,19 @@
 }
 
 /* Dashboard Layout */
+.resumen-page .main-container {
+    max-width: 98%;
+    width: 98%;
+    padding: 1.5rem;
+    /* Reduced padding to give more inner space */
+}
+
 .dashboard-container {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1.4fr 1fr;
     gap: 1.5rem;
     margin-top: 1rem;
+    width: 100%;
 }
 
 .dashboard-card {

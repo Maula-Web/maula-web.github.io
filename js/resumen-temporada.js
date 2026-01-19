@@ -153,7 +153,7 @@ class ResumenManager {
                     🏆 Ver Quinielas de Dobles
                 </button>
             </div>
-            <table class="rankings-table" style="width:100%; max-width:700px; margin:0 auto; background:white; border-radius:8px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+            <table class="rankings-table" style="width:100%; background:white; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
                 <thead style="background:var(--primary-purple); color:white;">
                     <tr>
                         <th style="padding:.5rem;">Ver</th>
