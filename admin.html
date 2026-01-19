@@ -495,10 +495,14 @@
             }
 
             if (useRealData && lastJ && window.TelegramService) {
-                // Ensure config is saved locally for the service to read (it reads from DB)
-                // We just saved it in saveTelegramConfig, so it should be fine.
-                await window.TelegramService.sendJornadaReport(lastJ.id);
-                alert(`Simulación de Jornada ${lastJ.number} enviada.`);
+                // Pass current screen values as manualConfig so it works even if unsaved
+                const manualConfig = {
+                    token: token,
+                    chatId: chat,
+                    enabled: true // Force enabled for manual test
+                };
+                await window.TelegramService.sendJornadaReport(lastJ.id, manualConfig);
+                alert(`Simulación de Jornada ${lastJ.number} enviada al grupo.`);
             } else {
                 const msg = "🚀 ¡Peña Maulas Test! Conexión de Administración configurada correctamente.";
                 const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}`;
