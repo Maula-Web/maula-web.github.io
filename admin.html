@@ -156,8 +156,11 @@
                             style="width:100%; padding:4px; margin-bottom:0.5rem;">
 
                         <label style="display:block; margin-bottom:0.2rem;">Chat ID:</label>
-                        <input type="text" id="tg-chat" placeholder="-100..."
-                            style="width:100%; padding:4px; margin-bottom:0.5rem;">
+                        <div style="display:flex; gap:5px; margin-bottom:0.5rem;">
+                            <input type="text" id="tg-chat" placeholder="-100..." style="flex:1; padding:4px;">
+                            <button type="button" onclick="fetchChatId()" class="btn-action"
+                                style="background:#0288d1; font-size:0.75rem;">🔍 Buscar</button>
+                        </div>
 
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:0.5rem;">
                             <input type="checkbox" id="tg-enabled">
@@ -479,6 +482,42 @@
                 else throw new Error(data.description);
             } catch (e) {
                 alert('Error al enviar: ' + e.message);
+            }
+        }
+
+        async function fetchChatId() {
+            const token = document.getElementById('tg-token').value.trim();
+            if (!token) {
+                alert('Primero introduce el Bot Token para poder buscar.');
+                return;
+            }
+
+            try {
+                const url = `https://api.telegram.org/bot${token}/getUpdates`;
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (!data.ok) throw new Error(data.description);
+
+                // Look for the last message in a group or supergroup
+                const updates = data.result;
+                if (!updates || updates.length === 0) {
+                    alert('No se han encontrado mensajes recientes. Pon un mensaje en el grupo de la peña y vuelve a intentarlo.');
+                    return;
+                }
+
+                // Get the most recent chat info
+                const lastUpdate = updates[updates.length - 1];
+                const chat = lastUpdate.message ? lastUpdate.message.chat : (lastUpdate.my_chat_member ? lastUpdate.my_chat_member.chat : null);
+
+                if (chat) {
+                    document.getElementById('tg-chat').value = chat.id;
+                    alert(`¡ID Encontrado!\n\nGrupo: ${chat.title || 'Privado'}\nID: ${chat.id}\n\nNo olvides pulsar "Guardar Config".`);
+                } else {
+                    alert('No se pudo identificar el chat. Asegúrate de que el bot esté en el grupo.');
+                }
+            } catch (e) {
+                alert('Error al buscar ID: ' + e.message);
             }
         }
 
