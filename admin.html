@@ -164,8 +164,14 @@
 
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:0.5rem;">
                             <input type="checkbox" id="tg-enabled">
-                            <label for="tg-enabled">🔔 Reporte Automático al cerrar jornada</label>
+                            <label for="tg-enabled" style="font-weight:bold;">🔔 Reporte Automático</label>
                         </div>
+
+                        <p
+                            style="font-size:0.7rem; color:#666; background:#fffde7; padding:5px; border-radius:4px; border:1px solid #fff59d;">
+                            <strong>¡Importante!:</strong> Si el buscador no encuentra el ID, haz al bot
+                            <b>Administrador</b> del grupo y envía un mensaje.
+                        </p>
 
                         <div style="display:flex; gap:5px;">
                             <button type="submit" class="btn-action" style="flex:1;">Guardar Config</button>
@@ -212,6 +218,7 @@
         </div>
     </div>
 
+    <script src="js/telegram-service.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/scoring.js"></script>
     <script src="js/utils.js"></script>
@@ -472,16 +479,38 @@
                 return;
             }
 
-            const msg = "🚀 ¡Peña Maulas Test! Conexión de Administración configurada correctamente.";
-            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}`;
+            // Get last Jornada to offer simulation
+            let lastJ = null;
+            if (window.DataService) {
+                const jornadas = await window.DataService.getAll('jornadas');
+                const played = jornadas.filter(j => j.matches && j.matches[0] && j.matches[0].result);
+                if (played.length > 0) {
+                    lastJ = played.sort((a, b) => b.number - a.number)[0];
+                }
+            }
 
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                if (data.ok) alert('¡Mensaje de prueba enviado con éxito!');
-                else throw new Error(data.description);
-            } catch (e) {
-                alert('Error al enviar: ' + e.message);
+            let useRealData = false;
+            if (lastJ) {
+                useRealData = confirm(`¿Quieres simular el reporte real de la ÚLTIMA JORNADA (J${lastJ.number})?\n\nAceptar: Envía reporte completo.\nCancelar: Envía mensaje de prueba corto.`);
+            }
+
+            if (useRealData && lastJ && window.TelegramService) {
+                // Ensure config is saved locally for the service to read (it reads from DB)
+                // We just saved it in saveTelegramConfig, so it should be fine.
+                await window.TelegramService.sendJornadaReport(lastJ.id);
+                alert(`Simulación de Jornada ${lastJ.number} enviada.`);
+            } else {
+                const msg = "🚀 ¡Peña Maulas Test! Conexión de Administración configurada correctamente.";
+                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}`;
+
+                try {
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    if (data.ok) alert('¡Mensaje de prueba enviado con éxito!');
+                    else throw new Error(data.description);
+                } catch (e) {
+                    alert('Error al enviar: ' + e.message);
+                }
             }
         }
 
@@ -502,19 +531,25 @@
                 // Look for the last message in a group or supergroup
                 const updates = data.result;
                 if (!updates || updates.length === 0) {
-                    alert('No se han encontrado mensajes recientes. Pon un mensaje en el grupo de la peña y vuelve a intentarlo.');
+                    alert('❌ NO SE ENCUENTRAN MENSAJES.\n\nPara solucionarlo RÁPIDO:\n1. Busca al bot @myidbot en Telegram.\n2. Añádelo a tu grupo y escribe /getgroupid.\n3. Copia el número que te dé y pégalo aquí.');
                     return;
                 }
 
-                // Get the most recent chat info
+                // Get the most recent chat info from various possible fields
                 const lastUpdate = updates[updates.length - 1];
-                const chat = lastUpdate.message ? lastUpdate.message.chat : (lastUpdate.my_chat_member ? lastUpdate.my_chat_member.chat : null);
+                let chat = null;
+
+                if (lastUpdate.message) chat = lastUpdate.message.chat;
+                else if (lastUpdate.my_chat_member) chat = lastUpdate.my_chat_member.chat;
+                else if (lastUpdate.channel_post) chat = lastUpdate.channel_post.chat;
+                else if (lastUpdate.callback_query) chat = lastUpdate.callback_query.message.chat;
 
                 if (chat) {
                     document.getElementById('tg-chat').value = chat.id;
-                    alert(`¡ID Encontrado!\n\nGrupo: ${chat.title || 'Privado'}\nID: ${chat.id}\n\nNo olvides pulsar "Guardar Config".`);
+                    const title = chat.title || chat.username || chat.first_name || 'Privado';
+                    alert(`¡ID Encontrado!\n\nChat: ${title}\nID: ${chat.id}\n\nNo olvides pulsar "Guardar Config".`);
                 } else {
-                    alert('No se pudo identificar el chat. Asegúrate de que el bot esté en el grupo.');
+                    alert('No se pudo identificar el chat. Prueba a mencionar al bot en el grupo (ej: @mi_bot hola).');
                 }
             } catch (e) {
                 alert('Error al buscar ID: ' + e.message);

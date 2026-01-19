@@ -3,3 +3,6 @@ Maula_Penia_Bot
 
 Bot Token
 8565424662:AAFskROJoJjo5kvLYnLh2I2kLjLsKYGHDlM
+
+ID
+-5252294941
