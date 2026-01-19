@@ -547,7 +547,7 @@ class ResumenManager {
                     </button>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                <div class="stats-detail-main-grid">
                     <!-- LEFT COLUMN -->
                     ${leftColumn}
 
@@ -560,7 +560,7 @@ class ResumenManager {
                             ${summaryText.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--primary-orange)">$1</strong>')}
                         </div>
 
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="stats-sub-grid">
                             <!-- MATCH STATS -->
                             <div style="background:#fffde7; padding:0.8rem; border-radius:8px; border-top:4px solid #ffb300;">
                                 <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:#ffb300; text-transform:uppercase; font-weight: 800;">ACIERTO POR PARTIDO</h5>

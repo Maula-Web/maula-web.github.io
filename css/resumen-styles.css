@@ -33,6 +33,19 @@
     width: 100%;
 }
 
+/* Stats Detail Grids */
+.stats-detail-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.stats-sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
 .rankings-card {
     grid-column: 2 / 3;
     min-width: 350px;
@@ -318,29 +331,45 @@
 /* Responsive */
 @media (max-width: 1024px) {
     .resumen-page .main-container {
-        width: 100%;
-        padding: 0.5rem;
-        overflow-x: auto;
-        /* allow scroll if chart cuts */
+        width: 100% !important;
+        max-width: 100vw !important;
+        padding: 0.5rem !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        overflow-x: hidden !important;
+        /* No scroll here, handle it in cards */
     }
 
     .dashboard-container {
         grid-template-columns: 1fr;
-        overflow-x: auto;
+    }
+
+    .dashboard-card {
+        padding: 1rem !important;
+        overflow-x: auto !important;
+        width: 100%;
+        min-width: 0 !important;
     }
 
     .chart-card,
     .rankings-card {
         grid-column: 1 / -1;
-        min-width: 100%;
     }
 
     .chart-wrapper {
         min-width: 600px;
-        /* force scroll to see chart properly on mobile */
+        /* chart needs width to be useful */
     }
 
-    .jornada-info-grid {
-        grid-template-columns: 1fr;
+    .jornada-info-grid,
+    .stats-detail-main-grid,
+    .stats-sub-grid {
+        grid-template-columns: 1fr !important;
+        width: 100%;
+    }
+
+    /* Study sub-cards should take full width on mobile */
+    .stats-sub-grid>div {
+        width: 100%;
     }
 }
