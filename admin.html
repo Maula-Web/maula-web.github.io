@@ -147,6 +147,30 @@
                         <!-- Doc Items -->
                     </ul>
                 </div>
+
+                <div class="config-card">
+                    <h2>📢 Telegram Bots</h2>
+                    <form id="telegram-form" style="font-size:0.9rem;">
+                        <label style="display:block; margin-bottom:0.2rem;">Bot Token:</label>
+                        <input type="password" id="tg-token" placeholder="123456:ABC..."
+                            style="width:100%; padding:4px; margin-bottom:0.5rem;">
+
+                        <label style="display:block; margin-bottom:0.2rem;">Chat ID:</label>
+                        <input type="text" id="tg-chat" placeholder="-100..."
+                            style="width:100%; padding:4px; margin-bottom:0.5rem;">
+
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:0.5rem;">
+                            <input type="checkbox" id="tg-enabled">
+                            <label for="tg-enabled">🔔 Reporte Automático al cerrar jornada</label>
+                        </div>
+
+                        <div style="display:flex; gap:5px;">
+                            <button type="submit" class="btn-action" style="flex:1;">Guardar Config</button>
+                            <button type="button" onclick="testTelegram()" class="btn-action"
+                                style="background:#673ab7;">Probar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <!-- 2. Config (Middle Column) -->
@@ -213,6 +237,13 @@
                     document.getElementById('new-pwd').value = '';
                 }
             });
+
+            document.getElementById('telegram-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveTelegramConfig();
+            });
+
+            loadTelegramConfig();
 
 
             // Doc Upload logic
@@ -405,6 +436,50 @@
                 `;
             });
             container.innerHTML = html;
+        }
+
+        async function loadTelegramConfig() {
+            if (!window.DataService) return;
+            const config = await window.DataService.getAll('config');
+            const tg = config.find(c => c.id === 'telegram');
+            if (tg) {
+                document.getElementById('tg-token').value = tg.token || '';
+                document.getElementById('tg-chat').value = tg.chatId || '';
+                document.getElementById('tg-enabled').checked = tg.enabled || false;
+            }
+        }
+
+        async function saveTelegramConfig() {
+            const config = {
+                id: 'telegram',
+                token: document.getElementById('tg-token').value.trim(),
+                chatId: document.getElementById('tg-chat').value.trim(),
+                enabled: document.getElementById('tg-enabled').checked
+            };
+            await window.DataService.save('config', config);
+            alert('Configuración de Telegram guardada.');
+            Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Actualizó Configuración Telegram');
+        }
+
+        async function testTelegram() {
+            const token = document.getElementById('tg-token').value.trim();
+            const chat = document.getElementById('tg-chat').value.trim();
+            if (!token || !chat) {
+                alert('Faltan Token o Chat ID');
+                return;
+            }
+
+            const msg = "🚀 ¡Peña Maulas Test! Conexión de Administración configurada correctamente.";
+            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}`;
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.ok) alert('¡Mensaje de prueba enviado con éxito!');
+                else throw new Error(data.description);
+            } catch (e) {
+                alert('Error al enviar: ' + e.message);
+            }
         }
 
         // GLOBAL FUNCTION FOR BUTTON

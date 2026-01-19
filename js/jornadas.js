@@ -354,6 +354,14 @@ class JornadaManager {
         this.saveSingle(jornadaData);
         this.renderGrid();
 
+        // TELEGRAM REPORT TRIGGER
+        const isFinished = jornadaData.matches.every(m => m.result && m.result.trim() !== '');
+        if (isFinished && window.TelegramService) {
+            // Optional: Show a message or do it silently if enabled in config
+            // The service already checks for tg.enabled
+            window.TelegramService.sendJornadaReport(jornadaData.id);
+        }
+
         const originalText = this.btnSave.innerHTML;
         this.btnSave.innerHTML = '✅ Guardado';
         this.btnSave.disabled = true;

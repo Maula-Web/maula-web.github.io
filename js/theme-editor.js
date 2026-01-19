@@ -12,6 +12,19 @@ const ThemeEditor = {
             { id: '--glass-border', label: 'Borde Cristal/Transparente' },
             { id: '--pastel-card', label: 'Fondo Tarjetas Tenues' }
         ],
+        'typography': [
+            {
+                id: '--main-font-family', label: 'Tipo de Letra', type: 'select', options: [
+                    { value: "'Inter', sans-serif", label: 'Inter (Moderno)' },
+                    { value: "'Montserrat', sans-serif", label: 'Montserrat (Premium)' },
+                    { value: "'Outfit', sans-serif", label: 'Outfit (Geométrico)' },
+                    { value: "'Raleway', sans-serif", label: 'Raleway (Elegante)' },
+                    { value: "'Playfair Display', serif", label: 'Playfair (Clásico)' },
+                    { value: "system-ui, sans-serif", label: 'Sistema (Nativo)' }
+                ]
+            },
+            { id: '--main-font-size', label: 'Tamaño de Texto Base', type: 'range', min: 12, max: 24, step: 1, suffix: 'px' }
+        ],
         'sombras': [
             { id: '--main-shadow', label: 'Sombra Contenedor Principal', type: 'toggle', onValue: '0 20px 50px rgba(0,0,0,0.8)' },
             { id: '--card-shadow', label: 'Sombra Tarjetas Secundarias', type: 'toggle', onValue: '0 4px 6px -1px rgba(0,0,0,0.1)' },
@@ -232,6 +245,21 @@ const ThemeEditor = {
                             <span style="font-size:0.8rem; color:var(--text-secondary)">Activar</span>
                         </div>
                     `;
+                } else if (v.type === 'select') {
+                    row.innerHTML = `
+                        <label>${v.label}</label>
+                        <select id="select-${v.id}" onchange="ThemeEditor.updateVariable('${v.id}', this.value)" style="padding:4px; border-radius:4px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-main);">
+                            ${v.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+                        </select>
+                    `;
+                } else if (v.type === 'range') {
+                    row.innerHTML = `
+                        <label>${v.label}</label>
+                        <div style="display:flex; gap:10px; align-items:center; flex:1; justify-content:flex-end;">
+                            <input type="range" id="range-${v.id}" min="${v.min}" max="${v.max}" step="${v.step}" oninput="ThemeEditor.updateRange('${v.id}', this.value, '${v.suffix}')" style="flex:1;">
+                            <span id="val-${v.id}" style="font-size:0.8rem; min-width:35px; text-align:right; color:var(--text-main);">0${v.suffix}</span>
+                        </div>
+                    `;
                 } else {
                     row.innerHTML = `
                         <label>${v.label}</label>
@@ -257,6 +285,21 @@ const ThemeEditor = {
                 if (v.type === 'toggle') {
                     const check = document.getElementById(`check-${v.id}`);
                     if (check) check.checked = (val !== 'none' && val !== '');
+                } else if (v.type === 'select') {
+                    const sel = document.getElementById(`select-${v.id}`);
+                    if (sel) {
+                        // Normalize val (might have quotes from computed style)
+                        const cleanVal = val.replace(/["']/g, "'");
+                        sel.value = cleanVal;
+                    }
+                } else if (v.type === 'range') {
+                    const rng = document.getElementById(`range-${v.id}`);
+                    const num = parseInt(val);
+                    if (rng && !isNaN(num)) {
+                        rng.value = num;
+                        const valDisplay = document.getElementById(`val-${v.id}`);
+                        if (valDisplay) valDisplay.textContent = num + (v.suffix || '');
+                    }
                 } else {
                     // Convert to Hex if it's RGB
                     if (val.startsWith('rgb')) {
@@ -299,6 +342,13 @@ const ThemeEditor = {
         document.documentElement.style.setProperty(id, val);
     },
 
+    updateRange: function (id, val, suffix) {
+        const finalVal = val + suffix;
+        document.documentElement.style.setProperty(id, finalVal);
+        const display = document.getElementById(`val-${id}`);
+        if (display) display.textContent = finalVal;
+    },
+
     rgbToHex: function (rgb) {
         const result = rgb.match(/\d+/g);
         if (!result) return '#000000';
@@ -317,6 +367,12 @@ const ThemeEditor = {
                 if (v.type === 'toggle') {
                     const el = document.getElementById(`check-${v.id}`);
                     if (el) themeData[v.id] = el.checked ? v.onValue : 'none';
+                } else if (v.type === 'select') {
+                    const el = document.getElementById(`select-${v.id}`);
+                    if (el) themeData[v.id] = el.value;
+                } else if (v.type === 'range') {
+                    const el = document.getElementById(`range-${v.id}`);
+                    if (el) themeData[v.id] = el.value + (v.suffix || '');
                 } else {
                     const el = document.getElementById(`picker-${v.id}`);
                     if (el) themeData[v.id] = el.value;
@@ -406,6 +462,16 @@ const ThemeEditor = {
                         if (picker) picker.value = val;
                         if (text) text.value = val;
                         if (check) check.checked = (val !== 'none' && val !== '');
+
+                        const sel = document.getElementById(`select-${key}`);
+                        if (sel) sel.value = val.replace(/["']/g, "'");
+
+                        const rng = document.getElementById(`range-${key}`);
+                        if (rng) {
+                            rng.value = parseInt(val);
+                            const valDisplay = document.getElementById(`val-${key}`);
+                            if (valDisplay) valDisplay.textContent = val;
+                        }
                     }
                 });
                 alert(`Tema "${preset.name}" cargado. Recuerda pulsar "APLICAR A TODA LA WEB" si quieres que sea el definitivo.`);

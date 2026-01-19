@@ -1,8 +1,10 @@
 /* Global Styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700&family=Raleway:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap');
 @import url('vertical-layout.css');
 
 :root {
+    --main-font-family: 'Inter', sans-serif;
+    --main-font-size: 16px;
     /* Socios - Professional Green (Muted) */
     --primary-green: #2ebd59;
     --dark-green: #1b5e20;
@@ -463,19 +465,23 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--main-font-family);
+}
+
+html {
+    font-size: var(--main-font-size);
 }
 
 body {
     height: 100vh;
     width: 100vw;
     overflow-x: hidden;
+    font-family: var(--main-font-family);
 }
 
 /* Home Page Styles */
 .home-body {
-    background-color: #1a1a1a !important;
-    /* Dark gray background */
+    background-color: var(--main-bg) !important;
     display: flex;
     flex-direction: column;
     align-items: center;
