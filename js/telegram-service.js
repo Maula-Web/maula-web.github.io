@@ -21,26 +21,41 @@ window.TelegramService = {
             const currentJ = jornadas.find(jor => jor.id == jId);
             if (!currentJ) return;
 
-            // 3. Process GLOBAL Classification
+            // 3. Process ALL Results and History for Tie-breaking
             const activeJornadas = jornadas.filter(j =>
                 j.active && j.matches && j.matches[0] && j.matches[0].result
-            );
+            ).sort((a, b) => a.number - b.number);
+
+            const memberHistory = {};
+            members.forEach(m => memberHistory[m.id] = []);
+
             const globalStats = {};
             members.forEach(m => globalStats[m.id] = { name: m.name, totalPoints: 0 });
 
+            // Build history up to current jornada
             activeJornadas.forEach(aj => {
                 const ajResults = aj.matches.map(m => m.result);
                 const ajDate = AppUtils.parseDate(aj.date);
                 members.forEach(m => {
                     const p = pronosticos.find(pred => (pred.jId == aj.id || pred.jornadaId == aj.id) && (pred.mId == m.id || pred.memberId == m.id));
+                    let h = 0;
+                    let pts = 0;
                     if (p && p.selection) {
                         const ev = ScoringSystem.evaluateForecast(p.selection, ajResults, ajDate);
-                        globalStats[m.id].totalPoints += ev.points;
+                        h = ev.hits;
+                        pts = ev.points;
+                        // Handle Late/Unpardoned in history too
+                        if (p.late && !p.pardoned) {
+                            h = 0;
+                            pts = ScoringSystem.calculateScore(0, ajDate);
+                        }
                     }
+                    memberHistory[m.id].push({ hits: h, points: pts });
+                    globalStats[m.id].totalPoints += pts;
                 });
             });
 
-            // 4. Current Jornada Stats
+            // 4. Current Jornada Evaluation
             const officialResults = currentJ.matches.map(m => m.result);
             const jDate = AppUtils.parseDate(currentJ.date);
             const minHits = currentJ.minHitsToWin || 10;
@@ -50,34 +65,71 @@ window.TelegramService = {
                 let hits = 0;
                 let points = 0;
                 let played = false;
-                if (p && p.selection) {
+                let isLate = false;
+                let isPardoned = false;
+
+                if (p) {
                     played = true;
-                    const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
-                    hits = ev.hits;
-                    points = ev.points;
+                    isLate = p.late || false;
+                    isPardoned = p.pardoned || false;
+                    if (isLate && !isPardoned) {
+                        hits = 0;
+                        points = ScoringSystem.calculateScore(0, jDate);
+                    } else if (p.selection) {
+                        const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
+                        hits = ev.hits;
+                        points = ev.points;
+                    }
                 }
+
                 const prize = (hits >= minHits) ? ((currentJ.prizeRates && currentJ.prizeRates[hits]) || 0) : 0;
-                return { name: m.name, hits, points, prize, played };
+                return {
+                    id: m.id,
+                    name: m.name,
+                    hits,
+                    points,
+                    prize,
+                    played,
+                    isLate,
+                    isPardoned
+                };
             });
 
-            // Winner logic (Max Points > Max Hits)
-            const winnersArr = [...currentResults].filter(r => r.played).sort((a, b) => b.points - a.points || b.hits - a.hits);
-            const maxP = winnersArr[0]?.points;
-            const maxH = winnersArr[0]?.hits;
-            const topNames = winnersArr.filter(r => r.points === maxP && r.hits === maxH).map(r => r.name).join(', ');
+            // --- WINNER LOGIC ---
+            const maxPoints = Math.max(...currentResults.map(r => r.points));
+            let winnerCandidates = currentResults.filter(r => r.points === maxPoints);
 
-            // Loser logic (Min Hits > Min Points)
-            const losersArr = [...currentResults].filter(r => r.played).sort((a, b) => a.hits - b.hits || a.points - b.points);
-            const minH = losersArr[0]?.hits;
-            const minP = losersArr[0]?.points;
-            const bottomNames = losersArr.filter(r => r.hits === minH && r.points === minP).map(r => r.name).join(', ');
+            if (winnerCandidates.length > 1) {
+                winnerCandidates = this.resolveTie(winnerCandidates, memberHistory, 'points', 'max');
+            }
+            // Final fallback: Lower ID
+            winnerCandidates.sort((a, b) => a.id - b.id);
+            const winner = winnerCandidates[0];
+
+            // --- LOSER LOGIC ---
+            const offenders = currentResults.filter(r => !r.played || (r.isLate && !r.isPardoned && r.hits < minHits));
+            let maulaCandidates = [];
+
+            if (offenders.length > 0) {
+                maulaCandidates = offenders;
+            } else {
+                const minPoints = Math.min(...currentResults.map(r => r.points));
+                maulaCandidates = currentResults.filter(r => r.points === minPoints);
+            }
+
+            if (maulaCandidates.length > 1) {
+                maulaCandidates = this.resolveTie(maulaCandidates, memberHistory, 'points', 'min');
+            }
+            // Final fallback: Higher ID
+            maulaCandidates.sort((a, b) => b.id - a.id);
+            const loser = maulaCandidates[0];
 
             // 5. Build Message
             let msg = `🏆 *PEÑA MAULAS - JORNADA ${currentJ.number}* 🏆\n`;
             msg += `📅 _${currentJ.date}_\n\n`;
 
             msg += `*📊 RESULTADOS:* \n`;
-            [...currentResults].sort((a, b) => b.points - a.points || b.hits - a.hits).forEach((r, idx) => {
+            [...currentResults].sort((a, b) => b.points - a.points || b.hits - a.hits || a.id - b.id).forEach((r, idx) => {
                 let medal = '';
                 if (idx === 0) medal = '🥇 ';
                 else if (idx === 1) medal = '🥈 ';
@@ -87,23 +139,22 @@ window.TelegramService = {
                 msg += `${medal}${r.name}: *${r.hits}* ac. (${r.points} pts)${r.prize > 0 ? ` 💰 *${r.prize.toFixed(2)}€*` : ''}\n`;
             });
 
-            // Extra / Doubles (Anonymous)
+            // Extras / Doubles
             const extras = pronosticosExtra.filter(p => (p.jId == currentJ.id || p.jornadaId == currentJ.id));
             if (extras.length > 0) {
                 msg += `\n*✨ ACIERTOS QUINIELA DE DOBLES:*\n`;
                 extras.forEach(p => {
-                    let hits = 0;
+                    let hCount = 0;
                     const sel = p.selection || [];
                     sel.forEach((s, idx) => {
-                        if (officialResults[idx] && s && s.includes(officialResults[idx])) hits++;
+                        if (officialResults[idx] && s && s.includes(officialResults[idx])) hCount++;
                     });
-                    msg += `🔹 Resultado: *${hits}* aciertos\n`;
+                    msg += `🔹 Resultado: *${hCount}* aciertos\n`;
                 });
             }
 
-            // Labels Update
-            msg += `\n🎟️ Quiniela de dobles: *${topNames}*`;
-            msg += `\n✍️ Sella: *${bottomNames}*`;
+            msg += `\n🎟️ Quiniela de dobles: *${winner.name}*`;
+            msg += `\n✍️ Sella: *${loser.name}*`;
 
             // Full Global Ranking
             const fullRanking = Object.values(globalStats).sort((a, b) => b.totalPoints - a.totalPoints);
@@ -122,6 +173,34 @@ window.TelegramService = {
         }
     },
 
+    resolveTie(candidates, history, metric, goal) {
+        if (!candidates || candidates.length <= 1) return candidates;
+
+        let sampleId = candidates[0].id;
+        let hLen = history[sampleId].length;
+        let index = hLen - 2; // Start from the jornada BEFORE the current one
+        let currentCandidates = [...candidates];
+
+        while (currentCandidates.length > 1 && index >= 0) {
+            const values = currentCandidates.map(c => ({
+                id: c.id,
+                val: history[c.id][index] ? history[c.id][index][metric] : 0
+            }));
+
+            let target;
+            if (goal === 'max') {
+                target = Math.max(...values.map(v => v.val));
+            } else {
+                target = Math.min(...values.map(v => v.val));
+            }
+
+            const survivors = values.filter(v => v.val === target).map(v => v.id);
+            currentCandidates = currentCandidates.filter(c => survivors.includes(c.id));
+            index--;
+        }
+        return currentCandidates;
+    },
+
     async sendRaw(token, chatId, text) {
         const url = `https://api.telegram.org/bot${token}/sendMessage`;
         const res = await fetch(url, {
@@ -136,3 +215,4 @@ window.TelegramService = {
         return await res.json();
     }
 };
+

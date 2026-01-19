@@ -415,17 +415,17 @@ class DashboardManager {
 
     calculateJornadaOutcome(jornada, results, memberStats, history) {
         // --- FIND WINNER ---
-        // 1. Filter by Max Hits
-        const maxHits = Math.max(...results.map(r => r.hits));
-        let winnerCandidates = results.filter(r => r.hits === maxHits);
+        // 1. Filter by Max Points
+        const maxPoints = Math.max(...results.map(r => r.points));
+        let winnerCandidates = results.filter(r => r.points === maxPoints);
 
-        // 2. Tie-break: Recursive History Check (Hits)
+        // 2. Tie-break: Recursive History Check (Points)
         if (winnerCandidates.length > 1) {
-            winnerCandidates = this.resolveTie(winnerCandidates, history, 'hits', 'max');
+            winnerCandidates = this.resolveTie(winnerCandidates, history, 'points', 'max');
         }
 
-        // 3. Final Fallback (if still tied): Lower Accumulated Score (Underdog)
-        winnerCandidates.sort((a, b) => a.runningTotal - b.runningTotal);
+        // 3. Final Fallback (if still tied): Lower Member ID
+        winnerCandidates.sort((a, b) => a.memberId - b.memberId);
         const winner = memberStats[winnerCandidates[0].memberId];
 
 
@@ -433,7 +433,7 @@ class DashboardManager {
         let maulaCandidates = [];
 
         // Condition A: Missing or Late (Unpardoned) with no prize
-        const prizeThreshold = 10;
+        const prizeThreshold = jornada.minHitsToWin || 10;
         const offenders = results.filter(r =>
             !r.hasPronostico || (r.isLate && !r.isPardoned && r.hits < prizeThreshold)
         );
@@ -454,8 +454,8 @@ class DashboardManager {
             maulaCandidates = this.resolveTie(maulaCandidates, history, 'points', 'min');
         }
 
-        // Final Fallback: Lower Running Total
-        maulaCandidates.sort((a, b) => a.runningTotal - b.runningTotal);
+        // Final Fallback: Higher Member ID
+        maulaCandidates.sort((a, b) => b.memberId - a.memberId);
 
         const loserId = maulaCandidates[0].memberId;
         const loser = memberStats[loserId];
