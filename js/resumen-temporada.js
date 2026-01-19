@@ -59,7 +59,7 @@ class ResumenManager {
             modal.id = 'detail-modal';
             modal.className = 'modal-overlay';
             modal.innerHTML = `
-                <div class="modal" style="max-width:500px;">
+                <div class="modal" style="max-width:95%; width:1200px; max-height:90vh; overflow-y:auto;">
                     <h2 id="modal-detail-title" style="margin-top:0;">Detalle</h2>
                     <div id="modal-detail-content"></div>
                     <div style="margin-top:1rem; text-align:right;">

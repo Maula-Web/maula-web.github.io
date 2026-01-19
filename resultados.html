@@ -161,6 +161,71 @@
             background-color: var(--resultados-loser-bg) !important;
             color: var(--resultados-loser-text) !important;
         }
+
+        /* Mobile Adjustments for Resultados */
+        @media (max-width: 850px) {
+
+            .results-table th:first-child,
+            .results-table td:first-child {
+                min-width: 100px !important;
+                width: 100px !important;
+                font-size: 0.75rem !important;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 0.3rem 0.4rem !important;
+                font-size: 0.8rem !important;
+            }
+
+            .accumulated-score {
+                font-size: 1.1rem !important;
+            }
+        }
+
+        /* Landscape Mobile / Low Height screens */
+        @media (max-height: 500px) and (max-width: 950px) {
+            .results-wrapper {
+                max-height: 60vh !important;
+            }
+
+            /* Override JS inline styles for sticky heights */
+            .results-table thead th {
+                padding: 4px !important;
+                font-size: 0.75rem !important;
+            }
+
+            .row-total {
+                top: 40px !important;
+                /* JS says 60px */
+            }
+
+            .row-total td {
+                padding: 2px 4px !important;
+                font-size: 0.75rem !important;
+            }
+
+            .row-hits {
+                top: 75px !important;
+            }
+
+            .row-bonus {
+                top: 100px !important;
+            }
+
+            .row-prizes {
+                top: 125px !important;
+            }
+
+            .summary-row td {
+                padding: 2px 4px !important;
+                font-size: 0.7rem !important;
+            }
+
+            .accumulated-score {
+                font-size: 0.9rem !important;
+            }
+        }
     </style>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>

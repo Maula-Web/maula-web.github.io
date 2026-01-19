@@ -148,7 +148,7 @@ class ResultsManager {
         theadHtml += `</tr>`;
 
         // 2. Grand Total (Sticky below names)
-        theadHtml += `<tr class="total-row" style="position:sticky; top:60px; z-index:2;">
+        theadHtml += `<tr class="total-row row-total" style="position:sticky; top:60px; z-index:2;">
                         <td style="position:sticky; left:0; z-index:3; background-color:var(--resultados-summary-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">TOTAL PUNTOS</td>`;
         sortedMembers.forEach(m => {
             theadHtml += `<td class="accumulated-score" style="font-size: 1.6rem;">${memberStats[m.id].grandTotal}</td>`;
@@ -156,7 +156,7 @@ class ResultsManager {
         theadHtml += `</tr>`;
 
         // 3. Base Hits
-        theadHtml += `<tr class="summary-row" style="position:sticky; top:110px; z-index:2;">
+        theadHtml += `<tr class="summary-row row-hits" style="position:sticky; top:110px; z-index:2;">
                         <td style="position:sticky; left:0; z-index:3; background:var(--resultados-summary-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">Aciertos Base</td>`;
         sortedMembers.forEach(m => {
             theadHtml += `<td style="color:var(--resultados-summary-row-text); background:var(--resultados-summary-row-bg);">${memberStats[m.id].baseTotal}</td>`;
@@ -164,7 +164,7 @@ class ResultsManager {
         theadHtml += `</tr>`;
 
         // 4. Bonus/Penalties
-        theadHtml += `<tr class="summary-row" style="border-bottom:2px solid #ddd; position:sticky; top:150px; z-index:2;">
+        theadHtml += `<tr class="summary-row row-bonus" style="border-bottom:2px solid #ddd; position:sticky; top:150px; z-index:2;">
                         <td style="position:sticky; left:0; z-index:3; background:var(--resultados-summary-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">Bonus / Penal.</td>`;
         sortedMembers.forEach(m => {
             const val = memberStats[m.id].bonusTotal;
@@ -175,7 +175,7 @@ class ResultsManager {
         theadHtml += `</tr>`;
 
         // 5. Total Prizes Money
-        theadHtml += `<tr class="summary-row" style="border-bottom:3px solid var(--primary-purple); position:sticky; top:190px; z-index:2;">
+        theadHtml += `<tr class="summary-row row-prizes" style="border-bottom:3px solid var(--primary-purple); position:sticky; top:190px; z-index:2;">
                         <td style="position:sticky; left:0; z-index:3; background:var(--resultados-prize-label-bg); color:var(--resultados-summary-label-text); border-right:2px solid #ddd;">Premios (€)</td>`;
         sortedMembers.forEach(m => {
             const val = memberStats[m.id].prizeTotal;

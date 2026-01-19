@@ -26,10 +26,17 @@
 
 .dashboard-container {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
+    grid-template-columns: 1fr auto;
+    /* Right card takes only needed space */
     gap: 1.5rem;
     margin-top: 1rem;
     width: 100%;
+}
+
+.rankings-card {
+    grid-column: 2 / 3;
+    min-width: 350px;
+    /* Smallest reasonable width for names and points */
 }
 
 .dashboard-card {
@@ -310,13 +317,27 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+    .resumen-page .main-container {
+        width: 100%;
+        padding: 0.5rem;
+        overflow-x: auto;
+        /* allow scroll if chart cuts */
+    }
+
     .dashboard-container {
         grid-template-columns: 1fr;
+        overflow-x: auto;
     }
 
     .chart-card,
     .rankings-card {
         grid-column: 1 / -1;
+        min-width: 100%;
+    }
+
+    .chart-wrapper {
+        min-width: 600px;
+        /* force scroll to see chart properly on mobile */
     }
 
     .jornada-info-grid {
