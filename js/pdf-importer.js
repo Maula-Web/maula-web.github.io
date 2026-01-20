@@ -131,12 +131,17 @@ class PDFImporter {
             // Clean date
             let dateClean = j.date.replace(/[\n\r]+/g, ' ').trim();
             dateClean = AppUtils.extractSundayFromRange(dateClean);
-
             const dateObj = AppUtils.parseDate(dateClean);
 
-            // STRICT FILTER 2: Must be Sunday (Maula Rule)
-            if (!AppUtils.isSunday(dateObj)) {
-                console.log(`DEBUG: J${j.number} excluida - No se juega en Domingo (${dateClean})`);
+            // LOGIC FILTERS:
+            const isSunday = AppUtils.isSunday(dateObj);
+            const isLaLigaComp = /LaLiga|Primera/i.test(j.competition || "");
+            const hasLaLigaTeams = firstDivCount >= 8;
+
+            console.log(`DEBUG: J${j.number} - Domingo: ${isSunday}, Competición: ${j.competition}, Equipos 1ª: ${firstDivCount}`);
+
+            if (!isSunday || !isLaLigaComp || !hasLaLigaTeams) {
+                console.log(`DEBUG: J${j.number} RECHAZADA por no cumplir criterios Maula.`);
                 return;
             }
 
@@ -172,11 +177,16 @@ class PDFImporter {
 
             const number = parseInt(jornadaMatch[1]);
 
-            // 2. Find Date (Heuristic: Look for date pattern in the first 500 chars)
-            // Pattern: "3-4 de enero" or "07 diciembre"
+            // 2. Find Date and Competition in header
             const headerText = rawText.substring(0, 1000);
-            const dateMatch = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?\s+de\s+[a-z]+(?:\s+de\s+\d{4})?)/i);
-            const dateVal = dateMatch ? dateMatch[1] : "Por definir";
+
+            // Competition is usually between ( ) right after Jornada
+            const compMatch = headerText.match(/\(([^)]+)\)/);
+            const competition = compMatch ? compMatch[1].trim() : "";
+
+            // Improved Date Match: Handles "24-25 de enero" and "24-25 / enero"
+            const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s]+\s*([a-z]+)(?:\s*[\/de\s]+\s*(\d{4}))?/i);
+            const dateVal = dateParts ? `${dateParts[1]} de ${dateParts[2]} ${dateParts[3] || new Date().getFullYear()}` : "Por definir";
 
             // 3. Find Matches
             const matches = [];
@@ -225,8 +235,8 @@ class PDFImporter {
                 extracted.push({
                     number: number,
                     date: dateVal,
-                    matches: matches.sort((a, b) => a.position - b.position),
-                    isLaLiga: /LaLiga|Primera/i.test(rawText)
+                    competition: competition,
+                    matches: matches.sort((a, b) => a.position - b.position)
                 });
             }
         }
