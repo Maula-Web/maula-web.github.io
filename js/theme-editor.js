@@ -185,6 +185,13 @@ const ThemeEditor = {
             { id: '--pastel-accent-orange', label: 'Acento Muted' },
             { id: '--resumen-text', label: 'Texto General Página' }
         ],
+        'importacion': [
+            { id: '--import-modal-bg', label: 'Fondo Ventana Confirmación' },
+            { id: '--import-modal-text', label: 'Texto Títulos/General' },
+            { id: '--import-modal-card-bg', label: 'Fondo Bloque Jornada' },
+            { id: '--import-modal-card-text', label: 'Texto Bloque Jornada' },
+            { id: '--import-modal-title', label: 'Color Título Principal' }
+        ],
         'acceso': [
             { id: '--login-bg', label: 'Fondo Pantalla' },
             { id: '--login-card-bg', label: 'Fondo Tarjeta' },

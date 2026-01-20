@@ -179,6 +179,7 @@ class JornadaManager {
         this.fillModalData(jornada);
         this.toggleEditMode(false);
         this.modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Lock scroll
     }
 
     openModalNew() {
@@ -194,6 +195,7 @@ class JornadaManager {
         this.fillModalData(newJornada);
         this.toggleEditMode(true);
         this.modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Lock scroll
 
         this.btnDelete.style.display = 'none';
         this.btnEdit.style.display = 'none';
@@ -399,6 +401,7 @@ class JornadaManager {
 
     closeModal() {
         this.modal.classList.remove('active');
+        document.body.style.overflow = ''; // Unlock scroll
     }
 
     async saveToStorage() {

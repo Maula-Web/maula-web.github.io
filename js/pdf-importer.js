@@ -158,20 +158,12 @@ class PDFImporter {
             const dateVal = dateMatch ? dateMatch[1] : "Por definir";
 
             // 3. Find Matches
-            // We look for patterns like: "1. Home - Away" or "1 Home - Away"
-            // The regex needs to be flexible with spaces and dots.
-            // We expect 14 or 15 matches.
-
             const matches = [];
-            // Regex to capture: Number + dot(opt) + Home + hyphen + Away
-            // Excluding lines that look like dates or titles.
-            // Note: Team names allow letters, spaces, dots.
-            const matchRegex = /(?:^|\s)(\d{1,2})[.,]?\s+([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+?)\s*[-–]\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+?)(?=\s\d+[.,]|\sP15|\sPleno|$)/gi;
 
-            // We can strictly look for 1 to 14
-            for (let m = 1; m <= 14; m++) {
+            // We look for 1 to 15
+            for (let m = 1; m <= 15; m++) {
                 // Specific regex for each number to avoid ordering issues
-                // " 1. Celta - Valencia "
+                // Handles "1. Team - Team", "1 Team - Team", "15. Team - Team", etc.
                 const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([A-Za-zñÑáéíóúÁÉÍÓÚ\\s.]+(?:\\s+[A-Za-zñÑáéíóúÁÉÍÓÚ]+)*?)\\s*[-–]\\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s.]+(?:\\s+[A-Za-zñÑáéíóúÁÉÍÓÚ]+)*)`, 'i');
 
                 const found = rawText.match(lineRegex);
@@ -181,29 +173,28 @@ class PDFImporter {
 
                     // Cleanup known artifacts
                     home = home.replace(/^\d+[.,]\s*/, '');
-
-                    // Apply name normalization
-                    // home = this.fixTeamName(home);
-                    // away = this.fixTeamName(away);
+                    away = away.replace(/\s*Jornada.*$/i, ''); // Cleanup P15 artifacts
 
                     // Validate length to avoid noise
                     if (home.length > 2 && away.length > 2 && !AppUtils.isDateString(home)) {
-                        matches.push({ position: m, home, away, result: '' });
+                        // Check if already added (to avoid duplicates if P15 regex also matches)
+                        if (!matches.some(existing => existing.position === m)) {
+                            matches.push({ position: m, home, away, result: '' });
+                        }
                     }
                 }
             }
 
-            // Pleno al 15
-            const p15Regex = /(?:Pleno al 15|P15)\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+?)\s*[-–]\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+)/i;
-            const p15Found = rawText.match(p15Regex);
-            if (p15Found) {
-                let pHome = p15Found[1].trim();
-                let pAway = p15Found[2].trim();
-
-                // Specific cleanup for P15 "Jornada" artifacts mentioned by user
-                pAway = pAway.replace(/\s*Jornada.*$/i, '');
-
-                matches.push({ position: 15, home: pHome, away: pAway, result: '' });
+            // Fallback for Pleno al 15 if not found by number 15
+            if (!matches.some(m => m.position === 15)) {
+                const p15Regex = /(?:Pleno al 15|P15)\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+?)\s*[-–]\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+)/i;
+                const p15Found = rawText.match(p15Regex);
+                if (p15Found) {
+                    let pHome = p15Found[1].trim();
+                    let pAway = p15Found[2].trim();
+                    pAway = pAway.replace(/\s*Jornada.*$/i, '');
+                    matches.push({ position: 15, home: pHome, away: pAway, result: '' });
+                }
             }
 
             if (matches.length >= 10) {
@@ -240,17 +231,17 @@ class PDFImporter {
         overlay.className = 'modal-overlay active';
 
         let html = `
-            <div class="modal" style="max-width:600px;">
-                <h2 style="color:var(--primary-blue); border-bottom:1px solid #eee; padding-bottom:0.5rem;">📥 Importar Jornadas PDF</h2>
-                <div style="max-height:300px; overflow-y:auto; margin:1rem 0;">
+            <div class="modal" style="max-width:600px; background:var(--import-modal-bg, #ffffff); color:var(--import-modal-text, #1b1b1b);">
+                <h2 style="color:var(--import-modal-title, var(--primary-blue)); border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:0.5rem;">📥 Importar Jornadas PDF</h2>
+                <div style="max-height:400px; overflow-y:auto; margin:1rem 0; padding-right:5px;">
         `;
 
         jornadas.forEach(j => {
             html += `
-                <div style="padding:0.5rem; background:#f5f5f5; margin-bottom:0.5rem; border-radius:4px;">
-                    <strong>Jornada ${j.number}</strong> (${j.date})
-                    <div style="font-size:0.8rem; margin-top:0.3rem;">
-                        ${j.matches.map((m, i) => `${i + 1}. ${m.home} - ${m.away}`).join('<br>')}
+                <div style="padding:1rem; background:var(--import-modal-card-bg, #f5f5f5); color:var(--import-modal-card-text, #333); margin-bottom:0.8rem; border-radius:8px; border:1px solid rgba(0,0,0,0.05);">
+                    <strong style="font-size:1.1rem;">Jornada ${j.number}</strong> <span style="opacity:0.8">(${j.date})</span>
+                    <div style="font-size:0.9rem; margin-top:0.5rem; line-height:1.4;">
+                        ${j.matches.map((m, i) => `<span style="opacity:0.6; font-weight:bold; width:20px; display:inline-block;">${i + 1}.</span> ${m.home} - ${m.away}`).join('<br>')}
                     </div>
                 </div>
             `;
@@ -258,7 +249,7 @@ class PDFImporter {
 
         html += `
                 </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:1rem; padding-bottom:1rem;">
                     <button class="btn-action" style="background:#ccc; color:#333;" id="btn-cancel-pdf">Cancelar</button>
                     <button class="btn-action btn-add" id="btn-confirm-pdf">Confirmar e Importar</button>
                 </div>
@@ -267,11 +258,16 @@ class PDFImporter {
 
         overlay.innerHTML = html;
         document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden'; // Lock scroll
 
-        overlay.querySelector('#btn-cancel-pdf').onclick = () => overlay.remove();
+        overlay.querySelector('#btn-cancel-pdf').onclick = () => {
+            overlay.remove();
+            document.body.style.overflow = ''; // Unlock scroll
+        };
         overlay.querySelector('#btn-confirm-pdf').onclick = async () => {
             await this.importToDB(jornadas);
             overlay.remove();
+            document.body.style.overflow = ''; // Unlock scroll
             window.location.reload();
         };
     }
