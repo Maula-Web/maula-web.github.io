@@ -746,11 +746,13 @@ class PronosticoManager {
         thead.appendChild(headerRow);
 
         // 3. Sort Jornadas (descending) & Filter empty ones
+        // 3. Sort Jornadas (descending) & Filter empty ones
         let sortedJornadas = [...this.jornadas].sort((a, b) => b.number - a.number);
 
-        // Filter: Keep only jornadas that have at least one forecast
+        // Filter: Keep jornadas that have forecasts OR are active (to allow "inaugurating" them from the table)
         sortedJornadas = sortedJornadas.filter(j => {
-            return this.pronosticos.some(p => p.jId === j.id && p.selection && p.selection.length > 0);
+            const hasForecasts = this.pronosticos.some(p => (p.jId === j.id || p.jornadaId === j.id) && p.selection && p.selection.length > 0);
+            return hasForecasts || j.active;
         });
 
         if (sortedJornadas.length === 0) {

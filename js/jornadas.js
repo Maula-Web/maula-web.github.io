@@ -62,6 +62,7 @@ class JornadaManager {
         this.inpId = document.getElementById('inp-jornada-id');
         this.inpDate = document.getElementById('inp-date');
         this.inpMinHits = document.getElementById('inp-min-hits');
+        this.inpActive = document.getElementById('inp-active');
         this.teamsCache = [];
     }
 
@@ -90,9 +91,7 @@ class JornadaManager {
         });
 
         sortedJornadas.forEach(j => {
-            if (!j.active) return;
-
-            // Filter: Only show jornadas on Sunday
+            // Filter: Only show jornadas on Sunday (Maula rule)
             if (j.date && j.date.toLowerCase() !== 'por definir') {
                 const dateObj = AppUtils.parseDate(j.date);
                 if (dateObj && !AppUtils.isSunday(dateObj)) return;
@@ -111,6 +110,12 @@ class JornadaManager {
             if (!hasTeams) {
                 // Using class for configurable empty state opacity/bg/border
                 card.classList.add('jornada-empty');
+            }
+
+            if (j.active === false) {
+                card.style.opacity = '0.5';
+                card.style.filter = 'grayscale(1)';
+                card.style.border = '1px dashed #ccc';
             }
 
             card.innerHTML = `
@@ -206,6 +211,7 @@ class JornadaManager {
         this.inpId.value = jornada.id || '';
         this.inpDate.value = jornada.date;
         if (this.inpMinHits) this.inpMinHits.value = jornada.minHitsToWin || 10;
+        if (this.inpActive) this.inpActive.checked = jornada.active !== false; // Active by default
         this.renderMatches(jornada.matches);
     }
 
@@ -290,8 +296,9 @@ class JornadaManager {
         inputs.forEach(inp => {
             if (inp.id === 'inp-season') return;
             inp.readOnly = !isEdit;
+            if (inp.type === 'checkbox') inp.disabled = !isEdit;
             if (!isEdit) inp.style.border = 'none';
-            else inp.style.border = '1px solid #ddd';
+            else if (inp.type !== 'checkbox') inp.style.border = '1px solid #ddd';
         });
 
         if (isEdit) {
@@ -343,7 +350,7 @@ class JornadaManager {
             date: dateStr,
             minHitsToWin: parseInt(this.inpMinHits.value) || 10,
             matches: matches,
-            active: true
+            active: this.inpActive ? this.inpActive.checked : true
         };
 
         if (existingIdx > -1) {

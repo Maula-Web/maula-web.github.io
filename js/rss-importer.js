@@ -362,12 +362,13 @@ class RSSImporter {
             console.log(`DEBUG: RSS date "${rssJornada.date}" -> DB match:`, dbJornada ? `Jornada ${dbJornada.number}` : 'NO MATCH');
 
             if (dbJornada) {
-                // Check if results or prize info are already filled
-                const hasResults = dbJornada.matches && dbJornada.matches.some(m => m.result && m.result !== '');
-                const hasPrizeInfo = dbJornada.prizeRates && Object.keys(dbJornada.prizeRates).length > 0;
+                // WE SKIP re-importing if results are already complete (15/15)
+                const completedCount = dbJornada.matches ? dbJornada.matches.filter(m => m.result && m.result.trim() !== '').length : 0;
+                if (completedCount === 15) {
+                    console.log(`DEBUG: Skipping J${dbJornada.number} - already has 15 results.`);
+                    continue;
+                }
 
-                // WE ALWAYS allow re-importing if results exist, to update prize info or bote status
-                // Previously it skipped if results were present.
                 // Check if teams match (at least some of them)
                 const teamsMatch = this.checkTeamsMatch(dbJornada, rssJornada);
 
@@ -377,7 +378,7 @@ class RSSImporter {
                     jornadaDate: dbJornada.date,
                     rssDate: rssJornada.date,
                     rssMatches: rssJornada.matches,
-                    dbMatches: dbJornada.matches,
+                    dbMatches: JSON.parse(JSON.stringify(dbJornada.matches)),
                     minHitsToWin: rssJornada.minHitsToWin,
                     prizeRates: rssJornada.prizeRates,
                     hasBote: rssJornada.hasBote,
@@ -485,9 +486,11 @@ class RSSImporter {
                 await window.DataService.save('jornadas', jornada);
             }
 
-            // TELEGRAM REPORT TRIGGER (if Jornada is now finished)
-            const isFinished = jornada.matches && jornada.matches.length === 15 && jornada.matches.every(m => m.result && m.result.trim() !== '');
-            if (isFinished && window.TelegramService) {
+            // TELEGRAM REPORT TRIGGER (only if Jornada was NOT finished before and IS finished now)
+            const wasFinished = item.dbMatches && item.dbMatches.length === 15 && item.dbMatches.every(m => m.result && m.result.trim() !== '');
+            const isFinishedNow = jornada.matches && jornada.matches.length === 15 && jornada.matches.every(m => m.result && m.result.trim() !== '');
+
+            if (!wasFinished && isFinishedNow && window.TelegramService) {
                 try {
                     await window.TelegramService.sendJornadaReport(jornada.id);
                     console.log(`DEBUG: Telegram report sent for J${jornada.number}`);
