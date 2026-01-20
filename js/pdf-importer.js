@@ -162,20 +162,17 @@ class PDFImporter {
 
             // We look for 1 to 15
             for (let m = 1; m <= 15; m++) {
-                // More permissive regex for team names to handle international teams and unusual characters
-                // Captures "N. Home Team - Away Team"
-                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s*([^\\n\\r]+)`, 'i');
+                // REGEX FIX: Use non-greedy capture and lookahead for the next match number or P15 keyword
+                // This prevents capturing "Team A - Team B 2 Team C - Team D" as a single match.
+                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}[.,]?\\s|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
 
                 const found = rawText.match(lineRegex);
                 if (found) {
                     let home = found[1].trim();
                     let away = found[2].trim();
 
-                    // Cleanup: remove any leading numbers if captured by mistake and stop at line end or common footer text
+                    // Cleanup: remove any leading numbers if captured by mistake 
                     home = home.replace(/^\d+[.,]\s*/, '');
-
-                    // Stop away at things like "Jornada", "P15", or just capture first part of line
-                    away = away.split(/\s+Jornada/i)[0].split(/\s+P15/i)[0].split(/\r?\n/)[0].trim();
 
                     // Basic noise filter
                     if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
@@ -188,8 +185,8 @@ class PDFImporter {
 
             // Fallback for Pleno al 15 (if named "PLENO AL 15" without "15" number)
             if (!matches.some(m => m.position === 15)) {
-                // Try literal strings
-                const p15Regex = /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+)/i;
+                // Use the same lookahead logic for safety
+                const p15Regex = /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+\d{1,2}[.,]?\s|$)/i;
                 const p15Found = rawText.match(p15Regex);
                 if (p15Found) {
                     let pHome = p15Found[1].trim();
