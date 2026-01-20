@@ -145,8 +145,12 @@ class DashboardManager {
                 history[member.id].push({ hits: hits, points: points });
 
                 // Accumulate season prizes
-                const jMinHits = jornada.minHitsToWin || 10;
-                if (hits >= jMinHits && hasPronostico) {
+                let actualMinHits = jornada.minHitsToWin || 10;
+                if (jornada.prizeRates && Object.keys(jornada.prizeRates).length > 0) {
+                    actualMinHits = Math.min(...Object.keys(jornada.prizeRates).map(Number));
+                }
+
+                if (hits >= actualMinHits && hasPronostico) {
                     totalSeasonPrizes++;
                     // Calculate money if rates exist
                     if (jornada.prizeRates && jornada.prizeRates[hits]) {
@@ -510,13 +514,17 @@ class DashboardManager {
 
 
         // --- PRIZE WINNERS ---
-        const minHitsToWin = jornada.minHitsToWin || 10;
+        let minHitsToWin = jornada.minHitsToWin || 10;
+        if (jornada.prizeRates && Object.keys(jornada.prizeRates).length > 0) {
+            minHitsToWin = Math.min(...Object.keys(jornada.prizeRates).map(Number));
+        }
+
         const prizeWinners = results
             .filter(r => r.hits >= minHitsToWin && r.hasPronostico)
             .sort((a, b) => b.hits - a.hits)
             .map(r => ({ name: r.name, hits: r.hits }));
 
-        // All eligible for NEXT dobles: Absolute Winner + anyone with hits >= 10
+        // All eligible for NEXT dobles: Absolute Winner + anyone with hits >= minHitsToWin (has prize)
         const eligibleNextNames = results
             .filter(r => r.memberId === winnerCandidates[0].memberId || (r.hits >= minHitsToWin && r.hasPronostico))
             .map(r => r.name);

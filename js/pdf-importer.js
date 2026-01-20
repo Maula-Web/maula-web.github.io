@@ -162,22 +162,23 @@ class PDFImporter {
 
             // We look for 1 to 15
             for (let m = 1; m <= 15; m++) {
-                // Specific regex for each number to avoid ordering issues
-                // Handles "1. Team - Team", "1 Team - Team", "15. Team - Team", etc.
-                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([A-Za-zñÑáéíóúÁÉÍÓÚ\\s.]+(?:\\s+[A-Za-zñÑáéíóúÁÉÍÓÚ]+)*?)\\s*[-–]\\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s.]+(?:\\s+[A-Za-zñÑáéíóúÁÉÍÓÚ]+)*)`, 'i');
+                // More permissive regex for team names to handle international teams and unusual characters
+                // Captures "N. Home Team - Away Team"
+                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s*([^\\n\\r]+)`, 'i');
 
                 const found = rawText.match(lineRegex);
                 if (found) {
                     let home = found[1].trim();
                     let away = found[2].trim();
 
-                    // Cleanup known artifacts
+                    // Cleanup: remove any leading numbers if captured by mistake and stop at line end or common footer text
                     home = home.replace(/^\d+[.,]\s*/, '');
-                    away = away.replace(/\s*Jornada.*$/i, ''); // Cleanup P15 artifacts
 
-                    // Validate length to avoid noise
-                    if (home.length > 2 && away.length > 2 && !AppUtils.isDateString(home)) {
-                        // Check if already added (to avoid duplicates if P15 regex also matches)
+                    // Stop away at things like "Jornada", "P15", or just capture first part of line
+                    away = away.split(/\s+Jornada/i)[0].split(/\s+P15/i)[0].split(/\r?\n/)[0].trim();
+
+                    // Basic noise filter
+                    if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
                         if (!matches.some(existing => existing.position === m)) {
                             matches.push({ position: m, home, away, result: '' });
                         }
@@ -185,14 +186,14 @@ class PDFImporter {
                 }
             }
 
-            // Fallback for Pleno al 15 if not found by number 15
+            // Fallback for Pleno al 15 (if named "PLENO AL 15" without "15" number)
             if (!matches.some(m => m.position === 15)) {
-                const p15Regex = /(?:Pleno al 15|P15)\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+?)\s*[-–]\s*([A-Za-zñÑáéíóúÁÉÍÓÚ\s.]+)/i;
+                // Try literal strings
+                const p15Regex = /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+)/i;
                 const p15Found = rawText.match(p15Regex);
                 if (p15Found) {
                     let pHome = p15Found[1].trim();
-                    let pAway = p15Found[2].trim();
-                    pAway = pAway.replace(/\s*Jornada.*$/i, '');
+                    let pAway = p15Found[2].trim().split(/\s+Jornada/i)[0].split(/\r?\n/)[0].trim();
                     matches.push({ position: 15, home: pHome, away: pAway, result: '' });
                 }
             }

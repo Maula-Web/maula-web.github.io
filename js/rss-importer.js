@@ -253,34 +253,40 @@ class RSSImporter {
         }
 
         // 1. Standard categories (10 to 14 hits)
-        const regexHits = /(\d{1,2})\s*Aciertos\)[^€E]*?\s+([\d\.,]+)\s*(?:Euros|€)/gi;
+        // Regex improved to handle: "5ª Categoría (10 Aciertos) 1.234 Euros" OR "10 Aciertos: 2,65 €" OR "10 Aciertos 2.65"
+        // It looks for a number, then "Aciertos", optional dots/colons/closing parenthesis, then the prize amount.
+        const regexHits = /(\d{1,2})\s*Aciertos\)?[:.-]?\s*([\d\.,]+)\s*(?:Euros|€)?/gi;
         let match;
         while ((match = regexHits.exec(text)) !== null) {
             const hits = parseInt(match[1]);
             const prizeVal = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
-            if (prizeVal > 0) {
+
+            // We only care about categories 10-14 here (15 is separate)
+            if (hits >= 10 && hits <= 14 && prizeVal > 0) {
                 rates[hits] = prizeVal;
                 if (hits < minHits) minHits = hits;
             }
         }
 
         // 2. Pleno al 15
-        // Format: "Pleno al 15 0 0,00 €" or "Pleno al 15: 0 (0,00 €)"
-        // If "Pleno al 15" has 0 beneficiaries, it's a bote.
-        const regexP15 = /Pleno\s+al\s+15[^\d]*(\d+)[^€E]*?\s+([\d\.,]+)\s*(?:Euros|€)/gi;
+        const regexP15 = /(?:Pleno\s+al\s+15|P15)[^\d]*(\d+)[^€E\d]*([\d\.,]+)\s*(?:Euros|€)?/gi;
         const matchP15 = regexP15.exec(text);
         if (matchP15) {
             const winners = parseInt(matchP15[1]);
             const prizeVal = parseFloat(matchP15[2].replace(/\./g, '').replace(',', '.'));
             if (prizeVal > 0) {
                 rates[15] = prizeVal;
+                if (15 < minHits) minHits = 15; // Should be rare but possible
             }
             if (winners === 0) {
                 hasBote = true;
             }
         }
 
-        console.log(`DEBUG: Parsed prize rates:`, rates, 'Has Bote:', hasBote);
+        // Final sanity check: if we have prize rates for 10 but minHits stayed 15
+        if (rates[10] && minHits > 10) minHits = 10;
+
+        console.log(`DEBUG: Parsed prize rates:`, rates, 'Has Bote:', hasBote, 'MinHits:', minHits);
         return { minHits, rates, hasBote };
     }
 

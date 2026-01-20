@@ -4,6 +4,7 @@ const ThemeEditor = {
         'ui': [
             { id: '--main-bg', label: 'Fondo Principal' },
             { id: '--modal-bg', label: 'Fondo Ventanas/Modales' },
+            { id: '--modal-header-bg', label: 'Fondo Cabecera Modal (Sticky)' },
             { id: '--card-bg', label: 'Fondo Tarjetas (Stats)' },
             { id: '--text-main', label: 'Texto Principal' },
             { id: '--text-secondary', label: 'Texto Secundario' },

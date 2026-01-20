@@ -1690,8 +1690,7 @@ tbody tr:hover {
 .modal form>div:first-child {
     position: sticky;
     top: 0;
-    background: inherit;
-    /* Use modal background */
+    background: var(--modal-header-bg, var(--modal-bg));
     z-index: 100 !important;
     padding: 2rem 2rem 1rem 2rem;
     margin-bottom: 0 !important;

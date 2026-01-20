@@ -96,9 +96,14 @@ class ResultsManager {
                     bonus = 0;
                 }
 
-                // Calculate Prize Money
+                // Calculate Prize Money - Determine real minHits from rates if available
+                let actualMinHits = j.minHitsToWin || 10;
+                if (j.prizeRates && Object.keys(j.prizeRates).length > 0) {
+                    actualMinHits = Math.min(...Object.keys(j.prizeRates).map(Number));
+                }
+
                 let prize = 0;
-                if (hits >= (j.minHitsToWin || 10)) {
+                if (hits >= actualMinHits) {
                     prize = (j.prizeRates && j.prizeRates[hits]) || 0;
                 }
 
