@@ -169,6 +169,8 @@
     --resumen-detail-table-row-bg: #ffffff;
     --resumen-detail-table-text: #1b1b1b;
     --resumen-detail-row-hit-bg: #e8f5e9;
+    --resumen-detail-match-text: #1b1b1b;
+    --resumen-detail-result-text: #546e7a;
 
     /* Common */
     --pastel-bg: #e8f5e9;

@@ -464,22 +464,32 @@ class ResumenManager {
             const totalSocios = this.members.length;
             const playedJornadas = this.jornadas.filter(j => j.matches && j.matches[0] && j.matches[0].result).length;
 
+            // Calculate total prizes for the whole peña
+            const totalPrizesGlobal = Object.values(this.data.stats).reduce((sum, m) => {
+                const prizes = m.prizes || [];
+                return sum + prizes.reduce((pSum, p) => pSum + (parseFloat(p.money) || 0), 0);
+            }, 0);
+
             leftColumn = `
                 <div style="border-right:1px solid rgba(0,0,0,0.1); padding-right:1rem; display:flex; flex-direction:column; justify-content:center;">
-                    <div style="text-align:center; padding:2rem; background:var(--resumen-summary-bg); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
-                        <div style="font-size:3rem; margin-bottom:1rem;">🏆</div>
-                        <h4 style="margin:0; color:var(--primary-orange); line-height:1.2;">Resumen Acumulado<br>Toda la Peña</h4>
-                        <div style="margin-top:2rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                            <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:1rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
-                                <div style="font-size:1.5rem; font-weight:bold; color:var(--primary-green);">${totalSocios}</div>
-                                <div style="font-size:0.7rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Socios</div>
+                    <div style="text-align:center; padding:1.5rem 1rem; background:var(--resumen-summary-bg); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
+                        <div style="font-size:2.5rem; margin-bottom:0.8rem;">🏆</div>
+                        <h4 style="margin:0; color:var(--primary-orange); line-height:1.2; font-size:1rem;">Resumen Acumulado<br>Toda la Peña</h4>
+                        <div style="margin-top:1.5rem; display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6rem;">
+                            <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:0.8rem 0.4rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="font-size:1.3rem; font-weight:bold; color:var(--primary-green);">${totalSocios}</div>
+                                <div style="font-size:0.6rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Socios</div>
                             </div>
-                            <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:1rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
-                                <div style="font-size:1.5rem; font-weight:bold; color:var(--primary-blue);">${playedJornadas}</div>
-                                <div style="font-size:0.7rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Jornadas</div>
+                            <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:0.8rem 0.4rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="font-size:1.3rem; font-weight:bold; color:var(--primary-blue);">${playedJornadas}</div>
+                                <div style="font-size:0.6rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Jornadas</div>
+                            </div>
+                            <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:0.8rem 0.4rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="font-size:1.3rem; font-weight:bold; color:#8b0000;">${totalPrizesGlobal.toFixed(2)}€</div>
+                                <div style="font-size:0.6rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Premios</div>
                             </div>
                         </div>
-                        <p style="margin-top:1.5rem; font-size:0.85rem; color:var(--resumen-summary-text); font-style:italic; opacity:0.8;">
+                        <p style="margin-top:1.2rem; font-size:0.8rem; color:var(--resumen-summary-text); font-style:italic; opacity:0.8;">
                             Haz clic en un punto de la gráfica para ver el estudio individual de un socio y su jornada.
                         </p>
                     </div>
@@ -639,10 +649,10 @@ class ResumenManager {
                 matchesHtml += `
                     <tr style="border-bottom:1px solid rgba(0,0,0,0.05); background-color:${rowBg};">
                         <td style="padding:4px; text-align:center; opacity:0.7;">${idx + 1}</td>
-                        <td style="padding:4px;">
+                        <td style="padding:4px; color:var(--resumen-detail-match-text);">
                             <span style="font-weight:600;">${m.home}</span> - <span style="font-weight:600;">${m.away}</span>
                         </td>
-                        <td style="padding:4px; text-align:center; font-weight:bold;">${officialVal}</td>
+                        <td style="padding:4px; text-align:center; font-weight:bold; color:var(--resumen-detail-result-text);">${officialVal}</td>
                         <td style="padding:4px; text-align:center; font-weight:bold; color:${color};">${userVal}</td>
                     </tr>
                 `;

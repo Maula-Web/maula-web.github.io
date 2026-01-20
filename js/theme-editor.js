@@ -202,7 +202,9 @@ const ThemeEditor = {
             { id: '--resumen-detail-table-header-text', label: 'Texto Cabecera Tabla Detalle' },
             { id: '--resumen-detail-table-row-bg', label: 'Fondo Filas Tabla Detalle' },
             { id: '--resumen-detail-table-text', label: 'Texto Filas Tabla Detalle' },
-            { id: '--resumen-detail-row-hit-bg', label: 'Fondo Fila Acierto (Detalle)' }
+            { id: '--resumen-detail-row-hit-bg', label: 'Fondo Fila Acierto (Detalle)' },
+            { id: '--resumen-detail-match-text', label: 'Color Texto Partidos' },
+            { id: '--resumen-detail-result-text', label: 'Color Texto Resultados' }
         ],
         'importacion': [
             { id: '--import-modal-bg', label: 'Fondo Ventana Confirmación' },
