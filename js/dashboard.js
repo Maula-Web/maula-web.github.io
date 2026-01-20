@@ -498,12 +498,22 @@ class DashboardManager {
                     }
                 });
 
-                doublesResults.push({ name: member.name, hits: hits });
+                // Calculate prize for doubles if hits >= minHits
+                const minHits = jornada.minHitsToWin || 10;
+                let prizeVal = 0;
+                if (hits >= minHits && jornada.prizeRates && jornada.prizeRates[hits]) {
+                    prizeVal = jornada.prizeRates[hits];
+                }
+
+                doublesResults.push({ name: member.name, hits: hits, prize: prizeVal });
             });
         }
 
         if (doublesResults.length > 0) {
-            const items = doublesResults.map(r => `${r.name}: <strong>${r.hits}</strong>`).join(', ');
+            const items = doublesResults.map(r => {
+                const prizeText = r.prize > 0 ? ` <span style="color:var(--primary-green); font-weight:bold;">(${r.prize.toFixed(2)}€)</span>` : '';
+                return `${r.name}: <strong>${r.hits}</strong>${prizeText}`;
+            }).join(', ');
             doublesHtml = `
                     <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
                         <div class="doubles-label" style="font-size:0.9rem; margin-bottom:0.3rem;"><strong>🏆 Quinielas de Dobles</strong></div>
@@ -545,7 +555,7 @@ class DashboardManager {
             totalMoney: prizeWinners.reduce((sum, pw) => {
                 const rate = (jornada.prizeRates && jornada.prizeRates[pw.hits]) || 0;
                 return sum + rate;
-            }, 0)
+            }, 0) + doublesResults.reduce((sum, dr) => sum + (dr.prize || 0), 0)
         };
     }
 

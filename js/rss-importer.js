@@ -253,15 +253,15 @@ class RSSImporter {
         }
 
         // 1. Standard categories (10 to 14 hits)
-        // Regex improved to handle: "5ª Categoría (10 Aciertos) 1.234 Euros" OR "10 Aciertos: 2,65 €" OR "10 Aciertos 2.65"
-        // It looks for a number, then "Aciertos", optional dots/colons/closing parenthesis, then the prize amount.
-        const regexHits = /(\d{1,2})\s*Aciertos\)?[:.-]?\s*([\d\.,]+)\s*(?:Euros|€)?/gi;
+        // Improved regex to handle cases with winners count: "10 aciertos 7.892 2,65 €"
+        // We look for "N aciertos", then skip any intermediate numbers (winners), 
+        // then capture the last number that is followed by Euros/€.
+        const regexHits = /(\d{1,2})\s*Aciertos\)?[:.-]?\s*(?:[\d\.,]+\s+)?([\d\.,]+)\s*(?:Euros|€)/gi;
         let match;
         while ((match = regexHits.exec(text)) !== null) {
             const hits = parseInt(match[1]);
             const prizeVal = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
 
-            // We only care about categories 10-14 here (15 is separate)
             if (hits >= 10 && hits <= 14 && prizeVal > 0) {
                 rates[hits] = prizeVal;
                 if (hits < minHits) minHits = hits;
@@ -269,14 +269,15 @@ class RSSImporter {
         }
 
         // 2. Pleno al 15
-        const regexP15 = /(?:Pleno\s+al\s+15|P15)[^\d]*(\d+)[^€E\d]*([\d\.,]+)\s*(?:Euros|€)?/gi;
+        // Similar logic for P15: handle winners count
+        const regexP15 = /(?:Pleno\s+al\s+15|P15)[^\d]*(\d+)[^€E\d]*(?:[\d\.,]+\s+)?([\d\.,]+)\s*(?:Euros|€)/gi;
         const matchP15 = regexP15.exec(text);
         if (matchP15) {
             const winners = parseInt(matchP15[1]);
             const prizeVal = parseFloat(matchP15[2].replace(/\./g, '').replace(',', '.'));
             if (prizeVal > 0) {
                 rates[15] = prizeVal;
-                if (15 < minHits) minHits = 15; // Should be rare but possible
+                if (15 < minHits) minHits = 15;
             }
             if (winners === 0) {
                 hasBote = true;

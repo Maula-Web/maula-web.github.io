@@ -162,16 +162,16 @@ class PDFImporter {
 
             // We look for 1 to 15
             for (let m = 1; m <= 15; m++) {
-                // REGEX FIX: Use non-greedy capture and lookahead for the next match number or P15 keyword
-                // This prevents capturing "Team A - Team B 2 Team C - Team D" as a single match.
-                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}[.,]?\\s|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
+                // REGEX FIX: Lookahead is now optional if we are at the end of the block.
+                // Also allowed less whitespace before numbers.
+                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s*\\d{1,2}[.,]\\s|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
 
                 const found = rawText.match(lineRegex);
                 if (found) {
                     let home = found[1].trim();
                     let away = found[2].trim();
 
-                    // Cleanup: remove any leading numbers if captured by mistake 
+                    // Cleanup common noise
                     home = home.replace(/^\d+[.,]\s*/, '');
 
                     // Basic noise filter
@@ -183,15 +183,25 @@ class PDFImporter {
                 }
             }
 
-            // Fallback for Pleno al 15 (if named "PLENO AL 15" without "15" number)
+            // Fallback for Match 15 (if named "PLENO AL 15" without "15" number or at the very end)
             if (!matches.some(m => m.position === 15)) {
-                // Use the same lookahead logic for safety
-                const p15Regex = /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+\d{1,2}[.,]?\s|$)/i;
-                const p15Found = rawText.match(p15Regex);
-                if (p15Found) {
-                    let pHome = p15Found[1].trim();
-                    let pAway = p15Found[2].trim().split(/\s+Jornada/i)[0].split(/\r?\n/)[0].trim();
-                    matches.push({ position: 15, home: pHome, away: pAway, result: '' });
+                // More aggressive search for match 15 patterns
+                const p15Patterns = [
+                    /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+)/i,
+                    /(?:^|\s)15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+)/i // Last attempt for "15 Team - Team"
+                ];
+
+                for (const pattern of p15Patterns) {
+                    const p15Found = rawText.match(pattern);
+                    if (p15Found) {
+                        let pHome = p15Found[1].trim();
+                        let pAway = p15Found[2].trim().split(/\s+Jornada/i)[0].split(/\r?\n/)[0].trim();
+                        // Validate pHome/pAway aren't just empty or junk
+                        if (pHome.length > 2 && pAway.length > 2) {
+                            matches.push({ position: 15, home: pHome, away: pAway, result: '' });
+                            break;
+                        }
+                    }
                 }
             }
 
