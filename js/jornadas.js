@@ -58,7 +58,7 @@ class JornadaManager {
         this.btnDelete = document.getElementById('btn-delete-jornada');
         this.btnDeleteAll = document.getElementById('btn-delete-all-jornadas');
 
-        this.modalTitleNum = document.getElementById('modal-jornada-num');
+        this.inpNumber = document.getElementById('inp-jornada-num');
         this.inpId = document.getElementById('inp-jornada-id');
         this.inpDate = document.getElementById('inp-date');
         this.inpMinHits = document.getElementById('inp-min-hits');
@@ -207,7 +207,7 @@ class JornadaManager {
     }
 
     fillModalData(jornada) {
-        this.modalTitleNum.textContent = jornada.number;
+        if (this.inpNumber) this.inpNumber.value = jornada.number;
         this.inpId.value = jornada.id || '';
         this.inpDate.value = jornada.date;
         if (this.inpMinHits) this.inpMinHits.value = jornada.minHitsToWin || 10;
@@ -301,6 +301,12 @@ class JornadaManager {
             else if (inp.type !== 'checkbox') inp.style.border = '1px solid #ddd';
         });
 
+        if (this.inpNumber) {
+            this.inpNumber.readOnly = !isEdit;
+            this.inpNumber.style.border = isEdit ? '1px solid #ddd' : '1px solid transparent';
+            this.inpNumber.style.background = isEdit ? '#fff' : 'transparent';
+        }
+
         if (isEdit) {
             this.btnEdit.style.display = 'none';
             this.btnSave.style.display = 'inline-block';
@@ -345,7 +351,7 @@ class JornadaManager {
 
         const jornadaData = {
             id: this.currentJornadaId || Date.now(),
-            number: parseInt(this.modalTitleNum.textContent) || (this.jornadas.length + 1),
+            number: parseInt(this.inpNumber.value) || 0,
             season: '2025-2026',
             date: dateStr,
             minHitsToWin: parseInt(this.inpMinHits.value) || 10,

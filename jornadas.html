@@ -62,8 +62,10 @@
             <form id="jornada-form">
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:1rem;">
-                    <h2 id="modal-title" style="margin:0;">
-                        <span>Jornada <span id="modal-jornada-num"></span></span>
+                    <h2 id="modal-title" style="margin:0; display:flex; align-items:center; gap:8px;">
+                        <span>Jornada</span>
+                        <input type="number" id="inp-jornada-num" min="1" max="999"
+                            style="width:70px; font-size:1.2rem; font-weight:bold; border:1px solid transparent; background:transparent; color:inherit; padding:2px 5px; border-radius:4px;">
                         <span id="modal-mode-badge"
                             style="font-size:0.8rem; background:#eee; padding:2px 8px; border-radius:4px; vertical-align: middle;">Vista</span>
                     </h2>
