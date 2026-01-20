@@ -293,7 +293,8 @@ class RSSImporter {
 
         for (const line of lines) {
             // Match pattern: "1 Team A - Team B X" or "Pleno al 15 Team A - Team B 1 - 2"
-            const matchPattern = /^(\d{1,2}|Pleno al 15)\s+(.+?)\s+-\s+(.+?)\s+([12XM]|M\s*-\s*\d+|\d+\s*-\s*\d+)\s*$/;
+            // Improved regex to handle noise like "10實" or other special characters between number and team
+            const matchPattern = /^(Pleno al 15|\d{1,2})[^\w\s]*\s+(.+?)\s+-\s+(.+?)\s+([12XM]|M\s*-\s*\d+|\d+\s*-\s*\d+)\s*$/i;
             const match = line.trim().match(matchPattern);
 
             if (match) {
@@ -455,11 +456,22 @@ class RSSImporter {
             // Update minimum hits and rates if available
             if (item.minHitsToWin) jornada.minHitsToWin = item.minHitsToWin;
             if (item.prizeRates) jornada.prizeRates = item.prizeRates;
-            if (item.hasBote !== undefined) jornada.hasBote = item.hasBote; // Added this
+            if (item.hasBote !== undefined) jornada.hasBote = item.hasBote;
 
             // Save to database
             if (window.DataService) {
                 await window.DataService.save('jornadas', jornada);
+            }
+
+            // TELEGRAM REPORT TRIGGER (if Jornada is now finished)
+            const isFinished = jornada.matches && jornada.matches.length === 15 && jornada.matches.every(m => m.result && m.result.trim() !== '');
+            if (isFinished && window.TelegramService) {
+                try {
+                    await window.TelegramService.sendJornadaReport(jornada.id);
+                    console.log(`DEBUG: Telegram report sent for J${jornada.number}`);
+                } catch (tgErr) {
+                    console.warn(`DEBUG: Failed to send Telegram report for J${jornada.number}:`, tgErr);
+                }
             }
 
             imported.push({

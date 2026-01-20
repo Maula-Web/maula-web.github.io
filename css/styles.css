@@ -1664,7 +1664,8 @@ tbody tr:hover {
 
 .modal {
     background: var(--modal-bg);
-    padding: 2rem;
+    padding: 0;
+    /* Remove padding to allow sticky header to reach edges */
     border-radius: 16px;
     width: 100%;
     max-width: 900px;
@@ -1673,6 +1674,29 @@ tbody tr:hover {
     box-shadow: var(--shadow-md);
     max-height: 98vh;
     overflow-y: auto;
+}
+
+/* Sticky Header in Modal */
+.modal form>div:first-child {
+    position: sticky;
+    top: 0;
+    background: inherit;
+    /* Use modal background */
+    z-index: 100 !important;
+    padding: 2rem 2rem 1rem 2rem;
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Compensate padding in the rest of the form */
+.modal form>div:not(:first-child),
+.modal form>.form-group,
+.modal form>.modal-actions {
+    padding: 1rem 2rem;
+}
+
+[data-theme="light"] .modal form>div:first-child {
+    border-bottom: 1px solid #eee;
 }
 
 .modal-overlay.active .modal {

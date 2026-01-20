@@ -235,7 +235,7 @@ class DashboardManager {
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
                         <div style="margin-bottom:0.5rem;">
                             <span style="font-size:1.2rem;">🍺</span> 
-                            <strong class="role-label">Columnas de Dobles:</strong> <span class="role-winner" style="font-weight:bold;">${winnerText}</span>
+                            <strong class="role-label">Columnas de Dobles:</strong> <span class="role-winner" style="font-weight:bold;">${lastJornadaInfo.doblesEligibleNames.join(", ")}</span>
                         </div>
                         <div>
                             <span style="font-size:1.2rem;">🥛</span> 
@@ -516,8 +516,17 @@ class DashboardManager {
             .sort((a, b) => b.hits - a.hits)
             .map(r => ({ name: r.name, hits: r.hits }));
 
+        // All eligible for NEXT dobles: Absolute Winner + anyone with hits >= 10
+        const eligibleNextNames = results
+            .filter(r => r.memberId === winnerCandidates[0].memberId || (r.hits >= minHitsToWin && r.hasPronostico))
+            .map(r => r.name);
+
+        // Remove duplicates and sort
+        const doblesEligibleNames = [...new Set(eligibleNextNames)].sort();
+
         return {
             winnerName: winner.name,
+            doblesEligibleNames: doblesEligibleNames,
             loserName: loser.name,
             isPig: isPig,
             pigAcertantes: pigAcertantes,

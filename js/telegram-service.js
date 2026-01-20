@@ -124,6 +124,12 @@ window.TelegramService = {
             maulaCandidates.sort((a, b) => b.id - a.id);
             const loser = maulaCandidates[0];
 
+            // --- ELIGIBLE FOR NEXT DOBLES ---
+            const eligibleForNext = currentResults
+                .filter(r => r.id === winner.id || (r.hits >= minHits && r.played))
+                .map(r => r.name);
+            const eligibleNames = [...new Set(eligibleForNext)].sort().join(", ");
+
             // 5. Build Message
             let msg = `🏆 *PEÑA MAULAS - JORNADA ${currentJ.number}* 🏆\n`;
             msg += `📅 _${currentJ.date}_\n\n`;
@@ -138,6 +144,9 @@ window.TelegramService = {
 
                 msg += `${medal}${r.name}: *${r.hits}* ac. (${r.points} pts)${r.prize > 0 ? ` 💰 *${r.prize.toFixed(2)}€*` : ''}\n`;
             });
+
+            msg += `\n🎟️ Quiniela de dobles: *${eligibleNames}*`;
+            msg += `\n✍️ Sella: *${loser.name}*`;
 
             // Extras / Doubles
             const extras = pronosticosExtra.filter(p => (p.jId == currentJ.id || p.jornadaId == currentJ.id));

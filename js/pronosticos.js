@@ -1128,16 +1128,20 @@ class PronosticoManager {
             console.log(`🏆 GANADOR ÚNICO J${prevJornada.number}: ${winnerCandidates[0].name} (${winnerCandidates[0].points} pts)`);
         }
 
-        // 8. Verificación para el socio actual
-        const isEligible = absoluteWinnerId && String(memberId) === String(absoluteWinnerId);
+        // 8. Verificación para el socio actual: GANADOR ABSOLUTO o 10+ ACIERTOS
+        const myStats = leaderboard.find(l => String(l.id) === String(memberId));
+        const isAbsoluteWinner = absoluteWinnerId && String(memberId) === String(absoluteWinnerId);
+        const hasPrizeHits = myStats && myStats.hits >= prizeThreshold;
+
+        const isEligible = isAbsoluteWinner || hasPrizeHits;
 
         if (isEligible) {
-            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name}`);
+            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name} (${isAbsoluteWinner ? 'Ganador' : '10+ Aciertos'})`);
         }
 
         return {
             eligible: isEligible,
-            reason: isEligible ? 'winner' : 'not_winner'
+            reason: isEligible ? (isAbsoluteWinner ? 'winner' : 'hits') : 'not_winner'
         };
     }
 
