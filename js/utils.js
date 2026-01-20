@@ -70,13 +70,22 @@ const AppUtils = {
      * Logic to extract the Sunday date from a range like "3-4 de enero"
      */
     extractSundayFromRange(dateStr) {
-        // Regex for "num-num" or "num/num"
-        const match = dateStr.match(/(\d+)[-–\/](\d+)/);
-        if (match) {
-            // Usually [Sat]-[Sun], so taking the second number is a safe bet for Quiniela
-            // Replaces the range "3-4" with just "4" in the string
-            return dateStr.replace(match[0], match[2]);
+        if (!dateStr) return '';
+
+        // 1. Range across months: "31 enero - 1 febrero"
+        const matchAcrossMonths = dateStr.match(/(\d{1,2})\s+([a-zñáéíóúü]+)\s*[-–]\s*(\d{1,2})\s+([a-zñáéíóúü]+)/i);
+        if (matchAcrossMonths) {
+            // We want the part after the hyphen: "1 de febrero"
+            return `${matchAcrossMonths[3]} de ${matchAcrossMonths[4]}`;
         }
+
+        // 2. Range within same month: "3-4 de enero"
+        const matchSameMonth = dateStr.match(/(\d{1,2})[-–\/](\d{1,2})/);
+        if (matchSameMonth) {
+            // Replaces the range "3-4" with just "4" (Sun)
+            return dateStr.replace(matchSameMonth[0], matchSameMonth[2]);
+        }
+
         return dateStr;
     },
 

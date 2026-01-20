@@ -131,12 +131,11 @@ class PDFImporter {
             const isSunday = AppUtils.isSunday(dateObj);
             const isPorDefinir = dateClean.toLowerCase().includes('por definir');
 
-            // Literal match as per user: "1ª La Liga EA"
-            // We search for "1ª La Liga EA" or just "La Liga EA" to be safe but specific
+            // Competition check: literal or high density of teams
             const isLaLigaComp = /1ª\s*La\s*Liga\s*EA|La\s*Liga\s*EA|Primera/i.test(j.competition || "");
             const hasLaLigaTeams = firstDivCount >= 8;
 
-            console.log(`DEBUG: J${j.number} - Domingo: ${isSunday}, Competición: "${j.competition}", Equipos 1ª: ${firstDivCount}`);
+            console.log(`DEBUG: J${j.number} - Domingo: ${isSunday}, TBD: ${isPorDefinir}, Competición: "${j.competition}", Equipos 1ª: ${firstDivCount}`);
 
             // We allow it if:
             // 1. It satisfies the strict rules (Sunday + Literal)
@@ -144,7 +143,7 @@ class PDFImporter {
             const isValid = (isSunday && isLaLigaComp) || (hasLaLigaTeams && (isSunday || isPorDefinir));
 
             if (!isValid) {
-                console.log(`DEBUG: J${j.number} RECHAZADA. Motivos: Sunday=${isSunday}, TBD=${isPorDefinir}, Density=${hasLaLigaTeams}, CompMatch=${isLaLigaComp}`);
+                console.log(`DEBUG: J${j.number} RECHAZADA. Sunday=${isSunday}, TBD=${isPorDefinir}, Density=${hasLaLigaTeams}, CompMatch=${isLaLigaComp}`);
                 return;
             }
 
@@ -169,94 +168,96 @@ class PDFImporter {
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
+            const rawText = textContent.items.map(item => item.str).join(' ');
 
-            // Join all strings with a space to create a big text blob
-            // This handles cases where "Team" "-" "Team" are split tokens
-            const rawText = textContent.items.map(item => item.str).join(' '); // "Jornada 32 ... 1. Celta - Valencia ..."
+            // Multiple jornadas per page: split by "Jornada" marker
+            const blocks = rawText.split(/\bJornada\s+/i);
 
-            // 1. Find Jornada Number
-            const jornadaMatch = rawText.match(/Jornada\s+(\d+)/i);
-            if (!jornadaMatch) continue;
+            blocks.forEach((block, bIdx) => {
+                // If the text starts with "Jornada", the first block will be empty, so we skip it.
+                // If it doesn't, the first block is header junk.
+                if (bIdx === 0 && !rawText.trim().startsWith('Jornada')) return;
 
-            const number = parseInt(jornadaMatch[1]);
+                // 1. Find Jornada Number
+                const numMatch = block.match(/^(\d+)/);
+                if (!numMatch) return;
+                const number = parseInt(numMatch[1]);
 
-            // 2. Find Date and Competition in header
-            const headerText = rawText.substring(0, 1000);
+                // 2. Extract header for this block (competition and date)
+                const headerText = block.substring(0, 600);
+                const compMatch = headerText.match(/\(([^)]+)\)/);
+                const competition = compMatch ? compMatch[1].trim() : "";
 
-            // Competition literal: the text after "Jornada Xª" and before the date
-            // Usually looks like: "(1ª LaLiga EA / 2ª LaLiga EA Hypermotion)"
-            const compMatch = headerText.match(/\(([^)]+)\)/);
-            const competition = compMatch ? compMatch[1].trim() : "";
+                // Improved Date search: handles ranges across months ("31 enero - 1 febrero")
+                // 1. Try complex range first
+                const rangeParts = headerText.match(/(\d{1,2}\s+[a-zñáéíóúü]+\s*[-–]\s*\d{1,2}\s+[a-zñáéíóúü]+)(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
 
-            // Improved Date Match: Handles "24-25 / enero / 2026"
-            // To handle split letters like "e nero", we capture a possible prefix letter.
-            const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s-]+\s*([a-zñáéíóúü]{0,2}\s*[a-zñáéíóúü]{3,})(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
-
-            let dateVal = "Por definir";
-            if (dateParts) {
-                const day = dateParts[1];
-                let month = dateParts[2].replace(/\s+/g, '').toLowerCase(); // Fix "e nero" -> "enero"
-                const year = dateParts[3] || new Date().getFullYear();
-                dateVal = `${day} de ${month} de ${year}`;
-            }
-
-            // 3. Find Matches
-            const matches = [];
-
-            // 3. Find Matches (Fixed regex with stricter lookahead to avoid concatenation)
-            for (let m = 1; m <= 14; m++) {
-                // Determine what markers to look for next to avoid greedy capture
-                const nextMarker = m < 14 ? `\\b${m + 1}[.\\s]` : `(?:P15|15\\b|\\*\\*P15|Jornada)`;
-                const matchRegex = new RegExp(`(?:^|\\b)${m}[.\\s]\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+${nextMarker}|$)`, 'i');
-                const found = rawText.match(matchRegex);
-
-                if (found) {
-                    let home = found[1].trim();
-                    let away = found[2].trim();
-
-                    // Cleanup Away: if it caught next match numbers, strip them
-                    away = away.split(/\s+\d+[.\s]/)[0].trim();
-
-                    if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
-                        matches.push({ position: m, home, away, result: '' });
+                let dateVal = "Por definir";
+                if (rangeParts) {
+                    dateVal = rangeParts[1] + (rangeParts[2] ? ` de ${rangeParts[2]}` : ` de ${new Date().getFullYear()}`);
+                } else {
+                    // 2. Try standard date or simple range
+                    const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s-]+\s*([a-zñáéíóúü]{0,2}\s*[a-zñáéíóúü]{3,})(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
+                    if (dateParts) {
+                        const day = dateParts[1];
+                        let month = dateParts[2].replace(/\s+/g, '').toLowerCase();
+                        const year = dateParts[3] || new Date().getFullYear();
+                        dateVal = `${day} de ${month} de ${year}`;
+                    } else if (headerText.toLowerCase().includes('por definir')) {
+                        dateVal = "Por definir";
                     }
                 }
-            }
 
-            // Match 15 (Improved handling for **P15**)
-            const p15Patterns = [
-                /\*\*(?:P15|15)\*\*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\*\*|$)/i, // **P15** Home - Away **
-                /\*\*(?:P15|15)\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)\*\*/i,
-                /(?:^|\s)P15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
-                /(?:^|\s)15[.\s]\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
-            ];
+                // 3. Find Matches
+                const matches = [];
+                for (let m = 1; m <= 14; m++) {
+                    const nextMarker = m < 14 ? `\\b${m + 1}[.\\s]` : `(?:P15|15\\b|\\*\\*P15|Jornada)`;
+                    const matchRegex = new RegExp(`(?:^|\\s)${m}[.\\s]\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+${nextMarker}|$)`, 'i');
+                    const found = block.match(matchRegex);
 
-            for (const pattern of p15Patterns) {
-                const p15Found = rawText.match(pattern);
-                if (p15Found) {
-                    let pHome = p15Found[1].trim();
-                    let pAway = p15Found[2].trim().split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
-                    if (pHome.length > 2 && pAway.length > 2) {
-                        matches.push({ position: 15, home: pHome, away: pAway, result: '' });
-                        break;
+                    if (found) {
+                        let home = found[1].trim();
+                        let away = found[2].trim().split(/\s{2,}/)[0].trim();
+                        away = away.split(/\s+\d+[.\s]/)[0].trim();
+                        if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
+                            matches.push({ position: m, home, away, result: '' });
+                        }
                     }
                 }
-            }
 
-            if (matches.length >= 10) {
-                extracted.push({
-                    number: number,
-                    date: dateVal,
-                    competition: competition,
-                    matches: matches.sort((a, b) => a.position - b.position)
-                });
-            }
+                // Pleno P15
+                const p15Patterns = [
+                    /\*\*(?:P15|15)\*\*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\*\*|$)/i,
+                    /\*\*(?:P15|15)\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)\*\*/i,
+                    /(?:^|\s)P15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
+                    /(?:^|\s)15[.\s]\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
+                ];
+
+                for (const pattern of p15Patterns) {
+                    const p15Found = block.match(pattern);
+                    if (p15Found) {
+                        let pHome = p15Found[1].trim();
+                        let pAway = p15Found[2].trim().split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
+                        if (pHome.length > 2 && pAway.length > 2) {
+                            matches.push({ position: 15, home: pHome, away: pAway, result: '' });
+                            break;
+                        }
+                    }
+                }
+
+                if (matches.length >= 10) {
+                    extracted.push({
+                        number,
+                        date: dateVal,
+                        competition,
+                        matches: matches.sort((a, b) => a.position - b.position)
+                    });
+                }
+            });
         }
 
         return extracted;
     }
-
-    // ... helpers ...
 
     showLoadingModal() {
         const overlay = document.createElement('div');
@@ -328,7 +329,6 @@ class PDFImporter {
             if (existing && existing.date && existing.date !== 'Por definir') {
                 finalDate = existing.date; // Keep existing date if valid
             }
-            // Note: date is already cleaned in processExtractedData via AppUtils.extractSundayFromRange
 
             const finalJornada = {
                 id: existing ? existing.id : Date.now() + nj.number,
@@ -343,10 +343,6 @@ class PDFImporter {
         }
         alert('Jornadas importadas correctamente.');
     }
-
-    // Unified process method - we use the one at line 115
-    // Removed duplicate at end of file to avoid confusion.
-
 }
 
 window.PDFImporter = new PDFImporter();
