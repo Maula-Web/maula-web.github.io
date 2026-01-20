@@ -168,81 +168,35 @@ class PDFImporter {
             // 3. Find Matches
             const matches = [];
 
-            // We look for 1 to 15
-            for (let m = 1; m <= 15; m++) {
-                // 1. STANDARD REGEX (with dash)
-                const dashRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}(?:[.,]\\s|\\s)|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
-                const found = rawText.match(dashRegex);
+            // We look for 1 to 14
+            for (let m = 1; m <= 14; m++) {
+                const matchRegex = new RegExp(`(?:^|\\s)${m}\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+(?:${m + 1}[.\\s]|P15|\\*\\*P15|Jornada)|$)`, 'i');
+                const found = rawText.match(matchRegex);
 
                 if (found) {
-                    let home = found[1].trim();
+                    let home = found[1].trim().replace(/^\d+[.,]?\s*/, '');
                     let away = found[2].trim();
-                    home = home.replace(/^\d+[.,]\s*/, '');
                     if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
-                        if (!matches.some(existing => existing.position === m)) {
-                            matches.push({ position: m, home, away, result: '' });
-                            continue;
-                        }
-                    }
-                }
-
-                // 2. FALLBACK: NO DASH (Gap-based search)
-                const gapRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}(?:[.,]\\s|\\s)|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
-                const gapFound = rawText.match(gapRegex);
-                if (gapFound && !matches.some(existing => existing.position === m)) {
-                    const content = gapFound[1].trim();
-
-                    let bestMatch = null;
-                    if (this.knownTeams) {
-                        for (const knownTeam of this.knownTeams) {
-                            if (content.toLowerCase().startsWith(knownTeam) && knownTeam.length > 3) {
-                                if (!bestMatch || knownTeam.length > bestMatch.length) {
-                                    bestMatch = knownTeam;
-                                }
-                            }
-                        }
-                    }
-
-                    if (bestMatch) {
-                        const home = content.substring(0, bestMatch.length).trim();
-                        const away = content.substring(bestMatch.length).trim();
-                        if (home && away) {
-                            matches.push({ position: m, home, away, result: '' });
-                            continue;
-                        }
-                    }
-
-                    const parts = content.split(/\s+/);
-                    if (parts.length >= 2) {
-                        const mid = Math.floor(parts.length / 2);
-                        const home = parts.slice(0, mid).join(' ');
-                        const away = parts.slice(mid).join(' ');
                         matches.push({ position: m, home, away, result: '' });
                     }
                 }
             }
 
-            // Fallback for Match 15
-            if (!matches.some(m => m.position === 15)) {
-                // Priority 1: Specifically look for P15 literal (User feedback)
-                // Priority 2: "Pleno al 15", "15.", etc.
-                const p15Patterns = [
-                    /(?:^|\s)P15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
-                    /(?:Pleno al 15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
-                    /(?:^|\s)15[.,]?\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
-                ];
+            // Match 15 (Handle P15 literal and the optional '**' markers)
+            const p15Patterns = [
+                /\*\*(?:P15|15)\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)\*\*/i,
+                /(?:^|\s)P15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
+                /(?:^|\s)15[.,]?\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
+            ];
 
-                for (const pattern of p15Patterns) {
-                    const p15Found = rawText.match(pattern);
-                    if (p15Found) {
-                        let pHome = p15Found[1].trim();
-                        // Special cleaning for the away team to avoid capturing the next jornada header
-                        let pAway = p15Found[2].trim().split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
-
-                        if (pHome.length > 2 && pAway.length > 2) {
-                            matches.push({ position: 15, home: pHome, away: pAway, result: '' });
-                            break;
-                        }
+            for (const pattern of p15Patterns) {
+                const p15Found = rawText.match(pattern);
+                if (p15Found) {
+                    let pHome = p15Found[1].trim();
+                    let pAway = p15Found[2].trim().split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
+                    if (pHome.length > 2 && pAway.length > 2) {
+                        matches.push({ position: 15, home: pHome, away: pAway, result: '' });
+                        break;
                     }
                 }
             }
