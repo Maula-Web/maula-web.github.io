@@ -129,16 +129,22 @@ class PDFImporter {
 
             // LOGIC FILTERS (The "Maula" Rulebook):
             const isSunday = AppUtils.isSunday(dateObj);
+            const isPorDefinir = dateClean.toLowerCase().includes('por definir');
 
             // Literal match as per user: "1ª La Liga EA"
             // We search for "1ª La Liga EA" or just "La Liga EA" to be safe but specific
-            const isLaLigaComp = /1ª\s*La\s*Liga\s*EA|La\s*Liga\s*EA/i.test(j.competition || "");
+            const isLaLigaComp = /1ª\s*La\s*Liga\s*EA|La\s*Liga\s*EA|Primera/i.test(j.competition || "");
             const hasLaLigaTeams = firstDivCount >= 8;
 
             console.log(`DEBUG: J${j.number} - Domingo: ${isSunday}, Competición: "${j.competition}", Equipos 1ª: ${firstDivCount}`);
 
-            if (!isSunday || !isLaLigaComp || !hasLaLigaTeams) {
-                console.log(`DEBUG: J${j.number} RECHAZADA. Motivos: Sunday=${isSunday}, Competition=${isLaLigaComp}, Density=${hasLaLigaTeams}`);
+            // We allow it if:
+            // 1. It satisfies the strict rules (Sunday + Literal)
+            // OR 2. It has very high density (>=8) and is either Sunday or TBD (we assume it will be Sunday)
+            const isValid = (isSunday && isLaLigaComp) || (hasLaLigaTeams && (isSunday || isPorDefinir));
+
+            if (!isValid) {
+                console.log(`DEBUG: J${j.number} RECHAZADA. Motivos: Sunday=${isSunday}, TBD=${isPorDefinir}, Density=${hasLaLigaTeams}, CompMatch=${isLaLigaComp}`);
                 return;
             }
 
@@ -183,14 +189,13 @@ class PDFImporter {
             const competition = compMatch ? compMatch[1].trim() : "";
 
             // Improved Date Match: Handles "24-25 / enero / 2026"
-            // The previous regex was cutting off the month because of partial matches inside words.
-            // We look for: (Numbers-Numbers or Numbers) / (Words) / (Year)
-            const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s-]+\s*([a-zñáéíóúü]+)(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
+            // To handle split letters like "e nero", we capture a possible prefix letter.
+            const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s-]+\s*([a-zñáéíóúü]{0,2}\s*[a-zñáéíóúü]{3,})(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
 
             let dateVal = "Por definir";
             if (dateParts) {
                 const day = dateParts[1];
-                const month = dateParts[2];
+                let month = dateParts[2].replace(/\s+/g, '').toLowerCase(); // Fix "e nero" -> "enero"
                 const year = dateParts[3] || new Date().getFullYear();
                 dateVal = `${day} de ${month} de ${year}`;
             }
