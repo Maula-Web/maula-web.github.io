@@ -253,8 +253,8 @@ class PronosticoManager {
 
         // Filter journeys that have matches informed (at least one team name set)
         const informedJornadas = this.jornadas.filter(j => {
-            if (!j.active || !j.matches) return false;
-            return j.matches.some(m => m.home && m.home.trim() !== '');
+            // Must be active AND have matches with at least one home team name
+            return j.active && j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
         });
 
         // Sort by number descending (most recent first)
@@ -749,10 +749,9 @@ class PronosticoManager {
         // 3. Sort Jornadas (descending) & Filter empty ones
         let sortedJornadas = [...this.jornadas].sort((a, b) => b.number - a.number);
 
-        // Filter: Keep jornadas that have forecasts OR are active (to allow "inaugurating" them from the table)
+        // Filter: Keep jornadas that have matches informed (Maula Rule: No matches, no show)
         sortedJornadas = sortedJornadas.filter(j => {
-            const hasForecasts = this.pronosticos.some(p => (p.jId === j.id || p.jornadaId === j.id) && p.selection && p.selection.length > 0);
-            return hasForecasts || j.active;
+            return j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
         });
 
         if (sortedJornadas.length === 0) {

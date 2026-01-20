@@ -122,10 +122,23 @@ class PDFImporter {
                 if (AppUtils.isLaLigaTeam(m.home) || AppUtils.isLaLigaTeam(m.away)) firstDivCount++;
             });
 
-            if (firstDivCount < 3) return;
+            // STRICT FILTER 1: Must have at least 8 matches with LaLiga EA teams (to avoid mid-week/Champions)
+            if (firstDivCount < 8) {
+                console.log(`DEBUG: J${j.number} excluida - No es jornada de Primera (${firstDivCount} equipos encontrados)`);
+                return;
+            }
 
+            // Clean date
             let dateClean = j.date.replace(/[\n\r]+/g, ' ').trim();
             dateClean = AppUtils.extractSundayFromRange(dateClean);
+
+            const dateObj = AppUtils.parseDate(dateClean);
+
+            // STRICT FILTER 2: Must be Sunday (Maula Rule)
+            if (!AppUtils.isSunday(dateObj)) {
+                console.log(`DEBUG: J${j.number} excluida - No se juega en Domingo (${dateClean})`);
+                return;
+            }
 
             valid.push({
                 number: j.number,
@@ -168,25 +181,32 @@ class PDFImporter {
             // 3. Find Matches
             const matches = [];
 
-            // We look for 1 to 14
+            // 3. Find Matches (Fixed regex with stricter lookahead to avoid concatenation)
             for (let m = 1; m <= 14; m++) {
-                const matchRegex = new RegExp(`(?:^|\\s)${m}\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+(?:${m + 1}[.\\s]|P15|\\*\\*P15|Jornada)|$)`, 'i');
+                // Determine what markers to look for next to avoid greedy capture
+                const nextMarker = m < 14 ? `\\b${m + 1}[.\\s]` : `(?:P15|15\\b|\\*\\*P15|Jornada)`;
+                const matchRegex = new RegExp(`(?:^|\\b)${m}[.\\s]\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+${nextMarker}|$)`, 'i');
                 const found = rawText.match(matchRegex);
 
                 if (found) {
-                    let home = found[1].trim().replace(/^\d+[.,]?\s*/, '');
+                    let home = found[1].trim();
                     let away = found[2].trim();
+
+                    // Cleanup Away: if it caught next match numbers, strip them
+                    away = away.split(/\s+\d+[.\s]/)[0].trim();
+
                     if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
                         matches.push({ position: m, home, away, result: '' });
                     }
                 }
             }
 
-            // Match 15 (Handle P15 literal and the optional '**' markers)
+            // Match 15 (Improved handling for **P15**)
             const p15Patterns = [
+                /\*\*(?:P15|15)\*\*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\*\*|$)/i, // **P15** Home - Away **
                 /\*\*(?:P15|15)\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)\*\*/i,
                 /(?:^|\s)P15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
-                /(?:^|\s)15[.,]?\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
+                /(?:^|\s)15[.\s]\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
             ];
 
             for (const pattern of p15Patterns) {
