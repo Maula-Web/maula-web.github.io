@@ -254,15 +254,15 @@ class RSSImporter {
 
         // 1. Standard categories (10 to 14 hits)
         // Improved regex to handle cases with winners count: "10 aciertos 7.892 2,65 €"
-        // We look for "N aciertos", then skip any intermediate numbers (winners), 
-        // then capture the last number that is followed by Euros/€.
+        // Also handles formats without winners: "10 aciertos: 2,65 €"
         const regexHits = /(\d{1,2})\s*Aciertos\)?[:.-]?\s*(?:[\d\.,]+\s+)?([\d\.,]+)\s*(?:Euros|€)/gi;
         let match;
         while ((match = regexHits.exec(text)) !== null) {
             const hits = parseInt(match[1]);
+            // Clean prize: remove dots (thousands) and replace comma with dot
             const prizeVal = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
 
-            if (hits >= 10 && hits <= 14 && prizeVal > 0) {
+            if (hits >= 10 && hits <= 14 && !isNaN(prizeVal) && prizeVal > 0) {
                 rates[hits] = prizeVal;
                 if (hits < minHits) minHits = hits;
             }

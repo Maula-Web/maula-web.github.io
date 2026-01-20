@@ -617,7 +617,7 @@ class ResumenManager {
         let matchesHtml = '';
         if (jornada && jornada.matches) {
             matchesHtml = `
-            < table style = "width:100%; border-collapse:collapse; font-size:0.85rem;" >
+            <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
                     <thead>
                         <tr style="background:#546e7a; color:white;">
                             <th style="padding:4px;">#</th>
@@ -647,7 +647,7 @@ class ResumenManager {
                     </tr>
                 `;
             });
-            matchesHtml += '</tbody></table > ';
+            matchesHtml += '</tbody></table>';
         }
 
         // Check for Doubles in this Jornada

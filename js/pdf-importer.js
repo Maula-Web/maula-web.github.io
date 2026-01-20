@@ -164,7 +164,7 @@ class PDFImporter {
             for (let m = 1; m <= 15; m++) {
                 // REGEX FIX: Lookahead is now optional if we are at the end of the block.
                 // Also allowed less whitespace before numbers.
-                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s*\\d{1,2}[.,]\\s|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
+                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}(?:[.,]\\s|\\s)|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
 
                 const found = rawText.match(lineRegex);
                 if (found) {
@@ -187,8 +187,8 @@ class PDFImporter {
             if (!matches.some(m => m.position === 15)) {
                 // More aggressive search for match 15 patterns
                 const p15Patterns = [
-                    /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+)/i,
-                    /(?:^|\s)15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+)/i // Last attempt for "15 Team - Team"
+                    /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\\n\\r-]+?)\s*[-–]\s*([^\\n\\r]+)/i,
+                    /(?:^|\\s)15[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s*([^\\n\\r]+)/i
                 ];
 
                 for (const pattern of p15Patterns) {
