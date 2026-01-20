@@ -180,11 +180,17 @@ const ThemeEditor = {
             { id: '--resultados-cell-alt-bg', label: 'Fondo Celdas Alternas' }
         ],
         'resumen': [
-            { id: '--primary-orange', label: 'Naranja Primario' },
-            { id: '--dark-orange', label: 'Naranja Oscuro' },
-            { id: '--pastel-bg-orange', label: 'Fondo Muted' },
-            { id: '--pastel-accent-orange', label: 'Acento Muted' },
-            { id: '--resumen-text', label: 'Texto General Página' }
+            { id: '--primary-orange', label: 'Color Primario' },
+            { id: '--dark-orange', label: 'Color Oscuro' },
+            { id: '--resumen-card-bg', label: 'Fondo Tarjetas Rankings' },
+            { id: '--resumen-table-header-bg', label: 'Fondo Cabecera Tabla' },
+            { id: '--resumen-table-header-text', label: 'Texto Cabecera Tabla' },
+            { id: '--resumen-table-row-bg', label: 'Fondo Filas' },
+            { id: '--resumen-table-text', label: 'Texto Filas' },
+            { id: '--resumen-link-color', label: 'Color Enlaces Socios' },
+            { id: '--resumen-row-points-text', label: 'Color Puntos Columna' },
+            { id: '--resumen-summary-bg', label: 'Fondo Texto Resumen IA' },
+            { id: '--resumen-summary-text', label: 'Texto Resumen IA' }
         ],
         'importacion': [
             { id: '--import-modal-bg', label: 'Fondo Ventana Confirmación' },

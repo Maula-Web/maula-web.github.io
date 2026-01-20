@@ -14,7 +14,21 @@ class PDFImporter {
         if (window.DataService) {
             await window.DataService.init();
             this.jornadas = await window.DataService.getAll('jornadas');
+            this.buildTeamDictionary();
         }
+    }
+
+    buildTeamDictionary() {
+        this.knownTeams = new Set();
+        this.jornadas.forEach(j => {
+            if (j.matches) {
+                j.matches.forEach(m => {
+                    if (m.home) this.knownTeams.add(m.home.trim().toLowerCase());
+                    if (m.away) this.knownTeams.add(m.away.trim().toLowerCase());
+                });
+            }
+        });
+        console.log(`DEBUG: Built team dictionary with ${this.knownTeams.size} teams.`);
     }
 
     /**
@@ -162,23 +176,54 @@ class PDFImporter {
 
             // We look for 1 to 15
             for (let m = 1; m <= 15; m++) {
-                // REGEX FIX: Lookahead is now optional if we are at the end of the block.
-                // Also allowed less whitespace before numbers.
-                const lineRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}(?:[.,]\\s|\\s)|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
+                // 1. STANDARD REGEX (with dash)
+                const dashRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}(?:[.,]\\s|\\s)|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
+                const found = rawText.match(dashRegex);
 
-                const found = rawText.match(lineRegex);
                 if (found) {
                     let home = found[1].trim();
                     let away = found[2].trim();
-
-                    // Cleanup common noise
                     home = home.replace(/^\d+[.,]\s*/, '');
-
-                    // Basic noise filter
                     if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
                         if (!matches.some(existing => existing.position === m)) {
                             matches.push({ position: m, home, away, result: '' });
+                            continue;
                         }
+                    }
+                }
+
+                // 2. FALLBACK: NO DASH (Gap-based search)
+                const gapRegex = new RegExp(`(?:^|\\s)${m}[.,]?\\s+([^\\n\\r]+?)(?=\\s+\\d{1,2}(?:[.,]\\s|\\s)|\\s+P15|\\s+Pleno|\\s+Partido|$)`, 'i');
+                const gapFound = rawText.match(gapRegex);
+                if (gapFound && !matches.some(existing => existing.position === m)) {
+                    const content = gapFound[1].trim();
+
+                    let bestMatch = null;
+                    if (this.knownTeams) {
+                        for (const knownTeam of this.knownTeams) {
+                            if (content.toLowerCase().startsWith(knownTeam) && knownTeam.length > 3) {
+                                if (!bestMatch || knownTeam.length > bestMatch.length) {
+                                    bestMatch = knownTeam;
+                                }
+                            }
+                        }
+                    }
+
+                    if (bestMatch) {
+                        const home = content.substring(0, bestMatch.length).trim();
+                        const away = content.substring(bestMatch.length).trim();
+                        if (home && away) {
+                            matches.push({ position: m, home, away, result: '' });
+                            continue;
+                        }
+                    }
+
+                    const parts = content.split(/\s+/);
+                    if (parts.length >= 2) {
+                        const mid = Math.floor(parts.length / 2);
+                        const home = parts.slice(0, mid).join(' ');
+                        const away = parts.slice(mid).join(' ');
+                        matches.push({ position: m, home, away, result: '' });
                     }
                 }
             }

@@ -153,8 +153,8 @@ class ResumenManager {
                     🏆 Ver Quinielas de Dobles
                 </button>
             </div>
-            <table class="rankings-table" style="width:100%; background:white; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                <thead style="background:var(--primary-purple); color:white;">
+            <table class="rankings-table" style="width:100%; background:var(--resumen-card-bg); border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                <thead style="background:var(--resumen-table-header-bg); color:var(--resumen-table-header-text);">
                     <tr>
                         <th style="padding:.5rem;">Ver</th>
                         <th style="padding:1rem;">Pos.</th>
@@ -174,17 +174,17 @@ class ResumenManager {
             const isChecked = this.selectedMembers.has(r.id) ? 'checked' : '';
 
             html += `
-                <tr style="border-bottom:1px solid #eee;">
+                <tr style="border-bottom:1px solid #eee; background:var(--resumen-table-row-bg); color:var(--resumen-table-text);">
                     <td style="text-align:center;">
                         <input type="checkbox" onchange="window.app.toggleSelection(${r.id}, this)" ${isChecked}>
                     </td>
                     <td style="padding:1rem; text-align:center;">${medal || (idx + 1)}</td>
                     <td style="padding:1rem; font-weight:bold;">
-                        <a href="javascript:void(0)" onclick="window.app.showMemberSummary(${r.id}, '${r.name.replace(/'/g, "\\'")}')" style="color:#ffb300; text-decoration:none; border-bottom:1px dashed #ffb300;">
+                        <a href="javascript:void(0)" onclick="window.app.showMemberSummary(${r.id}, '${r.name.replace(/'/g, "\\'")}')" style="color:var(--resumen-link-color); text-decoration:none; border-bottom:1px dashed var(--resumen-link-color);">
                             ${r.name}
                         </a>
                     </td>
-                    <td style="padding:1rem; text-align:right; font-size:1.2rem; color:#ffb300; font-weight:bold;">${r.points}</td>
+                    <td style="padding:1rem; text-align:right; font-size:1.2rem; color:var(--resumen-row-points-text); font-weight:bold;">${r.points}</td>
                 </tr>
             `;
         });
@@ -556,7 +556,7 @@ class ResumenManager {
                         ${titleName !== "PEÑA COMPLETA" ? `<h4 style="margin:0; font-size:0.9rem; color:#d84315; text-transform:uppercase;">📊 ESTUDIO ESTADÍSTICO - ${titleName.toUpperCase()}</h4>` : ''}
                         
                         <!-- Summary Text Box -->
-                        <div style="background:#fff3e0; padding:0.8rem; border-radius:8px; border:1px solid #ffe0b2; font-size:0.85rem; color:#5d4037; line-height:1.4;">
+                        <div style="background:var(--resumen-summary-bg); padding:0.8rem; border-radius:8px; border:1px solid #ffe0b2; font-size:0.85rem; color:var(--resumen-summary-text); line-height:1.4;">
                             ${summaryText.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--primary-orange)">$1</strong>')}
                         </div>
 

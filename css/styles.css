@@ -148,6 +148,15 @@
     --pronosticos-text: #1b1b1b;
     --resultados-text: #1b1b1b;
     --resumen-text: #1b1b1b;
+    --resumen-card-bg: #ffffff;
+    --resumen-table-header-bg: #6a1b9a;
+    --resumen-table-header-text: #ffffff;
+    --resumen-table-row-bg: #ffffff;
+    --resumen-table-text: #1b1b1b;
+    --resumen-link-color: #ffb300;
+    --resumen-row-points-text: #ffb300;
+    --resumen-summary-bg: #fff3e0;
+    --resumen-summary-text: #5d4037;
 
     /* Common */
     --pastel-bg: #e8f5e9;
