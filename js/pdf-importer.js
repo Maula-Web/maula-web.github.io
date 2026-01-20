@@ -122,26 +122,23 @@ class PDFImporter {
                 if (AppUtils.isLaLigaTeam(m.home) || AppUtils.isLaLigaTeam(m.away)) firstDivCount++;
             });
 
-            // STRICT FILTER 1: Must have at least 8 matches with LaLiga EA teams (to avoid mid-week/Champions)
-            if (firstDivCount < 8) {
-                console.log(`DEBUG: J${j.number} excluida - No es jornada de Primera (${firstDivCount} equipos encontrados)`);
-                return;
-            }
-
             // Clean date
             let dateClean = j.date.replace(/[\n\r]+/g, ' ').trim();
             dateClean = AppUtils.extractSundayFromRange(dateClean);
             const dateObj = AppUtils.parseDate(dateClean);
 
-            // LOGIC FILTERS:
+            // LOGIC FILTERS (The "Maula" Rulebook):
             const isSunday = AppUtils.isSunday(dateObj);
-            const isLaLigaComp = /LaLiga|Primera/i.test(j.competition || "");
+
+            // Literal match as per user: "1ª La Liga EA"
+            // We search for "1ª La Liga EA" or just "La Liga EA" to be safe but specific
+            const isLaLigaComp = /1ª\s*La\s*Liga\s*EA|La\s*Liga\s*EA/i.test(j.competition || "");
             const hasLaLigaTeams = firstDivCount >= 8;
 
-            console.log(`DEBUG: J${j.number} - Domingo: ${isSunday}, Competición: ${j.competition}, Equipos 1ª: ${firstDivCount}`);
+            console.log(`DEBUG: J${j.number} - Domingo: ${isSunday}, Competición: "${j.competition}", Equipos 1ª: ${firstDivCount}`);
 
             if (!isSunday || !isLaLigaComp || !hasLaLigaTeams) {
-                console.log(`DEBUG: J${j.number} RECHAZADA por no cumplir criterios Maula.`);
+                console.log(`DEBUG: J${j.number} RECHAZADA. Motivos: Sunday=${isSunday}, Competition=${isLaLigaComp}, Density=${hasLaLigaTeams}`);
                 return;
             }
 
@@ -180,13 +177,23 @@ class PDFImporter {
             // 2. Find Date and Competition in header
             const headerText = rawText.substring(0, 1000);
 
-            // Competition is usually between ( ) right after Jornada
+            // Competition literal: the text after "Jornada Xª" and before the date
+            // Usually looks like: "(1ª LaLiga EA / 2ª LaLiga EA Hypermotion)"
             const compMatch = headerText.match(/\(([^)]+)\)/);
             const competition = compMatch ? compMatch[1].trim() : "";
 
-            // Improved Date Match: Handles "24-25 de enero" and "24-25 / enero"
-            const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s]+\s*([a-z]+)(?:\s*[\/de\s]+\s*(\d{4}))?/i);
-            const dateVal = dateParts ? `${dateParts[1]} de ${dateParts[2]} ${dateParts[3] || new Date().getFullYear()}` : "Por definir";
+            // Improved Date Match: Handles "24-25 / enero / 2026"
+            // The previous regex was cutting off the month because of partial matches inside words.
+            // We look for: (Numbers-Numbers or Numbers) / (Words) / (Year)
+            const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s-]+\s*([a-zñáéíóúü]+)(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
+
+            let dateVal = "Por definir";
+            if (dateParts) {
+                const day = dateParts[1];
+                const month = dateParts[2];
+                const year = dateParts[3] || new Date().getFullYear();
+                dateVal = `${day} de ${month} de ${year}`;
+            }
 
             // 3. Find Matches
             const matches = [];
@@ -332,38 +339,8 @@ class PDFImporter {
         alert('Jornadas importadas correctamente.');
     }
 
-    processExtractedData(jornadasRaw) {
-        const valid = [];
-
-        jornadasRaw.forEach(j => {
-            let firstDivCount = 0;
-            j.matches.forEach(m => {
-                // Formatting via Utils
-                m.home = AppUtils.formatTeamName(m.home);
-                m.away = AppUtils.formatTeamName(m.away);
-
-                if (AppUtils.isLaLigaTeam(m.home) || AppUtils.isLaLigaTeam(m.away)) {
-                    firstDivCount++;
-                }
-            });
-
-            // If at least 3 matches involve 1st div teams, it's likely a La Liga journey.
-            if (firstDivCount < 3) return;
-
-            // Date Cleaning
-            let dateClean = j.date.replace(/[\n\r]+/g, ' ').trim();
-            dateClean = AppUtils.extractSundayFromRange(dateClean);
-
-            valid.push({
-                number: j.number,
-                date: dateClean,
-                matches: j.matches.slice(0, 15), // Ensure max 15
-                season: '2025-2026'
-            });
-        });
-
-        return valid;
-    }
+    // Unified process method - we use the one at line 115
+    // Removed duplicate at end of file to avoid confusion.
 
 }
 
