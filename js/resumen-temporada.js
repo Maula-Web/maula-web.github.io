@@ -428,8 +428,8 @@ class ResumenManager {
 
             return `
                 <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0; border-bottom:1px solid rgba(255, 179, 0, 0.2); ${style}">
-                    <span style="color:#ffb300;">Partido #${idx + 1} ${isBest ? '⭐' : isWorst ? '🚩' : ''}</span>
-                    <span style="color:${rate >= 50 ? '#2e7d32' : '#d84315'}">${rate.toFixed(0)}%</span>
+                    <span style="color:var(--resumen-match-box-text); opacity:0.8;">Partido #${idx + 1} ${isBest ? '⭐' : isWorst ? '🚩' : ''}</span>
+                    <span style="color:${rate >= 50 ? 'var(--primary-green)' : 'var(--danger)'}; font-weight:bold;">${rate.toFixed(0)}%</span>
                 </div>
             `;
         }).join('');
@@ -465,21 +465,21 @@ class ResumenManager {
             const playedJornadas = this.jornadas.filter(j => j.matches && j.matches[0] && j.matches[0].result).length;
 
             leftColumn = `
-                <div style="border-right:1px solid #eee; padding-right:1rem; display:flex; flex-direction:column; justify-content:center;">
-                    <div style="text-align:center; padding:2rem; background:#fff3e0; border-radius:12px; border:1px solid #ffe0b2;">
+                <div style="border-right:1px solid rgba(0,0,0,0.1); padding-right:1rem; display:flex; flex-direction:column; justify-content:center;">
+                    <div style="text-align:center; padding:2rem; background:var(--resumen-summary-bg); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
                         <div style="font-size:3rem; margin-bottom:1rem;">🏆</div>
                         <h4 style="margin:0; color:var(--primary-orange); line-height:1.2;">Resumen Acumulado<br>Toda la Peña</h4>
                         <div style="margin-top:2rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                            <div style="background:white; padding:1rem; border-radius:8px;">
-                                <div style="font-size:1.5rem; font-weight:bold; color:#558b2f;">${totalSocios}</div>
-                                <div style="font-size:0.7rem; color:#666; font-weight:bold; text-transform:uppercase;">Socios</div>
+                            <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:1rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="font-size:1.5rem; font-weight:bold; color:var(--primary-green);">${totalSocios}</div>
+                                <div style="font-size:0.7rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Socios</div>
                             </div>
-                            <div style="background:white; padding:1rem; border-radius:8px;">
-                                <div style="font-size:1.5rem; font-weight:bold; color:#1976d2;">${playedJornadas}</div>
-                                <div style="font-size:0.7rem; color:#666; font-weight:bold; text-transform:uppercase;">Jornadas</div>
+                            <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:1rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="font-size:1.5rem; font-weight:bold; color:var(--primary-blue);">${playedJornadas}</div>
+                                <div style="font-size:0.7rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Jornadas</div>
                             </div>
                         </div>
-                        <p style="margin-top:1.5rem; font-size:0.85rem; color:#795548; font-style:italic;">
+                        <p style="margin-top:1.5rem; font-size:0.85rem; color:var(--resumen-summary-text); font-style:italic; opacity:0.8;">
                             Haz clic en un punto de la gráfica para ver el estudio individual de un socio y su jornada.
                         </p>
                     </div>
@@ -511,13 +511,13 @@ class ResumenManager {
 
             return `
                 <div style="flex: 0 0 55px; display:flex; flex-direction:column; align-items:center; border-radius:4px; padding:4px; background:${isBest || isWorst ? bgColor : 'transparent'};">
-                    <div style="font-size:0.6rem; font-weight:bold; color:${textColor}; text-align:center; line-height:1.1;">
+                    <div style="font-size:0.6rem; font-weight:bold; color:var(--resumen-performance-text); text-align:center; line-height:1.1;">
                         J${j.num}<br>${j.rate.toFixed(0)}%
                     </div>
-                    <div style="width:12px; height:40px; background:#e0e0e0; border-radius:10px; position:relative; margin:4px 0; overflow:hidden;">
+                    <div style="width:12px; height:40px; background:rgba(0,0,0,0.1); border-radius:10px; position:relative; margin:4px 0; overflow:hidden;">
                         <div style="width:100%; height:${j.rate}%; background:${barColor}; position:absolute; bottom:0; transition: height 0.3s;"></div>
                     </div>
-                    <div style="font-size:0.65rem; font-weight:bold; color:#555;">
+                    <div style="font-size:0.65rem; font-weight:bold; color:var(--resumen-performance-text); opacity:0.8;">
                         ${(j.hits / (titleName === "PEÑA COMPLETA" ? this.members.length : 1)).toFixed(0)} ac.
                     </div>
                 </div>
@@ -536,7 +536,7 @@ class ResumenManager {
             : `**${titleName}** destaca especialmente en el **Partido #${stats.hitsByMatch.indexOf(Math.max(...stats.hitsByMatch)) + 1}**. Su mejor rendimiento se concentra en el **${mostRelevantTeam.name}** (${mostRelevantTeam.rate.toFixed(0)}% de acierto en ${mostRelevantTeam.total} partidos), con su pico máximo en **${bestJText}**.`;
 
         detailSection.innerHTML = `
-            <div style="background:white; padding:1rem; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); border:1px solid #eee;">
+            <div style="background:var(--resumen-main-bg); padding:1rem; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); border:1px solid rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid var(--primary-orange); padding-bottom:0.8rem;">
                     <h3 style="margin:0; color:var(--primary-orange); display:flex; align-items:center; gap:0.5rem;">
                         <span style="background:var(--primary-orange); color:white; padding:2px 8px; border-radius:4px;">📊</span>
@@ -562,16 +562,16 @@ class ResumenManager {
 
                         <div class="stats-sub-grid">
                             <!-- MATCH STATS -->
-                            <div style="background:#fffde7; padding:0.8rem; border-radius:8px; border-top:4px solid #ffb300;">
-                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:#ffb300; text-transform:uppercase; font-weight: 800;">ACIERTO POR PARTIDO</h5>
+                            <div style="background:var(--resumen-match-box-bg); color:var(--resumen-match-box-text); padding:0.8rem; border-radius:8px; border-top:4px solid var(--primary-orange);">
+                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:inherit; text-transform:uppercase; font-weight: 800; opacity:0.8;">ACIERTO POR PARTIDO</h5>
                                 <div style="max-height:150px; overflow-y:auto; padding-right:5px;">
                                     ${matchResultsHtml}
                                 </div>
                             </div>
 
                             <!-- TEAM STATS -->
-                            <div style="background:#e3f2fd; padding:0.8rem; border-radius:8px; border-top:4px solid #1976d2;">
-                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:#1976d2; text-transform:uppercase; font-weight: 800;">ACIERTO POR EQUIPOS</h5>
+                            <div style="background:var(--resumen-team-box-bg); color:var(--resumen-team-box-text); padding:0.8rem; border-radius:8px; border-top:4px solid var(--primary-blue);">
+                                <h5 style="margin:0 0 0.5rem 0; font-size:0.75rem; color:inherit; text-transform:uppercase; font-weight: 800; opacity:0.8;">ACIERTO POR EQUIPOS</h5>
                                 <div style="max-height:150px; overflow-y:auto; padding-right:5px;">
                                     ${teamResultsHtml}
                                 </div>
@@ -580,12 +580,12 @@ class ResumenManager {
 
                         ${this.renderPrizesHTML(stats.memberId)}
 
-                        <div style="background:#f1f8e9; padding:1rem; border-radius:8px; border-left:4px solid #7cb342;">
+                        <div style="background:var(--resumen-performance-bg); color:var(--resumen-performance-text); padding:1rem; border-radius:8px; border-left:4px solid var(--primary-green);">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                                <h5 style="margin:0; font-size:0.8rem; color:#33691e; text-transform:uppercase;">RENDIMIENTO POR JORNADA</h5>
+                                <h5 style="margin:0; font-size:0.8rem; color:inherit; text-transform:uppercase; opacity:0.8;">RENDIMIENTO POR JORNADA</h5>
                                 <div style="display:flex; gap:8px; font-size:0.6rem; font-weight:bold;">
-                                    <span style="color:#01579b;">● MEJOR</span>
-                                    <span style="color:#c62828;">● PEOR</span>
+                                    <span style="color:var(--primary-blue);">● MEJOR</span>
+                                    <span style="color:var(--danger);">● PEOR</span>
                                 </div>
                             </div>
                             <div style="display:flex; gap:5px; overflow-x:auto; padding:5px 0 10px 0; scrollbar-width: thin;">
@@ -617,9 +617,9 @@ class ResumenManager {
         let matchesHtml = '';
         if (jornada && jornada.matches) {
             matchesHtml = `
-            <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.85rem; background:var(--resumen-detail-table-row-bg); color:var(--resumen-detail-table-text);">
                     <thead>
-                        <tr style="background:#546e7a; color:white;">
+                        <tr style="background:var(--resumen-detail-table-header-bg); color:var(--resumen-detail-table-header-text);">
                             <th style="padding:4px;">#</th>
                             <th style="padding:4px; text-align:left;">Partido</th>
                             <th style="padding:4px; text-align:center;">Resultado</th>
@@ -634,11 +634,11 @@ class ResumenManager {
                 const officialVal = m.result;
                 const isHit = userVal === officialVal && officialVal !== '';
                 const color = isHit ? '#2e7d32' : (userVal !== '-' ? '#d32f2f' : '#999');
-                const rowBg = isHit ? '#e8f5e9' : 'transparent';
+                const rowBg = isHit ? 'var(--resumen-detail-row-hit-bg)' : 'transparent';
 
                 matchesHtml += `
-                    <tr style="border-bottom:1px solid #eee; background-color:${rowBg};">
-                        <td style="padding:4px; text-align:center; color:#666;">${idx + 1}</td>
+                    <tr style="border-bottom:1px solid rgba(0,0,0,0.05); background-color:${rowBg};">
+                        <td style="padding:4px; text-align:center; opacity:0.7;">${idx + 1}</td>
                         <td style="padding:4px;">
                             <span style="font-weight:600;">${m.home}</span> - <span style="font-weight:600;">${m.away}</span>
                         </td>

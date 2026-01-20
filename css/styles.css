@@ -148,6 +148,7 @@
     --pronosticos-text: #1b1b1b;
     --resultados-text: #1b1b1b;
     --resumen-text: #1b1b1b;
+    --resumen-main-bg: #ffffff;
     --resumen-card-bg: #ffffff;
     --resumen-table-header-bg: #6a1b9a;
     --resumen-table-header-text: #ffffff;
@@ -157,6 +158,17 @@
     --resumen-row-points-text: #ffb300;
     --resumen-summary-bg: #fff3e0;
     --resumen-summary-text: #5d4037;
+    --resumen-match-box-bg: #fffde7;
+    --resumen-match-box-text: #5d4037;
+    --resumen-team-box-bg: #e3f2fd;
+    --resumen-team-box-text: #1d3557;
+    --resumen-performance-bg: #f1f8e9;
+    --resumen-performance-text: #33691e;
+    --resumen-detail-table-header-bg: #546e7a;
+    --resumen-detail-table-header-text: #ffffff;
+    --resumen-detail-table-row-bg: #ffffff;
+    --resumen-detail-table-text: #1b1b1b;
+    --resumen-detail-row-hit-bg: #e8f5e9;
 
     /* Common */
     --pastel-bg: #e8f5e9;

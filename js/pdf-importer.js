@@ -114,32 +114,26 @@ class PDFImporter {
 
     processExtractedData(jornadasRaw) {
         const valid = [];
-
         jornadasRaw.forEach(j => {
-            const firstDivTeams = ['real madrid', 'barcelona', 'atlético', 'at. madrid', 'sevilla', 'betis', 'real sociedad', 'athletic', 'valencia', 'villarreal', 'girona', 'osasuna', 'celta', 'mallorca', 'rayo', 'getafe', 'alavés', 'palmas', 'leganés', 'espanyol', 'valladolid', 'las palmas', 'leganes', 'bilbao'];
-
             let firstDivCount = 0;
             j.matches.forEach(m => {
-                const h = m.home.toLowerCase();
-                const a = m.away.toLowerCase();
-                // Check if any part of the name matches known team keywords
-                if (firstDivTeams.some(t => h.includes(t) || a.includes(t))) firstDivCount++;
+                m.home = AppUtils.formatTeamName(m.home);
+                m.away = AppUtils.formatTeamName(m.away);
+                if (AppUtils.isLaLigaTeam(m.home) || AppUtils.isLaLigaTeam(m.away)) firstDivCount++;
             });
 
-            // If at least 3 matches involve 1st div teams, it's likely a La Liga journey.
             if (firstDivCount < 3) return;
 
-            // Clean Date
-            const dateClean = j.date.replace(/[\n\r]+/g, ' ').trim();
+            let dateClean = j.date.replace(/[\n\r]+/g, ' ').trim();
+            dateClean = AppUtils.extractSundayFromRange(dateClean);
 
             valid.push({
                 number: j.number,
                 date: dateClean,
-                matches: j.matches.slice(0, 15), // Ensure max 15
+                matches: j.matches.slice(0, 15),
                 season: '2025-2026'
             });
         });
-
         return valid;
     }
 
@@ -228,20 +222,20 @@ class PDFImporter {
                 }
             }
 
-            // Fallback for Match 15 (if named "PLENO AL 15" without "15" number or at the very end)
+            // Fallback for Match 15
             if (!matches.some(m => m.position === 15)) {
-                // More aggressive search for match 15 patterns
+                const contentAfter14 = rawText.split(new RegExp(`(?:^|\\s)14[.,]?\\s+`, 'i'))[1] || "";
+
                 const p15Patterns = [
-                    /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\\n\\r-]+?)\s*[-–]\s*([^\\n\\r]+)/i,
-                    /(?:^|\\s)15[.,]?\\s+([^\\n\\r-]+?)\\s*[-–]\\s*([^\\n\\r]+)/i
+                    /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\\n\\r-]+?)\s*[-–]\s*([^\\n\\r]+?)(?=\s+Jornada|$)/i,
+                    /(?:^|\\s)15[.,]?\\s+([^\\n\\r-]+?)\s*[-–]\s*([^\\n\\r]+?)(?=\s+Jornada|$)/i
                 ];
 
                 for (const pattern of p15Patterns) {
-                    const p15Found = rawText.match(pattern);
+                    const p15Found = contentAfter14.match(pattern) || rawText.match(pattern);
                     if (p15Found) {
                         let pHome = p15Found[1].trim();
-                        let pAway = p15Found[2].trim().split(/\s+Jornada/i)[0].split(/\r?\n/)[0].trim();
-                        // Validate pHome/pAway aren't just empty or junk
+                        let pAway = p15Found[2].trim().split(/\s{2,}/)[0]; // Split at large gaps if any
                         if (pHome.length > 2 && pAway.length > 2) {
                             matches.push({ position: 15, home: pHome, away: pAway, result: '' });
                             break;

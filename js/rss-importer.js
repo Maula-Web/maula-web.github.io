@@ -253,33 +253,37 @@ class RSSImporter {
         }
 
         // 1. Standard categories (10 to 14 hits)
-        // Improved regex to handle cases with winners count: "10 aciertos 7.892 2,65 €"
-        // Also handles formats without winners: "10 aciertos: 2,65 €"
-        const regexHits = /(\d{1,2})\s*Aciertos\)?[:.-]?\s*(?:[\d\.,]+\s+)?([\d\.,]+)\s*(?:Euros|€)/gi;
-        let match;
-        while ((match = regexHits.exec(text)) !== null) {
-            const hits = parseInt(match[1]);
-            // Clean prize: remove dots (thousands) and replace comma with dot
-            const prizeVal = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
+        // Look for "X Aciertos" followed by any characters and then a currency amount
+        const regexHits = /(\d{1,2})\s*Aciertos/gi;
+        let mHits;
+        while ((mHits = regexHits.exec(text)) !== null) {
+            const hits = parseInt(mHits[1]);
+            const searchSlice = text.substring(mHits.index, mHits.index + 200);
+            const prizeMatch = searchSlice.match(/([\d\.,]+)\s*(?:Euros|€)/i);
 
-            if (hits >= 10 && hits <= 14 && !isNaN(prizeVal) && prizeVal > 0) {
-                rates[hits] = prizeVal;
-                if (hits < minHits) minHits = hits;
+            if (prizeMatch) {
+                const prizeVal = parseFloat(prizeMatch[1].replace(/\./g, '').replace(',', '.'));
+                if (hits >= 10 && hits <= 14 && !isNaN(prizeVal) && prizeVal > 0) {
+                    rates[hits] = prizeVal;
+                    if (hits < minHits) minHits = hits;
+                }
             }
         }
 
         // 2. Pleno al 15
-        // Similar logic for P15: handle winners count
-        const regexP15 = /(?:Pleno\s+al\s+15|P15)[^\d]*(\d+)[^€E\d]*(?:[\d\.,]+\s+)?([\d\.,]+)\s*(?:Euros|€)/gi;
-        const matchP15 = regexP15.exec(text);
-        if (matchP15) {
-            const winners = parseInt(matchP15[1]);
-            const prizeVal = parseFloat(matchP15[2].replace(/\./g, '').replace(',', '.'));
-            if (prizeVal > 0) {
-                rates[15] = prizeVal;
-                if (15 < minHits) minHits = 15;
+        const p15Marker = text.match(/(?:Pleno\s+al\s+15|P15)/i);
+        if (p15Marker) {
+            const searchSlice = text.substring(p15Marker.index, p15Marker.index + 200);
+            const prizeMatch = searchSlice.match(/([\d\.,]+)\s*(?:Euros|€)/i);
+            if (prizeMatch) {
+                const prizeVal = parseFloat(prizeMatch[1].replace(/\./g, '').replace(',', '.'));
+                if (!isNaN(prizeVal) && prizeVal > 0) {
+                    rates[15] = prizeVal;
+                    if (15 < minHits) minHits = 15;
+                }
             }
-            if (winners === 0) {
+            // Check for winners if mentioned
+            if (searchSlice.toLowerCase().includes('0 ganadores') || searchSlice.toLowerCase().includes('0 acertantes')) {
                 hasBote = true;
             }
         }
