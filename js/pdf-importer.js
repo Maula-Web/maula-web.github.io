@@ -224,18 +224,21 @@ class PDFImporter {
 
             // Fallback for Match 15
             if (!matches.some(m => m.position === 15)) {
-                const contentAfter14 = rawText.split(new RegExp(`(?:^|\\s)14[.,]?\\s+`, 'i'))[1] || "";
-
+                // Priority 1: Specifically look for P15 literal (User feedback)
+                // Priority 2: "Pleno al 15", "15.", etc.
                 const p15Patterns = [
-                    /(?:Pleno al 15|P15|Partido 15)\s*[:.-]?\s*([^\\n\\r-]+?)\s*[-–]\s*([^\\n\\r]+?)(?=\s+Jornada|$)/i,
-                    /(?:^|\\s)15[.,]?\\s+([^\\n\\r-]+?)\s*[-–]\s*([^\\n\\r]+?)(?=\s+Jornada|$)/i
+                    /(?:^|\s)P15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
+                    /(?:Pleno al 15|Partido 15)\s*[:.-]?\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
+                    /(?:^|\s)15[.,]?\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
                 ];
 
                 for (const pattern of p15Patterns) {
-                    const p15Found = contentAfter14.match(pattern) || rawText.match(pattern);
+                    const p15Found = rawText.match(pattern);
                     if (p15Found) {
                         let pHome = p15Found[1].trim();
-                        let pAway = p15Found[2].trim().split(/\s{2,}/)[0]; // Split at large gaps if any
+                        // Special cleaning for the away team to avoid capturing the next jornada header
+                        let pAway = p15Found[2].trim().split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
+
                         if (pHome.length > 2 && pAway.length > 2) {
                             matches.push({ position: 15, home: pHome, away: pAway, result: '' });
                             break;
