@@ -338,28 +338,35 @@ class PDFImporter {
 
                 // If regular loop for 15 failed (because it's P15), try P15 specific patterns
                 if (!matches.find(x => x.position === 15)) {
+                    // Normalize block end for regex consistency
+                    const cleanBlock = block.trim();
+
                     const p15Patterns = [
-                        // Case 1: "**15. Home - Away**" or "**P15 Home - Away**" (Whole line wrapped in **)
-                        // Supports optional dot after 15, and whitespace flexibility
+                        // Robust P15: Look for "P15" or "15" followed eventually by "Team - Team" at the end of the text
+                        // We use [\s\S] to match across newlines if needed, or simply greedy scan
+                        // We explicitly allow NO space after P15/15 if it's there, but usually there is space
+                        /(?:P15|15)(?:\.|[\s]+)\s*([^\d\n\r-]+?)\s*[-–]\s*([^\d\n\r]+?)$/i,
+
+                        // Previous patterns just in case
                         /\*\*\s*(?:P15|15)[.\s]*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r*]+?)\s*\*\*/i,
 
-                        // Case 2: "**P15** Home - Away" (Only prefix wrapped)
-                        /\*\*\s*(?:P15|15)[.\s]*\*\*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
-
-                        // Case 3: Standard text "15. Home - Away" or "P15 Home - Away" (No asterisks or partial)
-                        /(?:^|\s)(?:P15|15)[.\s]\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
+                        // Fallback broad
+                        /(?:^|[^\w])(?:P15|15)[.\s]\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
                     ];
 
                     for (const pattern of p15Patterns) {
-                        const p15Found = block.match(pattern);
+                        const p15Found = cleanBlock.match(pattern);
                         if (p15Found) {
                             let pHome = p15Found[1].trim();
-                            // Clean potential trailing asterisks from away if regex missed them
-                            let pAway = p15Found[2].replace(/\*\*$/, '').trim();
-                            pAway = pAway.split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
+                            let pAway = p15Found[2].trim();
 
-                            // Cleanup leading artifacts from home team (like "15. " if included by mistake)
+                            // Clean noise
+                            pAway = pAway.replace(/\*\*$/, '').replace(/Jornada.*/i, '').trim();
+                            // Split by large gaps just in case
+                            pAway = pAway.split(/\s{2,}/)[0].trim();
+
                             pHome = pHome.replace(/^\**\d+[.\s]+\s*/, '');
+                            pHome = pHome.replace(/^\**\s*/, '');
 
                             if (pHome.length > 2 && pAway.length > 2) {
                                 matches.push({ position: 15, home: pHome, away: pAway, result: '' });
