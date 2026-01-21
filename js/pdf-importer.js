@@ -46,17 +46,43 @@ class PDFImporter {
             // 2. Parse PDF Text
             const extractedJornadas = await this.parsePDF(pdfData);
 
-            // 3. Filter & Process Data
-            const toImport = this.processExtractedData(extractedJornadas);
+            // 3. Filter & Process Data (PDF Level)
+            const validFromPDF = this.processExtractedData(extractedJornadas);
 
-            // 4. Verification Check
+            // 4. Filter by Local State (App Logic)
+            // Rule: Only offer to import if the local jornada doesn't exist OR corresponds to an incomplete/empty jornada.
+            // If we already have 15 matches with defined teams, we assume it's done and don't spam the user.
+            const toImport = validFromPDF.filter(nj => {
+                const local = this.jornadas.find(l => l.number === nj.number && l.season === nj.season);
+
+                // If not in DB, definitely import
+                if (!local) return true;
+
+                // If in DB, check if it's "full"
+                // definition of full: 15 matches, all have Home and Away teams (not empty strings)
+                let filledCount = 0;
+                if (local.matches && Array.isArray(local.matches)) {
+                    filledCount = local.matches.filter(m => m.home && m.home.trim().length > 0 && m.away && m.away.trim().length > 0).length;
+                }
+
+                if (filledCount === 15) {
+                    // It's full. Do NOT offer import.
+                    console.log(`DEBUG: Skipping Import for J${nj.number} - Local version is already complete (15 matches).`);
+                    return false;
+                }
+
+                // If exists but not full (matches deleted or partial), allow import/update
+                return true;
+            });
+
+            // 5. Verification Check
             if (toImport.length === 0) {
                 loadingOverlay.remove();
-                alert('No se encontraron jornadas nuevas válidas en el PDF.\n\nRecuerda: Solo se importan jornadas de DOMINGO con partidos de 1ª LaLiga EA.');
+                alert('No se encontraron jornadas nuevas válidas en el PDF (o las encontradas ya están completas en tu base de datos).');
                 return;
             }
 
-            // 5. Show Confirmation
+            // 6. Show Confirmation
             loadingOverlay.remove();
             this.showConfirmationModal(toImport);
 
