@@ -1,21 +1,20 @@
 const Auth = {
     async checkContext() {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                this.applySavedTheme();
-                this.applyLayoutPreference();
-                this.handleResponsive();
-                if (!window.location.pathname.includes('login.html')) {
-                    this.injectLogout();
-                }
-            });
-        } else {
-            this.applySavedTheme();
+        // Run Theme Logic INSTANTLY (variables on documentElement)
+        this.applySavedTheme();
+
+        const onReady = () => {
             this.applyLayoutPreference();
             this.handleResponsive();
             if (!window.location.pathname.includes('login.html')) {
                 this.injectLogout();
             }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', onReady);
+        } else {
+            onReady();
         }
 
         if (window.location.pathname.includes('login.html')) return;
@@ -52,14 +51,37 @@ const Auth = {
         window.addEventListener('resize', updateClasses);
     },
 
-    async applySavedTheme() {
+    applySavedTheme() {
+        // 1. Try Cache First (Instant) - Reads from LocalStorage to prevent flash
+        const cached = localStorage.getItem('maulas_theme_cache');
+        if (cached) {
+            try {
+                const themeDoc = JSON.parse(cached);
+                const root = document.documentElement;
+                Object.entries(themeDoc).forEach(([key, value]) => {
+                    if (key.startsWith('--')) {
+                        root.style.setProperty(key, value);
+                    }
+                });
+            } catch (e) {
+                console.warn('Auth: Invalid cached theme');
+            }
+        }
+
+        // 2. Background Sync (Async)
+        this.syncThemeFromCloud();
+    },
+
+    async syncThemeFromCloud() {
         if (window.DataService) {
             try {
                 if (!window.DataService.db) await window.DataService.init();
                 const config = await window.DataService.getAll('config');
                 const themeDoc = config.find(c => c.id === 'theme');
                 if (themeDoc) {
-                    console.log("Auth: Applying custom theme from cloud...");
+                    // Update cache if different
+                    localStorage.setItem('maulas_theme_cache', JSON.stringify(themeDoc));
+
                     const root = document.documentElement;
                     Object.entries(themeDoc).forEach(([key, value]) => {
                         if (key.startsWith('--')) {
@@ -68,7 +90,7 @@ const Auth = {
                     });
                 }
             } catch (e) {
-                console.warn("Auth: Could not load custom theme", e);
+                console.warn("Auth: Could not sync theme", e);
             }
         }
     },

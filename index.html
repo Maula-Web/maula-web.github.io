@@ -128,33 +128,7 @@
     <script src="js/dashboard.js"></script>
 
     <script>
-        // Theme Logic Shared
-        (function () {
-            const themeBtn = document.getElementById('themeToggle');
-            const body = document.body;
-
-            // Apply theme from storage immediately
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                body.setAttribute('data-theme', 'dark');
-                themeBtn.textContent = '☀️';
-                if (body.classList.contains('home-body')) { body.style.backgroundColor = 'var(--main-bg)'; }
-            }
-
-            themeBtn.addEventListener('click', () => {
-                if (body.getAttribute('data-theme') === 'dark') {
-                    body.removeAttribute('data-theme');
-                    localStorage.setItem('theme', 'light');
-                    themeBtn.textContent = '🌙';
-                    if (body.classList.contains('home-body')) { body.style.backgroundColor = '#ffffff'; }
-                } else {
-                    body.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                    themeBtn.textContent = '☀️';
-                    if (body.classList.contains('home-body')) { body.style.backgroundColor = 'var(--main-bg)'; }
-                }
-            });
-        })();
+        // Theme Logic is now handled by auth.js + theme-editor.js
     </script>
 </body>
 

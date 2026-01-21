@@ -532,7 +532,12 @@ const ThemeEditor = {
     applyTrace: async function () {
         const themeData = this.getFormValues();
         try {
+            // Save to DB (Cloud/Mock)
             await window.DataService.save('config', { id: 'theme', ...themeData });
+
+            // Save to LocalStorage for instant load on next visit
+            localStorage.setItem('maulas_theme_cache', JSON.stringify(themeData));
+
             alert('¡Tema aplicado! Ahora todos los usuarios verán estos colores.');
         } catch (e) {
             console.error(e);
