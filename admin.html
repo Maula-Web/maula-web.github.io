@@ -152,12 +152,18 @@
                     <h2>📢 Telegram Bots</h2>
                     <form id="telegram-form" style="font-size:0.9rem;">
                         <label style="display:block; margin-bottom:0.2rem;">Bot Token:</label>
-                        <input type="password" id="tg-token" placeholder="123456:ABC..."
-                            style="width:100%; padding:4px; margin-bottom:0.5rem;">
+                        <div style="display:flex; gap:5px; margin-bottom:0.5rem;">
+                            <input type="password" id="tg-token" placeholder="123456:ABC..."
+                                style="width:100%; padding:4px;" disabled>
+                            <button type="button" onclick="toggleEdit('tg-token')" class="btn-action"
+                                style="background:#ddd; color:#333;" title="Editar">🔓</button>
+                        </div>
 
                         <label style="display:block; margin-bottom:0.2rem;">Chat ID:</label>
                         <div style="display:flex; gap:5px; margin-bottom:0.5rem;">
-                            <input type="text" id="tg-chat" placeholder="-100..." style="flex:1; padding:4px;">
+                            <input type="text" id="tg-chat" placeholder="-100..." style="flex:1; padding:4px;" disabled>
+                            <button type="button" onclick="toggleEdit('tg-chat')" class="btn-action"
+                                style="background:#ddd; color:#333;" title="Editar">🔓</button>
                             <button type="button" onclick="fetchChatId()" class="btn-action"
                                 style="background:#0288d1; font-size:0.75rem;">🔍 Buscar</button>
                         </div>
@@ -616,6 +622,14 @@
                     btnSeed.disabled = false;
                     btnSeed.textContent = "⚠️ RECARGAR DATOS FÁBRICA";
                 }
+            }
+        };
+
+        window.toggleEdit = function (id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = !el.disabled;
+                if (!el.disabled) el.focus();
             }
         };
     </script>
