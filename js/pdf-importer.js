@@ -248,9 +248,10 @@ class PDFImporter {
 
                 // Helper to find the index of a match number
                 const findMatchIndex = (text, matchNum) => {
-                    // Look for " 1. ", " 10. ", etc. 
-                    // We handle start of line or preceding whitespace
-                    const re = new RegExp(`(?:^|\\s)${matchNum}[.\\s]`);
+                    // Look for " 1. ", " 10. "
+                    // ALSO look for "**15" or "* 15" (asterisks before number)
+                    // (?:^|[\s*]) matches start of line, whitespace, or asterisk
+                    const re = new RegExp(`(?:^|[\\s*])${matchNum}[.\\s]`);
                     const match = re.exec(text);
                     return match ? match.index : -1;
                 };
@@ -265,8 +266,10 @@ class PDFImporter {
                         let away = line.substring(mid + hyphenMatch[0].length).trim();
 
                         // Cleanup artifacts
-                        // Remove leading match number if present (cleanup)
-                        home = home.replace(/^\d+[.\s]+\s*/, '');
+                        // 1. Remove optional leading asterisks " ** " and numbers
+                        home = home.replace(/^[*]*\s*\d+[.\s]+\s*/, '');
+                        // 2. Remove leading asterisks if they remain
+                        home = home.replace(/^[*]+\s*/, '');
 
                         if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
                             return { position, home, away, result: '' };
