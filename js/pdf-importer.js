@@ -216,16 +216,19 @@ class PDFImporter {
                 const compMatch = headerText.match(/\(([^)]+)\)/);
                 const competition = compMatch ? compMatch[1].trim() : "";
 
-                // Improved Date search: handles ranges across months ("31 enero - 1 febrero")
+                // Improved Date search: safe against "de" eating the start of the month
                 // 1. Try complex range first
-                const rangeParts = headerText.match(/(\d{1,2}\s+[a-zñáéíóúü]+\s*[-–]\s*\d{1,2}\s+[a-zñáéíóúü]+)(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
+                const rangeParts = headerText.match(/(\d{1,2}\s+[a-zñáéíóúü]+\s*[-–]\s*\d{1,2}\s+[a-zñáéíóúü]+)(?:\s*(?:de|\/|-)\s*(\d{4}))?/i);
 
                 let dateVal = "Por definir";
                 if (rangeParts) {
                     dateVal = rangeParts[1] + (rangeParts[2] ? ` de ${rangeParts[2]}` : ` de ${new Date().getFullYear()}`);
                 } else {
                     // 2. Try standard date or simple range
-                    const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)\s*[\/de\s-]+\s*([a-zñáéíóúü]{0,2}\s*[a-zñáéíóúü]{3,})(?:\s*[\/de\s-]+\s*(\d{4}))?/i);
+                    // Fix: Use non-greedy separator or explicit "de" to avoid eating 'e' from 'enero'
+                    // separated: (\s+de\s+|\s*[\/-]\s*)
+                    const dateParts = headerText.match(/(\d{1,2}(?:[-–]\d{1,2})?)(?:\s+de\s+|\s*[\/-]\s*)([a-zñáéíóúü]+)(?:\s*(?:de|\/|-)\s*(\d{4}))?/i);
+
                     if (dateParts) {
                         const day = dateParts[1];
                         let month = dateParts[2].replace(/\s+/g, '').toLowerCase();
@@ -235,6 +238,10 @@ class PDFImporter {
                         dateVal = "Por definir";
                     }
                 }
+
+                // DEBUG: Save block for user inspection
+                if (!window.PDF_DEBUG_BLOCKS) window.PDF_DEBUG_BLOCKS = {};
+                window.PDF_DEBUG_BLOCKS[number] = block;
 
                 // 3. Find Matches (Robust Substring Method)
                 const matches = [];
@@ -410,9 +417,13 @@ class PDFImporter {
 
         html += `
                 </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:1rem; padding-bottom:1rem;">
-                    <button class="btn-action" style="background:#ccc; color:#333;" id="btn-cancel-pdf">Cancelar</button>
-                    <button class="btn-action btn-add" id="btn-confirm-pdf">Confirmar e Importar</button>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:flex-start; margin-top:1rem; padding-bottom:1rem;">
+                    <button class="btn-action" style="background:#555; color:#fff; font-size:0.8rem;" onclick="viewRawPDFText()">👁️ Ver Texto PDF (Debug)</button>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-action" style="background:#ccc; color:#333;" id="btn-cancel-pdf">Cancelar</button>
+                        <button class="btn-action btn-add" id="btn-confirm-pdf">Confirmar e Importar</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -461,3 +472,29 @@ class PDFImporter {
 
 window.PDFImporter = new PDFImporter();
 window.startPDFImport = () => window.PDFImporter.startImport();
+
+window.viewRawPDFText = () => {
+    if (!window.PDF_DEBUG_BLOCKS) {
+        alert("No hay datos de depuración disponibles.");
+        return;
+    }
+
+    // Create a simple modal on top
+    const dbgOverlay = document.createElement('div');
+    dbgOverlay.className = 'modal-overlay active';
+    dbgOverlay.style.zIndex = '100000'; // Very high
+
+    let content = "";
+    for (const [num, text] of Object.entries(window.PDF_DEBUG_BLOCKS)) {
+        content += `=== JORNADA ${num} RAW BLOCK START ===\n${text}\n=== END BLOCK ===\n\n`;
+    }
+
+    dbgOverlay.innerHTML = `
+        <div class="modal" style="width:90%; height:90%; max-width:1000px; display:flex; flex-direction:column;">
+            <h3>Texto Crudo del PDF (Debug)</h3>
+            <textarea style="flex:1; width:100%; font-family:monospace; padding:1rem; white-space:pre;">${content}</textarea>
+            <button class="btn-action" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+        </div>
+    `;
+    document.body.appendChild(dbgOverlay);
+};
