@@ -329,17 +329,28 @@ class PDFImporter {
                 // If regular loop for 15 failed (because it's P15), try P15 specific patterns
                 if (!matches.find(x => x.position === 15)) {
                     const p15Patterns = [
-                        /\*\*(?:P15|15)\*\*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\*\*|$)/i,
-                        /\*\*(?:P15|15)\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)\*\*/i,
-                        /(?:^|\s)P15\s+([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
-                        /(?:^|\s)15[.\s]\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
+                        // Case 1: "**15. Home - Away**" or "**P15 Home - Away**" (Whole line wrapped in **)
+                        // Supports optional dot after 15, and whitespace flexibility
+                        /\*\*\s*(?:P15|15)[.\s]*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r*]+?)\s*\*\*/i,
+
+                        // Case 2: "**P15** Home - Away" (Only prefix wrapped)
+                        /\*\*\s*(?:P15|15)[.\s]*\*\*\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i,
+
+                        // Case 3: Standard text "15. Home - Away" or "P15 Home - Away" (No asterisks or partial)
+                        /(?:^|\s)(?:P15|15)[.\s]\s*([^\n\r-]+?)\s*[-–]\s*([^\n\r]+?)(?=\s+Jornada|$)/i
                     ];
 
                     for (const pattern of p15Patterns) {
                         const p15Found = block.match(pattern);
                         if (p15Found) {
                             let pHome = p15Found[1].trim();
-                            let pAway = p15Found[2].trim().split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
+                            // Clean potential trailing asterisks from away if regex missed them
+                            let pAway = p15Found[2].replace(/\*\*$/, '').trim();
+                            pAway = pAway.split(/\s{2,}/)[0].split(/Jornada/i)[0].trim();
+
+                            // Cleanup leading artifacts from home team (like "15. " if included by mistake)
+                            pHome = pHome.replace(/^\**\d+[.\s]+\s*/, '');
+
                             if (pHome.length > 2 && pAway.length > 2) {
                                 matches.push({ position: 15, home: pHome, away: pAway, result: '' });
                                 break;
