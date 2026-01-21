@@ -247,93 +247,97 @@ class PDFImporter {
                 const matches = [];
 
                 // Helper to find the index of a match number
-                const findMatchIndex = (text, matchNum) => {
-                    // Look for " 1. ", " 10. "
-                    // ALSO look for "**15" or "* 15" (asterisks before number)
-                    // (?:^|[\s*]) matches start of line, whitespace, or asterisk
-                    const re = new RegExp(`(?:^|[\\s*])${matchNum}[.\\s]`);
-                    const match = re.exec(text);
-                    return match ? match.index : -1;
+                const findMatchIndex = (text, matchNum, startIndex = 0) => {
+                    const re = new RegExp(`(?:^|[\\s*])${matchNum}[.\\s]`, 'g');
+                    re.lastIndex = startIndex;
+                    let match;
+                    while ((match = re.exec(text)) !== null) {
+                        return match.index;
+                    }
+                    return -1;
                 };
 
                 // Helper to clean and parse a "Home - Away" string
                 const parseMatchLine = (line, position) => {
-                    // Check for hyphen (various types)
-                    const hyphenMatch = line.match(/\s*[-–]\s*/);
+                    // Try hyphen
+                    let hyphenMatch = line.match(/\s*[-–]\s*/);
+                    // Try wide gap if no hyphen (e.g. "TEAM A   TEAM B")
+                    // require at least 3 spaces to differentiate from words in a name
+                    if (!hyphenMatch) hyphenMatch = line.match(/\s{3,}/);
+
                     if (hyphenMatch) {
                         const mid = hyphenMatch.index;
                         let home = line.substring(0, mid).trim();
                         let away = line.substring(mid + hyphenMatch[0].length).trim();
 
                         // Cleanup artifacts
-                        // 1. Remove optional leading asterisks " ** " and numbers
-                        home = home.replace(/^[*]*\s*\d+[.\s]+\s*/, '');
-                        // 2. Remove leading asterisks if they remain
-                        home = home.replace(/^[*]+\s*/, '');
+                        if (home.length > 1 && away.length > 1) {
+                            if (AppUtils.isDateString(home)) return { isDate: true };
 
-                        if (home.length > 1 && away.length > 1 && !AppUtils.isDateString(home)) {
+                            home = home.replace(/^[*]*\s*\d+[.\s]+\s*/, '');
+                            home = home.replace(/^[*]+\s*/, '');
+
                             return { position, home, away, result: '' };
                         }
-                    } else {
-                        // Fallback: Try to split by known team names if no hyphen?
-                        // For now, if no hyphen, we might assume it's a parse error or use a heuristic
-                        // But usually the hyphen is the anchors.
-                        // Special case: "Las Palmas Cordoba" (missing hyphen)
-                        // This is hard without a dictionary, but we can try to find a capitalized word break
                     }
                     return null;
                 };
 
                 for (let m = 1; m <= 15; m++) {
-                    const idxCurrent = findMatchIndex(block, m);
-                    if (idxCurrent === -1) {
-                        // Try finding P15 if m=15
-                        if (m === 15) {
-                            // P15 logic separate below
+                    let searchIdx = 0;
+                    let foundValid = false;
+
+                    // Loop to try candidates, skipping those that turn out to be dates
+                    while (!foundValid && searchIdx < block.length) {
+                        const idxCurrent = findMatchIndex(block, m, searchIdx);
+
+                        if (idxCurrent === -1) {
+                            break;
                         }
-                        continue;
-                    }
 
-                    // Find end index (start of next match)
-                    let idxNext = -1;
-                    if (m < 15) {
-                        idxNext = findMatchIndex(block, m + 1);
-                    } else {
-                        // For 15, look for "Jornada" or end of string
-                        // Usually P15 is handled separately or last.
-                    }
+                        // Determine End Index for this line
+                        let idxNext = -1;
+                        if (m < 15) {
+                            const reNext = new RegExp(`(?:^|[\\s*])${m + 1}[.\\s]`, 'g');
+                            reNext.lastIndex = idxCurrent + 3;
+                            const matchNext = reNext.exec(block);
+                            if (matchNext) idxNext = matchNext.index;
+                        }
 
-                    // If we can't find next match (e.g. 11), maybe we look for 12?
-                    // Safe cleanup: if regex missed it, we take rest of string or cutoff at reasonable length
-                    let rawLine = '';
-                    if (idxNext !== -1 && idxNext > idxCurrent) {
-                        rawLine = block.substring(idxCurrent, idxNext);
-                    } else if (m < 15) {
-                        // Next match not found? Maybe implicit. 
-                        // Take a chunk, e.g., until next newline or 100 chars
-                        // But usually if 11 is missing, structure is broken.
-                        // Let's try searching for ANY next number
-                        const nextNumRe = /(?:^|\s)(\d{1,2})[.\\s]/g;
-                        nextNumRe.lastIndex = idxCurrent + 3; // skip current number
-                        const nextM = nextNumRe.exec(block);
-                        if (nextM) {
-                            rawLine = block.substring(idxCurrent, nextM.index);
+                        let rawLine = '';
+                        if (idxNext !== -1 && idxNext > idxCurrent) {
+                            rawLine = block.substring(idxCurrent, idxNext);
                         } else {
-                            // Take until end or P15
-                            const p15Idx = block.search(/\s+(?:P15|15[.\s]|\*\*P15)/i);
-                            if (p15Idx > idxCurrent) rawLine = block.substring(idxCurrent, p15Idx);
-                            else rawLine = block.substring(idxCurrent);
+                            if (m < 15) {
+                                // Try finding ANY next number
+                                const reAnyNext = /(?:^|[\s])(\d{1,2})[.\s]/g;
+                                reAnyNext.lastIndex = idxCurrent + 4;
+                                const nextM = reAnyNext.exec(block);
+                                if (nextM) rawLine = block.substring(idxCurrent, nextM.index);
+                                else {
+                                    // Check for P15 marker
+                                    const p15Idx = block.indexOf('P15', idxCurrent);
+                                    if (p15Idx > idxCurrent) rawLine = block.substring(idxCurrent, p15Idx);
+                                    else rawLine = block.substring(idxCurrent);
+                                }
+                            } else {
+                                rawLine = block.substring(idxCurrent);
+                            }
                         }
-                    } else {
-                        // Last match (15) or manual logic
-                        rawLine = block.substring(idxCurrent, idxCurrent + 200); // Caps length
+
+                        // Clean and Parse
+                        const cleanLine = rawLine.replace(/[\r\n]+/g, ' ').trim();
+                        const parsed = parseMatchLine(cleanLine, m);
+
+                        // Check validity
+                        if (parsed && !parsed.isDate) {
+                            matches.push(parsed);
+                            foundValid = true;
+                        } else {
+                            // It was a date artifact or garbage, try next occurrence
+                            searchIdx = idxCurrent + 1;
+                        }
                     }
-
-                    // Clean newlines
-                    rawLine = rawLine.replace(/[\r\n]+/g, ' ').trim();
-
-                    const parsed = parseMatchLine(rawLine, m);
-                    if (parsed) matches.push(parsed);
                 }
 
                 // If regular loop for 15 failed (because it's P15), try P15 specific patterns
