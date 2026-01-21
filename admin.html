@@ -166,6 +166,11 @@
                             <input type="checkbox" id="tg-enabled">
                             <label for="tg-enabled" style="font-weight:bold;">🔔 Reporte Automático</label>
                         </div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:0.5rem;">
+                            <input type="checkbox" id="tg-reminder-enabled">
+                            <label for="tg-reminder-enabled" style="font-weight:bold;">🕒 Recordatorio Jueves
+                                9:00</label>
+                        </div>
 
                         <p
                             style="font-size:0.7rem; color:#666; background:#fffde7; padding:5px; border-radius:4px; border:1px solid #fff59d;">
@@ -456,6 +461,7 @@
                 document.getElementById('tg-token').value = tg.token || '';
                 document.getElementById('tg-chat').value = tg.chatId || '';
                 document.getElementById('tg-enabled').checked = tg.enabled || false;
+                document.getElementById('tg-reminder-enabled').checked = tg.reminderEnabled || false;
             }
         }
 
@@ -464,7 +470,8 @@
                 id: 'telegram',
                 token: document.getElementById('tg-token').value.trim(),
                 chatId: document.getElementById('tg-chat').value.trim(),
-                enabled: document.getElementById('tg-enabled').checked
+                enabled: document.getElementById('tg-enabled').checked,
+                reminderEnabled: document.getElementById('tg-reminder-enabled').checked
             };
             await window.DataService.save('config', config);
             alert('Configuración de Telegram guardada.');

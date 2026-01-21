@@ -222,6 +222,70 @@ window.TelegramService = {
             })
         });
         return await res.json();
+    },
+    async checkThursdayReminder() {
+        if (!window.DataService) return;
+
+        try {
+            // 1. Get Config
+            const config = await window.DataService.getAll('config');
+            const tg = config.find(c => c.id === 'telegram');
+
+            if (!tg || !tg.enabled || !tg.reminderEnabled || !tg.token || !tg.chatId) return;
+
+            // 2. Check Time: Is it Thursday and past 9:00?
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon... 4=Thu
+            const hour = now.getHours();
+
+            // Strict check: Only on Thursdays after 9:00 AM
+            // If user wants it to be sent "even if I open it Friday", we'd change this.
+            // But "Por fin es jueves" makes no sense on Friday.
+            if (dayOfWeek !== 4 || hour < 9) return;
+
+            // 3. Find target Jornada (This coming weekend)
+            const jornadas = await window.DataService.getAll('jornadas');
+
+            // Filter: Active, Date is in the future (or today), and date is within next 5 days
+            // We want to target the Jornada of THIS coming Sunday.
+
+            const targetJornada = jornadas.find(j => {
+                if (!j.active) return false;
+                // If already sent, skip
+                if (j.thursdayReminderSent) return false;
+
+                const jDate = AppUtils.parseDate(j.date);
+                if (!jDate) return false;
+
+                // Time diff in milliseconds
+                const diff = jDate.getTime() - now.getTime();
+                const diffDays = diff / (1000 * 3600 * 24);
+
+                // We expect the Jornada to be roughly 0 to 4 days ahead (Thursday -> Sunday is 3 days)
+                return diffDays >= 0 && diffDays <= 4;
+            });
+
+            if (targetJornada) {
+                console.log(`TelegramService: Sending Thursday Reminder for Jornada ${targetJornada.number}...`);
+
+                const msg = `¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada ${targetJornada.number}.\n🔗 [Peña Maulas](https://peñamaulas.com)`;
+
+                const res = await this.sendRaw(tg.token, tg.chatId, msg);
+
+                if (res.ok) {
+                    // Mark as sent to avoid duplicates
+                    targetJornada.thursdayReminderSent = true;
+                    // We only update this specific field to minimize conflict (though DataService saves whole obj usually)
+                    await window.DataService.save('jornadas', targetJornada);
+                    console.log("TelegramService: Reminder sent and logged.");
+                } else {
+                    console.error("TelegramService: Failed to send reminder", res);
+                }
+            }
+
+        } catch (e) {
+            console.error("TelegramService (Reminder) Error:", e);
+        }
     }
 };
 

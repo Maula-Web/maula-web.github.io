@@ -165,8 +165,10 @@ class PDFImporter {
 
             // We allow it if:
             // 1. It satisfies the strict rules (Sunday + Literal)
-            // OR 2. It has very high density (>=8) and is either Sunday or TBD (we assume it will be Sunday)
-            const isValid = (isSunday && isLaLigaComp) || (hasLaLigaTeams && (isSunday || isPorDefinir));
+            // OR 2. It has very high density (>=8) - In this case we TRUST the content over the date.
+            // Many times date parsing fails or it's a "Wednesday" journey that we still want to see.
+            // We rely on the user to check/fix date if needed, but we don't hide the data.
+            const isValid = (isSunday && isLaLigaComp) || hasLaLigaTeams;
 
             if (!isValid) {
                 console.log(`DEBUG: J${j.number} RECHAZADA. Sunday=${isSunday}, TBD=${isPorDefinir}, Density=${hasLaLigaTeams}, CompMatch=${isLaLigaComp}`);
