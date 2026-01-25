@@ -1,5 +1,6 @@
 /* Global Styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700&family=Raleway:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap');
+
 /* Vertical Layout Overrides */
 body.layout-vertical .sidebar-menu {
     top: 0;
@@ -2946,4 +2947,18 @@ body.mobile-mode .p-divider {
     font-size: 0.65rem;
     color: #bbb;
     font-style: italic;
+}
+
+/* Jornada Navigation Arrows */
+#btn-prev-jornada:hover:not(:disabled),
+#btn-next-jornada:hover:not(:disabled) {
+    background: #673ab7 !important;
+    color: #fff !important;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(103, 58, 183, 0.4);
+}
+
+#btn-prev-jornada:active:not(:disabled),
+#btn-next-jornada:active:not(:disabled) {
+    transform: scale(0.95);
 }

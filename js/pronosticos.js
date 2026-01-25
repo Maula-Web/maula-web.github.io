@@ -63,6 +63,8 @@ class PronosticoManager {
         this.viewJornadaContent = document.getElementById('view-jornada-content');
         this.btnCloseViewJornada = document.getElementById('btnCloseViewJornada');
         this.selModalJornada = document.getElementById('sel-modal-jornada');
+        this.btnPrevJornada = document.getElementById('btn-prev-jornada');
+        this.btnNextJornada = document.getElementById('btn-next-jornada');
 
 
         this.btnToggleSummary = document.getElementById('btn-toggle-summary');
@@ -140,6 +142,19 @@ class PronosticoManager {
                 this.showJornadaForecasts(e.target.value);
             });
         }
+
+        // Navigation Arrow Events
+        if (this.btnPrevJornada) {
+            this.btnPrevJornada.addEventListener('click', () => {
+                this.navigateJornada('prev');
+            });
+        }
+        if (this.btnNextJornada) {
+            this.btnNextJornada.addEventListener('click', () => {
+                this.navigateJornada('next');
+            });
+        }
+
 
         // Doubles Save
         if (this.btnSaveDoubles) this.btnSaveDoubles.addEventListener('click', () => this.saveDoubles());
@@ -1024,12 +1039,71 @@ class PronosticoManager {
                 this.viewJornadaModal.style.opacity = '1';
             }
 
+            // Update navigation button states
+            this.updateNavigationButtons();
+
+
         } catch (err) {
             console.error("CRITICAL ERROR IN TECHNICAL PANEL:", err);
             alert("Error al abrir el panel técnico: " + err.message);
             if (this.viewJornadaModal) this.viewJornadaModal.style.display = 'none';
         }
     }
+
+    navigateJornada(direction) {
+        if (!this.selModalJornada || this.selModalJornada.options.length === 0) return;
+
+        const currentIndex = this.selModalJornada.selectedIndex;
+        let newIndex;
+
+        if (direction === 'prev') {
+            // Previous jornada (higher number, earlier in the list)
+            newIndex = currentIndex - 1;
+        } else if (direction === 'next') {
+            // Next jornada (lower number, later in the list)
+            newIndex = currentIndex + 1;
+        }
+
+        // Check boundaries
+        if (newIndex >= 0 && newIndex < this.selModalJornada.options.length) {
+            this.selModalJornada.selectedIndex = newIndex;
+            const newJornadaId = this.selModalJornada.value;
+            this.showJornadaForecasts(newJornadaId);
+        }
+
+        // Update button states
+        this.updateNavigationButtons();
+    }
+
+    updateNavigationButtons() {
+        if (!this.selModalJornada || !this.btnPrevJornada || !this.btnNextJornada) return;
+
+        const currentIndex = this.selModalJornada.selectedIndex;
+        const totalOptions = this.selModalJornada.options.length;
+
+        // Disable/enable previous button
+        if (currentIndex <= 0) {
+            this.btnPrevJornada.disabled = true;
+            this.btnPrevJornada.style.opacity = '0.3';
+            this.btnPrevJornada.style.cursor = 'not-allowed';
+        } else {
+            this.btnPrevJornada.disabled = false;
+            this.btnPrevJornada.style.opacity = '1';
+            this.btnPrevJornada.style.cursor = 'pointer';
+        }
+
+        // Disable/enable next button
+        if (currentIndex >= totalOptions - 1) {
+            this.btnNextJornada.disabled = true;
+            this.btnNextJornada.style.opacity = '0.3';
+            this.btnNextJornada.style.cursor = 'not-allowed';
+        } else {
+            this.btnNextJornada.disabled = false;
+            this.btnNextJornada.style.opacity = '1';
+            this.btnNextJornada.style.cursor = 'pointer';
+        }
+    }
+
 
     updateStickyScrollbar() {
         if (!this.summaryContainer || !this.stickyScrollContainer || !this.summaryTable) return;
