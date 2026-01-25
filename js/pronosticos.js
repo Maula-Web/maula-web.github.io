@@ -1051,57 +1051,69 @@ class PronosticoManager {
     }
 
     navigateJornada(direction) {
-        if (!this.selModalJornada || this.selModalJornada.options.length === 0) return;
+        if (!this.selModalJornada || this.selModalJornada.options.length === 0) {
+            console.warn('No se puede navegar: dropdown no disponible');
+            return;
+        }
 
         const currentIndex = this.selModalJornada.selectedIndex;
         let newIndex;
 
+        // El dropdown está ordenado descendente: Jornada 10, 9, 8, 7...
+        // Índice 0 = Jornada más reciente (número mayor)
+        // Índice N = Jornada más antigua (número menor)
+
         if (direction === 'prev') {
-            // Previous jornada (lower number, later in the list - older jornadas)
+            // Botón izquierdo: ir a jornada ANTERIOR (número menor)
+            // Necesitamos avanzar en la lista (índice mayor)
             newIndex = currentIndex + 1;
         } else if (direction === 'next') {
-            // Next jornada (higher number, earlier in the list - newer jornadas)
+            // Botón derecho: ir a jornada SIGUIENTE (número mayor)
+            // Necesitamos retroceder en la lista (índice menor)
             newIndex = currentIndex - 1;
+        } else {
+            console.warn('Dirección de navegación no válida:', direction);
+            return;
         }
 
-        // Check boundaries
+        // Verificar límites
         if (newIndex >= 0 && newIndex < this.selModalJornada.options.length) {
             this.selModalJornada.selectedIndex = newIndex;
             const newJornadaId = this.selModalJornada.value;
+            console.log(`Navegando a jornada ${newJornadaId} (índice ${newIndex})`);
             this.showJornadaForecasts(newJornadaId);
+        } else {
+            console.log('Límite alcanzado, no se puede navegar más');
         }
 
-        // Update button states
+        // Actualizar estado de los botones
         this.updateNavigationButtons();
     }
 
     updateNavigationButtons() {
-        if (!this.selModalJornada || !this.btnPrevJornada || !this.btnNextJornada) return;
+        if (!this.selModalJornada || !this.btnPrevJornada || !this.btnNextJornada) {
+            console.warn('No se pueden actualizar botones de navegación: elementos no disponibles');
+            return;
+        }
 
         const currentIndex = this.selModalJornada.selectedIndex;
         const totalOptions = this.selModalJornada.options.length;
 
-        // Disable/enable previous button
-        if (currentIndex <= 0) {
-            this.btnPrevJornada.disabled = true;
-            this.btnPrevJornada.style.opacity = '0.3';
-            this.btnPrevJornada.style.cursor = 'not-allowed';
-        } else {
-            this.btnPrevJornada.disabled = false;
-            this.btnPrevJornada.style.opacity = '1';
-            this.btnPrevJornada.style.cursor = 'pointer';
-        }
+        console.log(`Actualizando botones: índice ${currentIndex} de ${totalOptions}`);
 
-        // Disable/enable next button
-        if (currentIndex >= totalOptions - 1) {
-            this.btnNextJornada.disabled = true;
-            this.btnNextJornada.style.opacity = '0.3';
-            this.btnNextJornada.style.cursor = 'not-allowed';
-        } else {
-            this.btnNextJornada.disabled = false;
-            this.btnNextJornada.style.opacity = '1';
-            this.btnNextJornada.style.cursor = 'pointer';
-        }
+        // Botón PREV (◀): va a jornada anterior (número menor)
+        // Está al final de la lista (índice mayor)
+        const canGoPrev = currentIndex < totalOptions - 1;
+        this.btnPrevJornada.disabled = !canGoPrev;
+        this.btnPrevJornada.style.opacity = canGoPrev ? '1' : '0.3';
+        this.btnPrevJornada.style.cursor = canGoPrev ? 'pointer' : 'not-allowed';
+
+        // Botón NEXT (▶): va a jornada siguiente (número mayor)
+        // Está al principio de la lista (índice menor)
+        const canGoNext = currentIndex > 0;
+        this.btnNextJornada.disabled = !canGoNext;
+        this.btnNextJornada.style.opacity = canGoNext ? '1' : '0.3';
+        this.btnNextJornada.style.cursor = canGoNext ? 'pointer' : 'not-allowed';
     }
 
 
