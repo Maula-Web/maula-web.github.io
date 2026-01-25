@@ -1,0 +1,13 @@
+EMILIOes1MAULA
+
+
+En la Peña tenemos una broma interna. Cuando estamos frustrados o enfadados echamos a Emilio del grupo temjporalmente. Ya te digo que es una broma privada. No intentes entenderla.
+El caso es que me gustaría que en la hoja de Dashboard, aparezca un boton junto a las tarjetas de la fila superior, para anular durante 15 minutos el acceso del socio emilio@maulas.com
+Este tiempo se podrá configurar en el apartado Administración y el mensaje a anviar también.
+Al pulsar este botón ocurrirán varias cosas:
+Este usuario no podrá acceder a la web en el tiempo estipulado.
+Este socio nunca conocerá cuánto tiempo estará "expulsado".
+Se enviará un mensaje a Telegram con el texto "Nombre ha expulsado a Emilio de la web." Sustituyendo Nombre por el socio que haya llevado a cabo la acción.
+Para que esto funcione, El usuario emilio no podrá dar de alta socios nuevos ni cambiar losa datos de ningún socio ni el suyo propio, a no ser que introduzca la clave "EMILIOes1MAULA" sensible a mayúsculas y minúsculas.
+Esta contraseña no tiene nada que ver con su contraseña de acceso. Emilio podrá llevar a cabo cualquier otra acción excepto estas dos especificadas.
+Si se te ocurre alguna manera de que este socio "hackee" el sistema de broma, dímela e intentaremos cerrarla.

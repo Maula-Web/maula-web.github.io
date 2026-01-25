@@ -1,0 +1,5 @@
+🏠 Inicio: https://maula-web.github.io/index.html
+🔐 Login: https://maula-web.github.io/login.html
+📊 Pronósticos: https://maula-web.github.io/pronosticos.html
+👥 Socios: https://maula-web.github.io/socios.html
+📅 Jornadas: https://maula-web.github.io/jornadas.html
