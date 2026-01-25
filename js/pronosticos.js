@@ -1057,11 +1057,11 @@ class PronosticoManager {
         let newIndex;
 
         if (direction === 'prev') {
-            // Previous jornada (higher number, earlier in the list)
-            newIndex = currentIndex - 1;
-        } else if (direction === 'next') {
-            // Next jornada (lower number, later in the list)
+            // Previous jornada (lower number, later in the list - older jornadas)
             newIndex = currentIndex + 1;
+        } else if (direction === 'next') {
+            // Next jornada (higher number, earlier in the list - newer jornadas)
+            newIndex = currentIndex - 1;
         }
 
         // Check boundaries
