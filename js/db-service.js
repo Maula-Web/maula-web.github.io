@@ -30,8 +30,8 @@ class DataService {
         await this.migrateCollection('logs', 'maulas_logs');
         await this.migrateCollection('docs', 'maulas_docs');
 
-        // 1. Members Check
-        const memSnap = await this.db.collection('members').limit(1).get();
+        // 1. Members Check - PROTECT AGAINST OVERWRITING
+        const memSnap = await this.db.collection('members').get();
         if (memSnap.empty) {
             console.log("DB: Seeding defaults...");
             await this.seedDefaults();
