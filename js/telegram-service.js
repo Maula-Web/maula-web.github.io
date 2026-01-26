@@ -216,18 +216,8 @@ window.TelegramService = {
 
         if (!tg || !tg.enabled) return;
 
-        // Build absolute URL for production
-        // We prioritize the known GitHub Pages URL if we are on that domain
-        let urlWeb = "https://maula-web.github.io/votaciones.html";
-
-        // Fallback for different environments
-        if (!window.location.hostname.includes('maula-web')) {
-            urlWeb = window.location.origin + window.location.pathname;
-            if (!urlWeb.includes('votaciones.html')) {
-                const lastSlash = urlWeb.lastIndexOf('/');
-                urlWeb = urlWeb.substring(0, lastSlash + 1) + 'votaciones.html';
-            }
-        }
+        // Use the official GitHub URL for consistency
+        const urlWeb = "https://maula-web.github.io/votaciones.html";
 
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
@@ -237,8 +227,8 @@ window.TelegramService = {
         const keyboard = {
             inline_keyboard: [[
                 {
-                    text: "🗳️ VOTAR AHORA",
-                    web_app: { url: urlWeb }
+                    text: "🗳️ ABRIR WEB Y VOTAR",
+                    url: urlWeb  // CHANGED FROM web_app TO url TO FIX ERROR 400
                 }
             ]]
         };
