@@ -425,7 +425,8 @@ class VotingSystem {
                     tgStatus = " y avisada por Telegram.";
                 } else {
                     console.error("VotingSystem: Telegram Notification Failed:", res);
-                    tgStatus = " (Error enviando a Telegram: " + (res ? res.description : "Sin respuesta") + ")";
+                    const errorMsg = res ? (res.description || "Error desconocido") : "Sin respuesta";
+                    tgStatus = " (Telegram falló: " + errorMsg + ")";
                 }
             }
 

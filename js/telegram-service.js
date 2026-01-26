@@ -215,21 +215,23 @@ window.TelegramService = {
         const tg = await window.DataService.getDoc('config', 'telegram');
         if (!tg || !tg.enabled) return;
 
+        // The URL must match EXACTLY what's in BotFather
         const urlProd = "https://maula-web.github.io/votaciones.html";
+
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
         const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${safeTitle}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
 
-        // Strategy 1: Attempt the professional Mini App integrated button (web_app)
+        // Strategy 1: Professional Mini App integrated button
         const res = await this.sendRaw(tg.token, tg.chatId, msg, {
             reply_markup: {
                 inline_keyboard: [[{ text: "🗳️ VOTAR AHORA", web_app: { url: urlProd } }]]
             }
         });
 
-        // Strategy 2: Fallback to standard URL button if needed
+        // Strategy 2: Fallback to standard URL button if Strategy 1 fails
         if (!res.ok) {
-            console.warn("TGService: Mini App button failed, falling back to standard link...", res.description);
+            console.warn("TGService: Strategy 1 failed, using Strategy 2 fallback.", res.description);
             return await this.sendRaw(tg.token, tg.chatId, msg, {
                 reply_markup: {
                     inline_keyboard: [[{ text: "🗳️ ABRIR WEB Y VOTAR", url: urlProd }]]
