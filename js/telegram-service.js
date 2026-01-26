@@ -213,29 +213,30 @@ window.TelegramService = {
     async sendVoteNotification(vote) {
         if (!window.DataService) return;
         const tg = await window.DataService.getDoc('config', 'telegram');
-
         if (!tg || !tg.enabled) return;
 
-        // Official Direct Link for the Mini App
-        const urlWebApp = "https://t.me/Maula_Penia_Bot/votaciones";
-
+        const urlProd = "https://maula-web.github.io/votaciones.html";
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
-
         const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${safeTitle}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
 
-        const keyboard = {
-            inline_keyboard: [[
-                {
-                    text: "🗳️ VOTAR EN TELEGRAM",
-                    url: urlWebApp
-                }
-            ]]
-        };
-
-        return await this.sendRaw(tg.token, tg.chatId, msg, {
-            reply_markup: keyboard
+        // Strategy 1: Attempt the professional Mini App integrated button (web_app)
+        const res = await this.sendRaw(tg.token, tg.chatId, msg, {
+            reply_markup: {
+                inline_keyboard: [[{ text: "🗳️ VOTAR AHORA", web_app: { url: urlProd } }]]
+            }
         });
+
+        // Strategy 2: Fallback to standard URL button if needed
+        if (!res.ok) {
+            console.warn("TGService: Mini App button failed, falling back to standard link...", res.description);
+            return await this.sendRaw(tg.token, tg.chatId, msg, {
+                reply_markup: {
+                    inline_keyboard: [[{ text: "🗳️ ABRIR WEB Y VOTAR", url: urlProd }]]
+                }
+            });
+        }
+        return res;
     },
 
     async sendVoteResultReport(v, members) {
