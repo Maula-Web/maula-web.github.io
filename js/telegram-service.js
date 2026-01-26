@@ -210,16 +210,43 @@ window.TelegramService = {
         return currentCandidates;
     },
 
-    async sendRaw(token, chatId, text) {
+    async sendVoteNotification(vote) {
+        if (!window.DataService) return;
+        const config = await window.DataService.getAll('config');
+        const tg = config.find(c => c.id === 'telegram');
+        if (!tg || !tg.enabled) return;
+
+        const urlWeb = window.location.origin + window.location.pathname.replace('index.html', '').replace('votaciones.html', '') + 'votaciones.html';
+
+        const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${vote.title}*\n_${vote.description || ''}_\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
+
+        const keyboard = {
+            inline_keyboard: [
+                [
+                    {
+                        text: "🗳️ VOTAR AHORA",
+                        web_app: { url: urlWeb }
+                    }
+                ]
+            ]
+        };
+
+        return await this.sendRaw(tg.token, tg.chatId, msg, { reply_markup: keyboard });
+    },
+
+    async sendRaw(token, chatId, text, extra = {}) {
         const url = `https://api.telegram.org/bot${token}/sendMessage`;
+        const body = {
+            chat_id: chatId,
+            text: text,
+            parse_mode: 'Markdown',
+            ...extra
+        };
+
         const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: text,
-                parse_mode: 'Markdown'
-            })
+            body: JSON.stringify(body)
         });
         return await res.json();
     },

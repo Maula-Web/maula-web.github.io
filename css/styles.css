@@ -733,6 +733,16 @@ body {
     transform: scale(1.05);
 }
 
+.btn-votaciones {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+.btn-votaciones:hover {
+    background-color: #eee !important;
+    transform: scale(1.05);
+}
+
 /* Active states with colors */
 .btn-socios.active {
     color: var(--primary-green) !important;

@@ -289,6 +289,7 @@ const Auth = {
                 <a href="pronosticos.html" class="btn-primary btn-pronosticos ${page === 'pronosticos.html' ? 'active' : ''}">PRONÓSTICOS</a>
                 <a href="resultados.html" class="btn-primary btn-resultados ${page === 'resultados.html' ? 'active' : ''}">RESULTADOS</a>
                 <a href="resumen-temporada.html" class="btn-primary btn-resumen ${page === 'resumen-temporada.html' ? 'active' : ''}">RESUMEN TEMPORADA</a>
+                <a href="votaciones.html" class="btn-primary btn-votaciones ${page === 'votaciones.html' ? 'active' : ''}" style="background:white; color:black; font-weight:900;">VOTACIONES</a>
                 <a href="admin.html" class="btn-primary btn-admin ${page === 'admin.html' ? 'active' : ''}">ADMINISTRACIÓN</a>
                 <a href="theme-editor.html" class="btn-primary btn-theme-editor ${page === 'theme-editor.html' ? 'active' : ''}" style="color:var(--primary-gold); border-color:var(--primary-gold);">IDENTIDAD VISUAL</a>
             `;
@@ -308,6 +309,21 @@ const Auth = {
                     logo.style.cursor = 'pointer';
                     logo.onclick = () => window.location.href = 'index.html';
                 }
+            }
+
+            // 2b. Ensure Votaciones button exists
+            if (!sidebar.querySelector('a[href="votaciones.html"]')) {
+                const votBtn = document.createElement('a');
+                votBtn.href = "votaciones.html";
+                votBtn.className = `btn-primary btn-votaciones ${page === 'votaciones.html' ? 'active' : ''}`;
+                votBtn.style.background = "white";
+                votBtn.style.color = "black";
+                votBtn.style.fontWeight = "900";
+                votBtn.textContent = "VOTACIONES";
+                // Insert before admin
+                const adminBtn = sidebar.querySelector('a[href="admin.html"]');
+                if (adminBtn) sidebar.insertBefore(votBtn, adminBtn);
+                else sidebar.appendChild(votBtn);
             }
 
             // 2. Ensure Theme Editor button exists
