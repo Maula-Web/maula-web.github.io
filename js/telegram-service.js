@@ -216,8 +216,9 @@ window.TelegramService = {
 
         if (!tg || !tg.enabled) return;
 
-        // Use the official GitHub URL for consistency
-        const urlWeb = "https://maula-web.github.io/votaciones.html";
+        // Using the Telegram Direct Link for the Mini App created in BotFather
+        // This opens as an integrated window inside Telegram.
+        const urlWebApp = "https://t.me/Maula_Penia_Bot/votaciones";
 
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
@@ -227,8 +228,8 @@ window.TelegramService = {
         const keyboard = {
             inline_keyboard: [[
                 {
-                    text: "🗳️ ABRIR WEB Y VOTAR",
-                    url: urlWeb  // CHANGED FROM web_app TO url TO FIX ERROR 400
+                    text: "🗳️ VOTAR EN TELEGRAM",
+                    url: urlWebApp
                 }
             ]]
         };
