@@ -14,20 +14,7 @@ class VotingSystem {
         this.init();
     }
 
-    async handleTelegramAuth() {
-        if (!this.tg || !this.tg.initDataUnsafe || !this.tg.initDataUnsafe.user) return;
-
-        const tgUser = this.tg.initDataUnsafe.user;
-        const tgUsername = (tgUser.username || "").toLowerCase();
-
-        console.log("VotingSystem: Telegram session detected", tgUsername);
-
-        if (!this.currentUser && this.members.length > 0) {
-            this.tryAutoLogin(tgUsername);
-        }
-    }
-
-    tryAutoLogin(tgUsername) {
+    async tryAutoLogin(tgUsername) {
         if (!tgUsername) {
             console.warn("VotingSystem: No Telegram username provided for auto-login.");
             return;
@@ -38,7 +25,7 @@ class VotingSystem {
         // Normalize TG username for comparison
         const cleanTg = tgUsername.toLowerCase().replace('@', '').trim();
 
-        // Match by new tgNick field or phone
+        // Match by new tgNick field or phone (as nickname)
         const member = this.members.find(m =>
             (m.tgNick && m.tgNick.toLowerCase().trim() === cleanTg) ||
             (m.phone && m.phone.toLowerCase().replace('@', '').trim() === cleanTg)
@@ -76,8 +63,10 @@ class VotingSystem {
 
         // After loading members, try auto-login if TG detected
         if (this.tg && !this.currentUser) {
-            const tgUser = this.tg.initDataUnsafe.user;
-            if (tgUser) this.tryAutoLogin(tgUser.username);
+            this.attemptTgAuth();
+            // Retry twice because Telegram sometimes takes some ms to populate initDataUnsafe
+            setTimeout(() => this.attemptTgAuth(), 500);
+            setTimeout(() => this.attemptTgAuth(), 2500);
         }
 
         this.render();
@@ -87,6 +76,21 @@ class VotingSystem {
 
         // Auto-check for newly finished votations
         setInterval(() => this.checkAutoNotifications(), 10000);
+    }
+
+    attemptTgAuth() {
+        if (this.currentUser || !this.tg) return;
+        const tgData = this.tg.initDataUnsafe;
+        const tgUser = tgData ? tgData.user : null;
+
+        if (tgUser) {
+            if (tgUser.username) {
+                this.tryAutoLogin(tgUser.username);
+            } else if (tgUser.first_name) {
+                console.log("VotingSystem: No username, using first_name as fallback...");
+                this.tryAutoLogin(tgUser.first_name);
+            }
+        }
     }
 
     cacheDOM() {
@@ -329,17 +333,13 @@ class VotingSystem {
         let newVoteVal;
 
         if (v.allowMultiple) {
-            // Handle array for multiple choice
             let currentArray = Array.isArray(currentVoteVal) ? currentVoteVal : (currentVoteVal !== undefined && currentVoteVal !== null ? [currentVoteVal] : []);
             if (currentArray.includes(optionIdx)) {
-                // Toggle off
                 newVoteVal = currentArray.filter(i => i !== optionIdx);
             } else {
-                // Toggle on
                 newVoteVal = [...currentArray, optionIdx];
             }
         } else {
-            // Single choice (toggle off if already selected, or switch)
             newVoteVal = (currentVoteVal === optionIdx) ? null : optionIdx;
         }
 
@@ -371,6 +371,7 @@ class VotingSystem {
         if (!v) return;
 
         v.deadline = new Date().toISOString(); // Set deadline to now
+        v.tgNotified = false; // Reset to allow auto-notification of final results
         try {
             await window.DataService.save('votaciones', v);
             await this.loadData();
@@ -383,7 +384,6 @@ class VotingSystem {
     openModal() {
         if (!this.currentUser) return alert("Inicia sesión para proponer una votación.");
         this.modal.classList.add('active');
-        // Set default date to today + 3 days
         const d = new Date();
         d.setDate(d.getDate() + 3);
         this.inpDate.value = d.toISOString().split('T')[0];
@@ -424,17 +424,14 @@ class VotingSystem {
         };
 
         try {
-            console.log("VotingSystem: Saving new vote...", newVote);
             await window.DataService.save('votaciones', newVote);
 
             let tgStatus = " (Sin aviso Telegram)";
             if (window.TelegramService) {
-                console.log("VotingSystem: Notifying Telegram...");
                 const res = await window.TelegramService.sendVoteNotification(newVote);
                 if (res && res.ok) {
                     tgStatus = " y avisada por Telegram.";
                 } else {
-                    console.error("VotingSystem: Telegram Notification Failed:", res);
                     const errorMsg = res ? (res.description || "Error desconocido") : "Sin respuesta";
                     tgStatus = " (Telegram falló: " + errorMsg + ")";
                 }
@@ -451,5 +448,4 @@ class VotingSystem {
     }
 }
 
-// Global instance
 window.votingSystem = new VotingSystem();
