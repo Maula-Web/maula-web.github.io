@@ -221,8 +221,9 @@
 
             <!-- 3. Logs & Prank (Right Column) -->
             <div style="display:flex; flex-direction:column; gap:1rem;">
-                <div class="config-card" style="border-top-color: #d32f2f;">
+                <div id="prank-admin-card" class="config-card" style="border-top-color: #d32f2f; display: none;">
                     <h2 style="color: #d32f2f;">🎭 Echar a Emilio</h2>
+
                     <form id="prank-form" style="font-size:0.9rem;">
 
                         <div class="form-row">
@@ -520,12 +521,18 @@
             if (!window.DataService) return;
             // Check if user is Emilio
             const user = JSON.parse(sessionStorage.getItem('maulas_user'));
+            const prankCard = document.getElementById('prank-admin-card');
+
             if (user && user.email.toLowerCase() === 'emilio@maulas.com') {
-                document.getElementById('prank-form').parentElement.style.display = 'none';
+                if (prankCard) prankCard.remove(); // Completely remove from DOM for Emilio
                 return;
             }
 
+            // If not Emilio, show the card
+            if (prankCard) prankCard.style.display = 'block';
+
             const config = await window.DataService.getAll('config');
+
             const prank = config.find(c => c.id === 'prank');
             if (prank) {
                 document.getElementById('prank-duration').value = prank.duration || 15;
