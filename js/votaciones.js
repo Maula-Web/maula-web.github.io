@@ -28,16 +28,24 @@ class VotingSystem {
     }
 
     tryAutoLogin(tgUsername) {
-        if (!tgUsername) return;
+        if (!tgUsername) {
+            console.warn("VotingSystem: No Telegram username provided for auto-login.");
+            return;
+        }
 
-        // Match by new tgNick field primarily
+        console.log("VotingSystem: Attempting auto-login for:", tgUsername);
+
+        // Normalize TG username for comparison
+        const cleanTg = tgUsername.toLowerCase().replace('@', '').trim();
+
+        // Match by new tgNick field or phone
         const member = this.members.find(m =>
-            (m.tgNick && m.tgNick.toLowerCase() === tgUsername.replace('@', '')) ||
-            (m.phone && m.phone.toLowerCase().replace('@', '') === tgUsername.replace('@', ''))
+            (m.tgNick && m.tgNick.toLowerCase().trim() === cleanTg) ||
+            (m.phone && m.phone.toLowerCase().replace('@', '').trim() === cleanTg)
         );
 
         if (member) {
-            console.log("VotingSystem: Auto-logged in via Telegram", member.name);
+            console.log("VotingSystem: Auto-login SUCCESS for", member.name);
             const userData = {
                 id: member.id,
                 name: member.name,
@@ -49,6 +57,8 @@ class VotingSystem {
             sessionStorage.setItem('maulas_user', JSON.stringify(userData));
             this.currentUser = userData;
             this.render();
+        } else {
+            console.warn("VotingSystem: No matching member found for TG Nick:", cleanTg);
         }
     }
 
