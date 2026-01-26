@@ -221,17 +221,21 @@ window.TelegramService = {
         if (!urlWeb.includes('votaciones.html')) {
             urlWeb = urlWeb.substring(0, urlWeb.lastIndexOf('/') + 1) + 'votaciones.html';
         }
-        // Ensure we don't double the filename if it was already there
         urlWeb = urlWeb.replace('votaciones.html/votaciones.html', 'votaciones.html');
 
-        const isHttps = urlWeb.startsWith('https://');
+        // Telegram is very strict about web_app buttons:
+        // 1. Must be HTTPS
+        // 2. Must not be localhost / 127.0.0.1
+        const isProductionHttps = urlWeb.startsWith('https://') &&
+            !urlWeb.includes('localhost') &&
+            !urlWeb.includes('127.0.0.1');
 
         // Escape basic markdown in description
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
 
         const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${vote.title.replace(/[*_`]/g, '')}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
 
-        const button = isHttps ? {
+        const button = isProductionHttps ? {
             text: "🗳️ VOTAR AHORA",
             web_app: { url: urlWeb }
         } : {
