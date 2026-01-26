@@ -216,8 +216,8 @@ window.TelegramService = {
 
         if (!tg || !tg.enabled) return;
 
-        // Internal Telegram protocol often works better to force the Mini App player
-        const urlWebApp = "tg://resolve?domain=Maula_Penia_Bot&appname=votaciones";
+        // Official Direct Link for the Mini App
+        const urlWebApp = "https://t.me/Maula_Penia_Bot/votaciones";
 
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
