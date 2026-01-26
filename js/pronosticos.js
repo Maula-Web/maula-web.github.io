@@ -930,6 +930,10 @@ class PronosticoManager {
                 html += `<th style="border: 3px solid #ffd700; padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 70px; min-width: 70px; font-size: 0.9rem; color: #000; background: linear-gradient(to bottom, #ffd700, #ffecb3); font-weight: 900; letter-spacing: 1px; white-space: nowrap; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);">⭐ COLUMNA MAULA</th>`;
             }
 
+            // Results Column Header
+            html += `<th style="border: 1px solid #333; padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 60px; min-width: 60px; font-size: 1.1rem; color: #fff; background: #333; font-weight: bold; letter-spacing: 1px; white-space: nowrap;">RESULTADO REAL</th>`;
+
+
             html += `</tr></thead><tbody>`;
 
             // Hit counters for summary row
@@ -1005,6 +1009,11 @@ class PronosticoManager {
                     html += `<td style="${cellStyle}">${sign}</td>`;
                 }
 
+                // Official Result Cell
+                const resVal = officialResult || '-';
+                html += `<td style="border: 1px solid #333; padding: 8px; text-align: center; width: 60px; min-width: 60px; font-weight: 900; font-size: 1.5rem; color: #fff; background: #444;">${resVal}</td>`;
+
+
                 html += `</tr>`;
             });
 
@@ -1029,6 +1038,10 @@ class PronosticoManager {
             if (perfectColumn) {
                 html += `<td style="border: 3px solid #ffa000; text-align: center; font-weight: 900; font-size: 1.8rem; color: #000; background: #ffd700;">${perfectHits}</td>`;
             }
+
+            // Empty cell for Results column in footer
+            html += `<td style="background: #333; border: 1px solid #333;"></td>`;
+
 
             html += `</tr></tfoot></table>`;
 
