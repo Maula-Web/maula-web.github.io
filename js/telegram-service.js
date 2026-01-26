@@ -219,32 +219,28 @@ window.TelegramService = {
         // Build absolute URL correctly
         let urlWeb = window.location.origin + window.location.pathname;
         if (!urlWeb.includes('votaciones.html')) {
-            urlWeb = urlWeb.substring(0, urlWeb.lastIndexOf('/') + 1) + 'votaciones.html';
+            const lastSlash = urlWeb.lastIndexOf('/');
+            urlWeb = urlWeb.substring(0, lastSlash + 1) + 'votaciones.html';
         }
-        urlWeb = urlWeb.replace('votaciones.html/votaciones.html', 'votaciones.html');
 
-        // Telegram is very strict about web_app buttons:
-        // 1. Must be HTTPS
-        // 2. Must not be localhost / 127.0.0.1
-        const isProductionHttps = urlWeb.startsWith('https://') &&
-            !urlWeb.includes('localhost') &&
-            !urlWeb.includes('127.0.0.1');
-
-        // Escape basic markdown in description
+        // Escape basic markdown in title/description
+        const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
 
-        const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${vote.title.replace(/[*_`]/g, '')}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
+        const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${safeTitle}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
 
-        const button = isProductionHttps ? {
-            text: "🗳️ VOTAR AHORA",
-            web_app: { url: urlWeb }
-        } : {
-            text: "🔗 ABRIR WEB PARA VOTAR",
-            url: urlWeb
+        // Using standard 'url' button for maximum compatibility and to avoid BUTTON_TYPE_INVALID
+        const keyboard = {
+            inline_keyboard: [[
+                {
+                    text: "🗳️ ABRIR WEB Y VOTAR",
+                    url: urlWeb
+                }
+            ]]
         };
 
         return await this.sendRaw(tg.token, tg.chatId, msg, {
-            reply_markup: { inline_keyboard: [[button]] }
+            reply_markup: keyboard
         });
     },
 
