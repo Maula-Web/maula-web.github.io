@@ -216,9 +216,8 @@ window.TelegramService = {
 
         if (!tg || !tg.enabled) return;
 
-        // Using the Telegram Direct Link for the Mini App created in BotFather
-        // This opens as an integrated window inside Telegram.
-        const urlWebApp = "https://t.me/Maula_Penia_Bot/votaciones";
+        // Internal Telegram protocol often works better to force the Mini App player
+        const urlWebApp = "tg://resolve?domain=Maula_Penia_Bot&appname=votaciones";
 
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
