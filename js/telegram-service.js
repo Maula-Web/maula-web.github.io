@@ -215,30 +215,18 @@ window.TelegramService = {
         const tg = await window.DataService.getDoc('config', 'telegram');
         if (!tg || !tg.enabled) return;
 
-        const urlProd = "https://maula-web.github.io/votaciones.html";
-        const urlTgLink = "https://t.me/Maula_Penia_Bot/votaciones";
+        // The official direct app link is the only one that works reliably in groups
+        const urlApp = "https://t.me/Maula_Penia_Bot/votaciones";
 
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
         const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${safeTitle}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
 
-        // Strategy 1: Attempt professional Mini App integrated button (web_app)
-        let res = await this.sendRaw(tg.token, tg.chatId, msg, {
+        return await this.sendRaw(tg.token, tg.chatId, msg, {
             reply_markup: {
-                inline_keyboard: [[{ text: "🗳️ VOTAR AHORA", web_app: { url: urlProd } }]]
+                inline_keyboard: [[{ text: "🗳️ VOTAR EN TELEGRAM", url: urlApp }]]
             }
         });
-
-        // Strategy 2: Fallback for Groups (Direct App Link)
-        if (!res.ok) {
-            console.warn("TGService: Strategy 1 failed, using Strategy 2 fallback.", res.description);
-            res = await this.sendRaw(tg.token, tg.chatId, msg, {
-                reply_markup: {
-                    inline_keyboard: [[{ text: "🗳️ VOTAR EN TELEGRAM", url: urlTgLink }]]
-                }
-            });
-        }
-        return res;
     },
 
     async sendVoteResultReport(v, members) {

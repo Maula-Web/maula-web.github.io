@@ -64,6 +64,13 @@ class DataService {
     }
 
     async seedDefaults() {
+        // RADICAL PROTECTION: If there's any member, stop completely.
+        const memSnap = await this.db.collection('members').get();
+        if (!memSnap.empty) {
+            console.log("DB: Members already exist, skipping seed.");
+            return;
+        }
+
         const names = [
             "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
             "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
@@ -75,10 +82,9 @@ class DataService {
         let id = 1;
 
         for (const name of names) {
-            // Generate email: remove spaces, lowercase, remove accents
             const cleanName = name.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
-                .replace(/[^a-z0-9]/g, ""); // Remove non-alphanumeric
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, "");
 
             const email = `${cleanName}@maulas.com`;
 
@@ -88,6 +94,7 @@ class DataService {
                 name: name,
                 email: email,
                 phone: '',
+                tgNick: '', // Initialize new field
                 joinedDate: new Date().toISOString()
             });
             id++;
