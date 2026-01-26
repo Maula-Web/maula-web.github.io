@@ -216,25 +216,29 @@ window.TelegramService = {
 
         if (!tg || !tg.enabled) return;
 
-        // Build absolute URL correctly
-        let urlWeb = window.location.origin + window.location.pathname;
-        if (!urlWeb.includes('votaciones.html')) {
-            const lastSlash = urlWeb.lastIndexOf('/');
-            urlWeb = urlWeb.substring(0, lastSlash + 1) + 'votaciones.html';
+        // Build absolute URL for production
+        // We prioritize the known GitHub Pages URL if we are on that domain
+        let urlWeb = "https://maula-web.github.io/votaciones.html";
+
+        // Fallback for different environments
+        if (!window.location.hostname.includes('maula-web')) {
+            urlWeb = window.location.origin + window.location.pathname;
+            if (!urlWeb.includes('votaciones.html')) {
+                const lastSlash = urlWeb.lastIndexOf('/');
+                urlWeb = urlWeb.substring(0, lastSlash + 1) + 'votaciones.html';
+            }
         }
 
-        // Escape basic markdown in title/description
         const safeTitle = (vote.title || "").replace(/[*_`]/g, '');
         const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
 
         const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${safeTitle}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
 
-        // Using standard 'url' button for maximum compatibility and to avoid BUTTON_TYPE_INVALID
         const keyboard = {
             inline_keyboard: [[
                 {
-                    text: "🗳️ ABRIR WEB Y VOTAR",
-                    url: urlWeb
+                    text: "🗳️ VOTAR AHORA",
+                    web_app: { url: urlWeb }
                 }
             ]]
         };
