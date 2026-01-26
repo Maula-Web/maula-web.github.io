@@ -50,7 +50,7 @@ class DashboardManager {
         this.members.forEach(m => {
             memberStats[m.id] = {
                 id: m.id,
-                name: m.name + (m.surname ? ' ' + m.surname : ''),
+                name: AppUtils.getMemberName(m),
                 totalPoints: 0,
                 totalHits: 0
             };
@@ -130,7 +130,7 @@ class DashboardManager {
 
                 jornadaResults.push({
                     memberId: member.id,
-                    name: member.name + (member.surname ? ' ' + member.surname : ''),
+                    name: AppUtils.getMemberName(member),
                     hits: hits,
                     points: points,
                     isLate: isLate,
@@ -434,7 +434,7 @@ class DashboardManager {
             btn.style.cursor = 'not-allowed';
             cooldownMsg.style.display = 'block';
         } else {
-            btn.onclick = () => this.executePrank(user.name);
+            btn.onclick = () => this.executePrank(AppUtils.getMemberName(user));
         }
     }
 

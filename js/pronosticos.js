@@ -254,15 +254,15 @@ class PronosticoManager {
 
     populateDropdowns() {
         const sortedMembers = [...this.members].sort((a, b) => {
-            const nameA = `${a.name} ${a.surname || ''}`.toLowerCase();
-            const nameB = `${b.name} ${b.surname || ''}`.toLowerCase();
+            const nameA = AppUtils.getMemberName(a).toLowerCase();
+            const nameB = AppUtils.getMemberName(b).toLowerCase();
             return nameA.localeCompare(nameB);
         });
 
         sortedMembers.forEach(m => {
             const opt = document.createElement('option');
             opt.value = m.id;
-            opt.textContent = `${m.name} ${m.surname || ''}`;
+            opt.textContent = AppUtils.getMemberName(m);
             this.selMember.appendChild(opt);
         });
 
@@ -371,8 +371,9 @@ class PronosticoManager {
                 const sign = of.selection[idx];
                 if (!sign) return '';
 
+                const displayName = AppUtils.getMemberName(member);
                 return `
-                    <div class="others-item" title="${member.name} ${member.surname || ''}: ${sign}" data-sign="${sign}">
+                    <div class="others-item" title="${displayName}: ${sign}" data-sign="${sign}">
                          <span>${sign}</span>
                     </div>
                 `;
@@ -743,7 +744,7 @@ class PronosticoManager {
         tbody.innerHTML = '';
 
         // 1. Sort Members alphabetically
-        const sortedMembers = [...this.members].sort((a, b) => a.name.localeCompare(b.name));
+        const sortedMembers = [...this.members].sort((a, b) => AppUtils.getMemberName(a).localeCompare(AppUtils.getMemberName(b)));
 
         // 2. Build Header
         const headerRow = document.createElement('tr');
@@ -755,7 +756,7 @@ class PronosticoManager {
         sortedMembers.forEach((m, index) => {
             const th = document.createElement('th');
             th.className = 'summary-header-cell';
-            th.textContent = m.name;
+            th.textContent = AppUtils.getMemberName(m);
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);

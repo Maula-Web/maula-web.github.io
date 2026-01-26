@@ -76,7 +76,7 @@ class ResumenManager {
         const stats = {};
         this.members.forEach(m => {
             stats[m.id] = {
-                name: m.name,
+                name: AppUtils.getMemberName(m),
                 points: 0,
                 history: [],
                 prizes: []
@@ -727,7 +727,7 @@ class ResumenManager {
 
                 doublesData.push({
                     jornadaNum: j.number,
-                    memberName: m.name,
+                    memberName: AppUtils.getMemberName(m),
                     hits: hits,
                     selection: sel,
                     date: p.date

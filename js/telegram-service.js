@@ -30,7 +30,7 @@ window.TelegramService = {
             members.forEach(m => memberHistory[m.id] = []);
 
             const globalStats = {};
-            members.forEach(m => globalStats[m.id] = { name: m.name, totalPoints: 0 });
+            members.forEach(m => globalStats[m.id] = { name: AppUtils.getMemberName(m), totalPoints: 0 });
 
             // Build history up to current jornada
             activeJornadas.forEach(aj => {
@@ -85,7 +85,7 @@ window.TelegramService = {
                 const prize = (hits >= minHits) ? ((currentJ.prizeRates && currentJ.prizeRates[hits]) || 0) : 0;
                 return {
                     id: m.id,
-                    name: m.name,
+                    name: AppUtils.getMemberName(m),
                     hits,
                     points,
                     prize,

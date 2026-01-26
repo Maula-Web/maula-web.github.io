@@ -79,7 +79,7 @@ class MemberManager {
                 <td class="table-socio-id">${member.id}</td>
                 <td class="table-socio-name">${member.name}</td>
                 <td class="table-socio-email"><a href="mailto:${member.email}" style="color:inherit; text-decoration:none;">${member.email}</a></td>
-                <td class="table-socio-phone">${member.phone || '-'}</td>
+                <td class="table-socio-phone">${member.phone || '<span style="color:#999; font-style:italic;">Sin Apodo</span>'}</td>
                 <td class="action-cell">${actionHtml}</td>
             `;
             this.tableBody.appendChild(tr);

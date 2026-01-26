@@ -218,12 +218,13 @@ const Auth = {
             const userData = {
                 id: member.id,
                 name: member.name,
+                phone: member.phone, // Store nickname
                 email: member.email,
                 loginTime: new Date().toISOString()
             };
             sessionStorage.setItem('maulas_user', JSON.stringify(userData));
 
-            await this.logAction(member.name, 'Inicio de Sesión');
+            await this.logAction(member.phone || member.name, 'Inicio de Sesión');
             return true;
         } catch (e) {
             console.error(e);

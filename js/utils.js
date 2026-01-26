@@ -209,8 +209,19 @@ const AppUtils = {
         const entries = Object.entries(map);
         const fuzzyMatch = entries.find(([key]) => t.includes(key) || key.includes(t));
         return fuzzyMatch ? fuzzyMatch[1] : '';
+    },
+
+    /**
+     * Returns the name to display for a member (Nickname if exists, Name otherwise)
+     */
+    getMemberName(member) {
+        if (!member) return 'Invitado';
+        // We use 'phone' field as Nickname per user request
+        return (member.phone && member.phone.trim() !== '') ? member.phone : member.name;
     }
 };
+
+
 
 window.AppUtils = AppUtils;
 
@@ -249,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let userName = 'Invitado';
             try {
                 const u = JSON.parse(sessionStorage.getItem('maulas_user'));
-                if (u && u.name) userName = u.name;
+                if (u) userName = AppUtils.getMemberName(u);
             } catch (e) { }
 
             clockDiv.innerHTML = `<span style="color:#ffd54f; font-weight:bold; margin-right:10px;">👤 ${userName}</span> ${dateStr} ${timeStr}`;

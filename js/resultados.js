@@ -43,7 +43,7 @@ class ResultsManager {
         const memberStats = {};
         this.members.forEach(m => {
             memberStats[m.id] = {
-                name: m.name,
+                name: AppUtils.getMemberName(m),
                 grandTotal: 0,
                 baseTotal: 0,
                 bonusTotal: 0,
@@ -146,7 +146,7 @@ class ResultsManager {
         sortedMembers.forEach(m => {
             // Apply equal sizing
             theadHtml += `<th style="z-index:2; width:80px; min-width:80px; vertical-align:middle; padding:10px 2px; word-wrap: break-word; white-space: normal; background-color: var(--resultados-header-bg);">
-                            <div style="font-weight:bold; line-height:1.2; font-size:0.95rem; color:var(--resultados-header-text);">${m.name}</div>
+                            <div style="font-weight:bold; line-height:1.2; font-size:0.95rem; color:var(--resultados-header-text);">${AppUtils.getMemberName(m)}</div>
                             <div style="font-size:0.7rem; font-weight:normal; color:var(--resultados-header-text); opacity:0.8;">ID: ${m.id}</div>
                           </th>`;
         });
