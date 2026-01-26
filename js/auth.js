@@ -20,9 +20,11 @@ const Auth = {
         if (window.location.pathname.includes('login.html')) return;
 
         const user = sessionStorage.getItem('maulas_user');
-        if (!user) {
+        const isTg = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData;
+
+        if (!user && !isTg) {
             window.location.href = 'login.html';
-        } else {
+        } else if (user) {
             this.checkPrankStatus(JSON.parse(user));
         }
     },

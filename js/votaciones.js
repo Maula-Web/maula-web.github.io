@@ -7,8 +7,8 @@ class VotingSystem {
         // Telegram WebApp Integration
         this.tg = window.Telegram ? window.Telegram.WebApp : null;
         if (this.tg) {
+            this.tg.ready();
             this.tg.expand();
-            this.handleTelegramAuth();
         }
 
         this.init();
