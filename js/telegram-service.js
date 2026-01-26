@@ -212,16 +212,17 @@ window.TelegramService = {
 
     async sendVoteNotification(vote) {
         if (!window.DataService) return;
-        const config = await window.DataService.getAll('config');
-        const tg = config.find(c => c.id === 'telegram');
+        const tg = await window.DataService.getDoc('config', 'telegram');
 
         if (!tg || !tg.enabled) return;
 
         // Build absolute URL correctly
-        let urlWeb = window.location.href.split('?')[0].split('#')[0];
+        let urlWeb = window.location.origin + window.location.pathname;
         if (!urlWeb.includes('votaciones.html')) {
             urlWeb = urlWeb.substring(0, urlWeb.lastIndexOf('/') + 1) + 'votaciones.html';
         }
+        // Ensure we don't double the filename if it was already there
+        urlWeb = urlWeb.replace('votaciones.html/votaciones.html', 'votaciones.html');
 
         const isHttps = urlWeb.startsWith('https://');
 
@@ -245,29 +246,40 @@ window.TelegramService = {
 
     async sendVoteResultReport(v, members) {
         if (!window.DataService) return;
-        const config = await window.DataService.getAll('config');
-        const tg = config.find(c => c.id === 'telegram');
+        const tg = await window.DataService.getDoc('config', 'telegram');
         if (!tg || !tg.enabled) return;
 
         const options = v.options || ["Sí", "No"];
         const votes = v.votes || {};
-        const totalVotes = Object.keys(votes).length;
-        const counts = options.map((_, idx) => Object.values(votes).filter(val => val === idx).length);
+        const totalVoters = Object.keys(votes).length;
+
+        // Count each option (works for both single values and arrays)
+        const counts = options.map((_, idx) => {
+            let c = 0;
+            Object.values(votes).forEach(val => {
+                if (Array.isArray(val)) {
+                    if (val.includes(idx)) c++;
+                } else if (val === idx) {
+                    c++;
+                }
+            });
+            return c;
+        });
 
         const maxVal = Math.max(...counts);
-        const winners = counts.filter(c => c === maxVal);
-        const winnerIdx = counts.indexOf(maxVal);
-        const winnerPct = totalVotes > 0 ? (maxVal / totalVotes * 100) : 0;
+        const winnerIndices = counts.reduce((acc, c, i) => (c === maxVal ? [...acc, i] : acc), []);
+        const winnerPct = totalVoters > 0 ? (maxVal / totalVoters * 100) : 0;
 
         let resText = "";
-        if (totalVotes === 0) resText = "❌ Sin votos.";
-        else if (winners.length > 1) resText = "⚖️ EMPATE.";
-        else if (winnerPct >= v.threshold) resText = `🏆 GANADOR: *${options[winnerIdx]}* (${winnerPct.toFixed(1)}%)`;
+        if (totalVoters === 0) resText = "❌ Sin votos.";
+        else if (winnerIndices.length > 1) resText = `⚖️ EMPATE ENTRE: ${winnerIndices.map(i => options[i].toUpperCase()).join(', ')}`;
+        else if (winnerPct >= v.threshold) resText = `🏆 GANADOR: *${options[winnerIndices[0]]}* (${winnerPct.toFixed(1)}%)`;
         else resText = `❌ NO ALCANZA MAYORÍA (${winnerPct.toFixed(1)}% < ${v.threshold}%)`;
 
-        let msg = `🏁 *VOTACIÓN FINALIZADA* 🏁\n\n*Tema:* ${v.title.replace(/[*_`]/g, '')}\n\n*Resultados:*\n`;
+        let msg = `🏁 *VOTACIÓN FINALIZADA* 🏁\n\n*Tema:* ${v.title.replace(/[*_`]/g, '')}\n${v.allowMultiple ? '_(Votación múltiple)_\n' : ''}\n*Resultados:*\n`;
         options.forEach((o, i) => {
-            msg += `- ${o}: ${counts[i]} votos (${totalVotes > 0 ? (counts[i] / totalVotes * 100).toFixed(0) : 0}%)\n`;
+            const pct = totalVoters > 0 ? (counts[i] / totalVoters * 100).toFixed(0) : 0;
+            msg += `- ${o}: ${counts[i]} votos (${pct}%)\n`;
         });
 
         msg += `\n${resText}`;

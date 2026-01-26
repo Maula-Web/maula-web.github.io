@@ -129,6 +129,11 @@ class DataService {
         return snap.docs.map(doc => doc.data());
     }
 
+    async getDoc(collectionName, docId) {
+        const doc = await this.db.collection(collectionName).doc(String(docId)).get();
+        return doc.exists ? doc.data() : null;
+    }
+
     // Generic Add/Update (Upsert)
     async save(collectionName, item) {
         if (!item.id) item.id = Date.now();

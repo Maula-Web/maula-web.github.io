@@ -92,6 +92,7 @@ class VotingSystem {
         this.inpDate = document.getElementById('inp-vote-date');
         this.inpTime = document.getElementById('inp-vote-time');
         this.inpThreshold = document.getElementById('inp-vote-threshold');
+        this.inpMultiple = document.getElementById('inp-vote-multiple');
     }
 
     bindEvents() {
@@ -120,12 +121,12 @@ class VotingSystem {
 
         for (const v of this.votaciones) {
             const deadline = new Date(v.deadline);
-            if (now > deadline && !v.whatsappNotified) {
+            if (now > deadline && !v.tgNotified) {
                 console.log(`VotingSystem: Votation ${v.id} finished. Notifying Telegram Automatically.`);
 
                 if (window.TelegramService) {
                     await window.TelegramService.sendVoteResultReport(v, this.members);
-                    v.whatsappNotified = true; // Mark as notified
+                    v.tgNotified = true; // Mark as notified
                     await window.DataService.save('votaciones', v);
                     changed = true;
                 }
@@ -153,8 +154,18 @@ class VotingSystem {
             const deadline = new Date(v.deadline);
             const isFinished = now > deadline;
             const options = v.options || ["Sí", "No"];
-            const totalVotes = Object.keys(v.votes || {}).length;
-            const myVote = (this.currentUser && v.votes) ? v.votes[this.currentUser.id] : null;
+
+            // Normalize votes to array for multiple choice handling
+            const getMyVotes = () => {
+                if (!this.currentUser || !v.votes) return [];
+                const val = v.votes[this.currentUser.id];
+                if (val === undefined || val === null) return [];
+                return Array.isArray(val) ? val : [val];
+            };
+            const myVotes = getMyVotes();
+
+            // Total unique members who voted
+            const totalVoters = Object.keys(v.votes || {}).length;
 
             const card = document.createElement('div');
             card.className = `vote-card ${isFinished ? 'finished' : 'active'}`;
@@ -174,6 +185,7 @@ class VotingSystem {
                     <span>Propuesta por: <b>${v.creatorName}</b></span>
                     <span>Límite: ${new Date(v.deadline).toLocaleString()}</span>
                     <span>Para ganar: <b>${v.threshold}%</b> de los votos</span>
+                    ${v.allowMultiple ? `<span style="color:var(--primary-blue); font-weight:bold;">✅ Elección Múltiple Permitida</span>` : ''}
                 </div>
 
                 ${!isFinished ? `
@@ -185,9 +197,18 @@ class VotingSystem {
 
                 <div class="vote-options">
                     ${options.map((opt, idx) => {
-                        const count = Object.values(v.votes || {}).filter(val => val === idx).length;
-                        const pct = totalVotes > 0 ? (count / totalVotes * 100).toFixed(0) : 0;
-                        const isSelected = myVote === idx;
+                        // Count how many times this option appears in all votes
+                        let count = 0;
+                        Object.values(v.votes || {}).forEach(voteVal => {
+                            if (Array.isArray(voteVal)) {
+                                if (voteVal.includes(idx)) count++;
+                            } else {
+                                if (voteVal === idx) count++;
+                            }
+                        });
+
+                        const pct = totalVoters > 0 ? (count / totalVoters * 100).toFixed(0) : 0;
+                        const isSelected = myVotes.includes(idx);
 
                         return `
                             <div class="option-wrapper">
@@ -207,11 +228,11 @@ class VotingSystem {
 
                 <div class="vote-results">
                     <div class="voters-list">
-                        <b>Votos (${totalVotes}):</b> ${this.formatVoters(v)}
+                        <b>Socios que han votado (${totalVoters}):</b> ${this.formatVoters(v)}
                     </div>
                 </div>
 
-                ${isFinished ? this.renderWinnerInfo(v, totalVotes, options) : ''}
+                ${isFinished ? this.renderWinnerInfo(v, totalVoters, options) : ''}
             `;
             this.listContainer.appendChild(card);
         });
@@ -221,30 +242,38 @@ class VotingSystem {
 
     formatVoters(v) {
         if (!v.votes || Object.keys(v.votes).length === 0) return 'Nadie ha votado aún';
-        const options = v.options || ["Sí", "No"];
-        return Object.entries(v.votes).map(([uid, optIdx]) => {
+        return Object.keys(v.votes).map(uid => {
             const member = this.members.find(m => String(m.id) === String(uid));
-            const name = member ? (member.phone || member.name) : 'Socio ' + uid;
-            return `<span title="${options[optIdx]}">${name}</span>`;
+            return member ? (member.phone || member.name) : 'Socio ' + uid;
         }).join(', ');
     }
 
-    renderWinnerInfo(v, totalVotes, options) {
-        if (totalVotes === 0) return `<div class="winning-info" style="background:#eee; color:#666; border-color:#ccc;">Empate / Sin votos</div>`;
+    renderWinnerInfo(v, totalVoters, options) {
+        if (totalVoters === 0) return `<div class="winning-info" style="background:#eee; color:#666; border-color:#ccc;">Empate / Sin votos</div>`;
 
-        const counts = options.map((_, idx) => Object.values(v.votes).filter(val => val === idx).length);
+        // Calculate counts for each option
+        const counts = options.map((_, idx) => {
+            let c = 0;
+            Object.values(v.votes || {}).forEach(voteVal => {
+                if (Array.isArray(voteVal)) {
+                    if (voteVal.includes(idx)) c++;
+                } else {
+                    if (voteVal === idx) c++;
+                }
+            });
+            return c;
+        });
+
         const maxVal = Math.max(...counts);
-        const winnerIdx = counts.indexOf(maxVal);
-        const winnerPct = (maxVal / totalVotes * 100);
+        const winnerIndices = counts.reduce((acc, c, i) => (c === maxVal ? [...acc, i] : acc), []);
+        const winnerPct = (maxVal / totalVoters * 100);
 
-        const isTied = counts.filter(c => c === maxVal).length > 1;
-
-        if (isTied) {
-            return `<div class="winning-info" style="background:#fce4ec; color:#c2185b; border-color:#f8bbd0;">EMPATE</div>`;
+        if (winnerIndices.length > 1) {
+            return `<div class="winning-info" style="background:#fce4ec; color:#c2185b; border-color:#f8bbd0;">EMPATE ENTRE: ${winnerIndices.map(i => options[i].toUpperCase()).join(', ')}</div>`;
         }
 
         if (winnerPct >= v.threshold) {
-            return `<div class="winning-info">GANADOR: ${options[winnerIdx].toUpperCase()} (${winnerPct.toFixed(1)}%)</div>`;
+            return `<div class="winning-info">GANADOR: ${options[winnerIndices[0]].toUpperCase()} (${winnerPct.toFixed(1)}%)</div>`;
         } else {
             return `<div class="winning-info" style="background:#eee; color:#666; border-color:#ccc;">NO ALCANZA MAYORÍA (${winnerPct.toFixed(1)}% < ${v.threshold}%)</div>`;
         }
@@ -285,7 +314,26 @@ class VotingSystem {
         if (now > new Date(v.deadline)) return alert("La votación ya ha finalizado.");
 
         if (!v.votes) v.votes = {};
-        v.votes[this.currentUser.id] = optionIdx;
+
+        const currentVoteVal = v.votes[this.currentUser.id];
+        let newVoteVal;
+
+        if (v.allowMultiple) {
+            // Handle array for multiple choice
+            let currentArray = Array.isArray(currentVoteVal) ? currentVoteVal : (currentVoteVal !== undefined && currentVoteVal !== null ? [currentVoteVal] : []);
+            if (currentArray.includes(optionIdx)) {
+                // Toggle off
+                newVoteVal = currentArray.filter(i => i !== optionIdx);
+            } else {
+                // Toggle on
+                newVoteVal = [...currentArray, optionIdx];
+            }
+        } else {
+            // Single choice (toggle off if already selected, or switch)
+            newVoteVal = (currentVoteVal === optionIdx) ? null : optionIdx;
+        }
+
+        v.votes[this.currentUser.id] = newVoteVal;
 
         try {
             await window.DataService.save('votaciones', v);
@@ -345,6 +393,7 @@ class VotingSystem {
         const deadlineDate = this.inpDate.value;
         const deadlineTime = this.inpTime.value;
         const threshold = parseInt(this.inpThreshold.value) || 51;
+        const allowMultiple = this.inpMultiple.checked;
 
         const options = optsRaw ? optsRaw.split(',').map(o => o.trim()) : ["Sí", "No"];
         const deadline = new Date(`${deadlineDate}T${deadlineTime}`).toISOString();
@@ -356,25 +405,34 @@ class VotingSystem {
             options,
             deadline,
             threshold,
+            allowMultiple,
             creatorId: this.currentUser.id,
             creatorName: this.currentUser.phone || this.currentUser.name,
             createdAt: new Date().toISOString(),
             votes: {},
-            whatsappNotified: false
+            tgNotified: false
         };
 
         try {
             console.log("VotingSystem: Saving new vote...", newVote);
             await window.DataService.save('votaciones', newVote);
 
+            let tgStatus = " (Sin aviso Telegram)";
             if (window.TelegramService) {
-                await window.TelegramService.sendVoteNotification(newVote);
+                console.log("VotingSystem: Notifying Telegram...");
+                const res = await window.TelegramService.sendVoteNotification(newVote);
+                if (res && res.ok) {
+                    tgStatus = " y avisada por Telegram.";
+                } else {
+                    console.error("VotingSystem: Telegram Notification Failed:", res);
+                    tgStatus = " (Error enviando a Telegram: " + (res ? res.description : "Sin respuesta") + ")";
+                }
             }
 
             await this.loadData();
             this.render();
             this.closeModal();
-            alert("Votación creada con éxito y avisada por Telegram.");
+            alert("Votación creada con éxito" + tgStatus);
         } catch (e) {
             console.error("VotingSystem: Error in handleSubmit:", e);
             alert("Error al crear la votación.");
