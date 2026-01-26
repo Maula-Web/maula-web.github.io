@@ -214,24 +214,33 @@ window.TelegramService = {
         if (!window.DataService) return;
         const config = await window.DataService.getAll('config');
         const tg = config.find(c => c.id === 'telegram');
+
         if (!tg || !tg.enabled) return;
 
-        const urlWeb = window.location.origin + window.location.pathname.replace('index.html', '').replace('votaciones.html', '') + 'votaciones.html';
+        // Build absolute URL correctly
+        let urlWeb = window.location.href.split('?')[0].split('#')[0];
+        if (!urlWeb.includes('votaciones.html')) {
+            urlWeb = urlWeb.substring(0, urlWeb.lastIndexOf('/') + 1) + 'votaciones.html';
+        }
 
-        const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${vote.title}*\n_${vote.description || ''}_\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
+        const isHttps = urlWeb.startsWith('https://');
 
-        const keyboard = {
-            inline_keyboard: [
-                [
-                    {
-                        text: "🗳️ VOTAR AHORA",
-                        web_app: { url: urlWeb }
-                    }
-                ]
-            ]
+        // Escape basic markdown in description
+        const safeDesc = (vote.description || "").replace(/[*_`]/g, '');
+
+        const msg = `🆕 *NUEVA VOTACIÓN* 🗳️\n\n*${vote.title.replace(/[*_`]/g, '')}*\n${safeDesc ? `_${safeDesc}_` : ''}\n\n⌛ Límite: ${new Date(vote.deadline).toLocaleString()}\n✅ Mínimo para ganar: ${vote.threshold}%\n\nPuedes votar pulsando el botón de abajo:`;
+
+        const button = isHttps ? {
+            text: "🗳️ VOTAR AHORA",
+            web_app: { url: urlWeb }
+        } : {
+            text: "🔗 ABRIR WEB PARA VOTAR",
+            url: urlWeb
         };
 
-        return await this.sendRaw(tg.token, tg.chatId, msg, { reply_markup: keyboard });
+        return await this.sendRaw(tg.token, tg.chatId, msg, {
+            reply_markup: { inline_keyboard: [[button]] }
+        });
     },
 
     async sendRaw(token, chatId, text, extra = {}) {
@@ -243,12 +252,19 @@ window.TelegramService = {
             ...extra
         };
 
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-        return await res.json();
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            if (!data.ok) console.error("TGService Error Details:", data);
+            return data;
+        } catch (e) {
+            console.error("TGService Fetch Error:", e);
+            return { ok: false, description: e.message };
+        }
     },
     async checkThursdayReminder() {
         if (!window.DataService) return;

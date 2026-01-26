@@ -301,11 +301,19 @@ class VotingSystem {
         };
 
         try {
+            console.log("VotingSystem: Saving new vote...", newVote);
             await window.DataService.save('votaciones', newVote);
 
             // Notify Telegram
             if (window.TelegramService) {
-                await window.TelegramService.sendVoteNotification(newVote);
+                console.log("VotingSystem: Notifying Telegram...");
+                const tgRes = await window.TelegramService.sendVoteNotification(newVote);
+                console.log("VotingSystem: Telegram Response:", tgRes);
+                if (tgRes && tgRes.ok === false) {
+                    console.error("VotingSystem: Telegram Error:", tgRes.description);
+                }
+            } else {
+                console.warn("VotingSystem: TelegramService not found on window.");
             }
 
             await this.loadData();
@@ -313,7 +321,7 @@ class VotingSystem {
             this.closeModal();
             alert("Votación creada con éxito y avisada por Telegram.");
         } catch (e) {
-            console.error(e);
+            console.error("VotingSystem: Error in handleSubmit:", e);
             alert("Error al crear la votación.");
         }
     }
