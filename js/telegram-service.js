@@ -243,6 +243,38 @@ window.TelegramService = {
         });
     },
 
+    async sendVoteResultReport(v, members) {
+        if (!window.DataService) return;
+        const config = await window.DataService.getAll('config');
+        const tg = config.find(c => c.id === 'telegram');
+        if (!tg || !tg.enabled) return;
+
+        const options = v.options || ["Sí", "No"];
+        const votes = v.votes || {};
+        const totalVotes = Object.keys(votes).length;
+        const counts = options.map((_, idx) => Object.values(votes).filter(val => val === idx).length);
+
+        const maxVal = Math.max(...counts);
+        const winners = counts.filter(c => c === maxVal);
+        const winnerIdx = counts.indexOf(maxVal);
+        const winnerPct = totalVotes > 0 ? (maxVal / totalVotes * 100) : 0;
+
+        let resText = "";
+        if (totalVotes === 0) resText = "❌ Sin votos.";
+        else if (winners.length > 1) resText = "⚖️ EMPATE.";
+        else if (winnerPct >= v.threshold) resText = `🏆 GANADOR: *${options[winnerIdx]}* (${winnerPct.toFixed(1)}%)`;
+        else resText = `❌ NO ALCANZA MAYORÍA (${winnerPct.toFixed(1)}% < ${v.threshold}%)`;
+
+        let msg = `🏁 *VOTACIÓN FINALIZADA* 🏁\n\n*Tema:* ${v.title.replace(/[*_`]/g, '')}\n\n*Resultados:*\n`;
+        options.forEach((o, i) => {
+            msg += `- ${o}: ${counts[i]} votos (${totalVotes > 0 ? (counts[i] / totalVotes * 100).toFixed(0) : 0}%)\n`;
+        });
+
+        msg += `\n${resText}`;
+
+        return await this.sendRaw(tg.token, tg.chatId, msg);
+    },
+
     async sendRaw(token, chatId, text, extra = {}) {
         const url = `https://api.telegram.org/bot${token}/sendMessage`;
         const body = {

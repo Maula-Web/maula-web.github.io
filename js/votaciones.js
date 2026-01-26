@@ -30,10 +30,10 @@ class VotingSystem {
     tryAutoLogin(tgUsername) {
         if (!tgUsername) return;
 
-        // Match by "phone" (nickname) or name if they put their telegram username there
+        // Match by new tgNick field primarily
         const member = this.members.find(m =>
-            (m.phone && m.phone.toLowerCase().replace('@', '') === tgUsername.replace('@', '')) ||
-            (m.name && m.name.toLowerCase().includes(tgUsername.replace('@', '')))
+            (m.tgNick && m.tgNick.toLowerCase() === tgUsername.replace('@', '')) ||
+            (m.phone && m.phone.toLowerCase().replace('@', '') === tgUsername.replace('@', ''))
         );
 
         if (member) {
@@ -42,6 +42,7 @@ class VotingSystem {
                 id: member.id,
                 name: member.name,
                 phone: member.phone,
+                tgNick: member.tgNick,
                 email: member.email,
                 loginTime: new Date().toISOString()
             };
@@ -73,6 +74,9 @@ class VotingSystem {
 
         // Update countdowns every second
         setInterval(() => this.updateCountdowns(), 1000);
+
+        // Auto-check for newly finished votations
+        setInterval(() => this.checkAutoNotifications(), 10000);
     }
 
     cacheDOM() {
@@ -110,6 +114,30 @@ class VotingSystem {
         }
     }
 
+    async checkAutoNotifications() {
+        const now = new Date();
+        let changed = false;
+
+        for (const v of this.votaciones) {
+            const deadline = new Date(v.deadline);
+            if (now > deadline && !v.whatsappNotified) {
+                console.log(`VotingSystem: Votation ${v.id} finished. Notifying Telegram Automatically.`);
+
+                if (window.TelegramService) {
+                    await window.TelegramService.sendVoteResultReport(v, this.members);
+                    v.whatsappNotified = true; // Mark as notified
+                    await window.DataService.save('votaciones', v);
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            await this.loadData();
+            this.render();
+        }
+    }
+
     render() {
         if (!this.listContainer) return;
         this.listContainer.innerHTML = '';
@@ -133,7 +161,12 @@ class VotingSystem {
             card.innerHTML = `
                 <div class="vote-header">
                     <h3 class="vote-title">${v.title}</h3>
-                    <span class="vote-badge ${isFinished ? 'badge-finished' : 'badge-active'}">${isFinished ? 'Finalizada' : 'Activa'}</span>
+                    <div style="display:flex; gap: 0.5rem; align-items:center;">
+                        <span class="vote-badge ${isFinished ? 'badge-finished' : 'badge-active'}">${isFinished ? 'Finalizada' : 'Activa'}</span>
+                        ${(this.currentUser && (this.currentUser.id == v.creatorId || this.currentUser.email === 'emilio@maulas.com')) ?
+                    `<button class="delete-btn" onclick="votingSystem.deleteVote('${v.id}')" title="Borrar Votación">🗑️</button>` : ''
+                }
+                    </div>
                 </div>
                 ${v.description ? `<p class="vote-desc">${v.description}</p>` : ''}
                 
@@ -143,15 +176,20 @@ class VotingSystem {
                     <span>Para ganar: <b>${v.threshold}%</b> de los votos</span>
                 </div>
 
-                ${!isFinished ? `<div class="vote-timer" id="timer-${v.id}">Calculando tiempo...</div>` : ''}
+                ${!isFinished ? `
+                    <div class="vote-timer" id="timer-${v.id}">Calculando tiempo...</div>
+                    ${(this.currentUser && this.currentUser.id == v.creatorId) ?
+                        `<button class="btn-cancel" style="margin-top: 0.5rem; width:100%; font-size: 0.8rem; background: #ffebee; color: #d32f2f;" onclick="votingSystem.cancelVote('${v.id}')">⏹️ CANCELAR VOTACIÓN EN CURSO</button>` : ''
+                    }
+                ` : ''}
 
                 <div class="vote-options">
                     ${options.map((opt, idx) => {
-                const count = Object.values(v.votes || {}).filter(val => val === idx).length;
-                const pct = totalVotes > 0 ? (count / totalVotes * 100).toFixed(0) : 0;
-                const isSelected = myVote === idx;
+                        const count = Object.values(v.votes || {}).filter(val => val === idx).length;
+                        const pct = totalVotes > 0 ? (count / totalVotes * 100).toFixed(0) : 0;
+                        const isSelected = myVote === idx;
 
-                return `
+                        return `
                             <div class="option-wrapper">
                                 <button class="option-btn ${isSelected ? 'selected' : ''}" 
                                         onclick="votingSystem.castVote('${v.id}', ${idx})"
@@ -164,7 +202,7 @@ class VotingSystem {
                                 </div>
                             </div>
                         `;
-            }).join('')}
+                    }).join('')}
                 </div>
 
                 <div class="vote-results">
@@ -174,7 +212,6 @@ class VotingSystem {
                 </div>
 
                 ${isFinished ? this.renderWinnerInfo(v, totalVotes, options) : ''}
-                ${isFinished && !v.whatsappNotified ? `<button class="btn-new-vote" style="margin-top:1rem; padding: 0.5rem; font-size: 0.8rem; width:100%; border-color: #25D366; color: #25D366; background: transparent;" onclick="votingSystem.notifyWhatsApp('${v.id}')">📲 INFORMAR POR WHATSAPP</button>` : ''}
             `;
             this.listContainer.appendChild(card);
         });
@@ -259,6 +296,32 @@ class VotingSystem {
         }
     }
 
+    async deleteVote(voteId) {
+        if (!confirm("¿Seguro que quieres BORRAR esta votación definitivamente de la base de datos?")) return;
+        try {
+            await window.DataService.delete('votaciones', voteId);
+            await this.loadData();
+            this.render();
+        } catch (e) {
+            alert("Error al borrar.");
+        }
+    }
+
+    async cancelVote(voteId) {
+        if (!confirm("¿Deseas CANCELAR esta votación y darla por finalizada ahora mismo?")) return;
+        const v = this.votaciones.find(x => x.id === voteId);
+        if (!v) return;
+
+        v.deadline = new Date().toISOString(); // Set deadline to now
+        try {
+            await window.DataService.save('votaciones', v);
+            await this.loadData();
+            this.render();
+        } catch (e) {
+            alert("Error al cancelar.");
+        }
+    }
+
     openModal() {
         if (!this.currentUser) return alert("Inicia sesión para proponer una votación.");
         this.modal.classList.add('active');
@@ -304,16 +367,8 @@ class VotingSystem {
             console.log("VotingSystem: Saving new vote...", newVote);
             await window.DataService.save('votaciones', newVote);
 
-            // Notify Telegram
             if (window.TelegramService) {
-                console.log("VotingSystem: Notifying Telegram...");
-                const tgRes = await window.TelegramService.sendVoteNotification(newVote);
-                console.log("VotingSystem: Telegram Response:", tgRes);
-                if (tgRes && tgRes.ok === false) {
-                    console.error("VotingSystem: Telegram Error:", tgRes.description);
-                }
-            } else {
-                console.warn("VotingSystem: TelegramService not found on window.");
+                await window.TelegramService.sendVoteNotification(newVote);
             }
 
             await this.loadData();
@@ -324,34 +379,6 @@ class VotingSystem {
             console.error("VotingSystem: Error in handleSubmit:", e);
             alert("Error al crear la votación.");
         }
-    }
-
-    async notifyWhatsApp(voteId) {
-        const v = this.votaciones.find(x => x.id === voteId);
-        if (!v) return;
-
-        const options = v.options || ["Sí", "No"];
-        const totalVotes = Object.keys(v.votes || {}).length;
-        const counts = options.map((_, idx) => Object.values(v.votes).filter(val => val === idx).length);
-        const maxVal = Math.max(...counts);
-        const winnerIdx = counts.indexOf(maxVal);
-        const winnerPct = totalVotes > 0 ? (maxVal / totalVotes * 100) : 0;
-        const isTied = counts.filter(c => c === maxVal).length > 1;
-
-        let resText = "";
-        if (totalVotes === 0) resText = "Sin votos.";
-        else if (isTied) resText = "Empate.";
-        else resText = `GANADOR: *${options[winnerIdx]}* (${winnerPct.toFixed(1)}%)`;
-
-        const msg = `🗳️ *RESULTADOS DE LA VOTACIÓN* 🗳️\n\n*Tema:* ${v.title}\n*Resultados:*\n${options.map((o, i) => `- ${o}: ${counts[i]} votos`).join('\n')}\n\n🏆 *${resText}*`;
-
-        const encodedMsg = encodeURIComponent(msg);
-        window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
-
-        // Mark as notified in DB
-        v.whatsappNotified = true;
-        await window.DataService.save('votaciones', v);
-        this.render();
     }
 }
 

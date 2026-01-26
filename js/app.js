@@ -43,6 +43,7 @@ class MemberManager {
         this.inputName = document.getElementById('inp-name');
         this.inputEmail = document.getElementById('inp-email');
         this.inputPhone = document.getElementById('inp-phone');
+        this.inputTgNick = document.getElementById('inp-tgnick');
     }
 
     bindEvents() {
@@ -80,6 +81,7 @@ class MemberManager {
                 <td class="table-socio-name">${member.name}</td>
                 <td class="table-socio-email"><a href="mailto:${member.email}" style="color:inherit; text-decoration:none;">${member.email}</a></td>
                 <td class="table-socio-phone">${member.phone || '<span style="color:#999; font-style:italic;">Sin Apodo</span>'}</td>
+                <td class="table-socio-tgnick">${member.tgNick ? '@' + member.tgNick : '<span style="color:#999; font-style:italic;">N/A</span>'}</td>
                 <td class="action-cell">${actionHtml}</td>
             `;
             this.tableBody.appendChild(tr);
@@ -130,6 +132,7 @@ class MemberManager {
             name: this.inputName.value,
             email: this.inputEmail.value,
             phone: this.inputPhone.value,
+            tgNick: this.inputTgNick.value.replace('@', '').trim(),
             joinedDate: new Date().toISOString()
         };
 
@@ -145,6 +148,7 @@ class MemberManager {
             member.name = this.inputName.value;
             member.email = this.inputEmail.value;
             member.phone = this.inputPhone.value;
+            member.tgNick = this.inputTgNick.value.replace('@', '').trim();
 
             await window.DataService.save('members', member);
             await this.loadData();
@@ -198,6 +202,7 @@ class MemberManager {
             this.inputName.value = member.name;
             this.inputEmail.value = member.email;
             this.inputPhone.value = member.phone || '';
+            this.inputTgNick.value = member.tgNick || '';
         } else {
             this.modalTitle.textContent = 'Alta de Nuevo Socio';
             this.form.reset();
