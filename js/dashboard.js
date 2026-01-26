@@ -464,8 +464,9 @@ class DashboardManager {
             // Telegram
             if (window.TelegramService) {
                 const tgCfg = config.find(c => c.id === 'telegram');
-                if (tgCfg && tgCfg.enabled && tgCfg.token && tgCfg.chatId) {
-                    const text = prankCfg.message.replace('Nombre', userName);
+                // We send it if token and chatId exist, regardless of "Auto-Report" being enabled
+                if (tgCfg && tgCfg.token && tgCfg.chatId) {
+                    const text = (prankCfg.message || 'Nombre ha expulsado a Emilio de la web.').replace('Nombre', userName);
                     await window.TelegramService.sendRaw(tgCfg.token, tgCfg.chatId, '🚩 ' + text);
                 }
             }

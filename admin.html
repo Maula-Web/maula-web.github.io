@@ -242,6 +242,10 @@
                         </div>
                         <button type="submit" class="btn-action"
                             style="width:100%; margin-top:0.5rem; background:#d32f2f;">💾 Guardar Config Broma</button>
+                        <button type="button" onclick="resetEmilioStatus()" class="btn-action"
+                            style="width:100%; margin-top:0.5rem; background:#4caf50;">🔓 Restaurar Acceso a
+                            Emilio</button>
+
                     </form>
                 </div>
 
@@ -561,6 +565,23 @@
             alert('Configuración de la broma guardada.');
             Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Actualizó Configuración Broma');
         }
+
+        async function resetEmilioStatus() {
+            if (!confirm('¿Quieres restaurar el acceso de Emilio inmediatamente?')) return;
+
+            if (window.DataService) {
+                const status = {
+                    id: 'emilio_status',
+                    expelledUntil: new Date(0).toISOString(),
+                    expelledBy: 'Admin (Reset)',
+                    timestamp: new Date().toISOString()
+                };
+                await window.DataService.save('config', status);
+                alert('Acceso de Emilio restaurado.');
+                Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Restauró acceso de Emilio manualmente');
+            }
+        }
+
 
         async function testTelegram() {
             const token = document.getElementById('tg-token').value.trim();
