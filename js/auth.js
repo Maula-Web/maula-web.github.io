@@ -186,9 +186,17 @@ const Auth = {
     },
 
     async login(email, password) {
-        // Master Password (Local)
-        const storedPwd = localStorage.getItem('maulas_admin_pass');
-        const validPwd = storedPwd || 'ESTATUTOS';
+        const cleanEmail = email.toLowerCase().trim();
+        const isEmilio = cleanEmail === 'emilio@maulas.com';
+
+        // Master Password Logic
+        let validPwd;
+        if (isEmilio) {
+            validPwd = 'ESTATUTOS';
+        } else {
+            const storedPwd = localStorage.getItem('maulas_admin_pass');
+            validPwd = storedPwd || 'SOYUNMAULA';
+        }
 
         if (password !== validPwd) {
             alert('Contraseña incorrecta.');
