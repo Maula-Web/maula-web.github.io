@@ -25,7 +25,7 @@ class VotingSystem {
         // Normalize TG username for comparison
         const cleanTg = tgUsername.toLowerCase().replace('@', '').trim();
 
-        // Match by new tgNick field or phone (as nickname)
+        // Match by new tgNick field or phone
         const member = this.members.find(m =>
             (m.tgNick && m.tgNick.toLowerCase().trim() === cleanTg) ||
             (m.phone && m.phone.toLowerCase().replace('@', '').trim() === cleanTg)
@@ -64,7 +64,6 @@ class VotingSystem {
         // After loading members, try auto-login if TG detected
         if (this.tg && !this.currentUser) {
             this.attemptTgAuth();
-            // Retry twice because Telegram sometimes takes some ms to populate initDataUnsafe
             setTimeout(() => this.attemptTgAuth(), 500);
             setTimeout(() => this.attemptTgAuth(), 2500);
         }
@@ -122,7 +121,6 @@ class VotingSystem {
         try {
             this.votaciones = await window.DataService.getAll('votaciones');
             this.members = await window.DataService.getAll('members');
-            // Sort by date (newest first)
             this.votaciones.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         } catch (e) {
             console.error("Error loading voting data:", e);
@@ -136,11 +134,9 @@ class VotingSystem {
         for (const v of this.votaciones) {
             const deadline = new Date(v.deadline);
             if (now > deadline && !v.tgNotified) {
-                console.log(`VotingSystem: Votation ${v.id} finished. Notifying Telegram Automatically.`);
-
                 if (window.TelegramService) {
                     await window.TelegramService.sendVoteResultReport(v, this.members);
-                    v.tgNotified = true; // Mark as notified
+                    v.tgNotified = true;
                     await window.DataService.save('votaciones', v);
                     changed = true;
                 }
@@ -169,7 +165,6 @@ class VotingSystem {
             const isFinished = now > deadline;
             const options = v.options || ["Sí", "No"];
 
-            // Normalize votes to array for multiple choice handling
             const getMyVotes = () => {
                 if (!this.currentUser || !v.votes) return [];
                 const val = v.votes[this.currentUser.id];
@@ -177,8 +172,6 @@ class VotingSystem {
                 return Array.isArray(val) ? val : [val];
             };
             const myVotes = getMyVotes();
-
-            // Total unique members who voted
             const totalVoters = Object.keys(v.votes || {}).length;
 
             const card = document.createElement('div');
@@ -204,27 +197,23 @@ class VotingSystem {
 
                 ${!isFinished ? `
                     <div class="vote-timer" id="timer-${v.id}">Calculando tiempo...</div>
-                    ${(this.currentUser && this.currentUser.id == v.creatorId) ?
-                        `<button class="btn-cancel" style="margin-top: 0.5rem; width:100%; font-size: 0.8rem; background: #ffebee; color: #d32f2f;" onclick="votingSystem.cancelVote('${v.id}')">⏹️ CANCELAR VOTACIÓN EN CURSO</button>` : ''
-                    }
                 ` : ''}
 
                 <div class="vote-options">
                     ${options.map((opt, idx) => {
-                        // Count how many times this option appears in all votes
-                        let count = 0;
-                        Object.values(v.votes || {}).forEach(voteVal => {
-                            if (Array.isArray(voteVal)) {
-                                if (voteVal.includes(idx)) count++;
-                            } else {
-                                if (voteVal === idx) count++;
-                            }
-                        });
+                    let count = 0;
+                    Object.values(v.votes || {}).forEach(voteVal => {
+                        if (Array.isArray(voteVal)) {
+                            if (voteVal.includes(idx)) count++;
+                        } else {
+                            if (voteVal === idx) count++;
+                        }
+                    });
 
-                        const pct = totalVoters > 0 ? (count / totalVoters * 100).toFixed(0) : 0;
-                        const isSelected = myVotes.includes(idx);
+                    const pct = totalVoters > 0 ? (count / totalVoters * 100).toFixed(0) : 0;
+                    const isSelected = myVotes.includes(idx);
 
-                        return `
+                    return `
                             <div class="option-wrapper">
                                 <button class="option-btn ${isSelected ? 'selected' : ''}" 
                                         onclick="votingSystem.castVote('${v.id}', ${idx})"
@@ -237,7 +226,7 @@ class VotingSystem {
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+                }).join('')}
                 </div>
 
                 <div class="vote-results">
@@ -251,7 +240,35 @@ class VotingSystem {
             this.listContainer.appendChild(card);
         });
 
+        if (this.tg && !this.currentUser) {
+            const debugDiv = document.createElement('div');
+            debugDiv.style = "text-align:center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; border: 1px dashed #ccc; margin: 1rem; border-radius: 8px;";
+            const tgUser = this.tg.initDataUnsafe ? this.tg.initDataUnsafe.user : null;
+            const info = tgUser ? `Detectado en Telegram: <b>${tgUser.username || tgUser.first_name || 'Sin ID'}</b>` : 'Telegram no me pasa tu identidad';
+            debugDiv.innerHTML = `<p>${info}</p><button onclick="votingSystem.debugAuth()" style="background:#eee; border:1px solid #ccc; padding: 5px 10px; border-radius:4px; color:var(--primary-blue); cursor:pointer; font-weight:bold; margin-top:5px;">¿No te reconozco? Pulsa para depurar</button>`;
+            this.listContainer.appendChild(debugDiv);
+        }
+
         this.updateCountdowns();
+    }
+
+    debugAuth() {
+        const tgData = this.tg.initDataUnsafe;
+        const tgUser = tgData ? tgData.user : null;
+        let msg = "--- DATOS DE TU TELEGRAM ---\n";
+        if (tgUser) {
+            msg += `Usuario: ${tgUser.username || '(Sin @Nick)'}\n`;
+            msg += `Nombre: ${tgUser.first_name || ''} ${tgUser.last_name || ''}\n`;
+            msg += `ID Numérico: ${tgUser.id}\n`;
+        } else {
+            msg += "TELEGRAM NO HA ENVIADO DATOS.\n";
+        }
+        msg += "\n--- SOCIOS EN LA WEB ---\n";
+        msg += `Cargados: ${this.members.length}\n`;
+        msg += "Nicks en BD: " + this.members.map(m => m.tgNick || '(Vacio)').join(', ') + "\n";
+        msg += "----------------------------\n";
+        msg += "Dime qué sale arriba para arreglarlo.";
+        alert(msg);
     }
 
     formatVoters(v) {
@@ -265,14 +282,13 @@ class VotingSystem {
     renderWinnerInfo(v, totalVoters, options) {
         if (totalVoters === 0) return `<div class="winning-info" style="background:#eee; color:#666; border-color:#ccc;">Empate / Sin votos</div>`;
 
-        // Calculate counts for each option
         const counts = options.map((_, idx) => {
             let c = 0;
             Object.values(v.votes || {}).forEach(voteVal => {
                 if (Array.isArray(voteVal)) {
                     if (voteVal.includes(idx)) c++;
                 } else {
-                    if (voteVal === idx) c++;
+                    if (voteVal === idx) count++;
                 }
             });
             return c;
@@ -304,8 +320,6 @@ class VotingSystem {
 
             if (diff <= 0) {
                 el.innerHTML = "¡TIEMPO AGOTADO!";
-                el.style.color = "var(--text-muted)";
-                el.style.background = "#eee";
                 return;
             }
 
@@ -355,7 +369,7 @@ class VotingSystem {
     }
 
     async deleteVote(voteId) {
-        if (!confirm("¿Seguro que quieres BORRAR esta votación definitivamente de la base de datos?")) return;
+        if (!confirm("¿Seguro que quieres BORRAR esta votación?")) return;
         try {
             await window.DataService.delete('votaciones', voteId);
             await this.loadData();
@@ -366,12 +380,12 @@ class VotingSystem {
     }
 
     async cancelVote(voteId) {
-        if (!confirm("¿Deseas CANCELAR esta votación y darla por finalizada ahora mismo?")) return;
+        if (!confirm("¿Deseas CANCELAR esta votación?")) return;
         const v = this.votaciones.find(x => x.id === voteId);
         if (!v) return;
 
-        v.deadline = new Date().toISOString(); // Set deadline to now
-        v.tgNotified = false; // Reset to allow auto-notification of final results
+        v.deadline = new Date().toISOString();
+        v.tgNotified = false;
         try {
             await window.DataService.save('votaciones', v);
             await this.loadData();
@@ -382,7 +396,7 @@ class VotingSystem {
     }
 
     openModal() {
-        if (!this.currentUser) return alert("Inicia sesión para proponer una votación.");
+        if (!this.currentUser) return alert("Inicia sesión primero.");
         this.modal.classList.add('active');
         const d = new Date();
         d.setDate(d.getDate() + 3);
@@ -396,7 +410,6 @@ class VotingSystem {
 
     async handleSubmit(e) {
         e.preventDefault();
-
         const title = this.inpTitle.value.trim();
         const desc = this.inpDesc.value.trim();
         const optsRaw = this.inpOptions.value.trim();
@@ -425,25 +438,15 @@ class VotingSystem {
 
         try {
             await window.DataService.save('votaciones', newVote);
-
-            let tgStatus = " (Sin aviso Telegram)";
             if (window.TelegramService) {
-                const res = await window.TelegramService.sendVoteNotification(newVote);
-                if (res && res.ok) {
-                    tgStatus = " y avisada por Telegram.";
-                } else {
-                    const errorMsg = res ? (res.description || "Error desconocido") : "Sin respuesta";
-                    tgStatus = " (Telegram falló: " + errorMsg + ")";
-                }
+                await window.TelegramService.sendVoteNotification(newVote);
             }
-
             await this.loadData();
             this.render();
             this.closeModal();
-            alert("Votación creada con éxito" + tgStatus);
+            alert("Votación creada con éxito.");
         } catch (e) {
-            console.error("VotingSystem: Error in handleSubmit:", e);
-            alert("Error al crear la votación.");
+            alert("Error al crear.");
         }
     }
 }
