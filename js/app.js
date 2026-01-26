@@ -88,7 +88,35 @@ class MemberManager {
 
     async handleSubmit(e) {
         e.preventDefault();
+
+        // Prank Protection for Emilio
+        const user = JSON.parse(sessionStorage.getItem('maulas_user'));
+        const isEmilio = (user && user.email.toLowerCase() === 'emilio@maulas.com');
+
         const id = this.inputId.value;
+
+        if (isEmilio) {
+            if (!id) {
+                alert("Acceso Restringido. Emilio no tiene permiso para dar de alta nuevos socios.");
+                return;
+            }
+
+            // If editing, check if it's himself
+            const memberToEdit = this.members.find(m => m.id == id);
+            if (memberToEdit && memberToEdit.email.toLowerCase() !== 'emilio@maulas.com') {
+                alert("Acceso Restringido. Emilio no tiene permiso para modificar datos de otros socios.");
+                return;
+            }
+
+            // Prompt for password to edit himself
+            const pwd = prompt("Acceso Restringido. Introduce la clave de socios para modificar tus datos:");
+            const isValid = await Auth.verifyPrankPassword(pwd);
+            if (!isValid) {
+                alert("Clave incorrecta. No tienes permiso para modificar tus datos.");
+                return;
+            }
+        }
+
         if (id) {
             await this.updateMember(parseInt(id));
         } else {
@@ -132,6 +160,13 @@ class MemberManager {
     }
 
     async deleteMember(id) {
+        // Prank Protection for Emilio
+        const user = JSON.parse(sessionStorage.getItem('maulas_user'));
+        if (user && user.email.toLowerCase() === 'emilio@maulas.com') {
+            alert("Acceso Restringido. Emilio no tiene permiso para dar de baja a socios.");
+            return;
+        }
+
         if (confirm('¿Está seguro de que desea dar de baja a este socio?')) {
             await window.DataService.delete('members', id);
             await this.loadData();

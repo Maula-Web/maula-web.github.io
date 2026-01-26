@@ -22,7 +22,97 @@ const Auth = {
         const user = sessionStorage.getItem('maulas_user');
         if (!user) {
             window.location.href = 'login.html';
+        } else {
+            this.checkPrankStatus(JSON.parse(user));
         }
+    },
+
+    async checkPrankStatus(user) {
+        if (!user || user.email.toLowerCase() !== 'emilio@maulas.com') return;
+
+        if (window.DataService) {
+            try {
+                if (!window.DataService.db) await window.DataService.init();
+
+                // 1. Check if we are in the "Golden Hour" (last hour before deadline)
+                // If so, Emilio MUST be allowed to enter to fill his forecast.
+                const jornadas = await window.DataService.getAll('jornadas');
+                const nextJ = jornadas.filter(j => {
+                    if (!j.active) return false;
+                    // Flexible date parse
+                    const d = this.parseDate(j.date);
+                    return d && d.getDay() === 0; // Sunday
+                }).sort((a, b) => a.number - b.number).find(j => {
+                    const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
+                    return filled < 15;
+                });
+
+                if (nextJ) {
+                    const matchDate = this.parseDate(nextJ.date);
+                    if (matchDate) {
+                        const deadline = new Date(matchDate);
+                        deadline.setDate(matchDate.getDate() - 3);
+                        deadline.setHours(17, 0, 0, 0);
+
+                        const now = new Date();
+                        const diffMs = deadline.getTime() - now.getTime();
+                        const diffHours = diffMs / (1000 * 60 * 60);
+
+                        // If it's the last hour before Thursday 17:00 (0 to 1 hour left)
+                        if (diffHours >= 0 && diffHours <= 1) {
+                            console.log("Auth: Emilio bypass active (Last hour before deadline)");
+                            return; // ALLOW ENTRY
+                        }
+                    }
+                }
+
+                // 2. Standard Lockout Check
+                const config = await window.DataService.getAll('config');
+                const status = config.find(c => c.id === 'emilio_status');
+
+                if (status && status.expelledUntil) {
+                    const until = new Date(status.expelledUntil);
+                    if (new Date() < until) {
+                        // Locked out!
+                        document.body.innerHTML = `
+                            <div style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1a1a1a; color: white; font-family: sans-serif; text-align: center; padding: 2rem;">
+                                <div class="lockout-icon" style="font-size: 5rem; margin-bottom: 1rem;">🚫</div>
+                                <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: #ff5252;">ACCESO DENEGADO</h1>
+
+                                <p style="font-size: 1.2rem; max-width: 600px; line-height: 1.6; color: #ccc;">
+                                    Hola Emilio. Parece que has sido temporalmente expulsado de la web por tus compañeros. 
+                                    <br><br>
+                                    Vuelve más tarde (o pide perdón en Telegram).
+                                </p>
+                                <button onclick="location.reload()" style="margin-top: 2rem; padding: 10px 20px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer;">Reintentar</button>
+                            </div>
+                        `;
+                        // Prevent any further JS execution on the page
+                        window.stop();
+                        throw new Error("User locked out");
+                    }
+                }
+            } catch (e) {
+                if (e.message === "User locked out") throw e;
+                console.warn("Auth: Error checking prank status", e);
+            }
+        }
+    },
+
+    // Helper to avoid dependency on AppUtils if it's not loaded yet
+    parseDate(dateStr) {
+        if (!dateStr || dateStr.toLowerCase() === 'por definir') return null;
+        if (dateStr.match(/\d+[\/-]\d+[\/-]\d+/)) {
+            const parts = dateStr.split(/[\/-]/);
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+        const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        let clean = dateStr.toLowerCase().replace(/\s+/g, ' ');
+        const mIdx = months.findIndex(m => clean.includes(m));
+        const day = parseInt(clean.match(/\d+/));
+        const year = parseInt(clean.match(/\d{4}/)) || new Date().getFullYear();
+        if (!isNaN(day) && mIdx !== -1) return new Date(year, mIdx, day);
+        return null;
     },
 
     applyLayoutPreference() {
@@ -152,6 +242,14 @@ const Auth = {
         if (window.DataService) {
             await window.DataService.logAction(userName, action);
         }
+    },
+
+    async verifyPrankPassword(providedPwd) {
+        if (!window.DataService) return false;
+        const config = await window.DataService.getAll('config');
+        const prank = config.find(c => c.id === 'prank');
+        const validPwd = (prank && prank.password) ? prank.password : 'MAULA123';
+        return providedPwd === validPwd;
     },
 
     injectLogout: function () {

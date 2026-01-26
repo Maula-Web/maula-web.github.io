@@ -5,9 +5,12 @@ En la Peña tenemos una broma interna. Cuando estamos frustrados o enfadados ech
 El caso es que me gustaría que en la hoja de Dashboard, aparezca un boton junto a las tarjetas de la fila superior, para anular durante 15 minutos el acceso del socio emilio@maulas.com
 Este tiempo se podrá configurar en el apartado Administración y el mensaje a anviar también.
 Al pulsar este botón ocurrirán varias cosas:
-Este usuario no podrá acceder a la web en el tiempo estipulado.
+Este socio no podrá acceder a la web en el tiempo estipulado.
 Este socio nunca conocerá cuánto tiempo estará "expulsado".
 Se enviará un mensaje a Telegram con el texto "Nombre ha expulsado a Emilio de la web." Sustituyendo Nombre por el socio que haya llevado a cabo la acción.
-Para que esto funcione, El usuario emilio no podrá dar de alta socios nuevos ni cambiar losa datos de ningún socio ni el suyo propio, a no ser que introduzca la clave "EMILIOes1MAULA" sensible a mayúsculas y minúsculas.
+Para que esto funcione, El usuario Emilio no podrá dar de alta socios nuevos ni cambiar los datos de ningún socio ni el suyo propio en la hoja de Socios, a no ser que introduzca una clave definida en la hoja Administración. Todos los socios menos él podrán consultar y cambiar la clave cuando lo deseen.
 Esta contraseña no tiene nada que ver con su contraseña de acceso. Emilio podrá llevar a cabo cualquier otra acción excepto estas dos especificadas.
+No se podrá "expulsar" a este socio cuando quede 1 hora o menos para el cierre de una jornada. Si la jornada ya se ha cerrado, si le se podrá "expulsar".
+El tiempo de expulsión se debe poder configurar en la hoja de Administración pero nunca será inferior a 5 minutos ni superior a 1 hora.
+Aunque este socio conozca la clave, no podrá cambiar nada relacionado con esta broma, ni el tiempo de expulsión ni la clave de expulsión. Esta clave, únicamente servirá para cambiar sus propios datos en la hoja Socios pero no poadrá cambiar los datos de ningún otro socio aunque conozca la clave.
 Si se te ocurre alguna manera de que este socio "hackee" el sistema de broma, dímela e intentaremos cerrarla.

@@ -379,7 +379,103 @@ class DashboardManager {
                     ${nextRolesHtml}
                     ${deadlineHtml}
                 </div>
+
+                <!-- Expulsion Button for the Prank -->
+                <div id="prank-container" style="width: 100%; max-width: 1200px; margin-top: 1rem; display: none;">
+                    <button id="btn-expulsar-emilio" class="stat-card" style="width: 100%; background: #d32f2f; color: white; border: none; cursor: pointer; padding: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; font-size: 1.1rem; border-bottom: 4px solid #b71c1c;">
+                        🚩 ECHAR A EMILIO
+                    </button>
+                    <div id="prank-cooldown-msg" style="text-align: center; font-size: 0.85rem; color: #d32f2f; margin-top: 0.5rem; font-weight: bold; display: none;">
+                        ⚠️ Faltan menos de 1 hora para el cierre. No podéis echarle ahora.
+                    </div>
+                </div>
+
             `;
+
+        this.handlePrankDisplay();
+    }
+
+    async handlePrankDisplay() {
+        const user = JSON.parse(sessionStorage.getItem('maulas_user'));
+        if (!user || user.email.toLowerCase() === 'emilio@maulas.com') return;
+
+        const prankContainer = document.getElementById('prank-container');
+        if (!prankContainer) return;
+
+        prankContainer.style.display = 'block';
+
+        const nextJornadaData = this.getNextJornadaData();
+        let canExpel = true;
+
+        if (nextJornadaData && nextJornadaData.date) {
+            const matchDate = AppUtils.parseDate(nextJornadaData.date);
+            if (matchDate) {
+                const deadline = new Date(matchDate);
+                deadline.setDate(matchDate.getDate() - 3);
+                deadline.setHours(17, 0, 0, 0);
+
+                const now = new Date();
+                const diffMs = deadline.getTime() - now.getTime();
+                const diffHours = diffMs / (1000 * 60 * 60);
+
+                // Rule: Cannot expel if 1 hour or less until closure
+                if (diffHours > 0 && diffHours <= 1) {
+                    canExpel = false;
+                }
+            }
+        }
+
+        const btn = document.getElementById('btn-expulsar-emilio');
+        const cooldownMsg = document.getElementById('prank-cooldown-msg');
+
+        if (!canExpel) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            cooldownMsg.style.display = 'block';
+        } else {
+            btn.onclick = () => this.executePrank(user.name);
+        }
+    }
+
+    async executePrank(userName) {
+        if (!confirm('¿Seguro que quieres echar a Emilio de la web temporalmente?')) return;
+
+        try {
+            const config = await window.DataService.getAll('config');
+            const prankCfg = config.find(c => c.id === 'prank') || { duration: 15, message: 'Nombre ha expulsado a Emilio de la web.' };
+
+            const durationMin = prankCfg.duration || 15;
+            const until = new Date();
+            until.setMinutes(until.getMinutes() + durationMin);
+
+            const status = {
+                id: 'emilio_status',
+                expelledUntil: until.toISOString(),
+                expelledBy: userName,
+                timestamp: new Date().toISOString()
+            };
+
+            await window.DataService.save('config', status);
+
+            // Log it
+            await window.DataService.logAction(userName, 'Expulsó a Emilio de la web por ' + durationMin + ' minutos');
+
+            // Telegram
+            if (window.TelegramService) {
+                const tgCfg = config.find(c => c.id === 'telegram');
+                if (tgCfg && tgCfg.enabled && tgCfg.token && tgCfg.chatId) {
+                    const text = prankCfg.message.replace('Nombre', userName);
+                    await window.TelegramService.sendRaw(tgCfg.token, tgCfg.chatId, '🚩 ' + text);
+                }
+            }
+
+            alert('¡Emilio ha sido expulsado!');
+            location.reload();
+        } catch (e) {
+            console.error(e);
+            alert('Error al ejecutar la acción.');
+        }
     }
 
     startCountdown(deadline) {
