@@ -240,6 +240,20 @@
                                 style="width:100%; height:60px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
                             <small style="color:#888;">Usa "Nombre" para el socio que expulsa.</small>
                         </div>
+
+                        <!-- Mini Dashboard for Current Status -->
+                        <div id="prank-current-status"
+                            style="margin-top: 1rem; padding: 0.8rem; background: #fff5f5; border: 1px solid #ffcdd2; border-radius: 4px; display: none;">
+                            <div style="font-size: 0.8rem; color: #d32f2f; font-weight: bold; margin-bottom: 0.3rem;">🚨
+                                ESTADO ACTUAL:</div>
+                            <div id="prank-timer-display"
+                                style="font-size: 1.2rem; font-weight: 800; color: #d32f2f; font-family: monospace;">
+                                00:00:00
+                            </div>
+                            <div id="prank-expelled-by" style="font-size: 0.7rem; color: #666; margin-top: 0.2rem;">
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn-action"
                             style="width:100%; margin-top:0.5rem; background:#d32f2f;">💾 Guardar Config Broma</button>
                         <button type="button" onclick="resetEmilioStatus()" class="btn-action"
@@ -535,7 +549,11 @@
             // If not Emilio, show the card
             if (prankCard) prankCard.style.display = 'block';
 
+            // Start Status Sync (Polling)
+            startPrankStatusSync();
+
             const config = await window.DataService.getAll('config');
+
 
             const prank = config.find(c => c.id === 'prank');
             if (prank) {
@@ -579,8 +597,48 @@
                 await window.DataService.save('config', status);
                 alert('Acceso de Emilio restaurado.');
                 Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Restauró acceso de Emilio manualmente');
+
+                // Immediate sync
+                startPrankStatusSync();
             }
         }
+
+        let prankSyncInterval = null;
+        async function startPrankStatusSync() {
+            if (prankSyncInterval) clearInterval(prankSyncInterval);
+
+            const updateStatus = async () => {
+                if (!window.DataService) return;
+                const config = await window.DataService.getAll('config');
+                const status = config.find(c => c.id === 'emilio_status');
+                const container = document.getElementById('prank-current-status');
+                const timerEl = document.getElementById('prank-timer-display');
+                const byEl = document.getElementById('prank-expelled-by');
+
+                if (status && status.expelledUntil) {
+                    const until = new Date(status.expelledUntil);
+                    const now = new Date();
+                    const diff = until - now;
+
+                    if (diff > 0) {
+                        if (container) container.style.display = 'block';
+                        const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                        const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                        if (timerEl) timerEl.textContent = `${h}:${m}:${s}`;
+                        if (byEl) byEl.textContent = `Expulsado por: ${status.expelledBy || 'Alguien'}`;
+                    } else {
+                        if (container) container.style.display = 'none';
+                    }
+                } else {
+                    if (container) container.style.display = 'none';
+                }
+            };
+
+            await updateStatus();
+            prankSyncInterval = setInterval(updateStatus, 1000);
+        }
+
 
 
         async function testTelegram() {
