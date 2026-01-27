@@ -1598,33 +1598,53 @@ body {
     -webkit-overflow-scrolling: touch;
     border-radius: 8px;
     margin-bottom: 2rem;
+    box-sizing: border-box;
+}
+
+/* Custom Scrollbar for better visibility */
+.members-list-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.members-list-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.members-list-container::-webkit-scrollbar-thumb {
+    background: var(--primary-green);
+    border-radius: 10px;
 }
 
 .socios-page table {
-    min-width: 950px;
-    /* Calculated space needed for all columns horizontally */
+    min-width: 1100px !important;
     width: 100%;
     border-collapse: collapse;
+    table-layout: auto;
 }
 
 .socios-page th,
 .socios-page td {
-    white-space: nowrap;
-    /* Force content to stay in one line and trigger overflow */
+    white-space: nowrap !important;
     padding: 12px 15px !important;
 }
 
 @media (max-width: 800px) {
     .socios-page .main-container {
-        padding: 1rem 0.5rem;
-        width: 100% !important;
+        padding: 1rem 0.6rem !important;
+        width: 100vw !important;
         max-width: 100vw !important;
-        box-sizing: border-box;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
     }
 
     .members-list-container {
-        max-width: calc(100vw - 1rem);
-        /* 100vw minus main-container padding */
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        display: block !important;
     }
 }
 
