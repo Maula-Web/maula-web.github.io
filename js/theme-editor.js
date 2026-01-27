@@ -540,7 +540,7 @@ const ThemeEditor = {
         // Guardar en Firebase como el preset oficial "Tema IA"
         if (window.DataService) {
             try {
-                await window.DataService.save('config', 'preset_tema_ia', {
+                await window.DataService.save('config', {
                     id: 'preset_tema_ia',
                     name: 'Tema IA',
                     type: 'preset',
