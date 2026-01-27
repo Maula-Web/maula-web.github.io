@@ -206,6 +206,28 @@ const ThemeEditor = {
             { id: '--resumen-detail-match-text', label: 'Color Texto Partidos' },
             { id: '--resumen-detail-result-text', label: 'Color Texto Resultados' }
         ],
+        'votaciones': [
+            { id: '--votaciones-title', label: 'Título Página' },
+            { id: '--votaciones-subtitle', label: 'Subtítulo Página' },
+            { id: '--votaciones-btn-new-bg', label: 'Botón Nueva (Fondo)' },
+            { id: '--votaciones-btn-new-text', label: 'Botón Nueva (Texto)' },
+            { id: '--votaciones-card-bg', label: 'Fondo Tarjeta Voto' },
+            { id: '--votaciones-card-title', label: 'Título Voto' },
+            { id: '--votaciones-card-desc', label: 'Descripción Voto' },
+            { id: '--votaciones-badge-active-bg', label: 'Badge Activo (Fondo)' },
+            { id: '--votaciones-badge-finished-bg', label: 'Badge Finalizado (Fondo)' },
+            { id: '--votaciones-timer-bg', label: 'Reloj/Tiempo (Fondo)' },
+            { id: '--votaciones-timer-text', label: 'Reloj/Tiempo (Texto)' },
+            { id: '--votaciones-option-bg', label: 'Opción (Fondo)' },
+            { id: '--votaciones-option-text', label: 'Opción (Texto)' },
+            { id: '--votaciones-option-border', label: 'Opción (Borde)' },
+            { id: '--votaciones-option-selected-bg', label: 'Opción Elegida (Fondo)' },
+            { id: '--votaciones-option-selected-text', label: 'Opción Elegida (Texto)' },
+            { id: '--votaciones-progress-bg', label: 'Barra Progreso (Carril)' },
+            { id: '--votaciones-progress-bar', label: 'Barra Progreso (Lleno)' },
+            { id: '--votaciones-winning-bg', label: 'Info Ganador (Fondo)' },
+            { id: '--votaciones-winning-text', label: 'Info Ganador (Texto)' }
+        ],
         'importacion': [
             { id: '--import-modal-bg', label: 'Fondo Ventana Confirmación' },
             { id: '--import-modal-text', label: 'Texto Títulos/General' },

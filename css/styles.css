@@ -299,8 +299,39 @@ body.layout-vertical .main-container {
     --dash-winner-name: #1565c0;
     --dash-loser-label: #1b1b1b;
     --dash-loser-name: #d32f2f;
-    --dash-doubles-label: #6a1b9a;
+    --dash-doubles-label: #1b1b1b;
     --dash-doubles-value: #333333;
+
+    /* Votaciones */
+    --votaciones-title: var(--text-main);
+    --votaciones-subtitle: var(--text-secondary);
+    --votaciones-btn-new-bg: #000000;
+    --votaciones-btn-new-text: #ffffff;
+    --votaciones-card-bg: var(--card-bg);
+    --votaciones-card-title: var(--text-main);
+    --votaciones-card-desc: var(--text-secondary);
+    --votaciones-badge-active-bg: var(--primary-green);
+    --votaciones-badge-finished-bg: var(--text-muted);
+    --votaciones-timer-bg: rgba(255, 61, 0, 0.1);
+    --votaciones-timer-text: var(--primary-red);
+    --votaciones-option-bg: var(--input-bg);
+    --votaciones-option-text: var(--text-main);
+    --votaciones-option-border: var(--input-border);
+    --votaciones-option-selected-bg: var(--primary-blue);
+    --votaciones-option-selected-text: #ffffff;
+    --votaciones-progress-bg: #eeeeee;
+    --votaciones-progress-bar: var(--primary-blue);
+    --votaciones-winning-bg: #fff8e1;
+    --votaciones-winning-text: #827717;
+
+    /* Login / Acceso */
+    /* Login Page */
+    --login-bg: var(--primary-purple);
+    --login-card-bg: #ffffff;
+    --login-btn-bg: var(--primary-green);
+    --login-text: #333333;
+    --login-label: #555555;
+    --login-subtitle: #777777;
 
     /* UI Elements */
     --card-bg: #ffffff;
@@ -1563,6 +1594,19 @@ body {
     overflow-x: auto;
     /* Enable horizontal scroll on mobile */
     -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+.socios-page table {
+    min-width: 800px;
+    /* Force minimum width to ensure horizontal scroll on mobile */
+}
+
+@media (max-width: 600px) {
+    .socios-page table {
+        min-width: 650px;
+        /* Slightly less for very small screens but still forcing scroll */
+    }
 }
 
 .page-title.socios-title {

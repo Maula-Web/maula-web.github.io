@@ -240,35 +240,7 @@ class VotingSystem {
             this.listContainer.appendChild(card);
         });
 
-        if (this.tg && !this.currentUser) {
-            const debugDiv = document.createElement('div');
-            debugDiv.style = "text-align:center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; border: 1px dashed #ccc; margin: 1rem; border-radius: 8px;";
-            const tgUser = this.tg.initDataUnsafe ? this.tg.initDataUnsafe.user : null;
-            const info = tgUser ? `Detectado en Telegram: <b>${tgUser.username || tgUser.first_name || 'Sin ID'}</b>` : 'Telegram no me pasa tu identidad';
-            debugDiv.innerHTML = `<p>${info}</p><button onclick="votingSystem.debugAuth()" style="background:#eee; border:1px solid #ccc; padding: 5px 10px; border-radius:4px; color:var(--primary-blue); cursor:pointer; font-weight:bold; margin-top:5px;">¿No te reconozco? Pulsa para depurar</button>`;
-            this.listContainer.appendChild(debugDiv);
-        }
-
         this.updateCountdowns();
-    }
-
-    debugAuth() {
-        const tgData = this.tg.initDataUnsafe;
-        const tgUser = tgData ? tgData.user : null;
-        let msg = "--- DATOS DE TU TELEGRAM ---\n";
-        if (tgUser) {
-            msg += `Usuario: ${tgUser.username || '(Sin @Nick)'}\n`;
-            msg += `Nombre: ${tgUser.first_name || ''} ${tgUser.last_name || ''}\n`;
-            msg += `ID Numérico: ${tgUser.id}\n`;
-        } else {
-            msg += "TELEGRAM NO HA ENVIADO DATOS.\n";
-        }
-        msg += "\n--- SOCIOS EN LA WEB ---\n";
-        msg += `Cargados: ${this.members.length}\n`;
-        msg += "Nicks en BD: " + this.members.map(m => m.tgNick || '(Vacio)').join(', ') + "\n";
-        msg += "----------------------------\n";
-        msg += "Dime qué sale arriba para arreglarlo.";
-        alert(msg);
     }
 
     formatVoters(v) {

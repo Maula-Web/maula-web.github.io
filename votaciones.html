@@ -26,7 +26,7 @@
         }
 
         .vote-card {
-            background: var(--card-bg);
+            background: var(--votaciones-card-bg);
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: var(--card-shadow);
@@ -45,11 +45,11 @@
 
         .vote-card.finished {
             opacity: 0.9;
-            border-left: 5px solid var(--text-muted);
+            border-left: 5px solid var(--votaciones-badge-finished-bg);
         }
 
         .vote-card.active {
-            border-left: 5px solid var(--primary-green);
+            border-left: 5px solid var(--votaciones-badge-active-bg);
         }
 
         .vote-header {
@@ -61,7 +61,7 @@
         .vote-title {
             font-size: 1.4rem;
             font-weight: 800;
-            color: var(--text-main);
+            color: var(--votaciones-card-title);
             margin: 0;
         }
 
@@ -74,18 +74,18 @@
         }
 
         .badge-active {
-            background: var(--primary-green);
+            background: var(--votaciones-badge-active-bg);
             color: white;
         }
 
         .badge-finished {
-            background: var(--text-muted);
+            background: var(--votaciones-badge-finished-bg);
             color: white;
         }
 
         .vote-desc {
             font-size: 0.95rem;
-            color: var(--text-secondary);
+            color: var(--votaciones-card-desc);
             line-height: 1.4;
         }
 
@@ -100,9 +100,9 @@
         .vote-timer {
             font-family: monospace;
             font-weight: bold;
-            color: var(--primary-red);
+            color: var(--votaciones-timer-text);
             font-size: 1.1rem;
-            background: rgba(255, 61, 0, 0.1);
+            background: var(--votaciones-timer-bg);
             padding: 5px 10px;
             border-radius: 4px;
             text-align: center;
@@ -118,10 +118,10 @@
         .option-btn {
             width: 100%;
             padding: 12px;
-            border: 2px solid var(--input-border);
+            border: 2px solid var(--votaciones-option-border);
             border-radius: 8px;
-            background: var(--input-bg);
-            color: var(--text-main);
+            background: var(--votaciones-option-bg);
+            color: var(--votaciones-option-text);
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -136,14 +136,14 @@
         }
 
         .option-btn.selected {
-            border-color: var(--primary-blue);
-            background: var(--primary-blue);
-            color: white;
+            border-color: var(--votaciones-option-selected-bg);
+            background: var(--votaciones-option-selected-bg);
+            color: var(--votaciones-option-selected-text);
         }
 
         .option-progress {
             height: 4px;
-            background: #eee;
+            background: var(--votaciones-progress-bg);
             border-radius: 2px;
             margin-top: 4px;
             overflow: hidden;
@@ -152,7 +152,7 @@
 
         .progress-bar {
             height: 100%;
-            background: var(--primary-blue);
+            background: var(--votaciones-progress-bar);
             transition: width 0.5s ease-out;
         }
 
@@ -169,8 +169,8 @@
         }
 
         .btn-new-vote {
-            background-color: #000;
-            color: #fff;
+            background-color: var(--votaciones-btn-new-bg);
+            color: var(--votaciones-btn-new-text);
             padding: 1rem 2rem;
             border: 2px solid #fff;
             border-radius: 8px;
@@ -192,7 +192,7 @@
         }
 
         .page-subtitle {
-            color: var(--text-secondary);
+            color: var(--votaciones-subtitle);
             margin-bottom: 1.5rem;
         }
 
@@ -206,9 +206,13 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.8);
-            align-items: center;
+            align-items: flex-start;
+            /* Changed from center to allow scrolling from top */
             justify-content: center;
             backdrop-filter: blur(5px);
+            overflow-y: auto;
+            /* Enable vertical scroll for the whole modal overlay */
+            padding: 2rem 0;
         }
 
         .modal.active {
@@ -217,37 +221,54 @@
 
         .modal-content {
             background: var(--modal-bg);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: 16px;
             width: 90%;
             max-width: 500px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: auto;
+            /* Ensure it stays centered if smaller than viewport */
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             font-weight: 700;
             color: var(--text-main);
+            font-size: 0.9rem;
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid var(--input-border);
             border-radius: 8px;
             background: var(--input-bg);
             color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
         }
 
         .form-group-row {
             display: flex;
             gap: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .form-group-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
         }
 
         .form-group-row>div {
@@ -258,7 +279,8 @@
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .btn-save {
@@ -282,11 +304,11 @@
         }
 
         .winning-info {
-            background: #fff8e1;
+            background: var(--votaciones-winning-bg);
             padding: 10px;
             border-radius: 4px;
             font-size: 0.9rem;
-            color: #827717;
+            color: var(--votaciones-winning-text);
             border: 1px solid #ffe082;
             margin-top: 0.5rem;
             text-align: center;

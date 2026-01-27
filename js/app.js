@@ -62,7 +62,7 @@ class MemberManager {
         this.tableBody.innerHTML = '';
 
         if (this.members.length === 0) {
-            this.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: #888;">Cargando o no hay socios...</td></tr>`;
+            this.tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: #888;">Cargando o no hay socios...</td></tr>`;
             return;
         }
 

@@ -64,43 +64,70 @@ class DataService {
     }
 
     async seedDefaults() {
+        console.log("DB: seedDefaults requested. Checking data presence...");
         // RADICAL PROTECTION: If there's any member, stop completely.
         const memSnap = await this.db.collection('members').get();
         if (!memSnap.empty) {
-            console.log("DB: Members already exist, skipping seed.");
+            console.warn("DB: seedDefaults ABORTED. Members already exist in Cloud.");
             return;
         }
 
-        const names = [
-            "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
-            "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
-            "Juan Antonio", "Juanjo", "Luismi", "Marcelo", "Martín",
-            "Rafa", "Ramón", "Raúl Romera", "Samuel"
-        ];
+        // Check for custom template first
+        const customTemplateDoc = await this.db.collection('config').doc('default_members').get();
+        let membersToSeed = [];
+
+        if (customTemplateDoc.exists) {
+            console.log("DB: Using CUSTOM default members template.");
+            membersToSeed = customTemplateDoc.data().members || [];
+        } else {
+            console.log("DB: Using HARDCODED default members.");
+            const names = [
+                "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
+                "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
+                "Juan Antonio", "Juanjo", "Luismi", "Marcelo", "Martín",
+                "Rafa", "Ramón", "Raúl Romera", "Samuel"
+            ];
+            membersToSeed = names.map((name, index) => {
+                const id = index + 1;
+                const cleanName = name.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-z0-9]/g, "");
+                return {
+                    id: id,
+                    name: name,
+                    email: `${cleanName}@maulas.com`,
+                    phone: '',
+                    tgNick: '',
+                    joinedDate: new Date().toISOString()
+                };
+            });
+        }
+
+        if (membersToSeed.length === 0) {
+            console.warn("DB: No members to seed.");
+            return;
+        }
 
         const batch = this.db.batch();
-        let id = 1;
-
-        for (const name of names) {
-            const cleanName = name.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]/g, "");
-
-            const email = `${cleanName}@maulas.com`;
-
-            const docRef = this.db.collection('members').doc(String(id));
-            batch.set(docRef, {
-                id: id,
-                name: name,
-                email: email,
-                phone: '',
-                tgNick: '', // Initialize new field
-                joinedDate: new Date().toISOString()
-            });
-            id++;
+        for (const member of membersToSeed) {
+            const docRef = this.db.collection('members').doc(String(member.id));
+            batch.set(docRef, member);
         }
         await batch.commit();
-        console.log("Seeded default members successfully.");
+        console.log(`Seeded ${membersToSeed.length} default members successfully.`);
+    }
+
+    async saveMembersAsTemplate() {
+        const members = await this.getAll('members');
+        if (members.length === 0) {
+            throw new Error("No hay socios actualmente para guardar como plantilla.");
+        }
+        await this.db.collection('config').doc('default_members').set({
+            members: members,
+            updatedAt: new Date().toISOString()
+        });
+        console.log("Custom members template saved.");
+        return members.length;
     }
 
     async migrateCollection(colName, localKey) {

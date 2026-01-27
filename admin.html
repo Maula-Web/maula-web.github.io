@@ -148,6 +148,20 @@
                     </ul>
                 </div>
 
+                <div class="config-card" style="border-top-color: #0288d1;">
+                    <h2>💾 Respaldo de Socios</h2>
+                    <p style="font-size: 0.75rem; color: #666; margin-bottom: 0.8rem;">
+                        Guarda la lista actual (con correos y nicks) como la <b>plantilla por defecto</b> de la peña.
+                    </p>
+                    <button id="btn-save-members-template" onclick="saveMembersAsDefault(this)" class="btn-action"
+                        style="width:100%; background:#0288d1;">
+                        GRABAR SOCIOS ACTUALES COMO DEFAULT
+                    </button>
+                    <div id="save-members-msg"
+                        style="text-align:center; color:green; margin-top:5px; font-size:0.8rem; display:none;">
+                        ¡Plantilla guardada!</div>
+                </div>
+
                 <div class="config-card">
                     <h2>📢 Telegram Bots</h2>
                     <form id="telegram-form" style="font-size:0.9rem;">
@@ -731,6 +745,30 @@
         }
 
         // GLOBAL FUNCTION FOR BUTTON
+        window.saveMembersAsDefault = async function (btn) {
+            if (!confirm("¿Quieres guardar el estado actual de los socios como la plantilla por defecto? Esto sobrescribirá cualquier copia de seguridad de socios anterior.")) return;
+
+            btn.disabled = true;
+            btn.textContent = "Guardando...";
+
+            try {
+                const count = await window.DataService.saveMembersAsTemplate();
+                const msg = document.getElementById('save-members-msg');
+                msg.style.display = 'block';
+                msg.textContent = `¡Plantilla guardada con ${count} socios!`;
+                setTimeout(() => {
+                    msg.style.display = 'none';
+                    btn.disabled = false;
+                    btn.textContent = "GRABAR SOCIOS ACTUALES COMO DEFAULT";
+                }, 3000);
+                Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, `Guardó plantilla de socios (${count} socios)`);
+            } catch (e) {
+                alert("Error: " + e.message);
+                btn.disabled = false;
+                btn.textContent = "GRABAR SOCIOS ACTUALES COMO DEFAULT";
+            }
+        };
+
         window.runManualSeed = async function (btnSeed) {
             if (confirm("¿Seguro? Esto intentará cargar los datos históricos si faltan. Se generarán las jornadas futuras y se cargarán los pronósticos anteriores.")) {
                 btnSeed.disabled = true;
