@@ -45,8 +45,9 @@
 
         .stat-card h3 {
             margin: 0 0 1rem 0;
-            font-size: 0.95rem;
             color: var(--dash-card-title);
+            font-family: var(--dash-card-title-font);
+            font-size: var(--dash-card-title-size);
             text-transform: uppercase;
             letter-spacing: 1.5px;
             font-weight: 800;
@@ -54,10 +55,11 @@
         }
 
         .stat-value {
-            font-size: 3.2rem;
+            color: var(--dash-card-value);
+            font-family: var(--dash-card-value-font);
+            font-size: var(--dash-card-value-size);
             font-weight: 900;
             margin-bottom: 0.5rem;
-            color: var(--dash-card-value);
         }
 
         /* Neon Glows for values */
@@ -94,6 +96,8 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: var(--main-shadow);
             color: var(--dash-wide-text);
+            font-family: var(--dash-wide-text-font);
+            font-size: var(--dash-wide-text-size);
         }
 
         .stat-wide-card h3 {

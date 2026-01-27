@@ -1,3 +1,12 @@
+const FONT_OPTIONS = [
+    { value: "'Inter', sans-serif", label: 'Inter (Moderno)' },
+    { value: "'Montserrat', sans-serif", label: 'Montserrat (Premium)' },
+    { value: "'Outfit', sans-serif", label: 'Outfit (Geométrico)' },
+    { value: "'Raleway', sans-serif", label: 'Raleway (Elegante)' },
+    { value: "'Playfair Display', serif", label: 'Playfair (Clásico)' },
+    { value: "system-ui, sans-serif", label: 'Sistema (Nativo)' }
+];
+
 const ThemeEditor = {
     // Definición completa de todas las variables configurables
     groups: {
@@ -6,8 +15,8 @@ const ThemeEditor = {
             { id: '--modal-bg', label: 'Fondo Ventanas/Modales' },
             { id: '--modal-header-bg', label: 'Fondo Cabecera Modal (Sticky)' },
             { id: '--card-bg', label: 'Fondo Tarjetas (Stats)' },
-            { id: '--text-main', label: 'Texto Principal' },
-            { id: '--text-secondary', label: 'Texto Secundario' },
+            { id: '--text-main', label: 'Texto Principal', isText: true },
+            { id: '--text-secondary', label: 'Texto Secundario', isText: true },
             { id: '--input-bg', label: 'Fondo de Inputs' },
             { id: '--input-border', label: 'Borde de Inputs' },
             { id: '--glass-border', label: 'Borde Cristal/Transparente' },
@@ -24,7 +33,7 @@ const ThemeEditor = {
                     { value: "system-ui, sans-serif", label: 'Sistema (Nativo)' }
                 ]
             },
-            { id: '--main-font-size', label: 'Tamaño de Texto Base', type: 'range', min: 12, max: 24, step: 1, suffix: 'px' }
+            { id: '--main-font-size', label: 'Tamaño de Texto Base', type: 'range', min: 10, max: 40, step: 1, suffix: 'px' }
         ],
         'sombras': [
             { id: '--main-shadow', label: 'Sombra Contenedor Principal', type: 'toggle', onValue: '0 20px 50px rgba(0,0,0,0.8)' },
@@ -37,20 +46,20 @@ const ThemeEditor = {
         'dashboard': [
             { id: '--dash-bg', label: 'Fondo Dashboard' },
             { id: '--dash-card-bg', label: 'Fondo Tarjetas Stats' },
-            { id: '--dash-card-title', label: 'Título Stats' },
-            { id: '--dash-card-value', label: 'Valor Stats' },
+            { id: '--dash-card-title', label: 'Título Stats', isText: true },
+            { id: '--dash-card-value', label: 'Valor Stats', isText: true },
             { id: '--dash-wide-bg', label: 'Fondo Tarjeta Ancha' },
-            { id: '--dash-wide-text', label: 'Texto Tarjeta Ancha' },
+            { id: '--dash-wide-text', label: 'Texto Tarjeta Ancha', isText: true },
             { id: '--dash-clock-bg', label: 'Fondo Cuenta Atrás' },
-            { id: '--dash-clock-text', label: 'Texto Reloj' },
-            { id: '--dash-clock-title', label: 'Texto Título Reloj' },
+            { id: '--dash-clock-text', label: 'Texto Reloj', isText: true },
+            { id: '--dash-clock-title', label: 'Texto Título Reloj', isText: true },
             { id: '--dash-bote-bg', label: 'Fondo Badge Bote' },
-            { id: '--dash-bote-text', label: 'Texto Badge Bote' },
-            { id: '--dash-winner-label', label: 'Label Ganador Quiniela' },
-            { id: '--dash-winner-name', label: 'Nombre Ganador Quiniela' },
-            { id: '--dash-loser-label', label: 'Label Perdedor (Maula)' },
-            { id: '--dash-loser-name', label: 'Nombre Perdedor (Maula)' },
-            { id: '--dash-doubles-label', label: 'Título Quiniela Dobles' }
+            { id: '--dash-bote-text', label: 'Texto Badge Bote', isText: true },
+            { id: '--dash-winner-label', label: 'Label Ganador Quiniela', isText: true },
+            { id: '--dash-winner-name', label: 'Nombre Ganador Quiniela', isText: true },
+            { id: '--dash-loser-label', label: 'Label Perdedor (Maula)', isText: true },
+            { id: '--dash-loser-name', label: 'Nombre Perdedor (Maula)', isText: true },
+            { id: '--dash-doubles-label', label: 'Título Quiniela Dobles', isText: true }
         ],
         'tablas': [
             { id: '--table-bg', label: 'Fondo Tabla' },
@@ -68,27 +77,27 @@ const ThemeEditor = {
             { id: '--dark-green', label: 'Verde Oscuro' },
             { id: '--pastel-bg-green', label: 'Fondo Muted' },
             { id: '--pastel-accent-green', label: 'Acento Muted' },
-            { id: '--socios-text', label: 'Texto General Página' },
-            { id: '--socios-title', label: 'Título Página (SOCIOS)' },
+            { id: '--socios-text', label: 'Texto General Página', isText: true },
+            { id: '--socios-title', label: 'Título Página (SOCIOS)', isText: true },
             { id: '--socios-card-bg', label: 'Fondo Tarjeta Socio' },
             { id: '--socios-btn-new-bg', label: 'Botón Nuevo (Fondo)' },
-            { id: '--socios-btn-new-text', label: 'Botón Nuevo (Texto)' },
+            { id: '--socios-btn-new-text', label: 'Botón Nuevo (Texto)', isText: true },
             { id: '--socios-btn-import-bg', label: 'Botón Importar (Fondo)' },
-            { id: '--socios-btn-import-text', label: 'Botón Importar (Texto)' },
+            { id: '--socios-btn-import-text', label: 'Botón Importar (Texto)', isText: true },
             { id: '--socios-btn-delete-bg', label: 'Botón Eliminar (Fondo)' },
-            { id: '--socios-btn-delete-text', label: 'Botón Eliminar (Texto)' },
-            { id: '--socios-field-id-label', label: 'Label ID' },
-            { id: '--socios-field-id-value', label: 'Valor ID' },
-            { id: '--socios-field-name-label', label: 'Label Nombre' },
-            { id: '--socios-field-name-value', label: 'Valor Nombre' },
-            { id: '--socios-field-email-label', label: 'Label Email' },
-            { id: '--socios-field-email-value', label: 'Valor Email' },
-            { id: '--socios-field-phone-label', label: 'Label Teléfono' },
-            { id: '--socios-field-phone-value', label: 'Valor Teléfono' },
-            { id: '--socios-field-action-label', label: 'Label Acción' },
-            { id: '--socios-field-action-text', label: 'Texto Acción (Editar)' },
+            { id: '--socios-btn-delete-text', label: 'Botón Eliminar (Texto)', isText: true },
+            { id: '--socios-field-id-label', label: 'Label ID', isText: true },
+            { id: '--socios-field-id-value', label: 'Valor ID', isText: true },
+            { id: '--socios-field-name-label', label: 'Label Nombre', isText: true },
+            { id: '--socios-field-name-value', label: 'Valor Nombre', isText: true },
+            { id: '--socios-field-email-label', label: 'Label Email', isText: true },
+            { id: '--socios-field-email-value', label: 'Valor Email', isText: true },
+            { id: '--socios-field-phone-label', label: 'Label Teléfono', isText: true },
+            { id: '--socios-field-phone-value', label: 'Valor Teléfono', isText: true },
+            { id: '--socios-field-action-label', label: 'Label Acción', isText: true },
+            { id: '--socios-field-action-text', label: 'Texto Acción (Editar)', isText: true },
             { id: '--socios-btn-edit-bg', label: 'Botón Modificar (Fondo)' },
-            { id: '--socios-btn-edit-text', label: 'Botón Modificar (Texto)' },
+            { id: '--socios-btn-edit-text', label: 'Botón Modificar (Texto)', isText: true },
             { id: '--socios-main-card-bg', label: 'Fondo Contenedor Principal' }
         ],
         'jornadas': [
@@ -96,86 +105,84 @@ const ThemeEditor = {
             { id: '--dark-blue', label: 'Azul Oscuro' },
             { id: '--pastel-bg-blue', label: 'Fondo Muted' },
             { id: '--pastel-accent-blue', label: 'Acento Muted' },
-            { id: '--jornadas-text', label: 'Texto General Página' },
+            { id: '--jornadas-text', label: 'Texto General Página', isText: true },
             { id: '--jornadas-main-card-bg', label: 'Fondo Contenedor Principal' },
             { id: '--jornada-card-bg', label: 'Fondo Tarjeta Jornada' },
             { id: '--jornada-card-bg-active', label: 'Fondo Tarjeta Activa' },
-            { id: '--jornada-card-number', label: 'Título Jornada (Color)' },
-            { id: '--jornada-card-season', label: 'Temporada (Color)' },
-            { id: '--jornada-status-finished', label: 'Estado Finalizada (Verde)' },
-            { id: '--jornada-status-pending', label: 'Estado Pendiente (Naranja)' },
+            { id: '--jornada-card-number', label: 'Título Jornada (Color)', isText: true },
+            { id: '--jornada-card-season', label: 'Temporada (Color)', isText: true },
+            { id: '--jornada-status-finished', label: 'Estado Finalizada (Verde)', isText: true },
+            { id: '--jornada-status-pending', label: 'Estado Pendiente (Naranja)', isText: true },
             { id: '--jornada-date-bg', label: 'Fondo Badge Fecha' },
-            { id: '--jornada-date-text', label: 'Texto Badge Fecha' },
+            { id: '--jornada-date-text', label: 'Texto Badge Fecha', isText: true },
             { id: '--jornada-empty-bg', label: 'Fondo Tarjeta Vacía' },
-            { id: '--jornada-header-time', label: 'Texto Fecha Cabecera' },
+            { id: '--jornada-header-time', label: 'Texto Fecha Cabecera', isText: true },
             { id: '--jornadas-btn-pdf-bg', label: 'Btn Importar PDF (Fondo)' },
-            { id: '--jornadas-btn-pdf-text', label: 'Btn Importar PDF (Texto)' },
+            { id: '--jornadas-btn-pdf-text', label: 'Btn Importar PDF (Texto)', isText: true },
             { id: '--jornadas-btn-rss-bg', label: 'Btn Importar RSS (Fondo)' },
-            { id: '--jornadas-btn-rss-text', label: 'Btn Importar RSS (Texto)' },
+            { id: '--jornadas-btn-rss-text', label: 'Btn Importar RSS (Texto)', isText: true },
             { id: '--jornadas-btn-new-bg', label: 'Btn Nueva (Fondo)' },
-            { id: '--jornadas-btn-new-text', label: 'Btn Nueva (Texto)' },
+            { id: '--jornadas-btn-new-text', label: 'Btn Nueva (Texto)', isText: true },
             { id: '--jornadas-btn-delete-bg', label: 'Btn Borrar Todo (Fondo)' },
-            { id: '--jornadas-btn-delete-text', label: 'Btn Borrar Todo (Texto)' }
+            { id: '--jornadas-btn-delete-text', label: 'Btn Borrar Todo (Texto)', isText: true }
         ],
         'pronosticos': [
             { id: '--primary-red', label: 'Rojo Primario' },
             { id: '--dark-red', label: 'Rojo Oscuro' },
             { id: '--pastel-bg-red', label: 'Fondo Muted' },
             { id: '--pastel-accent-red', label: 'Acento Muted' },
-            { id: '--pronosticos-text', label: 'Texto General Página' },
+            { id: '--pronosticos-text', label: 'Texto General Página', isText: true },
             { id: '--pronosticos-main-card-bg', label: 'Fondo Contenedor Principal' },
             { id: '--pronosticos-card-bg', label: 'Fondo Tarjetas Internas' },
             { id: '--pronosticos-btn-bg', label: 'Fondo Botones' },
-            { id: '--pronosticos-btn-text', label: 'Texto Botones' },
+            { id: '--pronosticos-btn-text', label: 'Texto Botones', isText: true },
             { id: '--pronosticos-select-bg', label: 'Fondo Desplegables' },
-            { id: '--pronosticos-select-text', label: 'Texto Desplegables' },
+            { id: '--pronosticos-select-text', label: 'Texto Desplegables', isText: true },
             { id: '--pronosticos-select-border', label: 'Borde Desplegables' },
-            { id: '--pronosticos-scroll-thumb', label: 'Barra Deslizante (Mando)' },
-            { id: '--pronosticos-scroll-track', label: 'Barra Deslizante (Carril)' },
             { id: '--pronosticos-scroll-thumb', label: 'Barra Deslizante (Mando)' },
             { id: '--pronosticos-scroll-track', label: 'Barra Deslizante (Carril)' },
             { id: '--pronosticos-selection-card-bg', label: 'Fondo Tarjeta Superior (Selects)' },
             { id: '--pronosticos-table-head-col-bg', label: 'Fondo Cabecera Columnas (Top)' },
-            { id: '--pronosticos-table-head-col-text', label: 'Texto Cabecera Columnas' },
+            { id: '--pronosticos-table-head-col-text', label: 'Texto Cabecera Columnas', isText: true },
             { id: '--pronosticos-table-head-row-bg', label: 'Fondo Cabecera Filas (Left)' },
-            { id: '--pronosticos-table-head-row-text', label: 'Texto Cabecera Filas' },
+            { id: '--pronosticos-table-head-row-text', label: 'Texto Cabecera Filas', isText: true },
             { id: '--pronosticos-table-col-odd-bg', label: 'Fondo Columna Impar' },
-            { id: '--pronosticos-table-col-odd-text', label: 'Texto Columna Impar' },
+            { id: '--pronosticos-table-col-odd-text', label: 'Texto Columna Impar', isText: true },
             { id: '--pronosticos-table-col-even-bg', label: 'Fondo Columna Par' },
-            { id: '--pronosticos-table-col-even-text', label: 'Texto Columna Par' },
+            { id: '--pronosticos-table-col-even-text', label: 'Texto Columna Par', isText: true },
             { id: '--pronosticos-status-late-bg', label: 'Fondo Aviso Tarde' },
-            { id: '--pronosticos-status-late-text', label: 'Texto Aviso Tarde' }
+            { id: '--pronosticos-status-late-text', label: 'Texto Aviso Tarde', isText: true }
         ],
         'resultados': [
             { id: '--primary-purple', label: 'Color Primario' },
             { id: '--dark-purple', label: 'Color Oscuro' },
             { id: '--pastel-bg-purple', label: 'Fondo Muted' },
             { id: '--pastel-accent-purple', label: 'Acento Muted' },
-            { id: '--resultados-text', label: 'Texto General Página' },
+            { id: '--resultados-text', label: 'Texto General Página', isText: true },
             { id: '--resultados-header-bg', label: 'Fondo Cabecera Tabla (Nombres)' },
-            { id: '--resultados-header-text', label: 'Texto Cabecera Tabla' },
+            { id: '--resultados-header-text', label: 'Texto Cabecera Tabla', isText: true },
             { id: '--resultados-corner-bg', label: 'Fondo Esquina Superior Izq.' },
             { id: '--resultados-sticky-col-bg', label: 'Fondo Columna Jornadas' },
-            { id: '--resultados-sticky-col-text', label: 'Texto Columna Jornadas' },
+            { id: '--resultados-sticky-col-text', label: 'Texto Columna Jornadas', isText: true },
             { id: '--resultados-summary-total-bg', label: 'Fondo Celda "Total Puntos"' },
-            { id: '--resultados-summary-total-text', label: 'Texto Celda "Total Puntos"' },
+            { id: '--resultados-summary-total-text', label: 'Texto Celda "Total Puntos"', isText: true },
             { id: '--resultados-summary-row-bg', label: 'Fondo Filas Resumen' },
-            { id: '--resultados-summary-row-text', label: 'Texto Filas Resumen' },
+            { id: '--resultados-summary-row-text', label: 'Texto Filas Resumen', isText: true },
             { id: '--resultados-summary-label-bg', label: 'Fondo Labels Resumen' },
-            { id: '--resultados-summary-label-text', label: 'Texto Labels Resumen' },
+            { id: '--resultados-summary-label-text', label: 'Texto Labels Resumen', isText: true },
             { id: '--resultados-winner-bg', label: 'Fondo Celda Ganador' },
-            { id: '--resultados-winner-text', label: 'Texto Celda Ganador' },
+            { id: '--resultados-winner-text', label: 'Texto Celda Ganador', isText: true },
             { id: '--resultados-loser-bg', label: 'Fondo Celda Perdedor' },
-            { id: '--resultados-loser-text', label: 'Texto Celda Perdedor' },
+            { id: '--resultados-loser-text', label: 'Texto Celda Perdedor', isText: true },
             { id: '--resultados-bonus-positive', label: 'Color Bonificación (+)' },
             { id: '--resultados-bonus-negative', label: 'Color Penalización (-)' },
-            { id: '--resultados-prize-text', label: 'Color Texto Premios' },
+            { id: '--resultados-prize-text', label: 'Color Texto Premios', isText: true },
             { id: '--resultados-prize-bg', label: 'Fondo Celdas Premios' },
             { id: '--resultados-prize-label-bg', label: 'Fondo Label "Premios"' },
-            { id: '--resultados-jornada-number', label: 'Texto Número Jornada' },
-            { id: '--resultados-jornada-date', label: 'Texto Fecha Jornada' },
-            { id: '--resultados-hits-number', label: 'Texto Número Aciertos' },
-            { id: '--resultados-total-points-text', label: 'Texto Total Puntos' },
+            { id: '--resultados-jornada-number', label: 'Texto Número Jornada', isText: true },
+            { id: '--resultados-jornada-date', label: 'Texto Fecha Jornada', isText: true },
+            { id: '--resultados-hits-number', label: 'Texto Número Aciertos', isText: true },
+            { id: '--resultados-total-points-text', label: 'Texto Total Puntos', isText: true },
             { id: '--resultados-cell-bg', label: 'Fondo Celdas Tabla' },
             { id: '--resultados-cell-alt-bg', label: 'Fondo Celdas Alternas' }
         ],
@@ -185,62 +192,62 @@ const ThemeEditor = {
             { id: '--resumen-main-bg', label: 'Fondo Contenedor Principal' },
             { id: '--resumen-card-bg', label: 'Fondo Tarjetas Rankings' },
             { id: '--resumen-table-header-bg', label: 'Fondo Cabecera Tabla Ranking' },
-            { id: '--resumen-table-header-text', label: 'Texto Cabecera Tabla Ranking' },
+            { id: '--resumen-table-header-text', label: 'Texto Cabecera Tabla Ranking', isText: true },
             { id: '--resumen-table-row-bg', label: 'Fondo Filas Ranking' },
-            { id: '--resumen-table-text', label: 'Texto Filas Ranking' },
-            { id: '--resumen-link-color', label: 'Color Enlaces Socios' },
-            { id: '--resumen-row-points-text', label: 'Color Puntos Ranking' },
+            { id: '--resumen-table-text', label: 'Texto Filas Ranking', isText: true },
+            { id: '--resumen-link-color', label: 'Color Enlaces Socios', isText: true },
+            { id: '--resumen-row-points-text', label: 'Color Puntos Ranking', isText: true },
             { id: '--resumen-summary-bg', label: 'Fondo Texto Resumen IA' },
-            { id: '--resumen-summary-text', label: 'Texto Resumen IA' },
+            { id: '--resumen-summary-text', label: 'Texto Resumen IA', isText: true },
             { id: '--resumen-match-box-bg', label: 'Fondo Ventana Acierto Partido' },
-            { id: '--resumen-match-box-text', label: 'Texto Ventana Acierto Partido' },
+            { id: '--resumen-match-box-text', label: 'Texto Ventana Acierto Partido', isText: true },
             { id: '--resumen-team-box-bg', label: 'Fondo Ventana Acierto Equipo' },
-            { id: '--resumen-team-box-text', label: 'Texto Ventana Acierto Equipo' },
+            { id: '--resumen-team-box-text', label: 'Texto Ventana Acierto Equipo', isText: true },
             { id: '--resumen-performance-bg', label: 'Fondo Ventana Rendimiento' },
-            { id: '--resumen-performance-text', label: 'Texto Ventana Rendimiento' },
+            { id: '--resumen-performance-text', label: 'Texto Ventana Rendimiento', isText: true },
             { id: '--resumen-detail-table-header-bg', label: 'Fondo Cabecera Tabla Detalle' },
-            { id: '--resumen-detail-table-header-text', label: 'Texto Cabecera Tabla Detalle' },
+            { id: '--resumen-detail-table-header-text', label: 'Texto Cabecera Tabla Detalle', isText: true },
             { id: '--resumen-detail-table-row-bg', label: 'Fondo Filas Tabla Detalle' },
-            { id: '--resumen-detail-table-text', label: 'Texto Filas Tabla Detalle' },
+            { id: '--resumen-detail-table-text', label: 'Texto Filas Tabla Detalle', isText: true },
             { id: '--resumen-detail-row-hit-bg', label: 'Fondo Fila Acierto (Detalle)' },
-            { id: '--resumen-detail-match-text', label: 'Color Texto Partidos' },
-            { id: '--resumen-detail-result-text', label: 'Color Texto Resultados' }
+            { id: '--resumen-detail-match-text', label: 'Color Texto Partidos', isText: true },
+            { id: '--resumen-detail-result-text', label: 'Color Texto Resultados', isText: true }
         ],
         'votaciones': [
-            { id: '--votaciones-title', label: 'Título Página' },
-            { id: '--votaciones-subtitle', label: 'Subtítulo Página' },
+            { id: '--votaciones-title', label: 'Título Página', isText: true },
+            { id: '--votaciones-subtitle', label: 'Subtítulo Página', isText: true },
             { id: '--votaciones-btn-new-bg', label: 'Botón Nueva (Fondo)' },
-            { id: '--votaciones-btn-new-text', label: 'Botón Nueva (Texto)' },
+            { id: '--votaciones-btn-new-text', label: 'Botón Nueva (Texto)', isText: true },
             { id: '--votaciones-card-bg', label: 'Fondo Tarjeta Voto' },
-            { id: '--votaciones-card-title', label: 'Título Voto' },
-            { id: '--votaciones-card-desc', label: 'Descripción Voto' },
+            { id: '--votaciones-card-title', label: 'Título Voto', isText: true },
+            { id: '--votaciones-card-desc', label: 'Descripción Voto', isText: true },
             { id: '--votaciones-badge-active-bg', label: 'Badge Activo (Fondo)' },
             { id: '--votaciones-badge-finished-bg', label: 'Badge Finalizado (Fondo)' },
             { id: '--votaciones-timer-bg', label: 'Reloj/Tiempo (Fondo)' },
-            { id: '--votaciones-timer-text', label: 'Reloj/Tiempo (Texto)' },
+            { id: '--votaciones-timer-text', label: 'Reloj/Tiempo (Texto)', isText: true },
             { id: '--votaciones-option-bg', label: 'Opción (Fondo)' },
-            { id: '--votaciones-option-text', label: 'Opción (Texto)' },
+            { id: '--votaciones-option-text', label: 'Opción (Texto)', isText: true },
             { id: '--votaciones-option-border', label: 'Opción (Borde)' },
             { id: '--votaciones-option-selected-bg', label: 'Opción Elegida (Fondo)' },
-            { id: '--votaciones-option-selected-text', label: 'Opción Elegida (Texto)' },
+            { id: '--votaciones-option-selected-text', label: 'Opción Elegida (Texto)', isText: true },
             { id: '--votaciones-progress-bg', label: 'Barra Progreso (Carril)' },
             { id: '--votaciones-progress-bar', label: 'Barra Progreso (Lleno)' },
             { id: '--votaciones-winning-bg', label: 'Info Ganador (Fondo)' },
-            { id: '--votaciones-winning-text', label: 'Info Ganador (Texto)' }
+            { id: '--votaciones-winning-text', label: 'Info Ganador (Texto)', isText: true }
         ],
         'importacion': [
             { id: '--import-modal-bg', label: 'Fondo Ventana Confirmación' },
-            { id: '--import-modal-text', label: 'Texto Títulos/General' },
+            { id: '--import-modal-text', label: 'Texto Títulos/General', isText: true },
             { id: '--import-modal-card-bg', label: 'Fondo Bloque Jornada' },
-            { id: '--import-modal-card-text', label: 'Texto Bloque Jornada' },
-            { id: '--import-modal-title', label: 'Color Título Principal' }
+            { id: '--import-modal-card-text', label: 'Texto Bloque Jornada', isText: true },
+            { id: '--import-modal-title', label: 'Color Título Principal', isText: true }
         ],
         'acceso': [
             { id: '--login-bg', label: 'Fondo Pantalla' },
             { id: '--login-card-bg', label: 'Fondo Tarjeta' },
             { id: '--login-btn-bg', label: 'Fondo Botón' },
-            { id: '--login-text', label: 'Color Título' },
-            { id: '--login-label', label: 'Color Etiquetas (Labels)' }
+            { id: '--login-text', label: 'Color Título', isText: true },
+            { id: '--login-label', label: 'Color Etiquetas (Labels)', isText: true }
         ]
     },
 
@@ -320,6 +327,35 @@ const ThemeEditor = {
                     `;
                 }
                 container.appendChild(row);
+
+                // Si es un campo de texto, añadir controles extra de Fuente y Tamaño
+                if (v.isText) {
+                    const fontId = v.id + '-font';
+                    const sizeId = v.id + '-size';
+
+                    // Fila de Fuente
+                    const fontRow = document.createElement('div');
+                    fontRow.className = 'color-row submodule';
+                    fontRow.innerHTML = `
+                        <label style="padding-left:20px; font-size:0.85rem; opacity:0.8;">└ Fuente</label>
+                        <select id="select-${fontId}" onchange="ThemeEditor.updateVariable('${fontId}', this.value)" style="padding:4px; border-radius:4px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-main); font-size:0.8rem;">
+                            ${FONT_OPTIONS.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+                        </select>
+                    `;
+                    container.appendChild(fontRow);
+
+                    // Fila de Tamaño
+                    const sizeRow = document.createElement('div');
+                    sizeRow.className = 'color-row submodule';
+                    sizeRow.innerHTML = `
+                        <label style="padding-left:20px; font-size:0.85rem; opacity:0.8;">└ Tamaño</label>
+                        <div style="display:flex; gap:10px; align-items:center; flex:1; justify-content:flex-end;">
+                            <input type="range" id="range-${sizeId}" min="8" max="80" step="1" oninput="ThemeEditor.updateRange('${sizeId}', this.value, 'px')" style="flex:1;">
+                            <span id="val-${sizeId}" style="font-size:0.8rem; min-width:35px; text-align:right; color:var(--text-main);">0px</span>
+                        </div>
+                    `;
+                    container.appendChild(sizeRow);
+                }
             });
         }
     },
@@ -366,6 +402,29 @@ const ThemeEditor = {
                     const text = document.getElementById(`text-${v.id}`);
                     if (picker) picker.value = val;
                     if (text) text.value = val;
+                }
+
+                // Cargar valores de fuente y tamaño si aplica
+                if (v.isText) {
+                    const fontId = v.id + '-font';
+                    const sizeId = v.id + '-size';
+
+                    // Cargar fuente
+                    let fontVal = styles.getPropertyValue(fontId).trim();
+                    const sel = document.getElementById(`select-${fontId}`);
+                    if (sel && fontVal) {
+                        sel.value = fontVal.replace(/["']/g, "'");
+                    }
+
+                    // Cargar tamaño
+                    let sizeVal = styles.getPropertyValue(sizeId).trim();
+                    const rng = document.getElementById(`range-${sizeId}`);
+                    const num = parseInt(sizeVal);
+                    if (rng && !isNaN(num)) {
+                        rng.value = num;
+                        const valDisplay = document.getElementById(`val-${sizeId}`);
+                        if (valDisplay) valDisplay.textContent = num + 'px';
+                    }
                 }
             });
         }
@@ -426,6 +485,18 @@ const ThemeEditor = {
                 } else {
                     const el = document.getElementById(`picker-${v.id}`);
                     if (el) themeData[v.id] = el.value;
+                }
+
+                // Extra values for text
+                if (v.isText) {
+                    const fontId = v.id + '-font';
+                    const sizeId = v.id + '-size';
+
+                    const fEl = document.getElementById(`select-${fontId}`);
+                    if (fEl) themeData[fontId] = fEl.value;
+
+                    const sEl = document.getElementById(`range-${sizeId}`);
+                    if (sEl) themeData[sizeId] = sEl.value + 'px';
                 }
             });
         }

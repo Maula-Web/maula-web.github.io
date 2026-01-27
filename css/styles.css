@@ -359,6 +359,189 @@ body.layout-vertical .main-container {
     --login-text: #333333;
     --login-label: #555555;
     --login-subtitle: #777777;
+
+    /* Typography Defaults (Pre-loaded with current values) */
+    --text-main-font: var(--main-font-family);
+    --text-main-size: 16px;
+    --text-secondary-font: var(--main-font-family);
+    --text-secondary-size: 14px;
+    --dash-card-title-font: var(--main-font-family);
+    --dash-card-title-size: 16px;
+    --dash-card-value-font: var(--main-font-family);
+    --dash-card-value-size: 40px;
+    --dash-wide-text-font: var(--main-font-family);
+    --dash-wide-text-size: 16px;
+    --dash-clock-text-font: var(--main-font-family);
+    --dash-clock-text-size: 32px;
+    --dash-clock-title-font: var(--main-font-family);
+    --dash-clock-title-size: 14px;
+    --dash-bote-text-font: var(--main-font-family);
+    --dash-bote-text-size: 14px;
+    --dash-winner-label-font: var(--main-font-family);
+    --dash-winner-label-size: 14px;
+    --dash-winner-name-font: var(--main-font-family);
+    --dash-winner-name-size: 20px;
+    --dash-loser-label-font: var(--main-font-family);
+    --dash-loser-label-size: 14px;
+    --dash-loser-name-font: var(--main-font-family);
+    --dash-loser-name-size: 20px;
+    --dash-doubles-label-size: 18px;
+
+    /* More Typography Defaults */
+    --socios-text-font: var(--main-font-family);
+    --socios-text-size: 16px;
+    --socios-title-font: var(--main-font-family);
+    --socios-title-size: 35px;
+    --socios-btn-new-text-font: var(--main-font-family);
+    --socios-btn-new-text-size: 16px;
+    --socios-btn-import-text-font: var(--main-font-family);
+    --socios-btn-import-text-size: 16px;
+    --socios-btn-delete-text-font: var(--main-font-family);
+    --socios-btn-delete-text-size: 16px;
+    --socios-field-id-label-font: var(--main-font-family);
+    --socios-field-id-label-size: 13px;
+    --socios-field-id-value-font: var(--main-font-family);
+    --socios-field-id-value-size: 16px;
+    --socios-field-name-label-font: var(--main-font-family);
+    --socios-field-name-label-size: 13px;
+    --socios-field-name-value-font: var(--main-font-family);
+    --socios-field-name-value-size: 16px;
+    --socios-field-email-label-font: var(--main-font-family);
+    --socios-field-email-label-size: 13px;
+    --socios-field-email-value-font: var(--main-font-family);
+    --socios-field-email-value-size: 16px;
+    --socios-field-phone-label-font: var(--main-font-family);
+    --socios-field-phone-label-size: 13px;
+    --socios-field-phone-value-font: var(--main-font-family);
+    --socios-field-phone-value-size: 16px;
+    --socios-field-action-label-font: var(--main-font-family);
+    --socios-field-action-label-size: 13px;
+    --socios-field-action-text-font: var(--main-font-family);
+    --socios-field-action-text-size: 16px;
+    --socios-btn-edit-text-font: var(--main-font-family);
+    --socios-btn-edit-text-size: 16px;
+
+    --jornadas-text-font: var(--main-font-family);
+    --jornadas-text-size: 16px;
+    --jornada-card-number-font: var(--main-font-family);
+    --jornada-card-number-size: 24px;
+    --jornada-card-season-font: var(--main-font-family);
+    --jornada-card-season-size: 14px;
+    --jornada-status-finished-font: var(--main-font-family);
+    --jornada-status-finished-size: 13px;
+    --jornada-status-pending-font: var(--main-font-family);
+    --jornada-status-pending-size: 13px;
+    --jornada-date-text-font: var(--main-font-family);
+    --jornada-date-text-size: 13px;
+    --jornada-header-time-font: var(--main-font-family);
+    --jornada-header-time-size: 14px;
+    --jornadas-btn-pdf-text-font: var(--main-font-family);
+    --jornadas-btn-pdf-text-size: 16px;
+    --jornadas-btn-rss-text-font: var(--main-font-family);
+    --jornadas-btn-rss-text-size: 16px;
+    --jornadas-btn-new-text-font: var(--main-font-family);
+    --jornadas-btn-new-text-size: 16px;
+    --jornadas-btn-delete-text-font: var(--main-font-family);
+    --jornadas-btn-delete-text-size: 16px;
+
+    --pronosticos-text-font: var(--main-font-family);
+    --pronosticos-text-size: 16px;
+    --pronosticos-btn-text-font: var(--main-font-family);
+    --pronosticos-btn-text-size: 16px;
+    --pronosticos-select-text-font: var(--main-font-family);
+    --pronosticos-select-text-size: 14px;
+    --pronosticos-table-head-col-text-font: var(--main-font-family);
+    --pronosticos-table-head-col-text-size: 14px;
+    --pronosticos-table-head-row-text-font: var(--main-font-family);
+    --pronosticos-table-head-row-text-size: 14px;
+    --pronosticos-table-col-odd-text-font: var(--main-font-family);
+    --pronosticos-table-col-odd-text-size: 16px;
+    --pronosticos-table-col-even-text-font: var(--main-font-family);
+    --pronosticos-table-col-even-text-size: 16px;
+    --pronosticos-status-late-text-size: 13px;
+
+    --resultados-text-font: var(--main-font-family);
+    --resultados-text-size: 16px;
+    --resultados-header-text-font: var(--main-font-family);
+    --resultados-header-text-size: 14px;
+    --resultados-sticky-col-text-font: var(--main-font-family);
+    --resultados-sticky-col-text-size: 14px;
+    --resultados-summary-total-text-font: var(--main-font-family);
+    --resultados-summary-total-text-size: 16px;
+    --resultados-summary-row-text-font: var(--main-font-family);
+    --resultados-summary-row-text-size: 14px;
+    --resultados-summary-label-text-font: var(--main-font-family);
+    --resultados-summary-label-text-size: 14px;
+    --resultados-winner-text-font: var(--main-font-family);
+    --resultados-winner-text-size: 14px;
+    --resultados-loser-text-font: var(--main-font-family);
+    --resultados-loser-text-size: 14px;
+    --resultados-prize-text-font: var(--main-font-family);
+    --resultados-prize-text-size: 14px;
+    --resultados-jornada-number-font: var(--main-font-family);
+    --resultados-jornada-number-size: 16px;
+    --resultados-jornada-date-font: var(--main-font-family);
+    --resultados-jornada-date-size: 13px;
+    --resultados-hits-number-font: var(--main-font-family);
+    --resultados-hits-number-size: 16px;
+    --resultados-total-points-text-font: var(--main-font-family);
+    --resultados-total-points-text-size: 18px;
+
+    --resumen-table-header-text-font: var(--main-font-family);
+    --resumen-table-header-text-size: 14px;
+    --resumen-table-text-font: var(--main-font-family);
+    --resumen-table-text-size: 14px;
+    --resumen-link-color-font: var(--main-font-family);
+    --resumen-link-color-size: 14px;
+    --resumen-row-points-text-font: var(--main-font-family);
+    --resumen-row-points-text-size: 14px;
+    --resumen-summary-text-font: var(--main-font-family);
+    --resumen-summary-text-size: 15px;
+    --resumen-match-box-text-font: var(--main-font-family);
+    --resumen-match-box-text-size: 14px;
+    --resumen-team-box-text-font: var(--main-font-family);
+    --resumen-team-box-text-size: 14px;
+    --resumen-performance-text-font: var(--main-font-family);
+    --resumen-performance-text-size: 14px;
+    --resumen-detail-table-header-text-font: var(--main-font-family);
+    --resumen-detail-table-header-text-size: 14px;
+    --resumen-detail-table-text-font: var(--main-font-family);
+    --resumen-detail-table-text-size: 14px;
+    --resumen-detail-match-text-font: var(--main-font-family);
+    --resumen-detail-match-text-size: 14px;
+    --resumen-detail-result-text-font: var(--main-font-family);
+    --resumen-detail-result-text-size: 14px;
+
+    --votaciones-title-font: var(--main-font-family);
+    --votaciones-title-size: 35px;
+    --votaciones-subtitle-font: var(--main-font-family);
+    --votaciones-subtitle-size: 16px;
+    --votaciones-btn-new-text-font: var(--main-font-family);
+    --votaciones-btn-new-text-size: 16px;
+    --votaciones-card-title-font: var(--main-font-family);
+    --votaciones-card-title-size: 18px;
+    --votaciones-card-desc-font: var(--main-font-family);
+    --votaciones-card-desc-size: 14px;
+    --votaciones-timer-text-font: var(--main-font-family);
+    --votaciones-timer-text-size: 13px;
+    --votaciones-option-text-font: var(--main-font-family);
+    --votaciones-option-text-size: 16px;
+    --votaciones-option-selected-text-font: var(--main-font-family);
+    --votaciones-option-selected-text-size: 16px;
+    --votaciones-winning-text-font: var(--main-font-family);
+    --votaciones-winning-text-size: 14px;
+
+    --import-modal-text-font: var(--main-font-family);
+    --import-modal-text-size: 16px;
+    --import-modal-card-text-font: var(--main-font-family);
+    --import-modal-card-text-size: 14px;
+    --import-modal-title-font: var(--main-font-family);
+    --import-modal-title-size: 24px;
+
+    --login-text-font: var(--main-font-family);
+    --login-text-size: 30px;
+    --login-label-font: var(--main-font-family);
+    --login-label-size: 14px;
 }
 
 [data-theme="dark"] {
@@ -842,6 +1025,8 @@ body {
     /* Room for header + separator */
     color: #f1f5f9;
     min-height: 100vh;
+    font-family: var(--text-main-font);
+    font-size: var(--text-main-size);
 }
 
 /* Page-specific backgrounds */
@@ -873,6 +1058,9 @@ body {
 /* Jornadas page color overrides */
 .jornadas-page .page-title {
     color: var(--primary-blue);
+    font-family: var(--jornada-card-number-font);
+    font-size: var(--socios-title-size);
+    /* Reusing general title size or add specific */
 }
 
 .jornadas-page .header-actions {
@@ -933,6 +1121,9 @@ body {
 /* Pronósticos page color overrides */
 .pronosticos-page .page-title {
     color: var(--primary-red);
+    font-family: var(--main-font-family);
+    /* Or specific if added */
+    font-size: var(--socios-title-size);
 }
 
 .pronosticos-page .header-actions {
@@ -1049,6 +1240,8 @@ body {
 /* Resultados page color overrides */
 .resultados-page .page-title {
     color: var(--primary-purple);
+    font-family: var(--main-font-family);
+    font-size: var(--socios-title-size);
 }
 
 .resultados-page .header-actions {
@@ -1143,7 +1336,8 @@ body {
 }
 
 .page-title {
-    font-size: 2.2rem;
+    font-size: var(--socios-title-size, 2.2rem);
+    font-family: var(--socios-title-font, var(--main-font-family));
     font-weight: 900;
     color: var(--heading-color);
     margin-bottom: 2rem;
@@ -1173,6 +1367,8 @@ body {
     border: none;
     border-radius: 8px;
     font-weight: 600;
+    font-family: var(--text-main-font);
+    font-size: var(--text-main-size);
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
@@ -1627,6 +1823,8 @@ body {
 .socios-page td {
     white-space: nowrap !important;
     padding: 12px 15px !important;
+    font-family: var(--socios-text-font);
+    font-size: var(--socios-text-size);
 }
 
 @media (max-width: 800px) {
@@ -1650,11 +1848,15 @@ body {
 
 .page-title.socios-title {
     color: var(--socios-title) !important;
+    font-family: var(--socios-title-font) !important;
+    font-size: var(--socios-title-size) !important;
 }
 
 .btn-add-socio {
     background-color: var(--socios-btn-new-bg) !important;
     color: var(--socios-btn-new-text) !important;
+    font-family: var(--socios-btn-new-text-font) !important;
+    font-size: var(--socios-btn-new-text-size) !important;
 }
 
 .btn-remove-socio {
