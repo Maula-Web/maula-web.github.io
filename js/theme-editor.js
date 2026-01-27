@@ -430,6 +430,131 @@ const ThemeEditor = {
         }
     },
 
+    createIATheme: async function () {
+        const iaTheme = {
+            // UI
+            '--main-bg': '#0f172a',
+            '--modal-bg': '#1e293b',
+            '--modal-header-bg': '#1e293b',
+            '--card-bg': 'rgba(30, 41, 59, 0.7)',
+            '--text-main': '#f1f5f9',
+            '--text-main-font': "'Inter', sans-serif",
+            '--text-main-size': '16px',
+            '--text-secondary': '#94a3b8',
+            '--text-secondary-font': "'Inter', sans-serif",
+            '--text-secondary-size': '14px',
+            '--input-bg': '#334155',
+            '--input-border': '#475569',
+            '--glass-border': 'rgba(255, 255, 255, 0.1)',
+            '--pastel-card': '#1e293b',
+            '--main-font-family': "'Inter', sans-serif",
+            '--main-font-size': '16px',
+
+            // Dashboard
+            '--dash-bg': '#0f172a',
+            '--dash-card-bg': '#1e293b',
+            '--dash-card-title': '#10b981',
+            '--dash-card-title-font': "'Outfit', sans-serif",
+            '--dash-card-title-size': '14px',
+            '--dash-card-value': '#ffffff',
+            '--dash-card-value-font': "'Outfit', sans-serif",
+            '--dash-card-value-size': '42px',
+            '--dash-wide-bg': '#1e293b',
+            '--dash-wide-text': '#f1f5f9',
+            '--dash-wide-text-font': "'Inter', sans-serif",
+            '--dash-wide-text-size': '16px',
+            '--dash-winner-label': '#94a3b8',
+            '--dash-winner-name': '#3b82f6',
+            '--dash-loser-label': '#94a3b8',
+            '--dash-loser-name': '#f43f5e',
+            '--dash-doubles-label': '#f1f5f9',
+            '--dash-doubles-label-font': "'Outfit', sans-serif",
+            '--dash-doubles-label-size': '18px',
+
+            // Socios (Green Modern)
+            '--primary-green': '#10b981',
+            '--dark-green': '#065f46',
+            '--socios-text': '#f1f5f9',
+            '--socios-text-font': "'Inter', sans-serif",
+            '--socios-text-size': '16px',
+            '--socios-title': '#10b981',
+            '--socios-title-font': "'Outfit', sans-serif",
+            '--socios-title-size': '45px',
+            '--socios-card-bg': '#1e293b',
+            '--socios-btn-new-bg': '#10b981',
+            '--socios-btn-new-text': '#ffffff',
+            '--socios-btn-import-bg': '#3b82f6',
+            '--socios-btn-delete-bg': '#f43f5e',
+
+            // Jornadas (Blue Modern)
+            '--primary-blue': '#3b82f6',
+            '--dark-blue': '#1d4ed8',
+            '--jornadas-text': '#f1f5f9',
+            '--jornada-card-bg': '#1e293b',
+            '--jornada-card-number': '#3b82f6',
+            '--jornada-card-number-font': "'Outfit', sans-serif",
+            '--jornada-card-number-size': '30px',
+
+            // Pronósticos (Red Modern)
+            '--primary-red': '#f43f5e',
+            '--dark-red': '#be123c',
+            '--pronosticos-text': '#f1f5f9',
+            '--pronosticos-btn-bg': '#f43f5e',
+            '--pronosticos-table-head-col-bg': '#1e293b',
+            '--pronosticos-table-head-col-text': '#f43f5e',
+
+            // Resultados (Purple Modern)
+            '--primary-purple': '#8b5cf6',
+            '--resultados-text': '#f1f5f9',
+            '--resultados-header-bg': '#8b5cf6',
+            '--resultados-header-text': '#ffffff',
+            '--resultados-cell-bg': '#0f172a',
+
+            // Votaciones (Elegant)
+            '--votaciones-title': '#ffffff',
+            '--votaciones-title-font': "'Outfit', sans-serif",
+            '--votaciones-title-size': '48px',
+            '--votaciones-subtitle': '#94a3b8',
+            '--votaciones-card-bg': '#1e293b',
+            '--votaciones-btn-new-bg': '#ffffff',
+            '--votaciones-btn-new-text': '#0f172a',
+
+            // Resumen (Orange/Amber Modern)
+            '--primary-orange': '#f59e0b',
+            '--resumen-main-bg': '#0f172a',
+            '--resumen-card-bg': '#1e293b',
+            '--resumen-summary-bg': 'rgba(245, 158, 11, 0.1)',
+            '--resumen-summary-text': '#fde68a',
+            '--resumen-summary-text-font': "'Inter', sans-serif",
+            '--resumen-summary-text-size': '15px',
+            '--resumen-table-header-bg': '#f59e0b',
+            '--resumen-table-header-text': '#0f172a'
+        };
+
+        // Aplicar al root para vista previa inmediata
+        const root = document.documentElement;
+        for (const [key, value] of Object.entries(iaTheme)) {
+            root.style.setProperty(key, value);
+        }
+
+        // Guardar en Firebase como el preset oficial "Tema IA"
+        if (window.DataService) {
+            try {
+                await window.DataService.save('config', 'preset_tema_ia', {
+                    id: 'preset_tema_ia',
+                    name: 'Tema IA',
+                    type: 'preset',
+                    data: iaTheme
+                });
+                alert('✨ ¡Tema IA (Elegante y Moderno) generado y guardado con éxito!');
+                location.reload();
+            } catch (e) {
+                console.error(e);
+                alert('Error al guardar el Tema IA en la nube.');
+            }
+        }
+    },
+
     updateVariable: function (id, val) {
         document.documentElement.style.setProperty(id, val);
         const text = document.getElementById(`text-${id}`);
