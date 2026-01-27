@@ -252,7 +252,11 @@ const ThemeEditor = {
     },
 
     init: async function () {
-        if (window.DataService) await window.DataService.init();
+        console.log("ThemeEditor: Initializing...");
+        // Asegurar que la base de datos está lista
+        if (window.DataService && !window.DataService.db) {
+            await window.DataService.init();
+        }
 
         this.renderGroups();
         // Primero cargamos los valores actuales (colores)
@@ -551,12 +555,25 @@ const ThemeEditor = {
         // 2. Refrescar los controles del editor para que coincidan
         this.loadCurrentValues();
 
-        // 3. Guardar en la nube como el preset "Tema IA"
+        // 3. Guardar en la nube como tema ACTIVO y como PRESET
         if (window.DataService) {
             try {
+                // Preparar datos limpios para el tema activo (solo variables CSS)
+                const globalTheme = { id: 'theme' };
+                Object.entries(iaTheme).forEach(([k, v]) => {
+                    if (k.startsWith('--')) globalTheme[k] = v;
+                });
+
+                // Guardar en la nube (Asegurar que sea persistente)
+                await window.DataService.save('config', globalTheme);
                 await window.DataService.save('config', iaTheme);
-                alert('✨ ¡Sugerencia IA aplicada con éxito! Se ha guardado como "Tema IA" en tus ajustes guardados.');
-                this.loadPresetsList();
+
+                // Actualizar cache local ÚLTIMO y lo más limpio posible
+                localStorage.setItem('maulas_theme_cache', JSON.stringify(globalTheme));
+
+                alert('✨ ¡Diseño IA aplicado permanentemente! El estilo ha sido guardado también en tus temas.');
+
+                await this.loadPresetsList();
             } catch (e) {
                 console.error("IA Theme Error:", e);
                 alert('Error al guardar el Tema IA: ' + e.message);
@@ -675,14 +692,34 @@ const ThemeEditor = {
         select.innerHTML = '<option value="">-- Seleccionar Tema --</option>';
 
         try {
-            const configDocs = await window.DataService.getAll('config');
-            // Filter only presets
-            const presets = configDocs.filter(doc => doc.type === 'preset' || doc.id.startsWith('preset_'));
+            // Asegurar DB lista
+            if (window.DataService && !window.DataService.db) await window.DataService.init();
+
+            // Usar snap directamente para asegurar que tenemos los IDs aunque no estén en el body
+            const snap = await window.DataService.db.collection('config').get();
+            const configDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            console.log("Presets loaded (total config docs):", configDocs.length);
+
+            // Filtrado más flexible y defensivo
+            const presets = configDocs.filter(doc => {
+                if (!doc) return false;
+                const docId = String(doc.id || '');
+                return doc.type === 'preset' || docId.startsWith('preset_');
+            });
+
+            if (presets.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.textContent = "(No hay temas guardados)";
+                select.appendChild(opt);
+                return;
+            }
 
             presets.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.id;
-                opt.textContent = p.name || p.id;
+                opt.textContent = p.name || (String(p.id).replace('preset_', '').toUpperCase());
                 select.appendChild(opt);
             });
         } catch (e) {
