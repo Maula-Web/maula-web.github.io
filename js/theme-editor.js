@@ -413,7 +413,15 @@ const ThemeEditor = {
                     let fontVal = styles.getPropertyValue(fontId).trim();
                     const sel = document.getElementById(`select-${fontId}`);
                     if (sel && fontVal) {
-                        sel.value = fontVal.replace(/["']/g, "'");
+                        // More robust matching for fonts (Inter vs 'Inter')
+                        const cleanComputed = fontVal.replace(/["']/g, "");
+                        const option = Array.from(sel.options).find(opt => opt.value.replace(/["']/g, "").includes(cleanComputed));
+                        if (option) {
+                            sel.value = option.value;
+                        } else {
+                            // Fallback to manual clean if no match
+                            sel.value = fontVal.replace(/["']/g, "'");
+                        }
                     }
 
                     // Cargar tamaño
@@ -432,6 +440,9 @@ const ThemeEditor = {
 
     createIATheme: async function () {
         const iaTheme = {
+            id: 'preset_tema_ia',
+            name: 'Tema IA',
+            type: 'preset',
             // UI
             '--main-bg': '#0f172a',
             '--modal-bg': '#1e293b',
@@ -471,7 +482,7 @@ const ThemeEditor = {
             '--dash-doubles-label-font': "'Outfit', sans-serif",
             '--dash-doubles-label-size': '18px',
 
-            // Socios (Green Modern)
+            // Socios
             '--primary-green': '#10b981',
             '--dark-green': '#065f46',
             '--socios-text': '#f1f5f9',
@@ -486,7 +497,7 @@ const ThemeEditor = {
             '--socios-btn-import-bg': '#3b82f6',
             '--socios-btn-delete-bg': '#f43f5e',
 
-            // Jornadas (Blue Modern)
+            // Jornadas
             '--primary-blue': '#3b82f6',
             '--dark-blue': '#1d4ed8',
             '--jornadas-text': '#f1f5f9',
@@ -495,7 +506,7 @@ const ThemeEditor = {
             '--jornada-card-number-font': "'Outfit', sans-serif",
             '--jornada-card-number-size': '30px',
 
-            // Pronósticos (Red Modern)
+            // Pronósticos
             '--primary-red': '#f43f5e',
             '--dark-red': '#be123c',
             '--pronosticos-text': '#f1f5f9',
@@ -503,14 +514,14 @@ const ThemeEditor = {
             '--pronosticos-table-head-col-bg': '#1e293b',
             '--pronosticos-table-head-col-text': '#f43f5e',
 
-            // Resultados (Purple Modern)
+            // Resultados
             '--primary-purple': '#8b5cf6',
             '--resultados-text': '#f1f5f9',
             '--resultados-header-bg': '#8b5cf6',
             '--resultados-header-text': '#ffffff',
             '--resultados-cell-bg': '#0f172a',
 
-            // Votaciones (Elegant)
+            // Votaciones
             '--votaciones-title': '#ffffff',
             '--votaciones-title-font': "'Outfit', sans-serif",
             '--votaciones-title-size': '48px',
@@ -519,7 +530,7 @@ const ThemeEditor = {
             '--votaciones-btn-new-bg': '#ffffff',
             '--votaciones-btn-new-text': '#0f172a',
 
-            // Resumen (Orange/Amber Modern)
+            // Resumen
             '--primary-orange': '#f59e0b',
             '--resumen-main-bg': '#0f172a',
             '--resumen-card-bg': '#1e293b',
@@ -531,26 +542,24 @@ const ThemeEditor = {
             '--resumen-table-header-text': '#0f172a'
         };
 
-        // Aplicar al root para vista previa inmediata
+        // 1. Aplicar al documento (Vista previa instantánea)
         const root = document.documentElement;
-        for (const [key, value] of Object.entries(iaTheme)) {
-            root.style.setProperty(key, value);
-        }
+        Object.entries(iaTheme).forEach(([key, val]) => {
+            if (key.startsWith('--')) root.style.setProperty(key, val);
+        });
 
-        // Guardar en Firebase como el preset oficial "Tema IA"
+        // 2. Refrescar los controles del editor para que coincidan
+        this.loadCurrentValues();
+
+        // 3. Guardar en la nube como el preset "Tema IA"
         if (window.DataService) {
             try {
-                await window.DataService.save('config', {
-                    id: 'preset_tema_ia',
-                    name: 'Tema IA',
-                    type: 'preset',
-                    data: iaTheme
-                });
-                alert('✨ ¡Tema IA (Elegante y Moderno) generado y guardado con éxito!');
-                location.reload();
+                await window.DataService.save('config', iaTheme);
+                alert('✨ ¡Sugerencia IA aplicada con éxito! Se ha guardado como "Tema IA" en tus ajustes guardados.');
+                this.loadPresetsList();
             } catch (e) {
-                console.error(e);
-                alert('Error al guardar el Tema IA en la nube.');
+                console.error("IA Theme Error:", e);
+                alert('Error al guardar el Tema IA: ' + e.message);
             }
         }
     },
