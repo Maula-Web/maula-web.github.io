@@ -302,24 +302,36 @@ window.TelegramService = {
             // 1. Get Config
             const config = await window.DataService.getAll('config');
             const tg = config.find(c => c.id === 'telegram');
+            const rem = config.find(c => c.id === 'reminder') || {
+                day: 4,
+                hour: 9,
+                message: '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://peñamaulas.com)'
+            };
 
             if (!tg || !tg.enabled || !tg.reminderEnabled || !tg.token || !tg.chatId) return;
 
-            // 2. Check Time: Is it Thursday and past 9:00?
             const now = new Date();
-            const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon... 4=Thu
+
+            // 2. Check Date Range
+            if (rem.startDate) {
+                const start = new Date(rem.startDate);
+                if (now < start) return;
+            }
+            if (rem.endDate) {
+                const end = new Date(rem.endDate);
+                end.setHours(23, 59, 59, 999);
+                if (now > end) return;
+            }
+
+            // 3. Check Day & Hour
+            // rem.day is 0-6 (Sun-Sat)
+            const dayOfWeek = now.getDay();
             const hour = now.getHours();
 
-            // Strict check: Only on Thursdays after 9:00 AM
-            // If user wants it to be sent "even if I open it Friday", we'd change this.
-            // But "Por fin es jueves" makes no sense on Friday.
-            if (dayOfWeek !== 4 || hour < 9) return;
+            if (dayOfWeek !== rem.day || hour < (rem.hour || 0)) return;
 
-            // 3. Find target Jornada (This coming weekend)
+            // 4. Find target Jornada (upcoming)
             const jornadas = await window.DataService.getAll('jornadas');
-
-            // Filter: Active, Date is in the future (or today), and date is within next 5 days
-            // We want to target the Jornada of THIS coming Sunday.
 
             const targetJornada = jornadas.find(j => {
                 if (!j.active) return false;
@@ -333,21 +345,20 @@ window.TelegramService = {
                 const diff = jDate.getTime() - now.getTime();
                 const diffDays = diff / (1000 * 3600 * 24);
 
-                // We expect the Jornada to be roughly 0 to 4 days ahead (Thursday -> Sunday is 3 days)
-                return diffDays >= 0 && diffDays <= 4;
+                // We target the next Jornada within the next 6 days (to be safe across different configured days)
+                return diffDays >= 0 && diffDays <= 6;
             });
 
             if (targetJornada) {
-                console.log(`TelegramService: Sending Thursday Reminder for Jornada ${targetJornada.number}...`);
+                console.log(`TelegramService: Sending Weekly Reminder (J${targetJornada.number})...`);
 
-                const msg = `¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada ${targetJornada.number}.\n🔗 [Peña Maulas](https://peñamaulas.com)`;
+                let msg = rem.message || '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://peñamaulas.com)';
+                msg = msg.replace('{jornada}', targetJornada.number);
 
                 const res = await this.sendRaw(tg.token, tg.chatId, msg);
 
                 if (res.ok) {
-                    // Mark as sent to avoid duplicates
                     targetJornada.thursdayReminderSent = true;
-                    // We only update this specific field to minimize conflict (though DataService saves whole obj usually)
                     await window.DataService.save('jornadas', targetJornada);
                     console.log("TelegramService: Reminder sent and logged.");
                 } else {

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario Premium - Peña Maulas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1565c0;
+            --primary-light: #e3f2fd;
+            --secondary: #2ebd59;
+            --accent: #ff9100;
+            --dark: #1a1a1a;
+            --text: #333;
+            --text-light: #666;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Portada --- */
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 60px;
+        }
+
+        .cover img {
+            width: 250px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            background: white;
+            padding: 10px;
+        }
+
+        .cover h1 {
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .cover p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        .cover-footer {
+            margin-top: auto;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- Content Sections --- */
+        .section {
+            background: var(--white);
+            padding: 50px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section h2 span {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .section p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .section ul,
+        .section ol {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section li {
+            margin-bottom: 12px;
+        }
+
+        /* --- Images / Screenshots Placeholder --- */
+        .screenshot {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            margin: 30px 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .screenshot:hover {
+            transform: scale(1.02);
+        }
+
+        .screenshot img {
+            width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+
+        /* --- Special Blocks --- */
+        .info-box {
+            padding: 20px;
+            background: var(--primary-light);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            margin: 25px 0;
+        }
+
+        .warning-box {
+            padding: 20px;
+            background: #fff3e0;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            margin: 25px 0;
+        }
+
+        .success-box {
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+            margin: 25px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-item {
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .feature-item .icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* --- Print / Export Buttons --- */
+        .action-bar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            background: var(--dark);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        @media print {
+            .cover {
+                border-radius: 0;
+                margin-bottom: 0;
+                height: auto;
+                padding: 100px 40px !important;
+                page-break-after: always;
+            }
+
+            .section {
+                box-shadow: none;
+                border: 1px solid #eee;
+                page-break-inside: avoid;
+            }
+
+            .action-bar {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="action-bar">
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Exportar a PDF</button>
+        <a href="index.html" class="btn">🏠 Ir a la Web</a>
+    </div>
+
+    <!-- PORTADA -->
+    <div class="cover">
+        <img src="LOGOTIPO_MAULA.JPG" alt="Logotipo Peña Maulas">
+        <h1>PEÑA MAULAS</h1>
+        <p>Documentación Oficial y Guía de Usuario</p>
+        <div class="cover-footer">
+            TEMPORADA 2025 - 2026 | VERSIÓN 2.5
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- INTRODUCCIÓN -->
+        <div class="section" id="intro">
+            <h2><span>01</span> Introducción</h2>
+            <p>Este sistema ha sido diseñado específicamente para la gestión de la <strong>Peña Quinielista "Los
+                    Maulas"</strong>. Centraliza todos los aspectos necesarios para una temporada exitosa: desde la
+                realización de pronósticos individuales hasta el cálculo automatizado de premios, clasificaciones y
+                gestión de votaciones democráticas.</p>
+            <div class="info-box">
+                La aplicación utiliza tecnologías de última generación para garantizar la integridad de los datos, la
+                transparencia absoluta en las puntuaciones y una experiencia de usuario fluida en cualquier dispositivo.
+            </div>
+        </div>
+
+        <!-- ACCESO -->
+        <div class="section" id="acceso">
+            <h2><span>02</span> Acceso y Seguridad</h2>
+            <p>La seguridad es prioritaria. Cada socio dispone de un acceso único basado en su correo electrónico
+                institucional de la peña.</p>
+            <ul>
+                <li><strong>Usuario:</strong> Tu correo (ej: <code>alvaro@maulas.com</code>).</li>
+                <li><strong>Contraseña:</strong> Por defecto es la clave maestra establecida en los estatutos. El
+                    administrador puede modificarla desde el panel de seguridad.</li>
+            </ul>
+            <div class="screenshot">
+                <p>Captura: Pantalla de Login con diseño minimalista y fondo purpúreo.</p>
+            </div>
+            <div class="warning-box">
+                <strong>Importante:</strong> La sesión se mantiene activa en el navegador. Por seguridad, pulsa "Cerrar
+                Sesión" si utilizas un dispositivo compartido.
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="section" id="inicio">
+            <h2><span>03</span> Cuadro de Mandos (Inicio)</h2>
+            <p>Es el centro neurálgico de la aplicación. Al entrar, verás información crítica actualizada en tiempo
+                real:</p>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <span class="icon">🏆</span>
+                    <strong>Líder Actual</strong>
+                    <p>Socio con más puntos acumulados en la temporada.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">⌛</span>
+                    <strong>Cuenta atrás</strong>
+                    <p>Tiempo restante para el cierre de la jornada activa.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">💰</span>
+                    <strong>Estado del Bote</strong>
+                    <p>Aviso visual si la jornada de LAE cuenta con bote especial.</p>
+                </div>
+            </div>
+            <p>También se muestran los roles para la jornada actual:</p>
+            <ul>
+                <li>👑 <strong>Columnas de Dobles:</strong> Socios con derecho a elegir dobles por sus méritos en la
+                    jornada anterior.</li>
+                <li>🥛 <strong>Sella la Quiniela:</strong> Socio encargado de validar el boleto físico (el "Maula" de la
+                    semana).</li>
+            </ul>
+            <div class="screenshot">
+                <p>Captura: Dashboard principal mostrando estadísticas, premios semanales y el contador de tiempo.</p>
+            </div>
+        </div>
+
+        <!-- PRONÓSTICOS -->
+        <div class="section" id="pronosticos">
+            <h2><span>04</span> Realización de Pronósticos</h2>
+            <p>Cada socio debe registrar sus 15 signos antes del cierre de cada jornada.</p>
+            <ol>
+                <li>Selecciona tu nombre en el desplegable.</li>
+                <li>Verifica que la jornada seleccionada es la correcta.</li>
+                <li>Marca el signo (1, X, 2) para cada uno de los 15 partidos.</li>
+                <li>Pulsa <strong>Guardar Pronóstico</strong>.</li>
+            </ol>
+            <div class="info-box">
+                <strong>¿Qué es un pronóstico LATE?</strong> Si guardas tu pronóstico después del jueves a las 17:00h,
+                el sistema lo marcará automáticamente. Estos pronósticos no puntúan para el ganador de la jornada, a
+                menos que sean indultados por el administrador o consigan premio real (10+ aciertos).
+            </div>
+            <div class="screenshot">
+                <p>Captura: Interfaz de pronósticos con logos de los equipos y selector de signos.</p>
+            </div>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div class="section" id="resultados">
+            <h2><span>05</span> Visualización de Resultados</h2>
+            <p>Una vez que los partidos comienzan y finalizan, esta sección permite auditar el desempeño de todos los
+                socios.</p>
+            <ul>
+                <li><strong>Tabla Comparativa:</strong> Muestra en filas los partidos y en columnas a los socios.</li>
+                <li><strong>Aciertos:</strong> Los signos acertados se destacan en color (Azul/Verde).</li>
+                <li><strong>Desglose de Puntos:</strong> Debajo de cada acierto aparece la puntuación otorgada según las
+                    reglas activas.</li>
+                <li><strong>Resumen Superior:</strong> Total de aciertos, puntos base, bonificaciones por tramos y
+                    premios en metálico.</li>
+            </ul>
+            <div class="success-box">
+                El sistema detecta automáticamente los "PIG" (Pleno al Quince) cuando coinciden Real Madrid, Barcelona o
+                At. Madrid entre ellos.
+            </div>
+            <div class="screenshot">
+                <p>Captura: Tabla interactiva de resultados con scroll horizontal y vertical fijo.</p>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="section" id="stats">
+            <h2><span>06</span> Estadísticas y Evolución</h2>
+            <p>Para analizar la trayectoria a largo plazo.</p>
+            <ul>
+                <li><strong>Gráfica de Tendencia:</strong> Compara hasta 4 socios simultáneamente para ver quién está en
+                    racha.</li>
+                <li><strong>Podio de Temporada:</strong> Los 3 primeros puestos lucen medallas de Oro, Plata y Bronce.
+                </li>
+                <li><strong>Métricas Detalladas:</strong> Media de puntos, jornadas ganadas y efectividad por tramos.
+                </li>
+            </ul>
+            <div class="screenshot">
+                <p>Captura: Sección de resumen con el gráfico de líneas y la clasificación general.</p>
+            </div>
+        </div>
+
+        <!-- VOTACIONES -->
+        <div class="section" id="votaciones">
+            <h2><span>07</span> Sistema de Votaciones</h2>
+            <p>La democracia es fundamental en la peña. El sistema permite realizar votaciones vinculantes sobre
+                cualquier tema.</p>
+            <ul>
+                <li><strong>Creación:</strong> Solo administradores pueden lanzar nuevas votaciones, definiendo
+                    opciones, fecha límite y mayoría necesaria.</li>
+                <li><strong>Voto Secreto:</strong> El sistema garantiza que cada socio vote una sola vez y su voto se
+                    registre de forma segura.</li>
+                <li><strong>Resultados:</strong> Gráficos de barras muestran el progreso y el resultado final una vez
+                    cerrada la urna.</li>
+            </ul>
+            <div class="screenshot">
+                <p>Captura: Panel de votaciones con tarjetas de votaciones activas e históricas.</p>
+            </div>
+        </div>
+
+        <!-- ADMIN -->
+        <div class="section" id="admin">
+            <h2><span>08</span> Administración y Configuración</h2>
+            <p>Reservado para el gestor de la peña. Permite el control total sobre la lógica del juego.</p>
+
+            <h3>Puntuaciones y Reglas</h3>
+            <p>Se pueden definir los puntos otorgados por cada tramo de aciertos (10 a 15) y las penalizaciones por
+                pocos aciertos (0 a 3). Los cambios se aplican de forma inmediata a las futuras jornadas.</p>
+
+            <h3>Nuevo: Aviso Semanal Configurable</h3>
+            <p>El sistema puede enviar recordatorios automáticos por Telegram. Ahora es totalmente personalizable:</p>
+            <ul>
+                <li><strong>Rango de Fechas:</strong> Define cuándo empieza y acaba el envío (ej: solo durante la liga).
+                </li>
+                <li><strong>Día y Hora:</strong> Elige exactamente cuándo recibir el aviso (ej: Miércoles a las 20:00h).
+                </li>
+                <li><strong>Mensaje Dinámico:</strong> Usa la etiqueta <code>{jornada}</code> para que el mensaje
+                    incluya automáticamente el número de jornada actual.</li>
+            </ul>
+
+            <h3>Gestión de Documentos</h3>
+            <p>Permite subir PDFs, imágenes o archivos de texto (actas, estatutos, capturas de premios). Los socios
+                pueden visualizarlos directamente desde su panel.</p>
+            <div class="info-box">
+                Se ha mejorado la visualización de archivos <code>.txt</code> para que se vean correctamente formateados
+                en el navegador.
+            </div>
+
+            <div class="screenshot">
+                <p>Captura: Panel de administración con los nuevos controles de Aviso Semanal y el listado de
+                    documentación.</p>
+            </div>
+
+            <h3>Bots de Telegram</h3>
+            <p>Configuración del Token y Chat ID para que la web comunique los resultados, avisos y nuevas votaciones
+                directamente al grupo de la peña.</p>
+        </div>
+
+        <footer>
+            &copy; 2026 Peña Quinielista Los Maulas. Diseñado con ❤️ para los amantes del fútbol y la estadística.<br>
+            <em>"Porque un Maula nunca se rinde, solo espera a la siguiente jornada."</em>
+        </footer>
+    </div>
+
+</body>
+
+</html>

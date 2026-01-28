@@ -233,6 +233,49 @@
                 </form>
             </div>
 
+            <!-- New Weekly Reminder Card -->
+            <div class="config-card" style="border-top-color: #fbc02d;">
+                <h2>⏰ Aviso Semanal</h2>
+                <form id="reminder-form" style="font-size:0.9rem;">
+                    <div class="form-row">
+                        <label>Día de la semana</label>
+                        <select id="reminder-day" style="padding:2px; width: 100px;">
+                            <option value="1">Lunes</option>
+                            <option value="2">Martes</option>
+                            <option value="3">Miércoles</option>
+                            <option value="4" selected>Jueves</option>
+                            <option value="5">Viernes</option>
+                            <option value="6">Sábado</option>
+                            <option value="0">Domingo</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Hora de envío (0-23)</label>
+                        <input type="number" id="reminder-hour" min="0" max="23" value="9">
+                    </div>
+                    <div class="form-row">
+                        <label>Activo desde</label>
+                        <input type="date" id="reminder-start" style="width:120px;">
+                    </div>
+                    <div class="form-row">
+                        <label>Activo hasta</label>
+                        <input type="date" id="reminder-end" style="width:120px;">
+                    </div>
+                    <div style="margin-top:0.5rem;">
+                        <label style="display:block; margin-bottom:0.2rem;">Mensaje Personalizado:</label>
+                        <textarea id="reminder-msg"
+                            style="width:100%; height:80px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
+                        <small style="color:#888;">Usa {jornada} para el número de jornada.</small>
+                    </div>
+                    <button type="submit" class="btn-action"
+                        style="width:100%; margin-top:0.5rem; background:#fbc02d; color:#333; font-weight:bold;">💾
+                        Guardar Config Aviso</button>
+                    <div id="reminder-save-msg"
+                        style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
+                        ¡Guardado!</div>
+                </form>
+            </div>
+
             <!-- 3. Logs & Prank (Right Column) -->
             <div style="display:flex; flex-direction:column; gap:1rem;">
                 <div id="prank-admin-card" class="config-card" style="border-top-color: #d32f2f; display: none;">
@@ -332,6 +375,13 @@
             });
 
 
+            document.getElementById('reminder-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveReminderConfig();
+            });
+
+            loadReminderConfig();
+
             // Doc Upload logic
             const fileInput = document.getElementById('doc-file-input');
             const uploadBtn = document.getElementById('btn-upload-doc');
@@ -413,13 +463,50 @@
             const doc = docs.find(d => d.id == id);
             if (!doc) return;
 
-            // Open in new tab (Base64)
+            // Open in new tab
             const win = window.open();
+            if (!win) {
+                alert("Por favor, permite las ventanas emergentes para ver el documento.");
+                return;
+            }
+
             if (doc.type.startsWith('image/')) {
-                win.document.write(`<img src="${doc.content}" style="max-width:100%;">`);
+                win.document.write(`
+                    <html>
+                    <head><title>${doc.name}</title></head>
+                    <body style="margin:0; display:flex; justify-content:center; align-items:center; background:#333;">
+                        <img src="${doc.content}" style="max-width:100%; max-height:100%; box-shadow:0 0 20px rgba(0,0,0,0.5);">
+                    </body>
+                    </html>
+                `);
+            } else if (doc.type === 'text/plain') {
+                // Handle text files specially as they might not render well in iframe from dataURL
+                try {
+                    const base64Content = doc.content.split(',')[1];
+                    const decodedText = decodeURIComponent(escape(atob(base64Content)));
+                    win.document.write(`
+                        <html>
+                        <head><title>${doc.name}</title></head>
+                        <body style="margin:0; padding:20px; font-family:monospace; background:#f5f5f5; white-space: pre-wrap;">
+                            <div style="background:white; padding:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1); max-width:900px; margin:auto;">
+                                ${decodedText}
+                            </div>
+                        </body>
+                        </html>
+                    `);
+                } catch (e) {
+                    // Fallback to iframe if encoding fails
+                    win.document.write(`<iframe src="${doc.content}" style="width:100%; height:100vh; border:none;"></iframe>`);
+                }
             } else {
-                // Decode base64 if needed or iframe
-                win.document.write(`<iframe src="${doc.content}" style="width:100%; height:100vh; border:none;"></iframe>`);
+                win.document.write(`
+                    <html>
+                    <head><title>${doc.name}</title></head>
+                    <body style="margin:0;">
+                        <iframe src="${doc.content}" style="width:100%; height:100vh; border:none;"></iframe>
+                    </body>
+                    </html>
+                `);
             }
         }
 
@@ -522,6 +609,40 @@
                 `;
             });
             container.innerHTML = html;
+        }
+
+        async function loadReminderConfig() {
+            if (!window.DataService) return;
+            const config = await window.DataService.getAll('config');
+            const rem = config.find(c => c.id === 'reminder');
+            if (rem) {
+                document.getElementById('reminder-day').value = rem.day ?? 4;
+                document.getElementById('reminder-hour').value = rem.hour ?? 9;
+                document.getElementById('reminder-start').value = rem.startDate || '';
+                document.getElementById('reminder-end').value = rem.endDate || '';
+                document.getElementById('reminder-msg').value = rem.message || '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://peñamaulas.com)';
+            } else {
+                // Defaults
+                document.getElementById('reminder-msg').value = '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://peñamaulas.com)';
+            }
+        }
+
+        async function saveReminderConfig() {
+            const config = {
+                id: 'reminder',
+                day: parseInt(document.getElementById('reminder-day').value),
+                hour: parseInt(document.getElementById('reminder-hour').value),
+                startDate: document.getElementById('reminder-start').value,
+                endDate: document.getElementById('reminder-end').value,
+                message: document.getElementById('reminder-msg').value.trim()
+            };
+            await window.DataService.save('config', config);
+
+            const msg = document.getElementById('reminder-save-msg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+
+            Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Actualizó Configuración Aviso Semanal');
         }
 
         async function loadTelegramConfig() {
