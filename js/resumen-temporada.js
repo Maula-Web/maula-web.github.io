@@ -546,7 +546,7 @@ class ResumenManager {
             : `**${titleName}** destaca especialmente en el **Partido #${stats.hitsByMatch.indexOf(Math.max(...stats.hitsByMatch)) + 1}**. Su mejor rendimiento se concentra en el **${mostRelevantTeam.name}** (${mostRelevantTeam.rate.toFixed(0)}% de acierto en ${mostRelevantTeam.total} partidos), con su pico máximo en **${bestJText}**.`;
 
         detailSection.innerHTML = `
-            <div style="background:var(--resumen-main-bg); padding:1rem; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); border:1px solid rgba(0,0,0,0.05);">
+            <div class="study-card" style="background:var(--resumen-main-bg); padding:1rem; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); border:1px solid rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid var(--primary-orange); padding-bottom:0.8rem;">
                     <h3 style="margin:0; color:var(--primary-orange); display:flex; align-items:center; gap:0.5rem;">
                         <span style="background:var(--primary-orange); color:white; padding:2px 8px; border-radius:4px;">📊</span>

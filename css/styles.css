@@ -1905,6 +1905,7 @@ body {
 /* Tables Styling generic - fallback */
 .pronosticos-page .table-container {
     background: var(--pronosticos-card-bg);
+    overflow: visible !important;
 }
 
 .pronosticos-page thead th {
@@ -3330,5 +3331,11 @@ body.mobile-mode .p-divider {
         /* Force width to trigger good scrolling */
         width: auto !important;
         /* Allow it to expand beyond 100% */
+    }
+
+    /* Force Inertia on container specifically for Pronosticos */
+    #summary-container {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
     }
 }
