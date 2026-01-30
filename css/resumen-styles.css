@@ -386,8 +386,14 @@
     .dashboard-card {
         padding: 0.8rem !important;
         width: 100% !important;
-        overflow-x: hidden !important;
-        /* Hide overflow on card to prevent body scroll */
+        overflow-x: auto !important;
+        /* Allow scroll inside card if content is wide */
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .rankings-card {
+        min-width: 0 !important;
+        /* Allow card to shrink below 350px */
     }
 
     canvas#evolutionChart {
@@ -398,10 +404,8 @@
 
 /* Force table to be wide enough to scroll smoothly on mobile */
 @media (max-width: 800px) {
-    #forecast-summary-table {
-        min-width: 800px !important;
-        /* Force width to trigger good scrolling */
-        width: auto !important;
-        /* Allow it to expand beyond 100% */
+    .rankings-table {
+        min-width: 600px;
+        /* Force scroll on rankings table too if needed */
     }
 }
