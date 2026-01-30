@@ -394,6 +394,40 @@
         max-width: 100vw !important;
     }
 
+    /* Show 'pts' instead of 'puntos totales' on mobile */
+    .rankings-table .desktop-text {
+        display: none !important;
+    }
+
+    .rankings-table .mobile-text {
+        display: inline !important;
+    }
+
+    .rankings-table th,
+    .rankings-table td {
+        padding: 0.4rem 0.2rem !important;
+        /* Tighter padding for mobile */
+        font-size: 0.85rem;
+    }
+
+    .col-check {
+        width: 30px !important;
+        padding-left: 0 !important;
+        text-align: center;
+    }
+
+    .col-pos {
+        width: 30px !important;
+        text-align: center;
+    }
+
+    .col-puntos {
+        width: auto !important;
+        /* Let it grow */
+        max-width: 50px;
+        text-align: right;
+    }
+
     .study-card .stats-detail-main-grid {
         width: 100% !important;
         grid-template-columns: 1fr !important;
