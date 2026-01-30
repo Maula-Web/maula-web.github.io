@@ -1905,7 +1905,6 @@ body {
 /* Tables Styling generic - fallback */
 .pronosticos-page .table-container {
     background: var(--pronosticos-card-bg);
-    overflow: visible !important;
 }
 
 .pronosticos-page thead th {
@@ -3328,11 +3327,11 @@ body.mobile-mode .p-divider {
 @media (max-width: 800px) {
 
     /* Force Inertia on container specifically for Pronosticos */
+    /* Force Inertia on container specifically for Pronosticos */
     #summary-container {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
-        display: block;
-        width: 100% !important;
+        /* Let it take width from table width */
     }
 
     #forecast-summary-table {
