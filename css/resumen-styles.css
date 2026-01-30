@@ -347,6 +347,7 @@
     .dashboard-card {
         padding: 1rem !important;
         overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
         width: 100%;
         min-width: 0 !important;
     }

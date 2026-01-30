@@ -2078,6 +2078,7 @@ tbody tr:hover {
     /* Extra space top/bottom */
     overflow-y: auto;
     /* Allow overlay itself to scroll if needed */
+    -webkit-overflow-scrolling: touch;
     opacity: 0;
     transition: opacity 0.3s;
     z-index: 10001;
