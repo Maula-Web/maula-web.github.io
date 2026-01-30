@@ -377,13 +377,31 @@
 
 @media (max-width: 600px) {
     .chart-wrapper {
-        min-width: 100% !important;
-        /* Allow chart to scale down on small portrait screens */
+        min-width: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
         height: 300px;
-        /* Reduce height slightly for better aspect ratio */
     }
 
     .dashboard-card {
         padding: 0.8rem !important;
+        width: 100% !important;
+        overflow-x: hidden !important;
+        /* Hide overflow on card to prevent body scroll */
+    }
+
+    canvas#evolutionChart {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+/* Force table to be wide enough to scroll smoothly on mobile */
+@media (max-width: 800px) {
+    #forecast-summary-table {
+        min-width: 800px !important;
+        /* Force width to trigger good scrolling */
+        width: auto !important;
+        /* Allow it to expand beyond 100% */
     }
 }

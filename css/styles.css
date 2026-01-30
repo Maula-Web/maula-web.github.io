@@ -3322,3 +3322,13 @@ body.mobile-mode .p-divider {
 .lockout-icon {
     animation: shake 1s infinite;
 }
+
+/* Force table to be wide enough to scroll smoothly on mobile in Pronosticos page */
+@media (max-width: 800px) {
+    #forecast-summary-table {
+        min-width: 800px !important;
+        /* Force width to trigger good scrolling */
+        width: auto !important;
+        /* Allow it to expand beyond 100% */
+    }
+}
