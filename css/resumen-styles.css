@@ -130,6 +130,34 @@
     font-size: 1.2rem;
 }
 
+/* Desktop Defaults */
+.col-check {
+    width: 50px;
+    text-align: center;
+}
+
+.col-pos {
+    width: 60px;
+    text-align: center;
+}
+
+.col-socio {
+    text-align: left;
+    font-weight: bold;
+}
+
+.col-puntos {
+    text-align: right;
+    font-weight: bold;
+    color: var(--resumen-row-points-text, #e65100);
+    font-size: 1.1rem;
+}
+
+.rankings-table .mobile-text {
+    display: none;
+    /* Hide 'Pts' on desktop */
+}
+
 /* Modal Styles */
 .modal-large {
     max-width: 1200px;

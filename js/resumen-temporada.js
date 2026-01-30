@@ -156,12 +156,12 @@ class ResumenManager {
             <table class="rankings-table" style="width:100%; background:var(--resumen-card-bg); border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
                 <thead style="background:var(--resumen-table-header-bg); color:var(--resumen-table-header-text);">
                     <tr>
-                        <th class="col-check" style="width:40px; padding:0.5rem; text-align:center;">Ver</th>
-                        <th class="col-pos" style="width:40px; padding:0.5rem; text-align:center;">Pos.</th>
-                        <th class="col-socio" style="padding:0.5rem; text-align:left;">Socio</th>
-                        <th class="col-puntos" style="padding:0.5rem; text-align:right;">
+                        <th class="col-check">Ver</th>
+                        <th class="col-pos">Pos.</th>
+                        <th class="col-socio">Socio</th>
+                        <th class="col-puntos">
                             <span class="desktop-text">Puntos Totales</span>
-                            <span class="mobile-text" style="display:none;">Pts</span>
+                            <span class="mobile-text">Pts</span>
                         </th>
                     </tr>
                 </thead>
@@ -178,16 +178,16 @@ class ResumenManager {
 
             html += `
                 <tr style="border-bottom:1px solid #eee; background:var(--resumen-table-row-bg); color:var(--resumen-table-text);">
-                    <td class="col-check" style="text-align:center; padding:0.5rem;">
+                    <td class="col-check">
                         <input type="checkbox" onchange="window.app.toggleSelection(${r.id}, this)" ${isChecked}>
                     </td>
-                    <td class="col-pos" style="padding:0.5rem; text-align:center;">${medal || (idx + 1)}</td>
-                    <td class="col-socio" style="padding:0.5rem; font-weight:bold;">
+                    <td class="col-pos">${medal || (idx + 1)}</td>
+                    <td class="col-socio">
                         <a href="javascript:void(0)" onclick="window.app.showMemberSummary(${r.id}, '${r.name.replace(/'/g, "\\'")}')" style="color:var(--resumen-link-color); text-decoration:none; border-bottom:1px dashed var(--resumen-link-color);">
                             ${r.name}
                         </a>
                     </td>
-                    <td class="col-puntos" style="padding:0.5rem; text-align:right; font-size:1rem; color:var(--resumen-row-points-text); font-weight:bold;">${r.points}</td>
+                    <td class="col-puntos">${r.points}</td>
                 </tr>
             `;
         });
