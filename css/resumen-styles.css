@@ -462,21 +462,8 @@
         display: block !important;
     }
 
-    .rankings-card {
-        min-width: 0 !important;
-        /* Allow card to shrink below 350px */
-    }
-
-    canvas#evolutionChart {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-}
-
-/* Force table to be wide enough to scroll smoothly on mobile */
-@media (max-width: 800px) {
     .rankings-table {
-        min-width: 600px;
-        /* Force scroll on rankings table too if needed */
+        min-width: 0 !important;
+        width: 100% !important;
     }
 }

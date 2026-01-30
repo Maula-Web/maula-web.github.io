@@ -3326,16 +3326,18 @@ body.mobile-mode .p-divider {
 
 /* Force table to be wide enough to scroll smoothly on mobile in Pronosticos page */
 @media (max-width: 800px) {
-    #forecast-summary-table {
-        min-width: 800px !important;
-        /* Force width to trigger good scrolling */
-        width: auto !important;
-        /* Allow it to expand beyond 100% */
-    }
 
     /* Force Inertia on container specifically for Pronosticos */
     #summary-container {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
+        display: block;
+        width: 100% !important;
+    }
+
+    #forecast-summary-table {
+        min-width: 100% !important;
+        width: max-content !important;
+        /* Allow expansion like results page */
     }
 }
