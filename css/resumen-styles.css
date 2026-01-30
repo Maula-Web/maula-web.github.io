@@ -374,3 +374,16 @@
         width: 100%;
     }
 }
+
+@media (max-width: 600px) {
+    .chart-wrapper {
+        min-width: 100% !important;
+        /* Allow chart to scale down on small portrait screens */
+        height: 300px;
+        /* Reduce height slightly for better aspect ratio */
+    }
+
+    .dashboard-card {
+        padding: 0.8rem !important;
+    }
+}
