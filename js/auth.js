@@ -290,6 +290,7 @@ const Auth = {
                 <a href="jornadas.html" class="btn-primary btn-jornadas ${page === 'jornadas.html' ? 'active' : ''}">JORNADAS</a>
                 <a href="pronosticos.html" class="btn-primary btn-pronosticos ${page === 'pronosticos.html' ? 'active' : ''}">PRONÓSTICOS</a>
                 <a href="resultados.html" class="btn-primary btn-resultados ${page === 'resultados.html' ? 'active' : ''}">RESULTADOS</a>
+                <a href="bote.html" class="btn-primary btn-bote ${page === 'bote.html' ? 'active' : ''}" style="background:var(--primary-orange, #ff9100); border-color:var(--primary-orange, #ff9100);">BOTE</a>
                 <a href="resumen-temporada.html" class="btn-primary btn-resumen ${page === 'resumen-temporada.html' ? 'active' : ''}">RESUMEN TEMPORADA</a>
                 <a href="votaciones.html" class="btn-primary btn-votaciones ${page === 'votaciones.html' ? 'active' : ''}" style="background:white; color:black; font-weight:900;">VOTACIONES</a>
                 <a href="admin.html" class="btn-primary btn-admin ${page === 'admin.html' ? 'active' : ''}">ADMINISTRACIÓN</a>
@@ -313,7 +314,24 @@ const Auth = {
                 }
             }
 
-            // 2b. Ensure Votaciones button exists
+            // 2b. Ensure Bote button exists
+            if (!sidebar.querySelector('a[href="bote.html"]')) {
+                const boteBtn = document.createElement('a');
+                boteBtn.href = "bote.html";
+                boteBtn.className = `btn-primary btn-bote ${page === 'bote.html' ? 'active' : ''}`;
+                boteBtn.style.background = "var(--primary-orange, #ff9100)";
+                boteBtn.style.borderColor = "var(--primary-orange, #ff9100)";
+                boteBtn.textContent = "BOTE";
+                // Insert after resultados
+                const resultadosBtn = sidebar.querySelector('a[href="resultados.html"]');
+                if (resultadosBtn) {
+                    resultadosBtn.insertAdjacentElement('afterend', boteBtn);
+                } else {
+                    sidebar.appendChild(boteBtn);
+                }
+            }
+
+            // 2c. Ensure Votaciones button exists
             if (!sidebar.querySelector('a[href="votaciones.html"]')) {
                 const votBtn = document.createElement('a');
                 votBtn.href = "votaciones.html";

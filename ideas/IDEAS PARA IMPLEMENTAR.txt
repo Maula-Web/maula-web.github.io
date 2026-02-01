@@ -49,3 +49,101 @@ Esta herramiento se podrá utilizar en un futuro si decidimos cambiar el aspecto
 
 Las tarjetas principales de cada hoja (las que cotienen todos los elementos) tienen un sombreado. Coloca controles en identidad visual para todos los apartados en los que se puedan activar o desactivar ese sombreado.
 Crea también una sección para colocar los controles de color de la hoja principal. Pon controles de color para todos los elementos de tarjetas, textos y de cualquier otro tipo.
+
+
+
+BOTE:
+
+Quiero implementar la gestion de cuentas (Bote) de la peña. Lo vamos a hacer en una sección propia llamada Bote. Aparecerá en el menú tras la sección resultados y será de color naranja. Haz el botón del menú con el mismo estilo que la sección de socios, jornadas, pronósticos y resultados.
+Te explico cómo funciona el bote. Está muy relacionado con todo el reglamento de la Peña que ya hemos implementados en otras secciones así que tenlo en cuenta:
+Todas las semanas, los socios rellenan un pronóstico (una columna) y el ganador de la jornada anterior además de su columna una columna de dobles.
+El precio actual de una columna es de 0,75 € que cada socio pagará de su propio bote. El bote de cada socio se actualiza cada semana en función de los gastos y los ingresos.
+Cuando el perdedor de la jornada anterior sella las quinielas, las paga de su bolsillo y después la Peña le ingresa en su bote la cantidad correspondiente al sellado. El socio puede solicitar que en lugar de ingresar el dinero en su bote se le ingrese en su cuenta bancaria, pero siempre se le ingresará desde el total del bote de la Peña. Si se le ingresa a su cuenta, esa cantidad deja de estar disponible para la peña y desaparece del cuadrante. Si se le ingresa en su bote, esta cantidad computará para el total del bote.
+Los gastos corresponden a la suma del sellado de cada columna, tenendo en cuenta el suplemento por número de unos, más las penalizaciones por tener pocos aciertos o por sellar tarde una columna.
+Los ingresos vienen por la obtención de premios y por los ingresos que cada socio hace a la Peña mediante Bizum o transferencia bancaria.
+Todos los gastos suman al total de la Peña y todos los ingresos también. La diferencia entre Gastos e ingresos es el total de dinero (Bote) de la Peña.
+Necesitamos tener un detalle absoluto de cada movimiento, semana a semana de cada uno de los socios. Actualmente mantenemos las cuentas en una hojamexcel pero es mucho trabajo para el tesorero. Te he dejado una captura de pantalla del estado actual de cuentas para que te hagas una idea de lo que tenemos. Necesitamos algo con ese nivel de detalle pero más sencillo de mantener y de entender.
+Si no sabes lo que es alguna celda, pregúntame.
+La fila superior a partir de la columna K, es la fecha de cada jornada. Justo debajo de la fecha aparece cada jornada (J1, J2, etc...) y cada columna de jornada se subdivide en dos, el coste de esa jornada y los aciertos de cada socio en esa jornada.
+Si un socio ha obtenido premio en una jornada, la jornada siguiente queda exento de pagar su columna y la juega gratis, debiendo asumir el coste el resto de socios a partes iguales.
+Si te fijas hay una columna llamada 1V. Esta corresponde al total de la primera vuelta. Cada temporada se divide en dos vueltas, terminando la primera vuelta cuando todos los equipos han jugado contra todos los demás una vez. En ese momento, se presenta el total parcial de la primera vuelta. A partir de ahí comienza la segunda vuelta. Al final de la segunda vuelta la temporada termina y habrá que presentar el total final.
+Los socios pueden pedir reparto de ganancias al final de cada vuelta o en el momento de darse de baja, por lo que hay que establecer controles para ello. El bote debe estar actualizado en cada momento.
+Implementa los controles necesarios para la gestión del bote.
+Cada temporada debe ser accesible en cualquier momento, por lo que habrá que guardar la información en una base de datos histórica, por si un socio quiere consultar el bote de una temporada pasada o el bote de la temnporada actual.
+Si no entiendes algo, preguntalo, no te inventes reglas. Esto e muy importante ya que hay dinero de por medio. Por eso este sistema debe ser, fiable, preciso, coherente y robusto.
+
+
+
+Copio tus preguntas y te contesto a continuación de cada una. Mi respuesta va precedida de un guión.
+Preguntas de Clarificación:
+Columnas de la Excel:
+Veo las columnas: SELLADOS, MAIL, MAULA, BOTE, SUMA, RESTA, y luego las jornadas (J1, J2, etc.)
+¿Qué significa exactamente la columna "SELLADOS" (con números como 5, 6, 3, etc.)?
+- La columna SELLADOS contiene número del tipo J1, J11, etc. Es una manera de saber qué socio ha sellado cada jornada.
+¿Qué representa "MAIL" y "MAULA"?
+- En realidad no es "MAIL" es "MAUL". Es una manera que tiene el tesorero de saber a qué socio hace refeerencia cada fila. MAUL es una abreviatura y MAULA es el nombre completo de cada socio. Seguramente te puedas apañar con los datos contenidos en la tabla de socios, concretamente con el apodo de cada uno.
+¿SUMA y RESTA son los totales acumulados de ingresos y gastos respectivamente?
+- Exacto. SUMA es lo que ha ingresado cada socio a lo largo de la temporada hasta el momento y RESTA son los gatos generados por cada socio hasta el momento en esta temporada.
+Subdivisión de cada jornada:
+Veo que cada jornada tiene dos columnas. Mencionas que son "coste" y "aciertos"
+En la imagen veo valores como 1,50 (¿coste?) y números del 5-10 (¿aciertos?)
+- Correcto. 1,50 es el coste en euros. Corresponde al gasto de cada socio en esa jornada. Los números del 5-10 en realidad pueden ir del 0 al 15 y corresponden al número de aciertos que ha tenido cada socio en esa jornada.
+¿Las celdas de colores (amarillo, rojo, verde, azul) tienen algún significado especial?
+- Si. Las celdas amarillas sirven para señalar al socio ganador de cada jornada. Las celdas rojas marcan al perdedor de cada jornada. una celda rosa sirve para indicar que un socio no paga esa semana (Seguramente la joranda anterior, ingresó dinero por premios en su columna). Las celdas narajanas indican que un socio ha tenido tres aciertos o menos (Lo que conlleva penalización) pero aún así no ha perdido la jornada porque otro socio ha conseguido menos puntos que él. Las celdas verdes y moradas simplemente son para diferenciarse del resto de columnas. Me da la sensqación de que has analizado únicamente la columna de la primera jornada. Analiza todas para ver si hay algo más que no entiendas.
+Filas inferiores:
+Veo filas de "Sellado", "Recaudación", "Vueltas", "Premios"
+¿Qué representa cada una de estas filas exactamente?
+- Recaudación corresponde a lo ingresado esa jornada. Es la suma del coste de cada columna de cada socio más las penalizaciones por pocos aciertos más el suplemento por número de unos. 
+Sellado es el coste de sellar las columnas. Normalmente será 0,75€ por cada socio (19) más los 12€ que cuesta una columna de dobles, total 26,25€. Verás que hay veces que aparece otra cantidad. Eso se debe a  
+Vueltas es la diferencia entre Recaudación y Sellado.
+Premios es la cantidad de premios obtenidos esa jornada.
+Estas celdas se calculan a modo de resumen pero creo que no interfieren en el resultado final. El caso es que no tengo del todo claro cómo funcionan. De momento obvialas y cuando el tesorero me explique bien como funcionan te lo explicaré.
+
+La fila "BOTE MAULA PENALIZACIONES" con valor 129.83, ¿es el total de penalizaciones de toda la temporada?
+-Es la suma de penalizaciones hasta ese momento de la temporada más el bote que quedó sin repartir del año anterior.
+
+Columna de Dobles:
+¿El ganador de la jornada anterior juega una columna de dobles ADICIONAL a su columna normal, o solo juega la de dobles?
+- El ganador juega una columna de dobles adicional a su columna normal, tal y como ya hemos implementado en el sistema de relleno de pronósticos. Por eso te decía que es importante tener en cuenta todo lo que ya hemos implementado en la web.
+
+¿El coste de la columna de dobles es también 0,75€ o es diferente?
+- La columna de dobles tiene un coste de 12€. Se paga con lo aportado por cada socio desde su bote particular (1,50€ cada semana). 
+
+Penalizaciones:
+Mencionas "penalizaciones por tener pocos aciertos o por sellar tarde"
+¿Cuáles son exactamente las reglas de penalización? (ej: menos de X aciertos = Y euros de penalización)
+- Perdona. Olvida esto. Me equivoqué. Tener pocos aciertos sólo conlleva penalización en el número de puntos pero no conlleva penalización económica.
+
+
+Premios y Exención:
+Dices que si un socio obtiene premio, la siguiente jornada juega gratis
+¿Cuántos aciertos se necesitan para obtener premio? ¿10 o más?
+- El número de aciertos no determina la obtención de premio. Recuerda que la información sobre premios se obtiene desde los ficheros RSS de resultados de cada jornada. Es decir, hasta que no temrina una jornada, no podemos saber si un socio obtiene premio o no.
+
+¿El coste se reparte entre TODOS los demás socios o solo entre los que jugaron esa jornada?
+- Todos los socios juegan todas las jornadas. Si un socio no sella una jornada, se considera que también juega esa jornada y se le cobra igualmente. No sellar ya tiene establecido una serie de penalizaciones.
+
+Ingresos al Bote:
+Cuando un socio hace un ingreso por Bizum/transferencia, ¿se refleja en alguna columna específica de la Excel?
+- Se acumula en la celda SUMA. No sé si se podría habilitar un control para mostrar esos ingresos. Uns celda desplegable o una tabla en una ventana emergente. Mira a ver qué se te ocurre. Estaría bien mostrar la cuantía del ingreso y la fecha y el método de envío del dinero, efectivo, Bizum o transferencia.
+
+Sellado de Quinielas:
+El perdedor sella las quinielas y las paga
+¿Cuánto cuesta sellar? ¿Depende del número de columnas y del "suplemento por número de unos"?
+- Sellar una columna cuesta 0'75€ y sellar la de dobles cuesta 12€. Esto puede cambiar porque cada año los precios varían, así que como te dije antes, estaría bien tener una celda donde definir el coste de jugar una columna y el coste de la de dobles. Así el sistema sabe en cada momento el coste que debe aplicar.
+El número de unos no altera el coste de sellar una quiniela. Es una penalización para incentivar el resto de signos pero no altera el coste de sellar.
+
+¿Qué es exactamente el "suplemento por número de unos"?
+- Recuerda que se definió que poner demasiados unos en una columna conlleva una penalización en puntos. Pues también tiene penalización económica:
+10 unos = 1 eur. +10 cent. de penalización.
+11 unos = 1 eur. +20 cent. de penalización.
+12 unos = 1 eur. +30 cent. de penalización.
+13 unos = 1 eur. +50 cent. de penalización.
+14 unos = 1 eur. + 1 €. de penalización. 
+
+
+Se me olvidó decirte (Esto es importante) que una columna cuesta 0,75€, pero los socios ingresan a la peña 1,5€ cada semana para pagar la columna de dobles. 
+Si ves que se puede suprimir o cambiar algo para mejorarlo, hazlo.
+Incuye controles para definir el coste de cada columna y de la columna de dobles. Puede cambiar de un año para otro.
+Sé que es un sistema muy complicado, por lo que si algo no queda claro, no dudes en preguntarlo.
+El objetivo final es saber, de cuanto dinero dispone cada socio en su bote. De cuanto dispone la Peña. Y al desglosar la información quedarán claros los movimientos de dinero dentro de la Peña. Sabremos cuánto se ha llevado a sanciones, cuánto ha ingresado cada uno en premios o particularmente, cuánto se ha dedicado a pagar sellados de columnas, etc.

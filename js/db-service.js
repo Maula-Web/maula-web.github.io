@@ -7,7 +7,9 @@ class DataService {
             pronosticos: 'pronosticos',
             logs: 'logs',
             config: 'config',
-            docs: 'documents'
+            docs: 'documents',
+            bote: 'bote',
+            ingresos: 'ingresos'
         };
     }
 

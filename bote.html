@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión del Bote - PEÑA MAULAS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- DB Config -->
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+    <style>
+        .bote-container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .bote-header {
+            background: var(--primary-orange, #ff9100);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(255, 145, 0, 0.3);
+            text-align: center;
+        }
+
+        .bote-header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .bote-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(255, 145, 0, 0.1) 0%, rgba(255, 145, 0, 0.05) 100%);
+            border: 2px solid var(--primary-orange, #ff9100);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(255, 145, 0, 0.3);
+        }
+
+        .summary-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-orange, #ff9100);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text-primary, #fff);
+            text-shadow: 0 2px 8px rgba(255, 145, 0, 0.4);
+        }
+
+        .bote-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .bote-controls select,
+        .bote-controls button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--primary-orange, #ff9100);
+            background: rgba(255, 145, 0, 0.1);
+            color: var(--text-primary, #fff);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bote-controls button {
+            background: var(--primary-orange, #ff9100);
+            color: white;
+        }
+
+        .bote-controls button:hover {
+            background: #ff7700;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 145, 0, 0.4);
+        }
+
+        .bote-table-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .bote-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .bote-table th {
+            background: var(--primary-orange, #ff9100);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .bote-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 145, 0, 0.2);
+            color: var(--text-primary, #fff);
+        }
+
+        .bote-table tr:hover {
+            background: rgba(255, 145, 0, 0.1);
+        }
+
+        .bote-table .positive {
+            color: #4caf50;
+            font-weight: 700;
+        }
+
+        .bote-table .negative {
+            color: #f44336;
+            font-weight: 700;
+        }
+
+        .bote-table .neutral {
+            color: #ffc107;
+            font-weight: 700;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--bg-secondary, #1a1a1a);
+            margin: 5% auto;
+            padding: 2rem;
+            border: 2px solid var(--primary-orange, #ff9100);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(255, 145, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary-orange, #ff9100);
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+
+        .close-modal {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-orange, #ff9100);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary, #fff);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid rgba(255, 145, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary, #fff);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-orange, #ff9100);
+            box-shadow: 0 0 10px rgba(255, 145, 0, 0.3);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-orange, #ff9100);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #ff7700;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 145, 0, 0.4);
+        }
+
+        .detail-table {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .detail-table th,
+        .detail-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 145, 0, 0.2);
+        }
+
+        .detail-table th {
+            color: var(--primary-orange, #ff9100);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .bote-container {
+                padding: 0 1rem;
+            }
+
+            .bote-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .summary-card .value {
+                font-size: 1.5rem;
+            }
+
+            .bote-controls {
+                flex-direction: column;
+            }
+
+            .bote-controls select,
+            .bote-controls button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+
+    <!-- Dynamic Header will be injected by auth.js -->
+
+    <div class="bote-container">
+        <div class="bote-header">
+            <h1>💰 Gestión del Bote</h1>
+            <p style="margin: 0; font-size: 1.1rem; opacity: 0.9;">Control de cuentas y movimientos de la Peña</p>
+        </div>
+
+        <!-- Resumen General -->
+        <div class="bote-summary" id="bote-summary">
+            <div class="summary-card">
+                <h3>Bote Total Peña</h3>
+                <div class="value" id="total-bote">0.00 €</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Ingresos</h3>
+                <div class="value positive" id="total-ingresos">0.00 €</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Gastos</h3>
+                <div class="value negative" id="total-gastos">0.00 €</div>
+            </div>
+            <div class="summary-card">
+                <h3>Jornadas Procesadas</h3>
+                <div class="value neutral" id="jornadas-count">0</div>
+            </div>
+        </div>
+
+        <!-- Controles -->
+        <div class="bote-controls">
+            <select id="temporada-select">
+                <option value="2025-2026">Temporada 2025-2026</option>
+            </select>
+            <select id="vista-select">
+                <option value="general">Vista General</option>
+                <option value="detalle">Detalle por Jornada</option>
+                <option value="socios">Detalle por Socio</option>
+            </select>
+            <button onclick="boteManager.openIngresoModal()">➕ Registrar Ingreso</button>
+            <button onclick="boteManager.openConfigModal()">⚙️ Configuración</button>
+            <button onclick="boteManager.exportData()">📊 Exportar Datos</button>
+        </div>
+
+        <!-- Tabla Principal -->
+        <div class="bote-table-container">
+            <div id="bote-content">
+                <p style="text-align: center; color: #888;">Cargando datos del bote...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Registrar Ingreso -->
+    <div id="modal-ingreso" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Ingreso</h2>
+                <span class="close-modal" onclick="boteManager.closeModal('modal-ingreso')">&times;</span>
+            </div>
+            <form id="form-ingreso" onsubmit="boteManager.submitIngreso(event)">
+                <div class="form-group">
+                    <label>Socio</label>
+                    <select id="ingreso-socio" required>
+                        <option value="">Seleccionar socio...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad (€)</label>
+                    <input type="number" id="ingreso-cantidad" step="0.01" min="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Método de Pago</label>
+                    <select id="ingreso-metodo" required>
+                        <option value="bizum">Bizum</option>
+                        <option value="transferencia">Transferencia</option>
+                        <option value="efectivo">Efectivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" id="ingreso-fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Concepto (opcional)</label>
+                    <textarea id="ingreso-concepto" rows="3"
+                        placeholder="Ej: Ingreso voluntario, reposición, etc."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Registrar Ingreso</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Configuración -->
+    <div id="modal-config" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configuración del Bote</h2>
+                <span class="close-modal" onclick="boteManager.closeModal('modal-config')">&times;</span>
+            </div>
+            <form id="form-config" onsubmit="boteManager.submitConfig(event)">
+                <div class="form-group">
+                    <label>Coste Columna Normal (€)</label>
+                    <input type="number" id="config-coste-columna" step="0.01" min="0" value="0.75" required>
+                </div>
+                <div class="form-group">
+                    <label>Coste Columna Dobles (€)</label>
+                    <input type="number" id="config-coste-dobles" step="0.01" min="0" value="12.00" required>
+                </div>
+                <div class="form-group">
+                    <label>Aportación Semanal por Socio (€)</label>
+                    <input type="number" id="config-aportacion" step="0.01" min="0" value="1.50" required>
+                    <small style="color: #888; font-size: 0.85rem;">Cantidad que cada socio aporta semanalmente para
+                        cubrir gastos</small>
+                </div>
+                <div class="form-group">
+                    <label>Bote Inicial Temporada (€)</label>
+                    <input type="number" id="config-bote-inicial" step="0.01" value="0.00" required>
+                    <small style="color: #888; font-size: 0.85rem;">Bote arrastrado de temporadas anteriores</small>
+                </div>
+                <button type="submit" class="btn-submit">Guardar Configuración</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Detalle de Socio -->
+    <div id="modal-detalle-socio" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="detalle-socio-nombre">Detalle de Socio</h2>
+                <span class="close-modal" onclick="boteManager.closeModal('modal-detalle-socio')">&times;</span>
+            </div>
+            <div id="detalle-socio-content">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/bote.js"></script>
+</body>
+
+</html>
