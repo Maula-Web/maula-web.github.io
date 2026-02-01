@@ -24,6 +24,7 @@ class BoteManager {
             temporadaActual: '2025-2026'
         };
         this.currentVista = 'general';
+        this.currentJornadaIndex = -1; // Will be set to most recent jornada with results
         this.init();
     }
 
@@ -44,6 +45,7 @@ class BoteManager {
             // Bind events
             document.getElementById('vista-select').addEventListener('change', (e) => {
                 this.currentVista = e.target.value;
+                this.currentJornadaIndex = 0; // Reset when changing view
                 this.render();
             });
 
@@ -173,8 +175,11 @@ class BoteManager {
      * Calculate costs for a specific member in a specific jornada
      */
     calculateJornadaCosts(memberId, jornada, pronostico, jornadaIndex) {
+        // Check if jornada has been played (has results)
+        const jornadaPlayed = jornada.matches && jornada.matches.every(m => m.result && m.result !== '');
+
         const costs = {
-            aportacion: this.config.aportacionSemanal,
+            aportacion: jornadaPlayed ? this.config.aportacionSemanal : 0,
             columna: 0,
             dobles: 0,
             penalizacionUnos: 0,
@@ -185,17 +190,17 @@ class BoteManager {
         };
 
         if (!pronostico) {
-            // No pronostico = still pays but no hits
-            costs.columna = this.config.costeColumna;
+            // No pronostico = still pays columna if jornada was played
+            costs.columna = jornadaPlayed ? this.config.costeColumna : 0;
             return costs;
         }
 
-        // Check if member won previous jornada (exempt from paying)
+        // CORRECCIÓN: Check if member won a PRIZE in previous jornada (not just won)
         if (jornadaIndex > 0) {
             const prevJornada = this.jornadas[jornadaIndex - 1];
-            const wasWinner = this.wasWinnerOfJornada(memberId, prevJornada);
+            const hadPrize = this.getPrizesForJornada(memberId, prevJornada) > 0;
 
-            if (wasWinner) {
+            if (hadPrize) {
                 costs.exento = true;
                 costs.columna = 0; // Exempt from paying
             } else {
@@ -447,9 +452,6 @@ class BoteManager {
             case 'detalle':
                 this.renderVistaDetalle(movements);
                 break;
-            case 'socios':
-                this.renderVistaSocios(movements);
-                break;
         }
     }
 
@@ -522,8 +524,7 @@ class BoteManager {
                         <td class="negative">${summary.totalGastos.toFixed(2)} €</td>
                         <td class="${boteClass}">${summary.bote.toFixed(2)} €</td>
                         <td>
-                            <button onclick="boteManager.showMemberDetail('${summary.name}')" 
-                                    style="padding: 0.5rem 1rem; background: var(--primary-orange); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <button class="btn-action" onclick="boteManager.showMemberDetail('${summary.name}')">
                                 Ver Detalle
                             </button>
                         </td>
@@ -540,7 +541,7 @@ class BoteManager {
     }
 
     /**
-     * Render Vista Detalle - By jornada
+     * Render Vista Detalle - By jornada with navigation
      */
     renderVistaDetalle(movements) {
         // Group by jornada
@@ -553,82 +554,141 @@ class BoteManager {
             jornadaGroups[m.jornadaNum].push(m);
         });
 
-        let html = '<div style="max-height: 600px; overflow-y: auto;">';
+        const jornadaNums = Object.keys(jornadaGroups).sort((a, b) => parseInt(a) - parseInt(b));
 
-        Object.keys(jornadaGroups)
-            .sort((a, b) => parseInt(a) - parseInt(b))
-            .forEach(jornadaNum => {
-                const jornadaMovements = jornadaGroups[jornadaNum];
-                const jornada = this.jornadas.find(j => j.number === parseInt(jornadaNum));
+        if (jornadaNums.length === 0) {
+            document.getElementById('bote-content').innerHTML = '<p class="loading">No hay jornadas disponibles</p>';
+            return;
+        }
 
-                const totalIngresos = jornadaMovements.reduce((sum, m) => sum + m.totalIngresos, 0);
-                const totalGastos = jornadaMovements.reduce((sum, m) => sum + m.totalGastos, 0);
-                const neto = totalIngresos - totalGastos;
+        // If currentJornadaIndex is -1 (first time), find most recent jornada with results
+        if (this.currentJornadaIndex === -1) {
+            // Find the most recent jornada with complete results
+            for (let i = jornadaNums.length - 1; i >= 0; i--) {
+                const jornadaNum = parseInt(jornadaNums[i]);
+                const jornada = this.jornadas.find(j => j.number === jornadaNum);
+                if (jornada && jornada.matches && jornada.matches.every(m => m.result && m.result !== '')) {
+                    this.currentJornadaIndex = i;
+                    break;
+                }
+            }
+            // If no jornada with results found, default to last one
+            if (this.currentJornadaIndex === -1) {
+                this.currentJornadaIndex = jornadaNums.length - 1;
+            }
+        }
 
-                html += `
-                    <div style="margin-bottom: 2rem; padding: 1rem; background: rgba(255, 145, 0, 0.05); border-radius: 8px; border: 1px solid rgba(255, 145, 0, 0.2);">
-                        <h3 style="color: var(--primary-orange); margin: 0 0 1rem 0;">
-                            Jornada ${jornadaNum} - ${jornada ? jornada.date : 'N/A'}
-                        </h3>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
-                            <div>
-                                <strong style="color: var(--primary-orange);">Total Ingresos:</strong> 
-                                <span class="positive">${totalIngresos.toFixed(2)} €</span>
-                            </div>
-                            <div>
-                                <strong style="color: var(--primary-orange);">Total Gastos:</strong> 
-                                <span class="negative">${totalGastos.toFixed(2)} €</span>
-                            </div>
-                            <div>
-                                <strong style="color: var(--primary-orange);">Neto:</strong> 
-                                <span class="${neto >= 0 ? 'positive' : 'negative'}">${neto.toFixed(2)} €</span>
-                            </div>
-                        </div>
-                        <table class="detail-table">
-                            <thead>
-                                <tr>
-                                    <th>Socio</th>
-                                    <th>Aciertos</th>
-                                    <th>Aportación</th>
-                                    <th>Columna</th>
-                                    <th>Pen. 1s</th>
-                                    <th>Sellado</th>
-                                    <th>Premios</th>
-                                    <th>Neto</th>
-                                    <th>Bote</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
+        // Ensure currentJornadaIndex is valid
+        if (this.currentJornadaIndex >= jornadaNums.length) {
+            this.currentJornadaIndex = jornadaNums.length - 1;
+        }
+        if (this.currentJornadaIndex < 0) {
+            this.currentJornadaIndex = 0;
+        }
 
-                jornadaMovements
-                    .sort((a, b) => a.memberName.localeCompare(b.memberName))
-                    .forEach(m => {
-                        html += `
-                            <tr>
-                                <td>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}</td>
-                                <td>${m.aciertos}</td>
-                                <td class="positive">${m.aportacion.toFixed(2)} €</td>
-                                <td class="negative">${m.costeColumna.toFixed(2)} €</td>
-                                <td class="negative">${m.penalizacionUnos.toFixed(2)} €</td>
-                                <td class="${m.sellado < 0 ? 'positive' : 'negative'}">${m.sellado.toFixed(2)} €</td>
-                                <td class="positive">${m.premios.toFixed(2)} €</td>
-                                <td class="${m.neto >= 0 ? 'positive' : 'negative'}">${m.neto.toFixed(2)} €</td>
-                                <td class="${m.boteAcumulado >= 0 ? 'positive' : 'negative'}">${m.boteAcumulado.toFixed(2)} €</td>
-                            </tr>
-                        `;
-                    });
+        const currentJornadaNum = jornadaNums[this.currentJornadaIndex];
+        const jornadaMovements = jornadaGroups[currentJornadaNum];
+        const jornada = this.jornadas.find(j => j.number === parseInt(currentJornadaNum));
 
-                html += `
-                            </tbody>
-                        </table>
+        const totalIngresos = jornadaMovements.reduce((sum, m) => sum + m.totalIngresos, 0);
+        const totalGastos = jornadaMovements.reduce((sum, m) => sum + m.totalGastos, 0);
+        const neto = totalIngresos - totalGastos;
+
+        let html = `
+            <div class="jornada-nav">
+                <button onclick="boteManager.prevJornada()" ${this.currentJornadaIndex === 0 ? 'disabled' : ''}>
+                    ← Anterior
+                </button>
+                <span>Jornada ${currentJornadaNum} - ${jornada ? jornada.date : 'N/A'}</span>
+                <button onclick="boteManager.nextJornada()" ${this.currentJornadaIndex === jornadaNums.length - 1 ? 'disabled' : ''}>
+                    Siguiente →
+                </button>
+            </div>
+
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 145, 0, 0.08); border-radius: 8px; border: 1px solid rgba(255, 145, 0, 0.3);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <div>
+                        <strong style="color: #ff9100;">Total Ingresos:</strong> 
+                        <span class="positive">${totalIngresos.toFixed(2)} €</span>
                     </div>
+                    <div>
+                        <strong style="color: #ff9100;">Total Gastos:</strong> 
+                        <span class="negative">${totalGastos.toFixed(2)} €</span>
+                    </div>
+                    <div>
+                        <strong style="color: #ff9100;">Neto:</strong> 
+                        <span class="${neto >= 0 ? 'positive' : 'negative'}">${neto.toFixed(2)} €</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="bote-table">
+                    <thead>
+                        <tr>
+                            <th>Socio</th>
+                            <th>Aciertos</th>
+                            <th>Aportación</th>
+                            <th>Columna</th>
+                            <th>Pen. 1s</th>
+                            <th>Sellado</th>
+                            <th>Premios</th>
+                            <th>Neto</th>
+                            <th>Bote</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        jornadaMovements
+            .sort((a, b) => a.memberName.localeCompare(b.memberName))
+            .forEach(m => {
+                html += `
+                    <tr>
+                        <td>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}</td>
+                        <td>${m.aciertos}</td>
+                        <td class="positive">${m.aportacion.toFixed(2)} €</td>
+                        <td class="negative">${m.costeColumna.toFixed(2)} €</td>
+                        <td class="negative">${m.penalizacionUnos.toFixed(2)} €</td>
+                        <td class="${m.sellado < 0 ? 'positive' : 'negative'}">${m.sellado.toFixed(2)} €</td>
+                        <td class="positive">${m.premios.toFixed(2)} €</td>
+                        <td class="${m.neto >= 0 ? 'positive' : 'negative'}">${m.neto.toFixed(2)} €</td>
+                        <td class="${m.boteAcumulado >= 0 ? 'positive' : 'negative'}">${m.boteAcumulado.toFixed(2)} €</td>
+                    </tr>
                 `;
             });
 
-        html += '</div>';
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
 
         document.getElementById('bote-content').innerHTML = html;
+    }
+
+    prevJornada() {
+        if (this.currentJornadaIndex > 0) {
+            this.currentJornadaIndex--;
+            this.render();
+        }
+    }
+
+    nextJornada() {
+        const movements = this.calculateAllMovements();
+        const jornadaGroups = {};
+        movements.forEach(m => {
+            if (!jornadaGroups[m.jornadaNum]) {
+                jornadaGroups[m.jornadaNum] = [];
+            }
+            jornadaGroups[m.jornadaNum].push(m);
+        });
+        const jornadaNums = Object.keys(jornadaGroups).sort((a, b) => parseInt(a) - parseInt(b));
+
+        if (this.currentJornadaIndex < jornadaNums.length - 1) {
+            this.currentJornadaIndex++;
+            this.render();
+        }
     }
 
     /**
@@ -662,8 +722,7 @@ class BoteManager {
                         <td><strong>${member.name}</strong></td>
                         <td class="${boteClass}">${bote.toFixed(2)} €</td>
                         <td>
-                            <button onclick="boteManager.showMemberDetail('${member.name}')" 
-                                    style="padding: 0.5rem 1rem; background: var(--primary-orange); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <button class="btn-action" onclick="boteManager.showMemberDetail('${member.name}')">
                                 Ver Detalle Completo
                             </button>
                         </td>
@@ -693,8 +752,8 @@ class BoteManager {
 
         let html = `
             <div style="margin-bottom: 1.5rem;">
-                <h3 style="color: var(--primary-orange); margin-bottom: 0.5rem;">Resumen</h3>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                <h3 style="color: #ff9100; margin-bottom: 0.5rem;">Resumen</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
                     <div>
                         <strong>Total Ingresos:</strong> 
                         <span class="positive">${memberMovements.reduce((s, m) => s + m.totalIngresos, 0).toFixed(2)} €</span>
@@ -712,7 +771,7 @@ class BoteManager {
                 </div>
             </div>
             
-            <h3 style="color: var(--primary-orange); margin-bottom: 0.5rem;">Movimientos por Jornada</h3>
+            <h3 style="color: #ff9100; margin-bottom: 0.5rem;">Movimientos por Jornada</h3>
             <div style="max-height: 400px; overflow-y: auto;">
                 <table class="detail-table">
                     <thead>
@@ -774,6 +833,107 @@ class BoteManager {
     }
 
     /**
+     * Open gestión ingresos modal
+     */
+    openGestionIngresosModal() {
+        this.renderIngresosLista();
+        document.getElementById('modal-gestion-ingresos').style.display = 'block';
+    }
+
+    /**
+     * Render lista de ingresos
+     */
+    renderIngresosLista() {
+        if (this.ingresos.length === 0) {
+            document.getElementById('lista-ingresos-content').innerHTML = `
+                <p style="text-align: center; color: #888; padding: 2rem;">
+                    No hay ingresos registrados
+                </p>
+            `;
+            return;
+        }
+
+        // Sort by date (most recent first)
+        const sortedIngresos = [...this.ingresos].sort((a, b) => {
+            return new Date(b.fecha) - new Date(a.fecha);
+        });
+
+        let html = `
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Socio</th>
+                        <th>Cantidad</th>
+                        <th>Método</th>
+                        <th>Concepto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        sortedIngresos.forEach(ingreso => {
+            const member = this.members.find(m => m.id === ingreso.memberId);
+            const memberName = member ? member.name : 'Desconocido';
+            const fecha = new Date(ingreso.fecha).toLocaleDateString('es-ES');
+            const concepto = ingreso.concepto || '-';
+
+            html += `
+                <tr>
+                    <td>${fecha}</td>
+                    <td>${memberName}</td>
+                    <td class="positive">${parseFloat(ingreso.cantidad).toFixed(2)} €</td>
+                    <td>${ingreso.metodo}</td>
+                    <td>${concepto}</td>
+                    <td>
+                        <button class="btn-action" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);" 
+                                onclick="boteManager.deleteIngreso(${ingreso.id})">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        `;
+
+        document.getElementById('lista-ingresos-content').innerHTML = html;
+    }
+
+    /**
+     * Delete an ingreso
+     */
+    async deleteIngreso(ingresoId) {
+        const ingreso = this.ingresos.find(i => i.id === ingresoId);
+        if (!ingreso) return;
+
+        const member = this.members.find(m => m.id === ingreso.memberId);
+        const memberName = member ? member.name : 'Desconocido';
+        const cantidad = parseFloat(ingreso.cantidad).toFixed(2);
+
+        if (!confirm(`¿Estás seguro de eliminar el ingreso de ${cantidad}€ de ${memberName}?`)) {
+            return;
+        }
+
+        try {
+            await window.DataService.delete('ingresos', ingresoId);
+            this.ingresos = this.ingresos.filter(i => i.id !== ingresoId);
+
+            alert('Ingreso eliminado correctamente');
+            this.renderIngresosLista();
+            this.render();
+
+        } catch (error) {
+            console.error('Error deleting ingreso:', error);
+            alert('Error al eliminar el ingreso');
+        }
+    }
+
+    /**
      * Close modal
      */
     closeModal(modalId) {
@@ -802,9 +962,12 @@ class BoteManager {
 
             alert('Ingreso registrado correctamente');
             this.closeModal('modal-ingreso');
-            document.getElementById('form-ingreso').reset();
 
-            // Refresh view
+            // Reset form
+            document.getElementById('form-ingreso').reset();
+            document.getElementById('ingreso-fecha').valueAsDate = new Date();
+
+            // Re-render
             this.render();
 
         } catch (error) {
@@ -830,7 +993,7 @@ class BoteManager {
             alert('Configuración guardada correctamente');
             this.closeModal('modal-config');
 
-            // Refresh view
+            // Re-render
             this.render();
 
         } catch (error) {
@@ -845,22 +1008,29 @@ class BoteManager {
     exportData() {
         const movements = this.calculateAllMovements();
 
-        let csv = 'Socio,Jornada,Fecha,Aciertos,Aportación,Columna,Dobles,Pen.Unos,Sellado,Premios,Ingresos Manual,Total Ingresos,Total Gastos,Neto,Bote Acumulado\n';
+        let csv = 'Socio,Jornada,Fecha,Aciertos,Aportación,Coste Columna,Pen. 1s,Sellado,Premios,Ingresos Manual,Total Ingresos,Total Gastos,Neto,Bote Acumulado,Exento,Juega Dobles\n';
 
         movements.forEach(m => {
-            csv += `"${m.memberName}",${m.jornadaNum},"${m.jornadaDate}",${m.aciertos},${m.aportacion},${m.costeColumna},${m.costeDobles},${m.penalizacionUnos},${m.sellado},${m.premios},${m.ingresosManual},${m.totalIngresos},${m.totalGastos},${m.neto},${m.boteAcumulado}\n`;
+            csv += `${m.memberName},${m.jornadaNum},${m.jornadaDate},${m.aciertos},${m.aportacion},${m.costeColumna},${m.penalizacionUnos},${m.sellado},${m.premios},${m.ingresosManual},${m.totalIngresos},${m.totalGastos},${m.neto},${m.boteAcumulado},${m.exento ? 'Sí' : 'No'},${m.jugaDobles ? 'Sí' : 'No'}\n`;
         });
 
         // Download
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `bote_${this.config.temporadaActual}_${new Date().toISOString().split('T')[0]}.csv`;
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `bote_${this.config.temporadaActual}_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     }
 }
 
 // Initialize on page load
+let boteManager;
 document.addEventListener('DOMContentLoaded', () => {
-    window.boteManager = new BoteManager();
+    boteManager = new BoteManager();
 });

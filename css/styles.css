@@ -983,6 +983,21 @@ body {
     color: #000 !important;
 }
 
+.btn-bote {
+    background-color: transparent;
+}
+
+.btn-bote:hover {
+    color: var(--primary-orange);
+    transform: scale(1.05);
+}
+
+.btn-bote.active {
+    color: var(--primary-orange) !important;
+    border-bottom: 2px solid var(--primary-orange);
+}
+
+
 /* Logout button specifically (injected via auth.js) */
 #btn-logout-sidebar {
     background-color: #000 !important;
