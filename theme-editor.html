@@ -186,121 +186,132 @@
                     </div>
                 </div>
 
-                <!-- AI Theme Button -->
-                <div style="flex: 1; min-width: 250px;">
-                    <label style="display:block; margin-bottom:0.5rem; font-weight:bold;">Sugerencia de la IA:</label>
-                    <button class="btn-theme"
-                        style="width:100%; background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); color:white; border:none; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);"
-                        onclick="ThemeEditor.createIATheme()">
-                        ✨ APLICAR TEMA IA (ELEGANTE)
-                    </button>
-                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="config-grid">
+        <!-- Preview Section -->
+        <div class="preview-pane">
+            <h2>Vista Previa de Colores de Página</h2>
+            <div class="preview-sample">
+                <div class="sample-box" style="background: var(--primary-green)">SOCIOS</div>
+                <div class="sample-box" style="background: var(--primary-blue)">JORNADAS</div>
+                <div class="sample-box" style="background: var(--primary-red)">PRONÓSTICOS</div>
+                <div class="sample-box" style="background: var(--primary-purple)">RESULTADOS</div>
+                <div class="sample-box" style="background: var(--primary-orange)">RESUMEN</div>
+                <div class="sample-box" style="background: var(--bote-header-bg-start, #ff9100)">BOTE</div>
             </div>
         </div>
 
-        <div class="config-grid">
-            <!-- Preview Section -->
-            <div class="preview-pane">
-                <h2>Vista Previa de Colores de Página</h2>
-                <div class="preview-sample">
-                    <div class="sample-box" style="background: var(--primary-green)">SOCIOS</div>
-                    <div class="sample-box" style="background: var(--primary-blue)">JORNADAS</div>
-                    <div class="sample-box" style="background: var(--primary-red)">PRONÓSTICOS</div>
-                    <div class="sample-box" style="background: var(--primary-purple)">RESULTADOS</div>
-                    <div class="sample-box" style="background: var(--primary-orange)">RESUMEN</div>
-                </div>
-            </div>
-
-            <!-- UI Colors -->
-            <div class="config-card">
-                <h2>Interfaz General (Fondos y Textos)</h2>
-                <div class="color-group" id="group-ui"></div>
-            </div>
-
-            <!-- Typography -->
-            <div class="config-card">
-                <h2 style="border-bottom-color: var(--primary-green);">Tipografía (Google Fonts)</h2>
-                <div class="color-group" id="group-typography"></div>
-            </div>
-
-            <!-- Sombreados -->
-            <div class="config-card">
-                <h2 style="border-bottom-color: var(--primary-red);">Sombreados (Identidad Visual)</h2>
-                <div class="color-group" id="group-sombras"></div>
-            </div>
-
-            <!-- Dashboard Colors -->
-            <div class="config-card">
-                <h2 style="border-bottom-color: var(--primary-gold);">Hoja Principal (Dashboard)</h2>
-                <div class="color-group" id="group-dashboard"></div>
-            </div>
-
-            <!-- Tablas Colors -->
-            <div class="config-card">
-                <h2>Tablas y Listados</h2>
-                <div class="color-group" id="group-tablas"></div>
-            </div>
-
-            <!-- Status Colors -->
-            <div class="config-card">
-                <h2>Estados y Alertas</h2>
-                <div class="color-group" id="group-status"></div>
-            </div>
-
-            <!-- Socios Colors -->
-            <div class="config-card">
-                <h2>Socios</h2>
-                <div class="color-group" id="group-socios"></div>
-            </div>
-
-            <!-- Jornadas Colors -->
-            <div class="config-card">
-                <h2>Jornadas</h2>
-                <div class="color-group" id="group-jornadas"></div>
-            </div>
-
-            <!-- Pronósticos Colors -->
-            <div class="config-card">
-                <h2>Pronósticos</h2>
-                <div class="color-group" id="group-pronosticos"></div>
-            </div>
-
-            <!-- Resultados Colors -->
-            <div class="config-card">
-                <h2>Resultados</h2>
-                <div class="color-group" id="group-resultados"></div>
-            </div>
-
-            <!-- Resumen Colors -->
-            <div class="config-card">
-                <h2>Resumen Temporada</h2>
-                <div class="color-group" id="group-resumen"></div>
-            </div>
-
-            <!-- Acceso Colors -->
-            <div class="config-card">
-                <h2>Pantalla de Acceso</h2>
-                <div class="color-group" id="group-acceso"></div>
-            </div>
-
-            <!-- Votaciones Colors -->
-            <div class="config-card">
-                <h2>Votaciones</h2>
-                <div class="color-group" id="group-votaciones"></div>
-            </div>
-
-            <!-- Import PDF/RSS Colors -->
-            <div class="config-card">
-                <h2 style="border-bottom-color: var(--primary-orange);">Confirmación de Importación (PDF/RSS)</h2>
-                <div class="color-group" id="group-importacion"></div>
-            </div>
+        <!-- UI Colors -->
+        <div class="config-card">
+            <h2>Interfaz General (Fondos y Textos)</h2>
+            <div class="color-group" id="group-ui"></div>
         </div>
 
-        <div class="actions-bar">
-            <button class="btn-theme btn-reset" onclick="ThemeEditor.reset()">RESETEAR A FÁBRICA</button>
-            <button class="btn-theme btn-save" onclick="ThemeEditor.applyTrace()"
-                style="background: var(--primary-gold); color: black;">★ APLICAR A TODA LA WEB ★</button>
+        <!-- Typography -->
+        <div class="config-card">
+            <h2 style="border-bottom-color: var(--primary-green);">Tipografía (Google Fonts)</h2>
+            <div class="color-group" id="group-typography"></div>
         </div>
+
+        <!-- Sombreados -->
+        <div class="config-card">
+            <h2 style="border-bottom-color: var(--primary-red);">Sombreados (Identidad Visual)</h2>
+            <div class="color-group" id="group-sombras"></div>
+        </div>
+
+        <!-- Dashboard Colors -->
+        <div class="config-card">
+            <h2 style="border-bottom-color: var(--primary-gold);">Hoja Principal (Dashboard)</h2>
+            <div class="color-group" id="group-dashboard"></div>
+        </div>
+
+        <!-- Tablas Colors -->
+        <div class="config-card">
+            <h2>Tablas y Listados</h2>
+            <div class="color-group" id="group-tablas"></div>
+        </div>
+
+        <!-- Status Colors -->
+        <div class="config-card">
+            <h2>Estados y Alertas</h2>
+            <div class="color-group" id="group-status"></div>
+        </div>
+
+        <!-- Socios Colors -->
+        <div class="config-card">
+            <h2>Socios</h2>
+            <div class="color-group" id="group-socios"></div>
+        </div>
+
+        <!-- Jornadas Colors -->
+        <div class="config-card">
+            <h2>Jornadas</h2>
+            <div class="color-group" id="group-jornadas"></div>
+        </div>
+
+        <!-- Pronósticos Colors -->
+        <div class="config-card">
+            <h2>Pronósticos</h2>
+            <div class="color-group" id="group-pronosticos"></div>
+        </div>
+
+        <!-- Resultados Colors -->
+        <div class="config-card">
+            <h2>Resultados</h2>
+            <div class="color-group" id="group-resultados"></div>
+        </div>
+
+        <!-- Resumen Colors -->
+        <div class="config-card">
+            <h2>Resumen Temporada</h2>
+            <div class="color-group" id="group-resumen"></div>
+        </div>
+
+        <!-- Votaciones Colors -->
+        <div class="config-card">
+            <h2>Votaciones</h2>
+            <div class="color-group" id="group-votaciones"></div>
+        </div>
+
+        <!-- Bote Colors -->
+        <div class="config-card">
+            <h2 style="border-bottom-color: #ff9100;">Bote (General)</h2>
+            <div class="color-group" id="group-bote"></div>
+        </div>
+
+        <!-- Cuadrante Colors -->
+        <div class="config-card">
+            <h2 style="border-bottom-color: #ff9100;">Bote (Cuadrante)</h2>
+            <div class="color-group" id="group-cuadrante"></div>
+        </div>
+
+        <!-- Acceso Colors -->
+        <div class="config-card">
+            <h2>Pantalla de Acceso</h2>
+            <div class="color-group" id="group-acceso"></div>
+        </div>
+
+        <!-- Votaciones Colors -->
+        <div class="config-card">
+            <h2>Votaciones</h2>
+            <div class="color-group" id="group-votaciones"></div>
+        </div>
+
+        <!-- Import PDF/RSS Colors -->
+        <div class="config-card">
+            <h2 style="border-bottom-color: var(--primary-orange);">Confirmación de Importación (PDF/RSS)</h2>
+            <div class="color-group" id="group-importacion"></div>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <button class="btn-theme btn-reset" onclick="ThemeEditor.reset()">RESETEAR A FÁBRICA</button>
+        <button class="btn-theme btn-save" onclick="ThemeEditor.applyTrace()"
+            style="background: var(--primary-gold); color: black;">★ APLICAR A TODA LA WEB ★</button>
+    </div>
     </div>
 
     <!-- Firebase SDKs -->

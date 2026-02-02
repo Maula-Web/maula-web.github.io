@@ -13,6 +13,24 @@
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
     <style>
+        :root {
+            --cuadrante-win-bg: rgba(76, 175, 80, 0.2);
+            --cuadrante-win-text: #4CAF50;
+            --cuadrante-win-border: #4CAF50;
+            --cuadrante-loss-bg: rgba(244, 67, 54, 0.2);
+            --cuadrante-loss-text: #F44336;
+            --cuadrante-loss-border: #F44336;
+            --cuadrante-penalty-bg: rgba(255, 145, 0, 0.1);
+            --cuadrante-penalty-text: var(--primary-color);
+            --cuadrante-penalty-border: var(--primary-color);
+            --cuadrante-exempt-bg: rgba(255, 255, 255, 0.05);
+            --cuadrante-exempt-text: #aaa;
+            --cuadrante-header-bg: var(--table-header-bg);
+            --cuadrante-header-text: #fff;
+            --cuadrante-sticky-col: var(--card-bg);
+            --cuadrante-sticky-text: #fff;
+        }
+
         body {
             background: var(--bg-color, #0a0a0a);
             color: var(--text-color, #ffffff);
@@ -27,8 +45,8 @@
         }
 
         .bote-header {
-            background: linear-gradient(135deg, var(--primary-color, #ff9100) 0%, var(--secondary-color, #ff6600) 100%);
-            color: var(--header-text-color, white);
+            background: linear-gradient(135deg, var(--bote-header-bg-start, #ff9100) 0%, var(--bote-header-bg-end, #ff6600) 100%);
+            color: var(--bote-header-text, white);
             padding: 2.5rem 2rem;
             border-radius: 16px;
             margin-bottom: 2rem;
@@ -37,19 +55,49 @@
         }
 
         .bote-header h1 {
-            margin: 0 0 0.75rem 0;
-            font-size: clamp(1.8rem, 4vw, 3rem);
+            margin: 0 0 0.5rem 0;
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            line-height: 1.2;
-            color: var(--header-text-color, white);
+            line-height: 1.1;
+            color: inherit;
+        }
+
+        .bote-header p {
+            margin: 0;
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .bote-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--bote-card-bg, rgba(30, 30, 30, 0.8));
+            border: 2px solid var(--bote-card-border, rgba(255, 145, 0, 0.3));
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+            border-color: var(--bote-card-border-hover, rgba(255, 145, 0, 0.6));
         }
 
         .summary-card h3 {
             margin: 0 0 0.75rem 0;
-            color: var(--primary-color, #ff9100);
+            color: var(--bote-card-title, #ff9100);
             font-size: clamp(0.75rem, 1.5vw, 0.95rem);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -59,8 +107,8 @@
         .summary-card .value {
             font-size: clamp(1.5rem, 3vw, 2.2rem);
             font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 2px 8px rgba(255, 145, 0, 0.4);
+            color: var(--bote-card-value, #ffffff) !important;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         }
 
         .bote-controls {
@@ -75,13 +123,20 @@
         .bote-controls button {
             padding: 0.85rem 1.5rem;
             border-radius: 8px;
-            border: 2px solid rgba(255, 145, 0, 0.4);
-            background: rgba(30, 30, 30, 0.9);
-            color: #ffffff;
+            border: 2px solid var(--primary-color, rgba(255, 145, 0, 0.4));
+            background: var(--card-bg, rgba(30, 30, 30, 0.9));
+            color: var(--text-color, #ffffff);
             font-weight: 700;
             font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.2s;
+        }
+
+        .bote-controls button:hover {
+            background: var(--primary-color);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--primary-color);
         }
 
         .bote-controls select {
@@ -218,14 +273,16 @@
         }
 
         .modal-content {
-            background: #1a1a1a;
+            background: var(--bote-modal-bg, #1a1a1a);
             margin: 8rem auto 2rem auto;
             /* Aumentado el margen superior para evitar la cabecera */
             padding: 0;
-            border: 2px solid #ff9100;
+            border: 2px solid var(--bote-modal-border, #ff9100);
             border-radius: 16px;
             width: 90%;
             max-width: 900px;
+            opacity: 1 !important;
+            visibility: visible !important;
             max-height: calc(100vh - 10rem);
             /* Ajuste para que no se salga de la pantalla */
             box-shadow: 0 20px 60px rgba(255, 145, 0, 0.4);
@@ -358,6 +415,9 @@
             text-transform: uppercase;
             font-size: 0.8rem;
             letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .detail-table td {
@@ -536,11 +596,12 @@
             <select id="vista-select">
                 <option value="general">Vista General</option>
                 <option value="detalle">Detalle por Jornada</option>
+                <option value="cuadrante">Cuadrante (Resumen Total)</option>
             </select>
-            <button onclick="boteManager.openIngresoModal()">➕ Registrar Ingreso</button>
-            <button onclick="boteManager.openGestionIngresosModal()">📋 Gestionar Ingresos</button>
-            <button onclick="boteManager.openConfigModal()">⚙️ Configuración</button>
-            <button onclick="boteManager.exportData()">📊 Exportar Datos</button>
+            <button onclick="window.Bote.openIngresoModal()">➕ Registrar Ingreso</button>
+            <button onclick="window.Bote.openGestionIngresosModal()">📋 Gestionar Ingresos</button>
+            <button onclick="window.Bote.openConfigModal()">⚙️ Configuración</button>
+            <button onclick="window.Bote.exportData()">📊 Exportar Datos</button>
         </div>
 
         <!-- Tabla Principal -->
@@ -556,10 +617,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Registrar Ingreso</h2>
-                <span class="close-modal" onclick="boteManager.closeModal('modal-ingreso')">&times;</span>
+                <span class="close-modal" onclick="window.Bote.closeModal('modal-ingreso')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="form-ingreso" onsubmit="boteManager.submitIngreso(event)">
+                <form id="form-ingreso" onsubmit="window.Bote.submitIngreso(event)">
                     <div class="form-group">
                         <label>Socio</label>
                         <select id="ingreso-socio" required>
@@ -598,10 +659,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Configuración del Bote</h2>
-                <span class="close-modal" onclick="boteManager.closeModal('modal-config')">&times;</span>
+                <span class="close-modal" onclick="window.Bote.closeModal('modal-config')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="form-config" onsubmit="boteManager.submitConfig(event)">
+                <form id="form-config" onsubmit="window.Bote.submitConfig(event)">
                     <div class="form-group">
                         <label>Coste Columna Normal (€)</label>
                         <input type="number" id="config-coste-columna" step="0.01" min="0" value="0.75" required>
@@ -619,7 +680,60 @@
                     <div class="form-group">
                         <label>Bote Inicial Temporada (€)</label>
                         <input type="number" id="config-bote-inicial" step="0.01" value="0.00" required>
-                        <small style="color: #888; font-size: 0.85rem;">Bote arrastrado de temporadas anteriores</small>
+                    </div>
+                    <div
+                        style="background: rgba(255,145,0,0.05); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--primary-color); margin: 1.5rem 0;">
+                        <h3
+                            style="margin-top:0; color:var(--primary-color); font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:1.4rem;">⚖️</span> Penalizaciones del Bote
+                        </h3>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                            <div class="form-group">
+                                <label>Fallo en PIG (€)</label>
+                                <input type="number" id="config-penalizacion-pig" step="0.10" value="1.00">
+                                <small style="display:block; opacity:0.6; margin-top:4px;">Si no acierta el PIG</small>
+                            </div>
+                        </div>
+
+                        <h4 style="margin: 1rem 0 0.5rem; color:#fff; font-size:0.9rem; opacity:0.8;">Por Exceso de
+                            "Unos" (10 a 15):</h4>
+                        <div
+                            style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; margin-bottom: 1rem;">
+                            <div class="form-group"><label style="font-size:0.7rem;">10 Unos</label><input type="number"
+                                    id="config-unos-10" step="0.10" value="1.10"></div>
+                            <div class="form-group"><label style="font-size:0.7rem;">11 Unos</label><input type="number"
+                                    id="config-unos-11" step="0.10" value="1.20"></div>
+                            <div class="form-group"><label style="font-size:0.7rem;">12 Unos</label><input type="number"
+                                    id="config-unos-12" step="0.10" value="1.30"></div>
+                            <div class="form-group"><label style="font-size:0.7rem;">13 Unos</label><input type="number"
+                                    id="config-unos-13" step="0.10" value="1.50"></div>
+                            <div class="form-group"><label style="font-size:0.7rem;">14 Unos</label><input type="number"
+                                    id="config-unos-14" step="0.10" value="2.00"></div>
+                            <div class="form-group"><label style="font-size:0.7rem;">15 Unos</label><input type="number"
+                                    id="config-unos-15" step="0.10" value="3.00"></div>
+                        </div>
+
+                        <h4 style="margin: 1rem 0 0.5rem; color:#fff; font-size:0.9rem; opacity:0.8;">Por Bajos Aciertos
+                            (0 a 3):</h4>
+                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0.5rem;">
+                            <div class="form-group">
+                                <label style="font-size:0.75rem;">0 Ac.</label>
+                                <input type="number" id="config-pen-0" step="0.10" value="1.00">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size:0.75rem;">1 Ac.</label>
+                                <input type="number" id="config-pen-1" step="0.10" value="0.80">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size:0.75rem;">2 Ac.</label>
+                                <input type="number" id="config-pen-2" step="0.10" value="0.60">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size:0.75rem;">3 Ac.</label>
+                                <input type="number" id="config-pen-3" step="0.10" value="0.40">
+                            </div>
+                        </div>
                     </div>
                     <button type="submit" class="btn-submit">Guardar Configuración</button>
                 </form>
@@ -632,7 +746,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="detalle-socio-nombre">Detalle de Socio</h2>
-                <span class="close-modal" onclick="boteManager.closeModal('modal-detalle-socio')">&times;</span>
+                <span class="close-modal" onclick="window.Bote.closeModal('modal-detalle-socio')">&times;</span>
             </div>
             <div class="modal-body" id="detalle-socio-content">
                 <!-- Populated by JS -->
@@ -645,7 +759,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Gestionar Ingresos Registrados</h2>
-                <span class="close-modal" onclick="boteManager.closeModal('modal-gestion-ingresos')">&times;</span>
+                <span class="close-modal" onclick="window.Bote.closeModal('modal-gestion-ingresos')">&times;</span>
             </div>
             <div class="modal-body">
                 <div id="lista-ingresos-content">

@@ -242,6 +242,34 @@ const ThemeEditor = {
             { id: '--import-modal-card-text', label: 'Texto Bloque Jornada', isText: true },
             { id: '--import-modal-title', label: 'Color Título Principal', isText: true }
         ],
+        'bote': [
+            { id: '--bote-header-bg-start', label: 'Cabecera (Fondo Degradado Inicio)' },
+            { id: '--bote-header-bg-end', label: 'Cabecera (Fondo Degradado Fin)' },
+            { id: '--bote-header-text', label: 'Cabecera (Color Título)', isText: true },
+            { id: '--bote-card-bg', label: 'Tarjetas Resumen (Fondo)' },
+            { id: '--bote-card-border', label: 'Tarjetas Resumen (Borde)' },
+            { id: '--bote-card-title', label: 'Tarjetas Resumen (Texto Título)', isText: true },
+            { id: '--bote-card-value', label: 'Tarjetas Resumen (Texto Importe)', isText: true },
+            { id: '--bote-modal-bg', label: 'Ventanas Emergentes (Fondo)' },
+            { id: '--bote-modal-border', label: 'Ventanas Emergentes (Borde)' }
+        ],
+        'cuadrante': [
+            { id: '--cuadrante-win-bg', label: 'Fondo Ganador' },
+            { id: '--cuadrante-win-text', label: 'Texto Ganador', isText: true },
+            { id: '--cuadrante-win-border', label: 'Borde Ganador' },
+            { id: '--cuadrante-loss-bg', label: 'Fondo Perdedor' },
+            { id: '--cuadrante-loss-text', label: 'Texto Perdedor', isText: true },
+            { id: '--cuadrante-loss-border', label: 'Borde Perdedor' },
+            { id: '--cuadrante-penalty-bg', label: 'Fondo Penalización' },
+            { id: '--cuadrante-penalty-text', label: 'Texto Penalización', isText: true },
+            { id: '--cuadrante-penalty-border', label: 'Borde Penalización' },
+            { id: '--cuadrante-exempt-bg', label: 'Fondo Exento' },
+            { id: '--cuadrante-exempt-text', label: 'Texto Exento', isText: true },
+            { id: '--cuadrante-header-bg', label: 'Fondo Cabecera' },
+            { id: '--cuadrante-header-text', label: 'Texto Cabecera', isText: true },
+            { id: '--cuadrante-sticky-col', label: 'Fondo Columna Nombres' },
+            { id: '--cuadrante-sticky-text', label: 'Texto Columna Nombres', isText: true }
+        ],
         'acceso': [
             { id: '--login-bg', label: 'Fondo Pantalla' },
             { id: '--login-card-bg', label: 'Fondo Tarjeta' },
