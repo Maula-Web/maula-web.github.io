@@ -132,7 +132,7 @@ class BoteManager {
         const initialBalances = {
             'Alvaro': 15, 'Carlos': 8.5, 'David Buzón': 56.29, 'Edu': 2, 'Emilio': 41.13,
             'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.30,
-            'Javi Mora': 57.88, 'Juan Antonio': 17.9, 'Juanjo': -6.1, 'Luismi': 24.75,
+            'Valdi': 2.30, 'Javi Mora': 57.88, 'Juan Antonio': 17.9, 'Juanjo': -6.1, 'Luismi': 24.75,
             'Marcelo': 0, 'Martin': 15.1, 'Rafa': 4.45, 'Ramon': 2, 'Raul Romera': 8.95,
             'Samuel': 1.5
         };
@@ -472,24 +472,27 @@ class BoteManager {
             return false;
         }
 
-        const jornadaPronosticos = this.pronosticos.filter(p => (p.jId === jornada.id || p.jornadaId === jornada.id));
+        const jornadaPronosticos = this.pronosticos.filter(p =>
+        (String(p.jId || p.jornadaId) === String(jornada.id) ||
+            parseInt(p.jId || p.jornadaId) === jornada.number)
+        );
         if (jornadaPronosticos.length === 0) return false;
 
         const scores = jornadaPronosticos.map(p => {
             const currentSelection = p.selection || p.forecast;
             const aciertos = this.calculateAciertos(jornada.matches, currentSelection);
             const points = this.calculatePoints(aciertos, p);
-            return { memberId: p.memberId || p.mId, points: points };
+            return { memberId: String(p.memberId || p.mId), points: points };
         });
 
         const maxPoints = Math.max(...scores.map(s => s.points));
         const winners = scores.filter(s => s.points === maxPoints);
 
-        if (winners.length === 1) return winners[0].memberId === memberId;
+        if (winners.length === 1) return String(winners[0].memberId) === String(memberId);
 
         // Recursive Tie-breaker
         const finalWinnerId = this.resolveTie(winners.map(w => w.memberId), jornada.number - 1, 'max');
-        return finalWinnerId === memberId;
+        return String(finalWinnerId) === String(memberId);
     }
 
     /**
@@ -578,9 +581,11 @@ class BoteManager {
     getPrizesForMemberJornada(memberId, jornada) {
         if (!jornada.prizes || typeof jornada.prizes !== 'object') return 0;
 
+        const mIdStr = String(memberId);
         const pronostico = this.pronosticos.find(p => {
-            const matchJ = (p.jId === jornada.id || p.jornadaId === jornada.id || parseInt(p.jId) === jornada.number || parseInt(p.jornadaId) === jornada.number);
-            const matchM = (String(p.mId || p.memberId) === String(memberId));
+            const pJ = String(p.jId || p.jornadaId);
+            const matchJ = (pJ === String(jornada.id) || parseInt(pJ) === jornada.number);
+            const matchM = (String(p.mId || p.memberId) === mIdStr);
             return matchJ && matchM;
         });
 
@@ -589,7 +594,9 @@ class BoteManager {
         const selection = pronostico.selection || pronostico.forecast;
         const aciertos = this.calculateAciertos(jornada.matches, selection);
 
-        const prizeVal = jornada.prizes[aciertos] || jornada.prizes[String(aciertos)] || 0;
+        const prizes = jornada.prizes;
+        const prizeVal = prizes[aciertos] || prizes[String(aciertos)] || 0;
+
         return typeof prizeVal === 'number' ? prizeVal : parseFloat(prizeVal || 0);
     }
 
@@ -602,7 +609,7 @@ class BoteManager {
 
         // Get ingresos for this member around this jornada date
         const relevantIngresos = this.ingresos.filter(ing => {
-            if (ing.memberId !== memberId) return false;
+            if (String(ing.memberId) !== String(memberId)) return false;
 
             const ingresoDate = new Date(ing.fecha);
             // Consider ingresos within 7 days of jornada
@@ -671,7 +678,14 @@ class BoteManager {
         const totalGastos = movements.reduce((sum, m) => sum + (m.pennaOut || 0), 0);
         const boteTotal = totalIngresos - totalGastos + this.config.boteInicial;
 
-        const uniqueJornadas = new Set(movements.map(m => m.jornadaNum)).size;
+        const uniqueJornadas = new Set(
+            movements
+                .filter(m => {
+                    const j = this.jornadas.find(jor => jor.number === m.jornadaNum);
+                    return j && j.matches && j.matches.some(match => match.result && match.result !== '' && match.result.toLowerCase() !== 'por definir');
+                })
+                .map(m => m.jornadaNum)
+        ).size;
 
         document.getElementById('total-bote').textContent = boteTotal.toFixed(2) + ' €';
         document.getElementById('total-ingresos').textContent = totalIngresos.toFixed(2) + ' €';
@@ -687,7 +701,7 @@ class BoteManager {
 
         // Aggregate by member
         this.members.forEach(member => {
-            const memberMovements = movements.filter(m => m.memberId === member.id);
+            const memberMovements = movements.filter(m => String(m.memberId) === String(member.id));
 
             const totalIngresos = memberMovements.reduce((sum, m) => sum + m.totalIngresos, 0);
             const totalGastos = memberMovements.reduce((sum, m) => sum + m.totalGastos, 0);
@@ -761,7 +775,7 @@ class BoteManager {
         const jornadaNums = Object.keys(jornadaGroups)
             .filter(num => {
                 const j = this.jornadas.find(jor => jor.number === parseInt(num));
-                return j && j.matches && j.matches.some(m => m.result && m.result !== '' && m.result !== 'por definir');
+                return j && j.matches && j.matches.some(m => m.result && m.result !== '' && m.result.toLowerCase() !== 'por definir');
             })
             .sort((a, b) => parseInt(a) - parseInt(b));
 
@@ -860,7 +874,12 @@ class BoteManager {
             }
             jornadaGroups[m.jornadaNum].push(m);
         });
-        const jornadaNums = Object.keys(jornadaGroups).sort((a, b) => parseInt(a) - parseInt(b));
+        const jornadaNums = Object.keys(jornadaGroups)
+            .filter(num => {
+                const j = this.jornadas.find(jor => jor.number === parseInt(num));
+                return j && j.matches && j.matches.some(m => m.result && m.result !== '' && m.result.toLowerCase() !== 'por definir');
+            })
+            .sort((a, b) => parseInt(a) - parseInt(b));
 
         if (this.currentJornadaIndex < jornadaNums.length - 1) {
             this.currentJornadaIndex++;
@@ -914,7 +933,7 @@ class BoteManager {
                 </div>
             </div>
             
-            <div style="flex:1; min-height:480px; max-height: 75vh; overflow-y: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);">
+            <div style="flex:1; min-height:400px; max-height: 65vh; overflow-y: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);">
                 <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
                     <thead style="position: sticky; top:0; background: var(--primary-color); z-index: 10;">
                         <tr>
@@ -1046,7 +1065,7 @@ class BoteManager {
         `;
 
         sortedIngresos.forEach(ingreso => {
-            const member = this.members.find(m => m.id === ingreso.memberId);
+            const member = this.members.find(m => String(m.id) === String(ingreso.memberId));
             const memberName = member ? member.name : 'Desconocido';
             const fecha = new Date(ingreso.fecha).toLocaleDateString('es-ES');
             const concepto = ingreso.concepto || '-';
@@ -1083,7 +1102,7 @@ class BoteManager {
         const ingreso = this.ingresos.find(i => i.id === ingresoId);
         if (!ingreso) return;
 
-        const member = this.members.find(m => m.id === ingreso.memberId);
+        const member = this.members.find(m => String(m.id) === String(ingreso.memberId));
         const memberName = member ? member.name : 'Desconocido';
         const cantidad = parseFloat(ingreso.cantidad).toFixed(2);
 
@@ -1275,15 +1294,12 @@ class BoteManager {
             const isMadrid = (t) => { const tl = t.toLowerCase(); return tl.includes('madrid') && !tl.includes('atlet') && !tl.includes('at.'); };
             const isBarca = (t) => { const tl = t.toLowerCase(); return tl.includes('barcelona') || tl.includes('barça') || tl.includes('barca') || tl.includes('fcb'); };
             const isAtleti = (t) => { const tl = t.toLowerCase(); return tl.includes('atleti') || tl.includes('atlétic') || tl.includes('atletico') || tl.includes('at. madrid'); };
-            const hM = isMadrid(h), aM = isMadrid(a);
-            const hB = isBarca(h), aB = isBarca(a);
-            const hA = isAtleti(h), aA = isAtleti(a);
-            return (hM && (aB || aA)) || (hB && (aM || aA)) || (hA && (aM || aB));
+            return (isMadrid(h) && (isBarca(a) || isAtleti(a))) || (isBarca(h) && (isMadrid(a) || isAtleti(a))) || (isAtleti(h) && (isMadrid(a) || isBarca(a)));
         };
 
         uniqueJornadas.forEach(num => {
             const j = this.jornadas.find(jor => jor.number === num);
-            if (j) {
+            if (j && j.matches && j.matches.some(m => m.result && m.result !== '' && m.result.toLowerCase() !== 'por definir')) {
                 let pigIdx = j.pigMatchIndex !== undefined ? j.pigMatchIndex : 14;
                 if (j.matches && j.matches.length > 0) {
                     if (!checkIsPIG(j.matches[pigIdx])) {
@@ -1312,7 +1328,11 @@ class BoteManager {
         });
 
         let html = `
-            <div class="cuadrante-container" style="max-height: 90vh; overflow: auto; border: 1px solid var(--glass-border); border-radius: 12px; position: relative;">
+            <style>
+                .cuadrante-cell-win { background-color: var(--resultados-winner-bg, #1a73e8) !important; color: var(--resultados-winner-text, #ffffff) !important; border: 3px solid var(--primary-color, #ff9100) !important; font-weight: bold; }
+                .cuadrante-cell-loss { background-color: var(--resultados-loser-bg, #d93025) !important; color: var(--resultados-loser-text, #ffffff) !important; border: 2px solid var(--danger, #f44336) !important; }
+            </style>
+            <div class="cuadrante-container" style="max-height: 92vh; overflow: auto; border: 1px solid var(--glass-border); border-radius: 12px; position: relative;">
                 <table class="bote-table cuadrante-table" style="font-size: 0.8rem; min-width: 100%; border-collapse: separate; border-spacing: 0;">
                     <thead>
                         <tr>
@@ -1344,7 +1364,7 @@ class BoteManager {
                 let style = '';
 
                 if (mov) {
-                    const penalties = mov.penalizacionUnos + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0);
+                    const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0);
                     const payment = mov.aportacion + penalties;
 
                     cellContent = `<div style="font-size:1.1rem; font-weight:900; color: inherit;">${payment.toFixed(1)}€</div>`;
@@ -1353,11 +1373,12 @@ class BoteManager {
                         cellContent += `<div style="background: rgba(76, 175, 80, 0.2); color: #81c784; font-weight: bold; font-size: 0.75rem; margin-top:4px; padding: 2px 4px; border-radius: 4px; border: 1px solid #4CAF50;">+${mov.premios.toFixed(2)}€ 🏆</div>`;
                     }
 
-                    if (mov.exento) style = `background: var(--cuadrante-exempt-bg); color: var(--cuadrante-exempt-text);`;
+                    let cellClass = '';
+                    if (mov.exento) style = `background: var(--cuadrante-exempt-bg, #424242); color: var(--cuadrante-exempt-text, #ffffff);`;
 
                     let clickHandler = '';
                     if (penalties > 0) {
-                        style = `background: var(--cuadrante-penalty-bg); color: var(--cuadrante-penalty-text); border-left: 3px solid var(--cuadrante-penalty-border); cursor: pointer;`;
+                        style = `background: var(--cuadrante-penalty-bg, #422a00); color: var(--cuadrante-penalty-text, #ffcc80); border-left: 3px solid var(--cuadrante-penalty-border, #ff9100); cursor: pointer;`;
                         const tooltip = [];
                         if (mov.penalizacionUnos > 0) tooltip.push(`• Exceso de Unos: ${mov.penalizacionUnos.toFixed(2)}€`);
                         if (mov.penalizacionBajosAciertos > 0) tooltip.push(`• Bajos Aciertos: ${mov.penalizacionBajosAciertos.toFixed(2)}€`);
@@ -1366,12 +1387,12 @@ class BoteManager {
                     }
 
                     if (this.wasWinnerOfJornada(member.id, j)) {
-                        style += ` background-color: var(--resultados-winner-bg, #1a73e8) !important; color: var(--resultados-winner-text, #ffffff) !important; border: 2px solid var(--primary-color, #ff9100) !important; font-weight: bold;`;
+                        cellClass = 'cuadrante-cell-win';
                     } else if (this.wasLoserOfJornada(member.id, j)) {
-                        style += ` background-color: var(--resultados-loser-bg, #d93025) !important; color: var(--resultados-loser-text, #ffffff) !important; border: 2px solid var(--danger, #f44336) !important;`;
+                        cellClass = 'cuadrante-cell-loss';
                     }
 
-                    html += `<td ${clickHandler} style="text-align:center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); min-width:85px; ${style}">${cellContent}</td>`;
+                    html += `<td ${clickHandler} class="${cellClass}" style="text-align:center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); min-width:85px; ${style}">${cellContent}</td>`;
                 } else {
                     html += `<td style="text-align:center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); min-width:85px; ${style}">${cellContent}</td>`;
                 }
@@ -1395,49 +1416,50 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v15');
+        const migrationDone = localStorage.getItem('bote_maintenance_v17');
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v15 (Manual Prize Override)...');
+        console.log('Running maintenance migration v17 (Bulk Prize Sync)...');
 
         try {
-            const allJornadas = await window.DataService.getAll('jornadas');
+            const allJ = await window.DataService.getAll('jornadas');
 
-            // 1. Limpieza J16
-            const j16s = allJornadas.filter(j => j.number === 16);
+            // Clean J16
+            const j16s = allJ.filter(j => j.number === 16);
             for (const j of j16s) await window.DataService.update('jornadas', j.id, { prizes: {} });
 
-            // 2. Definición de Premios (Actualizada J2: 28.84€)
-            const updates = [
-                { num: 2, hits: 11, val: 28.84 }, // Valdi J2 real
+            // Group prizes by jornada number to avoid overwriting
+            const rawUpdates = [
+                { num: 2, hits: 11, val: 28.84 },
                 { num: 2, hits: 10, val: 3.00 },
-                { num: 3, hits: 11, val: 48.37 }, // Swap J2/J3?
+                { num: 3, hits: 11, val: 48.37 },
                 { num: 5, hits: 10, val: 13.08 },
                 { num: 7, hits: 10, val: 1.00 },
                 { num: 26, hits: 10, val: 6.30 }
             ];
 
-            for (const up of updates) {
-                const targets = allJornadas.filter(j => j.number === up.num);
-                for (const t of targets) {
-                    const p = (t.prizes && typeof t.prizes === 'object') ? { ...t.prizes } : {};
-                    p[String(up.hits)] = parseFloat(up.val);
-                    p[parseInt(up.hits)] = parseFloat(up.val);
-                    await window.DataService.update('jornadas', t.id, { prizes: p });
-                    console.log(`Updated J${up.num} prizes:`, p);
+            const prizesByNum = {};
+            rawUpdates.forEach(u => {
+                if (!prizesByNum[u.num]) prizesByNum[u.num] = {};
+                prizesByNum[u.num][String(u.hits)] = u.val;
+            });
+
+            for (const num of Object.keys(prizesByNum)) {
+                const jDocs = allJ.filter(j => j.number === parseInt(num));
+                const newPrizes = prizesByNum[num];
+                for (const d of jDocs) {
+                    // Combine with existing (if any) or overwrite with our clean set
+                    await window.DataService.update('jornadas', d.id, { prizes: newPrizes });
                 }
             }
 
-            // Mark all as done
-            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15'];
+            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17'];
             marks.forEach(m => localStorage.setItem(`bote_maintenance_${m}`, 'true'));
 
-            console.log('Migration v15 completed correctly!');
+            console.log('Migration v17 effective!');
             await this.loadData();
             this.render();
-        } catch (e) {
-            console.error('Migration failed:', e);
-        }
+        } catch (e) { console.error('Migration v17 failed:', e); }
     }
 
     showPenaltyDetail(memberName, jNum, detailHtml) {
