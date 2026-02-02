@@ -122,8 +122,11 @@ class BoteManager {
                 const jornadaNum = jornada.number;
 
                 // Get member's pronostico for this jornada
+                // BUSQUEDA POR APODO (Nickname) para asegurar compatibilidad
+                const memberKey = (member.nickname || member.name).trim().toLowerCase();
                 const pronostico = this.pronosticos.find(p =>
-                    p.jornadaId === jornada.id && p.memberId === member.id
+                    p.jornadaId === jornada.id &&
+                    (p.memberName?.trim().toLowerCase() === memberKey || p.memberId === member.id)
                 );
 
                 // Calculate costs for this jornada
@@ -146,7 +149,7 @@ class BoteManager {
 
                 movements.push({
                     memberId: member.id,
-                    memberName: member.name,
+                    memberName: member.nickname || member.name, // USAR APODO
                     jornadaId: jornada.id,
                     jornadaNum: jornadaNum,
                     jornadaDate: jornada.date,
@@ -231,6 +234,8 @@ class BoteManager {
         // Calculate aciertos (hits)
         if (jornada.matches && pronostico.forecast) {
             costs.aciertos = this.calculateAciertos(jornada.matches, pronostico.forecast);
+        } else {
+            costs.aciertos = 0;
         }
 
         // Sellado: if member was loser of previous jornada
@@ -276,10 +281,10 @@ class BoteManager {
         matches.forEach((match, idx) => {
             if (!match.result || match.result === '') return;
 
-            const result = match.result.trim();
-            const prediction = forecast[idx];
+            const result = match.result.trim().toUpperCase();
+            const prediction = forecast[idx].trim().toUpperCase();
 
-            if (result === prediction) {
+            if (result === prediction && result !== '') {
                 aciertos++;
             }
         });
@@ -561,21 +566,21 @@ class BoteManager {
             return;
         }
 
-        // If currentJornadaIndex is -1 (first time), find most recent jornada with results
+        // If currentJornadaIndex is -1 (first time), find most recent jornada with some results
         if (this.currentJornadaIndex === -1) {
-            // Find the most recent jornada with complete results
+            // Find the HIGHEST jornada number that has results
+            let foundIndex = -1;
             for (let i = jornadaNums.length - 1; i >= 0; i--) {
                 const jornadaNum = parseInt(jornadaNums[i]);
                 const jornada = this.jornadas.find(j => j.number === jornadaNum);
-                if (jornada && jornada.matches && jornada.matches.every(m => m.result && m.result !== '')) {
-                    this.currentJornadaIndex = i;
+                // Check if any match has a result
+                if (jornada && jornada.matches && jornada.matches.some(m => m.result && m.result.trim() !== '')) {
+                    foundIndex = i;
                     break;
                 }
             }
-            // If no jornada with results found, default to last one
-            if (this.currentJornadaIndex === -1) {
-                this.currentJornadaIndex = jornadaNums.length - 1;
-            }
+
+            this.currentJornadaIndex = foundIndex !== -1 ? foundIndex : 0;
         }
 
         // Ensure currentJornadaIndex is valid
@@ -626,15 +631,18 @@ class BoteManager {
                 <table class="bote-table">
                     <thead>
                         <tr>
-                            <th>Socio</th>
-                            <th>Aciertos</th>
-                            <th>Aportación</th>
-                            <th>Columna</th>
-                            <th>Pen. 1s</th>
-                            <th>Sellado</th>
-                            <th>Premios</th>
-                            <th>Neto</th>
-                            <th>Bote</th>
+                            <th rowspan="2">Socio</th>
+                            <th rowspan="2">Aciertos</th>
+                            <th rowspan="2">Aportación</th>
+                            <th rowspan="2">Columna</th>
+                            <th colspan="1" style="background: #e65100;">Penalizaciones</th>
+                            <th rowspan="2">Sellado</th>
+                            <th rowspan="2">Premios</th>
+                            <th rowspan="2">Neto</th>
+                            <th rowspan="2">Bote</th>
+                        </tr>
+                        <tr>
+                            <th style="background: #ff9100; font-size: 0.7rem;">Unos</th>
                         </tr>
                     </thead>
                     <tbody>

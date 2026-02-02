@@ -14,7 +14,9 @@
     <script src="js/db-service.js"></script>
     <style>
         body {
-            background: #0a0a0a;
+            background: var(--bg-color, #0a0a0a);
+            color: var(--text-color, #ffffff);
+            font-family: var(--font-family, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
             min-height: 100vh;
         }
 
@@ -25,12 +27,12 @@
         }
 
         .bote-header {
-            background: linear-gradient(135deg, #ff9100 0%, #ff6600 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--primary-color, #ff9100) 0%, var(--secondary-color, #ff6600) 100%);
+            color: var(--header-text-color, white);
             padding: 2.5rem 2rem;
             border-radius: 16px;
             margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(255, 145, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             text-align: center;
         }
 
@@ -42,41 +44,12 @@
             letter-spacing: 2px;
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             line-height: 1.2;
-        }
-
-        .bote-header p {
-            margin: 0;
-            font-size: clamp(0.9rem, 2vw, 1.2rem);
-            opacity: 0.95;
-            font-weight: 500;
-        }
-
-        .bote-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .summary-card {
-            background: rgba(30, 30, 30, 0.8);
-            border: 2px solid rgba(255, 145, 0, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .summary-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 32px rgba(255, 145, 0, 0.3);
-            border-color: rgba(255, 145, 0, 0.6);
+            color: var(--header-text-color, white);
         }
 
         .summary-card h3 {
             margin: 0 0 0.75rem 0;
-            color: #ff9100;
+            color: var(--primary-color, #ff9100);
             font-size: clamp(0.75rem, 1.5vw, 0.95rem);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -246,16 +219,19 @@
 
         .modal-content {
             background: #1a1a1a;
-            margin: 3% auto;
+            margin: 8rem auto 2rem auto;
+            /* Aumentado el margen superior para evitar la cabecera */
             padding: 0;
             border: 2px solid #ff9100;
             border-radius: 16px;
             width: 90%;
             max-width: 900px;
-            max-height: 85vh;
+            max-height: calc(100vh - 10rem);
+            /* Ajuste para que no se salga de la pantalla */
             box-shadow: 0 20px 60px rgba(255, 145, 0, 0.4);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .modal-header {
