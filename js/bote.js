@@ -1366,9 +1366,9 @@ class BoteManager {
                     }
 
                     if (this.wasWinnerOfJornada(member.id, j)) {
-                        style += ` background-color: var(--resultados-winner-bg) !important; color: var(--resultados-winner-text) !important; border: 2px solid var(--primary-color) !important; font-weight: bold;`;
+                        style += ` background-color: var(--resultados-winner-bg, #1a73e8) !important; color: var(--resultados-winner-text, #ffffff) !important; border: 2px solid var(--primary-color, #ff9100) !important; font-weight: bold;`;
                     } else if (this.wasLoserOfJornada(member.id, j)) {
-                        style += ` background-color: var(--resultados-loser-bg) !important; color: var(--resultados-loser-text) !important; border: 2px solid var(--danger) !important;`;
+                        style += ` background-color: var(--resultados-loser-bg, #d93025) !important; color: var(--resultados-loser-text, #ffffff) !important; border: 2px solid var(--danger, #f44336) !important;`;
                     }
 
                     html += `<td ${clickHandler} style="text-align:center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); min-width:85px; ${style}">${cellContent}</td>`;
@@ -1395,29 +1395,28 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v14');
+        const migrationDone = localStorage.getItem('bote_maintenance_v15');
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v14 (Final Prize Fix & Data Cleanup)...');
-
-        // 1. Hard Cleanup for J16 (Ensure NO prizes here)
-        const allJornadas = await window.DataService.getAll('jornadas');
-        const j16s = allJornadas.filter(j => j.number === 16);
-        for (const j of j16s) {
-            await window.DataService.update('jornadas', j.id, { prizes: {} });
-        }
-
-        // 2. Prize definitions (J2 prize is the critical focus)
-        const updates = [
-            { num: 2, hits: 11, val: 48.37 },
-            { num: 2, hits: 10, val: 3.00 },
-            { num: 3, hits: 11, val: 28.84 },
-            { num: 5, hits: 10, val: 13.08 },
-            { num: 7, hits: 10, val: 1.00 },
-            { num: 26, hits: 10, val: 6.30 }
-        ];
+        console.log('Running maintenance migration v15 (Manual Prize Override)...');
 
         try {
+            const allJornadas = await window.DataService.getAll('jornadas');
+
+            // 1. Limpieza J16
+            const j16s = allJornadas.filter(j => j.number === 16);
+            for (const j of j16s) await window.DataService.update('jornadas', j.id, { prizes: {} });
+
+            // 2. Definición de Premios (Actualizada J2: 28.84€)
+            const updates = [
+                { num: 2, hits: 11, val: 28.84 }, // Valdi J2 real
+                { num: 2, hits: 10, val: 3.00 },
+                { num: 3, hits: 11, val: 48.37 }, // Swap J2/J3?
+                { num: 5, hits: 10, val: 13.08 },
+                { num: 7, hits: 10, val: 1.00 },
+                { num: 26, hits: 10, val: 6.30 }
+            ];
+
             for (const up of updates) {
                 const targets = allJornadas.filter(j => j.number === up.num);
                 for (const t of targets) {
@@ -1425,17 +1424,15 @@ class BoteManager {
                     p[String(up.hits)] = parseFloat(up.val);
                     p[parseInt(up.hits)] = parseFloat(up.val);
                     await window.DataService.update('jornadas', t.id, { prizes: p });
+                    console.log(`Updated J${up.num} prizes:`, p);
                 }
             }
 
-            // Mark all previous and current as done
-            localStorage.setItem('bote_maintenance_v10', 'true');
-            localStorage.setItem('bote_maintenance_v11', 'true');
-            localStorage.setItem('bote_maintenance_v12', 'true');
-            localStorage.setItem('bote_maintenance_v13', 'true');
-            localStorage.setItem('bote_maintenance_v14', 'true');
+            // Mark all as done
+            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15'];
+            marks.forEach(m => localStorage.setItem(`bote_maintenance_${m}`, 'true'));
 
-            console.log('Migration v14 completed successfully!');
+            console.log('Migration v15 completed correctly!');
             await this.loadData();
             this.render();
         } catch (e) {
