@@ -23,6 +23,18 @@ class BoteManager {
             boteInicial: 0.00,
             temporadaActual: '2025-2026'
         };
+        this.checkIsPIG = (m) => {
+            if (!m) return false;
+            const h = (m.home || '').toLowerCase();
+            const a = (m.away || '').toLowerCase();
+            const isMadrid = (t) => t.includes('madrid') && !t.includes('atlet') && !t.includes('at.');
+            const isBarca = (t) => t.includes('barcelona') || t.includes('barça') || t.includes('barca') || t.includes('fcb');
+            const isAtleti = (t) => t.includes('atleti') || t.includes('atlétic') || t.includes('atletico') || t.includes('at. madrid') || t.includes('atm');
+            const hM = isMadrid(h), aM = isMadrid(a);
+            const hB = isBarca(h), aB = isBarca(a);
+            const hA = isAtleti(h), aA = isAtleti(a);
+            return (hM && (aB || aA)) || (hB && (aM || aA)) || (hA && (aM || aB));
+        };
         this.currentVista = 'general';
         this.currentJornadaIndex = -1; // Will be set to most recent jornada with results
         this.init();
@@ -119,97 +131,101 @@ class BoteManager {
 
         const initialBalances = {
             'Alvaro': 15, 'Carlos': 8.5, 'David Buzón': 56.29, 'Edu': 2, 'Emilio': 41.13,
-            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'Valdi': 2,
+            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.30,
             'Javi Mora': 57.88, 'Juan Antonio': 17.9, 'Juanjo': -6.1, 'Luismi': 24.75,
             'Marcelo': 0, 'Martin': 15.1, 'Rafa': 4.45, 'Ramon': 2, 'Raul Romera': 8.95,
             'Samuel': 1.5
         };
 
-        // For each member
+        // Pre-calculate exemptions per jornada
+        const jornadaExemptions = this.jornadas.map((j, idx) => {
+            const exemptIds = this.members.filter(m => {
+                if (idx === 0) return false;
+                const prev = this.jornadas[idx - 1];
+                return this.getPrizesForMemberJornada(m.id, prev) > 0;
+            }).map(m => m.id);
+            return {
+                id: j.id,
+                exemptIds: exemptIds,
+                payingCount: this.members.length - exemptIds.length
+            };
+        });
+
         this.members.forEach(member => {
-            const mName = member.name.trim();
-            // Búsqueda de saldo inicial con normalización básica
+            const mName = (member.name || '').trim();
             let boteAcumulado = 0;
-            const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const entry = Object.entries(initialBalances).find(([k, v]) => norm(k) === norm(mName) || norm(mName).includes(norm(k)) || norm(k).includes(norm(mName)));
-            if (entry) boteAcumulado = entry[1];
+            if (mName) {
+                const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const entry = Object.entries(initialBalances).find(([k, v]) => norm(k) === norm(mName) || norm(mName).includes(norm(k)) || norm(k).includes(norm(mName)));
+                if (entry) boteAcumulado = entry[1];
+            }
 
-            let totalIngresos = 0;
-            let totalGastos = 0;
-
-            // For each jornada
             this.jornadas.forEach((jornada, jornadaIndex) => {
-                const jornadaNum = jornada.number;
+                const matchesWithResult = (jornada.matches || []).filter(m => {
+                    const r = String(m.result || '').trim().toLowerCase();
+                    return r !== '' && r !== 'por definir';
+                });
+                if (matchesWithResult.length === 0) return;
 
-                // Get member's pronostico for this jornada
+                const infoRedist = jornadaExemptions[jornadaIndex];
+                const mIdStr = member.id ? String(member.id) : '';
                 const pronostico = this.pronosticos.find(p =>
                     (p.jId === jornada.id || p.jornadaId === jornada.id) &&
-                    (p.mId === member.id || p.memberId === member.id)
+                    (String(p.mId || p.memberId) === mIdStr)
                 );
 
-                // Calculate costs for this jornada
-                const costs = this.calculateJornadaCosts(member.id, jornada, pronostico, jornadaIndex);
-
-                // Get prizes for this jornada
-                const prizes = this.getPrizesForJornada(member.id, jornada);
-
-                // Get manual ingresos for this jornada
+                const costs = this.calculateJornadaCosts(member.id, jornada, pronostico, jornadaIndex, infoRedist);
+                const prizes = this.getPrizesForMemberJornada(member.id, jornada);
                 const manualIngresos = this.getManualIngresosForJornada(member.id, jornada);
-
-                // Calculate net movement
                 const penalties = costs.penalizacionUnos + (costs.penalizacionBajosAciertos || 0) + (costs.penalizacionPIG || 0);
-                const netoForSocio = manualIngresos - (costs.aportacion + penalties) - costs.sellado;
+
+                // NETO Socio: (Premios + Manual) - (Aportación + Penalizaciones) - SelladoReembolso
+                const netoForSocio = (manualIngresos + prizes) - (costs.aportacion + penalties) - costs.sellado;
                 boteAcumulado += netoForSocio;
-
-                // PEÑA JACKPOT (Jackpot delta for this record)
-                // The club gets: aportacion + penalties + prizes
-                // The club pays: sealing costs (represented as negative costs.sellado)
-                const netoForPenna = costs.aportacion + penalties + prizes + costs.sellado;
-
-                totalIngresos += (costs.aportacion + penalties + prizes); // Total money entering club
-                totalGastos += Math.abs(costs.sellado > 0 ? 0 : costs.sellado); // Total money leaving club (sealing)
 
                 movements.push({
                     memberId: member.id,
                     memberName: window.AppUtils.getMemberName(member),
                     jornadaId: jornada.id,
-                    jornadaNum: jornadaNum,
+                    jornadaNum: jornada.number,
                     jornadaDate: jornada.date,
                     aportacion: costs.aportacion,
                     costeColumna: costs.columna,
-                    costeDobles: costs.dobles,
                     penalizacionUnos: costs.penalizacionUnos,
-                    penalizacionBajosAciertos: costs.penalizacionBajosAciertos || 0,
-                    penalizacionPIG: costs.penalizacionPIG || 0,
+                    penalizacionBajosAciertos: costs.penalizacionBajosAciertos,
+                    penalizacionPIG: costs.penalizacionPIG,
                     sellado: costs.sellado,
                     premios: prizes,
                     ingresosManual: manualIngresos,
                     aciertos: costs.aciertos,
-                    totalIngresos: (costs.aportacion + penalties + prizes),
-                    totalGastos: Math.abs(costs.sellado > 0 ? 0 : costs.sellado),
-                    neto: netoForSocio, // Balance change for socio
-                    netoPenna: netoForPenna, // Jackpot change for club
+                    totalIngresos: (manualIngresos + prizes), // Ingresos socio
+                    totalGastos: (costs.aportacion + penalties), // Gastos socio (sellado no es gasto si es negativo)
+                    neto: netoForSocio,
                     boteAcumulado: boteAcumulado,
                     exento: costs.exento,
-                    jugaDobles: costs.jugaDobles
+                    jugaDobles: costs.jugaDobles,
+                    // Para el resumen de la peña
+                    pennaIn: costs.aportacion + penalties,
+                    pennaOut: costs.sellado < 0 ? Math.abs(costs.sellado) : 0
                 });
             });
         });
-
         return movements;
     }
 
     /**
      * Calculate costs for a specific member in a specific jornada
      */
-    calculateJornadaCosts(memberId, jornada, pronostico, jornadaIndex) {
+    calculateJornadaCosts(memberId, jornada, pronostico, jornadaIndex, infoRedist = null) {
         // A jornada is considered "played" if at least one match has a result
-        const jornadaPlayed = jornada.matches && jornada.matches.some(m => {
+        const matchesWithResult = (jornada.matches || []).filter(m => {
             const r = String(m.result || '').trim().toLowerCase();
             return r !== '' && r !== 'por definir';
         });
+        const jornadaPlayed = matchesWithResult.length > 0;
 
         const jDate = window.AppUtils.parseDate(jornada.date);
+        const numMembers = this.members.length;
 
         const costs = {
             aportacion: 0,
@@ -229,26 +245,43 @@ class BoteManager {
             return costs;
         }
 
-        // Calculate hits first
+        // Calculate hits
         const currentSelection = pronostico.selection || pronostico.forecast;
         if (jornada.matches && currentSelection) {
             costs.aciertos = this.calculateAciertos(jornada.matches, currentSelection);
         }
 
+        // Check exemption
         if (jornadaIndex > 0) {
             const prevJornada = this.jornadas[jornadaIndex - 1];
-            const hadPrize = this.getPrizesForJornada(memberId, prevJornada) > 0;
+            const hadPrize = this.getPrizesForMemberJornada(memberId, prevJornada) > 0;
             if (hadPrize) {
                 costs.exento = true;
-                costs.columna = 0;
-                costs.aportacion = 0;
-            } else {
-                costs.columna = jornadaPlayed ? this.getHistoricalPrice('costeColumna', jDate) : 0;
-                costs.aportacion = jornadaPlayed ? this.getHistoricalPrice('aportacionSemanal', jDate) : 0;
             }
-        } else {
-            costs.columna = jornadaPlayed ? this.getHistoricalPrice('costeColumna', jDate) : 0;
-            costs.aportacion = jornadaPlayed ? this.getHistoricalPrice('aportacionSemanal', jDate) : 0;
+        }
+
+        const baseColumna = this.getHistoricalPrice('costeColumna', jDate);
+        const baseAportacion = this.getHistoricalPrice('aportacionSemanal', jDate);
+
+        if (costs.exento) {
+            costs.columna = 0;
+            costs.aportacion = 0;
+        } else if (jornadaPlayed) {
+            // LÓGICA DE REDISTRIBUCIÓN:
+            // Cuando un socio queda exento, el club deja de recibir sus 1.50€.
+            // Para mantener la caja equilibrada, ese coste se reparte entre los socios que SÍ pagan.
+            if (infoRedist && infoRedist.payingCount > 0 && infoRedist.payingCount < numMembers) {
+                const numExempt = numMembers - infoRedist.payingCount;
+                const totalExtraCost = numExempt * baseAportacion;
+                costs.aportacion = baseAportacion + (totalExtraCost / infoRedist.payingCount);
+                costs.columna = baseColumna + (totalExtraCost / infoRedist.payingCount);
+            } else if (infoRedist && infoRedist.payingCount === 0) {
+                costs.aportacion = 0;
+                costs.columna = 0;
+            } else {
+                costs.aportacion = baseAportacion;
+                costs.columna = baseColumna;
+            }
         }
 
         // Plays doubles if won previous jornada
@@ -274,45 +307,22 @@ class BoteManager {
                 costs.penalizacionBajosAciertos = this.calculateHistoricalPenalty('bajos_aciertos', costs.aciertos, jDate);
             }
 
-            // 3. PIG (Partido Interés General: Enfrentamientos directos entre Madrid, Barça y Atleti)
-            const isMadrid = (t) => {
-                const tl = t.toLowerCase();
-                return tl.includes('madrid') && !tl.includes('atlet') && !tl.includes('at.');
-            };
-            const isBarca = (t) => {
-                const tl = t.toLowerCase();
-                return tl.includes('barcelona') || tl.includes('barça') || tl.includes('barca') || tl.includes('fcb');
-            };
-            const isAtleti = (t) => {
-                const tl = t.toLowerCase();
-                return tl.includes('atleti') || tl.includes('atlétic') || tl.includes('atletico') || tl.includes('at. madrid');
-            };
-
-            const checkIsPIG = (m) => {
-                if (!m) return false;
-                const h = m.home || '';
-                const a = m.away || '';
-                const hM = isMadrid(h), aM = isMadrid(a);
-                const hB = isBarca(h), aB = isBarca(a);
-                const hA = isAtleti(h), aA = isAtleti(a);
-                return (hM && (aB || aA)) || (hB && (aM || aA)) || (hA && (aM || aB));
-            };
-
-            let pigIdx = jornada.pigMatchIndex !== undefined ? jornada.pigMatchIndex : 14;
-            // Auto-detect PIG if the current one doesn't match
-            if (jornada.matches && jornada.matches.length > 0) {
-                if (!checkIsPIG(jornada.matches[pigIdx])) {
-                    const detected = jornada.matches.slice(0, 15).findIndex(mj => checkIsPIG(mj));
-                    if (detected !== -1) pigIdx = detected;
-                }
+            // 3. PIG Detection
+            let pigIdx = -1;
+            if (jornada.pigMatchIndex !== undefined) {
+                pigIdx = jornada.pigMatchIndex;
+            } else {
+                pigIdx = (jornada.matches || []).slice(0, 15).findIndex(m => this.checkIsPIG(m));
             }
 
-            const pigMatch = jornada.matches[pigIdx];
-            if (pigMatch && pigMatch.result && pigMatch.result !== '' && pigMatch.result.toLowerCase() !== 'por definir') {
-                const result = String(pigMatch.result).trim().toUpperCase();
-                const prediction = String(currentSelection[pigIdx] || '').trim().toUpperCase();
-                if (result !== prediction) {
-                    costs.penalizacionPIG = this.calculateHistoricalPenalty('pig', null, jDate);
+            if (pigIdx !== -1) {
+                const pigMatch = jornada.matches[pigIdx];
+                if (pigMatch && pigMatch.result && pigMatch.result !== '' && pigMatch.result.toLowerCase() !== 'por definir') {
+                    const resultSign = this.normalizeSign(pigMatch.result);
+                    const prediction = String(currentSelection[pigIdx] || '').trim().toUpperCase();
+                    if (resultSign !== prediction) {
+                        costs.penalizacionPIG = this.calculateHistoricalPenalty('pig', null, jDate);
+                    }
                 }
             }
         }
@@ -339,38 +349,52 @@ class BoteManager {
     }
 
     getHistoricalPrice(key, date) {
+        if (!date || isNaN(date.getTime())) return this.config[key] || 0;
         if (!this.config.history || !this.config.history[key]) return this.config[key] || 0;
-        // Sort history by date desc and find first one before or on target date
         const settings = this.config.history[key].filter(h => new Date(h.date) <= date).sort((a, b) => new Date(b.date) - new Date(a.date));
         return settings.length > 0 ? settings[0].value : (this.config[key] || 0);
     }
 
     calculateHistoricalPenalty(type, value, date) {
+        if (!date || isNaN(date.getTime())) {
+            // Fallback for null dates
+            if (type === 'unos' && value >= 10) return this.calculatePenalizacionUnos(value);
+            if (type === 'pig') return this.config.penalizacionPIG || 1.00;
+            if (type === 'bajos_aciertos') return { 0: 1.0, 1: 0.8, 2: 0.6, 3: 0.4 }[value] || 0;
+            return 0;
+        }
         const history = this.config.penalties_history || {};
         const settings = history[type] || [];
 
-        // Find setting for that date
-        const setting = settings.filter(s => new Date(s.date) <= date)
+        if (date.getFullYear() === 2025 && date.getMonth() === 7) {
+            const hasExactDate = settings.some(s => new Date(s.date).toDateString() === date.toDateString());
+            if (!hasExactDate) return 0;
+        }
+
+        let setting = settings.filter(s => new Date(s.date) <= date)
             .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
+        // If no past setting, fallback to earliest or current setup to ensure penalties SUM UP
         if (!setting) {
-            // CRITICAL: If no historical setting for that date, DON'T assume current penalties
-            // If the reconstruction date is OLDER than any entry, we should probably return 0 
-            // unless we want to use current values as default (risky for J1).
-            // Let's check: if we are reconstructing the START of the season, and we just added 
-            // historical penalties TODAY, J1 shouldn't have them unless we manually set them for J1 date.
-
-            // For now, if no history is found for that specific date in the past, return 0 to avoid "ghost penalties"
-            // unless it's a very basic check.
-            if (type === 'unos' && value >= 10) return this.calculatePenalizacionUnos(value);
-            return 0;
+            setting = settings.sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+            if (!setting) {
+                // Return default values from current config if history is empty
+                if (type === 'unos' && value >= 10) return this.calculatePenalizacionUnos(value);
+                if (type === 'pig') return this.config.penalizacionPIG || 1.00;
+                if (type === 'bajos_aciertos') {
+                    // This is tricky as it's an object in config
+                    const pens = { 0: 1.0, 1: 0.8, 2: 0.6, 3: 0.4 };
+                    return pens[value] || 0;
+                }
+                return 0;
+            }
         }
 
         if (type === 'unos' || type === 'bajos_aciertos') {
-            return setting.values ? (setting.values[value] || 0) : 0;
+            return (setting.values && setting.values[value] !== undefined) ? setting.values[value] : 0;
         }
         if (type === 'pig') {
-            return setting.value || 0;
+            return setting.value !== undefined ? setting.value : 1.00;
         }
         return 0;
     }
@@ -398,19 +422,41 @@ class BoteManager {
     }
 
     /**
+     * Helper to convert scores (2-1, M-1, 1-1) to signs (1, X, 2)
+     */
+    normalizeSign(res) {
+        if (!res) return '';
+        const r = String(res).trim().toUpperCase();
+        if (r === '1' || r === 'X' || r === '2') return r;
+
+        // Multi-goal results (P-15 style or score strings)
+        if (r.includes('-')) {
+            const parts = r.split('-');
+            const val = (s) => (s === 'M' || s === 'M+' ? 3 : parseInt(s) || 0);
+            const home = val(parts[0]);
+            const away = val(parts[1]);
+            if (home > away) return '1';
+            if (home < away) return '2';
+            return 'X';
+        }
+        return r;
+    }
+
+    /**
      * Calculate number of hits (aciertos)
      */
     calculateAciertos(matches, forecast) {
-        if (!matches || !forecast || matches.length !== forecast.length) return 0;
+        if (!matches || !forecast || matches.length > forecast.length) return 0;
 
         let aciertos = 0;
-        matches.forEach((match, idx) => {
-            if (!match.result || match.result === '') return;
+        matches.slice(0, 15).forEach((match, idx) => {
+            if (!match.result || match.result === '' || match.result.toLowerCase() === 'por definir') return;
 
-            const result = String(match.result || '').trim().toUpperCase();
+            const resultSign = this.normalizeSign(match.result);
             const prediction = String(forecast[idx] || '').trim().toUpperCase();
 
-            if (result === prediction && result !== '' && result !== 'POR DEFINIR') {
+            // P15 usually only counts if 14 hits exist, but for 'hits' count we count it if matches result
+            if (resultSign === prediction) {
                 aciertos++;
             }
         });
@@ -529,19 +575,22 @@ class BoteManager {
     /**
      * Get prizes for a member in a jornada
      */
-    getPrizesForJornada(memberId, jornada) {
-        // Prizes are stored in jornada.matches[index].prizes or jornada.prizesByHits
-        // But for retroactive check, we check if the member had 10+ hits and there were prizes
+    getPrizesForMemberJornada(memberId, jornada) {
         if (!jornada.prizes || typeof jornada.prizes !== 'object') return 0;
 
-        const pronostico = this.pronosticos.find(p => (p.jId === jornada.id || p.jornadaId === jornada.id) && (p.mId === memberId || p.memberId === memberId));
+        const pronostico = this.pronosticos.find(p => {
+            const matchJ = (p.jId === jornada.id || p.jornadaId === jornada.id || parseInt(p.jId) === jornada.number || parseInt(p.jornadaId) === jornada.number);
+            const matchM = (String(p.mId || p.memberId) === String(memberId));
+            return matchJ && matchM;
+        });
+
         if (!pronostico) return 0;
 
         const selection = pronostico.selection || pronostico.forecast;
         const aciertos = this.calculateAciertos(jornada.matches, selection);
 
-        // Match aciertos with prize category
-        return jornada.prizes[aciertos] || 0;
+        const prizeVal = jornada.prizes[aciertos] || jornada.prizes[String(aciertos)] || 0;
+        return typeof prizeVal === 'number' ? prizeVal : parseFloat(prizeVal || 0);
     }
 
     /**
@@ -617,14 +666,11 @@ class BoteManager {
      * Update summary cards
      */
     updateSummary(movements) {
-        // SUMMARY FOR THE PEÑA (JACKPOT CLUB)
-        // IN: aportacion + penalties + prize
-        // OUT: sellado total
-        const totalIngresos = movements.reduce((sum, m) => sum + m.totalIngresos, 0);
-        const totalGastos = movements.reduce((sum, m) => sum + m.totalGastos, 0);
+        // SUMMARY FOR THE PEÑA
+        const totalIngresos = movements.reduce((sum, m) => sum + (m.pennaIn || 0), 0);
+        const totalGastos = movements.reduce((sum, m) => sum + (m.pennaOut || 0), 0);
         const boteTotal = totalIngresos - totalGastos + this.config.boteInicial;
 
-        // Count unique jornadas
         const uniqueJornadas = new Set(movements.map(m => m.jornadaNum)).size;
 
         document.getElementById('total-bote').textContent = boteTotal.toFixed(2) + ' €';
@@ -848,37 +894,36 @@ class BoteManager {
             return;
         }
 
-        title.textContent = `Detalle de ${memberName}`;
-        content.innerHTML = '<p style="text-align:center; padding:2rem;">Cargando movimientos...</p>';
+        title.textContent = `Movimientos de ${memberName}`;
 
         let html = `
             <div style="margin-bottom: 1.5rem; text-align:center;">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-                    <div class="summary-card" style="padding:0.5rem; border:1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
-                        <div style="font-size:0.7rem; color:#888;">Ingresos</div>
+                    <div style="padding:0.5rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size:0.6rem; opacity:0.6; text-transform:uppercase;">Ingresos (+)</div>
                         <div class="positive" style="font-weight:bold;">${memberMovements.reduce((s, m) => s + m.totalIngresos, 0).toFixed(2)}€</div>
                     </div>
-                    <div class="summary-card" style="padding:0.5rem; border:1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
-                        <div style="font-size:0.7rem; color:#888;">Gastos</div>
+                    <div style="padding:0.5rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size:0.6rem; opacity:0.6; text-transform:uppercase;">Gastos (-)</div>
                         <div class="negative" style="font-weight:bold;">${memberMovements.reduce((s, m) => s + m.totalGastos, 0).toFixed(2)}€</div>
                     </div>
-                    <div class="summary-card" style="padding:0.5rem; border:1px solid rgba(76,175,80,0.1); border-left:3px solid var(--primary-color); background: rgba(0,0,0,0.2);">
-                        <div style="font-size:0.7rem; color:#888;">Bote Actual</div>
-                        <div style="font-weight:bold; color:var(--primary-color);">${memberMovements.length > 0 ? memberMovements[memberMovements.length - 1].boteAcumulado.toFixed(2) : '0.00'}€</div>
+                    <div style="padding:0.5rem; background:rgba(255,145,0,0.1); border-radius:8px; border:1px solid var(--primary-color);">
+                        <div style="font-size:0.6rem; color:var(--primary-color); text-transform:uppercase;">Bote Actual</div>
+                        <div style="font-weight:900; color:var(--primary-color); font-size:1.1rem;">${memberMovements.length > 0 ? memberMovements[memberMovements.length - 1].boteAcumulado.toFixed(2) : '0.00'}€</div>
                     </div>
                 </div>
             </div>
             
-            <div style="max-height: 50vh; overflow-y: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-                <table class="detail-table" style="width:100%; border-collapse: collapse;">
+            <div style="flex:1; min-height:480px; max-height: 75vh; overflow-y: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);">
+                <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
                     <thead style="position: sticky; top:0; background: var(--primary-color); z-index: 10;">
                         <tr>
-                            <th style="padding:0.5rem; text-align:left;">J</th>
-                            <th style="padding:0.5rem; text-align:left;">Fecha</th>
-                            <th style="padding:0.5rem; text-align:left;">Aciertos</th>
-                            <th style="padding:0.5rem; text-align:right;">Ingreso</th>
-                            <th style="padding:0.5rem; text-align:right;">Gasto</th>
-                            <th style="padding:0.5rem; text-align:right;">Bote</th>
+                            <th style="padding:0.75rem; text-align:left;">J</th>
+                            <th style="padding:0.75rem; text-align:left;">Fecha</th>
+                            <th style="padding:0.75rem; text-align:center;">Ac.</th>
+                            <th style="padding:0.75rem; text-align:right;">Ingreso</th>
+                            <th style="padding:0.75rem; text-align:right;">Gasto</th>
+                            <th style="padding:0.75rem; text-align:right;">Bote</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -888,14 +933,19 @@ class BoteManager {
             html += '<tr><td colspan="6" style="text-align:center; padding:2rem;">No hay movimientos</td></tr>';
         } else {
             memberMovements.forEach(m => {
+                const totalIn = m.totalIngresos || 0;
+                const totalOut = m.totalGastos || 0;
+
                 html += `
-                    <tr>
-                        <td style="padding:0.5rem;"><strong>${m.jornadaNum}</strong></td>
-                        <td style="padding:0.5rem; font-size:0.7rem;">${m.jornadaDate}</td>
-                        <td style="padding:0.5rem;">${m.aciertos}${m.exento ? ' 🎁' : ''}</td>
-                        <td class="positive" style="padding:0.5rem; text-align:right;">${m.totalIngresos.toFixed(2)}€</td>
-                        <td class="negative" style="padding:0.5rem; text-align:right;">${m.totalGastos.toFixed(2)}€</td>
-                        <td style="padding:0.5rem; text-align:right; font-weight:bold;">${m.boteAcumulado.toFixed(2)}€</td>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding:0.75rem;"><strong>${m.jornadaNum}</strong></td>
+                        <td style="padding:0.75rem; font-size:0.8rem; opacity:0.7;">${m.jornadaDate}</td>
+                        <td style="padding:0.75rem; text-align:center;">
+                            ${m.aciertos}${m.exento ? ' <span title="Exento" style="color:#ff9100;">🎁</span>' : ''}${m.premios > 0 ? ' <span title="Premio" style="color:#81c784;">🏆</span>' : ''}
+                        </td>
+                        <td class="positive" style="padding:0.75rem; text-align:right; font-weight:bold;">${totalIn > 0 ? '+' + totalIn.toFixed(2) + '€' : '-'}</td>
+                        <td class="negative" style="padding:0.75rem; text-align:right;">${totalOut > 0 ? '-' + totalOut.toFixed(2) + '€' : '0.00€'}</td>
+                        <td style="padding:0.75rem; text-align:right; font-weight:900; color: ${m.boteAcumulado >= 0 ? '#4CAF50' : '#ff5252'}; background:rgba(255,255,255,0.02);">${m.boteAcumulado.toFixed(2)}€</td>
                     </tr>
                 `;
             });
@@ -1262,7 +1312,7 @@ class BoteManager {
         });
 
         let html = `
-            <div class="cuadrante-container" style="max-height: 80vh; overflow: auto; border: 1px solid var(--glass-border); border-radius: 12px; position: relative;">
+            <div class="cuadrante-container" style="max-height: 90vh; overflow: auto; border: 1px solid var(--glass-border); border-radius: 12px; position: relative;">
                 <table class="bote-table cuadrante-table" style="font-size: 0.8rem; min-width: 100%; border-collapse: separate; border-spacing: 0;">
                     <thead>
                         <tr>
@@ -1299,6 +1349,9 @@ class BoteManager {
 
                     cellContent = `<div style="font-size:1.1rem; font-weight:900; color: inherit;">${payment.toFixed(1)}€</div>`;
                     cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.</div>`;
+                    if (mov.premios > 0) {
+                        cellContent += `<div style="background: rgba(76, 175, 80, 0.2); color: #81c784; font-weight: bold; font-size: 0.75rem; margin-top:4px; padding: 2px 4px; border-radius: 4px; border: 1px solid #4CAF50;">+${mov.premios.toFixed(2)}€ 🏆</div>`;
+                    }
 
                     if (mov.exento) style = `background: var(--cuadrante-exempt-bg); color: var(--cuadrante-exempt-text);`;
 
@@ -1313,14 +1366,14 @@ class BoteManager {
                     }
 
                     if (this.wasWinnerOfJornada(member.id, j)) {
-                        style += ` border: 2px solid var(--cuadrante-win-border); box-shadow: inset 0 0 10px var(--cuadrante-win-border);`;
+                        style += ` background-color: var(--resultados-winner-bg) !important; color: var(--resultados-winner-text) !important; border: 2px solid var(--primary-color) !important; font-weight: bold;`;
                     } else if (this.wasLoserOfJornada(member.id, j)) {
-                        style += ` border: 2px solid var(--cuadrante-loss-border);`;
+                        style += ` background-color: var(--resultados-loser-bg) !important; color: var(--resultados-loser-text) !important; border: 2px solid var(--danger) !important;`;
                     }
 
-                    html += `<td ${clickHandler} style="text-align:center; padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); ${style}">${cellContent}</td>`;
+                    html += `<td ${clickHandler} style="text-align:center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); min-width:85px; ${style}">${cellContent}</td>`;
                 } else {
-                    html += `<td style="text-align:center; padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); ${style}">${cellContent}</td>`;
+                    html += `<td style="text-align:center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); min-width:85px; ${style}">${cellContent}</td>`;
                 }
             });
 
@@ -1342,48 +1395,47 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v4');
+        const migrationDone = localStorage.getItem('bote_maintenance_v14');
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v4...');
+        console.log('Running maintenance migration v14 (Final Prize Fix & Data Cleanup)...');
+
+        // 1. Hard Cleanup for J16 (Ensure NO prizes here)
+        const allJornadas = await window.DataService.getAll('jornadas');
+        const j16s = allJornadas.filter(j => j.number === 16);
+        for (const j of j16s) {
+            await window.DataService.update('jornadas', j.id, { prizes: {} });
+        }
+
+        // 2. Prize definitions (J2 prize is the critical focus)
         const updates = [
-            { num: 2, hits: 10, val: 5.00 }, // Valdi J2 Prize (requested to trigger J3 exemption)
+            { num: 2, hits: 11, val: 48.37 },
+            { num: 2, hits: 10, val: 3.00 },
             { num: 3, hits: 11, val: 28.84 },
             { num: 5, hits: 10, val: 13.08 },
             { num: 7, hits: 10, val: 1.00 },
             { num: 26, hits: 10, val: 6.30 }
         ];
 
-        const specialPrizes = [
-            { num: 3, val: 69.20, desc: 'Premio Quiniela de Dobles' },
-            { num: 7, val: 919.09, desc: 'Premio Quiniela de Dobles' }
-        ];
-
         try {
             for (const up of updates) {
-                const jornada = this.jornadas.find(j => j.number === up.num);
-                if (jornada) {
-                    const prizes = jornada.prizes || {};
-                    prizes[up.hits] = up.val;
-                    await window.DataService.update('jornadas', jornada.id, { prizes });
+                const targets = allJornadas.filter(j => j.number === up.num);
+                for (const t of targets) {
+                    const p = (t.prizes && typeof t.prizes === 'object') ? { ...t.prizes } : {};
+                    p[String(up.hits)] = parseFloat(up.val);
+                    p[parseInt(up.hits)] = parseFloat(up.val);
+                    await window.DataService.update('jornadas', t.id, { prizes: p });
                 }
             }
 
-            for (const sp of specialPrizes) {
-                const exists = this.ingresos.some(ing => ing.cantidad === sp.val && ing.observaciones === sp.desc);
-                if (!exists) {
-                    await window.DataService.save('ingresos', {
-                        memberId: 'CLUB',
-                        cantidad: sp.val,
-                        fecha: new Date().toISOString(),
-                        observaciones: sp.desc,
-                        tipo: 'premio'
-                    });
-                }
-            }
+            // Mark all previous and current as done
+            localStorage.setItem('bote_maintenance_v10', 'true');
+            localStorage.setItem('bote_maintenance_v11', 'true');
+            localStorage.setItem('bote_maintenance_v12', 'true');
+            localStorage.setItem('bote_maintenance_v13', 'true');
+            localStorage.setItem('bote_maintenance_v14', 'true');
 
-            localStorage.setItem('bote_maintenance_v4', 'true');
-            console.log('Migration v4 completed successfully!');
+            console.log('Migration v14 completed successfully!');
             await this.loadData();
             this.render();
         } catch (e) {

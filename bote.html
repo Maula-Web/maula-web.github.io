@@ -14,20 +14,20 @@
     <script src="js/db-service.js"></script>
     <style>
         :root {
-            --cuadrante-win-bg: rgba(76, 175, 80, 0.2);
-            --cuadrante-win-text: #4CAF50;
-            --cuadrante-win-border: #4CAF50;
-            --cuadrante-loss-bg: rgba(244, 67, 54, 0.2);
-            --cuadrante-loss-text: #F44336;
-            --cuadrante-loss-border: #F44336;
+            --cuadrante-win-bg: var(--resultados-winner-bg, rgba(76, 175, 80, 0.2));
+            --cuadrante-win-text: var(--resultados-winner-text, #4CAF50);
+            --cuadrante-win-border: var(--primary-color, #4CAF50);
+            --cuadrante-loss-bg: var(--resultados-loser-bg, rgba(244, 67, 54, 0.2));
+            --cuadrante-loss-text: var(--resultados-loser-text, #F44336);
+            --cuadrante-loss-border: var(--danger, #F44336);
             --cuadrante-penalty-bg: rgba(255, 145, 0, 0.1);
             --cuadrante-penalty-text: var(--primary-color);
             --cuadrante-penalty-border: var(--primary-color);
             --cuadrante-exempt-bg: rgba(255, 255, 255, 0.05);
             --cuadrante-exempt-text: #aaa;
-            --cuadrante-header-bg: var(--table-header-bg);
+            --cuadrante-header-bg: var(--table-header-bg, #ff9100);
             --cuadrante-header-text: #fff;
-            --cuadrante-sticky-col: var(--card-bg);
+            --cuadrante-sticky-col: var(--card-bg, #1a1a1a);
             --cuadrante-sticky-text: #fff;
         }
 
@@ -39,17 +39,17 @@
         }
 
         .bote-container {
-            max-width: 1600px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+            max-width: 98%;
+            margin: 1rem auto;
+            padding: 0 1rem;
         }
 
         .bote-header {
             background: linear-gradient(135deg, var(--bote-header-bg-start, #ff9100) 0%, var(--bote-header-bg-end, #ff6600) 100%);
             color: var(--bote-header-text, white);
-            padding: 2.5rem 2rem;
+            padding: 1.5rem 1rem;
             border-radius: 16px;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             text-align: center;
         }

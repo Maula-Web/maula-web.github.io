@@ -176,6 +176,11 @@ class DataService {
         await this.db.collection(collectionName).doc(String(item.id)).set(item);
     }
 
+    // Generic Partial Update
+    async update(collectionName, id, data) {
+        await this.db.collection(collectionName).doc(String(id)).update(data);
+    }
+
     // Generic Delete
     async delete(collectionName, id) {
         await this.db.collection(collectionName).doc(String(id)).delete();
