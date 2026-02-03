@@ -5,7 +5,10 @@
 
 class RSSImporter {
     constructor() {
-        this.RSS_URL = 'https://www.loteriasyapuestas.es/es/la-quiniela/resultados/.formatoRSS';
+        this.RSS_URLS = [
+            'https://servicios.elpais.com/sorteos/quiniela/',
+            'https://www.loteriasyapuestas.es/es/la-quiniela/resultados/.formatoRSS'
+        ];
         this.jornadas = [];
         this.rssData = [];
     }
@@ -33,14 +36,16 @@ class RSSImporter {
             const localResponse = await fetch('datos_auxiliares/rss_cache.xml');
             if (localResponse.ok) {
                 const text = await localResponse.text();
-                if (text.trim().startsWith('<') && !text.includes('<!DOCTYPE html>')) {
-                    try {
-                        const results = this.parseRSSXML(text);
-                        console.log('DEBUG: Successfully parsed RSS from local cache!');
-                        return results;
-                    } catch (parseErr) {
-                        console.warn('DEBUG: Local cache content failed parsing:', parseErr);
-                    }
+                // If it's HTML from El Pais or XML, it's fine
+                if (text.trim().length > 100 && !text.includes('<!DOCTYPE html>')) {
+                    // Note: GitHub script saves El Pais HTML as rss_cache.xml too
+                }
+                try {
+                    const results = this.parseRSSXML(text);
+                    console.log('DEBUG: Successfully parsed from local cache!');
+                    return results;
+                } catch (parseErr) {
+                    console.warn('DEBUG: Local cache content failed parsing:', parseErr);
                 }
             }
         } catch (err) {
@@ -54,64 +59,37 @@ class RSSImporter {
             'https://thingproxy.freeboard.io/fetch/'
         ];
 
-        // Try each proxy
-        for (const proxy of corsProxies) {
-            try {
-                console.log(`DEBUG: Trying proxy ${proxy}...`);
-                const url = proxy + encodeURIComponent(this.RSS_URL);
+        // Try each URL with each proxy
+        for (const url of this.RSS_URLS) {
+            for (const proxy of corsProxies) {
+                try {
+                    console.log(`DEBUG: Trying URL ${url} via proxy ${proxy}...`);
+                    const finalUrl = proxy + encodeURIComponent(url);
 
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/rss+xml, application/xml, text/xml, */*' }
-                });
+                    const response = await fetch(finalUrl, {
+                        method: 'GET',
+                        headers: { 'Accept': 'text/html,application/rss+xml,application/xml,text/xml,*/*' }
+                    });
 
-                if (response.ok) {
-                    const text = await response.text();
-                    console.log(`DEBUG: Proxy ${proxy} returned ${text.length} chars.`);
-
-                    // VALIDATION: Check if it looks like XML/RSS and NOT HTML error page
-                    if (text.trim().startsWith('<') &&
-                        !text.toLowerCase().includes('<!doctype html>') &&
-                        !text.toLowerCase().includes('<html')) {
-
-                        try {
-                            // Try parsing immediately to validate structure
-                            const results = this.parseRSSXML(text);
-                            console.log('DEBUG: Successfully parsed RSS from proxy!');
-                            return results;
-                        } catch (parseErr) {
-                            console.warn(`DEBUG: Proxy ${proxy} content failed parsing:`, parseErr);
-                            // If parsing fails here, we continue to next proxy
+                    if (response.ok) {
+                        const text = await response.text();
+                        if (text.length > 500) {
+                            try {
+                                const results = this.parseRSSXML(text);
+                                console.log('DEBUG: Successfully parsed from proxy!');
+                                return results;
+                            } catch (parseErr) {
+                                console.warn(`DEBUG: Parse failed for ${url} via ${proxy}`);
+                            }
                         }
-                    } else {
-                        console.warn(`DEBUG: Proxy ${proxy} returned HTML/Invalid content (likely blocked/error page).`);
                     }
-                }
-            } catch (err) {
-                console.warn(`DEBUG: Proxy ${proxy} network/fetch error:`, err);
-            }
-        }
-
-        // Try direct fetch fallback
-        try {
-            console.log('DEBUG: Trying direct fetch...');
-            const response = await fetch(this.RSS_URL);
-            if (response.ok) {
-                const text = await response.text();
-                // Basic validation
-                if (text.trim().startsWith('<') && !text.includes('<!DOCTYPE html>')) {
-                    try {
-                        return this.parseRSSXML(text);
-                    } catch (e) { console.warn('Direct fetch parse fail', e); }
+                } catch (err) {
+                    console.warn(`DEBUG: Error with proxy ${proxy} for ${url}`);
                 }
             }
-        } catch (err) {
-            console.warn('DEBUG: Direct fetch failed:', err);
         }
 
         console.log('DEBUG: All automatic methods failed. Falling back to manual paste.');
-        // If we reach here, ALL automatic methods failed.
-        // Return manual dialog result directly.
         return await this.showManualPasteDialog();
     }
 
@@ -130,14 +108,14 @@ class RSSImporter {
             modal.className = 'modal';
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: var(--primary-blue); margin-bottom: 1rem;">📋 Pegar XML del RSS</h2>
+                    <h2 style="color: var(--primary-blue); margin-bottom: 1rem;">📋 Pegar Resultados Manualmente</h2>
                     <p style="margin-bottom: 1rem; color: #666;">
-                        No se pudo acceder automáticamente al feed RSS (posible bloqueo de seguridad). Por favor, sigue estos pasos:
+                        No se pudo acceder automáticamente a ninguna fuente (bloqueo de seguridad). Por favor, hazlo manualmente:
                     </p>
                     <ol style="text-align: left; margin-bottom: 1rem; color: #666; padding-left: 1.5rem;">
-                        <li>Abre <a href="${this.RSS_URL}" target="_blank" style="color: var(--primary-blue);">este enlace</a></li>
-                        <li>Si ves una página con texto y símbolos, pulsa <strong>Ctrl+U</strong> (Ver código fuente)</li>
-                        <li>Copia TODO el texto (Ctrl+A, Ctrl+C) y pégalo aquí</li>
+                        <li>Abre la web de resultados de <a href="https://servicios.elpais.com/sorteos/quiniela/" target="_blank" style="color: var(--primary-blue); font-weight: bold;">EL PAÍS pinchando aquí</a></li>
+                        <li>Pulsa <strong>Ctrl+U</strong> (o haz clic derecho -> Ver código fuente)</li>
+                        <li>Copia TODO el texto (Ctrl+A, Ctrl+C) y pégalo en el cuadro de abajo</li>
                     </ol>
                     <textarea id="manual-xml-input" style="width: 100%; height: 200px; font-family: monospace; font-size: 0.85rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Pega aquí el contenido XML..." spellcheck="false"></textarea>
                     <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">

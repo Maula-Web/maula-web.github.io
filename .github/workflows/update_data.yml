@@ -29,6 +29,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add datos_auxiliares/rss_cache.xml datos_auxiliares/proximas_jornadas.pdf datos_auxiliares/external_data_metadata.json
-          git commit -m "Auto-update: Datos externos (RSS/PDF) [skip ci]" || echo "No changes to commit"
+          # Agrega todo el contenido de la carpeta de datos, si existe
+          git add datos_auxiliares/ || echo "No hay archivos en datos_auxiliares"
+          git commit -m "Auto-update: Datos externos (RSS/PDF) [skip ci]" || echo "No hay cambios para registrar"
           git push
