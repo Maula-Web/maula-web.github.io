@@ -105,6 +105,21 @@ class PDFImporter {
     async fetchPDF() {
         console.log('DEBUG: Fetching PDF...');
 
+        // 1. Try LOCAL CACHE first (GitHub Actions update)
+        try {
+            console.log('DEBUG: Trying local PDF cache...');
+            const localResponse = await fetch('datos_auxiliares/proximas_jornadas.pdf');
+            if (localResponse.ok) {
+                const buffer = await localResponse.arrayBuffer();
+                if (buffer.byteLength > 1000) { // PDF should be decent size
+                    console.log('DEBUG: Found local PDF cache!');
+                    return buffer;
+                }
+            }
+        } catch (err) {
+            console.warn('DEBUG: Local PDF cache fetch failed:', err);
+        }
+
         // List of proxies to try
         const proxies = [
             'https://corsproxy.io/?',

@@ -27,6 +27,26 @@ class RSSImporter {
     async fetchRSSFeed() {
         console.log('DEBUG: Starting RSS fetch process...');
 
+        // 1. Try LOCAL CACHE first (GitHub Actions update)
+        try {
+            console.log('DEBUG: Trying local cache...');
+            const localResponse = await fetch('datos_auxiliares/rss_cache.xml');
+            if (localResponse.ok) {
+                const text = await localResponse.text();
+                if (text.trim().startsWith('<') && !text.includes('<!DOCTYPE html>')) {
+                    try {
+                        const results = this.parseRSSXML(text);
+                        console.log('DEBUG: Successfully parsed RSS from local cache!');
+                        return results;
+                    } catch (parseErr) {
+                        console.warn('DEBUG: Local cache content failed parsing:', parseErr);
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn('DEBUG: Local cache fetch failed:', err);
+        }
+
         const corsProxies = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
