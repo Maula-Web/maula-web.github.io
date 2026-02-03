@@ -29,7 +29,9 @@ class RSSImporter {
 
         const corsProxies = [
             'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?'
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest=',
+            'https://thingproxy.freeboard.io/fetch/'
         ];
 
         // Try each proxy
@@ -113,11 +115,11 @@ class RSSImporter {
                         No se pudo acceder automáticamente al feed RSS (posible bloqueo de seguridad). Por favor, sigue estos pasos:
                     </p>
                     <ol style="text-align: left; margin-bottom: 1rem; color: #666; padding-left: 1.5rem;">
-                        <li>Abre <a href="${this.RSS_URL}" target="_blank" style="color: var(--primary-blue);">este enlace</a> en una nueva pestaña</li>
-                        <li>Copia todo el contenido XML (Ctrl+A, Ctrl+C)</li>
-                        <li>Pégalo en el área de texto a continuación</li>
+                        <li>Abre <a href="${this.RSS_URL}" target="_blank" style="color: var(--primary-blue);">este enlace</a></li>
+                        <li>Si ves una página con texto y símbolos, pulsa <strong>Ctrl+U</strong> (Ver código fuente)</li>
+                        <li>Copia TODO el texto (Ctrl+A, Ctrl+C) y pégalo aquí</li>
                     </ol>
-                    <textarea id="manual-xml-input" style="width: 100%; height: 200px; font-family: monospace; font-size: 0.85rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Pega aquí el contenido XML..."></textarea>
+                    <textarea id="manual-xml-input" style="width: 100%; height: 200px; font-family: monospace; font-size: 0.85rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Pega aquí el contenido XML..." spellcheck="false"></textarea>
                     <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
                         <button id="cancel-manual-paste" class="btn-secondary" style="padding: 0.75rem 1.5rem;">Cancelar</button>
                         <button id="confirm-manual-paste" class="btn-primary" style="padding: 0.75rem 1.5rem;">Continuar</button>
@@ -151,9 +153,12 @@ class RSSImporter {
                 }
                 close();
                 try {
-                    const results = this.parseRSSXML(xmlText);
+                    // Try to clean XML first if it seems to have browser artifacts
+                    const cleanedXml = this.cleanXML(xmlText);
+                    const results = this.parseRSSXML(cleanedXml);
                     resolve(results);
                 } catch (err) {
+                    console.error('Manual paste parse failed:', err);
                     reject(new Error('Error al parsear el XML: ' + err.message));
                 }
             });
@@ -175,13 +180,20 @@ class RSSImporter {
         console.log('DEBUG: Parsing XML, length:', xmlText.length);
 
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+        let xmlDoc = parser.parseFromString(xmlText, 'text/xml');
 
         // Check for parsing errors
-        const parserError = xmlDoc.querySelector('parsererror');
+        let parserError = xmlDoc.querySelector('parsererror');
         if (parserError) {
-            console.error('DEBUG: XML parsing error:', parserError.textContent);
-            throw new Error('Error al parsear el XML del RSS');
+            console.warn('DEBUG: XML parsing error initially, trying to clean...', parserError.textContent);
+            const cleaned = this.cleanXML(xmlText);
+            xmlDoc = parser.parseFromString(cleaned, 'text/xml');
+            parserError = xmlDoc.querySelector('parsererror');
+        }
+
+        if (parserError) {
+            console.error('DEBUG: XML parsing error remains:', parserError.textContent);
+            throw new Error('El XML no es válido. Asegúrate de copiar el código fuente (Ctrl+U) completo.');
         }
 
         const items = xmlDoc.querySelectorAll('item');
@@ -311,13 +323,23 @@ class RSSImporter {
      */
     parseMatches(description) {
         const matches = [];
-        const lines = description.split('\n');
+
+        // Normalize description: replace <br/> or equivalents with newlines
+        // If it's already text, it might have them as literal or spaces
+        const normalizedDesc = description
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/&nbsp;/g, ' ');
+
+        const lines = normalizedDesc.split('\n');
+
+        // Pattern for a single match: "1 Team A - Team B 1"
+        const singleMatchPattern = /^(Pleno al 15|\d{1,2})[^\w\s]*\s+(.+?)\s+-\s+(.+?)\s+([12XM]|M\s*-\s*\d+|\d+\s*-\s*\d+)\s*$/i;
 
         for (const line of lines) {
-            // Match pattern: "1 Team A - Team B X" or "Pleno al 15 Team A - Team B 1 - 2"
-            // Improved regex to handle noise like "10實" or other special characters between number and team
-            const matchPattern = /^(Pleno al 15|\d{1,2})[^\w\s]*\s+(.+?)\s+-\s+(.+?)\s+([12XM]|M\s*-\s*\d+|\d+\s*-\s*\d+)\s*$/i;
-            const match = line.trim().match(matchPattern);
+            const trimmedLine = line.trim();
+            if (!trimmedLine) continue;
+
+            const match = trimmedLine.match(singleMatchPattern);
 
             if (match) {
                 const position = match[1];
@@ -327,8 +349,7 @@ class RSSImporter {
 
                 // Normalize result format
                 if (result.includes('-')) {
-                    // It's a score like "1 - 2" or "M - 0"
-                    result = result.replace(/\s/g, ''); // Remove spaces: "1-2" or "M-0"
+                    result = result.replace(/\s/g, '');
                 }
 
                 matches.push({
@@ -337,10 +358,59 @@ class RSSImporter {
                     away: away,
                     result: result
                 });
+            } else {
+                // FALLBACK: If the line has multiple matches because newlines were lost
+                // We look for patterns like "1 Team - Team X 2 Team - Team 1"
+                // This regex is more complex as it needs to be global
+                const globalPattern = /(Pleno al 15|\d{1,2})\s+([^-]+?)\s+-\s+(.+?)\s+([12XM]|M-\d+|\d+-\d+|M\s-\s\d+|\d\s-\s\d)(?=\s+(?:Pleno al 15|\d{1,2})|$)/gi;
+                let gMatch;
+                while ((gMatch = globalPattern.exec(trimmedLine)) !== null) {
+                    const pos = gMatch[1];
+                    const home = gMatch[2].trim();
+                    const away = gMatch[3].trim();
+                    let res = gMatch[4].trim();
+
+                    if (res.includes('-')) res = res.replace(/\s/g, '');
+
+                    // Avoid duplicates if already added by line split
+                    const posNum = pos === 'Pleno al 15' ? 15 : parseInt(pos);
+                    if (!matches.find(m => m.position === posNum)) {
+                        matches.push({
+                            position: posNum,
+                            home: home,
+                            away: away,
+                            result: res
+                        });
+                    }
+                }
             }
         }
 
         return matches.sort((a, b) => a.position - b.position);
+    }
+
+    /**
+     * Clean XML from browser artifacts
+     */
+    cleanXML(xmlText) {
+        if (!xmlText) return '';
+
+        // 1. Remove browser +/- buttons (common if copied from rendered view)
+        let cleaned = xmlText.replace(/^\s*[-+]\s*</gm, '<');
+
+        // 2. Remove leading/trailing garbage
+        cleaned = cleaned.trim();
+
+        // 3. If it doesn't start with <, try to find the start
+        if (cleaned[0] !== '<') {
+            const startIdx = cleaned.indexOf('<');
+            if (startIdx !== -1) cleaned = cleaned.substring(startIdx);
+        }
+
+        // 4. Basic entity fixes
+        cleaned = cleaned.replace(/&nbsp;/g, ' ');
+
+        return cleaned;
     }
 
     /**

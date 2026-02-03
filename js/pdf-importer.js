@@ -108,7 +108,9 @@ class PDFImporter {
         // List of proxies to try
         const proxies = [
             'https://corsproxy.io/?',
-            'https://api.allorigins.win/raw?url='
+            'https://api.allorigins.win/raw?url=',
+            'https://api.codetabs.com/v1/proxy?quest=',
+            'https://thingproxy.freeboard.io/fetch/'
         ];
 
         for (const proxy of proxies) {
