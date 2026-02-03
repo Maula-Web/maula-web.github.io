@@ -251,66 +251,92 @@ class RSSImporter {
     }
 
     /**
-     * Specialized parser for El Pais Results Page
-     * Can handle multiple jornadas if they exist in the page
+     * Specialized parser for El Pais Quiniela Page
+     * Structure: [Number, Team 1, Team 2, Sign 1, Sign X, Sign 2]
      */
     parseElPaisHTML(htmlText) {
-        console.log('DEBUG: Parsing El Pais HTML...');
+        console.log('DEBUG: Starting parseElPaisHTML (User-defined structure)...');
         const results = [];
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlText, 'text/html');
 
-        // El Pais has multiple containers for draws. 
-        // We look for any container that looks like a quiniela draw.
-        const sections = doc.querySelectorAll('.bloque_sorteo, .caja_sorteo');
-
+        // Identify sections by looking for dates or "Combinación ganadora"
+        // El Pais often has sections for each draw.
+        const sections = doc.querySelectorAll('.bloque_sorteo, .caja_sorteo, section, .contenedor_sorteo');
         const entries = sections.length > 0 ? Array.from(sections) : [doc.body];
 
         entries.forEach((section) => {
             // 1. Find Date
-            const cabecera = section.querySelector('.cabecera_sorteo, h2, h3');
             let dateStr = "";
-            if (cabecera) {
-                const rawDate = cabecera.textContent.trim().toLowerCase();
-                const dMatch = rawDate.match(/(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})/);
-                if (dMatch) dateStr = `${dMatch[1]} ${dMatch[2]} ${dMatch[3]}`;
+            const headers = section.querySelectorAll('h1, h2, h3, .cabecera_sorteo, .fecha');
+            for (const h of headers) {
+                const text = h.textContent.trim().toLowerCase();
+                const m = text.match(/(\d{1,2})\s+de\s+([a-zñáéíóú]+)\s+de\s+(\d{4})/i);
+                if (m) {
+                    dateStr = `${m[1]} ${m[2]} ${m[3]}`;
+                    break;
+                }
             }
 
             if (!dateStr) return;
 
-            // 2. Extract Matches
+            // 2. Find Match Table (after "RESULTADOS" or "APUESTA GANADORA")
             const matches = [];
             const rows = section.querySelectorAll('tr');
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 3) {
-                    const posStr = cells[0].textContent.trim();
-                    const teams = cells[1].textContent.trim();
-                    const sign = cells[2].textContent.trim().toUpperCase();
 
-                    const pos = posStr.includes('15') ? 15 : parseInt(posStr);
-                    if (isNaN(pos)) return;
+            rows.forEach((row) => {
+                const cells = Array.from(row.querySelectorAll('td, th')).map(c => c.textContent.trim());
+                if (cells.length < 4) return;
 
-                    const teamParts = teams.split(/\s*-\s*/);
-                    if (teamParts.length >= 2) {
-                        matches.push({
-                            position: pos,
-                            home: teamParts[0].trim(),
-                            away: teamParts[1].trim(),
-                            result: sign
-                        });
+                // First cell should be a number (1 to 15)
+                const posMatch = cells[0].match(/^(\d{1,2})$/);
+                if (!posMatch) return;
+                const pos = parseInt(posMatch[1]);
+                if (pos < 1 || pos > 15) return;
+
+                let home = "", away = "", result = "";
+
+                // Heuristic for El Pais table:
+                // Type A: [Num, Team1, Team2, S1, SX, S2] -> length 6
+                // Type B: [Num, Teams (T1 - T2), S1, SX, S2] -> length 5
+
+                if (cells.length >= 6) {
+                    home = cells[1];
+                    away = cells[2];
+                    // Check columns 3, 4, 5 for the result
+                    if (cells[3] && cells[3].length > 0) result = "1";
+                    else if (cells[4] && cells[4].length > 0) result = "X";
+                    else if (cells[5] && cells[5].length > 0) result = "2";
+                } else if (cells.length === 5) {
+                    const teams = cells[1].split(/\s*-\s*/);
+                    home = teams[0] || "";
+                    away = teams[1] || "";
+                    if (cells[2] && cells[2].length > 0) result = "1";
+                    else if (cells[3] && cells[3].length > 0) result = "X";
+                    else if (cells[4] && cells[4].length > 0) result = "2";
+                }
+
+                // Special handling for Pleno al 15 (if results are goals)
+                if (pos === 15) {
+                    // Sometimes El Pais adds goals in the result cell for P15
+                    const goalsMatch = row.textContent.match(/(\d|M)\s*-\s*(\d|M)/);
+                    if (goalsMatch) {
+                        result = `${goalsMatch[1]}-${goalsMatch[2]}`;
                     }
+                }
+
+                if (home && away && result) {
+                    matches.push({ position: pos, home, away, result });
                 }
             });
 
-            // 3. Find Prizes (Optional)
+            // 3. Find Prizes (REPARTO DE PREMIOS)
             const prizeInfo = { minHits: 15, rates: {}, hasBote: section.textContent.toLowerCase().includes('bote') };
-            const prizeRows = section.querySelectorAll('.tabla_premios tr');
-            prizeRows.forEach(pRow => {
+            rows.forEach(pRow => {
                 const pCells = pRow.querySelectorAll('td');
-                if (pCells.length >= 2) {
-                    const catText = pCells[0].textContent;
-                    const amountText = pCells[pCells.length - 1].textContent;
+                if (pCells.length >= 3) {
+                    const catText = pCells[0].textContent; // "15 Aciertos"
+                    const amountText = pCells[pCells.length - 1].textContent; // "1.234,56"
 
                     const hitsMatch = catText.match(/(\d{2})/);
                     const amountMatch = amountText.match(/([\d\.,]+)/);
@@ -326,47 +352,17 @@ class RSSImporter {
             });
 
             if (matches.length >= 14) {
+                console.log(`DEBUG: Extracted Jornada ${dateStr} with ${matches.length} matches`);
                 results.push({
                     date: dateStr,
                     matches: matches.sort((a, b) => a.position - b.position),
-                    minHitsToWin: prizeInfo.minHits,
+                    minHitsToWin: prizeInfo.minHits || 10,
                     prizeRates: prizeInfo.rates,
                     hasBote: prizeInfo.hasBote,
-                    rawDescription: "Importado desde El Pais (Histórico)"
+                    rawDescription: "Importado desde El Pais (Table Mode)"
                 });
             }
         });
-
-        // Fallback for single draw page
-        if (results.length === 0) {
-            const rows = doc.querySelectorAll('tr');
-            const matches = [];
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 3) {
-                    const posStr = cells[0].textContent.trim();
-                    const teams = cells[1].textContent.trim();
-                    const sign = cells[2].textContent.trim().toUpperCase();
-                    const pos = posStr.includes('15') ? 15 : parseInt(posStr);
-                    if (!isNaN(pos)) {
-                        const teamParts = teams.split(/\s*-\s*/);
-                        if (teamParts.length >= 2) {
-                            matches.push({ position: pos, home: teamParts[0].trim(), away: teamParts[1].trim(), result: sign });
-                        }
-                    }
-                }
-            });
-
-            if (matches.length >= 14) {
-                const dateEl = doc.querySelector('.cabecera_sorteo, h1, h2');
-                let dateStr = "Fecha Desconocida";
-                if (dateEl) {
-                    const m = dateEl.textContent.match(/(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})/i);
-                    if (m) dateStr = `${m[1]} ${m[2]} ${m[3]}`;
-                }
-                results.push({ date: dateStr, matches: matches.sort((a, b) => a.position - b.position), minHitsToWin: 10, prizeRates: {}, hasBote: htmlText.toLowerCase().includes('bote'), rawDescription: "Importado automático" });
-            }
-        }
 
         console.log(`DEBUG: El Pais Parser finished. Found ${results.length} jornadas.`);
         return results;
