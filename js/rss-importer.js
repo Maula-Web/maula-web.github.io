@@ -189,13 +189,24 @@ class QuinielaScraper {
                 if (state.quiniela) console.log("State.quiniela keys:", Object.keys(state.quiniela)); // Debug quiniela keys
 
 
-                // Navigate commonly known paths in their Redux-like state
-                // Usually: state.quiniela.proximas OR state.quiniela.jornadas
+                // Correct Root identified: datosGeneralesQuiniela
+                const root = state.datosGeneralesQuiniela || state.quiniela || {};
+                console.log("Root Keys:", Object.keys(root)); // Debug deeper
+
                 const candidateLists = [
-                    state?.quiniela?.proximas,
-                    state?.quiniela?.calendario,
-                    state?.page?.props?.proximas // React specific sometimes
+                    root.proxima_jornada, // Often a single object, processJsonList handles single objects if wrapped
+                    root.jornadas,
+                    root.calendario,
+                    root.proximas
                 ];
+
+                // Also try to find ANY array in the root object that looks promising
+                for (const key of Object.keys(root)) {
+                    if (Array.isArray(root[key])) {
+                        candidateLists.push(root[key]);
+                    }
+                }
+
 
                 for (const list of candidateLists) {
                     if (Array.isArray(list)) {
