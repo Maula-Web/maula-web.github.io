@@ -147,3 +147,12 @@ Si ves que se puede suprimir o cambiar algo para mejorarlo, hazlo.
 Incuye controles para definir el coste de cada columna y de la columna de dobles. Puede cambiar de un año para otro.
 Sé que es un sistema muy complicado, por lo que si algo no queda claro, no dudes en preguntarlo.
 El objetivo final es saber, de cuanto dinero dispone cada socio en su bote. De cuanto dispone la Peña. Y al desglosar la información quedarán claros los movimientos de dinero dentro de la Peña. Sabremos cuánto se ha llevado a sanciones, cuánto ha ingresado cada uno en premios o particularmente, cuánto se ha dedicado a pagar sellados de columnas, etc.
+
+
+Antes de hacer nada más quiero que pruebes desde fuera de la web (por ti mismo) si puedes acceder a los canales RSS de la web de quinielas de españa. Prueba todas las formas que se te ocurran o que conozcas para intentar acceder la información tanto de partidos (PDF) como de resultados y premios (XML). Si encuentras alguna manera, de acceder, dimelo y presentame la info que puedas recuperar. Insisto. No hagas cambios en la web. Prueba desde fuera.
+Si no encuentras ninguna forma de acceder a la web de quinielas, prueba si puedes acceder a esta otra información https://www.eduardolosilla.es/quiniela/ayudas/proximas
+Aquí tienes info de las proximas jornadas.
+Si puedes acceder dime qué información reconoces y si te sirve para importar en la web (en Jornadas).
+En esta otra hoja: https://www.eduardolosilla.es/quiniela/ayudas/escrutinio
+tienes los resultados y los premios de manera histórica desde la jornada 1 u de temporadas pasadas pero es más dificil de obtener ya que cada jornada tiene su propio enlace. ¿Crees que puedes acceder a cada jornada e importar los datos que se guardan en esas hojas? Sería espectacular ya que aquí disponemos de toda la información necesaria para alimentar nuestra web.
+Insisto, no cambies nada de nuestra web. Sólo informame de si puedes y de qué resultados puedes obtener.
