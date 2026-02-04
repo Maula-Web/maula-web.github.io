@@ -103,9 +103,9 @@ class QuinielaScraper {
             let importedCount = 0;
 
             for (const jData of foundJornadas) {
-                // 1. Validate Date (Sunday)
-                if (!jData.dateObj || !this.isSunday(jData.dateObj)) {
-                    console.log(`Skipping J${jData.number}: Not Sunday (${jData.dateStr})`);
+                // 1. Validate Date (Weekend Strategy: Fri/Sat/Sun -> Sunday)
+                if (!jData.dateObj || !this.isWeekend(jData)) {
+                    console.log(`Skipping J${jData.number}: Not Weekend/Sunday (${jData.dateStr})`);
                     continue;
                 }
 
@@ -370,9 +370,41 @@ class QuinielaScraper {
         return matches.length === 15 ? matches : null;
     }
 
-    isSunday(date) {
-        // 0 = Sunday
-        return date && date.getDay() === 0;
+    /**
+     * Valida si es una jornada de fin de semana (Viernes, Sábado o Domingo).
+     * Si es Viernes o Sábado, ajusta la fecha al Domingo.
+     */
+    isWeekend(jData) {
+        if (!jData.dateObj) return false;
+
+        const day = jData.dateObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
+
+        // Domingo (0) -> OK
+        if (day === 0) return true;
+
+        // Sábado (6) -> OK, ajustamos fecha a Domingo
+        if (day === 6) {
+            jData.dateObj.setDate(jData.dateObj.getDate() + 1);
+            jData.dateStr = this.formatDate(jData.dateObj);
+            return true;
+        }
+
+        // Viernes (5) -> OK, ajustamos fecha a Domingo (+2)
+        if (day === 5) {
+            jData.dateObj.setDate(jData.dateObj.getDate() + 2);
+            jData.dateStr = this.formatDate(jData.dateObj);
+            return true;
+        }
+
+        return false;
+    }
+
+    formatDate(date) {
+        // dd-mm-yyyy
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear();
+        return `${d}-${m}-${y}`;
     }
 
     /**
