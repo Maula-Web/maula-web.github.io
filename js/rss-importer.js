@@ -208,15 +208,65 @@ class QuinielaScraper {
                 }
 
 
-                for (const list of candidateLists) {
-                    if (Array.isArray(list)) {
-                        const parsed = this.processJsonList(list);
-                        if (parsed.length > 0) results = results.concat(parsed);
-                    } else if (list && typeof list === 'object') {
-                        // Sometimes it's an object keyed by ID
-                        const parsed = this.processJsonList(Object.values(list));
-                        if (parsed.length > 0) results = results.concat(parsed);
-                    }
+                // Aggressive Search for "partidos" in any form
+                console.log("Searching for 'partidos'...");
+
+                // 1. Check for standard "partidos" array in the root object (often 'datosGeneralesQuiniela')
+                // Although not listed in keys, sometimes it's nested or I missed it.
+                // Let's rely on finding ANY key that holds the matches
+
+                let foundPartidos = null;
+
+                // Check commonly known locations again
+                if (state.partidos) foundPartidos = state.partidos;
+                if (state.quiniela && state.quiniela.partidos) foundPartidos = state.quiniela.partidos;
+
+                // If not found, look for ANY array of objects that has "local" and "visitante" keys
+                if (!foundPartidos) {
+                    const searchInObject = (obj, depth = 0) => {
+                        if (depth > 3 || !obj || typeof obj !== 'object') return null;
+
+                        // Is this array looking like matches?
+                        if (Array.isArray(obj)) {
+                            if (obj.length >= 10 && (obj[0].local || obj[0].equipo1 || obj[0].nombreLocal)) {
+                                return obj;
+                            }
+                            return null;
+                        }
+
+                        // Recurse keys
+                        for (const key of Object.keys(obj)) {
+                            // optimize: skip huge strings or irrelevant keys
+                            if (key === 'plantillaCuentaAtras' || key === 'redesSociales') continue;
+
+                            const res = searchInObject(obj[key], depth + 1);
+                            if (res) return res;
+                        }
+                        return null;
+                    };
+
+                    // Start search from root
+                    foundPartidos = searchInObject(state);
+                }
+
+                if (foundPartidos) {
+                    console.log("FOUND Matches array:", foundPartidos.length);
+
+                    // We have matches! Do we have jornada number?
+                    const jNum = root.jornada || root.id || 0;
+                    const jDate = root.fechaJornada || root.fechaFinApuestas || null;
+
+                    // Assemble artificial item
+                    const assembled = [{
+                        jornada: jNum,
+                        fecha: jDate,
+                        partidos: foundPartidos
+                    }];
+
+                    const parsed = this.processJsonList(assembled);
+                    if (parsed.length > 0) results = results.concat(parsed);
+                } else {
+                    console.log("CRITICAL: Could not find any 'partidos' array in JSON state.");
                 }
             }
         } catch (e) {
