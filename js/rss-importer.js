@@ -630,28 +630,34 @@ class QuinielaScraper {
      * Run in console: window.quinielaScraper.debugEscrutinio(35)
      */
     async debugEscrutinio(jornadaNum = 35) {
-        console.log(`Debug Escrutinio J${jornadaNum}...`);
-        const url = `${this.BASE_URL}/jornada_${jornadaNum}`;
+        // Try ElQuinielista specific URL for results
+        // Note: URL structure might be 'resultados-quiniela/jornada-X' or similar. 
+        // Let's try a likely candidate found in typical ASP.NET sites or their structure.
+        // Or better: The main 'Resultados' page often takes a parameter.
+
+        // Let's try this specific structure often used:
+        const url = `https://sl.elquinielista.com/Quinielista/resultados-quiniela/jornada-${jornadaNum}`;
+        // Backup: `https://www.elquinielista.com/Quinielista/resultados-quiniela.aspx`
+
+        console.log(`Debug Escrutinio ElQuinielista J${jornadaNum} URL: ${url}`);
         const html = await this.fetchHTML(url);
+
         if (!html) { console.log("Fetch failed"); return; }
 
+        // Clean noise
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+        const trash = doc.querySelectorAll('script, style');
+        trash.forEach(el => el.remove());
+        const text = doc.body.innerText;
+        console.log("TEXT SAMPLE:", text.substring(0, 500));
 
-        // Find element containing "14 Aciertos"
-        const allDivs = doc.querySelectorAll('div, table, tr, td');
-        let found = false;
-        for (const el of allDivs) {
-            if (el.textContent.includes('14 Aciertos') && el.textContent.length < 500) {
-                console.log("FOUND '14 Aciertos' container:", el);
-                console.log("Classes:", el.className);
-                console.log("Parent:", el.parentElement);
-                console.log("HTML:", el.outerHTML);
-                found = true;
-                // Don't break, see multiple context
-            }
+        // Search specific Prize keywords
+        if (text.includes('14 Aciertos') || text.includes('Pleno al 15')) {
+            console.log("✅ FOUND Prize Data keywords!");
+        } else {
+            console.log("❌ Prize keywords NOT found.");
         }
-        if (!found) console.log("Could not find '14 Aciertos' in text.");
     }
 }
 
