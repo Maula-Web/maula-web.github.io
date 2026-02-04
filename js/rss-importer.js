@@ -13,7 +13,8 @@ class QuinielaScraper {
         this.CORS_PROXIES = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
-            'https://api.codetabs.com/v1/proxy?quest='
+            'https://api.codetabs.com/v1/proxy?quest=',
+            'https://corsproxy.org/?'
         ];
 
         this.jornadas = [];
@@ -184,6 +185,9 @@ class QuinielaScraper {
                 const state = JSON.parse(rawJson);
 
                 console.log("State encontrado:", state); // Debug
+                console.log("State Keys:", Object.keys(state)); // Debug keys
+                if (state.quiniela) console.log("State.quiniela keys:", Object.keys(state.quiniela)); // Debug quiniela keys
+
 
                 // Navigate commonly known paths in their Redux-like state
                 // Usually: state.quiniela.proximas OR state.quiniela.jornadas
