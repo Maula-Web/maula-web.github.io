@@ -501,11 +501,23 @@ class QuinielaScraper {
     }
 
     cleanTeamName(name) {
-        return name.trim()
-            .replace(/\./g, '') // R.OVIEDO -> ROVIEDO (Maybe keep dots? No, user uses "Real Oviedo")
-            // Actually, let's keep it simple, user can edit. 
-            // Previous logic did normalization.
-            .trim();
+        let clean = name.trim().replace(/\./g, ''); // Remove dots first
+
+        // Normalization Map for ElQuinielista abbreviations
+        const map = {
+            'R Madrid': 'Real Madrid',
+            'R Sociedad': 'Real Sociedad',
+            'R Zaragoza': 'Real Zaragoza',
+            'R Oviedo': 'Real Oviedo',
+            'R Racing': 'Racing',
+            'R Sporting': 'Sporting',
+            'At Madrid': 'Atlético', // Or 'At.Madrid' depending on your icon logic, usually 'Atlético' is safer
+            'Rayo V': 'Rayo Vallecano',
+            'Espanyol': 'RCD Espanyol', // Sometimes needed
+            'Athletic': 'Athletic Club'
+        };
+
+        return map[clean] || clean;
     }
 
     async applyResultsToJornada(dbJornada, importData) {
