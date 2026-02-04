@@ -89,6 +89,8 @@ class QuinielaScraper {
 
             if (!html) throw new Error("No se pudo acceder a la web de Próximas Jornadas.");
 
+            console.log("HTML Preview:", html.substring(0, 500)); // Debug
+
             // Parse ALL found jornadas
             const foundJornadas = this.parseAllProximas(html);
 
