@@ -8,7 +8,9 @@ class QuinielaScraper {
     constructor() {
         // We use specific URLs for different tasks
         this.BASE_URL = 'https://www.eduardolosilla.es/quiniela/ayudas/escrutinio';
-        this.PROXIMAS_URL = 'https://www.eduardolosilla.es/quiniela/ayudas/proximas';
+
+        // SWITCH TO PLAN B: ElQuinielista (Server Side Rendered, reliable for scraping)
+        this.PROXIMAS_URL = 'https://www.elquinielista.com/Quinielista/calendario-quiniela';
 
         this.CORS_PROXIES = [
             'https://api.allorigins.win/raw?url=',
@@ -164,19 +166,22 @@ class QuinielaScraper {
     }
 
     /**
-     * Parses the "Proximas" page to find multiple jornadas
-     * Strategy: Text Scanning for blocks of 15 matches.
+     * Parses the "Proximas" page (now ElQuinielista) by scanning for blocks of 15 matches.
      */
     parseAllProximas(html) {
         const results = [];
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
+        // CRITICAL FIX: Remove Scripts and Styles to avoid "Noise"
+        const trash = doc.querySelectorAll('script, style, noscript, meta, link');
+        trash.forEach(el => el.remove());
+
         // Extract clean text
         const fullText = doc.body.innerText || doc.body.textContent;
         const lines = fullText.split('\n').map(l => l.trim()).filter(l => l);
 
-        console.log("DEBUG TEXT LINES (First 20):", lines.slice(0, 20)); // VER QUÉ LLEGA
+        console.log("DEBUG CLEAN LINES (First 20):", lines.slice(0, 20));
         console.log("DEBUG TEXT LINES (Lines 100-120):", lines.slice(100, 120)); // VER MÁS ABAJO
 
 
