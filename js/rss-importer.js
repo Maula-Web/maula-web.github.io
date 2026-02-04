@@ -624,6 +624,35 @@ class QuinielaScraper {
         const el = overlay.querySelector('#loader-msg');
         if (el) el.textContent = msg;
     }
+
+    /**
+     * DEBUG: Helper to inspect Prize Table structure
+     * Run in console: window.quinielaScraper.debugEscrutinio(35)
+     */
+    async debugEscrutinio(jornadaNum = 35) {
+        console.log(`Debug Escrutinio J${jornadaNum}...`);
+        const url = `${this.BASE_URL}/jornada_${jornadaNum}`;
+        const html = await this.fetchHTML(url);
+        if (!html) { console.log("Fetch failed"); return; }
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Find element containing "14 Aciertos"
+        const allDivs = doc.querySelectorAll('div, table, tr, td');
+        let found = false;
+        for (const el of allDivs) {
+            if (el.textContent.includes('14 Aciertos') && el.textContent.length < 500) {
+                console.log("FOUND '14 Aciertos' container:", el);
+                console.log("Classes:", el.className);
+                console.log("Parent:", el.parentElement);
+                console.log("HTML:", el.outerHTML);
+                found = true;
+                // Don't break, see multiple context
+            }
+        }
+        if (!found) console.log("Could not find '14 Aciertos' in text.");
+    }
 }
 
 // Global Export for buttons
