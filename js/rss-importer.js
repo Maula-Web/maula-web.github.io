@@ -161,6 +161,96 @@ class QuinielaScraper {
     }
 
     /**
+     * Parses the "Proximas" page to find multiple jornadas
+     */
+    parseAllProximas(html) {
+        const results = [];
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const fullText = doc.body.innerText || doc.body.textContent;
+        // Normalize
+        const text = fullText.replace(/\n\s*\n/g, '\n');
+
+        // Regex to find "Jornada X" and subsequent text
+        const parts = text.split(/Jornada\s+(\d+)/i);
+        // parts[0] = intro, parts[1] = num, parts[2] = content, parts[3] = num, parts[4] = content...
+
+        for (let i = 1; i < parts.length; i += 2) {
+            const num = parseInt(parts[i]);
+            const content = parts[i + 1];
+
+            // Extract Date from content (usually at start)
+            let dateStr = "Por definir";
+            let dateObj = null;
+
+            // Regex for date: dd/mm/yyyy or dd-mm-yyyy
+            const dateMatch = content.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+            if (dateMatch) {
+                dateStr = `${dateMatch[1]}-${dateMatch[2]}`; // Simple format
+                dateObj = new Date(parseInt(dateMatch[3]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]));
+            }
+
+            // Extract Matches
+            const matches = this.parseMatchesFromText(content);
+
+            if (matches.length === 15) {
+                results.push({
+                    number: num,
+                    dateStr: dateStr,
+                    dateObj: dateObj,
+                    matches: matches
+                });
+            }
+        }
+
+        return results;
+    }
+
+    parseMatchesFromText(text) {
+        const matches = [];
+        const lines = text.split('\n');
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+            // Match "1 R.MADRID - BARCELONA"
+            // Or "15 RAYO AT.MADRID" 
+            const match = trimmed.match(/^(\d{1,2})\s+([A-Z0-9\.\s]+?)\s*-\s*([A-Z0-9\.\s]+?)$/i);
+            if (match) {
+                const pos = parseInt(match[1]);
+                if (pos >= 1 && pos <= 15) {
+                    matches.push({
+                        home: this.cleanTeamName(match[2]),
+                        away: this.cleanTeamName(match[3]),
+                        result: ''
+                    });
+                }
+            } else {
+                // Try Pleno al 15 special format
+                if (trimmed.startsWith('15 ') && !matches.find(m => m.position === 15)) {
+                    // Fallback for "15 TEAM TEAM" if hyphen missing
+                    // Heuristic: Last 2 words are teams? Dangerous.
+                    // Let's rely on standard format for now.
+                    // Sometimes "15 RAYO AT.MADRID" (no hyphen but specific string)
+                    const parts = trimmed.substring(3).trim().split(/\s+/);
+                    if (parts.length >= 2) {
+                        // Assuming last word is away, rest is home?? Dictionary-based would be better.
+                        // For now skip non-standard lines to avoid garbage.
+                    }
+                }
+            }
+        }
+
+        // Remove duplicates and sort
+        const unique = [];
+        matches.forEach(m => {
+            if (!unique.find(x => x.home === m.home && x.away === m.away)) unique.push(m);
+        });
+
+        return unique.slice(0, 15);
+    }
+
+    /**
      * Generic fetch with proxy rotation
      */
     async fetchHTML(targetUrl) {
