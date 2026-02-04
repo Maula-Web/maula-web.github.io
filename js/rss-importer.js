@@ -165,37 +165,83 @@ class QuinielaScraper {
     /**
      * Parses the "Proximas" page to find multiple jornadas
      */
+    /**
+     * Parses the "Proximas" page to find multiple jornadas
+     * Strategy 1: "Hidden API" (JSON State embedded in HTML) - Most reliable
+     * Strategy 2: Raw Text Parsing - Fallback
+     */
     parseAllProximas(html) {
-        const results = [];
+        let results = [];
+
+        // STRATEGY 1: JSON State Extraction
+        try {
+            const jsonPattern = /<script id="eduardo-losilla-state" type="application\/json">([\s\S]*?)<\/script>/;
+            const match = html.match(jsonPattern);
+
+            if (match && match[1]) {
+                // Decode HTML entities if present (e.g. &q;) - rudimentary check
+                let rawJson = match[1].replace(/&q;/g, '"');
+                const state = JSON.parse(rawJson);
+
+                console.log("State encontrado:", state); // Debug
+
+                // Navigate commonly known paths in their Redux-like state
+                // Usually: state.quiniela.proximas OR state.quiniela.jornadas
+                const candidateLists = [
+                    state?.quiniela?.proximas,
+                    state?.quiniela?.calendario,
+                    state?.page?.props?.proximas // React specific sometimes
+                ];
+
+                for (const list of candidateLists) {
+                    if (Array.isArray(list)) {
+                        const parsed = this.processJsonList(list);
+                        if (parsed.length > 0) results = results.concat(parsed);
+                    } else if (list && typeof list === 'object') {
+                        // Sometimes it's an object keyed by ID
+                        const parsed = this.processJsonList(Object.values(list));
+                        if (parsed.length > 0) results = results.concat(parsed);
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("Error parsing JSON state:", e);
+        }
+
+        if (results.length > 0) {
+            console.log(`Extracted ${results.length} jornadas via JSON State.`);
+            return this.deduplicateJornadas(results);
+        }
+
+        // STRATEGY 2: Fallback to Text Parsing (Improved)
+        console.log("Fallback to Text Parsing...");
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-
         const fullText = doc.body.innerText || doc.body.textContent;
-        // Normalize
+        // Normalize newlines
         const text = fullText.replace(/\n\s*\n/g, '\n');
 
-        // Regex to find "Jornada X" and subsequent text
+        // Split explicitly by "Jornada" header
         const parts = text.split(/Jornada\s+(\d+)/i);
-        // parts[0] = intro, parts[1] = num, parts[2] = content, parts[3] = num, parts[4] = content...
 
         for (let i = 1; i < parts.length; i += 2) {
             const num = parseInt(parts[i]);
             const content = parts[i + 1];
 
-            // Extract Date from content (usually at start)
+            // Attempt to extract date
             let dateStr = "Por definir";
             let dateObj = null;
 
-            // Regex for date: dd/mm/yyyy or dd-mm-yyyy
-            const dateMatch = content.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+            // Regex for date: dd/mm/yyyy or dd-mm-yyyy or dd/mm
+            const dateMatch = content.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?/);
             if (dateMatch) {
-                dateStr = `${dateMatch[1]}-${dateMatch[2]}`; // Simple format
-                dateObj = new Date(parseInt(dateMatch[3]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]));
+                const year = dateMatch[3] ? parseInt(dateMatch[3]) : new Date().getFullYear();
+                dateStr = `${dateMatch[1]}-${dateMatch[2]}`;
+                dateObj = new Date(year, parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]));
+                // Adjust year if date is in past (crossing year boundary) - simplified for now
             }
 
-            // Extract Matches
             const matches = this.parseMatchesFromText(content);
-
             if (matches.length === 15) {
                 results.push({
                     number: num,
@@ -206,7 +252,63 @@ class QuinielaScraper {
             }
         }
 
-        return results;
+        return this.deduplicateJornadas(results);
+    }
+
+    processJsonList(list) {
+        const parsed = [];
+        for (const item of list) {
+            // Check if item looks like a jornada
+            // Need keys like 'jornada', 'partidos' array, etc.
+            if (item.jornada && item.partidos && Array.isArray(item.partidos)) {
+                // Parse date (often in 'fecha_cierre' or similar)
+                let dateObj = null;
+                let dateStr = "F.Semana";
+                if (item.fecha) {
+                    dateObj = new Date(item.fecha);
+                    dateStr = this.formatDate(dateObj);
+                }
+
+                // Parse matches
+                const matches = [];
+                // Sort by order just in case
+                const sortedPartidos = item.partidos.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+
+                // Usually we need 15 matches.
+                // item.partidos might contain objects with { local: "TeamA", visitante: "TeamB" }
+
+                let position = 1;
+                for (const p of sortedPartidos) {
+                    if (position > 15) break;
+                    matches.push({
+                        home: this.cleanTeamName(p.local || p.equipo1 || ""),
+                        away: this.cleanTeamName(p.visitante || p.equipo2 || ""),
+                        result: ''
+                    });
+                    position++;
+                }
+
+                if (matches.length >= 14) { // Allow 14 associated with standard quiniela
+                    // Ensure Pleno exists if missing? Usually 15 provided.
+                    parsed.push({
+                        number: parseInt(item.jornada),
+                        dateStr: dateStr,
+                        dateObj: dateObj,
+                        matches: matches.slice(0, 15)
+                    });
+                }
+            }
+        }
+        return parsed;
+    }
+
+    deduplicateJornadas(list) {
+        const seen = new Set();
+        return list.filter(j => {
+            if (seen.has(j.number)) return false;
+            seen.add(j.number);
+            return true;
+        });
     }
 
     parseMatchesFromText(text) {
