@@ -176,6 +176,10 @@ class QuinielaScraper {
         const fullText = doc.body.innerText || doc.body.textContent;
         const lines = fullText.split('\n').map(l => l.trim()).filter(l => l);
 
+        console.log("DEBUG TEXT LINES (First 20):", lines.slice(0, 20)); // VER QUÉ LLEGA
+        console.log("DEBUG TEXT LINES (Lines 100-120):", lines.slice(100, 120)); // VER MÁS ABAJO
+
+
         let currentMatches = [];
         let bufferJornadaInfo = { number: 0, date: null };
 
