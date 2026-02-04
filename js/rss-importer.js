@@ -1,21 +1,24 @@
 /**
- * RSS Importer for Quiniela Results
- * Imports results from official RSS feed: https://www.loteriasyapuestas.es/es/la-quiniela/resultados/.formatoRSS
+ * Quiniela Scraper & Importer
+ * Replaces old RSS and PDF importers.
+ * Scrapes data directly from EduardoLosilla.es using client-side CORS proxies.
  */
 
-class RSSImporter {
+class QuinielaScraper {
     constructor() {
-        this.RSS_URLS = [
-            'https://servicios.elpais.com/sorteos/quiniela/',
-            'https://www.loteriasyapuestas.es/es/la-quiniela/resultados/.formatoRSS'
+        // We use specific URLs for different tasks
+        this.BASE_URL = 'https://www.eduardolosilla.es/quiniela/ayudas/escrutinio';
+        this.PROXIMAS_URL = 'https://www.eduardolosilla.es/quiniela/ayudas/proximas';
+
+        this.CORS_PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest='
         ];
+
         this.jornadas = [];
-        this.rssData = [];
     }
 
-    /**
-     * Initialize and load current jornadas from database
-     */
     async init() {
         if (window.DataService) {
             await window.DataService.init();
@@ -24,907 +27,364 @@ class RSSImporter {
     }
 
     /**
-     * Fetch and parse RSS feed
-     * Uses CORS proxies to avoid CORS issues
+     * Entry point for Importing RESULTS (formerly RSS)
      */
-    async fetchRSSFeed() {
-        console.log('DEBUG: Starting RSS fetch process...');
-
-        // 1. Try LOCAL CACHE first (GitHub Actions update)
-        try {
-            console.log('DEBUG: Trying local cache...');
-            const localResponse = await fetch('datos_auxiliares/rss_cache.xml');
-            if (localResponse.ok) {
-                const text = await localResponse.text();
-                // If it's HTML from El Pais or XML, it's fine
-                if (text.trim().length > 100 && !text.includes('<!DOCTYPE html>')) {
-                    // Note: GitHub script saves El Pais HTML as rss_cache.xml too
-                }
-                try {
-                    const results = this.parseRSSXML(text);
-                    console.log('DEBUG: Successfully parsed from local cache!');
-                    return results;
-                } catch (parseErr) {
-                    console.warn('DEBUG: Local cache content failed parsing:', parseErr);
-                }
-            }
-        } catch (err) {
-            console.warn('DEBUG: Local cache fetch failed:', err);
-        }
-
-        const corsProxies = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://api.codetabs.com/v1/proxy?quest=',
-            'https://thingproxy.freeboard.io/fetch/'
-        ];
-
-        // Try each URL with each proxy
-        for (const url of this.RSS_URLS) {
-            for (const proxy of corsProxies) {
-                try {
-                    console.log(`DEBUG: Trying URL ${url} via proxy ${proxy}...`);
-                    const finalUrl = proxy + encodeURIComponent(url);
-
-                    const response = await fetch(finalUrl, {
-                        method: 'GET',
-                        headers: { 'Accept': 'text/html,application/rss+xml,application/xml,text/xml,*/*' }
-                    });
-
-                    if (response.ok) {
-                        const text = await response.text();
-                        if (text.length > 500) {
-                            try {
-                                const results = this.parseRSSXML(text);
-                                console.log('DEBUG: Successfully parsed from proxy!');
-                                return results;
-                            } catch (parseErr) {
-                                console.warn(`DEBUG: Parse failed for ${url} via ${proxy}`);
-                            }
-                        }
-                    }
-                } catch (err) {
-                    console.warn(`DEBUG: Error with proxy ${proxy} for ${url}`);
-                }
-            }
-        }
-
-        console.log('DEBUG: All automatic methods failed. Falling back to manual paste.');
-        return await this.showManualPasteDialog();
-    }
-
-    /**
-     * Show dialog to manually paste XML content
-     */
-    async showManualPasteDialog() {
-        return new Promise((resolve, reject) => {
-            // Create OVERLAY first (which centers content)
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay active';
-            overlay.id = 'manual-paste-overlay';
-
-            // Create MODAL inside overlay
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: var(--primary-blue); margin-bottom: 1rem;">📋 Pegar Resultados Manualmente</h2>
-                    <p style="margin-bottom: 1rem; color: #666;">
-                        No se pudo acceder automáticamente a ninguna fuente (bloqueo de seguridad). Por favor, hazlo manualmente:
-                    </p>
-                    <ol style="text-align: left; margin-bottom: 1rem; color: #666; padding-left: 1.5rem;">
-                        <li>Abre la web de resultados de <a href="https://servicios.elpais.com/sorteos/quiniela/" target="_blank" style="color: var(--primary-blue); font-weight: bold;">EL PAÍS pinchando aquí</a></li>
-                        <li>Pulsa <strong>Ctrl+U</strong> (o haz clic derecho -> Ver código fuente)</li>
-                        <li>Copia TODO el texto (Ctrl+A, Ctrl+C) y pégalo en el cuadro de abajo</li>
-                    </ol>
-                    <textarea id="manual-xml-input" style="width: 100%; height: 200px; font-family: monospace; font-size: 0.85rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" placeholder="Pega aquí el contenido XML..." spellcheck="false"></textarea>
-                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
-                        <button id="cancel-manual-paste" class="btn-secondary" style="padding: 0.75rem 1.5rem;">Cancelar</button>
-                        <button id="confirm-manual-paste" class="btn-primary" style="padding: 0.75rem 1.5rem;">Continuar</button>
-                    </div>
-                </div>
-            `;
-
-            overlay.appendChild(modal);
-            document.body.appendChild(overlay);
-
-            const cancelBtn = modal.querySelector('#cancel-manual-paste');
-            const confirmBtn = modal.querySelector('#confirm-manual-paste');
-            const textarea = modal.querySelector('#manual-xml-input');
-
-            // Close function
-            const close = () => {
-                overlay.classList.remove('active');
-                setTimeout(() => overlay.remove(), 300);
-            };
-
-            cancelBtn.addEventListener('click', () => {
-                close();
-                reject(new Error('Importación cancelada por el usuario'));
-            });
-
-            confirmBtn.addEventListener('click', () => {
-                const xmlText = textarea.value.trim();
-                if (!xmlText) {
-                    alert('Por favor, pega el contenido XML');
-                    return;
-                }
-                close();
-                try {
-                    // Try to clean XML first if it seems to have browser artifacts
-                    const cleanedXml = this.cleanXML(xmlText);
-                    const results = this.parseRSSXML(cleanedXml);
-                    resolve(results);
-                } catch (err) {
-                    console.error('Manual paste parse failed:', err);
-                    reject(new Error('Error al parsear el XML: ' + err.message));
-                }
-            });
-
-            // Close on overlay click
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
-                    close();
-                    reject(new Error('Importación cancelada por el usuario'));
-                }
-            });
-        });
-    }
-
-    /**
-     * Parse XML text and extract jornada results
-     */
-    parseRSSXML(xmlText) {
-        console.log('DEBUG: Parsing XML/HTML content, length:', xmlText.length);
-
-        // Check if it's El Pais HTML or standard RSS
-        if (xmlText.includes('elpais.com') || xmlText.includes('cabecera_sorteo')) {
-            console.log('DEBUG: Detected El Pais HTML format');
-            return this.parseElPaisHTML(xmlText);
-        }
-
-        const parser = new DOMParser();
-        let xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-
-        // Check for parsing errors
-        let parserError = xmlDoc.querySelector('parsererror');
-        if (parserError) {
-            console.warn('DEBUG: XML parsing error initially, trying to clean...', parserError.textContent);
-            const cleaned = this.cleanXML(xmlText);
-            xmlDoc = parser.parseFromString(cleaned, 'text/xml');
-            parserError = xmlDoc.querySelector('parsererror');
-        }
-
-        if (parserError) {
-            console.error('DEBUG: XML parsing error remains:', parserError.textContent);
-            throw new Error('El XML no es válido. Asegúrate de copiar el código fuente (Ctrl+U) completo.');
-        }
-
-        const items = xmlDoc.querySelectorAll('item');
-        console.log('DEBUG: Found', items.length, 'items in RSS');
-
-        const results = [];
-
-        items.forEach((item, index) => {
-            const title = item.querySelector('title')?.textContent || '';
-            const description = item.querySelector('description')?.textContent || '';
-
-            console.log(`DEBUG: Item ${index + 1}:`, { title: title.substring(0, 100) });
-
-            // Extract date from title: "La Quiniela: premios y ganadores del 21 de diciembre de 2025"
-            const dateMatch = title.match(/del (\d{1,2}) de (\w+) de (\d{4})/);
-            if (!dateMatch) {
-                console.log(`DEBUG: Item ${index + 1}: No date match in title`);
-                return;
-            }
-
-            const day = dateMatch[1];
-            const monthName = dateMatch[2];
-            const year = dateMatch[3];
-
-            console.log(`DEBUG: Item ${index + 1}: Extracted date: ${day} ${monthName} ${year}`);
-
-            // Parse matches from description
-            const matches = this.parseMatches(description);
-            console.log(`DEBUG: Item ${index + 1}: Found ${matches.length} matches`);
-
-            if (matches.length === 0) {
-                console.log(`DEBUG: Item ${index + 1}: Skipping - no matches found`);
-                return;
-            }
-
-            // Parse Prize Info
-            const prizeInfo = this.parsePrizeRates(description);
-
-            results.push({
-                date: `${day} ${monthName} ${year}`,
-                matches: matches,
-                minHitsToWin: prizeInfo.minHits,
-                prizeRates: prizeInfo.rates,
-                hasBote: prizeInfo.hasBote,
-                rawDescription: description
-            });
-        });
-
-        console.log('DEBUG: Total results parsed:', results.length);
-        return results;
-    }
-
-    /**
-     * Specialized parser for El Pais Quiniela Page
-     * Structure: [Number, Team 1, Team 2, Sign 1, Sign X, Sign 2]
-     */
-    parseElPaisHTML(htmlText) {
-        console.log('DEBUG: Starting parseElPaisHTML (User-defined structure)...');
-        const results = [];
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlText, 'text/html');
-
-        // Identify sections by looking for classes like '.sorteo', '.caja', or '.laquiniela'
-        const sections = doc.querySelectorAll('.sorteo, .caja, .laquiniela, section');
-        const entries = sections.length > 0 ? Array.from(sections) : [doc.body];
-        console.log(`DEBUG: Found ${entries.length} potential sections to parse.`);
-
-        entries.forEach((section, sIdx) => {
-            // 1. Find Date
-            let dateStr = "";
-            // Look for <div class="fecha">
-            const fechaEl = section.querySelector('.fecha');
-            if (fechaEl) {
-                const text = fechaEl.textContent.trim().toLowerCase();
-                // Matches "domingo 01/02/2026" or "1 de febrero..."
-                const m = text.match(/(\d{1,2})[\/\-s]+(\d{1,2})[\/\-s]+(\d{4})/) ||
-                    text.match(/(\d{1,2})\s+de\s+([a-zñáéíóú]+)\s+de\s+(\d{4})/i);
-                if (m) {
-                    if (m[2].length > 2) dateStr = `${m[1]} ${m[2]} ${m[3]}`;
-                    else dateStr = `${m[1]}/${m[2]}/${m[3]}`;
-                }
-            }
-
-            if (!dateStr) {
-                // Try headers
-                const headers = section.querySelectorAll('h1, h2, h3');
-                for (const h of headers) {
-                    const text = h.textContent.trim().toLowerCase();
-                    const m = text.match(/(\d{1,2})\s+de\s+([a-zñáéíóú]+)\s+de\s+(\d{4})/i);
-                    if (m) { dateStr = `${m[1]} ${m[2]} ${m[3]}`; break; }
-                }
-            }
-
-            if (!dateStr) return;
-
-            // Avoid duplicates: If we already have a result for this exact raw date string, skip
-            if (results.find(r => r.date === dateStr)) return;
-
-            // 2. Find Match Table
-            const matches = [];
-            const rows = section.querySelectorAll('tr');
-
-            rows.forEach((row) => {
-                const cells = Array.from(row.querySelectorAll('td, th')).map(c => c.textContent.trim().replace(/\u00a0/g, ' ').trim());
-                if (cells.length < 4) return;
-
-                // First cell should be a number (1 to 15)
-                const posStr = cells[0].match(/(\d{1,2})/);
-                if (!posStr) return;
-                const pos = parseInt(posStr[1]);
-                if (pos < 1 || pos > 15) return;
-
-                let home = "", away = "", result = "";
-
-                // Heuristic for El Pais table:
-                if (cells.length >= 6) {
-                    home = cells[1];
-                    away = cells[2];
-                    // Check columns 3, 4, 5 for the result. Must not be empty or just space/&nbsp;
-                    if (cells[3] && cells[3].length > 0) result = "1";
-                    else if (cells[4] && cells[4].length > 0) result = "X";
-                    else if (cells[5] && cells[5].length > 0) result = "2";
-                } else if (cells.length === 5) {
-                    const teams = cells[1].split(/\s*-\s*/);
-                    home = teams[0] || "";
-                    away = teams[1] || "";
-                    if (cells[2] && cells[2].length > 0) result = "1";
-                    else if (cells[3] && cells[3].length > 0) result = "X";
-                    else if (cells[4] && cells[4].length > 0) result = "2";
-                }
-
-                // Special handling for Pleno al 15 goals
-                if (pos === 15) {
-                    const goalsMatch = row.textContent.match(/(\d|M)\s*-\s*(\d|M)/);
-                    if (goalsMatch) result = `${goalsMatch[1]}-${goalsMatch[2]}`;
-                }
-
-                if (home && away && result) {
-                    matches.push({ position: pos, home, away, result });
-                }
-            });
-
-            // 3. Find Prizes
-            const prizeInfo = { minHits: 15, rates: {}, hasBote: section.textContent.toLowerCase().includes('bote') };
-            rows.forEach(pRow => {
-                const pCells = pRow.querySelectorAll('td');
-                if (pCells.length >= 2) {
-                    const catText = pCells[0].textContent;
-                    const amountText = pCells[pCells.length - 1].textContent;
-
-                    const hitsMatch = catText.match(/(\d{2})/);
-                    const amountMatch = amountText.match(/([\d\.,]+)/);
-                    if (hitsMatch && amountMatch) {
-                        const hits = parseInt(hitsMatch[1]);
-                        const val = parseFloat(amountMatch[1].replace(/\./g, '').replace(',', '.'));
-                        if (!isNaN(val) && val > 0) {
-                            prizeInfo.rates[hits] = val;
-                            if (hits < prizeInfo.minHits) prizeInfo.minHits = hits;
-                        }
-                    }
-                }
-            });
-
-            if (matches.length >= 14) {
-                console.log(`DEBUG: Extracted Jornada ${dateStr} with ${matches.length} matches`);
-                results.push({
-                    date: dateStr,
-                    matches: matches.sort((a, b) => a.position - b.position),
-                    minHitsToWin: prizeInfo.minHits || 10,
-                    prizeRates: prizeInfo.rates,
-                    hasBote: prizeInfo.hasBote,
-                    rawDescription: "Importado desde El Pais"
-                });
-            }
-        });
-
-        console.log(`DEBUG: El Pais Parser finished. Found ${results.length} jornadas.`);
-        // LOG the data as requested by user
-        if (results.length > 0) {
-            console.log('--- DETALLE DE DATOS ENCONTRADOS ---');
-            results.forEach(r => {
-                console.log(`Fecha: ${r.date}`);
-                console.log(`Partidos: ${r.matches.length}`);
-                console.log('Resultados:', r.matches.map(m => `${m.position}: ${m.result}`).join(', '));
-            });
-            console.log('------------------------------------');
-        }
-        return results;
-    }
-
-    /**
-     * Parse description to extract prize amounts for each category
-     * Returns { minHits, rates: { "10": 1.5, "11": 5.2, ... } }
-     */
-    parsePrizeRates(description) {
-        let minHits = 15;
-        const rates = {};
-        let hasBote = false;
-
-        // Normalize
-        const text = description.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
-
-        // Check for explicit "Bote" mention
-        if (text.toLowerCase().includes('bote') || text.toLowerCase().includes('jackpot')) {
-            hasBote = true;
-        }
-
-        // 1. SPECIFIC FORMAT (User feedback): "5ª (10 Aciertos) 166.699 2,65 €"
-        // Also captures: "Especial (Pleno al 15) 0 0,00 €"
-        const specificRegex = /(\d+|Especial)\s*\((?:Pleno\s+al\s+15|(\d+)\s+Aciertos)\)\s+[\d\.,]+\s+([\d\.,]+)\s*(?:Euros|€)/gi;
-        let sMatch;
-        let foundSpecific = false;
-        while ((sMatch = specificRegex.exec(text)) !== null) {
-            const hits = sMatch[1] === 'Especial' ? 15 : parseInt(sMatch[2]);
-            const prizeVal = parseFloat(sMatch[3].replace(/\./g, '').replace(',', '.'));
-
-            if (!isNaN(hits) && !isNaN(prizeVal) && prizeVal > 0) {
-                rates[hits] = prizeVal;
-                if (hits < minHits) minHits = hits;
-                foundSpecific = true;
-            }
-            if (hits === 15 && prizeVal === 0) hasBote = true;
-        }
-
-        // 2. FALLBACK: If specific matches didn't work, use the looser logic
-        if (!foundSpecific) {
-            const regexHits = /(\d{1,2})\s*Aciertos/gi;
-            let mHits;
-            while ((mHits = regexHits.exec(text)) !== null) {
-                const hits = parseInt(mHits[1]);
-                const searchSlice = text.substring(mHits.index, mHits.index + 200);
-                const prizeMatch = searchSlice.match(/([\d\.,]+)\s*(?:Euros|€)/i);
-                if (prizeMatch) {
-                    const prizeVal = parseFloat(prizeMatch[1].replace(/\./g, '').replace(',', '.'));
-                    if (hits >= 10 && hits <= 14 && !isNaN(prizeVal) && prizeVal > 0) {
-                        rates[hits] = prizeVal;
-                        if (hits < minHits) minHits = hits;
-                    }
-                }
-            }
-            const p15Marker = text.match(/(?:Pleno\s+al\s+15|P15)/i);
-            if (p15Marker) {
-                const searchSlice = text.substring(p15Marker.index, p15Marker.index + 200);
-                const prizeMatch = searchSlice.match(/([\d\.,]+)\s*(?:Euros|€)/i);
-                if (prizeMatch) {
-                    const prizeVal = parseFloat(prizeMatch[1].replace(/\./g, '').replace(',', '.'));
-                    if (!isNaN(prizeVal) && prizeVal > 0) {
-                        rates[15] = prizeVal;
-                        if (15 < minHits) minHits = 15;
-                    }
-                }
-            }
-        }
-
-        // Final sanity check: if we have prize rates for 10 but minHits stayed 15
-        if (rates[10] && minHits > 10) minHits = 10;
-
-        console.log(`DEBUG: Parsed prize rates:`, rates, 'Has Bote:', hasBote, 'MinHits:', minHits);
-        return { minHits, rates, hasBote };
-    }
-
-    /**
-     * Parse match results from description text
-     */
-    parseMatches(description) {
-        const matches = [];
-
-        // Normalize description: replace <br/> or equivalents with newlines
-        // If it's already text, it might have them as literal or spaces
-        const normalizedDesc = description
-            .replace(/<br\s*\/?>/gi, '\n')
-            .replace(/&nbsp;/g, ' ');
-
-        const lines = normalizedDesc.split('\n');
-
-        // Pattern for a single match: "1 Team A - Team B 1"
-        const singleMatchPattern = /^(Pleno al 15|\d{1,2})[^\w\s]*\s+(.+?)\s+-\s+(.+?)\s+([12XM]|M\s*-\s*\d+|\d+\s*-\s*\d+)\s*$/i;
-
-        for (const line of lines) {
-            const trimmedLine = line.trim();
-            if (!trimmedLine) continue;
-
-            const match = trimmedLine.match(singleMatchPattern);
-
-            if (match) {
-                const position = match[1];
-                const home = match[2].trim();
-                const away = match[3].trim();
-                let result = match[4].trim();
-
-                // Normalize result format
-                if (result.includes('-')) {
-                    result = result.replace(/\s/g, '');
-                }
-
-                matches.push({
-                    position: position === 'Pleno al 15' ? 15 : parseInt(position),
-                    home: home,
-                    away: away,
-                    result: result
-                });
-            } else {
-                // FALLBACK: If the line has multiple matches because newlines were lost
-                // We look for patterns like "1 Team - Team X 2 Team - Team 1"
-                // This regex is more complex as it needs to be global
-                const globalPattern = /(Pleno al 15|\d{1,2})\s+([^-]+?)\s+-\s+(.+?)\s+([12XM]|M-\d+|\d+-\d+|M\s-\s\d+|\d\s-\s\d)(?=\s+(?:Pleno al 15|\d{1,2})|$)/gi;
-                let gMatch;
-                while ((gMatch = globalPattern.exec(trimmedLine)) !== null) {
-                    const pos = gMatch[1];
-                    const home = gMatch[2].trim();
-                    const away = gMatch[3].trim();
-                    let res = gMatch[4].trim();
-
-                    if (res.includes('-')) res = res.replace(/\s/g, '');
-
-                    // Avoid duplicates if already added by line split
-                    const posNum = pos === 'Pleno al 15' ? 15 : parseInt(pos);
-                    if (!matches.find(m => m.position === posNum)) {
-                        matches.push({
-                            position: posNum,
-                            home: home,
-                            away: away,
-                            result: res
-                        });
-                    }
-                }
-            }
-        }
-
-        return matches.sort((a, b) => a.position - b.position);
-    }
-
-    /**
-     * Clean XML from browser artifacts
-     */
-    cleanXML(xmlText) {
-        if (!xmlText) return '';
-
-        // 1. Remove browser +/- buttons (common if copied from rendered view)
-        let cleaned = xmlText.replace(/^\s*[-+]\s*</gm, '<');
-
-        // 2. Remove leading/trailing garbage
-        cleaned = cleaned.trim();
-
-        // 3. If it doesn't start with <, try to find the start
-        if (cleaned[0] !== '<') {
-            const startIdx = cleaned.indexOf('<');
-            if (startIdx !== -1) cleaned = cleaned.substring(startIdx);
-        }
-
-        // 4. Basic entity fixes
-        cleaned = cleaned.replace(/&nbsp;/g, ' ');
-
-        return cleaned;
-    }
-
-    /**
-     * Find jornadas that need results imported
-     */
-    async findJornadasToImport() {
+    async startResultImport() {
         await this.init();
-        const rssResults = await this.fetchRSSFeed();
 
-        console.log('DEBUG: RSS Results:', rssResults.map(r => r.date));
-        console.log('DEBUG: DB Jornadas:', this.jornadas.map(j => ({ num: j.number, date: j.date })));
+        // Find active or incomplete jornadas
+        const candidates = this.jornadas.filter(j => {
+            // Filter out fully completed ones (15 results)
+            const completed = j.matches ? j.matches.filter(m => m.result && m.result.trim()).length : 0;
+            return completed < 15 && j.active !== false;
+        });
 
-        const toImport = [];
+        if (candidates.length === 0) {
+            alert('Todas las jornadas activas están completas. No hay nada que actualizar.');
+            return;
+        }
 
-        for (const rssJornada of rssResults) {
-            // Find matching jornada in database by date
-            const dbJornada = this.findMatchingJornada(rssJornada.date);
+        const loadingOverlay = this.showLoading('Buscando resultados en EduardoLosilla.es...');
+        let updates = 0;
 
-            console.log(`DEBUG: RSS date "${rssJornada.date}" -> DB match:`, dbJornada ? `Jornada ${dbJornada.number}` : 'NO MATCH');
+        try {
+            for (const jornada of candidates) {
+                this.updateLoading(loadingOverlay, `Consultando Jornada ${jornada.number}...`);
 
-            if (dbJornada) {
-                // WE SKIP re-importing if results are already complete (15/15)
-                const completedCount = dbJornada.matches ? dbJornada.matches.filter(m => m.result && m.result.trim() !== '').length : 0;
-                if (completedCount === 15) {
-                    console.log(`DEBUG: Skipping J${dbJornada.number} - already has 15 results.`);
+                // Construct URL: .../jornada_X
+                const url = `${this.BASE_URL}/jornada_${jornada.number}`;
+                const html = await this.fetchHTML(url);
+
+                if (html) {
+                    const results = this.parseResultsFromHTML(html, jornada.number);
+                    if (results && results.matches.length > 0) {
+                        const updated = await this.applyResultsToJornada(jornada, results);
+                        if (updated) updates++;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error durante la importación: ' + e.message);
+        } finally {
+            loadingOverlay.remove();
+            if (updates > 0) {
+                alert(`✅ Se han actualizado ${updates} jornadas con nuevos resultados.`);
+                window.location.reload(); // Refresh grid
+            } else {
+                alert('⚠️ No se encontraron nuevos resultados disponibles para las jornadas pendientes.');
+            }
+        }
+    }
+
+    /**
+     * Entry point for Importing MATCHES (formerly PDF)
+     * Auto-imports ALL upcoming valid jornadas (Sunday + 1st/2nd Div)
+     */
+    async startMatchImport() {
+        const loadingOverlay = this.showLoading('Buscando próximas jornadas...');
+
+        try {
+            const html = await this.fetchHTML(this.PROXIMAS_URL);
+
+            if (!html) throw new Error("No se pudo acceder a la web de Próximas Jornadas.");
+
+            // Parse ALL found jornadas
+            const foundJornadas = this.parseAllProximas(html);
+
+            if (foundJornadas.length === 0) {
+                throw new Error("No se encontraron jornadas en la página de Próximas.");
+            }
+
+            console.log(`DEBUG: Encontradas ${foundJornadas.length} jornadas candidatas.`);
+
+            // Filter relevant ones (Sunday + Logic)
+            await this.init(); // Refresh DB
+            let importedCount = 0;
+
+            for (const jData of foundJornadas) {
+                // 1. Validate Date (Sunday)
+                if (!jData.dateObj || !this.isSunday(jData.dateObj)) {
+                    console.log(`Skipping J${jData.number}: Not Sunday (${jData.dateStr})`);
                     continue;
                 }
 
-                // Check if teams match (at least some of them)
-                const teamsMatch = this.checkTeamsMatch(dbJornada, rssJornada);
+                // 2. Validate League (Heavy check for Spanish Teams)
+                // This prevents importing Premier League or International Breaks
+                if (!this.isSpanishLeague(jData.matches)) {
+                    console.log(`Skipping J${jData.number}: Not Spanish League (Detected teams: ${jData.matches[0].home} vs ${jData.matches[0].away}...)`);
+                    continue;
+                }
 
-                toImport.push({
-                    jornadaId: dbJornada.id,
-                    jornadaNumber: dbJornada.number,
-                    jornadaDate: dbJornada.date,
-                    rssDate: rssJornada.date,
-                    rssMatches: rssJornada.matches,
-                    dbMatches: JSON.parse(JSON.stringify(dbJornada.matches)),
-                    minHitsToWin: rssJornada.minHitsToWin,
-                    prizeRates: rssJornada.prizeRates,
-                    hasBote: rssJornada.hasBote,
-                    teamsMatch: teamsMatch,
-                    confidence: teamsMatch ? 'high' : 'low'
-                });
+                // 3. Already exists? Update matches if empty
+                const existing = this.jornadas.find(j => j.number === jData.number);
+                if (existing) {
+                    // Update only if existing has no matches or we want to refresh
+                    // Let's assume we overwrite matches if they are placeholders? 
+                    // User wants "import" so likely update or create.
+                    existing.matches = jData.matches;
+                    // Update date if "Pending"
+                    if (existing.date === 'Por definir' || existing.date.includes('Pendiente')) {
+                        existing.date = jData.dateStr;
+                    }
+                    await window.DataService.save('jornadas', existing);
+                    importedCount++;
+                } else {
+                    // Create new
+                    const newJornada = {
+                        id: Date.now() + jData.number, // Ensure unique ID
+                        number: jData.number,
+                        season: '2025-2026',
+                        date: jData.dateStr,
+                        matches: jData.matches,
+                        active: true
+                    };
+                    await window.DataService.save('jornadas', newJornada);
+                    importedCount++;
+                }
             }
-        }
 
-        return toImport;
+            loadingOverlay.remove();
+
+            if (importedCount > 0) {
+                alert(`✅ Se han importado/actualizado ${importedCount} jornadas de Domingo.`);
+                window.location.reload();
+            } else {
+                alert('⚠️ Se encontraron jornadas pero ninguna cumplía los requisitos (Domingo).');
+            }
+
+        } catch (e) {
+            loadingOverlay.remove();
+            console.error(e);
+            alert('Error al importar partidos: ' + e.message);
+        }
     }
 
     /**
-     * Find matching jornada in database by date
+     * Generic fetch with proxy rotation
      */
-    findMatchingJornada(rssDateStr) {
-        // Parse RSS date: "21 diciembre 2025"
-        const rssDate = AppUtils.parseDate(rssDateStr);
-
-        if (!rssDate) {
-            console.log(`DEBUG: Could not parse RSS date: "${rssDateStr}"`);
-            return null;
-        }
-
-        console.log(`DEBUG: Parsed RSS date "${rssDateStr}" -> ${rssDate.toDateString()}`);
-
-        // Improved Matching: Date +/- 2 days AND team check
-        for (const jornada of this.jornadas) {
-            const jornadaDate = AppUtils.parseDate(jornada.date);
-            if (jornadaDate) {
-                const diffDays = Math.abs(rssDate - jornadaDate) / (1000 * 60 * 60 * 24);
-
-                // If same day, high confidence
-                if (diffDays === 0) return jornada;
-
-                // If within 2 days, only match if it's the closest one or we have no other
-                // But let's actually let findJornadasToImport handle the team check
-                if (diffDays <= 2.1) {
-                    return jornada;
+    async fetchHTML(targetUrl) {
+        for (const proxy of this.CORS_PROXIES) {
+            try {
+                const finalUrl = proxy + encodeURIComponent(targetUrl);
+                console.log(`Trying ${finalUrl}...`);
+                const response = await fetch(finalUrl);
+                if (response.ok) {
+                    const text = await response.text();
+                    if (text.length > 500) return text;
                 }
+            } catch (e) {
+                console.warn(`Proxy ${proxy} failed`, e);
             }
         }
-
-        console.log(`DEBUG: ✗ NO MATCH for RSS date "${rssDateStr}"`);
         return null;
     }
 
     /**
-     * Check if two dates are the same day
+     * Parse Results (1, X, 2) from HTML using the "m-resultado" class
+     * Confirmed strategy.
      */
-    isSameDate(date1, date2) {
-        return date1.getFullYear() === date2.getFullYear() &&
-            date1.getMonth() === date2.getMonth() &&
-            date1.getDate() === date2.getDate();
+    parseResultsFromHTML(html, jornadaNumber) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Find buttons with class "m-resultado"
+        const resultBtns = Array.from(doc.querySelectorAll('.m-resultado'));
+
+        if (resultBtns.length === 0) return null;
+
+        console.log(`Found ${resultBtns.length} result buttons for J${jornadaNumber}`);
+
+        const matches = [];
+
+        // Pattern: id="1_1" -> first number is match index (1-based usually, check logic)
+        // Wait, earlier inspection showed IDs like "1_1", "2_1", "3_0"... 
+        // AND order in DOM usually follows match order.
+
+        // Let's rely on data-casilla or text content
+        // Also need to map to position 1-15.
+        // We assume they appear in order 1..15
+
+        // Filter unique matches (in case duplicates exist for UI reasons)
+        // But usually it's one board per match.
+
+        // Let's try to grab the parent row or just iterate
+        // The previous analysis showed they are inside "c-detalle-partido-simple" or similar containers?
+        // Actually, just taking the first 15 valid occurrences might work if the page structure is linear.
+
+        // Better: Find the match containers to ensure order
+        // The match name container: c-detalle-partido-simple__equipos__equipo__nombre
+
+        // Let's stick to the simplest proven "salmon" class content for now
+        // Format: { position: 1, result: 'X' }
+
+        for (let i = 0; i < Math.min(resultBtns.length, 15); i++) {
+            const btn = resultBtns[i];
+            let res = btn.getAttribute('data-casilla') || btn.textContent.trim();
+
+            // Normalize
+            if (res === '1') res = '1';
+            else if (res === '2') res = '2';
+            else if (res === 'X' || res === 'x') res = 'X';
+
+            matches.push({
+                position: i + 1,
+                result: res
+            });
+        }
+
+        return { matches };
     }
 
     /**
-     * Check if teams in RSS match teams in database
+     * Parse Matches (Teams) from HTML
+     * Looks for team names in the structure
      */
-    checkTeamsMatch(dbJornada, rssJornada) {
-        if (!dbJornada.matches || dbJornada.matches.length === 0) return false;
-        if (!rssJornada.matches || rssJornada.matches.length === 0) return false;
+    parseMatchesFromHTML(html, targetJornadaNum) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const matches = [];
+
+        // Try to find the specific blocks
+        // Based on previous view_file: c-detalle-partido-simple__equipos__equipo__nombre
+        const nameElements = doc.querySelectorAll('.c-detalle-partido-simple__equipos__equipo__nombre');
+
+        if (nameElements.length >= 30) {
+            // We have pairs. 0=Home1, 1=Away1, 2=Home2...
+            for (let i = 0; i < 15; i++) {
+                const homeIdx = i * 2;
+                const awayIdx = i * 2 + 1;
+
+                if (nameElements[homeIdx] && nameElements[awayIdx]) {
+                    matches.push({
+                        home: this.cleanTeamName(nameElements[homeIdx].textContent),
+                        away: this.cleanTeamName(nameElements[awayIdx].textContent),
+                        result: ''
+                    });
+                }
+            }
+        } else {
+            // Fallback for "Proximas" list if structure is different
+            // Often lists are "1. TeamA - TeamB" text
+            // Try searching text content with regex
+            const text = doc.body.textContent;
+            const regex = new RegExp(`^\\s*${targetJornadaNum}\\s*[\\r\\n]+`, 'm'); // Find header "Jornada X"
+            // This is hard on raw text.
+
+            // Any table with "Partidos" class?
+            // "tabla-partidos"?
+            console.warn("Could not find standard match blocks. Trying fallback text search...");
+        }
+
+        return matches.length === 15 ? matches : null;
+    }
+
+    isSunday(date) {
+        // 0 = Sunday
+        return date && date.getDay() === 0;
+    }
+
+    /**
+     * Heuristic: Check if > 50% of teams are recognized Spanish teams
+     */
+    isSpanishLeague(matches) {
+        if (!matches || matches.length === 0) return false;
+
+        const spanishTeams = [
+            'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
+            'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
+            'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'LAS PALMAS', 'LEGANÉS',
+            'ESPANYOL', 'VALLADOLID', 'RACING', 'EIBAR', 'OVIEDO', 'R.OVIEDO', 'SPORTING',
+            'ZARAGOZA', 'BURGOS', 'MIRANDÉS', 'LEVANTE', 'TENERIFE', 'HUESCA', 'ALBACETE',
+            'CARTAGENA', 'FERROL', 'CASTELLÓN', 'CÓRDOBA', 'MÁLAGA', 'ELDA', 'ELDENSE',
+            'ALMERÍA', 'CÁDIZ', 'GRANADA'
+        ];
 
         let matchCount = 0;
-        const totalMatches = Math.min(dbJornada.matches.length, rssJornada.matches.length);
+        let totalTeams = matches.length * 2; // Home and Away for 15 matches
 
-        for (let i = 0; i < totalMatches; i++) {
-            const dbMatch = dbJornada.matches[i];
-            const rssMatch = rssJornada.matches[i];
+        for (const m of matches) {
+            const home = m.home.toUpperCase();
+            const away = m.away.toUpperCase();
 
-            if (AppUtils.normalizeName(dbMatch.home) === AppUtils.normalizeName(rssMatch.home) &&
-                AppUtils.normalizeName(dbMatch.away) === AppUtils.normalizeName(rssMatch.away)) {
-                matchCount++;
+            // Simple substring check (e.g. "REAL MADRID" matches "MADRID"?) No, better be explicit.
+            // Our scraper returns "R.MADRID", "ATH.CLUB".
+            // Let's check includes or startsWith to be flexible.
+
+            const isSpanishHome = spanishTeams.some(t => home.includes(t));
+            const isSpanishAway = spanishTeams.some(t => away.includes(t));
+
+            if (isSpanishHome) matchCount++;
+            if (isSpanishAway) matchCount++;
+        }
+
+        const percentage = matchCount / totalTeams;
+        // If at least 40% of teams are recognized, it's Spanish league. 
+        // (Premier League or Serie A would have close to 0%)
+        return percentage > 0.4;
+    }
+
+    cleanTeamName(name) {
+        return name.trim()
+            .replace(/\./g, '') // R.OVIEDO -> ROVIEDO (Maybe keep dots? No, user uses "Real Oviedo")
+            // Actually, let's keep it simple, user can edit. 
+            // Previous logic did normalization.
+            .trim();
+    }
+
+    async applyResultsToJornada(dbJornada, importData) {
+        let changed = false;
+
+        for (const impMatch of importData.matches) {
+            // Find match at position (0-indexed in array vs 1-indexed import)
+            const idx = impMatch.position - 1;
+
+            if (dbJornada.matches[idx]) {
+                const current = dbJornada.matches[idx].result;
+                const imported = impMatch.result;
+
+                if (imported && imported !== current) {
+                    dbJornada.matches[idx].result = imported;
+                    changed = true;
+                }
             }
         }
 
-        // Consider it a match if at least 70% of teams match
-        return (matchCount / totalMatches) >= 0.7;
-    }
-
-    /**
-     * Import results into database
-     */
-    async importResults(importData) {
-        const imported = [];
-
-        for (const item of importData) {
-            const jornada = this.jornadas.find(j => j.id === item.jornadaId);
-            if (!jornada) continue;
-
-            // Update matches with results
-            for (let i = 0; i < Math.min(jornada.matches.length, item.rssMatches.length); i++) {
-                if (jornada.matches[i]) {
-                    jornada.matches[i].result = item.rssMatches[i].result;
-                }
-            }
-
-            // Update minimum hits and rates if available
-            if (item.minHitsToWin) jornada.minHitsToWin = item.minHitsToWin;
-            if (item.prizeRates) jornada.prizeRates = item.prizeRates;
-            if (item.hasBote !== undefined) jornada.hasBote = item.hasBote;
-
-            // Save to database
+        if (changed) {
             if (window.DataService) {
-                await window.DataService.save('jornadas', jornada);
+                await window.DataService.save('jornadas', dbJornada);
             }
 
-            // TELEGRAM REPORT TRIGGER (only if Jornada was NOT finished before and IS finished now)
-            const wasFinished = item.dbMatches && item.dbMatches.length === 15 && item.dbMatches.every(m => m.result && m.result.trim() !== '');
-            const isFinishedNow = jornada.matches && jornada.matches.length === 15 && jornada.matches.every(m => m.result && m.result.trim() !== '');
-
-            if (!wasFinished && isFinishedNow && window.TelegramService) {
+            // Check for completion & Telegram
+            const isFinished = dbJornada.matches.every(m => m.result && m.result.trim() !== '');
+            if (isFinished && window.TelegramService) {
                 try {
-                    await window.TelegramService.sendJornadaReport(jornada.id);
-                    console.log(`DEBUG: Telegram report sent for J${jornada.number}`);
-                } catch (tgErr) {
-                    console.warn(`DEBUG: Failed to send Telegram report for J${jornada.number}:`, tgErr);
-                }
-            }
-
-            imported.push({
-                jornadaNumber: jornada.number,
-                jornadaDate: jornada.date
-            });
-        }
-
-        return imported;
-    }
-
-    /**
-     * Show import confirmation modal
-     */
-    async showImportModal() {
-        // Show loading indicator
-        const loadingOverlay = this.showLoadingModal();
-
-        try {
-            const toImport = await this.findJornadasToImport();
-
-            // Hide loading indicator
-            loadingOverlay.remove();
-
-            if (toImport.length === 0) {
-                // Show debug info
-                console.log('DEBUG: Jornadas en BD:', this.jornadas.map(j => ({
-                    number: j.number,
-                    date: j.date,
-                    hasResults: j.matches && j.matches.some(m => m.result && m.result !== '')
-                })));
-
-                alert('✅ Todas las jornadas ya tienen resultados importados.\n\nNo hay nada que importar.\n\n(Revisa la consola del navegador para ver detalles de debug)');
-                return;
-            }
-
-            // Create modal
-            const modalOverlay = this.createImportModal(toImport);
-            document.body.appendChild(modalOverlay);
-
-            // Show modal (fade in)
-            // Small delay to allow element to be added to DOM before adding 'active' class
-            requestAnimationFrame(() => {
-                setTimeout(() => modalOverlay.classList.add('active'), 10);
-            });
-
-        } catch (error) {
-            // Hide loading indicator if still visible
-            if (loadingOverlay && loadingOverlay.parentNode) {
-                loadingOverlay.remove();
-            }
-
-            console.error('Error in import process:', error);
-            // Don't alert if it was a manual cancellation
-            if (error.message !== 'Importación cancelada por el usuario') {
-                alert('❌ Error al cargar los resultados del RSS:\n\n' + error.message);
+                    await window.TelegramService.sendJornadaReport(dbJornada.id);
+                } catch (e) { console.warn("Telegram error", e); }
             }
         }
+
+        return changed;
     }
 
-    /**
-     * Show loading modal
-     */
-    showLoadingModal() {
-        // Create OVERLAY first
+    showLoading(msg) {
         const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay active';
-        overlay.id = 'loading-overlay';
-        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        overlay.style.display = 'flex'; // Enforce flex
-
-        // Create modal inside
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        // Override modal styles to be smaller and centered
-        modal.style.maxWidth = '400px';
-        modal.style.textAlign = 'center';
-        modal.style.padding = '2rem';
-        modal.style.margin = '0 auto'; // Ensure centering
-
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div style="font-size: 3rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
-                <h3 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Cargando resultados...</h3>
-                <p style="color: #666; font-size: 0.9rem;">Descargando y procesando el feed RSS</p>
-            </div>
-            <style>
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-            </style>
-        `;
-
-        overlay.appendChild(modal);
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;display:flex;justify-content:center;align-items:center;color:white;flex-direction:column';
+        overlay.innerHTML = `<div style="font-size:3rem;">⏳</div><div id="loader-msg" style="margin-top:1rem;font-size:1.2rem;">${msg}</div>`;
         document.body.appendChild(overlay);
         return overlay;
     }
 
-    /**
-     * Create import confirmation modal
-     */
-    createImportModal(toImport) {
-        // Create OVERLAY first
-        const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay';
-        overlay.id = 'import-overlay';
-
-        // Create MODAL inside
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-
-        let itemsHTML = '';
-        toImport.forEach(item => {
-            const confidenceBadge = item.confidence === 'high'
-                ? '<span style="color: #2e7d32; font-weight: bold;">✓ Equipos coinciden</span>'
-                : '<span style="color: #f57f17; font-weight: bold;">⚠ Verificar equipos</span>';
-
-            itemsHTML += `
-                <div style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; background: #f9f9f9;">
-                    <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary-blue);">
-                        Jornada ${item.jornadaNumber} - ${item.jornadaDate}
-                    </div>
-                    <div style="margin-bottom: 0.5rem;">${confidenceBadge}</div>
-                    <div style="font-size: 0.9rem; color: #666;">
-                        <strong>Resultados a importar:</strong> ${item.rssMatches.length} partidos
-                    </div>
-                    <details style="margin-top: 0.5rem;">
-                        <summary style="cursor: pointer; color: var(--primary-blue);">Ver detalles</summary>
-                        <div style="margin-top: 0.5rem; font-size: 0.85rem; max-height: 200px; overflow-y: auto;">
-                            ${item.rssMatches.map((m, idx) => `
-                                <div style="padding: 0.25rem 0; border-bottom: 1px solid #eee;">
-                                    <strong>${m.position === 15 ? 'P15' : m.position}.</strong> 
-                                    ${m.home} - ${m.away} 
-                                    <span style="color: var(--primary-green); font-weight: bold;">${m.result}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </details>
-                </div>
-            `;
-        });
-
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-blue); padding-bottom: 1rem;">
-                    <h2 style="margin: 0; color: var(--primary-blue);">📥 Importar Resultados desde RSS</h2>
-                    <button id="close-import-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999;">✕</button>
-                </div>
-
-                <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #f57f17;">
-                    <strong>📋 Se importarán resultados para ${toImport.length} jornada${toImport.length > 1 ? 's' : ''}:</strong>
-                </div>
-
-                <div style="margin-bottom: 1.5rem;">
-                    ${itemsHTML}
-                </div>
-
-                <div style="display: flex; gap: 1rem; justify-content: flex-end; border-top: 1px solid #ddd; padding-top: 1rem;">
-                    <button id="cancel-import" class="btn-secondary" style="padding: 0.75rem 1.5rem;">
-                        Cancelar
-                    </button>
-                    <button id="confirm-import" class="btn-primary" style="padding: 0.75rem 1.5rem; background: var(--primary-green);">
-                        ✓ Confirmar Importación
-                    </button>
-                </div>
-            </div>
-        `;
-
-        overlay.appendChild(modal);
-
-        // Event listeners
-        const closeBtn = modal.querySelector('#close-import-modal');
-        const cancelBtn = modal.querySelector('#cancel-import');
-        const confirmBtn = modal.querySelector('#confirm-import');
-
-        const closeModal = () => {
-            overlay.classList.remove('active');
-            setTimeout(() => overlay.remove(), 300);
-        };
-
-        closeBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
-
-        confirmBtn.addEventListener('click', async () => {
-            confirmBtn.disabled = true;
-            confirmBtn.innerHTML = '⏳ Importando...';
-
-            try {
-                const imported = await this.importResults(toImport);
-                closeModal();
-
-                alert(`✅ Importación completada con éxito!\n\nSe importaron resultados para ${imported.length} jornada${imported.length > 1 ? 's' : ''}:\n\n${imported.map(i => `• Jornada ${i.jornadaNumber} (${i.jornadaDate})`).join('\n')}`);
-
-                // Reload page to show updated data
-                window.location.reload();
-            } catch (error) {
-                console.error('Error importing results:', error);
-                alert('❌ Error al importar resultados:\n\n' + error.message);
-                confirmBtn.disabled = false;
-                confirmBtn.innerHTML = '✓ Confirmar Importación';
-            }
-        });
-
-        // Close on background click
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) closeModal();
-        });
-
-        return overlay;
+    updateLoading(overlay, msg) {
+        const el = overlay.querySelector('#loader-msg');
+        if (el) el.textContent = msg;
     }
 }
 
-// Create global instance
-window.RSSImporter = new RSSImporter();
+// Global Export for buttons
+window.quinielaScraper = new QuinielaScraper();
 
-// Add button to trigger import (can be called from HTML)
-window.startRSSImport = async function () {
-    await window.RSSImporter.showImportModal();
-};
+// Mapear funciones antiguas a las nuevas
+window.startRSSImport = () => window.quinielaScraper.startResultImport(); // "Importar Resultados"
+window.startPDFImport = () => window.quinielaScraper.startMatchImport();  // "Importar Partidos"
