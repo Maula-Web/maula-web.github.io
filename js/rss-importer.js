@@ -52,6 +52,26 @@ class QuinielaScraper {
 
         try {
             for (const jornada of candidates) {
+                // SECURITY CHECK: Avoid future jornadas (EduardoLosilla returns old season data for future dates)
+                // Parse date "dd-mm-yyyy"
+                if (jornada.date && jornada.date.includes('-')) {
+                    const parts = jornada.date.split('-'); // [dd, mm, yyyy]
+                    // Assume yyyy is correct
+                    const jDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                    const today = new Date();
+
+                    // Difference in days
+                    const diffTime = jDate - today;
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                    // If Jornada is more than 4 days in the future, SKIP IT.
+                    // (Allowing 4 days margin for early starts or timezone diffs)
+                    if (diffDays > 4) {
+                        console.warn(`Skipping Results for J${jornada.number}: Date ${jornada.date} is too far in future (Avoid fake history data).`);
+                        continue;
+                    }
+                }
+
                 this.updateLoading(loadingOverlay, `Consultando Jornada ${jornada.number}...`);
 
                 // Construct URL: .../jornada_X
@@ -121,12 +141,31 @@ class QuinielaScraper {
                     continue;
                 }
 
-                // 3. Already exists? Update matches if empty
+                // 3. Already exists? 
                 const existing = this.jornadas.find(j => j.number === jData.number);
                 if (existing) {
-                    // Update only if existing has no matches or we want to refresh
-                    // Let's assume we overwrite matches if they are placeholders? 
-                    // User wants "import" so likely update or create.
+                    // CRITICAL: Do NOT overwrite if it already has valid match data
+                    // We check if matches exist and have reasonable names
+                    const hasValidData = existing.matches &&
+                        existing.matches.length > 0 &&
+                        existing.matches[0].home &&
+                        existing.matches[0].home.length > 3;
+
+                    if (hasValidData) {
+                        console.log(`Skipping J${jData.number} Matches: Already exists with data.`);
+
+                        // Optional: Still update date if needed
+                        if (jData.dateObj && (!existing.dateObj || existing.date === 'Por definir' || existing.date.includes('Pendiente'))) {
+                            existing.date = jData.dateStr;
+                            // existing.dateObj could be added if schema supports it
+                            await window.DataService.save('jornadas', existing);
+                            console.log(`Updated date for J${jData.number}`);
+                        }
+
+                        continue; // SKIP THE REST (Matches update)
+                    }
+
+                    // Only overwrite if it was empty
                     existing.matches = jData.matches;
                     // Update date if "Pending"
                     if (existing.date === 'Por definir' || existing.date.includes('Pendiente')) {
@@ -152,10 +191,10 @@ class QuinielaScraper {
             loadingOverlay.remove();
 
             if (importedCount > 0) {
-                alert(`✅ Se han importado/actualizado ${importedCount} jornadas de Domingo.`);
+                alert(`✅ Se han importado/actualizado ${importedCount} jornadas nuevas.`);
                 window.location.reload();
             } else {
-                alert('⚠️ Se encontraron jornadas pero ninguna cumplía los requisitos (Domingo).');
+                alert('⚠️ No se encontraron jornadas nuevas que importar (las existentes se han respetado).');
             }
 
         } catch (e) {
@@ -504,17 +543,35 @@ class QuinielaScraper {
         let clean = name.trim().replace(/\./g, ''); // Remove dots first
 
         // Normalization Map for ElQuinielista abbreviations
+        // Handles "R Madrid", "RMadrid", "RSociedad", "CultLeonesa", etc.
         const map = {
             'R Madrid': 'Real Madrid',
+            'RMadrid': 'Real Madrid',
             'R Sociedad': 'Real Sociedad',
+            'RSociedad': 'Real Sociedad',
             'R Zaragoza': 'Real Zaragoza',
+            'RZaragoza': 'Real Zaragoza',
             'R Oviedo': 'Real Oviedo',
+            'ROviedo': 'Real Oviedo',
             'R Racing': 'Racing',
             'R Sporting': 'Sporting',
-            'At Madrid': 'Atlético', // Or 'At.Madrid' depending on your icon logic, usually 'Atlético' is safer
+            'RSporting': 'Sporting',
+            'At Madrid': 'Atlético',
+            'AtMadrid': 'Atlético',
             'Rayo V': 'Rayo Vallecano',
-            'Espanyol': 'RCD Espanyol', // Sometimes needed
-            'Athletic': 'Athletic Club'
+            'RayoV': 'Rayo Vallecano',
+            'Espanyol': 'RCD Espanyol',
+            'Athletic': 'Athletic Club',
+            'Ath Club': 'Athletic Club',
+            'CultLeonesa': 'Cultural Leonesa',
+            'Castellon': 'Castellón',
+            'Alaves': 'Alavés', // Add accent
+            'Malaga': 'Málaga', // Add accent if missing
+            'Cadiz': 'Cádiz',
+            'Cordoba': 'Córdoba',
+            'La Coruña': 'Deportivo',
+            'Deportivo': 'Deportivo', // Sometimes 'RC Deportivo'
+            'Elda': 'Eldense'
         };
 
         return map[clean] || clean;
