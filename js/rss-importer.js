@@ -168,6 +168,10 @@ class QuinielaScraper {
     /**
      * Parses the "Proximas" page (now ElQuinielista) by scanning for blocks of 15 matches.
      */
+    /**
+     * Parses the "Proximas" page (now ElQuinielista) by scanning for blocks of 15 matches.
+     * Pattern observed: 'Jornada :', '3', ... '1º', 'Alavés', 'At.Madrid'
+     */
     parseAllProximas(html) {
         const results = [];
         const parser = new DOMParser();
@@ -182,91 +186,87 @@ class QuinielaScraper {
         const lines = fullText.split('\n').map(l => l.trim()).filter(l => l);
 
         console.log("DEBUG CLEAN LINES (First 20):", lines.slice(0, 20));
-        console.log("DEBUG TEXT LINES (Lines 100-120):", lines.slice(100, 120)); // VER MÁS ABAJO
-
 
         let currentMatches = [];
         let bufferJornadaInfo = { number: 0, date: null };
 
-        // Scan lines
+        // ElQuinielista State Machine
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
 
-            // 1. Check for "Jornada X" header to capture context
-            const jornadaMatch = line.match(/Jornada\s*(\d+)/i);
-            if (jornadaMatch) {
-                // If we hit a new header and have a full set, save the previous one
-                if (currentMatches.length >= 14) {
-                    this.saveFoundJornada(results, currentMatches, bufferJornadaInfo);
-                    currentMatches = []; // Reset for new block
+            // 1. Detect Jornada Start
+            // Log shows: 'Jornada :', '3' -> unlikely to be same line in split?
+            if (line.match(/^Jornada\s*:/i)) {
+                let num = 0;
+                // Check if number is in same line "Jornada : 34"
+                const sameLineMatch = line.match(/^Jornada\s*:\s*(\d+)/i);
+                if (sameLineMatch) {
+                    num = parseInt(sameLineMatch[1]);
+                } else if (i + 1 < lines.length) {
+                    // Check next line
+                    const nextLine = lines[i + 1];
+                    if (nextLine.match(/^\d+$/)) {
+                        num = parseInt(nextLine);
+                    }
                 }
 
-                bufferJornadaInfo = { number: parseInt(jornadaMatch[1]), date: null };
-            }
-
-            // 2. Check for Date "dd-mm-yyyy" or "dd/mm/yyyy"
-            const dateMatch = line.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-            if (dateMatch) {
-                bufferJornadaInfo.date = new Date(parseInt(dateMatch[3]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]));
-            }
-
-            // 3. Check for Match line: "1 TeamA - TeamB"
-            // Start of line, number 1-14, followed by dot/space, then text
-            // e.g. "1. R.MADRID - BARCELONA" or "1 R.MADRID - BARCELONA"
-            // More strict regex to avoid false positives
-            const matchLineRegex = /^(\d{1,2})[\.\s]+([A-Z0-9\.\sÁÉÍÓÚÑ]+?)\s*[\-vV][sS]?\s*([A-Z0-9\.\sÁÉÍÓÚÑ]+?)$/i;
-            const m = line.match(matchLineRegex);
-
-            if (m) {
-                const pos = parseInt(m[1]);
-
-                // Safety: verify position is sequential? 
-                // Creating a new block on '1' is safer
-                if (pos === 1 && currentMatches.length > 0) {
-                    // We found a '1' but were already building a set. 
-                    // This implies we missed the previous end or start of new block.
-                    // Save what we have if it's substantial (e.g. 14 matches)
+                if (num > 0) {
+                    // Save previous if valid set
+                    // We need at least 14 matches to consider it a valid jornada import
                     if (currentMatches.length >= 14) {
                         this.saveFoundJornada(results, currentMatches, bufferJornadaInfo);
                     }
+                    // Reset
                     currentMatches = [];
+                    bufferJornadaInfo = { number: num, date: null };
                 }
+            }
 
-                if (pos >= 1 && pos <= 14) {
-                    currentMatches.push({
-                        position: pos,
-                        home: this.cleanTeamName(m[2]),
-                        away: this.cleanTeamName(m[3]),
-                        result: ''
-                    });
+            // 2. Detect Date
+            if (line.match(/^Fecha\s*:/i)) {
+                let dStr = line.split(':')[1] || '';
+                if (dStr.trim() === '' && (i + 1 < lines.length)) dStr = lines[i + 1];
+
+                const dateMatch = dStr.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+                if (dateMatch) {
+                    bufferJornadaInfo.date = new Date(parseInt(dateMatch[3]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]));
                 }
-            } else {
-                // 4. Check for Pleno al 15 usually "15 TEAM - TEAM" or "15 TEAM TEAM"
-                if (line.startsWith('15 ') || line.startsWith('15.')) {
-                    const cleanLine = line.replace(/^15[\.\s]+/, '').trim();
+            }
 
-                    // Try with hyphen first
-                    let parts = cleanLine.split(/\s*[\-]\s*/);
+            // 3. Detect Match "1º", "2º"... "15º" or just "15"
+            const posMatch = line.match(/^(\d{1,2})[ºª\.]?$/);
+            if (posMatch) {
+                const pos = parseInt(posMatch[1]);
 
-                    // If no hyphen, try splitting by space if it looks like 2 teams? 
-                    if (parts.length < 2) {
-                        const pM = cleanLine.match(/^([A-Z0-9\.\sÁÉÍÓÚÑ]+?)\s{2,}([A-Z0-9\.\sÁÉÍÓÚÑ]+?)$/i);
-                        if (pM) parts = [pM[1], pM[2]];
-                    }
+                // Validate it's likely a position marker by checking context
+                // Next 2 lines should be texts (Teams)
+                if (pos >= 1 && pos <= 15 && (i + 2 < lines.length)) {
+                    const home = lines[i + 1];
+                    const away = lines[i + 2];
 
-                    if (parts.length >= 2) {
-                        currentMatches.push({
-                            position: 15,
-                            home: this.cleanTeamName(parts[0]),
-                            away: this.cleanTeamName(parts[1]),
-                            result: ''
-                        });
+                    // Basic validation: Teams shouldn't be too short or looking like metadata
+                    // Exclude if it looks like a day "Sábado" or date
+                    if (home.length > 2 && away.length > 2 && !home.match(/^\d+$/)) {
+
+                        // Check for duplicates in current block (sometimes page repeats)
+                        const exists = currentMatches.find(m => m.position === pos);
+                        if (!exists) {
+                            currentMatches.push({
+                                position: pos,
+                                home: this.cleanTeamName(home),
+                                away: this.cleanTeamName(away),
+                                result: ''
+                            });
+                        }
+
+                        // Skip the lines we consumed
+                        i += 2;
                     }
                 }
             }
         }
 
-        // Save last block if valid
+        // Save last block
         if (currentMatches.length >= 14) {
             this.saveFoundJornada(results, currentMatches, bufferJornadaInfo);
         }
