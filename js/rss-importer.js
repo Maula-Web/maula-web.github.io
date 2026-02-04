@@ -165,205 +165,125 @@ class QuinielaScraper {
 
     /**
      * Parses the "Proximas" page to find multiple jornadas
-     */
-    /**
-     * Parses the "Proximas" page to find multiple jornadas
-     * Strategy 1: "Hidden API" (JSON State embedded in HTML) - Most reliable
-     * Strategy 2: Raw Text Parsing - Fallback
+     * Strategy: Text Scanning for blocks of 15 matches.
      */
     parseAllProximas(html) {
-        let results = [];
-
-        // STRATEGY 1: JSON State Extraction
-        try {
-            const jsonPattern = /<script id="eduardo-losilla-state" type="application\/json">([\s\S]*?)<\/script>/;
-            const match = html.match(jsonPattern);
-
-            if (match && match[1]) {
-                // Decode HTML entities if present (e.g. &q;) - rudimentary check
-                let rawJson = match[1].replace(/&q;/g, '"');
-                const state = JSON.parse(rawJson);
-
-                console.log("State encontrado:", state); // Debug
-                console.log("State Keys:", Object.keys(state)); // Debug keys
-                if (state.quiniela) console.log("State.quiniela keys:", Object.keys(state.quiniela)); // Debug quiniela keys
-
-
-                // Correct Root identified: datosGeneralesQuiniela
-                const root = state.datosGeneralesQuiniela || state.quiniela || {};
-                console.log("Root Keys:", Object.keys(root)); // Debug deeper
-
-                const candidateLists = [
-                    root.proxima_jornada, // Often a single object, processJsonList handles single objects if wrapped
-                    root.jornadas,
-                    root.calendario,
-                    root.proximas
-                ];
-
-                // Also try to find ANY array in the root object that looks promising
-                for (const key of Object.keys(root)) {
-                    if (Array.isArray(root[key])) {
-                        candidateLists.push(root[key]);
-                    }
-                }
-
-
-                // Aggressive Search for "partidos" in any form
-                console.log("Searching for 'partidos'...");
-
-                // 1. Check for standard "partidos" array in the root object (often 'datosGeneralesQuiniela')
-                // Although not listed in keys, sometimes it's nested or I missed it.
-                // Let's rely on finding ANY key that holds the matches
-
-                let foundPartidos = null;
-
-                // Check commonly known locations again
-                if (state.partidos) foundPartidos = state.partidos;
-                if (state.quiniela && state.quiniela.partidos) foundPartidos = state.quiniela.partidos;
-
-                // If not found, look for ANY array of objects that has "local" and "visitante" keys
-                if (!foundPartidos) {
-                    const searchInObject = (obj, depth = 0) => {
-                        if (depth > 3 || !obj || typeof obj !== 'object') return null;
-
-                        // Is this array looking like matches?
-                        if (Array.isArray(obj)) {
-                            if (obj.length >= 10 && (obj[0].local || obj[0].equipo1 || obj[0].nombreLocal)) {
-                                return obj;
-                            }
-                            return null;
-                        }
-
-                        // Recurse keys
-                        for (const key of Object.keys(obj)) {
-                            // optimize: skip huge strings or irrelevant keys
-                            if (key === 'plantillaCuentaAtras' || key === 'redesSociales') continue;
-
-                            const res = searchInObject(obj[key], depth + 1);
-                            if (res) return res;
-                        }
-                        return null;
-                    };
-
-                    // Start search from root
-                    foundPartidos = searchInObject(state);
-                }
-
-                if (foundPartidos) {
-                    console.log("FOUND Matches array:", foundPartidos.length);
-
-                    // We have matches! Do we have jornada number?
-                    const jNum = root.jornada || root.id || 0;
-                    const jDate = root.fechaJornada || root.fechaFinApuestas || null;
-
-                    // Assemble artificial item
-                    const assembled = [{
-                        jornada: jNum,
-                        fecha: jDate,
-                        partidos: foundPartidos
-                    }];
-
-                    const parsed = this.processJsonList(assembled);
-                    if (parsed.length > 0) results = results.concat(parsed);
-                } else {
-                    console.log("CRITICAL: Could not find any 'partidos' array in JSON state.");
-                }
-            }
-        } catch (e) {
-            console.warn("Error parsing JSON state:", e);
-        }
-
-        if (results.length > 0) {
-            console.log(`Extracted ${results.length} jornadas via JSON State.`);
-            return this.deduplicateJornadas(results);
-        }
-
-        // STRATEGY 2: Fallback to Text Parsing (Improved)
-        console.log("Fallback to Text Parsing...");
+        const results = [];
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+
+        // Extract clean text
         const fullText = doc.body.innerText || doc.body.textContent;
-        // Normalize newlines
-        const text = fullText.replace(/\n\s*\n/g, '\n');
+        const lines = fullText.split('\n').map(l => l.trim()).filter(l => l);
 
-        // Split explicitly by "Jornada" header
-        const parts = text.split(/Jornada\s+(\d+)/i);
+        let currentMatches = [];
+        let bufferJornadaInfo = { number: 0, date: null };
 
-        for (let i = 1; i < parts.length; i += 2) {
-            const num = parseInt(parts[i]);
-            const content = parts[i + 1];
+        // Scan lines
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
 
-            // Attempt to extract date
-            let dateStr = "Por definir";
-            let dateObj = null;
+            // 1. Check for "Jornada X" header to capture context
+            const jornadaMatch = line.match(/Jornada\s*(\d+)/i);
+            if (jornadaMatch) {
+                // If we hit a new header and have a full set, save the previous one
+                if (currentMatches.length >= 14) {
+                    this.saveFoundJornada(results, currentMatches, bufferJornadaInfo);
+                    currentMatches = []; // Reset for new block
+                }
 
-            // Regex for date: dd/mm/yyyy or dd-mm-yyyy or dd/mm
-            const dateMatch = content.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{4}))?/);
+                bufferJornadaInfo = { number: parseInt(jornadaMatch[1]), date: null };
+            }
+
+            // 2. Check for Date "dd-mm-yyyy" or "dd/mm/yyyy"
+            const dateMatch = line.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
             if (dateMatch) {
-                const year = dateMatch[3] ? parseInt(dateMatch[3]) : new Date().getFullYear();
-                dateStr = `${dateMatch[1]}-${dateMatch[2]}`;
-                dateObj = new Date(year, parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]));
-                // Adjust year if date is in past (crossing year boundary) - simplified for now
+                bufferJornadaInfo.date = new Date(parseInt(dateMatch[3]), parseInt(dateMatch[2]) - 1, parseInt(dateMatch[1]));
             }
 
-            const matches = this.parseMatchesFromText(content);
-            if (matches.length === 15) {
-                results.push({
-                    number: num,
-                    dateStr: dateStr,
-                    dateObj: dateObj,
-                    matches: matches
-                });
+            // 3. Check for Match line: "1 TeamA - TeamB"
+            // Start of line, number 1-14, followed by dot/space, then text
+            // e.g. "1. R.MADRID - BARCELONA" or "1 R.MADRID - BARCELONA"
+            // More strict regex to avoid false positives
+            const matchLineRegex = /^(\d{1,2})[\.\s]+([A-Z0-9\.\sÁÉÍÓÚÑ]+?)\s*[\-vV][sS]?\s*([A-Z0-9\.\sÁÉÍÓÚÑ]+?)$/i;
+            const m = line.match(matchLineRegex);
+
+            if (m) {
+                const pos = parseInt(m[1]);
+
+                // Safety: verify position is sequential? 
+                // Creating a new block on '1' is safer
+                if (pos === 1 && currentMatches.length > 0) {
+                    // We found a '1' but were already building a set. 
+                    // This implies we missed the previous end or start of new block.
+                    // Save what we have if it's substantial (e.g. 14 matches)
+                    if (currentMatches.length >= 14) {
+                        this.saveFoundJornada(results, currentMatches, bufferJornadaInfo);
+                    }
+                    currentMatches = [];
+                }
+
+                if (pos >= 1 && pos <= 14) {
+                    currentMatches.push({
+                        position: pos,
+                        home: this.cleanTeamName(m[2]),
+                        away: this.cleanTeamName(m[3]),
+                        result: ''
+                    });
+                }
+            } else {
+                // 4. Check for Pleno al 15 usually "15 TEAM - TEAM" or "15 TEAM TEAM"
+                if (line.startsWith('15 ') || line.startsWith('15.')) {
+                    const cleanLine = line.replace(/^15[\.\s]+/, '').trim();
+
+                    // Try with hyphen first
+                    let parts = cleanLine.split(/\s*[\-]\s*/);
+
+                    // If no hyphen, try splitting by space if it looks like 2 teams? 
+                    if (parts.length < 2) {
+                        const pM = cleanLine.match(/^([A-Z0-9\.\sÁÉÍÓÚÑ]+?)\s{2,}([A-Z0-9\.\sÁÉÍÓÚÑ]+?)$/i);
+                        if (pM) parts = [pM[1], pM[2]];
+                    }
+
+                    if (parts.length >= 2) {
+                        currentMatches.push({
+                            position: 15,
+                            home: this.cleanTeamName(parts[0]),
+                            away: this.cleanTeamName(parts[1]),
+                            result: ''
+                        });
+                    }
+                }
             }
+        }
+
+        // Save last block if valid
+        if (currentMatches.length >= 14) {
+            this.saveFoundJornada(results, currentMatches, bufferJornadaInfo);
         }
 
         return this.deduplicateJornadas(results);
     }
 
+    saveFoundJornada(results, matches, info) {
+        // Validation: Need at least a number. 
+        // If number is 0, we can't reliably import it.
+        if (!info.number || info.number === 0) return;
+
+        let dDate = info.date;
+        let dStr = dDate ? this.formatDate(dDate) : "Próximamente";
+
+        results.push({
+            number: info.number,
+            dateStr: dStr,
+            dateObj: dDate,
+            matches: matches.slice(0, 15)
+        });
+    }
+
     processJsonList(list) {
+        // Legacy support in case we switch back or for testing
         const parsed = [];
-        for (const item of list) {
-            // Check if item looks like a jornada
-            // Need keys like 'jornada', 'partidos' array, etc.
-            if (item.jornada && item.partidos && Array.isArray(item.partidos)) {
-                // Parse date (often in 'fecha_cierre' or similar)
-                let dateObj = null;
-                let dateStr = "F.Semana";
-                if (item.fecha) {
-                    dateObj = new Date(item.fecha);
-                    dateStr = this.formatDate(dateObj);
-                }
-
-                // Parse matches
-                const matches = [];
-                // Sort by order just in case
-                const sortedPartidos = item.partidos.sort((a, b) => (a.orden || 0) - (b.orden || 0));
-
-                // Usually we need 15 matches.
-                // item.partidos might contain objects with { local: "TeamA", visitante: "TeamB" }
-
-                let position = 1;
-                for (const p of sortedPartidos) {
-                    if (position > 15) break;
-                    matches.push({
-                        home: this.cleanTeamName(p.local || p.equipo1 || ""),
-                        away: this.cleanTeamName(p.visitante || p.equipo2 || ""),
-                        result: ''
-                    });
-                    position++;
-                }
-
-                if (matches.length >= 14) { // Allow 14 associated with standard quiniela
-                    // Ensure Pleno exists if missing? Usually 15 provided.
-                    parsed.push({
-                        number: parseInt(item.jornada),
-                        dateStr: dateStr,
-                        dateObj: dateObj,
-                        matches: matches.slice(0, 15)
-                    });
-                }
-            }
-        }
         return parsed;
     }
 
@@ -377,6 +297,8 @@ class QuinielaScraper {
     }
 
     parseMatchesFromText(text) {
+        // Helper used by scan strategy? Actually scan strategy parses internally.
+        // Keeping this for reference or fallback.
         const matches = [];
         const lines = text.split('\n');
 
@@ -394,29 +316,9 @@ class QuinielaScraper {
                         result: ''
                     });
                 }
-            } else {
-                // Try Pleno al 15 special format
-                if (trimmed.startsWith('15 ') && !matches.find(m => m.position === 15)) {
-                    // Fallback for "15 TEAM TEAM" if hyphen missing
-                    // Heuristic: Last 2 words are teams? Dangerous.
-                    // Let's rely on standard format for now.
-                    // Sometimes "15 RAYO AT.MADRID" (no hyphen but specific string)
-                    const parts = trimmed.substring(3).trim().split(/\s+/);
-                    if (parts.length >= 2) {
-                        // Assuming last word is away, rest is home?? Dictionary-based would be better.
-                        // For now skip non-standard lines to avoid garbage.
-                    }
-                }
             }
         }
-
-        // Remove duplicates and sort
-        const unique = [];
-        matches.forEach(m => {
-            if (!unique.find(x => x.home === m.home && x.away === m.away)) unique.push(m);
-        });
-
-        return unique.slice(0, 15);
+        return matches;
     }
 
     /**
@@ -456,25 +358,6 @@ class QuinielaScraper {
 
         const matches = [];
 
-        // Pattern: id="1_1" -> first number is match index (1-based usually, check logic)
-        // Wait, earlier inspection showed IDs like "1_1", "2_1", "3_0"... 
-        // AND order in DOM usually follows match order.
-
-        // Let's rely on data-casilla or text content
-        // Also need to map to position 1-15.
-        // We assume they appear in order 1..15
-
-        // Filter unique matches (in case duplicates exist for UI reasons)
-        // But usually it's one board per match.
-
-        // Let's try to grab the parent row or just iterate
-        // The previous analysis showed they are inside "c-detalle-partido-simple" or similar containers?
-        // Actually, just taking the first 15 valid occurrences might work if the page structure is linear.
-
-        // Better: Find the match containers to ensure order
-        // The match name container: c-detalle-partido-simple__equipos__equipo__nombre
-
-        // Let's stick to the simplest proven "salmon" class content for now
         // Format: { position: 1, result: 'X' }
 
         for (let i = 0; i < Math.min(resultBtns.length, 15); i++) {
@@ -525,14 +408,6 @@ class QuinielaScraper {
             }
         } else {
             // Fallback for "Proximas" list if structure is different
-            // Often lists are "1. TeamA - TeamB" text
-            // Try searching text content with regex
-            const text = doc.body.textContent;
-            const regex = new RegExp(`^\\s*${targetJornadaNum}\\s*[\\r\\n]+`, 'm'); // Find header "Jornada X"
-            // This is hard on raw text.
-
-            // Any table with "Partidos" class?
-            // "tabla-partidos"?
             console.warn("Could not find standard match blocks. Trying fallback text search...");
         }
 
