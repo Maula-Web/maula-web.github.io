@@ -418,6 +418,7 @@ class QuinielaScraper {
     /**
      * NEW: Parse Results + Prizes from ElQuinielista
      * Extracts 1/X/2 results and prize amounts from the text content
+     * IMPROVED VERSION with better pattern recognition
      */
     parseResultsFromElQuinielista(html, targetJornadaNum) {
         const parser = new DOMParser();
@@ -430,94 +431,147 @@ class QuinielaScraper {
         const fullText = doc.body.innerText || doc.body.textContent;
         const lines = fullText.split('\n').map(l => l.trim()).filter(l => l);
 
-        console.log(`Parsing ElQuinielista for J${targetJornadaNum}...`);
+        console.log(`[ElQuinielista] Parsing for J${targetJornadaNum}...`);
+        console.log(`[ElQuinielista] Total lines: ${lines.length}`);
 
-        let currentJornada = null;
+        // Strategy: Look for the results table which typically shows:
+        // - Jornada number
+        // - List of teams with positions (1º, 2º, etc.)
+        // - Results (1, X, 2) either inline or in a separate section
+        // - Prize table with "X Aciertos" and amounts
+
+        let foundTarget = false;
         let currentMatches = [];
         let prizes = {};
-        let foundTarget = false;
+        let insideTargetJornada = false;
+        let resultsLine = null;
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
 
-            // 1. Detect Jornada number "Jornada :" or "Jornada nº X"
-            const jornadaMatch = line.match(/Jornada\s*[:\s#nº]*\s*(\d+)/i);
+            // 1. Detect Jornada marker
+            // Patterns: "Jornada :", "Jornada nº 39", "Jornada: 39", "Jornada 39"
+            const jornadaMatch = line.match(/Jornada\s*[:\s#nºNº]*\s*(\d+)/i);
             if (jornadaMatch) {
                 const jNum = parseInt(jornadaMatch[1]);
 
-                // If we found our target and have data, stop
-                if (foundTarget && currentMatches.length > 0) {
-                    break;
-                }
-
-                // Check if this is our target jornada
                 if (jNum === targetJornadaNum) {
-                    currentJornada = jNum;
+                    console.log(`[ElQuinielista] ✓ Found target Jornada ${jNum} at line ${i}`);
+                    foundTarget = true;
+                    insideTargetJornada = true;
                     currentMatches = [];
                     prizes = {};
-                    foundTarget = true;
-                    console.log(`Found target Jornada ${jNum}`);
-                } else if (currentJornada) {
-                    // We passed our target jornada
+                } else if (insideTargetJornada) {
+                    // We were inside our target and hit a different jornada = end of section
+                    console.log(`[ElQuinielista] Exiting target section, found J${jNum}`);
                     break;
                 }
             }
 
-            if (!foundTarget) continue;
+            if (!insideTargetJornada) continue;
 
-            // 2. Detect Results: Look for "1", "X", "2" preceded by position or team names
-            // ElQuinielista shows results like: "1º" then team names then "1" or "X" or "2"
-            // Or sometimes just "1  X  2  1  X..." in sequence
-
-            // Simple pattern: Line contains only result chars and spaces
-            if (line.match(/^[1X2\sxº]+$/i) && line.length > 10) {
-                const results = line.split(/\s+/).filter(r => r.match(/^[1X2]$/i));
-                if (results.length >= 10 && currentMatches.length === 0) {
-                    // Likely the results row
-                    for (let j = 0; j < Math.min(results.length, 15); j++) {
-                        currentMatches.push({
-                            position: j + 1,
-                            result: results[j].toUpperCase()
-                        });
-                    }
-                    console.log(`Extracted ${currentMatches.length} results`);
+            // 2. Detect Results Line
+            // Look for a line with multiple 1/X/2 results
+            // Example: "1  X  2  1  X  1  2  X  1  2  X  1  1  X  2"
+            // or: "1 X 2 1 X 1 2 X 1 2 X 1 1 X X"
+            if (line.match(/^[1X2\s]+$/i) && line.length > 20) {
+                const potentialResults = line.split(/\s+/).filter(r => r.match(/^[1X2]$/i));
+                if (potentialResults.length >= 14 && !resultsLine) {
+                    resultsLine = potentialResults.map(r => r.toUpperCase());
+                    console.log(`[ElQuinielista] Found results line with ${resultsLine.length} items:`, resultsLine.slice(0, 5));
                 }
             }
 
-            // 3. Detect Prizes: "15 Aciertos", "14 Aciertos", etc. with amounts
-            // Format: "1º 15 Aciertos 523 53.423,92 €"
-            // Or: "15 Aciertos" (line), then amount (next line or same)
+            // Alternative: Results might be in a table structure
+            // Look for patterns like "1º" followed by result on same or next line
+            const positionMatch = line.match(/^(\d{1,2})[ºª\.]\s*([1X2])?$/i);
+            if (positionMatch && currentMatches.length < 15) {
+                const pos = parseInt(positionMatch[1]);
+                let result = positionMatch[2] ? positionMatch[2].toUpperCase() : null;
 
-            const prizeMatch = line.match(/(\d{1,2})\s+Aciertos/i);
-            if (prizeMatch) {
-                const category = prizeMatch[1]; // "15", "14", etc.
-
-                // Look for Euro amount in this line or next few lines
-                let amount = null;
-                for (let j = 0; j < 3; j++) {
-                    const checkLine = lines[i + j] || '';
-                    const amountMatch = checkLine.match(/([\d,.]+)\s*€/);
-                    if (amountMatch) {
-                        amount = amountMatch[1].replace(/\./g, '').replace(',', '.');
-                        break;
+                // If no result on same line, check next line
+                if (!result && i + 1 < lines.length) {
+                    const nextLine = lines[i + 1].trim();
+                    if (nextLine.match(/^[1X2]$/i)) {
+                        result = nextLine.toUpperCase();
                     }
                 }
 
-                if (amount) {
-                    prizes[category] = parseFloat(amount);
-                    console.log(`Found prize: ${category} aciertos = ${amount}€`);
+                if (result && pos >= 1 && pos <= 15) {
+                    currentMatches.push({
+                        position: pos,
+                        result: result
+                    });
+                }
+            }
+
+            // 3. Detect Prizes
+            // Patterns:
+            // - "15 Aciertos" followed by amount
+            // - "Categoría	Acertantes	Euros/Apuesta"
+            // - "1ª	15 Aciertos	523	53.423,92 €"
+            // - Or just "15 Aciertos ... 53.423,92 €" on same line
+
+            const prizeLineMatch = line.match(/(\d{1,2})\s+Aciertos.*?([\d.,]+)\s*€/i);
+            if (prizeLineMatch) {
+                const category = prizeLineMatch[1];
+                const amountStr = prizeLineMatch[2].replace(/\./g, '').replace(',', '.');
+                const amount = parseFloat(amountStr);
+                if (!isNaN(amount)) {
+                    prizes[category] = amount;
+                    console.log(`[ElQuinielista] Prize found: ${category} aciertos = ${amount}€`);
+                }
+            } else {
+                // Try multi-line approach
+                const prizeMatch = line.match(/(\d{1,2})\s+Aciertos/i);
+                if (prizeMatch) {
+                    const category = prizeMatch[1];
+                    // Search next few lines for amount
+                    for (let j = 0; j < 3; j++) {
+                        const checkLine = lines[i + j] || '';
+                        const amountMatch = checkLine.match(/([\d.,]+)\s*€/);
+                        if (amountMatch) {
+                            const amountStr = amountMatch[1].replace(/\./g, '').replace(',', '.');
+                            const amount = parseFloat(amountStr);
+                            if (!isNaN(amount) && amount > 0) {
+                                prizes[category] = amount;
+                                console.log(`[ElQuinielista] Prize found (multi-line): ${category} aciertos = ${amount}€`);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        if (!foundTarget || currentMatches.length === 0) {
-            console.warn(`Could not find results for J${targetJornadaNum} in ElQuinielista`);
+        // Process results line if found
+        if (resultsLine && resultsLine.length >= 14 && currentMatches.length === 0) {
+            for (let i = 0; i < Math.min(resultsLine.length, 15); i++) {
+                currentMatches.push({
+                    position: i + 1,
+                    result: resultsLine[i]
+                });
+            }
+        }
+
+        // Validation
+        if (!foundTarget) {
+            console.warn(`[ElQuinielista] ❌ Target Jornada ${targetJornadaNum} not found in page`);
             return null;
         }
 
+        if (currentMatches.length === 0) {
+            console.warn(`[ElQuinielista] ❌ No results extracted for J${targetJornadaNum}`);
+            return null;
+        }
+
+        console.log(`[ElQuinielista] ✓ Successfully parsed J${targetJornadaNum}:`);
+        console.log(`  - Results: ${currentMatches.length} matches`);
+        console.log(`  - Prizes: ${Object.keys(prizes).length} categories`);
+
         return {
             matches: currentMatches,
-            prizes: prizes
+            prizes: Object.keys(prizes).length > 0 ? prizes : null
         };
     }
 
@@ -762,38 +816,59 @@ class QuinielaScraper {
     }
 
     /**
-     * DEBUG: Helper to inspect Prize Table structure
-     * Run in console: window.quinielaScraper.debugEscrutinio(35)
+     * DEBUG: Helper to test ElQuinielista parsing
+     * Run in console: window.quinielaScraper.debugEscrutinio(39)
      */
-    async debugEscrutinio(jornadaNum = 35) {
-        // Try ElQuinielista specific URL for results
-        // Note: URL structure might be 'resultados-quiniela/jornada-X' or similar. 
-        // Let's try a likely candidate found in typical ASP.NET sites or their structure.
-        // Or better: The main 'Resultados' page often takes a parameter.
+    async debugEscrutinio(jornadaNum = 39) {
+        console.log(`\n=== DEBUG ElQuinielista J${jornadaNum} ===`);
+        const url = this.RESULTADOS_URL;
+        console.log(`Fetching: ${url}`);
 
-        // Let's try this specific structure often used:
-        const url = `https://sl.elquinielista.com/Quinielista/resultados-quiniela/jornada-${jornadaNum}`;
-        // Backup: `https://www.elquinielista.com/Quinielista/resultados-quiniela.aspx`
-
-        console.log(`Debug Escrutinio ElQuinielista J${jornadaNum} URL: ${url}`);
         const html = await this.fetchHTML(url);
 
-        if (!html) { console.log("Fetch failed"); return; }
+        if (!html) {
+            console.log("❌ Fetch failed");
+            return;
+        }
 
-        // Clean noise
+        console.log(`✅ Fetched ${html.length} bytes`);
+
+        // Parse and show sample
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-        const trash = doc.querySelectorAll('script, style');
+        const trash = doc.querySelectorAll('script, style, noscript, meta, link');
         trash.forEach(el => el.remove());
         const text = doc.body.innerText;
-        console.log("TEXT SAMPLE:", text.substring(0, 500));
 
-        // Search specific Prize keywords
-        if (text.includes('14 Aciertos') || text.includes('Pleno al 15')) {
-            console.log("✅ FOUND Prize Data keywords!");
+        console.log(`\n📄 TEXT SAMPLE (first 1000 chars):`);
+        console.log(text.substring(0, 1000));
+
+        // Check for keywords
+        console.log(`\n🔍 Searching for keywords:`);
+        console.log(`- Contains "Jornada": ${text.includes('Jornada')}`);
+        console.log(`- Contains "Jornada ${jornadaNum}": ${text.includes(`Jornada ${jornadaNum}`)}`);
+        console.log(`- Contains "Aciertos": ${text.includes('Aciertos')}`);
+        console.log(`- Contains "14 Aciertos": ${text.includes('14 Aciertos')}`);
+
+        // Test actual parsing
+        console.log(`\n🧪 Testing parseResultsFromElQuinielista...`);
+        const result = this.parseResultsFromElQuinielista(html, jornadaNum);
+
+        if (result) {
+            console.log(`✅ Parse succeeded!`);
+            console.log(`- Matches found: ${result.matches ? result.matches.length : 0}`);
+            if (result.matches && result.matches.length > 0) {
+                console.log(`- First 3 results:`, result.matches.slice(0, 3));
+            }
+            console.log(`- Prizes found: ${result.prizes ? Object.keys(result.prizes).length : 0}`);
+            if (result.prizes) {
+                console.log(`- Prize details:`, result.prizes);
+            }
         } else {
-            console.log("❌ Prize keywords NOT found.");
+            console.log(`❌ Parse returned null`);
         }
+
+        return result;
     }
 }
 
