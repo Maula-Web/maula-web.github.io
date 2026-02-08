@@ -24,9 +24,16 @@ class ResultsManager {
         const loading = document.getElementById('loading');
 
         const finishedJornadas = this.jornadas.filter(j => {
-            // Show all jornadas that have results, regardless of day
-            return j.matches && j.matches[0] && j.matches[0].result !== '';
+            // Show all jornadas that have AT LEAST ONE result in ANY match
+            if (!j.matches || j.matches.length === 0) return false;
+
+            // Check if ANY match has a result
+            const hasAnyResult = j.matches.some(m => m.result && m.result.trim() !== '');
+            return hasAnyResult;
         }).sort((a, b) => b.number - a.number);
+
+        console.log(`ResultsManager: Found ${finishedJornadas.length} jornadas with results`);
+        console.log(`Jornada numbers:`, finishedJornadas.map(j => j.number));
 
         if (finishedJornadas.length === 0) {
             loading.textContent = "No hay jornadas finalizadas con resultados todavía.";
