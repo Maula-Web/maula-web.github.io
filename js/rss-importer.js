@@ -1,16 +1,13 @@
 /**
  * Quiniela Scraper & Importer
- * Replaces old RSS and PDF importers.
- * Scrapes data directly from EduardoLosilla.es using client-side CORS proxies.
+ * Migrated to ElQuinielista.com for both matches and results.
  */
 
 class QuinielaScraper {
     constructor() {
-        // We use specific URLs for different tasks
-        this.BASE_URL = 'https://www.eduardolosilla.es/quiniela/ayudas/escrutinio';
-
-        // SWITCH TO PLAN B: ElQuinielista (Server Side Rendered, reliable for scraping)
+        // Migrate everything to ElQuinielista (server-side rendered, reliable)
         this.PROXIMAS_URL = 'https://www.elquinielista.com/Quinielista/calendario-quiniela';
+        this.RESULTADOS_URL = 'https://www.elquinielista.com/Quinielista/resultados-quiniela';
 
         this.CORS_PROXIES = [
             'https://api.allorigins.win/raw?url=',
@@ -30,7 +27,7 @@ class QuinielaScraper {
     }
 
     /**
-     * Entry point for Importing RESULTS (formerly RSS)
+     * Entry point for Importing RESULTS + PRIZES from ElQuinielista
      */
     async startResultImport() {
         await this.init();
@@ -47,40 +44,32 @@ class QuinielaScraper {
             return;
         }
 
-        const loadingOverlay = this.showLoading('Buscando resultados en EduardoLosilla.es...');
+        const loadingOverlay = this.showLoading('Buscando resultados en ElQuinielista...');
         let updates = 0;
 
         try {
             for (const jornada of candidates) {
-                // SECURITY CHECK: Avoid future jornadas (EduardoLosilla returns old season data for future dates)
-                // Parse date "dd-mm-yyyy"
+                // SECURITY CHECK: Avoid future jornadas
                 if (jornada.date && jornada.date.includes('-')) {
                     const parts = jornada.date.split('-'); // [dd, mm, yyyy]
-                    // Assume yyyy is correct
                     const jDate = new Date(parts[2], parts[1] - 1, parts[0]);
                     const today = new Date();
+                    const diffDays = (jDate - today) / (1000 * 60 * 60 * 24);
 
-                    // Difference in days
-                    const diffTime = jDate - today;
-                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-                    // If Jornada is more than 4 days in the future, SKIP IT.
-                    // (Allowing 4 days margin for early starts or timezone diffs)
                     if (diffDays > 4) {
-                        console.warn(`Skipping Results for J${jornada.number}: Date ${jornada.date} is too far in future (Avoid fake history data).`);
+                        console.warn(`Skipping Results for J${jornada.number}: Date ${jornada.date} is too far in future.`);
                         continue;
                     }
                 }
 
                 this.updateLoading(loadingOverlay, `Consultando Jornada ${jornada.number}...`);
 
-                // Construct URL: .../jornada_X
-                const url = `${this.BASE_URL}/jornada_${jornada.number}`;
-                const html = await this.fetchHTML(url);
+                // Fetch from ElQuinielista
+                const html = await this.fetchHTML(this.RESULTADOS_URL);
 
                 if (html) {
-                    const results = this.parseResultsFromHTML(html, jornada.number);
-                    if (results && results.matches.length > 0) {
+                    const results = this.parseResultsFromElQuinielista(html, jornada.number);
+                    if (results && results.matches && results.matches.length > 0) {
                         const updated = await this.applyResultsToJornada(jornada, results);
                         if (updated) updates++;
                     }
@@ -93,7 +82,7 @@ class QuinielaScraper {
             loadingOverlay.remove();
             if (updates > 0) {
                 alert(`✅ Se han actualizado ${updates} jornadas con nuevos resultados.`);
-                window.location.reload(); // Refresh grid
+                window.location.reload();
             } else {
                 alert('⚠️ No se encontraron nuevos resultados disponibles para las jornadas pendientes.');
             }
@@ -391,7 +380,7 @@ class QuinielaScraper {
 
     /**
      * Parse Results (1, X, 2) from HTML using the "m-resultado" class
-     * Confirmed strategy.
+     * Confirmed strategy - OLD (Eduardo Losilla, no longer works)
      */
     parseResultsFromHTML(html, jornadaNumber) {
         const parser = new DOMParser();
@@ -424,6 +413,153 @@ class QuinielaScraper {
         }
 
         return { matches };
+    }
+
+    /**
+     * NEW: Parse Results + Prizes from ElQuinielista
+     * Extracts 1/X/2 results and prize amounts from the text content
+     */
+    parseResultsFromElQuinielista(html, targetJornadaNum) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Clean noise
+        const trash = doc.querySelectorAll('script, style, noscript, meta, link');
+        trash.forEach(el => el.remove());
+
+        const fullText = doc.body.innerText || doc.body.textContent;
+        const lines = fullText.split('\n').map(l => l.trim()).filter(l => l);
+
+        console.log(`Parsing ElQuinielista for J${targetJornadaNum}...`);
+
+        let currentJornada = null;
+        let currentMatches = [];
+        let prizes = {};
+        let foundTarget = false;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            // 1. Detect Jornada number "Jornada :" or "Jornada nº X"
+            const jornadaMatch = line.match(/Jornada\s*[:\s#nº]*\s*(\d+)/i);
+            if (jornadaMatch) {
+                const jNum = parseInt(jornadaMatch[1]);
+
+                // If we found our target and have data, stop
+                if (foundTarget && currentMatches.length > 0) {
+                    break;
+                }
+
+                // Check if this is our target jornada
+                if (jNum === targetJornadaNum) {
+                    currentJornada = jNum;
+                    currentMatches = [];
+                    prizes = {};
+                    foundTarget = true;
+                    console.log(`Found target Jornada ${jNum}`);
+                } else if (currentJornada) {
+                    // We passed our target jornada
+                    break;
+                }
+            }
+
+            if (!foundTarget) continue;
+
+            // 2. Detect Results: Look for "1", "X", "2" preceded by position or team names
+            // ElQuinielista shows results like: "1º" then team names then "1" or "X" or "2"
+            // Or sometimes just "1  X  2  1  X..." in sequence
+
+            // Simple pattern: Line contains only result chars and spaces
+            if (line.match(/^[1X2\sxº]+$/i) && line.length > 10) {
+                const results = line.split(/\s+/).filter(r => r.match(/^[1X2]$/i));
+                if (results.length >= 10 && currentMatches.length === 0) {
+                    // Likely the results row
+                    for (let j = 0; j < Math.min(results.length, 15); j++) {
+                        currentMatches.push({
+                            position: j + 1,
+                            result: results[j].toUpperCase()
+                        });
+                    }
+                    console.log(`Extracted ${currentMatches.length} results`);
+                }
+            }
+
+            // 3. Detect Prizes: "15 Aciertos", "14 Aciertos", etc. with amounts
+            // Format: "1º 15 Aciertos 523 53.423,92 €"
+            // Or: "15 Aciertos" (line), then amount (next line or same)
+
+            const prizeMatch = line.match(/(\d{1,2})\s+Aciertos/i);
+            if (prizeMatch) {
+                const category = prizeMatch[1]; // "15", "14", etc.
+
+                // Look for Euro amount in this line or next few lines
+                let amount = null;
+                for (let j = 0; j < 3; j++) {
+                    const checkLine = lines[i + j] || '';
+                    const amountMatch = checkLine.match(/([\d,.]+)\s*€/);
+                    if (amountMatch) {
+                        amount = amountMatch[1].replace(/\./g, '').replace(',', '.');
+                        break;
+                    }
+                }
+
+                if (amount) {
+                    prizes[category] = parseFloat(amount);
+                    console.log(`Found prize: ${category} aciertos = ${amount}€`);
+                }
+            }
+        }
+
+        if (!foundTarget || currentMatches.length === 0) {
+            console.warn(`Could not find results for J${targetJornadaNum} in ElQuinielista`);
+            return null;
+        }
+
+        return {
+            matches: currentMatches,
+            prizes: prizes
+        };
+    }
+
+    /**
+     * Apply imported results (and prizes) to a jornada
+     */
+    async applyResultsToJornada(dbJornada, importData) {
+        if (!importData || !importData.matches) return false;
+
+        let hasChanges = false;
+
+        // Update results for each match
+        for (const imported of importData.matches) {
+            const existing = dbJornada.matches.find(m => m.position === imported.position);
+            if (existing && imported.result) {
+                // Only update if different or was empty
+                if (existing.result !== imported.result) {
+                    existing.result = imported.result;
+                    hasChanges = true;
+                }
+            }
+        }
+
+        // Update prizes if available
+        if (importData.prizes && Object.keys(importData.prizes).length > 0) {
+            if (!dbJornada.prizes) dbJornada.prizes = {};
+
+            for (const [category, amount] of Object.entries(importData.prizes)) {
+                if (dbJornada.prizes[category] !== amount) {
+                    dbJornada.prizes[category] = amount;
+                    hasChanges = true;
+                }
+            }
+        }
+
+        if (hasChanges) {
+            await window.DataService.save('jornadas', dbJornada);
+            console.log(`Updated J${dbJornada.number} with results and prizes`);
+            return true;
+        }
+
+        return false;
     }
 
     /**

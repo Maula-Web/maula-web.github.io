@@ -24,13 +24,7 @@ class ResultsManager {
         const loading = document.getElementById('loading');
 
         const finishedJornadas = this.jornadas.filter(j => {
-            // Filter: Only show jornadas on Sunday
-            if (j.date) {
-                const dateObj = AppUtils.parseDate(j.date);
-                // Si la fecha es inválida o NO es domingo, la ignoramos para resultados finales
-                // (Ojo: Si quieres permitir jornadas entre semana, quita isSunday)
-                if (!dateObj || !AppUtils.isSunday(dateObj)) return false;
-            }
+            // Show all jornadas that have results, regardless of day
             return j.matches && j.matches[0] && j.matches[0].result !== '';
         }).sort((a, b) => b.number - a.number);
 
