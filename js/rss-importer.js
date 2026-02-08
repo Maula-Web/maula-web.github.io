@@ -871,12 +871,12 @@ class QuinielaScraper {
         // Try to find any jornada number pattern
         const lines = text.split('\n').map(l => l.trim()).filter(l => l);
         console.log(`\n🔢 Looking for jornada number patterns...`);
-        for (let i = 0; i < Math.min(lines.length, 200); i++) {
+        let count = 0;
+        for (let i = 0; i < lines.length && count < 50; i++) {
             if (lines[i].toLowerCase().includes('jornada')) {
-                console.log(`Line ${i}: "${lines[i]}"`);
-                console.log(`  Next: "${lines[i + 1] || ''}"`);
-                if (i < 10) continue; // Show first 10 occurrences
-                break;
+                console.log(`Line ${i}: "${lines[i].substring(0, 150)}"`);
+                if (lines[i + 1]) console.log(`  Next: "${lines[i + 1].substring(0, 150)}"`);
+                count++;
             }
         }
 
