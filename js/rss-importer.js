@@ -5,10 +5,12 @@
 
 class QuinielaScraper {
     constructor() {
-        // Migrate everything to ElQuinielista (server-side rendered, reliable)
-        // The calendario page shows BOTH upcoming matches AND past results with prizes
+        // Use ElQuinielista:
+        // - estadisticas page for RESULTS (has clear table structure)
+        // - calendario page for PRIZES
         this.PROXIMAS_URL = 'https://www.elquinielista.com/Quinielista/calendario-quiniela';
-        this.RESULTADOS_URL = 'https://www.elquinielista.com/Quinielista/calendario-quiniela';
+        this.RESULTADOS_URL = 'https://www.elquinielista.com/Quinielista/Estadisticas-Quinielas';
+        this.PREMIOS_URL = 'https://www.elquinielista.com/Quinielista/calendario-quiniela';
 
         this.CORS_PROXIES = [
             'https://api.allorigins.win/raw?url=',
@@ -417,12 +419,15 @@ class QuinielaScraper {
     }
 
     /**
-     * NEW: Parse Results + Prizes from ElQuinielista
-     * Extracts 1/X/2 results and prize amounts from the text content
-     * IMPROVED VERSION with better pattern recognition
-     * Format: "Jornada : 40 Fecha : 08/02/2026 22:00:00"
+     * Parse Results from Estadisticas page
+     * The page has a table where columns=jornadas, rows=partidos
+     * Format:
+     * Jornada   1    2    3  ... 39  Jornada
+     * 12XX1122XX22XX21X...1   (row for match 1)
+     * 21X1XX21X11111111...2   (row for match 2)
+     * etc.
      */
-    parseResultsFromElQuinielista(html, targetJornadaNum) {
+    parseResultsFromEstadisticas(html, targetJornadaNum) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
