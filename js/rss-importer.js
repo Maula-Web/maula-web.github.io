@@ -904,6 +904,30 @@ class QuinielaScraper {
             if (result.prizes) {
                 console.log(`- Prize details:`, result.prizes);
             }
+
+            // If no matches found, show the section content
+            if (!result.matches || result.matches.length === 0) {
+                console.log(`\n⚠️ No matches found. Showing jornada section for analysis:`);
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+                let inSection = false;
+                let lineCount = 0;
+                for (let i = 0; i < lines.length && lineCount < 100; i++) {
+                    if (lines[i] === 'Jornada :' && lines[i + 1] === String(jornadaNum)) {
+                        inSection = true;
+                        console.log(`\n--- START OF J${jornadaNum} SECTION (Line ${i}) ---`);
+                    }
+                    if (inSection) {
+                        console.log(`${i}: ${lines[i].substring(0, 200)}`);
+                        lineCount++;
+
+                        // Stop at next jornada
+                        if (lineCount > 5 && lines[i] === 'Jornada :' && lines[i + 1] !== String(jornadaNum)) {
+                            console.log(`--- END OF SECTION (Next jornada: ${lines[i + 1]}) ---`);
+                            break;
+                        }
+                    }
+                }
+            }
         } else {
             console.log(`❌ Parse returned null`);
         }
