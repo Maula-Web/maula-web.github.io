@@ -420,6 +420,7 @@ class QuinielaScraper {
      * NEW: Parse Results + Prizes from ElQuinielista
      * Extracts 1/X/2 results and prize amounts from the text content
      * IMPROVED VERSION with better pattern recognition
+     * Format: "Jornada : 40 Fecha : 08/02/2026 22:00:00"
      */
     parseResultsFromElQuinielista(html, targetJornadaNum) {
         const parser = new DOMParser();
@@ -451,8 +452,8 @@ class QuinielaScraper {
             const line = lines[i];
 
             // 1. Detect Jornada marker
-            // Patterns: "Jornada :", "Jornada nº 39", "Jornada: 39", "Jornada 39"
-            const jornadaMatch = line.match(/Jornada\s*[:\s#nºNº]*\s*(\d+)/i);
+            // Format: "Jornada : 40 Fecha : 08/02/2026 22:00:00"
+            const jornadaMatch = line.match(/Jornada\s*:\s*(\d+)\s+Fecha\s*:/i);
             if (jornadaMatch) {
                 const jNum = parseInt(jornadaMatch[1]);
 
@@ -461,7 +462,6 @@ class QuinielaScraper {
                     foundTarget = true;
                     insideTargetJornada = true;
                     currentMatches = [];
-                    prizes = {};
                 } else if (insideTargetJornada) {
                     // We were inside our target and hit a different jornada = end of section
                     console.log(`[ElQuinielista] Exiting target section, found J${jNum}`);
@@ -474,7 +474,7 @@ class QuinielaScraper {
             // 2. Detect Results Line
             // Look for a line with multiple 1/X/2 results
             // Example: "1  X  2  1  X  1  2  X  1  2  X  1  1  X  2"
-            // or: "1 X 2 1 X 1 2 X 1 2 X 1 1 X X"
+            // or: "1 X 2 1 X 1 2 X 1 1 X X"
             if (line.match(/^[1X2\s]+$/i) && line.length > 20) {
                 const potentialResults = line.split(/\s+/).filter(r => r.match(/^[1X2]$/i));
                 if (potentialResults.length >= 14 && !resultsLine) {
@@ -483,18 +483,27 @@ class QuinielaScraper {
                 }
             }
 
-            // Alternative: Results might be in a table structure
-            // Look for patterns like "1º" followed by result on same or next line
-            const positionMatch = line.match(/^(\d{1,2})[ºª\.]\s*([1X2])?$/i);
+            // Alternative: Results might be embedded in match info
+            // Look for patterns like "1º Home-Away 1" or just the result markers
+            const positionMatch = line.match(/^(\d{1,2})[ºª\.\s]+/);
             if (positionMatch && currentMatches.length < 15) {
                 const pos = parseInt(positionMatch[1]);
-                let result = positionMatch[2] ? positionMatch[2].toUpperCase() : null;
 
-                // If no result on same line, check next line
-                if (!result && i + 1 < lines.length) {
-                    const nextLine = lines[i + 1].trim();
-                    if (nextLine.match(/^[1X2]$/i)) {
-                        result = nextLine.toUpperCase();
+                // Look for result (1/X/2) in the same line or next few lines
+                let result = null;
+
+                // Check if result is at end of this line
+                const resultInLine = line.match(/\s+([1X2])\s*$/i);
+                if (resultInLine) {
+                    result = resultInLine[1].toUpperCase();
+                } else {
+                    // Check next lines
+                    for (let j = 1; j <= 3; j++) {
+                        const nextLine = lines[i + j]?.trim() || '';
+                        if (nextLine.match(/^[1X2]$/i)) {
+                            result = nextLine.toUpperCase();
+                            break;
+                        }
                     }
                 }
 
@@ -518,7 +527,7 @@ class QuinielaScraper {
                 const category = prizeLineMatch[1];
                 const amountStr = prizeLineMatch[2].replace(/\./g, '').replace(',', '.');
                 const amount = parseFloat(amountStr);
-                if (!isNaN(amount)) {
+                if (!isNaN(amount) && amount > 0) {
                     prizes[category] = amount;
                     console.log(`[ElQuinielista] Prize found: ${category} aciertos = ${amount}€`);
                 }
@@ -534,7 +543,7 @@ class QuinielaScraper {
                         if (amountMatch) {
                             const amountStr = amountMatch[1].replace(/\./g, '').replace(',', '.');
                             const amount = parseFloat(amountStr);
-                            if (!isNaN(amount) && amount > 0) {
+                            if (!isNaN(amount) && amount > 0.5) { // Avoid catching small numbers like 0.5
                                 prizes[category] = amount;
                                 console.log(`[ElQuinielista] Prize found (multi-line): ${category} aciertos = ${amount}€`);
                                 break;
@@ -562,16 +571,17 @@ class QuinielaScraper {
         }
 
         if (currentMatches.length === 0) {
-            console.warn(`[ElQuinielista] ❌ No results extracted for J${targetJornadaNum}`);
-            return null;
+            console.warn(`[ElQuinielista] ⚠️ No results extracted for J${targetJornadaNum} (might be future jornada)`);
+            // Don't return null - might have prizes even without results
         }
 
         console.log(`[ElQuinielista] ✓ Successfully parsed J${targetJornadaNum}:`);
         console.log(`  - Results: ${currentMatches.length} matches`);
         console.log(`  - Prizes: ${Object.keys(prizes).length} categories`);
 
+        // Return data even if only partial
         return {
-            matches: currentMatches,
+            matches: currentMatches.length > 0 ? currentMatches : null,
             prizes: Object.keys(prizes).length > 0 ? prizes : null
         };
     }
@@ -850,6 +860,25 @@ class QuinielaScraper {
         console.log(`- Contains "Jornada ${jornadaNum}": ${text.includes(`Jornada ${jornadaNum}`)}`);
         console.log(`- Contains "Aciertos": ${text.includes('Aciertos')}`);
         console.log(`- Contains "14 Aciertos": ${text.includes('14 Aciertos')}`);
+
+        // Find where "Jornada" appears and show context
+        const jornadaIndex = text.indexOf('Jornada');
+        if (jornadaIndex !== -1) {
+            console.log(`\n📍 Sample around first "Jornada" (at position ${jornadaIndex}):`);
+            console.log(text.substring(jornadaIndex, jornadaIndex + 500));
+        }
+
+        // Try to find any jornada number pattern
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+        console.log(`\n🔢 Looking for jornada number patterns...`);
+        for (let i = 0; i < Math.min(lines.length, 200); i++) {
+            if (lines[i].toLowerCase().includes('jornada')) {
+                console.log(`Line ${i}: "${lines[i]}"`);
+                console.log(`  Next: "${lines[i + 1] || ''}"`);
+                if (i < 10) continue; // Show first 10 occurrences
+                break;
+            }
+        }
 
         // Test actual parsing
         console.log(`\n🧪 Testing parseResultsFromElQuinielista...`);
