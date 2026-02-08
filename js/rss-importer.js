@@ -6,8 +6,9 @@
 class QuinielaScraper {
     constructor() {
         // Migrate everything to ElQuinielista (server-side rendered, reliable)
+        // The calendario page shows BOTH upcoming matches AND past results with prizes
         this.PROXIMAS_URL = 'https://www.elquinielista.com/Quinielista/calendario-quiniela';
-        this.RESULTADOS_URL = 'https://www.elquinielista.com/Quinielista/resultados-quiniela';
+        this.RESULTADOS_URL = 'https://www.elquinielista.com/Quinielista/calendario-quiniela';
 
         this.CORS_PROXIES = [
             'https://api.allorigins.win/raw?url=',
@@ -869,6 +870,57 @@ class QuinielaScraper {
         }
 
         return result;
+    }
+
+    /**
+     * DEBUG: Find the correct ElQuinielista results URL
+     * Run: window.quinielaScraper.findCorrectResultsURL()
+     */
+    async findCorrectResultsURL() {
+        const baseUrls = [
+            'https://www.elquinielista.com/Quinielista/resultados-quiniela',
+            'https://www.elquinielista.com/Quinielista/resultados-quiniela.aspx',
+            'https://www.elquinielista.com/Quinielista/resultados',
+            'https://www.elquinielista.com/Quinielista/historico-quiniela',
+            'https://www.elquinielista.com/Quinielista/escrutinio',
+            'https://sl.elquinielista.com/Quinielista/resultados-quiniela',
+            'https://www.elquinielista.com/resultados-quiniela',
+            'https://www.elquinielista.com/Quinielista/jornadas'
+        ];
+
+        console.log('\n=== Testing ElQuinielista URLs ===');
+
+        for (const url of baseUrls) {
+            console.log(`\nTesting: ${url}`);
+            const html = await this.fetchHTML(url);
+
+            if (html && html.length > 1000) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const trash = doc.querySelectorAll('script, style, noscript, meta, link');
+                trash.forEach(el => el.remove());
+                const text = doc.body.innerText;
+
+                const hasJornada = text.includes('Jornada');
+                const hasAciertos = text.includes('Aciertos');
+                const has404 = text.includes('404') || text.includes('not found');
+
+                console.log(`  - Length: ${html.length} bytes`);
+                console.log(`  - Has "Jornada": ${hasJornada}`);
+                console.log(`  - Has "Aciertos": ${hasAciertos}`);
+                console.log(`  - ERROR page: ${has404}`);
+
+                if (hasJornada && hasAciertos && !has404) {
+                    console.log(`  ✅ LOOKS GOOD! Sample:`, text.substring(0, 200));
+                    return url;
+                }
+            } else {
+                console.log(`  ❌ Failed to fetch or too small`);
+            }
+        }
+
+        console.log('\n❌ No valid URL found');
+        return null;
     }
 }
 
