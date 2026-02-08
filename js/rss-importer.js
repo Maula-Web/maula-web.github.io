@@ -452,20 +452,30 @@ class QuinielaScraper {
             const line = lines[i];
 
             // 1. Detect Jornada marker
-            // Format: "Jornada : 40 Fecha : 08/02/2026 22:00:00"
-            const jornadaMatch = line.match(/Jornada\s*:\s*(\d+)\s+Fecha\s*:/i);
-            if (jornadaMatch) {
-                const jNum = parseInt(jornadaMatch[1]);
+            // Actual format from ElQuinielista:
+            // Line i:   "Jornada :"
+            // Line i+1: "39"
+            // Line i+2: "Fecha :"
+            // Line i+3: "08/02/2026 22:00:00"
 
-                if (jNum === targetJornadaNum) {
-                    console.log(`[ElQuinielista] ✓ Found target Jornada ${jNum} at line ${i}`);
-                    foundTarget = true;
-                    insideTargetJornada = true;
-                    currentMatches = [];
-                } else if (insideTargetJornada) {
-                    // We were inside our target and hit a different jornada = end of section
-                    console.log(`[ElQuinielista] Exiting target section, found J${jNum}`);
-                    break;
+            if (line.trim() === 'Jornada :' && i + 1 < lines.length) {
+                const nextLine = lines[i + 1].trim();
+                const numMatch = nextLine.match(/^(\d+)$/);
+
+                if (numMatch) {
+                    const jNum = parseInt(numMatch[1]);
+
+                    if (jNum === targetJornadaNum) {
+                        console.log(`[ElQuinielista] ✓ Found target Jornada ${jNum} at line ${i}`);
+                        foundTarget = true;
+                        insideTargetJornada = true;
+                        currentMatches = [];
+                        prizes = {};
+                    } else if (insideTargetJornada) {
+                        // We were inside our target and hit a different jornada = end of section
+                        console.log(`[ElQuinielista] Exiting target section, found J${jNum}`);
+                        break;
+                    }
                 }
             }
 
