@@ -218,6 +218,31 @@ const AppUtils = {
         if (!member) return 'Invitado';
         // We use 'phone' field as Nickname per user request
         return (member.phone && member.phone.trim() !== '') ? member.phone : member.name;
+    },
+
+    /**
+     * Formats a number as Euro currency (Spanish format: 1.234,56 €)
+     */
+    formatEuro(value) {
+        if (value === null || value === undefined || isNaN(value)) return '0,00 €';
+        return new Intl.NumberFormat('es-ES', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    },
+
+    /**
+     * Parses a string with Euro format back to a float
+     */
+    parseEuro(str) {
+        if (!str) return 0;
+        // Remove currency symbol, whitespace and thousand separators (points)
+        // Change decimal separator (comma) to point
+        const clean = str.replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.');
+        const val = parseFloat(clean);
+        return isNaN(val) ? 0 : val;
     }
 };
 

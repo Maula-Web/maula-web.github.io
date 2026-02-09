@@ -302,10 +302,20 @@ class JornadaManager {
             row.className = 'prize-row';
             row.dataset.category = cat;
 
+            const formatted = AppUtils.formatEuro(amount);
+
             row.innerHTML = `
                 <span class="prize-category">${cat === '15' ? 'Pleno al 15' : cat + ' Aciertos'}</span>
-                <input type="number" step="0.01" class="inp-prize" value="${amount}" placeholder="0.00">
+                <input type="text" class="inp-prize" value="${formatted}" placeholder="0,00 €">
             `;
+
+            // Formatting on blur
+            const inp = row.querySelector('input');
+            inp.addEventListener('blur', () => {
+                const val = AppUtils.parseEuro(inp.value);
+                inp.value = AppUtils.formatEuro(val);
+            });
+
             this.prizesContainer.appendChild(row);
         });
     }
@@ -383,7 +393,8 @@ class JornadaManager {
             const prizeRows = this.prizesContainer.querySelectorAll('.prize-row');
             prizeRows.forEach(row => {
                 const category = row.dataset.category;
-                const value = parseFloat(row.querySelector('input').value) || 0;
+                const valueStr = row.querySelector('input').value;
+                const value = AppUtils.parseEuro(valueStr);
                 if (value > 0) prizes[category] = value;
             });
         }
