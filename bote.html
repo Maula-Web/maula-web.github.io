@@ -583,8 +583,12 @@
                 <div class="value negative" id="total-gastos">0.00 €</div>
             </div>
             <div class="summary-card">
-                <h3>Jornadas Procesadas</h3>
+                <h3>Jornadas</h3>
                 <div class="value neutral" id="jornadas-count">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Caja por Premios</h3>
+                <div class="value positive" id="total-premios" style="color: #4caf50;">0.00 €</div>
             </div>
         </div>
 
@@ -597,9 +601,11 @@
                 <option value="general">Vista General</option>
                 <option value="detalle">Detalle por Jornada</option>
                 <option value="cuadrante">Cuadrante (Resumen Total)</option>
+                <option value="repartos">Reparto de Ganancias</option>
             </select>
             <button onclick="window.Bote.openIngresoModal()">➕ Registrar Ingreso</button>
             <button onclick="window.Bote.openGestionIngresosModal()">📋 Gestionar Ingresos</button>
+            <button onclick="window.Bote.openRepartoModal()">💰 Realizar Reparto</button>
             <button onclick="window.Bote.openConfigModal()">⚙️ Configuración</button>
             <button onclick="window.Bote.exportData()">📊 Exportar Datos</button>
         </div>
@@ -770,6 +776,63 @@
     </div>
 
     <script src="js/bote.js"></script>
+    <!-- Modal: Registrar Reparto -->
+    <div id="modal-reparto" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Realizar Reparto de Ganancias</h2>
+                <span class="close-modal" onclick="window.Bote.closeModal('modal-reparto')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="form-reparto">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label>Fecha del Reparto:</label>
+                            <input type="date" id="reparto-fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Importe Total (€):</label>
+                            <input type="number" id="reparto-importe" step="0.01" min="0.01" placeholder="0.00"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Reparto:</label>
+                        <select id="reparto-tipo" onchange="window.Bote.toggleRepartoType(this.value)">
+                            <option value="socios">Reparto a partes iguales entre SOCIOS</option>
+                            <option value="actividad">Destinado a ACTIVIDAD (Cena, Evento, etc.)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Concepto / Descripción:</label>
+                        <input type="text" id="reparto-descripcion"
+                            placeholder="Ej: Reparto Navidad / Cena Fin Temporada" required>
+                    </div>
+
+                    <div id="reparto-socios-config"
+                        style="margin-top: 1.5rem; border-top: 1px solid #444; padding-top: 1rem;">
+                        <h3>Preferencia de Cobro por Socio</h3>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 1rem;">
+                            Indique cómo prefiere recibir cada socio su parte (Bote o Efectivo). El importe por socio se
+                            calcula automáticamente.
+                        </p>
+                        <div id="reparto-miembros-list"
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 300px; overflow-y: auto;">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                        <button type="button" class="btn-cancel"
+                            onclick="window.Bote.closeModal('modal-reparto')">Cancelar</button>
+                        <button type="submit" class="btn-primary">Confirmar y Registrar Reparto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

@@ -24,6 +24,7 @@ class BoteManager {
             temporadaActual: '2025-2026'
         };
         this.cashPayments = []; // New - Tracks sellados paid in cash
+        this.repartos = []; // New - Tracks profit distributions
         this.checkIsPIG = (m) => {
             if (!m) return false;
             const h = (m.home || '').toLowerCase();
@@ -60,6 +61,11 @@ class BoteManager {
                 this.currentVista = e.target.value;
                 this.currentJornadaIndex = -1; // Trigger recalculation of most recent jornada
                 this.render();
+            });
+
+            document.getElementById('form-reparto').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveReparto();
             });
 
             // Initial render
@@ -99,6 +105,9 @@ class BoteManager {
 
         // Load extra forecasts (Doubles Column)
         this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
+
+        // Load repartos
+        this.repartos = await window.DataService.getAll('repartos') || [];
     }
 
     async loadConfig() {
@@ -168,65 +177,103 @@ class BoteManager {
                 if (entry) boteAcumulado = entry[1];
             }
 
-            this.jornadas.forEach((jornada, jornadaIndex) => {
-                const matchesWithResult = (jornada.matches || []).filter(m => {
-                    const r = String(m.result || '').trim().toLowerCase();
-                    return r !== '' && r !== 'por definir';
-                });
-                if (matchesWithResult.length === 0) return;
+            const mIdStr = member.id ? String(member.id) : '';
 
-                const infoRedist = jornadaExemptions[jornadaIndex];
-                const mIdStr = member.id ? String(member.id) : '';
-                const pronostico = this.pronosticos.find(p =>
-                    (p.jId === jornada.id || p.jornadaId === jornada.id) &&
-                    (String(p.mId || p.memberId) === mIdStr)
-                );
+            // Combinar jornadas y repartos en una línea de tiempo
+            const timeline = [
+                ...this.jornadas.map(j => ({ type: 'jornada', date: j.date, data: j })),
+                ...this.repartos.map(r => ({ type: 'reparto', date: r.date, data: r }))
+            ].sort((a, b) => {
+                const dA = window.AppUtils.parseDate(a.date) || new Date(0);
+                const dB = window.AppUtils.parseDate(b.date) || new Date(0);
+                return dA - dB;
+            });
 
-                const costs = this.calculateJornadaCosts(member.id, jornada, pronostico, jornadaIndex, infoRedist);
-                const prizes = this.getPrizesForMemberJornada(member.id, jornada);
-                const manualIngresos = this.getManualIngresosForJornada(member.id, jornada);
-                const penalties = costs.penalizacionUnos + (costs.penalizacionBajosAciertos || 0) + (costs.penalizacionPIG || 0);
+            timeline.forEach(event => {
+                if (event.type === 'jornada') {
+                    const jornada = event.data;
+                    const jornadaIndex = this.jornadas.findIndex(j => j.id === jornada.id);
 
-                const isSelladoInCash = this.cashPayments.some(cp => String(cp.memberId) === mIdStr && String(cp.jornadaId) === String(jornada.id));
+                    const matchesWithResult = (jornada.matches || []).filter(m => {
+                        const r = String(m.result || '').trim().toLowerCase();
+                        return r !== '' && r !== 'por definir';
+                    });
+                    if (matchesWithResult.length === 0) return;
 
-                // NEW LOGIC: Prizes do NOT go to the individual member's bote
-                const selladoForNeto = isSelladoInCash ? 0 : costs.sellado;
-                const netoForSocio = manualIngresos - (costs.aportacion + penalties) - selladoForNeto;
-                boteAcumulado += netoForSocio;
+                    const infoRedist = jornadaExemptions[jornadaIndex];
+                    const pronostico = this.pronosticos.find(p =>
+                        (p.jId === jornada.id || p.jornadaId === jornada.id) &&
+                        (String(p.mId || p.memberId) === mIdStr)
+                    );
 
-                // Extra prizes (Doubles Column) are counted once per jornada in the Peña's summary
-                let extraPrizes = 0;
-                if (memberIndex === 0) {
-                    extraPrizes = this.getExtraPrizesForJornada(jornada);
+                    const costs = this.calculateJornadaCosts(member.id, jornada, pronostico, jornadaIndex, infoRedist);
+                    const prizes = this.getPrizesForMemberJornada(member.id, jornada);
+                    const manualIngresos = this.getManualIngresosForJornada(member.id, jornada);
+                    const penalties = costs.penalizacionUnos + (costs.penalizacionBajosAciertos || 0) + (costs.penalizacionPIG || 0);
+
+                    const isSelladoInCash = this.cashPayments.some(cp => String(cp.memberId) === mIdStr && String(cp.jornadaId) === String(jornada.id));
+
+                    // NEW LOGIC: Prizes do NOT go to the individual member's bote
+                    const selladoForNeto = isSelladoInCash ? 0 : costs.sellado;
+                    const netoForSocio = manualIngresos - (costs.aportacion + penalties) - selladoForNeto;
+                    boteAcumulado += netoForSocio;
+
+                    // Extra prizes (Doubles Column) are counted once per jornada in the Peña's summary
+                    let extraPrizes = 0;
+                    if (memberIndex === 0) {
+                        extraPrizes = this.getExtraPrizesForJornada(jornada);
+                    }
+
+                    movements.push({
+                        type: 'jornada',
+                        memberId: member.id,
+                        memberName: window.AppUtils.getMemberName(member),
+                        jornadaId: jornada.id,
+                        jornadaNum: jornada.number,
+                        jornadaDate: jornada.date,
+                        aportacion: costs.aportacion,
+                        costeColumna: costs.columna,
+                        penalizacionUnos: costs.penalizacionUnos,
+                        penalizacionBajosAciertos: costs.penalizacionBajosAciertos,
+                        penalizacionPIG: costs.penalizacionPIG,
+                        sellado: costs.sellado,
+                        premios: prizes,
+                        extraPrizes: extraPrizes,
+                        ingresosManual: manualIngresos,
+                        aciertos: costs.aciertos,
+                        totalIngresos: (manualIngresos + prizes), // Shown in table for info
+                        totalGastos: (costs.aportacion + penalties),
+                        neto: netoForSocio, // Now excludes prizes
+                        boteAcumulado: boteAcumulado,
+                        exento: costs.exento,
+                        jugaDobles: costs.jugaDobles,
+                        isSelladoInCash: isSelladoInCash,
+                        // Peña fund: Member contributions + Penalties + Member prizes + Doubles prizes
+                        pennaIn: costs.aportacion + penalties + prizes + extraPrizes,
+                        pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
+                    });
+                } else if (event.type === 'reparto') {
+                    const r = event.data;
+                    if (r.type === 'socios') {
+                        const choice = (r.memberChoices || {})[member.id] || 'bote';
+                        if (choice === 'bote') {
+                            const splitAmount = r.totalAmount / this.members.length;
+                            boteAcumulado += splitAmount;
+
+                            // We record this internally to update the member's historical line
+                            movements.push({
+                                type: 'reparto',
+                                memberId: member.id,
+                                memberName: window.AppUtils.getMemberName(member),
+                                date: r.date,
+                                description: r.description,
+                                neto: splitAmount,
+                                boteAcumulado: boteAcumulado,
+                                isReparto: true
+                            });
+                        }
+                    }
                 }
-
-                movements.push({
-                    memberId: member.id,
-                    memberName: window.AppUtils.getMemberName(member),
-                    jornadaId: jornada.id,
-                    jornadaNum: jornada.number,
-                    jornadaDate: jornada.date,
-                    aportacion: costs.aportacion,
-                    costeColumna: costs.columna,
-                    penalizacionUnos: costs.penalizacionUnos,
-                    penalizacionBajosAciertos: costs.penalizacionBajosAciertos,
-                    penalizacionPIG: costs.penalizacionPIG,
-                    sellado: costs.sellado,
-                    premios: prizes,
-                    extraPrizes: extraPrizes,
-                    ingresosManual: manualIngresos,
-                    aciertos: costs.aciertos,
-                    totalIngresos: (manualIngresos + prizes), // Shown in table for info
-                    totalGastos: (costs.aportacion + penalties),
-                    neto: netoForSocio, // Now excludes prizes
-                    boteAcumulado: boteAcumulado,
-                    exento: costs.exento,
-                    jugaDobles: costs.jugaDobles,
-                    isSelladoInCash: isSelladoInCash,
-                    // Peña fund: Member contributions + Penalties + Member prizes + Doubles prizes
-                    pennaIn: costs.aportacion + penalties + prizes + extraPrizes,
-                    pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
-                });
             });
         });
         return movements;
@@ -718,6 +765,9 @@ class BoteManager {
             case 'cuadrante':
                 this.renderVistaCuadrante(movements);
                 break;
+            case 'repartos':
+                this.renderVistaRepartos(movements);
+                break;
         }
     }
 
@@ -728,7 +778,11 @@ class BoteManager {
         // SUMMARY FOR THE PEÑA
         const totalIngresos = movements.reduce((sum, m) => sum + (m.pennaIn || 0), 0);
         const totalGastos = movements.reduce((sum, m) => sum + (m.pennaOut || 0), 0);
-        const boteTotal = totalIngresos - totalGastos + this.config.boteInicial;
+        const totalRepartos = (this.repartos || []).reduce((sum, r) => sum + (r.totalAmount || 0), 0);
+        const boteTotal = totalIngresos - totalGastos - totalRepartos + this.config.boteInicial;
+
+        // Calculate total prizes for the new card
+        const totalPremios = movements.reduce((sum, m) => sum + (m.premios || 0) + (m.extraPrizes || 0), 0);
 
         // Get processed jornadas (those with results)
         const playedJornadas = this.jornadas.filter(j =>
@@ -740,6 +794,7 @@ class BoteManager {
         document.getElementById('total-bote').textContent = boteTotal.toFixed(2) + ' €';
         document.getElementById('total-ingresos').textContent = totalIngresos.toFixed(2) + ' €';
         document.getElementById('total-gastos').textContent = totalGastos.toFixed(2) + ' €';
+        document.getElementById('total-premios').textContent = totalPremios.toFixed(2) + ' €';
         document.getElementById('jornadas-count').textContent = uniqueJornadasCount;
 
         // Update header subtitle with date range
@@ -1630,6 +1685,164 @@ class BoteManager {
         } catch (error) {
             console.error('Error toggling sellado cash payment:', error);
             alert('Error al actualizar el tipo de reembolso');
+        }
+    }
+
+    renderVistaRepartos(movements) {
+        const totalBote = parseFloat(document.getElementById('total-bote').textContent);
+
+        let html = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="margin:0; color: var(--primary-color);">Histórico de Repartos</h2>
+            </div>
+            
+            <div style="overflow-x: auto; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <table class="bote-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                            <th>Tipo</th>
+                            <th>Importe Total</th>
+                            <th>Info Detalle</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        if (this.repartos.length === 0) {
+            html += `<tr><td colspan="6" style="text-align:center; padding: 2rem; opacity: 0.6;">No se han realizado repartos todavía.</td></tr>`;
+        } else {
+            [...this.repartos].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(r => {
+                const isActividad = r.type === 'actividad';
+                html += `
+                    <tr>
+                        <td style="font-weight:bold;">${new Date(r.date).toLocaleDateString()}</td>
+                        <td>${r.description}</td>
+                        <td>
+                            <span style="padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; background: ${isActividad ? 'rgba(103, 58, 183, 0.2)' : 'rgba(76, 175, 80, 0.2)'}; color: ${isActividad ? '#b39ddb' : '#a5d6a7'}; border: 1px solid ${isActividad ? '#673ab7' : '#4caf50'};">
+                                ${isActividad ? '🚀 Actividad' : '👥 Socios'}
+                            </span>
+                        </td>
+                        <td style="font-weight:bold; color: var(--primary-red); shadow: 0 0 10px rgba(217, 48, 37, 0.3);">${r.totalAmount.toFixed(2)}€</td>
+                        <td style="font-size: 0.85rem;">
+                            ${isActividad ? '-' : `Reparto individual: ${(r.totalAmount / this.members.length).toFixed(2)}€`}
+                        </td>
+                        <td>
+                           <button onclick="window.Bote.deleteReparto('${r.id}')" style="background: rgba(217, 48, 37, 0.1); color: var(--primary-red); border: 1px solid var(--primary-red); padding: 4px 8px; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        document.getElementById('bote-content').innerHTML = html;
+    }
+
+    openRepartoModal() {
+        // Check current balance
+        const totalBote = parseFloat(document.getElementById('total-bote').textContent);
+        if (totalBote <= 0) {
+            alert('No hay saldo suficiente en el bote para realizar un reparto.');
+            return;
+        }
+
+        document.getElementById('reparto-fecha').valueAsDate = new Date();
+        document.getElementById('reparto-importe').max = totalBote;
+        document.getElementById('reparto-importe').placeholder = `Máximo: ${totalBote.toFixed(2)}€`;
+
+        // Reset list of members settings
+        const listDiv = document.getElementById('reparto-miembros-list');
+        listDiv.innerHTML = '';
+
+        this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)).forEach(m => {
+            const div = document.createElement('div');
+            div.style.padding = '8px';
+            div.style.background = 'rgba(255,255,255,0.05)';
+            div.style.borderRadius = '6px';
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
+            div.style.alignItems = 'center';
+
+            div.innerHTML = `
+                <span style="font-size: 0.85rem; font-weight: bold;">${m.name}</span>
+                <select name="choice_${m.id}" style="font-size: 0.8rem; padding: 2px 4px; background: #222; color: #fff; border: 1px solid #444;">
+                    <option value="bote" selected>Al Bote</option>
+                    <option value="cash">En Efectivo</option>
+                </select>
+            `;
+            listDiv.appendChild(div);
+        });
+
+        document.getElementById('modal-reparto').style.display = 'flex';
+    }
+
+    toggleRepartoType(val) {
+        document.getElementById('reparto-socios-config').style.display = (val === 'socios') ? 'block' : 'none';
+        if (val === 'actividad') {
+            document.getElementById('reparto-descripcion').placeholder = "Ej: Cena Navidad / Pago Loteria";
+        } else {
+            document.getElementById('reparto-descripcion').placeholder = "Ej: Reparto parcial ganancias";
+        }
+    }
+
+    async saveReparto() {
+        const totalBote = parseFloat(document.getElementById('total-bote').textContent);
+        const importe = parseFloat(document.getElementById('reparto-importe').value);
+        const type = document.getElementById('reparto-tipo').value;
+
+        if (importe > totalBote) {
+            alert(`No se puede repartir más de lo que hay en el bote (${totalBote.toFixed(2)}€).`);
+            return;
+        }
+
+        const choices = {};
+        if (type === 'socios') {
+            const selects = document.querySelectorAll('#reparto-miembros-list select');
+            selects.forEach(s => {
+                const mid = s.name.replace('choice_', '');
+                choices[mid] = s.value;
+            });
+        }
+
+        const reparto = {
+            id: 'rep_' + Date.now(),
+            date: document.getElementById('reparto-fecha').value,
+            totalAmount: importe,
+            type: type,
+            description: document.getElementById('reparto-descripcion').value,
+            memberChoices: choices,
+            createdAt: new Date().toISOString()
+        };
+
+        try {
+            await window.DataService.save('repartos', reparto);
+            this.repartos.push(reparto);
+            this.closeModal('modal-reparto');
+            this.render();
+            alert('Reparto registrado correctamente.');
+        } catch (error) {
+            console.error('Error saving reparto:', error);
+            alert('Error al guardar el reparto.');
+        }
+    }
+
+    async deleteReparto(id) {
+        if (!confirm('¿Seguro que quieres eliminar este reparto? Esta acción revertirá todos los saldos.')) return;
+        try {
+            await window.DataService.delete('repartos', id);
+            this.repartos = this.repartos.filter(r => r.id !== id);
+            this.render();
+        } catch (error) {
+            console.error('Error deleting reparto:', error);
+            alert('Error al eliminar el reparto.');
         }
     }
 }
