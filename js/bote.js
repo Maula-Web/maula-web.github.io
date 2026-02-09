@@ -918,8 +918,20 @@ class BoteManager {
         const jornada = this.jornadas.find(j => j.number === parseInt(currentJornadaNum));
 
         const extraPrizes = jornadaMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
-        const totalIngresos = jornadaMovements.reduce((sum, m) => sum + m.totalIngresos, 0) + extraPrizes;
-        const totalGastos = jornadaMovements.reduce((sum, m) => sum + m.totalGastos, 0);
+
+        // Total Ingresos for the Peña = Contributions + Penalties + Member Prizes + Extra Prizes
+        const totalIngresos = jornadaMovements.reduce((sum, m) => {
+            const penalties = (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0);
+            return sum + (m.aportacion || 0) + penalties + (m.premios || 0);
+        }, 0) + extraPrizes;
+
+        // Total Gastos for the Peña = Reimbursed sellados (only if Bote option chosen)
+        const totalGastos = jornadaMovements.reduce((sum, m) => {
+            // Sellado is negative in movement. If isSelladoInCash is TRUE, Peña doesn't pay from Bote now.
+            // If isSelladoInCash is FALSE, it's a debt/cost for the Peña bote relative to INITIAL BALANCES.
+            return sum + (m.isSelladoInCash ? 0 : Math.abs(m.sellado || 0));
+        }, 0);
+
         const neto = totalIngresos - totalGastos;
 
         let html = `
@@ -938,12 +950,12 @@ class BoteManager {
             
             <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 145, 0, 0.08); border-radius: 8px; border: 1px solid rgba(255, 145, 0, 0.3);">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align:center;">
-                    <div><strong style="color: #ff9100; font-size:0.75rem;">INGRESOS (Socios + Premios)</strong><br><span class="positive">${totalIngresos.toFixed(2)}€</span></div>
-                    <div><strong style="color: #ff9100; font-size:0.75rem;">GASTOS (Validación + Comisión)</strong><br><span class="negative">${totalGastos.toFixed(2)}€</span></div>
-                    <div><strong style="color: #ff9100; font-size:0.75rem;">NETO JORNADA</strong><br><span class="${neto >= 0 ? 'positive' : 'negative'}">${neto.toFixed(2)}€</span></div>
+                    <div><strong style="color: #ff9100; font-size:0.75rem;">CAJA JORNADA (Socios + Premios)</strong><br><span class="positive">${totalIngresos.toFixed(2)}€</span></div>
+                    <div><strong style="color: #ff9100; font-size:0.75rem;">GASTOS/REEMBOLSOS (Sellado)</strong><br><span class="negative">${totalGastos.toFixed(2)}€</span></div>
+                    <div><strong style="color: #ff9100; font-size:0.75rem;">BALANCE NETO</strong><br><span class="${neto >= 0 ? 'positive' : 'negative'}">${neto.toFixed(2)}€</span></div>
                 </div>
                 <p style="margin-top: 0.8rem; font-size: 0.75rem; color: #ff9100; text-align: center; opacity: 0.8;">
-                    📝 <em>Nota: Todos los premios se acumulan íntegramente en el bote común de la Peña.</em>
+                    📝 <em>Nota: Caja Jornada incluye aportaciones semanales, penalizaciones y todos los premios (Socio + Dobles).</em>
                 </p>
             </div>
 
@@ -1600,10 +1612,10 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v17');
+        const migrationDone = localStorage.getItem('bote_maintenance_v18');
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v17 (Bulk Prize Sync)...');
+        console.log('Running maintenance migration v18 (Bulk Prize Sync)...');
 
         try {
             const allJ = await window.DataService.getAll('jornadas');
@@ -1618,6 +1630,9 @@ class BoteManager {
                 { num: 2, hits: 10, val: 3.00 },
                 { num: 3, hits: 11, val: 48.37 },
                 { num: 5, hits: 10, val: 13.08 },
+                { num: 7, hits: 13, val: 902.93 },
+                { num: 7, hits: 12, val: 16.16 },
+                { num: 7, hits: 11, val: 1.83 },
                 { num: 7, hits: 10, val: 1.00 },
                 { num: 26, hits: 10, val: 6.30 }
             ];
@@ -1637,7 +1652,7 @@ class BoteManager {
                 }
             }
 
-            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17'];
+            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18'];
             marks.forEach(m => localStorage.setItem(`bote_maintenance_${m}`, 'true'));
 
             console.log('Migration v17 effective!');
