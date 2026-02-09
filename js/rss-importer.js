@@ -503,7 +503,12 @@ class QuinielaScraper {
                     // PLENO AL 15: Goles (ej: "21", "M0", "11")
                     // Aceptamos caracteres 0, 1, 2, M
                     if (char.length >= 1) {
-                        const plenoResult = char.replace(/[^012M]/gi, '').toUpperCase();
+                        let plenoResult = char.replace(/[^012M]/gi, '').toUpperCase();
+                        if (plenoResult.length === 2) {
+                            // Formateamos como "1-1" en lugar de "11"
+                            plenoResult = plenoResult[0] + '-' + plenoResult[1];
+                        }
+
                         if (plenoResult.length >= 1) {
                             matches.push({
                                 position: 15,
