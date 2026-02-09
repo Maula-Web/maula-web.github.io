@@ -780,11 +780,12 @@
     <div id="modal-reparto" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h2>Realizar Reparto de Ganancias</h2>
+                <h2 id="modal-reparto-title">Realizar Reparto de Ganancias</h2>
                 <span class="close-modal" onclick="window.Bote.closeModal('modal-reparto')">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="form-reparto">
+                    <input type="hidden" id="reparto-id">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                         <div class="form-group">
                             <label>Fecha del Reparto:</label>
