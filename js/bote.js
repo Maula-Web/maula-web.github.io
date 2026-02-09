@@ -347,14 +347,23 @@ class BoteManager {
         }
 
         // Sellado Reimbursement
+        let isMaula = false;
         if (jornadaIndex > 0) {
             const prevJornada = this.jornadas[jornadaIndex - 1];
-            if (this.wasLoserOfJornada(memberId, prevJornada)) {
-                const numSocios = this.members.length;
-                const cCol = this.getHistoricalPrice('costeColumna', jDate);
-                const cDob = this.getHistoricalPrice('costeDobles', jDate);
-                costs.sellado = -((numSocios * cCol) + cDob);
+            isMaula = this.wasLoserOfJornada(memberId, prevJornada);
+        } else if (jornada.number === 1) {
+            // Manual override for J1: Luismi sealed it (J0 maula)
+            const member = this.members.find(m => String(m.id) === String(memberId));
+            if (member && member.name && member.name.toLowerCase().includes('luismi')) {
+                isMaula = true;
             }
+        }
+
+        if (isMaula) {
+            const numSocios = this.members.length;
+            const cCol = this.getHistoricalPrice('costeColumna', jDate);
+            const cDob = this.getHistoricalPrice('costeDobles', jDate);
+            costs.sellado = -((numSocios * cCol) + cDob);
         }
 
         return costs;
@@ -690,19 +699,25 @@ class BoteManager {
         const totalGastos = movements.reduce((sum, m) => sum + (m.pennaOut || 0), 0);
         const boteTotal = totalIngresos - totalGastos + this.config.boteInicial;
 
-        const uniqueJornadas = new Set(
-            movements
-                .filter(m => {
-                    const j = this.jornadas.find(jor => jor.number === m.jornadaNum);
-                    return j && j.matches && j.matches.some(match => match.result && match.result !== '' && match.result.toLowerCase() !== 'por definir');
-                })
-                .map(m => m.jornadaNum)
-        ).size;
+        // Get processed jornadas (those with results)
+        const playedJornadas = this.jornadas.filter(j =>
+            j.matches && j.matches.some(match => match.result && match.result !== '' && match.result.toLowerCase() !== 'por definir')
+        ).sort((a, b) => a.number - b.number);
+
+        const uniqueJornadasCount = playedJornadas.length;
 
         document.getElementById('total-bote').textContent = boteTotal.toFixed(2) + ' €';
         document.getElementById('total-ingresos').textContent = totalIngresos.toFixed(2) + ' €';
         document.getElementById('total-gastos').textContent = totalGastos.toFixed(2) + ' €';
-        document.getElementById('jornadas-count').textContent = uniqueJornadas;
+        document.getElementById('jornadas-count').textContent = uniqueJornadasCount;
+
+        // Update header subtitle with date range
+        const headerSub = document.querySelector('.bote-header p');
+        if (headerSub && playedJornadas.length > 0) {
+            const firstDate = playedJornadas[0].date;
+            const lastDate = playedJornadas[playedJornadas.length - 1].date;
+            headerSub.innerHTML = `Movimientos del <span style="color:#fff; font-weight:bold;">${firstDate}</span> al <span style="color:#fff; font-weight:bold;">${lastDate}</span>`;
+        }
     }
 
     /**
@@ -730,8 +745,20 @@ class BoteManager {
             };
         });
 
+        // Aggregated date range for the general view
+        const playedJornadas = this.jornadas.filter(j =>
+            j.matches && j.matches.some(match => match.result && match.result !== '' && match.result.toLowerCase() !== 'por definir')
+        ).sort((a, b) => a.number - b.number);
+        let dateRangeHtml = '';
+        if (playedJornadas.length > 0) {
+            dateRangeHtml = `<p style="text-align:center; color: var(--primary-color); font-weight:bold; margin-bottom: 1rem; opacity:0.8; font-size:0.9rem;">
+                Resumen acumulado: ${playedJornadas[0].date} — ${playedJornadas[playedJornadas.length - 1].date}
+            </p>`;
+        }
+
         // Render table
         let html = `
+            ${dateRangeHtml}
             <table class="bote-table">
                 <thead>
                     <tr>
@@ -841,6 +868,7 @@ class BoteManager {
                             <th rowspan="2">Premios</th>
                             <th rowspan="2" style="background: #e65100; font-size: 0.7rem;">Reembolso Sellado</th>
                             <th rowspan="2">Neto</th>
+                            <th rowspan="2" style="background: var(--primary-color, #ff9100); color: #000; border-left: 2px solid #000;">Bote Total</th>
                         </tr>
                         <tr>
                             <th style="background: #ff9100; font-size: 0.65rem;">Unos</th>
@@ -877,6 +905,7 @@ class BoteManager {
                         <td class="positive">${m.premios.toFixed(1)}€</td>
                         <td>${selladoUI}</td>
                         <td class="${m.neto >= 0 ? 'positive' : 'negative'}">${m.neto.toFixed(2)}€</td>
+                        <td style="font-weight:900; background: rgba(255,145,0,0.1); border-left: 2px solid var(--primary-color);">${m.boteAcumulado.toFixed(2)}€</td>
                     </tr>
                 `;
             });
@@ -1365,18 +1394,29 @@ class BoteManager {
 
         let html = `
             <style>
-                .cuadrante-cell-win { background-color: var(--resultados-winner-bg, #1a73e8) !important; color: var(--resultados-winner-text, #ffffff) !important; border: 3px solid var(--primary-color, #ff9100) !important; font-weight: bold; }
-                .cuadrante-cell-loss { background-color: var(--resultados-loser-bg, #d93025) !important; color: var(--resultados-loser-text, #ffffff) !important; border: 2px solid var(--danger, #f44336) !important; }
+                .cuadrante-cell-win { background-color: var(--cuadrante-win-bg, #1a73e8) !important; color: var(--cuadrante-win-text, #ffffff) !important; border: 3px solid var(--cuadrante-win-border, #ff9100) !important; font-weight: bold; }
+                .cuadrante-cell-loss { background-color: var(--cuadrante-loss-bg, #d93025) !important; color: var(--cuadrante-loss-text, #ffffff) !important; border: 2px solid var(--cuadrante-loss-border, #f44336) !important; }
             </style>
             <div class="cuadrante-container" style="max-height: 92vh; overflow: auto; border: 1px solid var(--glass-border); border-radius: 12px; position: relative;">
                 <table class="bote-table cuadrante-table" style="font-size: 0.8rem; min-width: 100%; border-collapse: separate; border-spacing: 0;">
                     <thead>
                         <tr>
-                            <th style="position: sticky; top: 0; left: 0; z-index: 100; background: var(--cuadrante-header-bg); color: var(--cuadrante-header-text); border-right: 2px solid var(--primary-color);">Socio</th>
+                            <th style="position: sticky; top: 0; left: 0; z-index: 100; background: var(--cuadrante-header-bg); color: var(--cuadrante-header-text); border-right: 2px solid var(--cuadrante-win-border, var(--primary-color, #ff9100));">Socio</th>
         `;
 
         jornadasInfo.forEach(j => {
-            html += `<th style="position: sticky; top: 0; min-width: 70px; background: var(--cuadrante-header-bg); color: var(--cuadrante-header-text); border-bottom: 2px solid var(--primary-color);">J${j.number}${j.hasPig ? ' 🐷' : ''}</th>`;
+            let shortDate = '';
+            const d = window.AppUtils.parseDate(j.date);
+            if (d) {
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                shortDate = `<div style="font-size: 0.6rem; opacity: 0.8; font-weight: normal;">${day}/${month}</div>`;
+            }
+            html += `
+                <th style="position: sticky; top: 0; min-width: 70px; background: var(--cuadrante-header-bg); color: var(--cuadrante-header-text); border-bottom: 2px solid var(--cuadrante-win-border, var(--primary-color, #ff9100));">
+                    <div>J${j.number}${j.hasPig ? ' 🐷' : ''}</div>
+                    ${shortDate}
+                </th>`;
         });
 
         html += `
@@ -1389,7 +1429,7 @@ class BoteManager {
             const data = memberData[member.id];
             html += `
                 <tr>
-                    <td style="position: sticky; left: 0; z-index: 50; background: var(--cuadrante-sticky-col); color: var(--cuadrante-sticky-text); font-weight: bold; border-right: 2px solid var(--primary-color); white-space: nowrap;">
+                    <td style="position: sticky; left: 0; z-index: 50; background: var(--cuadrante-sticky-col); color: var(--cuadrante-sticky-text); font-weight: bold; border-right: 2px solid var(--cuadrante-win-border, var(--primary-color, #ff9100)); white-space: nowrap;">
                         ${data.name}
                     </td>
             `;
