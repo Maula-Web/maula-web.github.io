@@ -202,7 +202,7 @@ class BoteManager {
 
                     const infoRedist = jornadaExemptions[jornadaIndex];
                     const pronostico = this.pronosticos.find(p =>
-                        (p.jId === jornada.id || p.jornadaId === jornada.id) &&
+                        (p.jId == jornada.id || p.jornadaId == jornada.id) &&
                         (String(p.mId || p.memberId) === mIdStr)
                     );
 

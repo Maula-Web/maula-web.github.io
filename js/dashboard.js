@@ -68,7 +68,11 @@ class DashboardManager {
             const jDate = AppUtils.parseDate(jornada.date);
 
             this.members.forEach(member => {
-                const p = this.pronosticos.find(pr => (pr.jornadaId === jornada.id || pr.jId === jornada.id) && (pr.memberId === member.id || pr.mId === member.id));
+                const mIdStr = String(member.id);
+                const p = this.pronosticos.find(pr =>
+                    (pr.jornadaId == jornada.id || pr.jId == jornada.id) &&
+                    (pr.memberId == member.id || pr.mId == member.id)
+                );
 
                 let hits = -1;
                 let points = 0;

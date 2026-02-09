@@ -291,7 +291,7 @@ class PronosticoManager {
 
         if (!this.currentMemberId || !this.currentJornadaId) return;
 
-        const jornada = this.jornadas.find(j => j.id === this.currentJornadaId);
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
         if (!jornada) return;
 
         const deadline = this.calculateDeadline(jornada.date);
@@ -329,13 +329,13 @@ class PronosticoManager {
             this.container.style.border = "none";
         }
 
-        const existing = this.pronosticos.find(p => p.jId === this.currentJornadaId && p.mId === this.currentMemberId);
+        const existing = this.pronosticos.find(p => p.jId == this.currentJornadaId && p.mId == this.currentMemberId);
         const currentSelections = existing ? existing.selection : Array(15).fill(null);
 
         // Fetch other members' forecasts for this jornada
         const othersForecasts = this.pronosticos.filter(p =>
-            (p.jId === this.currentJornadaId || p.jornadaId === this.currentJornadaId) &&
-            (p.mId !== this.currentMemberId && p.memberId !== this.currentMemberId)
+            (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) &&
+            (p.mId != this.currentMemberId && p.memberId != this.currentMemberId)
         );
 
         jornada.matches.forEach((match, idx) => {
@@ -668,37 +668,59 @@ class PronosticoManager {
 
         const isForceLate = this.auditLateCheck.checked;
 
-        // 1. Prepare Log Entry
-        const existing = this.pronosticos.find(p => p.id === this.pendingSaveData.id);
-        const logEntry = {
-            timestamp: new Date().toISOString(),
-            type: 'CORRECTION',
-            memberId: this.currentMemberId,
-            jornadaId: this.currentJornadaId,
-            oldSelection: existing ? existing.selection : null,
-            newSelection: this.pendingSaveData.selection,
-            reason: reason,
-            forcedLate: isForceLate
-        };
-
-        // 2. Save Log
-        if (window.DataService) {
-            await window.DataService.save('modification_logs', logEntry);
+        // Disable button to prevent double clicking and show status
+        if (this.btnConfirmAudit) {
+            this.btnConfirmAudit.disabled = true;
+            this.btnConfirmAudit.textContent = 'Guardando...';
         }
 
-        // 3. Update Record with Forced Late Status
-        this.pendingSaveData.late = isForceLate;
+        try {
+            console.log("🔵 Iniciando proceso de guardado de auditoría...");
 
-        // 4. Save Record
-        await this.performFinalSave(this.pendingSaveData, isForceLate, true);
+            // 1. Prepare Log Entry
+            const existing = this.pronosticos.find(p => p.id == this.pendingSaveData.id);
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                type: 'CORRECTION',
+                memberId: this.currentMemberId,
+                jornadaId: this.currentJornadaId,
+                oldSelection: existing ? existing.selection : null,
+                newSelection: this.pendingSaveData.selection,
+                reason: reason,
+                forcedLate: isForceLate
+            };
 
-        this.auditModal.style.display = 'none';
-        document.body.style.overflow = ''; // Restaurar scroll
-        this.pendingSaveData = null;
+            // 2. Save Log
+            if (window.DataService) {
+                console.log("Saving log entry...");
+                await window.DataService.save('modification_logs', logEntry);
+            }
+
+            // 3. Update Record with Forced Late Status
+            this.pendingSaveData.late = isForceLate;
+
+            // 4. Save Record
+            console.log("Saving record...");
+            await this.performFinalSave(this.pendingSaveData, isForceLate, true);
+
+            // 5. Success Flow: Close modal
+            this.auditModal.style.display = 'none';
+            document.body.style.overflow = ''; // Restaurar scroll
+            this.pendingSaveData = null;
+
+        } catch (error) {
+            console.error("❌ ERROR CRÍTICO EN executeAuditSave:", error);
+            alert("Error al guardar la corrección: " + error.message);
+        } finally {
+            if (this.btnConfirmAudit) {
+                this.btnConfirmAudit.disabled = false;
+                this.btnConfirmAudit.textContent = 'Confirmar Cambio';
+            }
+        }
     }
 
     async performFinalSave(record, isLate, isCorrection = false) {
-        const idx = this.pronosticos.findIndex(p => p.id === record.id);
+        const idx = this.pronosticos.findIndex(p => p.id == record.id);
         if (idx > -1) {
             this.pronosticos[idx] = { ...this.pronosticos[idx], ...record };
         } else {
