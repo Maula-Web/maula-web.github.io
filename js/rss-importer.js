@@ -487,18 +487,32 @@ class QuinielaScraper {
             if (cells.length > colIndex) {
                 const char = cells[colIndex].innerText.trim().toUpperCase();
 
-                // A valid result cell contains 1, X or 2
-                const matchResult = char.match(/[1X2]/i);
-                if (matchResult && char.length <= 2) { // Results are usually single chars, maybe a space
-                    matches.push({
-                        position: matchCount + 1,
-                        result: matchResult[0].toUpperCase()
-                    });
-                    matchCount++;
-
-                    // Log the team name if possible (usually in the first/second cell)
-                    const teamInfo = cells[1] ? cells[1].innerText.trim() : '?';
-                    console.log(`[Estadisticas] Match ${matchCount} (${teamInfo}): ${matchResult[0].toUpperCase()}`);
+                if (matchCount < 14) {
+                    // PARTIDOS 1 al 14: Signos 1, X, 2
+                    const matchResult = char.match(/[1X2]/i);
+                    if (matchResult && char.length <= 2) {
+                        matches.push({
+                            position: matchCount + 1,
+                            result: matchResult[0].toUpperCase()
+                        });
+                        matchCount++;
+                        const teamInfo = cells[1] ? cells[1].innerText.trim() : '?';
+                        console.log(`[Estadisticas] Match ${matchCount} (${teamInfo}): ${matchResult[0].toUpperCase()}`);
+                    }
+                } else {
+                    // PLENO AL 15: Goles (ej: "21", "M0", "11")
+                    // Aceptamos caracteres 0, 1, 2, M
+                    if (char.length >= 1) {
+                        const plenoResult = char.replace(/[^012M]/gi, '').toUpperCase();
+                        if (plenoResult.length >= 1) {
+                            matches.push({
+                                position: 15,
+                                result: plenoResult
+                            });
+                            matchCount++;
+                            console.log(`[Estadisticas] Match 15 (PLENO): ${plenoResult}`);
+                        }
+                    }
                 }
             }
 
