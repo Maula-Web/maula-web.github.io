@@ -781,7 +781,7 @@ class BoteManager {
         const totalRepartos = (this.repartos || []).reduce((sum, r) => sum + (r.totalAmount || 0), 0);
         const boteTotal = totalIngresos - totalGastos - totalRepartos + this.config.boteInicial;
 
-        // Calculate total prizes for the new card
+        // Calculate total prizes for the new card - SHOW RAW TOTAL without subtractions
         const totalPremios = movements.reduce((sum, m) => sum + (m.premios || 0) + (m.extraPrizes || 0), 0);
 
         // Get processed jornadas (those with results)
@@ -1004,7 +1004,7 @@ class BoteManager {
                         <td class="negative">${(m.penalizacionUnos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionBajosAciertos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionPIG || 0).toFixed(1)}€</td>
-                        <td class="positive" title="Premio acumulado en el Bote Peña">${m.premios.toFixed(1)}€</td>
+                        <td class="positive" title="Premio acumulado en el Bote Peña">${m.premios.toFixed(2)}€</td>
                         <td>${selladoUI}</td>
                         <td class="${m.neto >= 0 ? 'positive' : 'negative'}">${m.neto.toFixed(2)}€</td>
                         <td style="font-weight:900; background: rgba(255,145,0,0.1); border-left: 2px solid var(--primary-color);">${m.boteAcumulado.toFixed(2)}€</td>
@@ -1612,10 +1612,10 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v18');
+        const migrationDone = localStorage.getItem('bote_maintenance_v19');
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v18 (Bulk Prize Sync)...');
+        console.log('Running maintenance migration v19 (Bulk Prize Sync)...');
 
         try {
             const allJ = await window.DataService.getAll('jornadas');
@@ -1652,7 +1652,7 @@ class BoteManager {
                 }
             }
 
-            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18'];
+            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19'];
             marks.forEach(m => localStorage.setItem(`bote_maintenance_${m}`, 'true'));
 
             console.log('Migration v17 effective!');
