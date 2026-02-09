@@ -811,7 +811,14 @@ class BoteManager {
         let html = `
             <div class="jornada-nav">
                 <button onclick="window.Bote.prevJornada()" ${this.currentJornadaIndex === 0 ? 'disabled' : ''}>← Anterior</button>
-                <span>Jornada ${currentJornadaNum} - ${jornada ? jornada.date : ''}</span>
+                
+                <select id="jornada-select" onchange="window.Bote.goToJornada(this.value)" style="padding: 0.6rem 1rem; border-radius: 8px; background: rgba(30, 30, 30, 0.9); color: white; border: 1px solid var(--primary-color); font-weight: bold; cursor: pointer;">
+                    ${jornadaNums.map((num, idx) => {
+            const j = this.jornadas.find(jor => jor.number === parseInt(num));
+            return `<option value="${idx}" ${idx === this.currentJornadaIndex ? 'selected' : ''}>Jornada ${num} - ${j ? j.date : ''}</option>`;
+        }).join('')}
+                </select>
+
                 <button onclick="window.Bote.nextJornada()" ${this.currentJornadaIndex === jornadaNums.length - 1 ? 'disabled' : ''}>Siguiente →</button>
             </div>
             
@@ -909,6 +916,11 @@ class BoteManager {
             this.currentJornadaIndex++;
             this.render();
         }
+    }
+
+    goToJornada(index) {
+        this.currentJornadaIndex = parseInt(index);
+        this.render();
     }
 
 
