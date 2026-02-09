@@ -65,6 +65,7 @@ class PronosticoManager {
         this.selModalJornada = document.getElementById('sel-modal-jornada');
         this.btnPrevJornada = document.getElementById('btn-prev-jornada');
         this.btnNextJornada = document.getElementById('btn-next-jornada');
+        this.btnLoadForecast = document.getElementById('btn-load-forecast');
 
 
         this.btnToggleSummary = document.getElementById('btn-toggle-summary');
@@ -208,6 +209,9 @@ class PronosticoManager {
         });
 
         this.btnSave.addEventListener('click', () => this.saveForecast());
+        if (this.btnLoadForecast) {
+            this.btnLoadForecast.addEventListener('click', () => this.loadForecast());
+        }
     }
 
     selectAndLoad(jId, mId) {
@@ -1170,6 +1174,9 @@ class PronosticoManager {
      * Incluye sistema de DESEMPATE para garantizar un único ganador.
      */
     checkEligibility(currentJornadaNum, memberId) {
+        // CORRECTION MODE BYPASS: If we are in correction mode, always allow managing doubles
+        if (this.correctionMode) return { eligible: true };
+
         if (currentJornadaNum <= 1) return { eligible: false };
 
         // 1. Encontrar la jornada previa REAL
