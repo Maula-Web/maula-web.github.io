@@ -253,11 +253,7 @@ class PronosticoManager {
     }
 
     populateDropdowns() {
-        const sortedMembers = [...this.members].sort((a, b) => {
-            const nameA = AppUtils.getMemberName(a).toLowerCase();
-            const nameB = AppUtils.getMemberName(b).toLowerCase();
-            return nameA.localeCompare(nameB);
-        });
+        const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         sortedMembers.forEach(m => {
             const opt = document.createElement('option');
@@ -744,7 +740,7 @@ class PronosticoManager {
         tbody.innerHTML = '';
 
         // 1. Sort Members alphabetically
-        const sortedMembers = [...this.members].sort((a, b) => AppUtils.getMemberName(a).localeCompare(AppUtils.getMemberName(b)));
+        const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         // 2. Build Header
         const headerRow = document.createElement('tr');
@@ -889,8 +885,8 @@ class PronosticoManager {
             // Fetch all doubles forecasts for this jornada
             const allDoubles = (this.pronosticosExtra || []).filter(p => String(p.jId || p.jornadaId) === String(jId));
 
-            // Sort members alphabetically
-            const sortedMembers = [...this.members].sort((a, b) => a.name.localeCompare(b.name));
+            // Sort members by ID (Member Number)
+            const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
             this.viewJornadaTitle.textContent = `Ver Pronósticos - Jornada ${jornada.number}`;
             this.viewJornadaContent.innerHTML = '<p style="padding:40px; font-size:1.2rem; font-weight:bold; color:#673ab7; animation: blink 1s infinite;">⚙️ Procesando datos y generando tabla...</p>';

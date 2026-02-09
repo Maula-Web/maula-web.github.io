@@ -114,7 +114,7 @@ class BoteManager {
         select.innerHTML = '<option value="">Seleccionar socio...</option>';
 
         this.members
-            .sort((a, b) => a.name.localeCompare(b.name))
+            .sort((a, b) => parseInt(a.id) - parseInt(b.id))
             .forEach(member => {
                 const option = document.createElement('option');
                 option.value = member.id;
