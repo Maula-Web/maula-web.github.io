@@ -448,45 +448,77 @@ class QuinielaScraper {
     parseResultsFromEstadisticas(html, targetJornadaNum) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+        // Remove noise
+        const trash = doc.querySelectorAll('script, style, noscript');
+        trash.forEach(el => el.remove());
+
         const text = doc.body.innerText || doc.body.textContent;
         const lines = text.split('\n').map(l => l.trim()).filter(l => l);
 
-        console.log(`[Estadisticas] Parsing J${targetJornadaNum}...`);
+        console.log(`[Estadisticas] Parsing J${targetJornadaNum}... Found ${lines.length} lines.`);
 
         // Find the line that lists Jornada numbers to determine indices
-        // Format: "Jornada   1    2    3 ... 39"
         let headerLineIndex = -1;
         for (let i = 0; i < lines.length; i++) {
-            if (lines[i].includes('Jornada') && lines[i].includes('1') && lines[i].includes('2')) {
+            const l = lines[i];
+            // Look for "Jornada" followed by numbers
+            if (l.includes('Jornada') && (l.includes(' 1 ') || l.includes('\t1\t')) && l.includes(String(targetJornadaNum))) {
                 headerLineIndex = i;
+                console.log(`[Estadisticas] Found header at line ${i}: "${l.substring(0, 100)}..."`);
                 break;
             }
         }
 
-        if (headerLineIndex === -1) return null;
-
-        // The results are in the 15 lines following the header (or nearby)
-        // We know the column for J39 is at a certain position in the strings
-        const matches = [];
-        let matchCount = 0;
-
-        for (let i = headerLineIndex + 1; i < lines.length && matchCount < 15; i++) {
-            const line = lines[i];
-            // Results rows are mostly signs 1, X, 2 (sometimes 3 for some reason in elquinielista)
-            if (line.match(/^[1X23\s\-]+$/)) {
-                // The character at index targetJornadaNum - 1 is the result
-                const result = line[targetJornadaNum - 1];
-                if (result && result.match(/[1X2]/i)) {
-                    matches.push({
-                        position: matchCount + 1,
-                        result: result.toUpperCase()
-                    });
-                    matchCount++;
+        if (headerLineIndex === -1) {
+            // Fallback: search for any line with "Jornada" and "1"
+            for (let i = 0; i < Math.min(lines.length, 300); i++) {
+                if (lines[i].includes('Jornada') && lines[i].includes(' 1 ')) {
+                    headerLineIndex = i;
+                    break;
                 }
             }
         }
 
-        return matches.length >= 14 ? matches : null;
+        if (headerLineIndex === -1) {
+            console.warn("[Estadisticas] Header line not found");
+            return null;
+        }
+
+        const matches = [];
+        let matchCount = 0;
+
+        // The results rows are after the header. 
+        // We look for rows that look like a sequence of signs.
+        for (let i = headerLineIndex + 1; i < lines.length && matchCount < 15; i++) {
+            const line = lines[i];
+
+            // Clean the line - sometimes there are numbers at the start or end
+            // A results line in ElQuinielista stats usually looks like "112XX..." 
+            // and might have the match number "1", "2" at start/end.
+            const cleanLine = line.replace(/^\d+/, '').replace(/\d+$/, '').trim();
+
+            if (cleanLine.length >= 35 && /^[1X2x\-\s]+$/.test(cleanLine)) {
+                // The character for this jornada is at index (targetJornadaNum - 1)
+                // but we must account for possible spaces if they are present
+                // However, the text preview showed a solid block of characters.
+                const char = cleanLine[targetJornadaNum - 1];
+
+                if (char && char.match(/[1X2x]/i)) {
+                    matches.push({
+                        position: matchCount + 1,
+                        result: char.toUpperCase()
+                    });
+                    matchCount++;
+                }
+            } else if (matchCount > 0 && matchCount < 15) {
+                // If we already found some results but this line doesn't match, 
+                // it might be a gap or end of table.
+                console.log(`[Estadisticas] Interruption at line ${i}: "${line.substring(0, 50)}"`);
+            }
+        }
+
+        console.log(`[Estadisticas] Extracted ${matches.length} matches for J${targetJornadaNum}`);
+        return matches.length >= 10 ? matches : null; // Return if we found at least 10 (partial is better than nothing)
     }
 
     /**
@@ -735,18 +767,34 @@ class QuinielaScraper {
     }
 
     async applyResultsToJornada(dbJornada, importData) {
+        if (!importData) return false;
         let changed = false;
 
-        for (const impMatch of importData.matches) {
-            // Find match at position (0-indexed in array vs 1-indexed import)
-            const idx = impMatch.position - 1;
+        // 1. Update Results if available
+        if (importData.matches && Array.isArray(importData.matches)) {
+            for (const impMatch of importData.matches) {
+                // Find match at position (0-indexed in array vs 1-indexed import)
+                const idx = impMatch.position - 1;
 
-            if (dbJornada.matches[idx]) {
-                const current = dbJornada.matches[idx].result;
-                const imported = impMatch.result;
+                if (dbJornada.matches[idx]) {
+                    const current = dbJornada.matches[idx].result;
+                    const imported = impMatch.result;
 
-                if (imported && imported !== current) {
-                    dbJornada.matches[idx].result = imported;
+                    if (imported && imported !== current) {
+                        dbJornada.matches[idx].result = imported;
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        // 2. Update Prizes if available
+        if (importData.prizes && Object.keys(importData.prizes).length > 0) {
+            if (!dbJornada.prizes) dbJornada.prizes = {};
+
+            for (const [category, amount] of Object.entries(importData.prizes)) {
+                if (dbJornada.prizes[category] !== amount) {
+                    dbJornada.prizes[category] = amount;
                     changed = true;
                 }
             }
