@@ -23,6 +23,7 @@ class BoteManager {
             boteInicial: 0.00,
             temporadaActual: '2025-2026'
         };
+        this.cashPayments = []; // New - Tracks sellados paid in cash
         this.checkIsPIG = (m) => {
             if (!m) return false;
             const h = (m.home || '').toLowerCase();
@@ -91,6 +92,10 @@ class BoteManager {
         // Load ingresos
         const ingresosCollection = await window.DataService.getAll('ingresos');
         this.ingresos = ingresosCollection || [];
+
+        // Load cash payments
+        const cashCollection = await window.DataService.getAll('reembolsos_efectivo');
+        this.cashPayments = cashCollection || [];
     }
 
     async loadConfig() {
@@ -179,8 +184,12 @@ class BoteManager {
                 const manualIngresos = this.getManualIngresosForJornada(member.id, jornada);
                 const penalties = costs.penalizacionUnos + (costs.penalizacionBajosAciertos || 0) + (costs.penalizacionPIG || 0);
 
+                const isSelladoInCash = this.cashPayments.some(cp => String(cp.memberId) === mIdStr && String(cp.jornadaId) === String(jornada.id));
+
                 // NETO Socio: (Premios + Manual) - (Aportación + Penalizaciones) - SelladoReembolso
-                const netoForSocio = (manualIngresos + prizes) - (costs.aportacion + penalties) - costs.sellado;
+                // If paid in cash, sellado is NOT added to member's individual bote
+                const selladoForNeto = isSelladoInCash ? 0 : costs.sellado;
+                const netoForSocio = (manualIngresos + prizes) - (costs.aportacion + penalties) - selladoForNeto;
                 boteAcumulado += netoForSocio;
 
                 movements.push({
@@ -204,9 +213,12 @@ class BoteManager {
                     boteAcumulado: boteAcumulado,
                     exento: costs.exento,
                     jugaDobles: costs.jugaDobles,
-                    // Para el resumen de la peña
+                    isSelladoInCash: isSelladoInCash,
+                    // Para el resumen de la peña: 
+                    // El dinero solo "sale" del bote común si se paga en efectivo (Cash)
+                    // Si va "Al Bote", es un movimiento interno que no reduce la liquidez total
                     pennaIn: costs.aportacion + penalties,
-                    pennaOut: costs.sellado < 0 ? Math.abs(costs.sellado) : 0
+                    pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
                 });
             });
         });
@@ -819,8 +831,8 @@ class BoteManager {
                             <th rowspan="2">Aciertos</th>
                             <th rowspan="2">PAGA</th>
                             <th colspan="3" style="text-align:center; background: #e65100;">Penalizaciones</th>
-                            <th rowspan="2">Sellado</th>
                             <th rowspan="2">Premios</th>
+                            <th rowspan="2" style="background: #e65100; font-size: 0.7rem;">Reembolso Sellado</th>
                             <th rowspan="2">Neto</th>
                         </tr>
                         <tr>
@@ -835,6 +847,18 @@ class BoteManager {
         jornadaMovements
             .sort((a, b) => parseInt(a.memberId) - parseInt(b.memberId))
             .forEach(m => {
+                let selladoUI = '-';
+                if (m.sellado < 0) {
+                    const sellVal = Math.abs(m.sellado).toFixed(1);
+                    selladoUI = `
+                        <div style="font-size:0.7rem; border: 1px solid rgba(255,145,0,0.3); border-radius: 4px; padding: 2px;">
+                            <div style="font-weight:bold; margin-bottom:2px;">${sellVal}€</div>
+                            <label style="display:block; cursor:pointer;"><input type="radio" name="reemb_${m.memberId}_${m.jornadaId}" ${!m.isSelladoInCash ? 'checked' : ''} onclick="window.Bote.toggleSelladoCash('${m.memberId}', '${m.jornadaId}', false)"> Bote</label>
+                            <label style="display:block; cursor:pointer;"><input type="radio" name="reemb_${m.memberId}_${m.jornadaId}" ${m.isSelladoInCash ? 'checked' : ''} onclick="window.Bote.toggleSelladoCash('${m.memberId}', '${m.jornadaId}', true)"> Cash</label>
+                        </div>
+                    `;
+                }
+
                 html += `
                     <tr>
                         <td><strong>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}</strong></td>
@@ -843,8 +867,8 @@ class BoteManager {
                         <td class="negative">${(m.penalizacionUnos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionBajosAciertos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionPIG || 0).toFixed(1)}€</td>
-                        <td class="${m.sellado < 0 ? 'positive' : 'negative'}">${m.sellado.toFixed(1)}€</td>
                         <td class="positive">${m.premios.toFixed(1)}€</td>
+                        <td>${selladoUI}</td>
                         <td class="${m.neto >= 0 ? 'positive' : 'negative'}">${m.neto.toFixed(2)}€</td>
                     </tr>
                 `;
@@ -1484,6 +1508,24 @@ class BoteManager {
         `;
         modal.style.display = 'flex';
         modal.style.zIndex = '9999';
+    }
+
+    async toggleSelladoCash(memberId, jornadaId, isCash) {
+        const id = `${memberId}_${jornadaId}`;
+        try {
+            if (isCash) {
+                const entry = { id, memberId, jornadaId, date: new Date().toISOString() };
+                await window.DataService.save('reembolsos_efectivo', entry);
+                this.cashPayments.push(entry);
+            } else {
+                await window.DataService.delete('reembolsos_efectivo', id);
+                this.cashPayments = this.cashPayments.filter(cp => cp.id !== id);
+            }
+            this.render();
+        } catch (error) {
+            console.error('Error toggling sellado cash payment:', error);
+            alert('Error al actualizar el tipo de reembolso');
+        }
     }
 }
 
