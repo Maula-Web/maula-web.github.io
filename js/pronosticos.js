@@ -168,6 +168,7 @@ class PronosticoManager {
         if (window.DataService) await window.DataService.init();
 
         this.members = await window.DataService.getAll('members');
+        this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Global sort by member ID
         this.jornadas = await window.DataService.getAll('jornadas');
         this.pronosticos = await window.DataService.getAll('pronosticos');
         this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || []; // New Collection

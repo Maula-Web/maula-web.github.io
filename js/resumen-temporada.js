@@ -15,6 +15,7 @@ class ResumenManager {
         if (window.DataService) await window.DataService.init();
 
         this.members = await window.DataService.getAll('members');
+        this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Global sort by member ID
         this.jornadas = await window.DataService.getAll('jornadas');
         this.jornadas = await window.DataService.getAll('jornadas');
         this.pronosticos = await window.DataService.getAll('pronosticos');
