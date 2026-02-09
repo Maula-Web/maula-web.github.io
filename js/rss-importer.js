@@ -466,18 +466,26 @@ class QuinielaScraper {
         let colIndex = -1;
         const targetStr = String(targetJornadaNum);
 
-        for (let i = 0; i < Math.min(rawLines.length, 500); i++) {
+        // Search the whole page because J39 might be very far down
+        for (let i = 0; i < rawLines.length; i++) {
             const line = rawLines[i];
-            if (line.includes('Jornada') && line.includes(' 1 ') && line.includes(' 2 ')) {
-                // Find horizontal position of targetJornadaNum as a whole number
+            // Look for a line that contains "Jornada" and our target number as a distinct word
+            if (line.includes('Jornada')) {
                 const regex = new RegExp(`(\\s|^|\\t)${targetStr}(\\s|$|\\t)`);
                 const match = line.match(regex);
-                if (match) {
+
+                // It's likely a header if it contains multiple numbers (not just the jornada number)
+                const numbersInLine = (line.match(/\d+/g) || []).length;
+
+                if (match && numbersInLine > 5) {
                     headerLineIndex = i;
-                    // match.index is the start of the whole match
-                    // but we want the position of the number itself
-                    colIndex = line.indexOf(targetStr, match.index);
+                    // Find the exact start position of the target number within the match
+                    const matchStart = match.index;
+                    const padding = match[1] ? match[1].length : 0;
+                    colIndex = matchStart + padding;
+
                     console.log(`[Estadisticas] ✅ Header found at line ${i}. Column for J${targetJornadaNum} is at index ${colIndex}`);
+                    console.log(`Line context: "${line.substring(Math.max(0, colIndex - 20), colIndex + 20)}"`);
                     break;
                 }
             }
@@ -485,6 +493,9 @@ class QuinielaScraper {
 
         if (headerLineIndex === -1 || colIndex === -1) {
             console.warn(`[Estadisticas] ❌ Could not find column for J${targetJornadaNum}`);
+            // Log a sample of lines that contain "Jornada" to see what's happening
+            const samples = rawLines.filter(l => l.includes('Jornada')).slice(0, 5);
+            console.log("Jornada lines found:", samples);
             return null;
         }
 
