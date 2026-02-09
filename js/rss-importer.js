@@ -67,15 +67,37 @@ class QuinielaScraper {
 
                 this.updateLoading(loadingOverlay, `Consultando Jornada ${jornada.number}...`);
 
-                // Fetch from ElQuinielista
-                const html = await this.fetchHTML(this.RESULTADOS_URL);
+                // We need TWO pages: 
+                // 1. Estadisticas (for 1/X/2 results, because they are plain text here)
+                // 2. Calendario (for prizes)
 
-                if (html) {
-                    const results = this.parseResultsFromElQuinielista(html, jornada.number);
-                    if (results && results.matches && results.matches.length > 0) {
-                        const updated = await this.applyResultsToJornada(jornada, results);
-                        if (updated) updates++;
+                const resultsHtml = await this.fetchHTML(this.RESULTADOS_URL);
+                const prizesHtml = await this.fetchHTML(this.PREMIOS_URL);
+
+                const importData = {
+                    matches: null,
+                    prizes: null
+                };
+
+                if (resultsHtml) {
+                    const matches = this.parseResultsFromEstadisticas(resultsHtml, jornada.number);
+                    if (matches && matches.length > 0) {
+                        importData.matches = matches;
+                        console.log(`[Importer] Extracted ${matches.length} results for J${jornada.number}`);
                     }
+                }
+
+                if (prizesHtml) {
+                    const prizes = this.parsePrizesFromCalendario(prizesHtml, jornada.number);
+                    if (prizes) {
+                        importData.prizes = prizes;
+                        console.log(`[Importer] Extracted prizes for J${jornada.number}`);
+                    }
+                }
+
+                if (importData.matches || importData.prizes) {
+                    const updated = await this.applyResultsToJornada(jornada, importData);
+                    if (updated) updates++;
                 }
             }
         } catch (e) {
@@ -420,121 +442,95 @@ class QuinielaScraper {
 
     /**
      * Parse Results from Estadisticas page
-     * The page has a table where columns=jornadas, rows=partidos
-     * Format:
-     * Jornada   1    2    3  ... 39  Jornada
-     * 12XX1122XX22XX21X...1   (row for match 1)
-     * 21X1XX21X11111111...2   (row for match 2)
-     * etc.
+     * The page has a table with 15 rows of signs. 
+     * Each row is a string like "12X1..." where index corresponds to Jornada - 1.
      */
     parseResultsFromEstadisticas(html, targetJornadaNum) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+        const text = doc.body.innerText || doc.body.textContent;
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
 
-        console.log(`[ElQuinielista] Parsing for J${targetJornadaNum}...`);
+        console.log(`[Estadisticas] Parsing J${targetJornadaNum}...`);
 
-        // First, find the jornada section by looking for the jornada number
-        // The structure has multiple jornadas, we need to isolate the target one
-
-        let foundTarget = false;
-        let currentMatches = [];
-        let prizes = {};
-
-        // Strategy: Find all text nodes with "Jornada :" and check the next node
-        const allText = doc.body.innerText || doc.body.textContent;
-        const lines = allText.split('\n').map(l => l.trim()).filter(l => l);
-
-        let jornadaSectionStart = -1;
-        let jornadaSectionEnd = -1;
-
-        // Find section boundaries in text
+        // Find the line that lists Jornada numbers to determine indices
+        // Format: "Jornada   1    2    3 ... 39"
+        let headerLineIndex = -1;
         for (let i = 0; i < lines.length; i++) {
-            if (lines[i] === 'Jornada :' && lines[i + 1] === String(targetJornadaNum)) {
-                jornadaSectionStart = i;
-                foundTarget = true;
-                console.log(`[ElQuinielista] ✓ Found target Jornada ${targetJornadaNum} at text line ${i}`);
-            } else if (foundTarget && lines[i] === 'Jornada :' && lines[i + 1] !== String(targetJornadaNum)) {
-                jornadaSectionEnd = i;
-                console.log(`[ElQuinielista] Section ends at line ${i} (next jornada: ${lines[i + 1]})`);
+            if (lines[i].includes('Jornada') && lines[i].includes('1') && lines[i].includes('2')) {
+                headerLineIndex = i;
                 break;
             }
         }
 
-        if (!foundTarget) {
-            console.warn(`[ElQuinielista] ❌ Target Jornada ${targetJornadaNum} not found in page`);
-            return null;
-        }
+        if (headerLineIndex === -1) return null;
 
-        // Now search for result buttons/cells in the DOM
-        // Common patterns: buttons, divs, or spans with classes like 'resultado', 'btn-1', 'btn-x', 'btn-2'
-        // Or with inline styles like background-color: salmon/red/orange
+        // The results are in the 15 lines following the header (or nearby)
+        // We know the column for J39 is at a certain position in the strings
+        const matches = [];
+        let matchCount = 0;
 
-        const possibleResultSelectors = [
-            'button',
-            'div[class*="resultado"]',
-            'span[class*="resultado"]',
-            'div[class*="btn"]',
-            'span[class*="btn"]',
-            '.result',
-            '[data-result]'
-        ];
-
-        let resultElements = [];
-        for (const selector of possibleResultSelectors) {
-            const elements = doc.querySelectorAll(selector);
-            if (elements.length > 0) {
-                console.log(`[ElQuinielista] Found ${elements.length} elements matching: ${selector}`);
-                resultElements.push(...Array.from(elements));
-            }
-        }
-
-        // Filter to only elements that contain '1', 'X', or '2' as text content
-        const validResults = resultElements.filter(el => {
-            const text = el.textContent?.trim() || '';
-            return text.match(/^[1X2]$/i);
-        });
-
-        console.log(`[ElQuinielista] Found ${validResults.length} potential result elements`);
-
-        if (validResults.length >= 14) {
-            // We likely found the results! Extract them in order
-            for (let i = 0; i < Math.min(validResults.length, 15); i++) {
-                const result = validResults[i].textContent.trim().toUpperCase();
-                if (result.match(/^[1X2]$/)) {
-                    currentMatches.push({
-                        position: i + 1,
-                        result: result
-                    });
-                }
-            }
-            console.log(`[ElQuinielista] Extracted ${currentMatches.length} results from DOM elements`);
-        }
-
-        // Extract prizes from text (this part was working)
-        for (let i = jornadaSectionStart; i < (jornadaSectionEnd > 0 ? jornadaSectionEnd : lines.length); i++) {
+        for (let i = headerLineIndex + 1; i < lines.length && matchCount < 15; i++) {
             const line = lines[i];
-
-            // Detect Prizes
-            const prizeLineMatch = line.match(/(\d{1,2})\s+Aciertos.*?([\d.,]+)\s*€/i);
-            if (prizeLineMatch) {
-                const category = prizeLineMatch[1];
-                const amountStr = prizeLineMatch[2].replace(/\./g, '').replace(',', '.');
-                const amount = parseFloat(amountStr);
-                if (!isNaN(amount) && amount > 0) {
-                    prizes[category] = amount;
+            // Results rows are mostly signs 1, X, 2 (sometimes 3 for some reason in elquinielista)
+            if (line.match(/^[1X23\s\-]+$/)) {
+                // The character at index targetJornadaNum - 1 is the result
+                const result = line[targetJornadaNum - 1];
+                if (result && result.match(/[1X2]/i)) {
+                    matches.push({
+                        position: matchCount + 1,
+                        result: result.toUpperCase()
+                    });
+                    matchCount++;
                 }
-            } else {
-                const prizeMatch = line.match(/(\d{1,2})\s+Aciertos/i);
-                if (prizeMatch) {
-                    const category = prizeMatch[1];
-                    for (let j = 0; j < 3; j++) {
-                        const checkLine = lines[i + j] || '';
-                        const amountMatch = checkLine.match(/([\d.,]+)\s*€/);
-                        if (amountMatch) {
-                            const amountStr = amountMatch[1].replace(/\./g, '').replace(',', '.');
-                            const amount = parseFloat(amountStr);
-                            if (!isNaN(amount) && amount > 0.5) {
-                                prizes[category] = amount;
+            }
+        }
+
+        return matches.length >= 14 ? matches : null;
+    }
+
+    /**
+     * Parse Prizes from Calendario page
+     */
+    parsePrizesFromCalendario(html, targetJornadaNum) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const text = doc.body.innerText || doc.body.textContent;
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+        let foundTarget = false;
+        const prizes = {};
+
+        for (let i = 0; i < lines.length; i++) {
+            // Find J section: "Jornada :" on line i, number on line i+1
+            if (lines[i] === 'Jornada :' && lines[i + 1] === String(targetJornadaNum)) {
+                foundTarget = true;
+                continue;
+            }
+
+            if (foundTarget) {
+                // If we hit next Jornada, stop
+                if (lines[i] === 'Jornada :') break;
+
+                // Extract prizes: "14 Aciertos ... 21.154,80 €"
+                const prizeLineMatch = lines[i].match(/(\d{1,2})\s+Aciertos.*?([\d.,]+)\s*€/i);
+                if (prizeLineMatch) {
+                    const category = prizeLineMatch[1];
+                    const amountStr = prizeLineMatch[2].replace(/\./g, '').replace(',', '.');
+                    const amount = parseFloat(amountStr);
+                    if (!isNaN(amount)) prizes[category] = amount;
+                } else {
+                    // Alternative format (multi-line)
+                    const prizeMatch = lines[i].match(/(\d{1,2})\s+Aciertos/i);
+                    if (prizeMatch) {
+                        const category = prizeMatch[1];
+                        // Look at next few lines for €
+                        for (let j = 1; j <= 3; j++) {
+                            const amountMatch = (lines[i + j] || '').match(/([\d.,]+)\s*€/);
+                            if (amountMatch) {
+                                const amountStr = amountMatch[1].replace(/\./g, '').replace(',', '.');
+                                const amount = parseFloat(amountStr);
+                                if (!isNaN(amount)) prizes[category] = amount;
                                 break;
                             }
                         }
@@ -543,15 +539,7 @@ class QuinielaScraper {
             }
         }
 
-        console.log(`[ElQuinielista] ✓ Successfully parsed J${targetJornadaNum}:`);
-        console.log(`  - Results: ${currentMatches.length} matches`);
-        console.log(`  - Prizes: ${Object.keys(prizes).length} categories`);
-
-        // Return data even if only partial
-        return {
-            matches: currentMatches.length > 0 ? currentMatches : null,
-            prizes: Object.keys(prizes).length > 0 ? prizes : null
-        };
+        return Object.keys(prizes).length > 0 ? prizes : null;
     }
 
     /**
@@ -799,98 +787,48 @@ class QuinielaScraper {
      * Run in console: window.quinielaScraper.debugEscrutinio(39)
      */
     async debugEscrutinio(jornadaNum = 39) {
-        console.log(`\n=== DEBUG ElQuinielista J${jornadaNum} ===`);
-        const url = this.RESULTADOS_URL;
-        console.log(`Fetching: ${url}`);
+        console.log(`\n=== DEBUG ElQuinielista J${jornadaNum} (Dual Source) ===`);
 
-        const html = await this.fetchHTML(url);
-
-        if (!html) {
-            console.log("❌ Fetch failed");
-            return;
-        }
-
-        console.log(`✅ Fetched ${html.length} bytes`);
-
-        // Parse and show sample
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const trash = doc.querySelectorAll('script, style, noscript, meta, link');
-        trash.forEach(el => el.remove());
-        const text = doc.body.innerText;
-
-        console.log(`\n📄 TEXT SAMPLE (first 1000 chars):`);
-        console.log(text.substring(0, 1000));
-
-        // Check for keywords
-        console.log(`\n🔍 Searching for keywords:`);
-        console.log(`- Contains "Jornada": ${text.includes('Jornada')}`);
-        console.log(`- Contains "Jornada ${jornadaNum}": ${text.includes(`Jornada ${jornadaNum}`)}`);
-        console.log(`- Contains "Aciertos": ${text.includes('Aciertos')}`);
-        console.log(`- Contains "14 Aciertos": ${text.includes('14 Aciertos')}`);
-
-        // Find where "Jornada" appears and show context
-        const jornadaIndex = text.indexOf('Jornada');
-        if (jornadaIndex !== -1) {
-            console.log(`\n📍 Sample around first "Jornada" (at position ${jornadaIndex}):`);
-            console.log(text.substring(jornadaIndex, jornadaIndex + 500));
-        }
-
-        // Try to find any jornada number pattern
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-        console.log(`\n🔢 Looking for jornada number patterns...`);
-        let count = 0;
-        for (let i = 0; i < lines.length && count < 50; i++) {
-            if (lines[i].toLowerCase().includes('jornada')) {
-                console.log(`Line ${i}: "${lines[i].substring(0, 150)}"`);
-                if (lines[i + 1]) console.log(`  Next: "${lines[i + 1].substring(0, 150)}"`);
-                count++;
-            }
-        }
-
-        // Test actual parsing
-        console.log(`\n🧪 Testing parseResultsFromElQuinielista...`);
-        const result = this.parseResultsFromElQuinielista(html, jornadaNum);
-
-        if (result) {
-            console.log(`✅ Parse succeeded!`);
-            console.log(`- Matches found: ${result.matches ? result.matches.length : 0}`);
-            if (result.matches && result.matches.length > 0) {
-                console.log(`- First 3 results:`, result.matches.slice(0, 3));
-            }
-            console.log(`- Prizes found: ${result.prizes ? Object.keys(result.prizes).length : 0}`);
-            if (result.prizes) {
-                console.log(`- Prize details:`, result.prizes);
-            }
-
-            // If no matches found, show the section content
-            if (!result.matches || result.matches.length === 0) {
-                console.log(`\n⚠️ No matches found. Showing jornada section for analysis:`);
-                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-                let inSection = false;
-                let lineCount = 0;
-                for (let i = 0; i < lines.length && lineCount < 100; i++) {
-                    if (lines[i] === 'Jornada :' && lines[i + 1] === String(jornadaNum)) {
-                        inSection = true;
-                        console.log(`\n--- START OF J${jornadaNum} SECTION (Line ${i}) ---`);
-                    }
-                    if (inSection) {
-                        console.log(`${i}: ${lines[i].substring(0, 200)}`);
-                        lineCount++;
-
-                        // Stop at next jornada
-                        if (lineCount > 5 && lines[i] === 'Jornada :' && lines[i + 1] !== String(jornadaNum)) {
-                            console.log(`--- END OF SECTION (Next jornada: ${lines[i + 1]}) ---`);
-                            break;
-                        }
-                    }
-                }
+        // 1. Check Results from Estadisticas
+        console.log(`\n--- Source 1: Resultados (Estadisticas) ---`);
+        console.log(`Fetching: ${this.RESULTADOS_URL}`);
+        const resHtml = await this.fetchHTML(this.RESULTADOS_URL);
+        if (resHtml) {
+            console.log(`✅ Fetched ${resHtml.length} bytes`);
+            const matches = this.parseResultsFromEstadisticas(resHtml, jornadaNum);
+            if (matches && matches.length > 0) {
+                console.log(`✅ Extracted ${matches.length} results:`, matches.map(m => m.result).join(' '));
+            } else {
+                console.log(`❌ Failed to extract results from Estadisticas.`);
+                // Show a bit of text for context
+                const lines = resHtml.replace(/<[^>]*>/g, '').split('\n').map(l => l.trim()).filter(l => l);
+                console.log(`Sample lines around 100-115:`, lines.slice(100, 115));
             }
         } else {
-            console.log(`❌ Parse returned null`);
+            console.log(`❌ Failed to fetch Estadisticas.`);
         }
 
-        return result;
+        // 2. Check Prizes from Calendario
+        console.log(`\n--- Source 2: Premios (Calendario) ---`);
+        console.log(`Fetching: ${this.PREMIOS_URL}`);
+        const przHtml = await this.fetchHTML(this.PREMIOS_URL);
+        if (przHtml) {
+            console.log(`✅ Fetched ${przHtml.length} bytes`);
+            const prizes = this.parsePrizesFromCalendario(przHtml, jornadaNum);
+            if (prizes) {
+                console.log(`✅ Extracted Prizes:`, prizes);
+            } else {
+                console.log(`❌ Failed to extract prizes for J${jornadaNum}.`);
+                // Check if Jornada marker even exists
+                const text = przHtml.replace(/<[^>]*>/g, '');
+                console.log(`- Page contains 'Jornada :' keyword: ${text.includes('Jornada :')}`);
+                console.log(`- Page contains J${jornadaNum} indicator: ${text.includes(String(jornadaNum))}`);
+            }
+        } else {
+            console.log(`❌ Failed to fetch Calendario.`);
+        }
+
+        return { jornadaNum };
     }
 
     /**
