@@ -293,6 +293,10 @@ class PronosticoManager {
         this.statusMsg.textContent = '';
         this.deadlineInfo.textContent = '';
 
+        // Ensure IDs are synced with selects if called from button
+        if (this.selMember) this.currentMemberId = this.selMember.value;
+        if (this.selJornada) this.currentJornadaId = this.selJornada.value;
+
         if (!this.currentMemberId || !this.currentJornadaId) return;
 
         const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
@@ -452,6 +456,7 @@ class PronosticoManager {
                 if (eligibility && eligibility.eligible) {
                     if (this.renderDoublesForm) this.renderDoublesForm(jornada, isLocked);
                     if (this.doublesSection) this.doublesSection.classList.remove('hidden');
+                    if (this.doublesInfoHeader) this.doublesInfoHeader.style.display = 'flex';
                 }
             }
         }
@@ -1346,7 +1351,7 @@ class PronosticoManager {
         this.btnSaveDoubles.style.display = isLocked ? 'none' : 'block';
 
         // Load existing doubles
-        const existingExtra = this.pronosticosExtra.find(p => p.jId === this.currentJornadaId && p.mId === this.currentMemberId);
+        const existingExtra = this.pronosticosExtra.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
         const selections = existingExtra ? existingExtra.selection : Array(15).fill('');
 
         jornada.matches.forEach((match, idx) => {
