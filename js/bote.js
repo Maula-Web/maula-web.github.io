@@ -96,6 +96,9 @@ class BoteManager {
         // Load cash payments
         const cashCollection = await window.DataService.getAll('reembolsos_efectivo');
         this.cashPayments = cashCollection || [];
+
+        // Load extra forecasts (Doubles Column)
+        this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
     }
 
     async loadConfig() {
@@ -156,7 +159,7 @@ class BoteManager {
             };
         });
 
-        this.members.forEach(member => {
+        this.members.forEach((member, memberIndex) => {
             const mName = (member.name || '').trim();
             let boteAcumulado = 0;
             if (mName) {
@@ -186,11 +189,16 @@ class BoteManager {
 
                 const isSelladoInCash = this.cashPayments.some(cp => String(cp.memberId) === mIdStr && String(cp.jornadaId) === String(jornada.id));
 
-                // NETO Socio: (Premios + Manual) - (Aportación + Penalizaciones) - SelladoReembolso
-                // If paid in cash, sellado is NOT added to member's individual bote
+                // NEW LOGIC: Prizes do NOT go to the individual member's bote
                 const selladoForNeto = isSelladoInCash ? 0 : costs.sellado;
-                const netoForSocio = (manualIngresos + prizes) - (costs.aportacion + penalties) - selladoForNeto;
+                const netoForSocio = manualIngresos - (costs.aportacion + penalties) - selladoForNeto;
                 boteAcumulado += netoForSocio;
+
+                // Extra prizes (Doubles Column) are counted once per jornada in the Peña's summary
+                let extraPrizes = 0;
+                if (memberIndex === 0) {
+                    extraPrizes = this.getExtraPrizesForJornada(jornada);
+                }
 
                 movements.push({
                     memberId: member.id,
@@ -205,19 +213,18 @@ class BoteManager {
                     penalizacionPIG: costs.penalizacionPIG,
                     sellado: costs.sellado,
                     premios: prizes,
+                    extraPrizes: extraPrizes,
                     ingresosManual: manualIngresos,
                     aciertos: costs.aciertos,
-                    totalIngresos: (manualIngresos + prizes), // Ingresos socio
-                    totalGastos: (costs.aportacion + penalties), // Gastos socio (sellado no es gasto si es negativo)
-                    neto: netoForSocio,
+                    totalIngresos: (manualIngresos + prizes), // Shown in table for info
+                    totalGastos: (costs.aportacion + penalties),
+                    neto: netoForSocio, // Now excludes prizes
                     boteAcumulado: boteAcumulado,
                     exento: costs.exento,
                     jugaDobles: costs.jugaDobles,
                     isSelladoInCash: isSelladoInCash,
-                    // Para el resumen de la peña: 
-                    // El dinero solo "sale" del bote común si se paga en efectivo (Cash)
-                    // Si va "Al Bote", es un movimiento interno que no reduce la liquidez total
-                    pennaIn: costs.aportacion + penalties,
+                    // Peña fund: Member contributions + Penalties + Member prizes + Doubles prizes
+                    pennaIn: costs.aportacion + penalties + prizes + extraPrizes,
                     pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
                 });
             });
@@ -622,6 +629,30 @@ class BoteManager {
     }
 
     /**
+     * Get prizes for the extra column (Doubles) in a jornada
+     */
+    getExtraPrizesForJornada(jornada) {
+        if (!jornada.prizes || typeof jornada.prizes !== 'object') return 0;
+        if (!this.pronosticosExtra) return 0;
+
+        const extras = this.pronosticosExtra.filter(p => {
+            const pJ = String(p.jId || p.jornadaId);
+            return pJ === String(jornada.id) || parseInt(pJ) === jornada.number;
+        });
+
+        let totalExtraPrize = 0;
+        extras.forEach(p => {
+            const selection = p.selection || p.forecast;
+            const aciertos = this.calculateAciertos(jornada.matches, selection);
+            const prizes = jornada.prizes;
+            const prizeVal = prizes[aciertos] || prizes[String(aciertos)] || 0;
+            totalExtraPrize += typeof prizeVal === 'number' ? prizeVal : parseFloat(prizeVal || 0);
+        });
+
+        return totalExtraPrize;
+    }
+
+    /**
      * Get manual ingresos for a member in a jornada
      */
     getManualIngresosForJornada(memberId, jornada) {
@@ -831,7 +862,8 @@ class BoteManager {
         const jornadaMovements = jornadaGroups[currentJornadaNum];
         const jornada = this.jornadas.find(j => j.number === parseInt(currentJornadaNum));
 
-        const totalIngresos = jornadaMovements.reduce((sum, m) => sum + m.totalIngresos, 0);
+        const extraPrizes = jornadaMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
+        const totalIngresos = jornadaMovements.reduce((sum, m) => sum + m.totalIngresos, 0) + extraPrizes;
         const totalGastos = jornadaMovements.reduce((sum, m) => sum + m.totalGastos, 0);
         const neto = totalIngresos - totalGastos;
 
@@ -851,10 +883,13 @@ class BoteManager {
             
             <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 145, 0, 0.08); border-radius: 8px; border: 1px solid rgba(255, 145, 0, 0.3);">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align:center;">
-                    <div><strong style="color: #ff9100; font-size:0.75rem;">INGRESOS</strong><br><span class="positive">${totalIngresos.toFixed(2)}€</span></div>
-                    <div><strong style="color: #ff9100; font-size:0.75rem;">GASTOS</strong><br><span class="negative">${totalGastos.toFixed(2)}€</span></div>
-                    <div><strong style="color: #ff9100; font-size:0.75rem;">NETO</strong><br><span class="${neto >= 0 ? 'positive' : 'negative'}">${neto.toFixed(2)}€</span></div>
+                    <div><strong style="color: #ff9100; font-size:0.75rem;">INGRESOS (Socios + Premios)</strong><br><span class="positive">${totalIngresos.toFixed(2)}€</span></div>
+                    <div><strong style="color: #ff9100; font-size:0.75rem;">GASTOS (Validación + Comisión)</strong><br><span class="negative">${totalGastos.toFixed(2)}€</span></div>
+                    <div><strong style="color: #ff9100; font-size:0.75rem;">NETO JORNADA</strong><br><span class="${neto >= 0 ? 'positive' : 'negative'}">${neto.toFixed(2)}€</span></div>
                 </div>
+                <p style="margin-top: 0.8rem; font-size: 0.75rem; color: #ff9100; text-align: center; opacity: 0.8;">
+                    📝 <em>Nota: Todos los premios se acumulan íntegramente en el bote común de la Peña.</em>
+                </p>
             </div>
 
             <div style="overflow-x: auto; border-radius: 12px; border: 1px solid var(--glass-border);">
@@ -902,13 +937,31 @@ class BoteManager {
                         <td class="negative">${(m.penalizacionUnos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionBajosAciertos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionPIG || 0).toFixed(1)}€</td>
-                        <td class="positive">${m.premios.toFixed(1)}€</td>
+                        <td class="positive" title="Premio acumulado en el Bote Peña">${m.premios.toFixed(1)}€</td>
                         <td>${selladoUI}</td>
                         <td class="${m.neto >= 0 ? 'positive' : 'negative'}">${m.neto.toFixed(2)}€</td>
                         <td style="font-weight:900; background: rgba(255,145,0,0.1); border-left: 2px solid var(--primary-color);">${m.boteAcumulado.toFixed(2)}€</td>
                     </tr>
                 `;
             });
+
+        // Row for Extra Column (Doubles) if they have prizes
+        if (extraPrizes > 0) {
+            html += `
+                <tr style="background: rgba(255, 145, 0, 0.1); border-top: 2px solid var(--primary-color);">
+                    <td><strong>💰 Quiniela de Dobles</strong></td>
+                    <td style="text-align:center;">-</td>
+                    <td style="text-align:center;">-</td>
+                    <td style="text-align:center;">-</td>
+                    <td style="text-align:center;">-</td>
+                    <td style="text-align:center;">-</td>
+                    <td class="positive" style="font-weight:bold;">${extraPrizes.toFixed(2)}€</td>
+                    <td style="text-align:center;">-</td>
+                    <td style="text-align:center;">-</td>
+                    <td style="text-align:center; opacity: 0.5;">-</td>
+                </tr>
+            `;
+        }
 
         html += `
                     </tbody>
