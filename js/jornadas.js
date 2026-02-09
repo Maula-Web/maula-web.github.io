@@ -50,6 +50,7 @@ class JornadaManager {
         this.modal = document.getElementById('jornada-modal');
         this.form = document.getElementById('jornada-form');
         this.matchesContainer = document.getElementById('matches-container');
+        this.prizesContainer = document.getElementById('prizes-container');
 
         this.btnNew = document.getElementById('btn-new-jornada');
         this.btnClose = document.getElementById('btn-close-modal');
@@ -211,6 +212,7 @@ class JornadaManager {
         this.inpDate.value = jornada.date;
         if (this.inpActive) this.inpActive.checked = jornada.active !== false; // Active by default
         this.renderMatches(jornada.matches);
+        this.renderPrizes(jornada.prizes || {});
     }
 
     renderMatches(matches) {
@@ -289,6 +291,25 @@ class JornadaManager {
         });
     }
 
+    renderPrizes(prizes) {
+        if (!this.prizesContainer) return;
+        this.prizesContainer.innerHTML = '';
+
+        const categories = ['15', '14', '13', '12', '11', '10'];
+        categories.forEach(cat => {
+            const amount = prizes[cat] || 0;
+            const row = document.createElement('div');
+            row.className = 'prize-row';
+            row.dataset.category = cat;
+
+            row.innerHTML = `
+                <span class="prize-category">${cat === '15' ? 'Pleno al 15' : cat + ' Aciertos'}</span>
+                <input type="number" step="0.01" class="inp-prize" value="${amount}" placeholder="0.00">
+            `;
+            this.prizesContainer.appendChild(row);
+        });
+    }
+
     toggleEditMode(isEdit) {
         const inputs = this.form.querySelectorAll('input');
         inputs.forEach(inp => {
@@ -298,6 +319,16 @@ class JornadaManager {
             if (!isEdit) inp.style.border = 'none';
             else if (inp.type !== 'checkbox') inp.style.border = '1px solid #ddd';
         });
+
+        // Also handle prize inputs
+        if (this.prizesContainer) {
+            const prizeInputs = this.prizesContainer.querySelectorAll('input');
+            prizeInputs.forEach(inp => {
+                inp.readOnly = !isEdit;
+                if (!isEdit) inp.style.border = 'none';
+                else inp.style.border = '1px solid #ddd';
+            });
+        }
 
         if (this.inpNumber) {
             this.inpNumber.readOnly = !isEdit;
@@ -347,12 +378,23 @@ class JornadaManager {
 
         const existingIdx = this.jornadas.findIndex(j => j.id == this.currentJornadaId);
 
+        const prizes = {};
+        if (this.prizesContainer) {
+            const prizeRows = this.prizesContainer.querySelectorAll('.prize-row');
+            prizeRows.forEach(row => {
+                const category = row.dataset.category;
+                const value = parseFloat(row.querySelector('input').value) || 0;
+                if (value > 0) prizes[category] = value;
+            });
+        }
+
         const jornadaData = {
             id: this.currentJornadaId || Date.now(),
             number: parseInt(this.inpNumber.value) || 0,
             season: '2025-2026',
             date: dateStr,
             matches: matches,
+            prizes: prizes,
             active: this.inpActive ? this.inpActive.checked : true
         };
 

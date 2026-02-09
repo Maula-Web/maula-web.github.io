@@ -3355,3 +3355,45 @@ body.mobile-mode .p-divider {
         /* Allow expansion like results page */
     }
 }
+
+/* Prizes Grid for Jornada Details */
+.prizes-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 15px;
+    background: rgba(0,0,0,0.03);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+}
+
+.prize-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: var(--card-bg);
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.prize-category {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--primary-green);
+}
+
+.inp-prize {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: var(--text-main);
+    background: var(--input-bg);
+}
+
+[data-theme="dark"] .prizes-grid-container {
+    background: rgba(255,255,255,0.05);
+}
