@@ -521,20 +521,33 @@ class BoteManager {
      * Calculate number of hits (aciertos)
      */
     calculateAciertos(matches, forecast) {
-        if (!matches || !forecast || matches.length > forecast.length) return 0;
+        if (!matches || !forecast) return 0;
 
         let aciertos = 0;
-        matches.slice(0, 15).forEach((match, idx) => {
-            if (!match.result || match.result === '' || match.result.toLowerCase() === 'por definir') return;
+        // Iterate only up to the minimum of regular matches or forecast length
+        const limit = Math.min(15, matches.length, forecast.length);
 
-            const resultSign = this.normalizeSign(match.result);
-            const prediction = String(forecast[idx] || '').trim().toUpperCase();
+        for (let i = 0; i < limit; i++) {
+            const match = matches[i];
+            const pred = String(forecast[i] || '').trim().toUpperCase();
 
-            // P15 usually only counts if 14 hits exist, but for 'hits' count we count it if matches result
-            if (resultSign === prediction) {
-                aciertos++;
+            if (!match.result || match.result === '' || match.result.toLowerCase() === 'por definir') continue;
+
+            const rSign = this.normalizeSign(match.result);
+            const rScore = String(match.result).trim().toUpperCase();
+
+            let isHit = false;
+            if (i === 14) {
+                // P15: Exact match for score strings (e.g. "1-0" === "1-0") 
+                // OR sign match as fallback if prediction is just a sign
+                isHit = (rScore === pred) || (rSign === pred);
+            } else {
+                // 1-14: Support for multiple signs (e.g. "1X" contains "1")
+                isHit = pred.includes(rSign);
             }
-        });
+
+            if (isHit) aciertos++;
+        }
 
         return aciertos;
     }
@@ -658,8 +671,8 @@ class BoteManager {
 
         const mIdStr = String(memberId);
         const pronostico = this.pronosticos.find(p => {
-            const pJ = String(p.jId || p.jornadaId);
-            const matchJ = (pJ === String(jornada.id) || parseInt(pJ) === jornada.number);
+            const pJ = String(p.jId || p.jornadaId || '');
+            const matchJ = (pJ === String(jornada.id) || pJ === String(jornada.number));
             const matchM = (String(p.mId || p.memberId) === mIdStr);
             return matchJ && matchM;
         });
@@ -683,8 +696,8 @@ class BoteManager {
         if (!this.pronosticosExtra) return 0;
 
         const extras = this.pronosticosExtra.filter(p => {
-            const pJ = String(p.jId || p.jornadaId);
-            return pJ === String(jornada.id) || parseInt(pJ) === jornada.number;
+            const pJ = String(p.jId || p.jornadaId || '');
+            return pJ === String(jornada.id) || pJ === String(jornada.number);
         });
 
         let totalExtraPrize = 0;
@@ -1612,10 +1625,10 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v19');
+        const migrationDone = localStorage.getItem('bote_maintenance_v20');
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v19 (Bulk Prize Sync)...');
+        console.log('Running maintenance migration v20 (Bulk Prize Sync)...');
 
         try {
             const allJ = await window.DataService.getAll('jornadas');
@@ -1652,10 +1665,10 @@ class BoteManager {
                 }
             }
 
-            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19'];
+            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19', 'v20'];
             marks.forEach(m => localStorage.setItem(`bote_maintenance_${m}`, 'true'));
 
-            console.log('Migration v17 effective!');
+            console.log('Migration v20 effective!');
             await this.loadData();
             this.render();
         } catch (e) { console.error('Migration v17 failed:', e); }

@@ -81,11 +81,48 @@ const ScoringSystem = {
         return hits + bonus;
     },
 
+    // Helper to normalize results for comparison
+    normalizeSign: function (res) {
+        if (!res) return '';
+        const r = String(res).trim().toUpperCase();
+        if (r === '1' || r === 'X' || r === '2') return r;
+
+        // Multi-goal results (P-15 style score strings "2-1")
+        if (r.includes('-')) {
+            const parts = r.split('-');
+            const val = (s) => (s === 'M' || s === 'M+' ? 3 : parseInt(s) || 0);
+            const home = val(parts[0]);
+            const away = val(parts[1]);
+            if (home > away) return '1';
+            if (home < away) return '2';
+            return 'X';
+        }
+        return r;
+    },
+
     // Returns { hits, points, bonus }
     evaluateForecast: function (forecastSelection, officialResults, targetDate) {
         let hits = 0;
+
         forecastSelection.forEach((sel, idx) => {
-            if (sel && sel === officialResults[idx]) hits++;
+            if (idx >= 15) return; // Only first 15 matches count
+            const res = officialResults[idx];
+            if (!res || res === '' || res.toUpperCase() === 'POR DEFINIR') return;
+
+            const pred = String(sel || '').trim().toUpperCase();
+            const rSign = this.normalizeSign(res);
+            const rScore = String(res).trim().toUpperCase();
+
+            let isHit = false;
+            if (idx === 14) {
+                // P15: Exact match for score OR sign match
+                isHit = (rScore === pred) || (rSign === pred);
+            } else {
+                // 1-14: Sign inclusion (supports doubles '1X' etc)
+                isHit = pred.includes(rSign);
+            }
+
+            if (isHit) hits++;
         });
 
         const points = this.calculateScore(hits, targetDate);
@@ -96,4 +133,3 @@ const ScoringSystem = {
 };
 
 ScoringSystem.init(); // Run migration immediately on load
-

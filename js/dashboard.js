@@ -150,19 +150,34 @@ class DashboardManager {
                 history[member.id].push({ hits: hits, points: points });
 
                 // Accumulate season prizes
-                let actualMinHits = jornada.minHitsToWin || 10;
-                if (jornada.prizeRates && Object.keys(jornada.prizeRates).length > 0) {
-                    actualMinHits = Math.min(...Object.keys(jornada.prizeRates).map(Number));
-                }
+                const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                const prizeVal = prizesMap[hits] || prizesMap[String(hits)] || 0;
 
-                if (hits >= actualMinHits && hasPronostico) {
+                if (prizeVal > 0 && hasPronostico) {
                     totalSeasonPrizes++;
-                    // Calculate money if rates exist
-                    if (jornada.prizeRates && jornada.prizeRates[hits]) {
-                        totalSeasonMoney += jornada.prizeRates[hits];
-                    }
+                    totalSeasonMoney += parseFloat(prizeVal);
                 }
             });
+
+            // ADDITION: Count Extra Column prizes (Doubles) in the season total
+            if (this.pronosticosExtra && this.pronosticosExtra.length > 0) {
+                const extras = this.pronosticosExtra.filter(p => {
+                    const pJ = String(p.jId || p.jornadaId || '');
+                    return pJ === String(jornada.id) || pJ === String(jornada.number);
+                });
+
+                extras.forEach(p => {
+                    const sel = p.selection || p.forecasts || [];
+                    const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
+                    const evaluation = window.ScoringSystem.evaluateForecast(sel, officialResults, jornada.date);
+
+                    const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                    const prizeVal = prizesMap[evaluation.hits] || prizesMap[String(evaluation.hits)] || 0;
+                    if (prizeVal > 0) {
+                        totalSeasonMoney += parseFloat(prizeVal);
+                    }
+                });
+            }
 
             // Update Totals
             jornadaResults.forEach(r => {
