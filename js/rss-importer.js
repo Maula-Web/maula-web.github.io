@@ -450,58 +450,68 @@ class QuinielaScraper {
         const doc = parser.parseFromString(html, 'text/html');
 
         // Aggressive cleanup: remove all noise before getting text
-        const noise = doc.querySelectorAll('script, style, noscript, iframe, link, meta');
+        // Note: We don't use .map(l => l.trim()) on all lines at once 
+        // because we need to preserve horizontal alignment in the table rows.
+        const noise = doc.querySelectorAll('script, style, noscript, iframe');
         noise.forEach(el => el.remove());
 
-        const text = doc.body.innerText || doc.body.textContent;
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const fullText = doc.body.innerText || doc.body.textContent;
+        // Split but don't global-trim immediately to keep spaces that align columns
+        const rawLines = fullText.split('\n');
 
-        console.log(`[Estadisticas] Parsing J${targetJornadaNum}... Found ${lines.length} cleaned lines.`);
+        console.log(`[Estadisticas] Parsing J${targetJornadaNum}... Found ${rawLines.length} raw lines.`);
 
-        // Search for the header line using Regex for flexibility with spaces
+        // 1. Find the header line and the horizontal position (column index)
         let headerLineIndex = -1;
-        const headerRegex = new RegExp(`Jornada\\s+1\\s+2\\s+3.*${targetJornadaNum}`, 'i');
+        let colIndex = -1;
+        const targetStr = String(targetJornadaNum);
 
-        for (let i = 0; i < Math.min(lines.length, 500); i++) {
-            if (headerRegex.test(lines[i])) {
-                headerLineIndex = i;
-                console.log(`[Estadisticas] ✅ Header found at line ${i}: "${lines[i].substring(0, 100)}"`);
-                break;
+        for (let i = 0; i < Math.min(rawLines.length, 500); i++) {
+            const line = rawLines[i];
+            if (line.includes('Jornada') && line.includes(' 1 ') && line.includes(' 2 ')) {
+                // Find horizontal position of targetJornadaNum as a whole number
+                const regex = new RegExp(`(\\s|^|\\t)${targetStr}(\\s|$|\\t)`);
+                const match = line.match(regex);
+                if (match) {
+                    headerLineIndex = i;
+                    // match.index is the start of the whole match
+                    // but we want the position of the number itself
+                    colIndex = line.indexOf(targetStr, match.index);
+                    console.log(`[Estadisticas] ✅ Header found at line ${i}. Column for J${targetJornadaNum} is at index ${colIndex}`);
+                    break;
+                }
             }
         }
 
-        if (headerLineIndex === -1) {
-            console.warn("[Estadisticas] ❌ Header line not found. Check if page structure changed.");
-            console.log("First 20 lines for debug:", lines.slice(0, 20));
+        if (headerLineIndex === -1 || colIndex === -1) {
+            console.warn(`[Estadisticas] ❌ Could not find column for J${targetJornadaNum}`);
             return null;
         }
 
         const matches = [];
         let matchCount = 0;
 
-        for (let i = headerLineIndex + 1; i < lines.length && matchCount < 15; i++) {
-            const line = lines[i];
+        // 2. Extract signs from rows below the header
+        for (let i = headerLineIndex + 1; i < rawLines.length && matchCount < 15; i++) {
+            const line = rawLines[i];
 
-            // Clean the line - remove partida numbers if they exist
-            const cleanLine = line.replace(/^\d+\s+/, '').replace(/\s+\d+$/, '').replace(/\s+/g, '');
+            if (line.length > colIndex) {
+                const char = line[colIndex];
 
-            if (cleanLine.length >= targetJornadaNum && /^[1X2x\-]+$/.test(cleanLine)) {
-                const char = cleanLine[targetJornadaNum - 1];
+                // If it's a valid sign, we take it
                 if (char && char.match(/[1X2x]/i)) {
                     matches.push({
                         position: matchCount + 1,
                         result: char.toUpperCase()
                     });
                     matchCount++;
-                    console.log(`[Estadisticas] Partida ${matchCount}: ${char.toUpperCase()}`);
+                    console.log(`[Estadisticas] Match ${matchCount}: ${char.toUpperCase()} (from line ${i})`);
                 }
-            } else if (line.includes('DISTRIBUCIÓN') || line.includes('ZONA')) {
-                continue;
             }
         }
 
-        console.log(`[Estadisticas] Total: ${matches.length} matches extracted.`);
-        return matches.length >= 10 ? matches : null;
+        console.log(`[Estadisticas] Total extracted: ${matches.length} matches.`);
+        return matches.length >= 14 ? matches : null;
     }
 
     /**
