@@ -449,76 +449,60 @@ class QuinielaScraper {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
-        // Aggressive cleanup: remove all noise before getting text
-        // Note: We don't use .map(l => l.trim()) on all lines at once 
-        // because we need to preserve horizontal alignment in the table rows.
-        const noise = doc.querySelectorAll('script, style, noscript, iframe');
-        noise.forEach(el => el.remove());
+        console.log(`[Estadisticas] Parsing J${targetJornadaNum} using DOM Table strategy...`);
 
-        const fullText = doc.body.innerText || doc.body.textContent;
-        // Split but don't global-trim immediately to keep spaces that align columns
-        const rawLines = fullText.split('\n');
-
-        console.log(`[Estadisticas] Parsing J${targetJornadaNum}... Found ${rawLines.length} raw lines.`);
-
-        // 1. Find the header line and the horizontal position (column index)
-        let headerLineIndex = -1;
+        // 1. Find the table row (tr) that contains the jornada headers
+        const allRows = Array.from(doc.querySelectorAll('tr'));
+        let headerRow = null;
         let colIndex = -1;
-        const targetStr = String(targetJornadaNum);
 
-        // Search the whole page because J39 might be very far down
-        for (let i = 0; i < rawLines.length; i++) {
-            const line = rawLines[i];
-            // Look for a line that contains "Jornada" and our target number as a distinct word
-            if (line.includes('Jornada')) {
-                const regex = new RegExp(`(\\s|^|\\t)${targetStr}(\\s|$|\\t)`);
-                const match = line.match(regex);
+        for (const row of allRows) {
+            const cells = Array.from(row.querySelectorAll('td, th'));
+            const cellTexts = cells.map(c => c.innerText.trim());
 
-                // It's likely a header if it contains multiple numbers (not just the jornada number)
-                const numbersInLine = (line.match(/\d+/g) || []).length;
-
-                if (match && numbersInLine > 5) {
-                    headerLineIndex = i;
-                    // Find the exact start position of the target number within the match
-                    const matchStart = match.index;
-                    const padding = match[1] ? match[1].length : 0;
-                    colIndex = matchStart + padding;
-
-                    console.log(`[Estadisticas] ✅ Header found at line ${i}. Column for J${targetJornadaNum} is at index ${colIndex}`);
-                    console.log(`Line context: "${line.substring(Math.max(0, colIndex - 20), colIndex + 20)}"`);
-                    break;
-                }
+            // Look for a row that has "Jornada" (or "Jornadas") and our target number as a solo cell
+            if (cellTexts.some(t => t.toLowerCase().includes('jornada')) && cellTexts.includes(String(targetJornadaNum))) {
+                headerRow = row;
+                colIndex = cellTexts.indexOf(String(targetJornadaNum));
+                console.log(`[Estadisticas] ✅ Found header row. J${targetJornadaNum} is at cell index: ${colIndex}`);
+                break;
             }
         }
 
-        if (headerLineIndex === -1 || colIndex === -1) {
-            console.warn(`[Estadisticas] ❌ Could not find column for J${targetJornadaNum}`);
-            // Log a sample of lines that contain "Jornada" to see what's happening
-            const samples = rawLines.filter(l => l.includes('Jornada')).slice(0, 5);
-            console.log("Jornada lines found:", samples);
+        if (!headerRow || colIndex === -1) {
+            console.warn(`[Estadisticas] ❌ Could not find table column for J${targetJornadaNum}`);
             return null;
         }
 
         const matches = [];
         let matchCount = 0;
 
-        // 2. Extract signs from rows below the header
-        for (let i = headerLineIndex + 1; i < rawLines.length && matchCount < 15; i++) {
-            const line = rawLines[i];
+        // 2. Extract signs from the same column in all other rows
+        // We look for rows that contain a result in that specific column
+        for (const row of allRows) {
+            // Skip the header itself
+            if (row === headerRow) continue;
 
-            if (line.length > colIndex) {
-                const char = line[colIndex];
+            const cells = Array.from(row.querySelectorAll('td, th'));
+            if (cells.length > colIndex) {
+                const char = cells[colIndex].innerText.trim().toUpperCase();
 
-                // If it's a valid sign, we take it
-                if (char && char.match(/[1X2x]/i)) {
+                // A valid result cell contains 1, X or 2
+                const matchResult = char.match(/[1X2]/i);
+                if (matchResult && char.length <= 2) { // Results are usually single chars, maybe a space
                     matches.push({
                         position: matchCount + 1,
-                        result: char.toUpperCase()
+                        result: matchResult[0].toUpperCase()
                     });
                     matchCount++;
-                    console.log(`[Estadisticas] Match ${matchCount}: ${char.toUpperCase()} (from line ${i})`);
+
+                    // Log the team name if possible (usually in the first/second cell)
+                    const teamInfo = cells[1] ? cells[1].innerText.trim() : '?';
+                    console.log(`[Estadisticas] Match ${matchCount} (${teamInfo}): ${matchResult[0].toUpperCase()}`);
                 }
             }
+
+            if (matchCount >= 15) break;
         }
 
         console.log(`[Estadisticas] Total extracted: ${matches.length} matches.`);
