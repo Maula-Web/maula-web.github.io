@@ -448,77 +448,60 @@ class QuinielaScraper {
     parseResultsFromEstadisticas(html, targetJornadaNum) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-        // Remove noise
-        const trash = doc.querySelectorAll('script, style, noscript');
-        trash.forEach(el => el.remove());
+
+        // Aggressive cleanup: remove all noise before getting text
+        const noise = doc.querySelectorAll('script, style, noscript, iframe, link, meta');
+        noise.forEach(el => el.remove());
 
         const text = doc.body.innerText || doc.body.textContent;
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-        console.log(`[Estadisticas] Parsing J${targetJornadaNum}... Found ${lines.length} lines.`);
+        console.log(`[Estadisticas] Parsing J${targetJornadaNum}... Found ${lines.length} cleaned lines.`);
 
-        // Find the line that lists Jornada numbers to determine indices
+        // Search for the header line using Regex for flexibility with spaces
         let headerLineIndex = -1;
-        for (let i = 0; i < lines.length; i++) {
-            const l = lines[i];
-            // Look for "Jornada" followed by numbers
-            if (l.includes('Jornada') && (l.includes(' 1 ') || l.includes('\t1\t')) && l.includes(String(targetJornadaNum))) {
+        const headerRegex = new RegExp(`Jornada\\s+1\\s+2\\s+3.*${targetJornadaNum}`, 'i');
+
+        for (let i = 0; i < Math.min(lines.length, 500); i++) {
+            if (headerRegex.test(lines[i])) {
                 headerLineIndex = i;
-                console.log(`[Estadisticas] Found header at line ${i}: "${l.substring(0, 100)}..."`);
+                console.log(`[Estadisticas] ✅ Header found at line ${i}: "${lines[i].substring(0, 100)}"`);
                 break;
             }
         }
 
         if (headerLineIndex === -1) {
-            // Fallback: search for any line with "Jornada" and "1"
-            for (let i = 0; i < Math.min(lines.length, 300); i++) {
-                if (lines[i].includes('Jornada') && lines[i].includes(' 1 ')) {
-                    headerLineIndex = i;
-                    break;
-                }
-            }
-        }
-
-        if (headerLineIndex === -1) {
-            console.warn("[Estadisticas] Header line not found");
+            console.warn("[Estadisticas] ❌ Header line not found. Check if page structure changed.");
+            console.log("First 20 lines for debug:", lines.slice(0, 20));
             return null;
         }
 
         const matches = [];
         let matchCount = 0;
 
-        // The results rows are after the header. 
-        // We look for rows that look like a sequence of signs.
         for (let i = headerLineIndex + 1; i < lines.length && matchCount < 15; i++) {
             const line = lines[i];
 
-            // Clean the line - sometimes there are numbers at the start or end
-            // A results line in ElQuinielista stats usually looks like "112XX..." 
-            // and might have the match number "1", "2" at start/end.
-            const cleanLine = line.replace(/^\d+/, '').replace(/\d+$/, '').trim();
+            // Clean the line - remove partida numbers if they exist
+            const cleanLine = line.replace(/^\d+\s+/, '').replace(/\s+\d+$/, '').replace(/\s+/g, '');
 
-            if (cleanLine.length >= 35 && /^[1X2x\-\s]+$/.test(cleanLine)) {
-                // The character for this jornada is at index (targetJornadaNum - 1)
-                // but we must account for possible spaces if they are present
-                // However, the text preview showed a solid block of characters.
+            if (cleanLine.length >= targetJornadaNum && /^[1X2x\-]+$/.test(cleanLine)) {
                 const char = cleanLine[targetJornadaNum - 1];
-
                 if (char && char.match(/[1X2x]/i)) {
                     matches.push({
                         position: matchCount + 1,
                         result: char.toUpperCase()
                     });
                     matchCount++;
+                    console.log(`[Estadisticas] Partida ${matchCount}: ${char.toUpperCase()}`);
                 }
-            } else if (matchCount > 0 && matchCount < 15) {
-                // If we already found some results but this line doesn't match, 
-                // it might be a gap or end of table.
-                console.log(`[Estadisticas] Interruption at line ${i}: "${line.substring(0, 50)}"`);
+            } else if (line.includes('DISTRIBUCIÓN') || line.includes('ZONA')) {
+                continue;
             }
         }
 
-        console.log(`[Estadisticas] Extracted ${matches.length} matches for J${targetJornadaNum}`);
-        return matches.length >= 10 ? matches : null; // Return if we found at least 10 (partial is better than nothing)
+        console.log(`[Estadisticas] Total: ${matches.length} matches extracted.`);
+        return matches.length >= 10 ? matches : null;
     }
 
     /**
