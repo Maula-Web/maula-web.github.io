@@ -781,6 +781,9 @@ class BoteManager {
             case 'repartos':
                 this.renderVistaRepartos(movements);
                 break;
+            case 'premios_dobles':
+                this.renderVistaPremiosDobles(movements);
+                break;
         }
     }
 
@@ -1625,10 +1628,10 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v20');
+        const migrationDone = localStorage.getItem('bote_maintenance_v21');
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v20 (Bulk Prize Sync)...');
+        console.log('Running maintenance migration v21 (Bulk Prize Sync)...');
 
         try {
             const allJ = await window.DataService.getAll('jornadas');
@@ -1665,10 +1668,10 @@ class BoteManager {
                 }
             }
 
-            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19', 'v20'];
+            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21'];
             marks.forEach(m => localStorage.setItem(`bote_maintenance_${m}`, 'true'));
 
-            console.log('Migration v20 effective!');
+            console.log('Migration v21 effective!');
             await this.loadData();
             this.render();
         } catch (e) { console.error('Migration v17 failed:', e); }
@@ -1926,6 +1929,68 @@ class BoteManager {
             console.error('Error deleting reparto:', error);
             alert('Error al eliminar el reparto.');
         }
+    }
+
+    renderVistaPremiosDobles(movements) {
+        let html = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="margin:0; color: #ff9100;">🏆 Historial de Premios (Columnas Dobles)</h2>
+            </div>
+            <div style="overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255, 145, 0, 0.3); background: rgba(0,0,0,0.2);">
+                <table class="bote-table">
+                    <thead>
+                        <tr>
+                            <th>Jornada</th>
+                            <th>Fecha</th>
+                            <th>Columna Extra</th>
+                            <th>Aciertos</th>
+                            <th>Premio Ganado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        const winningExtras = [];
+        this.jornadas.forEach(j => {
+            const extras = this.pronosticosExtra.filter(p => String(p.jId || p.jornadaId) === String(j.id) || String(p.jId || p.jornadaId) === String(j.number));
+            extras.forEach(p => {
+                const hits = this.calculateAciertos(j.matches, p.selection || p.forecast);
+                const prizesMap = j.prizes || {};
+                const prize = parseFloat(prizesMap[hits] || prizesMap[String(hits)] || 0);
+                if (prize > 0) {
+                    winningExtras.push({
+                        jNum: j.number,
+                        date: j.date,
+                        memberName: window.AppUtils.getMemberName(this.members.find(m => String(m.id) === String(p.mId || p.memberId))),
+                        hits: hits,
+                        prize: prize
+                    });
+                }
+            });
+        });
+
+        if (winningExtras.length === 0) {
+            html += `<tr><td colspan="5" style="text-align:center; padding: 2rem; opacity: 0.6;">No hay premios registrados en columnas de dobles.</td></tr>`;
+        } else {
+            winningExtras.sort((a, b) => b.jNum - a.jNum).forEach(e => {
+                html += `
+                    <tr style="background: rgba(255, 145, 0, 0.05);">
+                        <td style="font-weight:bold;">J${e.jNum}</td>
+                        <td style="opacity:0.8;">${e.date}</td>
+                        <td><span style="color: #ff9100; font-weight:bold;">${e.memberName}</span></td>
+                        <td><span style="background: #e65100; color:white; padding: 2px 8px; border-radius: 10px; font-weight:bold;">${e.hits} hits</span></td>
+                        <td class="positive" style="font-size:1.1rem; font-weight:900;">+ ${e.prize.toFixed(2)}€</td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        document.getElementById('bote-content').innerHTML = html;
     }
 }
 
