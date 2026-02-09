@@ -1730,7 +1730,10 @@ class BoteManager {
                             ${isActividad ? '-' : `Reparto individual: ${(r.totalAmount / this.members.length).toFixed(2)}€`}
                         </td>
                         <td>
-                           <button onclick="window.Bote.deleteReparto('${r.id}')" style="background: rgba(217, 48, 37, 0.1); color: var(--primary-red); border: 1px solid var(--primary-red); padding: 4px 8px; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                           <div style="display:flex; gap:5px;">
+                               <button onclick="window.Bote.openRepartoModal('${r.id}')" style="background: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid #2196f3; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Editar</button>
+                               <button onclick="window.Bote.deleteReparto('${r.id}')" style="background: rgba(217, 48, 37, 0.1); color: var(--primary-red); border: 1px solid var(--primary-red); padding: 4px 8px; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                           </div>
                         </td>
                     </tr>
                 `;
@@ -1746,19 +1749,44 @@ class BoteManager {
         document.getElementById('bote-content').innerHTML = html;
     }
 
-    openRepartoModal() {
+    openRepartoModal(repartoId = null) {
         // Check current balance
-        const totalBote = parseFloat(document.getElementById('total-bote').textContent);
-        if (totalBote <= 0) {
-            alert('No hay saldo suficiente en el bote para realizar un reparto.');
-            return;
+        const totalBoteCalculado = parseFloat(document.getElementById('total-bote').textContent);
+
+        let reparto = null;
+        if (repartoId) {
+            reparto = this.repartos.find(r => r.id === repartoId);
         }
 
-        document.getElementById('reparto-fecha').valueAsDate = new Date();
-        document.getElementById('reparto-importe').max = totalBote;
-        document.getElementById('reparto-importe').placeholder = `Máximo: ${totalBote.toFixed(2)}€`;
+        const titleEl = document.getElementById('modal-reparto-title');
+        const idInp = document.getElementById('reparto-id');
+        const fechaInp = document.getElementById('reparto-fecha');
+        const importeInp = document.getElementById('reparto-importe');
+        const tipoInp = document.getElementById('reparto-tipo');
+        const descInp = document.getElementById('reparto-descripcion');
 
-        // Reset list of members settings
+        if (reparto) {
+            titleEl.textContent = 'Editar Reparto de Ganancias';
+            idInp.value = reparto.id;
+            fechaInp.value = reparto.date;
+            importeInp.value = reparto.totalAmount;
+            tipoInp.value = reparto.type;
+            descInp.value = reparto.description;
+            // The max import for editing is current balance + amount of THIS reparto (since we would "return" it temporarily)
+            importeInp.max = totalBoteCalculado + reparto.totalAmount;
+            importeInp.placeholder = `Máximo disponible: ${(totalBoteCalculado + reparto.totalAmount).toFixed(2)}€`;
+        } else {
+            titleEl.textContent = 'Realizar Reparto de Ganancias';
+            idInp.value = '';
+            fechaInp.valueAsDate = new Date();
+            importeInp.value = '';
+            tipoInp.value = 'socios';
+            descInp.value = '';
+            importeInp.max = totalBoteCalculado;
+            importeInp.placeholder = `Máximo: ${totalBoteCalculado.toFixed(2)}€`;
+        }
+
+        // Reset/Fill list of members settings
         const listDiv = document.getElementById('reparto-miembros-list');
         listDiv.innerHTML = '';
 
@@ -1771,16 +1799,19 @@ class BoteManager {
             div.style.justifyContent = 'space-between';
             div.style.alignItems = 'center';
 
+            const savedChoice = (reparto && reparto.memberChoices) ? (reparto.memberChoices[m.id] || 'bote') : 'bote';
+
             div.innerHTML = `
                 <span style="font-size: 0.85rem; font-weight: bold;">${m.name}</span>
                 <select name="choice_${m.id}" style="font-size: 0.8rem; padding: 2px 4px; background: #222; color: #fff; border: 1px solid #444;">
-                    <option value="bote" selected>Al Bote</option>
-                    <option value="cash">En Efectivo</option>
+                    <option value="bote" ${savedChoice === 'bote' ? 'selected' : ''}>Al Bote</option>
+                    <option value="cash" ${savedChoice === 'cash' ? 'selected' : ''}>En Efectivo</option>
                 </select>
             `;
             listDiv.appendChild(div);
         });
 
+        this.toggleRepartoType(tipoInp.value);
         document.getElementById('modal-reparto').style.display = 'flex';
     }
 
@@ -1794,12 +1825,27 @@ class BoteManager {
     }
 
     async saveReparto() {
-        const totalBote = parseFloat(document.getElementById('total-bote').textContent);
+        const totalBoteCalculado = parseFloat(document.getElementById('total-bote').textContent);
+        const editingId = document.getElementById('reparto-id').value;
         const importe = parseFloat(document.getElementById('reparto-importe').value);
         const type = document.getElementById('reparto-tipo').value;
+        const date = document.getElementById('reparto-fecha').value;
+        const description = document.getElementById('reparto-descripcion').value;
 
-        if (importe > totalBote) {
-            alert(`No se puede repartir más de lo que hay en el bote (${totalBote.toFixed(2)}€).`);
+        if (isNaN(importe) || importe <= 0) {
+            alert('Importe no válido.');
+            return;
+        }
+
+        // Validation against balance
+        let existingAmount = 0;
+        if (editingId) {
+            const existing = this.repartos.find(r => r.id === editingId);
+            if (existing) existingAmount = existing.totalAmount;
+        }
+
+        if (importe > (totalBoteCalculado + existingAmount)) {
+            alert('El importe del reparto no puede superar el saldo disponible en el Bote de la Peña.');
             return;
         }
 
@@ -1807,27 +1853,35 @@ class BoteManager {
         if (type === 'socios') {
             const selects = document.querySelectorAll('#reparto-miembros-list select');
             selects.forEach(s => {
-                const mid = s.name.replace('choice_', '');
-                choices[mid] = s.value;
+                const mId = s.name.replace('choice_', '');
+                choices[mId] = s.value;
             });
         }
 
         const reparto = {
-            id: 'rep_' + Date.now(),
-            date: document.getElementById('reparto-fecha').value,
+            id: editingId || ('rep_' + Date.now()),
+            date: date,
             totalAmount: importe,
             type: type,
-            description: document.getElementById('reparto-descripcion').value,
+            description: description,
             memberChoices: choices,
-            createdAt: new Date().toISOString()
+            updatedAt: new Date().toISOString()
         };
+        if (!editingId) reparto.createdAt = reparto.updatedAt;
 
         try {
             await window.DataService.save('repartos', reparto);
-            this.repartos.push(reparto);
+
+            if (editingId) {
+                const idx = this.repartos.findIndex(r => r.id === editingId);
+                if (idx > -1) this.repartos[idx] = reparto;
+            } else {
+                this.repartos.push(reparto);
+            }
+
             this.closeModal('modal-reparto');
             this.render();
-            alert('Reparto registrado correctamente.');
+            alert(editingId ? 'Reparto actualizado correctamente.' : 'Reparto registrado correctamente.');
         } catch (error) {
             console.error('Error saving reparto:', error);
             alert('Error al guardar el reparto.');
