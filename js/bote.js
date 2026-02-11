@@ -1053,7 +1053,7 @@ class BoteManager {
                 <select id="jornada-select" onchange="window.Bote.goToJornada(this.value)" style="padding: 0.6rem 1rem; border-radius: 8px; background: rgba(30, 30, 30, 0.9); color: white; border: 1px solid var(--primary-color); font-weight: bold; cursor: pointer;">
                     ${jornadaNums.map((num, idx) => {
             const j = this.jornadas.find(jor => jor.number === parseInt(num));
-            return `<option value="${idx}" ${idx === this.currentJornadaIndex ? 'selected' : ''}>Jornada ${num} - ${j ? j.date : ''}</option>`;
+            return `<option value="${idx}" ${idx === this.currentJornadaIndex ? 'selected' : ''}>Jornada ${num} - ${j ? j.date : ''}${j && j.noSellado ? ' 🚫' : ''}</option>`;
         }).join('')}
                 </select>
 
@@ -1646,7 +1646,7 @@ class BoteManager {
             }
             html += `
                 <th style="position: sticky; top: 0; min-width: 70px; background: var(--cuadrante-header-bg); color: var(--cuadrante-header-text); border-bottom: 2px solid var(--cuadrante-win-border, var(--primary-color, #ff9100));">
-                    <div>J${j.number}${j.hasPig ? ' 🐷' : ''}</div>
+                    <div>J${j.number}${j.hasPig ? ' 🐷' : ''}${j.noSellado ? ' 🚫' : ''}</div>
                     ${shortDate}
                 </th>`;
         });
@@ -2113,6 +2113,7 @@ class BoteManager {
                 jornadasMap[j.number] = {
                     number: j.number,
                     date: j.date,
+                    noSellado: j.noSellado,
                     boteInicial: 0,
                     aportaciones: 0,
                     penalizaciones: 0,
@@ -2255,7 +2256,7 @@ class BoteManager {
 
         evolutionData.forEach(j => {
             const th = document.createElement('th');
-            th.innerHTML = `<div style="font-size:1.1em;">J${j.number}</div><div style="font-size:0.75em; font-weight:normal; opacity:0.8;">${j.date}</div>`;
+            th.innerHTML = `<div style="font-size:1.1em;">J${j.number}${j.noSellado ? ' 🚫' : ''}</div><div style="font-size:0.75em; font-weight:normal; opacity:0.8;">${j.date}</div>`;
             th.style.textAlign = 'center';
             th.style.minWidth = '100px';
             trHead.appendChild(th);
