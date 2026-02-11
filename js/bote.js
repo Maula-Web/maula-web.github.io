@@ -308,6 +308,19 @@ class BoteManager {
             isSustituto: false // Track if this member is substituting the original sealer
         };
 
+        // If jornada is not sealed, NO COSTS apply
+        if (jornada.noSellado) {
+            // We still might want to calculate hits (aciertos) for stats?
+            // User just mentioned "gasto".
+            // If not sealed, maybe hits are irrelevant too or maybe just for fun.
+            // But definitely 0 money.
+            if (pronostico && jornada.matches) {
+                const currentSelection = pronostico.selection || pronostico.forecast;
+                costs.aciertos = this.calculateAciertos(jornada.matches, currentSelection);
+            }
+            return costs;
+        }
+
         if (!pronostico) {
             costs.columna = jornadaPlayed ? this.getHistoricalPrice('costeColumna', jDate) : 0;
             return costs;
@@ -335,17 +348,16 @@ class BoteManager {
             costs.columna = 0;
             costs.aportacion = 0;
         } else if (jornadaPlayed) {
-            // LÓGICA DE REDISTRIBUCIÓN:
-            // Cuando un socio queda exento, el club deja de recibir sus 1.50€.
-            // Para mantener la caja equilibrada, ese coste se reparte entre los socios que SÍ pagan.
+            // LÓGICA DE SOBRECOSTE POR EXENTOS:
+            // Por cada socio exento, el resto paga un extra fijo (e.g. 0.20€).
             if (infoRedist && infoRedist.payingCount > 0 && infoRedist.payingCount < numMembers) {
                 const numExempt = numMembers - infoRedist.payingCount;
-                const totalExtraCost = numExempt * baseAportacion;
-                costs.aportacion = baseAportacion + (totalExtraCost / infoRedist.payingCount);
-                costs.columna = baseColumna + (totalExtraCost / infoRedist.payingCount);
-            } else if (infoRedist && infoRedist.payingCount === 0) {
-                costs.aportacion = 0;
-                costs.columna = 0;
+                const extraPerExempt = this.getHistoricalPrice('costeExtraExento', jDate) || 0.20;
+
+                costs.aportacion = baseAportacion + (numExempt * extraPerExempt);
+                // Costs column remains base? Usually 'columna' tracks the base cost of playing.
+                // But the user pays 'aportacion'.
+                costs.columna = baseColumna;
             } else {
                 costs.aportacion = baseAportacion;
                 costs.columna = baseColumna;
@@ -1294,6 +1306,7 @@ class BoteManager {
         document.getElementById('config-coste-columna').value = this.config.costeColumna;
         document.getElementById('config-coste-dobles').value = this.config.costeDobles;
         document.getElementById('config-aportacion').value = this.config.aportacionSemanal;
+        document.getElementById('config-extra-exento').value = this.config.costeExtraExento !== undefined ? this.config.costeExtraExento : 0.20;
         document.getElementById('config-bote-inicial').value = this.config.boteInicial;
 
         const history = this.config.penalties_history || {};
@@ -1476,6 +1489,7 @@ class BoteManager {
         this.config.costeColumna = parseFloat(document.getElementById('config-coste-columna').value);
         this.config.costeDobles = parseFloat(document.getElementById('config-coste-dobles').value);
         this.config.aportacionSemanal = parseFloat(document.getElementById('config-aportacion').value);
+        this.config.costeExtraExento = parseFloat(document.getElementById('config-extra-exento').value);
         this.config.boteInicial = parseFloat(document.getElementById('config-bote-inicial').value);
 
         // Advanced Penalties History
