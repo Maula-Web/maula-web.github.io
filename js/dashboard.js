@@ -668,13 +668,25 @@ class DashboardManager {
         }
 
         const prizeWinners = results
-            .filter(r => r.hits >= minHitsToWin && r.hasPronostico)
+            .filter(r => {
+                if (!r.hasPronostico) return false;
+                const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
+                return parseFloat(val) > 0;
+            })
             .sort((a, b) => b.hits - a.hits)
             .map(r => ({ name: r.name, hits: r.hits }));
 
-        // All eligible for NEXT dobles: Absolute Winner + anyone with hits >= minHitsToWin (has prize)
+        // All eligible for NEXT dobles: Absolute Winner + anyone with a monetary prize > 0
         const eligibleNextNames = results
-            .filter(r => r.memberId === winnerCandidates[0].memberId || (r.hits >= minHitsToWin && r.hasPronostico))
+            .filter(r => {
+                const isWinner = r.memberId === winnerCandidates[0].memberId;
+                const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
+                const hasPrize = parseFloat(val) > 0;
+
+                return isWinner || (hasPrize && r.hasPronostico);
+            })
             .map(r => r.name);
 
         // Remove duplicates and sort
