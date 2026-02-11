@@ -2264,6 +2264,164 @@ class BoteManager {
         tableContainer.appendChild(table);
         container.appendChild(tableContainer);
     }
+    /**
+     * Open Modal for Managing Jornada Settings and Reductions
+     */
+    openGestionJornadasModal() {
+        const modal = document.getElementById('modal-gestion-jornada');
+        const select = document.getElementById('gestion-jornada-select');
+        const content = document.getElementById('gestion-jornada-details');
+
+        // Populate Select
+        select.innerHTML = '<option value="">Selecciona una jornada...</option>';
+        [...this.jornadas].sort((a, b) => b.number - a.number).forEach(j => {
+            select.innerHTML += `<option value="${j.id}">Jornada ${j.number} (${j.date})</option>`;
+        });
+
+        // Reset UI
+        content.style.display = 'none';
+        document.getElementById('gestion-no-sellado').checked = false;
+        document.getElementById('gestion-sustituto').innerHTML = '<option value="">-- Sin sustituto --</option>';
+
+        // Populate Member Select for Substitute
+        const subSelect = document.getElementById('gestion-sustituto');
+        this.members.sort((a, b) => a.name.localeCompare(b.name)).forEach(m => {
+            subSelect.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+        });
+
+        // Event Listener for Change
+        select.onchange = (e) => this.loadGestionJornadaDetails(e.target.value);
+
+        modal.style.display = 'flex';
+    }
+
+    loadGestionJornadaDetails(jornadaId) {
+        const content = document.getElementById('gestion-jornada-details');
+        if (!jornadaId) {
+            content.style.display = 'none';
+            return;
+        }
+
+        const jornada = this.jornadas.find(j => String(j.id) === String(jornadaId));
+        if (!jornada) return;
+
+        // 1. Settings
+        document.getElementById('gestion-no-sellado').checked = !!jornada.noSellado;
+        const subSelect = document.getElementById('gestion-sustituto');
+        subSelect.value = jornada.sustitutoSellado || "";
+
+        // 2. Doubles / Reductions
+        const listDiv = document.getElementById('gestion-dobles-list');
+        listDiv.innerHTML = '';
+
+        const extras = this.pronosticosExtra ? this.pronosticosExtra.filter(p => String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number)) : [];
+
+        if (extras.length === 0) {
+            listDiv.innerHTML = '<p style="text-align: center; opacity: 0.5;">No hay columnas de dobles registradas para esta jornada.</p>';
+        } else {
+            const table = document.createElement('table');
+            table.className = 'bote-table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Socio</th>
+                        <th>Aciertos Calc.</th>
+                        <th>Aciertos Reales</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+
+            extras.forEach(p => {
+                const member = this.members.find(m => String(m.id) === String(p.mId || p.memberId));
+                const calcHits = this.calculateAciertos(jornada.matches, p.selection || p.forecast);
+                const manualHits = (p.manualHits !== undefined && p.manualHits !== null) ? p.manualHits : '';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${member ? member.name : 'Desconocido'}</td>
+                    <td style="font-weight:bold;">${calcHits}</td>
+                    <td>
+                        <input type="number" id="manual-hits-${p.id}" value="${manualHits}" placeholder="${calcHits}" 
+                            style="width: 60px; padding: 4px; border-radius: 4px; border: 1px solid #555; background: #333; color: white;">
+                    </td>
+                    <td>
+                        <button onclick="window.Bote.saveManualHits('${p.id}')" class="btn-action">Guardar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            listDiv.appendChild(table);
+        }
+
+        content.style.display = 'block';
+    }
+
+    async saveJornadaSettings() {
+        const jId = document.getElementById('gestion-jornada-select').value;
+        if (!jId) return;
+
+        const noSellado = document.getElementById('gestion-no-sellado').checked;
+        const sustituto = document.getElementById('gestion-sustituto').value;
+
+        try {
+            // Need to merge with existing jornada data to avoid overwriting everything else?
+            // DataService.save usually overwrites or merges depending on implementation.
+            // Assuming we must send FULL object or partial update if supported. 
+            // Standard Firestore 'save' usually means set() with merge:true or similar.
+            // Let's get the full object first.
+            const jornada = this.jornadas.find(j => String(j.id) === String(jId));
+            if (!jornada) return;
+
+            const updateData = {
+                ...jornada,
+                noSellado: noSellado,
+                sustitutoSellado: sustituto || null
+            };
+
+            await window.DataService.save('jornadas', updateData);
+
+            // Update local state
+            const idx = this.jornadas.findIndex(j => j.id === jId);
+            if (idx !== -1) this.jornadas[idx] = updateData;
+
+            alert('Configuración de jornada guardada correctamente.');
+            this.render(); // Re-render to reflect changes
+        } catch (e) {
+            console.error(e);
+            alert('Error al guardar configuración de jornada.');
+        }
+    }
+
+    async saveManualHits(extraId) {
+        const input = document.getElementById(`manual-hits-${extraId}`);
+        const val = input.value;
+        const manualHits = val === '' ? null : parseInt(val);
+
+        try {
+            const extra = this.pronosticosExtra.find(p => p.id === extraId);
+            if (!extra) return;
+
+            const updateData = {
+                ...extra,
+                manualHits: manualHits
+            };
+
+            await window.DataService.save('pronosticos_extra', updateData);
+
+            // Update local state
+            const idx = this.pronosticosExtra.findIndex(p => p.id === extraId);
+            if (idx !== -1) this.pronosticosExtra[idx] = updateData;
+
+            alert('Aciertos reales actualizados.');
+            this.render();
+        } catch (e) {
+            console.error(e);
+            alert('Error al actualizar aciertos.');
+        }
+    }
 }
 
 // Initialize on page load
