@@ -2171,13 +2171,28 @@ class BoteManager {
                 // Loose matching: if rDate is <= currDate and > prevDate
                 return rDate > prevDate && rDate <= currDate;
             });
-
             const totalRepartos = repartosInPeriod.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
             jData.repartos = totalRepartos;
 
             // Bote Final Formula
-            // Bote Final = Inicial + Aportaciones + Penalizaciones + Premios - CosteQuinielas - Repartos
-            const ingresosJ = jData.aportaciones + jData.penalizaciones + jData.premios;
+            // Bote Final = Inicial + Aportaciones + Penalizaciones + Premios + IngresosManuales - CosteQuinielas - Repartos
+
+            // Calculate Manual Ingresos for this Jornada
+            const manualIngresosJ = movements
+                .filter(m => m.jornadaNum === jData.number)
+                .reduce((sum, m) => sum + (m.ingresosManual || 0), 0);
+
+            // We can add it to 'aportaciones' for display or keep separate?
+            // User view has: Aportaciones, Penalizaciones, Premios...
+            // It might be better to sum it with Aportaciones or add a row.
+            // Let's add it to Aportaciones to keep table simple, or create 'Ingresos Extra'.
+            // Given the table columns: Aportaciones Socios.
+            // Let's add it to Aportaciones but maybe Rename label?
+            // "Aportaciones Socios" usually means the 1.50.
+            // Let's add it to a new field 'ingresosExtra' in jData and add a row in the table.
+            jData.ingresosExtra = manualIngresosJ;
+
+            const ingresosJ = jData.aportaciones + jData.penalizaciones + jData.premios + jData.ingresosExtra;
             const gastosJ = jData.costeQuinielas + jData.repartos;
 
             jData.boteFinal = currentBote + ingresosJ - gastosJ;
@@ -2254,6 +2269,7 @@ class BoteManager {
 
         createRow('Bote Inicial', 'boteInicial');
         createRow('(+) Aportaciones Socios', 'aportaciones', true, 'positive');
+        createRow('(+) Ingresos Extra (Bizum)', 'ingresosExtra', true, 'positive');
         createRow('(+) Penalizaciones', 'penalizaciones', true, 'positive');
         createRow('(+) Premios Cobrados', 'premios', true, 'positive');
         createRow('(-) Coste Quinielas', 'costeQuinielas', true, 'negative');

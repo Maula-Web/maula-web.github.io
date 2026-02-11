@@ -709,8 +709,15 @@ class DashboardManager {
 
         // Safe Money Calculation
         const prizeMoney = prizeWinners.reduce((sum, pw) => {
-            const rate = (jornada.prizeRates && jornada.prizeRates[pw.hits]) || 0;
-            return sum + rate;
+            const prizesMap = jornada.prizes || jornada.prizeRates || {};
+            // Try number key then string key
+            let val = prizesMap[pw.hits] || prizesMap[String(pw.hits)] || 0;
+
+            // Handle "4.24" or "4,24" or "4,24 €"
+            if (typeof val === 'string') {
+                val = parseFloat(val.replace(',', '.').replace('€', '').trim());
+            }
+            return sum + (val || 0);
         }, 0);
         const doublesMoney = doublesResults.reduce((sum, dr) => sum + (dr.prize || 0), 0);
 
