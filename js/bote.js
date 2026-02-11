@@ -241,15 +241,16 @@ class BoteManager {
                         extraPrizes: extraPrizes,
                         ingresosManual: manualIngresos,
                         aciertos: costs.aciertos,
-                        totalIngresos: (manualIngresos + prizes), // Shown in table for info
-                        totalGastos: (costs.aportacion + penalties),
-                        neto: netoForSocio, // Now excludes prizes
+                        totalIngresos: (manualIngresos + prizes),
+                        totalGastos: (costs.aportacion + penalties), // User pays this
+                        neto: netoForSocio,
                         boteAcumulado: boteAcumulado,
                         exento: costs.exento,
                         jugaDobles: costs.jugaDobles,
                         isSelladoInCash: isSelladoInCash,
-                        // Peña fund: Member contributions + Penalties + Member prizes + Doubles prizes
                         pennaIn: costs.aportacion + penalties + prizes + extraPrizes,
+                        // Fix: pennaOut should track reimbursements AND general expenses logic is separate. 
+                        // But for member movement, pennaOut is only relevant if they receive cash.
                         pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
                     });
                 } else if (event.type === 'reparto') {
@@ -516,10 +517,13 @@ class BoteManager {
         }
 
         if (type === 'unos' || type === 'bajos_aciertos') {
-            return (setting.values && setting.values[value] !== undefined) ? setting.values[value] : 0;
+            if (setting.values && setting.values[value] !== undefined) {
+                return parseFloat(setting.values[value]);
+            }
+            return 0; // If defined in config but value is missing for this int, assume 0
         }
         if (type === 'pig') {
-            return setting.value !== undefined ? setting.value : 1.00;
+            return setting.value !== undefined ? parseFloat(setting.value) : 1.00;
         }
         return 0;
     }
@@ -858,9 +862,40 @@ class BoteManager {
      */
     updateSummary(movements) {
         // SUMMARY FOR THE PEÑA
-        const totalIngresos = movements.reduce((sum, m) => sum + (m.pennaIn || 0), 0);
-        const totalGastos = movements.reduce((sum, m) => sum + (m.pennaOut || 0), 0);
+        // INCOMES: Member Contribs + Penalties + Member Prizes + Doubles Prizes + Manual Ingresos
+        const totalIngresos = movements.reduce((sum, m) => sum + (m.pennaIn || 0) + (m.ingresosManual || 0), 0);
+
+        // EXPENSES: Quiniela Costs + Repartos
+        let totalGastosQuinielas = 0;
+
+        // Calculate Expenses per Jornada (Quinielas + Dobles)
+        this.jornadas.forEach(j => {
+            const played = (j.matches || []).some(m => m.result && m.result !== '');
+            if (!played) return;
+
+            // Check No Sellado
+            if (j.noSellado) return;
+
+            const jDate = window.AppUtils.parseDate(j.date);
+            const costCol = this.getHistoricalPrice('costeColumna', jDate);
+            const costDob = this.getHistoricalPrice('costeDobles', jDate);
+            const numSocios = this.members.length;
+
+            let numDobles = 0;
+            if (j.number > 1) {
+                // Count played doubles
+                const doblesCount = movements.filter(m => m.jornadaNum === j.number && m.jugaDobles).length;
+                numDobles = doblesCount;
+            } else if (j.number === 1) {
+                // J1 assumption: 1 double
+                numDobles = 1;
+            }
+
+            totalGastosQuinielas += (numSocios * costCol) + (numDobles * costDob);
+        });
+
         const totalRepartos = (this.repartos || []).reduce((sum, r) => sum + (r.totalAmount || 0), 0);
+        const totalGastos = totalGastosQuinielas + totalRepartos;
         const boteTotal = totalIngresos - totalGastos - totalRepartos + this.config.boteInicial;
 
         // Calculate total prizes for the new card - SHOW RAW TOTAL without subtractions
