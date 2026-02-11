@@ -492,11 +492,6 @@ class BoteManager {
         const history = this.config.penalties_history || {};
         const settings = history[type] || [];
 
-        if (date.getFullYear() === 2025 && date.getMonth() === 7) {
-            const hasExactDate = settings.some(s => new Date(s.date).toDateString() === date.toDateString());
-            if (!hasExactDate) return 0;
-        }
-
         let setting = settings.filter(s => new Date(s.date) <= date)
             .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
