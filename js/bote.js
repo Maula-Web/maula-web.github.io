@@ -784,6 +784,9 @@ class BoteManager {
             case 'premios_dobles':
                 this.renderVistaPremiosDobles(movements);
                 break;
+            case 'evolucion':
+                this.renderVistaEvolucion(movements);
+                break;
         }
     }
 
@@ -1952,7 +1955,7 @@ class BoteManager {
 
         const winningExtras = [];
         this.jornadas.forEach(j => {
-            const extras = this.pronosticosExtra.filter(p => String(p.jId || p.jornadaId) === String(j.id) || String(p.jId || p.jornadaId) === String(j.number));
+            const extras = this.pronosticosExtra ? this.pronosticosExtra.filter(p => String(p.jId || p.jornadaId) === String(j.id) || String(p.jId || p.jornadaId) === String(j.number)) : [];
             extras.forEach(p => {
                 const hits = this.calculateAciertos(j.matches, p.selection || p.forecast);
                 const prizesMap = j.prizes || {};
@@ -1973,11 +1976,12 @@ class BoteManager {
             html += `<tr><td colspan="5" style="text-align:center; padding: 2rem; opacity: 0.6;">No hay premios registrados en columnas de dobles.</td></tr>`;
         } else {
             winningExtras.sort((a, b) => b.jNum - a.jNum).forEach(e => {
+                const rowStyle = 'background: rgba(255, 145, 0, 0.05);';
                 html += `
-                    <tr style="background: rgba(255, 145, 0, 0.05);">
+                    <tr style="${rowStyle}">
                         <td style="font-weight:bold;">J${e.jNum}</td>
                         <td style="opacity:0.8;">${e.date}</td>
-                        <td><span style="color: #ff9100; font-weight:bold;">${e.memberName}</span></td>
+                        <td><span style="color: #ff9100; font-weight:bold;">${typeof e.memberName === 'object' ? 'Socio' : e.memberName}</span></td>
                         <td><span style="background: #e65100; color:white; padding: 2px 8px; border-radius: 10px; font-weight:bold;">${e.hits} hits</span></td>
                         <td class="positive" style="font-size:1.1rem; font-weight:900;">+ ${e.prize.toFixed(2)}€</td>
                     </tr>
@@ -1991,6 +1995,194 @@ class BoteManager {
             </div>
         `;
         document.getElementById('bote-content').innerHTML = html;
+    }
+
+    /**
+     * Render Evolution View (Jornada a Jornada)
+     */
+    renderVistaEvolucion(movements) {
+        const container = document.getElementById('bote-content');
+        container.innerHTML = `
+            <div style="margin-bottom: 2rem;">
+                <h2 style="margin:0; color: var(--primary-color);">Evolución del Bote de la Peña</h2>
+                <p style="opacity: 0.8;">Histórico del saldo y movimientos jornada a jornada</p>
+            </div>
+        `;
+
+        // Group movements by Jornada Number
+        const jornadasMap = {};
+
+        // Initialize map with all played jornadas
+        this.jornadas.forEach(j => {
+            // Only count if played
+            const played = (j.matches || []).some(m => m.result && m.result !== '');
+            if (played) {
+                jornadasMap[j.number] = {
+                    number: j.number,
+                    date: j.date,
+                    boteInicial: 0,
+                    aportaciones: 0,
+                    penalizaciones: 0,
+                    costeQuinielas: 0,
+                    premios: 0,
+                    boteFinal: 0,
+                    repartos: 0
+                };
+            }
+        });
+
+        // Add movements per jornada
+        movements.forEach(m => {
+            if (m.type === 'jornada' && jornadasMap[m.jornadaNum]) {
+                const jData = jornadasMap[m.jornadaNum];
+                jData.aportaciones += (m.aportacion || 0);
+                jData.penalizaciones += (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0);
+                // Note: m.premios are prizes kept by member (usually). Wait, in current model prizes > 0 make member EXEMPT from paying next time, but prizes go to the member? No, "peñaIn" includes prizes?
+                // Let's re-read calculateAllMovements.
+                // pennaIn: costs.aportacion + penalties + prizes + extraPrizes.
+                // So prizes go into the FUND.
+                jData.premios += (m.premios || 0) + (m.extraPrizes || 0);
+            }
+        });
+
+        // We iterate jornadas chronologically to update Bote
+        let currentBote = this.config.boteInicial || 0;
+        const evolutionData = [];
+
+        // Sort jornadas
+        const sortedJornadas = Object.values(jornadasMap).sort((a, b) => a.number - b.number);
+
+        sortedJornadas.forEach(jData => {
+            jData.boteInicial = currentBote;
+
+            // Re-calculate costs accurately (Coste Quinielas)
+            // It equals: (Nº Socios Pagadores + Nº Socios Exentos) * Coste Columna + (Nº Socios Ganadores prev) * Coste Doble
+            // Assuming ALL active members play every jornada.
+            // Coste Columna is per member.
+            const jDate = window.AppUtils.parseDate(jData.date);
+            const costCol = this.getHistoricalPrice('costeColumna', jDate);
+            const costDob = this.getHistoricalPrice('costeDobles', jDate);
+
+            const numSocios = this.members.length;
+
+            // Doubles Count
+            let numDobles = 0;
+            if (jData.number > 1) {
+                const doblesCount = movements.filter(m => m.jornadaNum === jData.number && m.jugaDobles).length;
+                numDobles = doblesCount;
+            } else {
+                // J1 special case manually? Or by default 0.
+            }
+
+            // Total Cost for this Jornada (Quinielas + Dobles)
+            // We assume 1 column per member.
+            const totalCost = (numSocios * costCol) + (numDobles * costDob);
+            jData.costeQuinielas = totalCost;
+
+            // Repartos Logic
+            const prevJornada = sortedJornadas.find(j => j.number === jData.number - 1);
+            const prevDate = prevJornada ? window.AppUtils.parseDate(prevJornada.date) : new Date(0);
+            const currDate = window.AppUtils.parseDate(jData.date);
+            // Fix: If jDate parsing fails, assume order is correct
+
+            const repartosInPeriod = this.repartos.filter(r => {
+                const rDate = new Date(r.date);
+                // Include repartos "up to" this jornada date that haven't been counted?
+                // Loose matching: if rDate is <= currDate and > prevDate
+                return rDate > prevDate && rDate <= currDate;
+            });
+
+            const totalRepartos = repartosInPeriod.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
+            jData.repartos = totalRepartos;
+
+            // Bote Final Formula
+            // Bote Final = Inicial + Aportaciones + Penalizaciones + Premios - CosteQuinielas - Repartos
+            const ingresosJ = jData.aportaciones + jData.penalizaciones + jData.premios;
+            const gastosJ = jData.costeQuinielas + jData.repartos;
+
+            jData.boteFinal = currentBote + ingresosJ - gastosJ;
+            currentBote = jData.boteFinal;
+
+            evolutionData.push(jData);
+        });
+
+        // Create Table
+        const tableContainer = document.createElement('div');
+        tableContainer.style.overflowX = 'auto';
+        tableContainer.style.borderRadius = '12px';
+        tableContainer.style.border = '1px solid var(--glass-border)';
+        tableContainer.style.background = 'rgba(0,0,0,0.2)';
+
+        const table = document.createElement('table');
+        table.className = 'bote-table';
+        table.style.minWidth = '1200px';
+
+        const thead = document.createElement('thead');
+        const trHead = document.createElement('tr');
+        const thConcept = document.createElement('th');
+        thConcept.textContent = 'CONCEPTO / JORNADA';
+        thConcept.style.minWidth = '220px';
+        thConcept.style.position = 'sticky';
+        thConcept.style.left = '0';
+        thConcept.style.zIndex = '20';
+        thConcept.style.background = 'var(--bote-header-bg-start, #ff9100)';
+        trHead.appendChild(thConcept);
+
+        evolutionData.forEach(j => {
+            const th = document.createElement('th');
+            th.innerHTML = `<div style="font-size:1.1em;">J${j.number}</div><div style="font-size:0.75em; font-weight:normal; opacity:0.8;">${j.date}</div>`;
+            th.style.textAlign = 'center';
+            th.style.minWidth = '100px';
+            trHead.appendChild(th);
+        });
+        thead.appendChild(trHead);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+
+        const createRow = (label, key, isCurrency = true, colorClass = '', isBold = false) => {
+            const tr = document.createElement('tr');
+            const tdLabel = document.createElement('td');
+            tdLabel.textContent = label;
+            tdLabel.style.fontWeight = 'bold';
+            tdLabel.style.position = 'sticky';
+            tdLabel.style.left = '0';
+            tdLabel.style.background = 'var(--card-bg, #1a1a1a)';
+            tdLabel.style.zIndex = '15';
+            tdLabel.style.borderRight = '2px solid rgba(255,145,0,0.3)';
+            tr.appendChild(tdLabel);
+
+            evolutionData.forEach(j => {
+                const td = document.createElement('td');
+                const val = j[key];
+                td.textContent = isCurrency ? (val !== 0 ? val.toFixed(2) + ' €' : '-') : val;
+                td.style.textAlign = 'center';
+                if (colorClass) td.classList.add(colorClass);
+                // Manual style because simple add class might not work with styles definied in HTML head if scoping issues, but bote.html has global styles.
+                if (colorClass === 'positive') td.style.color = '#4caf50';
+                if (colorClass === 'negative') td.style.color = '#f44336';
+
+                if (isBold) {
+                    td.style.fontWeight = '900';
+                    td.style.fontSize = '1.1em';
+                    td.style.color = 'var(--primary-color, #ff9100)';
+                }
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        };
+
+        createRow('Bote Inicial', 'boteInicial');
+        createRow('(+) Aportaciones Socios', 'aportaciones', true, 'positive');
+        createRow('(+) Penalizaciones', 'penalizaciones', true, 'positive');
+        createRow('(+) Premios Cobrados', 'premios', true, 'positive');
+        createRow('(-) Coste Quinielas', 'costeQuinielas', true, 'negative');
+        createRow('(-) Repartos', 'repartos', true, 'negative');
+        createRow('(=) BOTE FINAL', 'boteFinal', true, '', true);
+
+        table.appendChild(tbody);
+        tableContainer.appendChild(table);
+        container.appendChild(tableContainer);
     }
 }
 

@@ -672,7 +672,10 @@ class DashboardManager {
                 if (!r.hasPronostico) return false;
                 const prizesMap = jornada.prizes || jornada.prizeRates || {};
                 const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
-                return parseFloat(val) > 0;
+                // Hardened check: Ensure it's strictly > 0.00
+                const safeVal = String(val).replace(',', '.').replace(/[^\d.-]/g, '');
+                const numVal = parseFloat(safeVal);
+                return !isNaN(numVal) && numVal > 0.001;
             })
             .sort((a, b) => b.hits - a.hits)
             .map(r => ({ name: r.name, hits: r.hits }));
@@ -683,7 +686,10 @@ class DashboardManager {
                 const isWinner = r.memberId === winnerCandidates[0].memberId;
                 const prizesMap = jornada.prizes || jornada.prizeRates || {};
                 const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
-                const hasPrize = parseFloat(val) > 0;
+                // Hardened check
+                const safeVal = String(val).replace(',', '.').replace(/[^\d.-]/g, '');
+                const numVal = parseFloat(safeVal);
+                const hasPrize = !isNaN(numVal) && numVal > 0.001;
 
                 return isWinner || (hasPrize && r.hasPronostico);
             })
