@@ -114,11 +114,15 @@ class DashboardManager {
                             }
                         }
 
-                        let ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
+                        // Use window.ScoringSystem to ensure access
+                        let ev = { hits: -1, points: 0, bonus: 0 };
+                        if (window.ScoringSystem) {
+                            ev = window.ScoringSystem.evaluateForecast(sel, officialResults, jDate);
+                        }
 
                         if (isLate && !isPardoned) {
                             hits = 0;
-                            points = ScoringSystem.calculateScore(0, jDate);
+                            points = window.ScoringSystem ? window.ScoringSystem.calculateScore(0, jDate) : 0;
                             bonus = points;
                         } else {
                             hits = ev.hits;
@@ -134,7 +138,7 @@ class DashboardManager {
                                     // Remove this hit from classification stats
                                     hits = Math.max(0, hits - 1);
                                     // Recalculate points without this hit
-                                    points = ScoringSystem.calculateScore(hits, jDate);
+                                    points = window.ScoringSystem ? window.ScoringSystem.calculateScore(hits, jDate) : 0;
                                 }
                             }
                         }
@@ -179,7 +183,7 @@ class DashboardManager {
                     extras.forEach(p => {
                         const sel = p.selection || p.forecasts || [];
                         const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
-                        const evaluation = window.ScoringSystem.evaluateForecast(sel, officialResults, jornada.date);
+                        const evaluation = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(sel, officialResults, jornada.date) : { hits: 0, points: 0, bonus: 0 };
 
                         const prizesMap = jornada.prizes || jornada.prizeRates || {};
                         const prizeVal = prizesMap[evaluation.hits] || prizesMap[String(evaluation.hits)] || 0;

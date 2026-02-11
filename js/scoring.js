@@ -133,3 +133,4 @@ const ScoringSystem = {
 };
 
 ScoringSystem.init(); // Run migration immediately on load
+window.ScoringSystem = ScoringSystem;
