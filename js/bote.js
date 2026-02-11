@@ -1628,10 +1628,10 @@ class BoteManager {
         container.innerHTML = html;
     }
     async runMaintenanceMigrations() {
-        const migrationDone = localStorage.getItem('bote_maintenance_v21');
+        const migrationDone = localStorage.getItem('bote_maintenance_v23'); // Bumped to v23 to force re-run
         if (migrationDone) return;
 
-        console.log('Running maintenance migration v21 (Bulk Prize Sync)...');
+        console.log('Running maintenance migration v23 (Bulk Prize Sync)...');
 
         try {
             const allJ = await window.DataService.getAll('jornadas');
@@ -1646,7 +1646,7 @@ class BoteManager {
                 { num: 2, hits: 10, val: 3.00 },
                 { num: 3, hits: 11, val: 48.37 },
                 { num: 5, hits: 10, val: 13.08 },
-                { num: 7, hits: 13, val: 902.93 },
+                { num: 7, hits: 13, val: 920.09 }, // UPDATED from 902.93 to 920.09 (Total prize correction)
                 { num: 7, hits: 12, val: 16.16 },
                 { num: 7, hits: 11, val: 1.83 },
                 { num: 7, hits: 10, val: 1.00 },
@@ -1668,13 +1668,13 @@ class BoteManager {
                 }
             }
 
-            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21'];
+            const marks = ['v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21', 'v22', 'v23'];
             marks.forEach(m => localStorage.setItem(`bote_maintenance_${m}`, 'true'));
 
-            console.log('Migration v21 effective!');
+            console.log('Migration v23 effective!');
             await this.loadData();
             this.render();
-        } catch (e) { console.error('Migration v17 failed:', e); }
+        } catch (e) { console.error('Migration v23 failed:', e); }
     }
 
     showPenaltyDetail(memberName, jNum, detailHtml) {
