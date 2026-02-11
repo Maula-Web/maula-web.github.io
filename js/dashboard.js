@@ -7,240 +7,250 @@ class DashboardManager {
     }
 
     async init() {
-        if (window.DataService) await window.DataService.init();
+        try {
+            if (window.DataService) await window.DataService.init();
 
-        this.members = await window.DataService.getAll('members');
-        this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Global sort by member ID
-        this.jornadas = await window.DataService.getAll('jornadas');
-        this.jornadas = await window.DataService.getAll('jornadas');
-        this.pronosticos = await window.DataService.getAll('pronosticos');
-        this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
+            this.members = await window.DataService.getAll('members');
+            if (this.members && Array.isArray(this.members)) {
+                this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Global sort by member ID
+            } else {
+                this.members = [];
+            }
+            this.jornadas = await window.DataService.getAll('jornadas');
+            this.pronosticos = await window.DataService.getAll('pronosticos');
+            this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
 
-        // Ensure Rules are loaded
-        if (window.ScoringSystem && window.ScoringSystem.getConfig) {
-            window.ScoringSystem.getConfig();
+            // Ensure Rules are loaded
+            if (window.ScoringSystem && window.ScoringSystem.getConfig) {
+                window.ScoringSystem.getConfig();
+            }
+
+            this.renderStats();
+        } catch (e) {
+            console.error("Dashboard Init Error:", e);
+            const statsContainer = document.getElementById('dashboard-stats');
+            if (statsContainer) statsContainer.innerHTML = `<div style="color:red; text-align:center; padding:20px;">Error cargando datos: ${e.message}</div>`;
         }
-
-        this.renderStats();
     }
 
     renderStats() {
-        const statsContainer = document.getElementById('dashboard-stats');
-        if (!statsContainer) return;
+        try {
+            const statsContainer = document.getElementById('dashboard-stats');
+            if (!statsContainer) return;
 
-        // 1. Nº Socios
-        const activeMembers = this.members.length;
+            // 1. Nº Socios
+            const activeMembers = this.members.length;
 
-        // 2. Temporada
-        const season = "2025-2026";
+            // 2. Temporada
+            const season = "2025-2026";
 
-        // 3. Jornadas Jugadas (Completed)
-        // A jornada is considered played if it has matches AND first match has result AND it is a Sunday.
-        const playedJornadas = this.jornadas.filter(j => {
-            const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
-            const d = AppUtils.parseDate(j.date);
-            const isValidDate = d && AppUtils.isSunday(d);
-            return hasResult && isValidDate;
-        }).sort((a, b) => a.number - b.number);
+            // 3. Jornadas Jugadas (Completed)
+            // A jornada is considered played if it has matches AND first match has result AND it is a Sunday.
+            const playedJornadas = this.jornadas.filter(j => {
+                const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
+                const d = AppUtils.parseDate(j.date);
+                const isValidDate = d && AppUtils.isSunday(d);
+                return hasResult && isValidDate;
+            }).sort((a, b) => a.number - b.number);
 
-        const playedCount = playedJornadas.length;
+            const playedCount = playedJornadas.length;
 
-        // 4. Calculate Scores & Find Leader
-        const memberStats = {};
-        const history = {}; // Track history for tie-breaks
-        this.members.forEach(m => {
-            memberStats[m.id] = {
-                id: m.id,
-                name: AppUtils.getMemberName(m),
-                totalPoints: 0,
-                totalHits: 0
-            };
-            history[m.id] = [];
-        });
-
-        let lastJornadaInfo = null;
-        let totalSeasonPrizes = 0;
-        let totalSeasonMoney = 0;
-
-        // Process all played jornadas
-        playedJornadas.forEach((jornada, index) => {
-            const jornadaResults = [];
-            const jDate = AppUtils.parseDate(jornada.date);
-
-            this.members.forEach(member => {
-                const mIdStr = String(member.id);
-                const p = this.pronosticos.find(pr =>
-                    (pr.jornadaId == jornada.id || pr.jId == jornada.id) &&
-                    (pr.memberId == member.id || pr.mId == member.id)
-                );
-
-                let hits = -1;
-                let points = 0;
-                let bonus = 0;
-                let isLate = false;
-                let isPardoned = false;
-                let hasPronostico = false;
-                let isPig15 = false;
-                let pigHit = false;
-
-                if (p) {
-                    hasPronostico = true;
-                    isLate = p.late || false;
-                    isPardoned = p.pardoned || false;
-                    const sel = p.selection || p.forecasts || [];
-                    const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
-
-                    // Check for PIG (Pleno al 15 is index 14)
-                    const pigTeams = ['Real Madrid', 'At. Madrid', 'Barcelona', 'FC Barcelona', 'Atlético de Madrid'];
-                    const match15 = jornada.matches && jornada.matches[14];
-
-                    if (match15) {
-                        const home = match15.home || '';
-                        const away = match15.away || '';
-                        const isHomePig = pigTeams.some(t => home.includes(t));
-                        const isAwayPig = pigTeams.some(t => away.includes(t));
-                        if (isHomePig && isAwayPig) {
-                            isPig15 = true;
-                        }
-                    }
-
-                    let ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
-
-                    if (isLate && !isPardoned) {
-                        hits = 0;
-                        points = ScoringSystem.calculateScore(0, jDate);
-                        bonus = points;
-                    } else {
-                        hits = ev.hits;
-                        points = ev.points;
-                        bonus = ev.bonus;
-
-                        // Exclude PIG from classification if it's Pleno al 15
-                        if (isPig15) {
-                            // Check if user hit the PIG (Match 15)
-                            // sel[14] is the forecast, officialResults[14] is the result
-                            if (sel[14] && sel[14] === officialResults[14]) {
-                                pigHit = true;
-                                // Remove this hit from classification stats
-                                hits = Math.max(0, hits - 1);
-                                // Recalculate points without this hit
-                                points = ScoringSystem.calculateScore(hits, jDate);
-                            }
-                        }
-                    }
-                } else {
-                    hits = -1;
-                    points = 0;
-                }
-
-                jornadaResults.push({
-                    memberId: member.id,
-                    name: AppUtils.getMemberName(member),
-                    hits: hits,
-                    points: points,
-                    isLate: isLate,
-                    isPardoned: isPardoned,
-                    hasPronostico: hasPronostico,
-                    pigHit: pigHit, // Store pig status
-                    isPig15: isPig15, // Store if this row belongs to a PIG jornada
-                    runningTotal: 0
-                });
-
-                // Add to history
-                history[member.id].push({ hits: hits, points: points });
-
-                // Accumulate season prizes
-                const prizesMap = jornada.prizes || jornada.prizeRates || {};
-                const prizeVal = prizesMap[hits] || prizesMap[String(hits)] || 0;
-
-                if (prizeVal > 0 && hasPronostico) {
-                    totalSeasonPrizes++;
-                    totalSeasonMoney += parseFloat(prizeVal);
-                }
+            // 4. Calculate Scores & Find Leader
+            const memberStats = {};
+            const history = {}; // Track history for tie-breaks
+            this.members.forEach(m => {
+                memberStats[m.id] = {
+                    id: m.id,
+                    name: AppUtils.getMemberName(m),
+                    totalPoints: 0,
+                    totalHits: 0
+                };
+                history[m.id] = [];
             });
 
-            // ADDITION: Count Extra Column prizes (Doubles) in the season total
-            if (this.pronosticosExtra && this.pronosticosExtra.length > 0) {
-                const extras = this.pronosticosExtra.filter(p => {
-                    const pJ = String(p.jId || p.jornadaId || '');
-                    return pJ === String(jornada.id) || pJ === String(jornada.number);
-                });
+            let lastJornadaInfo = null;
+            let totalSeasonPrizes = 0;
+            let totalSeasonMoney = 0;
 
-                extras.forEach(p => {
-                    const sel = p.selection || p.forecasts || [];
-                    const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
-                    const evaluation = window.ScoringSystem.evaluateForecast(sel, officialResults, jornada.date);
+            // Process all played jornadas
+            playedJornadas.forEach((jornada, index) => {
+                const jornadaResults = [];
+                const jDate = AppUtils.parseDate(jornada.date);
 
+                this.members.forEach(member => {
+                    const mIdStr = String(member.id);
+                    const p = this.pronosticos.find(pr =>
+                        (pr.jornadaId == jornada.id || pr.jId == jornada.id) &&
+                        (pr.memberId == member.id || pr.mId == member.id)
+                    );
+
+                    let hits = -1;
+                    let points = 0;
+                    let bonus = 0;
+                    let isLate = false;
+                    let isPardoned = false;
+                    let hasPronostico = false;
+                    let isPig15 = false;
+                    let pigHit = false;
+
+                    if (p) {
+                        hasPronostico = true;
+                        isLate = p.late || false;
+                        isPardoned = p.pardoned || false;
+                        const sel = p.selection || p.forecasts || [];
+                        const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
+
+                        // Check for PIG (Pleno al 15 is index 14)
+                        const pigTeams = ['Real Madrid', 'At. Madrid', 'Barcelona', 'FC Barcelona', 'Atlético de Madrid'];
+                        const match15 = jornada.matches && jornada.matches[14];
+
+                        if (match15) {
+                            const home = match15.home || '';
+                            const away = match15.away || '';
+                            const isHomePig = pigTeams.some(t => home.includes(t));
+                            const isAwayPig = pigTeams.some(t => away.includes(t));
+                            if (isHomePig && isAwayPig) {
+                                isPig15 = true;
+                            }
+                        }
+
+                        let ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
+
+                        if (isLate && !isPardoned) {
+                            hits = 0;
+                            points = ScoringSystem.calculateScore(0, jDate);
+                            bonus = points;
+                        } else {
+                            hits = ev.hits;
+                            points = ev.points;
+                            bonus = ev.bonus;
+
+                            // Exclude PIG from classification if it's Pleno al 15
+                            if (isPig15) {
+                                // Check if user hit the PIG (Match 15)
+                                // sel[14] is the forecast, officialResults[14] is the result
+                                if (sel[14] && sel[14] === officialResults[14]) {
+                                    pigHit = true;
+                                    // Remove this hit from classification stats
+                                    hits = Math.max(0, hits - 1);
+                                    // Recalculate points without this hit
+                                    points = ScoringSystem.calculateScore(hits, jDate);
+                                }
+                            }
+                        }
+                    } else {
+                        hits = -1;
+                        points = 0;
+                    }
+
+                    jornadaResults.push({
+                        memberId: member.id,
+                        name: AppUtils.getMemberName(member),
+                        hits: hits,
+                        points: points,
+                        isLate: isLate,
+                        isPardoned: isPardoned,
+                        hasPronostico: hasPronostico,
+                        pigHit: pigHit, // Store pig status
+                        isPig15: isPig15, // Store if this row belongs to a PIG jornada
+                        runningTotal: 0
+                    });
+
+                    // Add to history
+                    history[member.id].push({ hits: hits, points: points });
+
+                    // Accumulate season prizes
                     const prizesMap = jornada.prizes || jornada.prizeRates || {};
-                    const prizeVal = prizesMap[evaluation.hits] || prizesMap[String(evaluation.hits)] || 0;
-                    if (prizeVal > 0) {
+                    const prizeVal = prizesMap[hits] || prizesMap[String(hits)] || 0;
+
+                    if (prizeVal > 0 && hasPronostico) {
+                        totalSeasonPrizes++;
                         totalSeasonMoney += parseFloat(prizeVal);
                     }
                 });
-            }
 
-            // Update Totals
-            jornadaResults.forEach(r => {
-                if (memberStats[r.memberId]) {
-                    memberStats[r.memberId].totalPoints += r.points;
-                    memberStats[r.memberId].totalHits += r.hits;
-                    r.runningTotal = memberStats[r.memberId].totalPoints;
+                // ADDITION: Count Extra Column prizes (Doubles) in the season total
+                if (this.pronosticosExtra && this.pronosticosExtra.length > 0) {
+                    const extras = this.pronosticosExtra.filter(p => {
+                        const pJ = String(p.jId || p.jornadaId || '');
+                        return pJ === String(jornada.id) || pJ === String(jornada.number);
+                    });
+
+                    extras.forEach(p => {
+                        const sel = p.selection || p.forecasts || [];
+                        const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
+                        const evaluation = window.ScoringSystem.evaluateForecast(sel, officialResults, jornada.date);
+
+                        const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                        const prizeVal = prizesMap[evaluation.hits] || prizesMap[String(evaluation.hits)] || 0;
+                        if (prizeVal > 0) {
+                            totalSeasonMoney += parseFloat(prizeVal);
+                        }
+                    });
+                }
+
+                // Update Totals
+                jornadaResults.forEach(r => {
+                    if (memberStats[r.memberId]) {
+                        memberStats[r.memberId].totalPoints += r.points;
+                        memberStats[r.memberId].totalHits += r.hits;
+                        r.runningTotal = memberStats[r.memberId].totalPoints;
+                    }
+                });
+
+                // Check if this is the last played jornada to determine Winner/User
+                if (index === playedJornadas.length - 1) {
+                    lastJornadaInfo = this.calculateJornadaOutcome(jornada, jornadaResults, memberStats, history);
                 }
             });
 
-            // Check if this is the last played jornada to determine Winner/User
-            if (index === playedJornadas.length - 1) {
-                lastJornadaInfo = this.calculateJornadaOutcome(jornada, jornadaResults, memberStats, history);
+            // Determine Overall Leader
+            let leaderName = "-";
+            let leaderPoints = 0;
+            if (playedCount > 0) {
+                const sortedMembers = Object.values(memberStats).sort((a, b) => b.totalPoints - a.totalPoints);
+                if (sortedMembers.length > 0) {
+                    leaderName = sortedMembers[0].name;
+                    leaderPoints = sortedMembers[0].totalPoints;
+                }
             }
-        });
 
-        // Determine Overall Leader
-        let leaderName = "-";
-        let leaderPoints = 0;
-        if (playedCount > 0) {
-            const sortedMembers = Object.values(memberStats).sort((a, b) => b.totalPoints - a.totalPoints);
-            if (sortedMembers.length > 0) {
-                leaderName = sortedMembers[0].name;
-                leaderPoints = sortedMembers[0].totalPoints;
-            }
-        }
+            // 5. Build HTML
+            let winnerText = "-";
+            let loserText = "-";
+            let nextRolesHtml = "";
+            let lastJornadaPrizesHtml = "";
 
-        // 5. Build HTML
-        let winnerText = "-";
-        let loserText = "-";
-        let nextRolesHtml = "";
-        let lastJornadaPrizesHtml = "";
+            if (lastJornadaInfo) {
+                winnerText = lastJornadaInfo.winnerName;
+                loserText = lastJornadaInfo.loserName;
 
-        if (lastJornadaInfo) {
-            winnerText = lastJornadaInfo.winnerName;
-            loserText = lastJornadaInfo.loserName;
+                let pigHtml = "";
+                if (lastJornadaInfo.isPig) {
+                    const acertantes = lastJornadaInfo.pigAcertantes.join(", ");
+                    const fallantes = lastJornadaInfo.pigFallantes.join(", ");
 
-            let pigHtml = "";
-            if (lastJornadaInfo.isPig) {
-                const acertantes = lastJornadaInfo.pigAcertantes.join(", ");
-                const fallantes = lastJornadaInfo.pigFallantes.join(", ");
-
-                pigHtml = `
+                    pigHtml = `
                     <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
                         <div style="font-size:0.9rem; margin-bottom:0.3rem;"><strong>🐽 PIG (Pleno al 15)</strong></div>
                         <div style="font-size:0.85rem; color:#2e7d32;">✅ ${acertantes || 'Ninguno'}</div>
                         <div style="font-size:0.85rem; color:#c62828;">❌ ${fallantes || 'Ninguno'}</div>
                     </div>
                 `;
-            }
+                }
 
-            // Check if next jornada is in progress (has some but not all results)
-            const nextJornadaData = this.getNextJornadaData();
-            let isNextJornadaInProgress = false;
+                // Check if next jornada is in progress (has some but not all results)
+                const nextJornadaData = this.getNextJornadaData();
+                let isNextJornadaInProgress = false;
 
-            if (nextJornadaData && nextJornadaData.matches) {
-                const matchesWithResults = nextJornadaData.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length;
-                isNextJornadaInProgress = matchesWithResults > 0 && matchesWithResults < 15;
-            }
+                if (nextJornadaData && nextJornadaData.matches) {
+                    const matchesWithResults = nextJornadaData.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length;
+                    isNextJornadaInProgress = matchesWithResults > 0 && matchesWithResults < 15;
+                }
 
-            // Only show winner/loser if next jornada is NOT in progress
-            if (isNextJornadaInProgress) {
-                nextRolesHtml = `
+                // Only show winner/loser if next jornada is NOT in progress
+                if (isNextJornadaInProgress) {
+                    nextRolesHtml = `
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
                         <div style="padding: 1rem; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
                             <div style="font-size: 0.95rem; color: #e65100; font-weight: 600; margin-bottom: 0.5rem;">
@@ -254,8 +264,8 @@ class DashboardManager {
                         ${lastJornadaInfo.doublesHtml || ''}
                     </div>
                 `;
-            } else {
-                nextRolesHtml = `
+                } else {
+                    nextRolesHtml = `
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
                         <div style="margin-bottom:0.5rem;">
                             <span style="font-size:1.2rem;">🍺</span> 
@@ -269,25 +279,25 @@ class DashboardManager {
                         ${lastJornadaInfo.doublesHtml || ''}
                     </div>
                 `;
-            }
+                }
 
-            // Last Jornada Prizes
-            const lastJNum = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : 0;
-            const lastJDate = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].date : '';
+                // Last Jornada Prizes
+                const lastJNum = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : 0;
+                const lastJDate = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].date : '';
 
-            let prizesList = "";
-            if (lastJornadaInfo.prizeWinners && lastJornadaInfo.prizeWinners.length > 0) {
-                prizesList = lastJornadaInfo.prizeWinners.map(pw => `
+                let prizesList = "";
+                if (lastJornadaInfo.prizeWinners && lastJornadaInfo.prizeWinners.length > 0) {
+                    prizesList = lastJornadaInfo.prizeWinners.map(pw => `
                     <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f5f5f5;">
                         <span style="font-weight:500;">${pw.name}</span>
                         <span style="background:var(--primary-green); color:white; padding:0 8px; border-radius:10px; font-weight:bold; font-size:0.85rem;">${pw.hits} aciertos</span>
                     </div>
                 `).join('');
-            } else {
-                prizesList = `<div style="color:#888; font-style:italic;">No hubo socios con premio (${lastJornadaInfo.minHitsToWin} aciertos)</div>`;
-            }
+                } else {
+                    prizesList = `<div style="color:#888; font-style:italic;">No hubo socios con premio (${lastJornadaInfo.minHitsToWin} aciertos)</div>`;
+                }
 
-            lastJornadaPrizesHtml = `
+                lastJornadaPrizesHtml = `
                 <div class="stat-wide-card" style="border-left: 4px solid var(--primary-green); padding: 1.5rem;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                         <!-- Column 1: Weekly -->
@@ -317,28 +327,28 @@ class DashboardManager {
                     </div>
                 </div>
             `;
-        }
+            }
 
-        const nextJornadaData = this.getNextJornadaData();
-        const nextJornadaLabel = nextJornadaData ? `Jornada ${nextJornadaData.number} (${nextJornadaData.date})` : "Final de Temporada";
+            const nextJornadaData = this.getNextJornadaData();
+            const nextJornadaLabel = nextJornadaData ? `Jornada ${nextJornadaData.number} (${nextJornadaData.date})` : "Final de Temporada";
 
-        let deadlineHtml = "";
-        if (nextJornadaData && nextJornadaData.date) {
-            const matchDate = AppUtils.parseDate(nextJornadaData.date);
+            let deadlineHtml = "";
+            if (nextJornadaData && nextJornadaData.date) {
+                const matchDate = AppUtils.parseDate(nextJornadaData.date);
 
-            if (matchDate) {
-                // Deadline: Thursday 17:00 implies -3 days from Sunday
-                const deadline = new Date(matchDate);
-                deadline.setDate(matchDate.getDate() - 3);
-                deadline.setHours(17, 0, 0, 0);
+                if (matchDate) {
+                    // Deadline: Thursday 17:00 implies -3 days from Sunday
+                    const deadline = new Date(matchDate);
+                    deadline.setDate(matchDate.getDate() - 3);
+                    deadline.setHours(17, 0, 0, 0);
 
-                this.startCountdown(deadline);
+                    this.startCountdown(deadline);
 
-                // Format deadline date: "Jueves dd/mm"
-                const dayName = "Jueves";
-                const dateFormatted = deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+                    // Format deadline date: "Jueves dd/mm"
+                    const dayName = "Jueves";
+                    const dateFormatted = deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
 
-                deadlineHtml = `
+                    deadlineHtml = `
                     <div class="deadline-container" style="margin-top:1.5rem; padding:1rem; border-radius:8px;">
                         <div class="deadline-title" style="font-weight:bold; margin-bottom:0.5rem; font-size:0.9rem;">
                             ⏳ Límite para rellenar: ${dayName} ${dateFormatted} 17:00h
@@ -349,15 +359,15 @@ class DashboardManager {
                          <div style="font-size:0.75rem; color:#666; margin-top:0.2rem;">días hrs min seg</div>
                     </div>
                 `;
+                }
             }
-        }
 
-        const lastPlayedJ = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1] : null;
-        const hasUpcomingBote = lastPlayedJ && lastPlayedJ.hasBote;
+            const lastPlayedJ = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1] : null;
+            const hasUpcomingBote = lastPlayedJ && lastPlayedJ.hasBote;
 
-        let boteBadgeHtml = "";
-        if (hasUpcomingBote) {
-            boteBadgeHtml = `
+            let boteBadgeHtml = "";
+            if (hasUpcomingBote) {
+                boteBadgeHtml = `
                     <div class="bote-badge" style="padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255,152,0,0.4); animation: pulse 2s infinite;">
                         <span>💰</span> ¡HAY BOTE PARA ESTA JORNADA! <span>💰</span>
                     </div>
@@ -369,9 +379,9 @@ class DashboardManager {
                         }
                     </style>
                 `;
-        }
+            }
 
-        statsContainer.innerHTML = `
+            statsContainer.innerHTML = `
                 <div class="stat-card">
                     <h3>Temporada</h3>
                     <div class="stat-value" style="font-size:1.5rem;">${season}</div>
@@ -412,7 +422,12 @@ class DashboardManager {
 
             `;
 
-        this.handlePrankDisplay();
+            this.handlePrankDisplay();
+        } catch (e) {
+            console.error("Dashboard Render Error:", e);
+            const statsContainer = document.getElementById('dashboard-stats');
+            if (statsContainer) statsContainer.innerHTML = `<div style="color:red; text-align:center; padding:20px;">Error mostrando dashboard: ${e.message}</div>`;
+        }
     }
 
     async handlePrankDisplay() {
@@ -535,10 +550,15 @@ class DashboardManager {
     }
 
     calculateJornadaOutcome(jornada, results, memberStats, history) {
+        // Safety checks
+        if (!results || results.length === 0) return null;
+
         // --- FIND WINNER ---
         // 1. Filter by Max Points
         const maxPoints = Math.max(...results.map(r => r.points));
         let winnerCandidates = results.filter(r => r.points === maxPoints);
+
+        if (winnerCandidates.length === 0) return null;
 
         // 2. Tie-break: Recursive History Check (Points)
         if (winnerCandidates.length > 1) {
@@ -547,6 +567,10 @@ class DashboardManager {
 
         // 3. Final Fallback (if still tied): Lower Member ID
         winnerCandidates.sort((a, b) => a.memberId - b.memberId);
+
+        // Safety: ensure candidate exists in memberStats
+        if (!winnerCandidates[0] || !memberStats[winnerCandidates[0].memberId]) return null;
+
         const winner = memberStats[winnerCandidates[0].memberId];
 
 
@@ -567,19 +591,16 @@ class DashboardManager {
             maulaCandidates = results.filter(r => r.points === minPoints);
         }
 
-        // Tie-break: Recursive History Check (Points) - User said "same way but looking for lower score"
+        // Tie-break: Recursive History Check (Points)
         if (maulaCandidates.length > 1) {
-            // For Loser, we look for MIN points in history to break tie?
-            // "El perdedor se calcula de la misma forma pero buscando al socio que haya obtenido una puntuación menor"
-            // This implies filtering for MIN points in previous jornadas.
             maulaCandidates = this.resolveTie(maulaCandidates, history, 'points', 'min');
         }
 
         // Final Fallback: Higher Member ID
         maulaCandidates.sort((a, b) => b.memberId - a.memberId);
 
-        const loserId = maulaCandidates[0].memberId;
-        const loser = memberStats[loserId];
+        const loserId = maulaCandidates[0] ? maulaCandidates[0].memberId : null;
+        const loser = loserId ? memberStats[loserId] : { name: '-' };
 
         // Pig Stats for this Jornada
         const isPig = results.some(r => r.isPig15);
@@ -591,14 +612,12 @@ class DashboardManager {
         }
 
         // --- DOUBLES EVALUATION ---
-        // Evaluate doubles forecasts for THIS jornada (played by winners of previous)
         let doublesHtml = '';
         const doublesResults = [];
         const doublesForecasts = this.pronosticosExtra.filter(p => p.jId === jornada.id || p.jornadaId === jornada.id);
 
         if (doublesForecasts.length > 0) {
             const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
-            const jDate = AppUtils.parseDate(jornada.date);
 
             doublesForecasts.forEach(df => {
                 const mId = df.mId || df.memberId;
@@ -606,7 +625,6 @@ class DashboardManager {
                 if (!member) return;
 
                 const selection = df.selection || [];
-                // Evaluate: Hit if result is IN the selection string (e.g. "1X" includes "1")
                 let hits = 0;
                 selection.forEach((sel, idx) => {
                     const res = officialResults[idx];
@@ -615,7 +633,6 @@ class DashboardManager {
                     }
                 });
 
-                // Calculate prize for doubles if hits >= minHits
                 const minHits = jornada.minHitsToWin || 10;
                 let prizeVal = 0;
                 if (hits >= minHits && jornada.prizeRates && jornada.prizeRates[hits]) {
@@ -659,6 +676,13 @@ class DashboardManager {
         // Remove duplicates and sort
         const doblesEligibleNames = [...new Set(eligibleNextNames)].sort();
 
+        // Safe Money Calculation
+        const prizeMoney = prizeWinners.reduce((sum, pw) => {
+            const rate = (jornada.prizeRates && jornada.prizeRates[pw.hits]) || 0;
+            return sum + rate;
+        }, 0);
+        const doublesMoney = doublesResults.reduce((sum, dr) => sum + (dr.prize || 0), 0);
+
         return {
             winnerName: winner.name,
             doblesEligibleNames: doblesEligibleNames,
@@ -669,10 +693,7 @@ class DashboardManager {
             doublesHtml: doublesHtml,
             prizeWinners: prizeWinners,
             minHitsToWin: minHitsToWin,
-            totalMoney: prizeWinners.reduce((sum, pw) => {
-                const rate = (jornada.prizeRates && jornada.prizeRates[pw.hits]) || 0;
-                return sum + rate;
-            }, 0) + doublesResults.reduce((sum, dr) => sum + (dr.prize || 0), 0)
+            totalMoney: prizeMoney + doublesMoney
         };
     }
 
