@@ -671,11 +671,18 @@ class DashboardManager {
             .filter(r => {
                 if (!r.hasPronostico) return false;
                 const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                // Simply check if the prize for hits is > 0
                 const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
-                // Hardened check: Ensure it's strictly > 0.00
-                const safeVal = String(val).replace(',', '.').replace(/[^\d.-]/g, '');
-                const numVal = parseFloat(safeVal);
-                return !isNaN(numVal) && numVal > 0.001;
+                // If the value is "0,00 €" or similar, parseFloat might need cleaning?
+                // But normally data is number or simple string.
+                // User insists: "ver si en la jornada anterior la categoría de 10 aciertos tiene 0,00 € no cobra premio"
+                // This means we should trust the value from the map.
+                let numVal = val;
+                if (typeof val === 'string') {
+                    // Replace comma with dot just in case
+                    numVal = parseFloat(val.replace(',', '.').replace('€', '').trim());
+                }
+                return numVal > 0;
             })
             .sort((a, b) => b.hits - a.hits)
             .map(r => ({ name: r.name, hits: r.hits }));
@@ -686,10 +693,12 @@ class DashboardManager {
                 const isWinner = r.memberId === winnerCandidates[0].memberId;
                 const prizesMap = jornada.prizes || jornada.prizeRates || {};
                 const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
-                // Hardened check
-                const safeVal = String(val).replace(',', '.').replace(/[^\d.-]/g, '');
-                const numVal = parseFloat(safeVal);
-                const hasPrize = !isNaN(numVal) && numVal > 0.001;
+
+                let numVal = val;
+                if (typeof val === 'string') {
+                    numVal = parseFloat(val.replace(',', '.').replace('€', '').trim());
+                }
+                const hasPrize = numVal > 0;
 
                 return isWinner || (hasPrize && r.hasPronostico);
             })

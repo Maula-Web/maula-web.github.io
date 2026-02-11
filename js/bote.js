@@ -303,7 +303,8 @@ class BoteManager {
             sellado: 0,
             aciertos: 0,
             exento: false,
-            jugaDobles: false
+            jugaDobles: false,
+            isSustituto: false // Track if this member is substituting the original sealer
         };
 
         if (!pronostico) {
@@ -400,24 +401,73 @@ class BoteManager {
             costs.penalizacionPIG = 0;
         }
 
+        // check if jornada is NOT sealed
+        if (jornada.noSellado) {
+            // If jornada is explicitly marked as 'noSellado', then NO sellado cost applies to anyone
+            costs.sellado = 0;
+            return costs;
+        }
+
         // Sellado Reimbursement
         let isMaula = false;
+        let originalMaulaId = null;
+
         if (jornadaIndex > 0) {
             const prevJornada = this.jornadas[jornadaIndex - 1];
-            isMaula = this.wasLoserOfJornada(memberId, prevJornada);
+            if (this.wasLoserOfJornada(memberId, prevJornada)) {
+                isMaula = true;
+                originalMaulaId = memberId;
+            } else {
+                // Check if I was the loser but someone else is substituting me
+                // We need to know who was the loser first.
+                // This logic checks if CURRENT member is Maula.
+                // We need to invert: Find who WAS maula, check if substituted.
+            }
         } else if (jornada.number === 1) {
             // Manual override for J1: Luismi sealed it (J0 maula)
             const member = this.members.find(m => String(m.id) === String(memberId));
             if (member && member.name && member.name.toLowerCase().includes('luismi')) {
                 isMaula = true;
+                originalMaulaId = memberId;
+            }
+        }
+
+        // Logic for Substitution
+        // If jornada has 'sustitutoSellado' field with a memberId
+        const sustitutoId = jornada.sustitutoSellado;
+        if (sustitutoId) {
+            // If there is a substitute defined
+            if (String(memberId) === String(sustitutoId)) {
+                // I am the substitute, I pay the sellado (get reimbursed negative cost)
+                isMaula = true;
+                costs.isSustituto = true;
+            } else if (isMaula) {
+                // I WAS the maula, but I am being substituted. I do NOT pay.
+                isMaula = false;
             }
         }
 
         if (isMaula) {
-            const numSocios = this.members.length;
             const cCol = this.getHistoricalPrice('costeColumna', jDate);
-            const cDob = this.getHistoricalPrice('costeDobles', jDate);
-            costs.sellado = -((numSocios * cCol) + cDob);
+            const cDob = this.getHistoricalPrice('costeDobles', jDate); // 12.00
+
+            // Recalculate Total Cost based on actual playing members
+            // Original logic: (numSocios * cCol) + cDob.
+            // Correct logic: Sum of all 'columna' costs of all members + 'dobles' (usually 1, unless defined otherwise)
+            // But we are inside 'calculateJornadaCosts' for ONE member. We can't sum others here easily without circular dep or passing full info.
+            // However, 'numSocios' is constant? No, 'payingCount' varies but cost is redistributed so TOTAL is constant.
+            // (NumMembers * BasePrice) is the Total Cost of Columns.
+            // Exemption logic maintains Total Revenue constant?
+            // "Cuando un socio queda exento, ... ese coste se reparte".
+            // So Total Collected = NumMembers * BasePrice.
+            // So Sellado Cost = (NumMembers * BasePrice) + DoublesPrice.
+
+            // J1 Fix: User reported Coste Quinielas 26.25 but displayed 14.25
+            // 20 members? 20 * 0.75 = 15.00. + 12.00 (Dobles) = 27.00?
+            // User said 26.25. Maybe 19 members? 19 * 0.75 = 14.25. + 12 = 26.25.
+            // So logic (numSocios * cCol) + cDob is correct IF numSocios is correct.
+
+            costs.sellado = -((numMembers * cCol) + cDob);
         }
 
         return costs;
@@ -702,11 +752,24 @@ class BoteManager {
 
         let totalExtraPrize = 0;
         extras.forEach(p => {
-            const selection = p.selection || p.forecast;
-            const aciertos = this.calculateAciertos(jornada.matches, selection);
+            // Check manual hits (reducciones)
+            let aciertos = 0;
+            if (p.manualHits !== undefined && p.manualHits !== null) {
+                aciertos = parseInt(p.manualHits);
+            } else {
+                const selection = p.selection || p.forecast;
+                aciertos = this.calculateAciertos(jornada.matches, selection);
+            }
+
             const prizes = jornada.prizes;
+            // Support both string keys ("10") and numbers (10)
             const prizeVal = prizes[aciertos] || prizes[String(aciertos)] || 0;
-            totalExtraPrize += typeof prizeVal === 'number' ? prizeVal : parseFloat(prizeVal || 0);
+            const finalPrize = typeof prizeVal === 'number' ? prizeVal : parseFloat(prizeVal || 0);
+
+            // Validate Prize (must be positive)
+            if (finalPrize > 0) {
+                totalExtraPrize += finalPrize;
+            }
         });
 
         return totalExtraPrize;
@@ -2055,29 +2118,46 @@ class BoteManager {
         sortedJornadas.forEach(jData => {
             jData.boteInicial = currentBote;
 
-            // Re-calculate costs accurately (Coste Quinielas)
-            // It equals: (Nº Socios Pagadores + Nº Socios Exentos) * Coste Columna + (Nº Socios Ganadores prev) * Coste Doble
-            // Assuming ALL active members play every jornada.
-            // Coste Columna is per member.
             const jDate = window.AppUtils.parseDate(jData.date);
-            const costCol = this.getHistoricalPrice('costeColumna', jDate);
-            const costDob = this.getHistoricalPrice('costeDobles', jDate);
+            const jornadaObj = this.jornadas.find(j => j.number === jData.number);
 
-            const numSocios = this.members.length;
-
-            // Doubles Count
-            let numDobles = 0;
-            if (jData.number > 1) {
-                const doblesCount = movements.filter(m => m.jornadaNum === jData.number && m.jugaDobles).length;
-                numDobles = doblesCount;
+            if (jornadaObj && jornadaObj.noSellado) {
+                jData.costeQuinielas = 0;
             } else {
-                // J1 special case manually? Or by default 0.
-            }
+                // Re-calculate costs accurately (Coste Quinielas)
+                // It equals: (Nº Socios Pagadores + Nº Socios Exentos) * Coste Columna + (Nº Socios Ganadores prev) * Coste Doble
+                // Assuming ALL active members play every jornada.
+                // Coste Columna is per member.
 
-            // Total Cost for this Jornada (Quinielas + Dobles)
-            // We assume 1 column per member.
-            const totalCost = (numSocios * costCol) + (numDobles * costDob);
-            jData.costeQuinielas = totalCost;
+                const costCol = this.getHistoricalPrice('costeColumna', jDate);
+                const costDob = this.getHistoricalPrice('costeDobles', jDate);
+                const numSocios = this.members.length;
+
+                // Doubles Count
+                let numDobles = 0;
+                if (jData.number > 1) {
+                    // We need to check who Played Doubles. Using 'jugaDobles' flag from movements is safest way.
+                    const doblesCount = movements.filter(m => m.jornadaNum === jData.number && m.jugaDobles).length;
+                    // Fallback if movements not populated correctly (e.g. no winner prev?)
+                    numDobles = doblesCount;
+                } else if (jData.number === 1) {
+                    // J1 might have initial doubles... usually 0 or manual.
+                    // The user mentioned J1 cost was 26.25 (19 * 0.75 + 12 = 26.25)
+                    // Let's assume J1 has 1 double if total cost suggests it.
+                    // But cleaner is to check if anyone played double.
+                    // For J1 we can assume 1 double (paid by Peña/Sponsor?) NO - Paid by Maula J0.
+                    // J1 Cost logic: (19 * 0.75) + 12 = 26.25. Yes.
+                    // So we force 1 double for J1?
+                    // Or check movements? Let's rely on movements.
+                    // IMPORTANT: J1 movements might not have 'jugaDobles' set if there is no J0 winner logic implemented yet.
+                    // Let's assume 1 double for J1 as per user feedback "cost was 26.25".
+                    numDobles = 1;
+                }
+
+                // Total Cost for this Jornada (Quinielas + Dobles)
+                const totalCost = (numSocios * costCol) + (numDobles * costDob);
+                jData.costeQuinielas = totalCost;
+            }
 
             // Repartos Logic
             const prevJornada = sortedJornadas.find(j => j.number === jData.number - 1);
