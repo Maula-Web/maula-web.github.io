@@ -480,8 +480,8 @@ class PronosticoManager {
 
     updateRowConsensus(idx, myVal) {
         const othersForecasts = this.pronosticos.filter(p =>
-            (p.jId === this.currentJornadaId || p.jornadaId === this.currentJornadaId) &&
-            (p.mId !== this.currentMemberId && p.memberId !== this.currentMemberId)
+            (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) &&
+            (p.mId != this.currentMemberId && p.memberId != this.currentMemberId)
         );
 
         const signs = othersForecasts.map(of => of.selection[idx]).filter(s => s);
@@ -790,12 +790,20 @@ class PronosticoManager {
         thead.appendChild(headerRow);
 
         // 3. Sort Jornadas (descending) & Filter empty ones
-        // 3. Sort Jornadas (descending) & Filter empty ones
         let sortedJornadas = [...this.jornadas].sort((a, b) => b.number - a.number);
 
-        // Filter: Keep jornadas that have matches informed (Maula Rule: No matches, no show)
+        // Filter: Keep jornadas that have matches informed OR have at least one forecast saved
+        // This ensures that forecasts are visible even if match data hasn't been imported yet
         sortedJornadas = sortedJornadas.filter(j => {
-            return j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
+            // Check if jornada has matches informed
+            const hasMatches = j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
+
+            // Check if jornada has any forecasts saved
+            const hasForecasts = this.pronosticos.some(p =>
+                String(p.jId) === String(j.id) || String(p.jornadaId) === String(j.id)
+            );
+
+            return hasMatches || hasForecasts;
         });
 
         if (sortedJornadas.length === 0) {
@@ -827,7 +835,11 @@ class PronosticoManager {
             row.appendChild(stickyTd);
 
             sortedMembers.forEach((m, index) => {
-                const p = this.pronosticos.find(pr => pr.jId === j.id && pr.mId === m.id);
+                // Use String comparison to handle both string and number IDs
+                const p = this.pronosticos.find(pr =>
+                    (String(pr.jId) === String(j.id) || String(pr.jornadaId) === String(j.id)) &&
+                    (String(pr.mId) === String(m.id) || String(pr.memberId) === String(m.id))
+                );
                 const isEven = index % 2 !== 0;
 
                 let cellContent = '-';
