@@ -1519,8 +1519,8 @@ class PronosticoManager {
             if (active === 3) triples++;
         });
 
-        // Rules: Exactly 7 Doubles OR Exactly 4 Triples
-        const isValid = (doubles === 7 && triples === 0) || (doubles === 0 && triples === 4);
+        // Rules: Exactly 7 Doubles OR Exactly 4 Doubles (no triples)
+        const isValid = (doubles === 7 && triples === 0) || (doubles === 4 && triples === 0);
 
         this.doublesCounter.textContent = `${doubles} Dobles, ${triples} Triples`;
 
@@ -1528,7 +1528,7 @@ class PronosticoManager {
             this.doublesCounter.style.color = '#ff5252'; // Red
             this.doublesCounter.style.backgroundColor = '#ffebee';
             this.doublesCounter.style.border = "1px solid red";
-            this.doublesCounter.innerHTML += '<br><span style="font-size:0.7rem;">(Error: Deben ser EXACTAMENTE 7 Dobles o 4 Triples)</span>';
+            this.doublesCounter.innerHTML += '<br><span style="font-size:0.7rem;">(Error: Deben ser EXACTAMENTE 7 Dobles o 4 Dobles)</span>';
         } else {
             this.doublesCounter.style.color = '#ffeb3b'; // Yellow
             this.doublesCounter.style.backgroundColor = 'rgba(0,0,0,0.2)';
@@ -1539,7 +1539,7 @@ class PronosticoManager {
 
     async saveDoubles() {
         if (!this.updateDoublesCounters()) {
-            alert('La combinación no es válida. \n\nPara poder guardar, debes seleccionar EXACTAMENTE:\n- 7 Dobles (y 0 Triples)\nO bien\n- 4 Triples (y 0 Dobles)');
+            alert('La combinación no es válida. \n\nPara poder guardar, debes seleccionar EXACTAMENTE:\n- 7 Dobles (y 0 Triples)\nO bien\n- 4 Dobles (y 0 Triples)');
             return;
         }
 
