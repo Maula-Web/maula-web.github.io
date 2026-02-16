@@ -2546,47 +2546,47 @@ class BoteManager {
         let html = `
             <div style="display:grid; grid-template-columns: 1.5fr 0.8fr; gap: 2rem;">
                 <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem;">
-                         <h3 style="margin:0; color:#673ab7;">Resumen de Premios Total:</h3>
-                         <div style="background:#4caf50; color:white; padding:5px 15px; border-radius:20px; font-weight:900; font-size:1.2rem; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom: 2px solid #673ab7; padding-bottom:0.75rem;">
+                         <h3 style="margin:0; color:#673ab7; font-size:1.4rem;">Resumen de Premios Total:</h3>
+                         <div style="background:#2e7d32; color:white; padding:8px 20px; border-radius:30px; font-weight:900; font-size:1.4rem; box-shadow:0 8px 16px rgba(0,0,0,0.4); border:2px solid #4caf50;">
                             TOTAL: ${totalPrizeValue.toFixed(2)}€
                          </div>
                     </div>
 
-                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:1.5rem;">
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:1.5rem;">
                         ${Object.keys(ev.breakdown).sort((a, b) => b - a).map(h => {
             const count = ev.breakdown[h];
             const pVal = legacyPrizes[h] || 0;
             if (count === 0) return '';
-            return `<div style="background:rgba(103, 58, 183, 0.05); border:1px solid #673ab7; padding:10px; border-radius:8px; text-align:center; min-width:120px;">
-                                <div style="font-weight:900; font-size:1.2rem; color: #1a237e;">${count} de ${h} ac.</div>
-                                <div style="font-size:0.75rem; color:#5c6bc0; font-weight:bold;">${pVal.toFixed(2)}€ / ud</div>
-                                <div style="font-weight:bold; color:#2e7d32; margin-top:4px; font-size:1rem;">${(count * pVal).toFixed(2)}€</div>
+            return `<div style="background:rgba(49, 27, 146, 0.85); border:2px solid #7e57c2; padding:12px; border-radius:10px; text-align:center; min-width:130px; box-shadow: 0 6px 15px rgba(0,0,0,0.3);">
+                                <div style="font-weight:900; font-size:1.3rem; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${count} de ${h} ac.</div>
+                                <div style="font-size:0.85rem; color:#e0e0e0; font-weight:bold; margin: 4px 0;">${pVal.toFixed(2)}€ / ud</div>
+                                <div style="font-weight:900; color:#81c784; font-size:1.1rem;">${(count * pVal).toFixed(2)}€</div>
                             </div>`;
         }).join('')}
                     </div>
 
-                    <h3 style="color:#673ab7; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem;">Desglose por Apuesta (16):</h3>
+                    <h3 style="color:#673ab7; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem; margin-top:2rem;">Desglose por Apuesta (16):</h3>
                     <div style="overflow-x:auto;">
-                        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; text-align:center;">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.85rem; text-align:center;">
                             <thead>
-                                <tr style="background:#f0f0f0;">
-                                    <th style="padding:4px; border:1px solid #ccc;">Apuesta</th>
-                                    ${Array.from({ length: 15 }).map((_, i) => `<th style="padding:4px; border:1px solid #ccc; width:25px;">${i === 14 ? 'P15' : i + 1}</th>`).join('')}
-                                    <th style="padding:4px; border:1px solid #ccc; background:#e1f5fe; color:#0d47a1;">Hits</th>
+                                <tr style="background:#e0e0e0; color: #1a1a1a;">
+                                    <th style="padding:6px; border:1px solid #999;">Apuesta</th>
+                                    ${Array.from({ length: 15 }).map((_, i) => `<th style="padding:6px; border:1px solid #999; width:30px;">${i === 14 ? 'P15' : i + 1}</th>`).join('')}
+                                    <th style="padding:6px; border:1px solid #999; background:#b3e5fc; color:#01579b;">Hits</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${bets.map(b => `
-                                    <tr style="${b.isWinner ? 'background:rgba(76, 175, 80, 0.05);' : ''}">
-                                        <td style="padding:4px; border:1px solid #ccc; font-weight:bold;">#${b.num}</td>
+                                    <tr style="${b.isWinner ? 'background:rgba(76, 175, 80, 0.25); border-left: 6px solid #2e7d32; border-right: 1px solid #2e7d32; box-shadow: inset 0 0 10px rgba(76, 175, 80, 0.1);' : ''}">
+                                        <td style="padding:6px; border:1px solid #ccc; font-weight:bold; color:#eee;">#${b.num}</td>
                                         ${b.selection.map((s, idx) => {
             const res = officialResults[idx];
             const rSign = window.ScoringSystem.normalizeSign(res);
             const isHit = idx < 14 ? s.includes(rSign) : (s === officialResults[idx] || s === rSign);
-            return `<td style="padding:4px; border:1px solid #ccc; ${isHit ? 'background:#c8e6c9; font-weight:900; color:#333;' : ''}">${s}</td>`;
+            return `<td style="padding:6px; border:1px solid #ccc; ${isHit ? 'background:#c8e6c9; color:#1b5e20; font-weight:500;' : 'color:#bbb;'}">${s}</td>`;
         }).join('')}
-                                        <td style="padding:4px; border:1px solid #ccc; font-weight:900; background:#e1f5fe; color: #0d47a1;">${b.hits}</td>
+                                        <td style="padding:6px; border:1px solid #ccc; font-weight:900; background:#b3e5fc; color: #01579b;">${b.hits}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -2594,13 +2594,13 @@ class BoteManager {
                     </div>
                 </div>
 
-                <div style="background:rgba(0,0,0,0.03); padding:1rem; border-radius:12px; border:1px solid #ccc;">
-                    <h3 style="margin-top:0; font-size:1rem; opacity:0.7;">Resultados Oficiales J${j.number}:</h3>
-                    <div style="display:grid; grid-template-columns: 1fr; gap:5px;">
+                <div style="background:rgba(255,255,255,0.05); padding:1.5rem; border-radius:12px; border:1px solid #444;">
+                    <h3 style="margin-top:0; font-size:1.1rem; color:#b0bec5; border-bottom:1px solid #444; padding-bottom:0.5rem;">Resultados Oficiales J${j.number}:</h3>
+                    <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:1rem;">
                         ${j.matches.slice(0, 15).map((m, idx) => `
-                            <div style="font-size:0.75rem; padding:4px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                                <span>${idx + 1}. ${m.home.substring(0, 15)} - ${m.away.substring(0, 15)}</span>
-                                <strong style="color:#673ab7; font-size:0.9rem;">${m.result}</strong>
+                            <div style="font-size:0.8rem; padding:6px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="color:#cfd8dc;">${idx + 1}. ${m.home.substring(0, 12)} - ${m.away.substring(0, 12)}</span>
+                                <strong style="color:#ab47bc; font-size:1rem; background:rgba(171, 71, 188, 0.1); padding:2px 8px; border-radius:4px;">${m.result}</strong>
                             </div>
                         `).join('')}
                     </div>
