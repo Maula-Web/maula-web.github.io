@@ -581,46 +581,7 @@ class QuinielaScraper {
         return Object.keys(prizes).length > 0 ? prizes : null;
     }
 
-    /**
-     * Apply imported results (and prizes) to a jornada
-     */
-    async applyResultsToJornada(dbJornada, importData) {
-        if (!importData || !importData.matches) return false;
 
-        let hasChanges = false;
-
-        // Update results for each match
-        for (const imported of importData.matches) {
-            const existing = dbJornada.matches.find(m => m.position === imported.position);
-            if (existing && imported.result) {
-                // Only update if different or was empty
-                if (existing.result !== imported.result) {
-                    existing.result = imported.result;
-                    hasChanges = true;
-                }
-            }
-        }
-
-        // Update prizes if available
-        if (importData.prizes && Object.keys(importData.prizes).length > 0) {
-            if (!dbJornada.prizes) dbJornada.prizes = {};
-
-            for (const [category, amount] of Object.entries(importData.prizes)) {
-                if (dbJornada.prizes[category] !== amount) {
-                    dbJornada.prizes[category] = amount;
-                    hasChanges = true;
-                }
-            }
-        }
-
-        if (hasChanges) {
-            await window.DataService.save('jornadas', dbJornada);
-            console.log(`Updated J${dbJornada.number} with results and prizes`);
-            return true;
-        }
-
-        return false;
-    }
 
     /**
      * Parse Matches (Teams) from HTML

@@ -34,7 +34,8 @@ class ResultsManager {
         }).sort((a, b) => b.number - a.number);
 
         console.log(`ResultsManager: Found ${finishedJornadas.length} jornadas with results`);
-        console.log(`Jornada numbers:`, finishedJornadas.map(j => j.number));
+        const jornadaNums = finishedJornadas.map(j => j.number);
+        console.log(`Jornada numbers:`, jornadaNums);
 
         if (finishedJornadas.length === 0) {
             loading.textContent = "No hay jornadas finalizadas con resultados todavía.";
@@ -65,31 +66,39 @@ class ResultsManager {
 
             // First pass: Calculate scores for all members
             this.members.forEach(m => {
-                const p = this.pronosticos.find(pred => pred.jId === j.id && pred.mId === m.id);
+                // Find pronostico - Use loose comparison for IDs (mix of strings and numbers)
+                const p = this.pronosticos.find(pred =>
+                    String(pred.jId) === String(j.id) &&
+                    String(pred.mId) === String(m.id)
+                );
 
                 let hits = 0;
                 let points = 0;
                 let bonus = 0;
                 let played = false;
                 let isLate = false;
-                let isPardoned = false; // Default false. In future, read from 'p.pardoned'
+                let isPardoned = false;
 
-                if (p && p.selection) {
+                if (p && p.selection && Array.isArray(p.selection)) {
                     played = true;
                     isLate = p.late || false;
                     isPardoned = p.pardoned || false;
 
-                    let ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
+                    try {
+                        let ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
 
-                    // Late Logic: If late and NOT pardoned -> Hits = 0 -> Recalculate Score
-                    if (isLate && !isPardoned) {
-                        hits = 0;
-                        points = ScoringSystem.calculateScore(0, jDate);
-                        bonus = points; // points - hits(0)
-                    } else {
-                        hits = ev.hits;
-                        points = ev.points;
-                        bonus = ev.bonus;
+                        // Late Logic: If late and NOT pardoned -> Hits = 0 -> Recalculate Score
+                        if (isLate && !isPardoned) {
+                            hits = 0;
+                            points = ScoringSystem.calculateScore(0, jDate);
+                            bonus = points;
+                        } else {
+                            hits = ev.hits;
+                            points = ev.points;
+                            bonus = ev.bonus;
+                        }
+                    } catch (e) {
+                        console.error(`Error evaluating forecast for M${m.id} J${j.number}`, e);
                     }
                 } else {
                     // Not played
@@ -98,15 +107,16 @@ class ResultsManager {
                     bonus = 0;
                 }
 
-                // Calculate Prize Money - Determine real minHits from rates if available
+                // Calculate Prize Money - Field name can be prizes or prizeRates
+                const legacyPrizes = j.prizeRates || j.prizes || {};
                 let actualMinHits = j.minHitsToWin || 10;
-                if (j.prizeRates && Object.keys(j.prizeRates).length > 0) {
-                    actualMinHits = Math.min(...Object.keys(j.prizeRates).map(Number));
+                if (legacyPrizes && Object.keys(legacyPrizes).length > 0) {
+                    actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
                 }
 
                 let prize = 0;
                 if (hits >= actualMinHits) {
-                    prize = (j.prizeRates && j.prizeRates[hits]) || 0;
+                    prize = legacyPrizes[hits] || 0;
                 }
 
                 // Store
