@@ -761,25 +761,40 @@ class BoteManager {
             return pJ === String(jornada.id) || pJ === String(jornada.number);
         });
 
+        const jDate = window.AppUtils.parseDate(jornada.date);
+        const officialResults = (jornada.matches || []).map(m => m.result);
+        const legacyPrizes = jornada.prizes || {};
+
         let totalExtraPrize = 0;
         extras.forEach(p => {
-            // Check manual hits (reducciones)
-            let aciertos = 0;
-            if (p.manualHits !== undefined && p.manualHits !== null) {
-                aciertos = parseInt(p.manualHits);
+            const selection = p.selection || p.forecast;
+            if (!selection) return;
+
+            // Determine if it should be treated as reduced
+            // Use the flag if present, or auto-detect if exactly 7 doubles
+            const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+            const isReduced = p.isReduced || (doubleCount === 7);
+
+            const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced });
+
+            if (ev.breakdown) {
+                // REDUCED: Sum all prizes from the breakdown
+                Object.keys(ev.breakdown).forEach(h => {
+                    const count = ev.breakdown[h];
+                    if (count > 0 && legacyPrizes[h]) {
+                        totalExtraPrize += count * legacyPrizes[h];
+                    }
+                });
             } else {
-                const selection = p.selection || p.forecast;
-                aciertos = this.calculateAciertos(jornada.matches, selection);
-            }
-
-            const prizes = jornada.prizes;
-            // Support both string keys ("10") and numbers (10)
-            const prizeVal = prizes[aciertos] || prizes[String(aciertos)] || 0;
-            const finalPrize = typeof prizeVal === 'number' ? prizeVal : parseFloat(prizeVal || 0);
-
-            // Validate Prize (must be positive)
-            if (finalPrize > 0) {
-                totalExtraPrize += finalPrize;
+                // DIRECT: Highest hit prize
+                const hits = ev.hits;
+                let actualMinHits = jornada.minHitsToWin || 10;
+                if (legacyPrizes && Object.keys(legacyPrizes).length > 0) {
+                    actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
+                }
+                if (hits >= actualMinHits) {
+                    totalExtraPrize += legacyPrizes[hits] || 0;
+                }
             }
         });
 
@@ -2063,17 +2078,42 @@ class BoteManager {
         const winningExtras = [];
         this.jornadas.forEach(j => {
             const extras = this.pronosticosExtra ? this.pronosticosExtra.filter(p => String(p.jId || p.jornadaId) === String(j.id) || String(p.jId || p.jornadaId) === String(j.number)) : [];
+            const jDate = window.AppUtils.parseDate(j.date);
+            const officialResults = (j.matches || []).map(m => m.result);
+            const legacyPrizes = j.prizes || {};
+
             extras.forEach(p => {
-                const hits = this.calculateAciertos(j.matches, p.selection || p.forecast);
-                const prizesMap = j.prizes || {};
-                const prize = parseFloat(prizesMap[hits] || prizesMap[String(hits)] || 0);
+                const selection = p.selection || p.forecast;
+                if (!selection) return;
+
+                const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+                const isReduced = p.isReduced || (doubleCount === 7);
+                const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced });
+
+                let prize = 0;
+                if (ev.breakdown) {
+                    Object.keys(ev.breakdown).forEach(h => {
+                        if (ev.breakdown[h] > 0 && legacyPrizes[h]) {
+                            prize += ev.breakdown[h] * legacyPrizes[h];
+                        }
+                    });
+                } else {
+                    if (ev.hits >= (j.minHitsToWin || 10) && legacyPrizes[ev.hits]) {
+                        prize = legacyPrizes[ev.hits];
+                    }
+                }
+
                 if (prize > 0) {
                     winningExtras.push({
                         jNum: j.number,
+                        jId: j.id,
                         date: j.date,
+                        memberId: p.mId || p.memberId,
                         memberName: window.AppUtils.getMemberName(this.members.find(m => String(m.id) === String(p.mId || p.memberId))),
-                        hits: hits,
-                        prize: prize
+                        hits: ev.hits,
+                        prize: prize,
+                        isReduced: isReduced,
+                        breakdown: ev.breakdown
                     });
                 }
             });
@@ -2083,13 +2123,16 @@ class BoteManager {
             html += `<tr><td colspan="5" style="text-align:center; padding: 2rem; opacity: 0.6;">No hay premios registrados en columnas de dobles.</td></tr>`;
         } else {
             winningExtras.sort((a, b) => b.jNum - a.jNum).forEach(e => {
-                const rowStyle = 'background: rgba(255, 145, 0, 0.05);';
+                const rowStyle = e.isReduced ? 'background: rgba(103, 58, 183, 0.05); border-left: 4px solid #673ab7;' : 'background: rgba(255, 145, 0, 0.05);';
                 html += `
                     <tr style="${rowStyle}">
                         <td style="font-weight:bold;">J${e.jNum}</td>
                         <td style="opacity:0.8;">${e.date}</td>
                         <td><span style="color: #ff9100; font-weight:bold;">${typeof e.memberName === 'object' ? 'Socio' : e.memberName}</span></td>
-                        <td><span style="background: #e65100; color:white; padding: 2px 8px; border-radius: 10px; font-weight:bold;">${e.hits} hits</span></td>
+                        <td>
+                            <span style="background: #e65100; color:white; padding: 2px 8px; border-radius: 10px; font-weight:bold;">${e.hits} hits</span>
+                            ${e.isReduced ? `<span style="background: #673ab7; color:white; padding: 2px 8px; border-radius: 10px; font-size:0.7rem; cursor:pointer;" onclick="window.Bote.showReducedBreakdown('${e.memberId}', '${e.jId}')">📋 Ver Reducción</span>` : ''}
+                        </td>
                         <td class="positive" style="font-size:1.1rem; font-weight:900;">+ ${e.prize.toFixed(2)}€</td>
                     </tr>
                 `;
@@ -2482,6 +2525,125 @@ class BoteManager {
             console.error(e);
             alert('Error al actualizar aciertos.');
         }
+    }
+
+    showReducedBreakdown(memberId, jId) {
+        const p = this.pronosticosExtra.find(x => String(x.mId || x.memberId) === String(memberId) && String(x.jId || x.jornadaId) === String(jId));
+        const j = this.jornadas.find(jor => String(jor.id) === String(jId));
+        if (!p || !j) return;
+
+        const selection = p.selection || p.forecast;
+        const jDate = window.AppUtils.parseDate(j.date);
+        const officialResults = (j.matches || []).map(m => m.result);
+        const legacyPrizes = j.prizes || {};
+
+        const multiIndices = [];
+        selection.forEach((sel, idx) => {
+            if (idx < 14 && sel && sel.length > 1) multiIndices.push(idx);
+        });
+
+        if (multiIndices.length !== 7) {
+            alert("No se detectan exactamente 7 dobles para esta reducción.");
+            return;
+        }
+
+        const matrix = window.ScoringSystem.reducciones['R2'];
+        const bets = [];
+
+        matrix.forEach((betRow, bIdx) => {
+            let hits = 0;
+            const betSelection = selection.map((sel, idx) => {
+                if (idx >= 15) return sel;
+                const mIdx = multiIndices.indexOf(idx);
+                if (mIdx !== -1) {
+                    return (betRow[mIdx] === '1') ? sel[0] : (sel[1] || sel[0]);
+                }
+                return sel;
+            });
+
+            // Calculate hits for this specific bet
+            betSelection.forEach((sel, idx) => {
+                if (idx >= 15) return;
+                const res = officialResults[idx];
+                if (!res || res === '' || res.toUpperCase() === 'POR DEFINIR') return;
+                const rSign = window.ScoringSystem.normalizeSign(res);
+                const rScore = String(res).trim().toUpperCase();
+                let isHit = (idx === 14) ? (rScore === sel || rSign === sel) : sel.includes(rSign);
+                if (isHit) hits++;
+            });
+
+            bets.push({ num: bIdx + 1, selection: betSelection, hits });
+        });
+
+        const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced: true });
+
+        // Build HTML
+        let html = `
+            <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
+                <div>
+                    <h3 style="margin-top:0; color:#673ab7; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem;">Resumen de Premios Total:</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:1.5rem;">
+                        ${Object.keys(ev.breakdown).sort((a, b) => b - a).map(h => {
+            const count = ev.breakdown[h];
+            const pVal = legacyPrizes[h] || 0;
+            if (count === 0) return '';
+            return `<div style="background:rgba(103, 58, 183, 0.1); border:1px solid #673ab7; padding:10px; border-radius:8px; text-align:center; min-width:120px;">
+                                <div style="font-weight:900; font-size:1.2rem;">${count} de ${h} ac.</div>
+                                <div style="font-size:0.8rem; opacity:0.8;">${pVal.toFixed(2)}€ / ud</div>
+                                <div style="font-weight:bold; color:#4caf50; margin-top:4px;">Total: ${(count * pVal).toFixed(2)}€</div>
+                            </div>`;
+        }).join('')}
+                    </div>
+
+                    <h3 style="color:#673ab7; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem;">Desglose por Apuesta (16):</h3>
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; text-align:center;">
+                            <thead>
+                                <tr style="background:#f0f0f0;">
+                                    <th style="padding:4px; border:1px solid #ccc;">Apuesta</th>
+                                    ${Array.from({ length: 15 }).map((_, i) => `<th style="padding:4px; border:1px solid #ccc; width:25px;">${i === 14 ? 'P15' : i + 1}</th>`).join('')}
+                                    <th style="padding:4px; border:1px solid #ccc; background:#e1f5fe;">Hits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${bets.map(b => `
+                                    <tr>
+                                        <td style="padding:4px; border:1px solid #ccc; font-weight:bold;">#${b.num}</td>
+                                        ${b.selection.map((s, idx) => {
+            const res = officialResults[idx];
+            const rSign = window.ScoringSystem.normalizeSign(res);
+            const isHit = idx < 14 ? s.includes(rSign) : (s === officialResults[idx] || s === rSign);
+            return `<td style="padding:4px; border:1px solid #ccc; ${isHit ? 'background:#c8e6c9; font-weight:bold;' : ''}">${s}</td>`;
+        }).join('')}
+                                        <td style="padding:4px; border:1px solid #ccc; font-weight:900; background:#e1f5fe;">${b.hits}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="background:rgba(0,0,0,0.03); padding:1rem; border-radius:12px; border:1px solid #ccc;">
+                    <h3 style="margin-top:0; font-size:1rem; opacity:0.7;">Resultados Oficiales J${j.number}:</h3>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        ${j.matches.slice(0, 15).map((m, idx) => `
+                            <div style="font-size:0.75rem; padding:4px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                                <span>${idx + 1}. ${m.home.substring(0, 10)} - ${m.away.substring(0, 10)}</span>
+                                <strong style="color:#673ab7;">${m.result}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const modal = document.getElementById('modal-reducida-detalle');
+        const content = document.getElementById('reducida-detalle-content');
+        const title = document.getElementById('reducida-detalle-titulo');
+
+        title.textContent = `Desglose Reducción - J${j.number} - ${window.AppUtils.getMemberName(this.members.find(m => String(m.id) === String(p.mId || p.memberId)))}`;
+        content.innerHTML = html;
+        modal.style.display = 'flex';
     }
 }
 
