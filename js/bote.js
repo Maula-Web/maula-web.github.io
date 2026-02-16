@@ -2569,7 +2569,9 @@ class BoteManager {
         const bets = [];
 
         matrix.forEach((betRow, bIdx) => {
-            let hits = 0;
+            let regHits = 0;
+            let p15Hit = false;
+
             const betSelection = selection.map((sel, idx) => {
                 if (idx >= 15) return sel;
                 const mIdx = multiIndices.indexOf(idx);
@@ -2586,18 +2588,25 @@ class BoteManager {
                 if (!res || res === '' || res.toUpperCase() === 'POR DEFINIR') return;
                 const rSign = window.ScoringSystem.normalizeSign(res);
                 const rScore = String(res).trim().toUpperCase();
-                let isHit = (idx === 14) ? (rScore === sel || rSign === sel) : sel.includes(rSign);
-                if (isHit) hits++;
+
+                if (idx < 14) {
+                    // Main 14 matches
+                    if (sel.includes(rSign)) regHits++;
+                } else if (idx === 14) {
+                    // Pleno al 15
+                    p15Hit = (rScore === sel || rSign === sel);
+                }
             });
 
-            bets.push({ num: bIdx + 1, selection: betSelection, hits });
+            const totalH = (regHits === 14 && p15Hit) ? 15 : regHits;
+            bets.push({ num: bIdx + 1, selection: betSelection, hits: totalH });
         });
 
         const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced: true });
 
         // Build HTML
         let html = `
-            <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
+            <div style="display:grid; grid-template-columns: 1.5fr 0.8fr; gap: 2rem;">
                 <div>
                     <h3 style="margin-top:0; color:#673ab7; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem;">Resumen de Premios Total:</h3>
                     <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:1.5rem;">
@@ -2606,9 +2615,9 @@ class BoteManager {
             const pVal = legacyPrizes[h] || 0;
             if (count === 0) return '';
             return `<div style="background:rgba(103, 58, 183, 0.1); border:1px solid #673ab7; padding:10px; border-radius:8px; text-align:center; min-width:120px;">
-                                <div style="font-weight:900; font-size:1.2rem;">${count} de ${h} ac.</div>
+                                <div style="font-weight:900; font-size:1.2rem; color: #311b92;">${count} de ${h} ac.</div>
                                 <div style="font-size:0.8rem; opacity:0.8;">${pVal.toFixed(2)}€ / ud</div>
-                                <div style="font-weight:bold; color:#4caf50; margin-top:4px;">Total: ${(count * pVal).toFixed(2)}€</div>
+                                <div style="font-weight:bold; color:#2e7d32; margin-top:4px;">Total: ${(count * pVal).toFixed(2)}€</div>
                             </div>`;
         }).join('')}
                     </div>
@@ -2633,7 +2642,7 @@ class BoteManager {
             const isHit = idx < 14 ? s.includes(rSign) : (s === officialResults[idx] || s === rSign);
             return `<td style="padding:4px; border:1px solid #ccc; ${isHit ? 'background:#c8e6c9; font-weight:bold;' : ''}">${s}</td>`;
         }).join('')}
-                                        <td style="padding:4px; border:1px solid #ccc; font-weight:900; background:#e1f5fe;">${b.hits}</td>
+                                        <td style="padding:4px; border:1px solid #ccc; font-weight:900; background:#e1f5fe; color: #0d47a1;">${b.hits}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -2643,11 +2652,11 @@ class BoteManager {
 
                 <div style="background:rgba(0,0,0,0.03); padding:1rem; border-radius:12px; border:1px solid #ccc;">
                     <h3 style="margin-top:0; font-size:1rem; opacity:0.7;">Resultados Oficiales J${j.number}:</h3>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                    <div style="display:grid; grid-template-columns: 1fr; gap:5px;">
                         ${j.matches.slice(0, 15).map((m, idx) => `
                             <div style="font-size:0.75rem; padding:4px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                                <span>${idx + 1}. ${m.home.substring(0, 10)} - ${m.away.substring(0, 10)}</span>
-                                <strong style="color:#673ab7;">${m.result}</strong>
+                                <span>${idx + 1}. ${m.home.substring(0, 15)} - ${m.away.substring(0, 15)}</span>
+                                <strong style="color:#673ab7; font-size:0.9rem;">${m.result}</strong>
                             </div>
                         `).join('')}
                     </div>

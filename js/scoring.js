@@ -129,7 +129,7 @@ const ScoringSystem = {
     evaluateForecast: function (forecastSelection, officialResults, targetDate, options = {}) {
         const { isReduced = false, reductionType = 'R2' } = options;
 
-        // 1. Identify where the doubles/triples are in the selection
+        // 1. Identify where the doubles/triples are in the selection (First 14 matches)
         const multiIndices = [];
         forecastSelection.forEach((sel, idx) => {
             if (idx < 14 && sel && sel.length > 1) {
@@ -138,14 +138,15 @@ const ScoringSystem = {
         });
 
         // 2. Logic for Reduced Quiniela
-        // Only applies if specifically requested and we have exactly 7 doubles (for R2)
         if (isReduced && multiIndices.length === 7 && this.reducciones[reductionType]) {
             const matrix = this.reducciones[reductionType];
             const betsHits = [];
 
             // Evaluate each of the 16 bets
             matrix.forEach(betRow => {
-                let currentHits = 0;
+                let regHits = 0; // Hits in first 14 matches (0-13)
+                let p15Hit = false;
+
                 forecastSelection.forEach((sel, idx) => {
                     if (idx >= 15) return;
                     const res = officialResults[idx];
@@ -159,28 +160,29 @@ const ScoringSystem = {
                     if (multiIndices.includes(idx)) {
                         const matrixPos = multiIndices.indexOf(idx);
                         const matrixSign = betRow[matrixPos]; // '1' or 'X'
-                        // '1' -> first sign of double, 'X' -> second sign
                         activeSign = (matrixSign === '1') ? sel[0] : (sel[1] || sel[0]);
                     }
 
-                    let isHit = false;
-                    if (idx === 14) {
-                        isHit = (rScore === activeSign) || (rSign === activeSign);
-                    } else {
-                        // For reduced column, it's a simple sign comparison
-                        isHit = activeSign.includes(rSign);
+                    if (idx < 14) {
+                        // Standard sign check
+                        if (activeSign.includes(rSign)) regHits++;
+                    } else if (idx === 14) {
+                        // Pleno al 15 check
+                        p15Hit = (rScore === activeSign) || (rSign === activeSign);
                     }
-                    if (isHit) currentHits++;
                 });
-                betsHits.push(currentHits);
+
+                // In Quiniela, P15 ONLY counts if you have 14 hits.
+                const totalH = (regHits === 14 && p15Hit) ? 15 : regHits;
+                betsHits.push(totalH);
             });
 
-            // The main result is the maximum hits achieved by any of the 16 bets
+            // The main result for stats is the maximum hits achieved
             const hits = Math.max(...betsHits);
             const points = this.calculateScore(hits, targetDate);
 
-            // Prize breakdown
-            const breakdown = { 14: 0, 13: 0, 12: 0, 11: 0, 10: 0 };
+            // Prize breakdown (15, 14, 13, 12, 11, 10)
+            const breakdown = { 15: 0, 14: 0, 13: 0, 12: 0, 11: 0, 10: 0 };
             betsHits.forEach(h => {
                 if (h >= 10) breakdown[h]++;
             });
@@ -189,7 +191,8 @@ const ScoringSystem = {
         }
 
         // 3. Normal / Direct Multiple Logic (Current Default)
-        let hits = 0;
+        let regHits = 0;
+        let p15Hit = false;
         forecastSelection.forEach((sel, idx) => {
             if (idx >= 15) return;
             const res = officialResults[idx];
@@ -199,15 +202,14 @@ const ScoringSystem = {
             const rSign = this.normalizeSign(res);
             const rScore = String(res).trim().toUpperCase();
 
-            let isHit = false;
-            if (idx === 14) {
-                isHit = (rScore === pred) || (rSign === pred);
-            } else {
-                isHit = pred.includes(rSign);
+            if (idx < 14) {
+                if (pred.includes(rSign)) regHits++;
+            } else if (idx === 14) {
+                p15Hit = (rScore === pred) || (rSign === pred);
             }
-            if (isHit) hits++;
         });
 
+        const hits = (regHits === 14 && p15Hit) ? 15 : regHits;
         const points = this.calculateScore(hits, targetDate);
         return { hits, points, bonus: points - hits, breakdown: null };
     }
