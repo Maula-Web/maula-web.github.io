@@ -124,12 +124,11 @@ const ScoringSystem = {
         ]
     },
 
-    // Returns { hits, points, bonus, breakdown }
+    // Returns { hits, points, bonus, breakdown, officialHits }
     // options: { isReduced: bool, reductionType: 'R2', reducedIndices: [] }
     evaluateForecast: function (forecastSelection, officialResults, targetDate, options = {}) {
         const { isReduced = false, reductionType = 'R2' } = options;
 
-        // 1. Identify where the doubles/triples are in the selection (First 14 matches)
         const multiIndices = [];
         forecastSelection.forEach((sel, idx) => {
             if (idx < 14 && sel && sel.length > 1) {
@@ -137,14 +136,12 @@ const ScoringSystem = {
             }
         });
 
-        // 2. Logic for Reduced Quiniela
         if (isReduced && multiIndices.length === 7 && this.reducciones[reductionType]) {
             const matrix = this.reducciones[reductionType];
-            const betsHits = [];
+            const betsData = [];
 
-            // Evaluate each of the 16 bets
             matrix.forEach(betRow => {
-                let regHits = 0; // Hits in first 14 matches (0-13)
+                let regHits = 0;
                 let p15Hit = false;
 
                 forecastSelection.forEach((sel, idx) => {
@@ -156,41 +153,37 @@ const ScoringSystem = {
                     const rScore = String(res).trim().toUpperCase();
 
                     let activeSign = sel;
-                    // If this match is part of the reduction, pick the sign based on matrix
                     if (multiIndices.includes(idx)) {
                         const matrixPos = multiIndices.indexOf(idx);
-                        const matrixSign = betRow[matrixPos]; // '1' or 'X'
+                        const matrixSign = betRow[matrixPos];
                         activeSign = (matrixSign === '1') ? sel[0] : (sel[1] || sel[0]);
                     }
 
                     if (idx < 14) {
-                        // Standard sign check
                         if (activeSign.includes(rSign)) regHits++;
                     } else if (idx === 14) {
-                        // Pleno al 15 check
                         p15Hit = (rScore === activeSign) || (rSign === activeSign);
                     }
                 });
 
-                // In Quiniela, P15 ONLY counts if you have 14 hits.
-                const totalH = (regHits === 14 && p15Hit) ? 15 : regHits;
-                betsHits.push(totalH);
+                const totalRaw = regHits + (p15Hit ? 1 : 0);
+                const officialCat = (regHits === 14 && p15Hit) ? 15 : regHits;
+                betsData.push({ totalRaw, officialCat });
             });
 
-            // The main result for stats is the maximum hits achieved
-            const hits = Math.max(...betsHits);
+            const hits = Math.max(...betsData.map(b => b.totalRaw));
+            const officialHits = Math.max(...betsData.map(b => b.officialCat));
             const points = this.calculateScore(hits, targetDate);
 
-            // Prize breakdown (15, 14, 13, 12, 11, 10)
             const breakdown = { 15: 0, 14: 0, 13: 0, 12: 0, 11: 0, 10: 0 };
-            betsHits.forEach(h => {
-                if (h >= 10) breakdown[h]++;
+            betsData.forEach(b => {
+                if (b.officialCat >= 10) breakdown[b.officialCat]++;
             });
 
-            return { hits, points, bonus: points - hits, breakdown };
+            return { hits, points, bonus: points - hits, breakdown, officialHits };
         }
 
-        // 3. Normal / Direct Multiple Logic (Current Default)
+        // 3. Normal / Direct Multiple Logic
         let regHits = 0;
         let p15Hit = false;
         forecastSelection.forEach((sel, idx) => {
@@ -209,9 +202,10 @@ const ScoringSystem = {
             }
         });
 
-        const hits = (regHits === 14 && p15Hit) ? 15 : regHits;
+        const hits = regHits + (p15Hit ? 1 : 0);
+        const officialHits = (regHits === 14 && p15Hit) ? 15 : regHits;
         const points = this.calculateScore(hits, targetDate);
-        return { hits, points, bonus: points - hits, breakdown: null };
+        return { hits, points, bonus: points - hits, breakdown: null, officialHits };
     }
 };
 

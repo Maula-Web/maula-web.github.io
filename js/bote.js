@@ -789,14 +789,13 @@ class BoteManager {
             const selection = p.selection || p.forecast;
             if (!selection || !Array.isArray(selection)) return;
 
-            // Determine if it should be treated as reduced
             const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
             const isReduced = p.isReduced || (doubleCount === 7);
 
             const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced });
 
             if (ev && ev.breakdown) {
-                // REDUCED: Sum all prizes from the breakdown
+                // REDUCED: Sum all prizes from the breakdown (already based on official categories)
                 Object.keys(ev.breakdown).forEach(h => {
                     const count = ev.breakdown[h];
                     if (count > 0 && legacyPrizes[h]) {
@@ -804,14 +803,14 @@ class BoteManager {
                     }
                 });
             } else if (ev) {
-                // DIRECT: Highest hit prize
-                const hits = ev.hits;
+                // DIRECT: Use officialHits (P15 only if 14 hits)
+                const cat = ev.officialHits;
                 let actualMinHits = jornada.minHitsToWin || 10;
                 if (legacyPrizes && Object.keys(legacyPrizes).length > 0) {
                     actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
                 }
-                if (hits >= actualMinHits) {
-                    totalExtraPrize += parseFloat(legacyPrizes[hits] || 0);
+                if (cat >= actualMinHits) {
+                    totalExtraPrize += parseFloat(legacyPrizes[cat] || 0);
                 }
             }
         });
@@ -2427,56 +2426,10 @@ class BoteManager {
         const jornada = this.jornadas.find(j => String(j.id) === String(jornadaId));
         if (!jornada) return;
 
-        // 1. Settings
+        // Settings Only
         document.getElementById('gestion-no-sellado').checked = !!jornada.noSellado;
         const subSelect = document.getElementById('gestion-sustituto');
         subSelect.value = jornada.sustitutoSellado || "";
-
-        // 2. Doubles / Reductions
-        const listDiv = document.getElementById('gestion-dobles-list');
-        listDiv.innerHTML = '';
-
-        const extras = this.pronosticosExtra ? this.pronosticosExtra.filter(p => String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number)) : [];
-
-        if (extras.length === 0) {
-            listDiv.innerHTML = '<p style="text-align: center; opacity: 0.5;">No hay columnas de dobles registradas para esta jornada.</p>';
-        } else {
-            const table = document.createElement('table');
-            table.className = 'bote-table';
-            table.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Socio</th>
-                        <th>Aciertos Calc.</th>
-                        <th>Aciertos Reales</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            `;
-            const tbody = table.querySelector('tbody');
-
-            extras.forEach(p => {
-                const member = this.members.find(m => String(m.id) === String(p.mId || p.memberId));
-                const calcHits = this.calculateAciertos(jornada.matches, p.selection || p.forecast);
-                const manualHits = (p.manualHits !== undefined && p.manualHits !== null) ? p.manualHits : '';
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${member ? member.name : 'Desconocido'}</td>
-                    <td style="font-weight:bold;">${calcHits}</td>
-                    <td>
-                        <input type="number" id="manual-hits-${p.id}" value="${manualHits}" placeholder="${calcHits}" 
-                            style="width: 60px; padding: 4px; border-radius: 4px; border: 1px solid #555; background: #333; color: white;">
-                    </td>
-                    <td>
-                        <button onclick="window.Bote.saveManualHits('${p.id}')" class="btn-action">Guardar</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            listDiv.appendChild(table);
-        }
 
         content.style.display = 'block';
     }
@@ -2517,33 +2470,7 @@ class BoteManager {
         }
     }
 
-    async saveManualHits(extraId) {
-        const input = document.getElementById(`manual-hits-${extraId}`);
-        const val = input.value;
-        const manualHits = val === '' ? null : parseInt(val);
 
-        try {
-            const extra = this.pronosticosExtra.find(p => p.id === extraId);
-            if (!extra) return;
-
-            const updateData = {
-                ...extra,
-                manualHits: manualHits
-            };
-
-            await window.DataService.save('pronosticos_extra', updateData);
-
-            // Update local state
-            const idx = this.pronosticosExtra.findIndex(p => p.id === extraId);
-            if (idx !== -1) this.pronosticosExtra[idx] = updateData;
-
-            alert('Aciertos reales actualizados.');
-            this.render();
-        } catch (e) {
-            console.error(e);
-            alert('Error al actualizar aciertos.');
-        }
-    }
 
     showReducedBreakdown(memberId, jId) {
         const p = this.pronosticosExtra.find(x => String(x.mId || x.memberId) === String(memberId) && String(x.jId || x.jornadaId) === String(jId));
@@ -2598,26 +2525,43 @@ class BoteManager {
                 }
             });
 
-            const totalH = (regHits === 14 && p15Hit) ? 15 : regHits;
-            bets.push({ num: bIdx + 1, selection: betSelection, hits: totalH });
+            // Total Raw Hits (0-15) for peña stats
+            bets.push({
+                num: bIdx + 1,
+                selection: betSelection,
+                hits: regHits + (p15Hit ? 1 : 0),
+                isWinner: regHits >= 10
+            });
         });
 
         const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced: true });
+
+        // Calculate Total Prize
+        let totalPrizeValue = 0;
+        Object.keys(ev.breakdown).forEach(h => {
+            totalPrizeValue += ev.breakdown[h] * (legacyPrizes[h] || 0);
+        });
 
         // Build HTML
         let html = `
             <div style="display:grid; grid-template-columns: 1.5fr 0.8fr; gap: 2rem;">
                 <div>
-                    <h3 style="margin-top:0; color:#673ab7; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem;">Resumen de Premios Total:</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom: 2px solid #673ab7; padding-bottom:0.5rem;">
+                         <h3 style="margin:0; color:#673ab7;">Resumen de Premios Total:</h3>
+                         <div style="background:#4caf50; color:white; padding:5px 15px; border-radius:20px; font-weight:900; font-size:1.2rem; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                            TOTAL: ${totalPrizeValue.toFixed(2)}€
+                         </div>
+                    </div>
+
                     <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:1.5rem;">
                         ${Object.keys(ev.breakdown).sort((a, b) => b - a).map(h => {
             const count = ev.breakdown[h];
             const pVal = legacyPrizes[h] || 0;
             if (count === 0) return '';
-            return `<div style="background:rgba(103, 58, 183, 0.1); border:1px solid #673ab7; padding:10px; border-radius:8px; text-align:center; min-width:120px;">
-                                <div style="font-weight:900; font-size:1.2rem; color: #311b92;">${count} de ${h} ac.</div>
-                                <div style="font-size:0.8rem; opacity:0.8;">${pVal.toFixed(2)}€ / ud</div>
-                                <div style="font-weight:bold; color:#2e7d32; margin-top:4px;">Total: ${(count * pVal).toFixed(2)}€</div>
+            return `<div style="background:rgba(103, 58, 183, 0.05); border:1px solid #673ab7; padding:10px; border-radius:8px; text-align:center; min-width:120px;">
+                                <div style="font-weight:900; font-size:1.2rem; color: #1a237e;">${count} de ${h} ac.</div>
+                                <div style="font-size:0.75rem; color:#5c6bc0; font-weight:bold;">${pVal.toFixed(2)}€ / ud</div>
+                                <div style="font-weight:bold; color:#2e7d32; margin-top:4px; font-size:1rem;">${(count * pVal).toFixed(2)}€</div>
                             </div>`;
         }).join('')}
                     </div>
@@ -2629,18 +2573,18 @@ class BoteManager {
                                 <tr style="background:#f0f0f0;">
                                     <th style="padding:4px; border:1px solid #ccc;">Apuesta</th>
                                     ${Array.from({ length: 15 }).map((_, i) => `<th style="padding:4px; border:1px solid #ccc; width:25px;">${i === 14 ? 'P15' : i + 1}</th>`).join('')}
-                                    <th style="padding:4px; border:1px solid #ccc; background:#e1f5fe;">Hits</th>
+                                    <th style="padding:4px; border:1px solid #ccc; background:#e1f5fe; color:#0d47a1;">Hits</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${bets.map(b => `
-                                    <tr>
+                                    <tr style="${b.isWinner ? 'background:rgba(76, 175, 80, 0.05);' : ''}">
                                         <td style="padding:4px; border:1px solid #ccc; font-weight:bold;">#${b.num}</td>
                                         ${b.selection.map((s, idx) => {
             const res = officialResults[idx];
             const rSign = window.ScoringSystem.normalizeSign(res);
             const isHit = idx < 14 ? s.includes(rSign) : (s === officialResults[idx] || s === rSign);
-            return `<td style="padding:4px; border:1px solid #ccc; ${isHit ? 'background:#c8e6c9; font-weight:bold;' : ''}">${s}</td>`;
+            return `<td style="padding:4px; border:1px solid #ccc; ${isHit ? 'background:#c8e6c9; font-weight:900; color:#333;' : ''}">${s}</td>`;
         }).join('')}
                                         <td style="padding:4px; border:1px solid #ccc; font-weight:900; background:#e1f5fe; color: #0d47a1;">${b.hits}</td>
                                     </tr>
