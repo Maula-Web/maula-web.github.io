@@ -44,39 +44,54 @@ class BoteManager {
 
     async init() {
         try {
+            console.log('BoteManager: Starting initialization...');
             if (!window.DataService.db) await window.DataService.init();
 
             // Load data
             await this.loadData();
             await this.loadConfig();
 
+            // Check dependencies
+            if (!window.ScoringSystem) {
+                console.warn('BoteManager: ScoringSystem not found, loading fallback...');
+                // You could dynamically load it here if needed, but for now we'll just log
+            }
+
             // Populate dropdowns
             this.populateSociosDropdown();
 
             // Set default date to today
-            document.getElementById('ingreso-fecha').valueAsDate = new Date();
+            const fechaInput = document.getElementById('ingreso-fecha');
+            if (fechaInput) fechaInput.valueAsDate = new Date();
 
             // Bind events
-            document.getElementById('vista-select').addEventListener('change', (e) => {
-                this.currentVista = e.target.value;
-                this.currentJornadaIndex = -1; // Trigger recalculation of most recent jornada
-                this.render();
-            });
+            const vistaSelect = document.getElementById('vista-select');
+            if (vistaSelect) {
+                vistaSelect.addEventListener('change', (e) => {
+                    this.currentVista = e.target.value;
+                    this.currentJornadaIndex = -1;
+                    this.render();
+                });
+            }
 
-            document.getElementById('form-reparto').addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.saveReparto();
-            });
+            const formReparto = document.getElementById('form-reparto');
+            if (formReparto) {
+                formReparto.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveReparto();
+                });
+            }
 
             // Initial render
             this.render();
 
             // Run maintenance migrations (prizes request)
             await this.runMaintenanceMigrations();
+            console.log('BoteManager: Initialization complete.');
 
         } catch (error) {
-            console.error('Error initializing BoteManager:', error);
-            alert('Error al cargar los datos del bote');
+            console.error('CRITICAL Error initializing BoteManager:', error);
+            alert('Error al cargar los datos del bote. Por favor, revisa la consola para más detalles.');
         }
     }
 
@@ -755,37 +770,40 @@ class BoteManager {
     getExtraPrizesForJornada(jornada) {
         if (!jornada.prizes || typeof jornada.prizes !== 'object') return 0;
         if (!this.pronosticosExtra) return 0;
+        if (!window.ScoringSystem) {
+            console.error("ScoringSystem not available for getExtraPrizesForJornada");
+            return 0;
+        }
 
         const extras = this.pronosticosExtra.filter(p => {
             const pJ = String(p.jId || p.jornadaId || '');
             return pJ === String(jornada.id) || pJ === String(jornada.number);
         });
 
-        const jDate = window.AppUtils.parseDate(jornada.date);
+        const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : this.parseDate(jornada.date);
         const officialResults = (jornada.matches || []).map(m => m.result);
         const legacyPrizes = jornada.prizes || {};
 
         let totalExtraPrize = 0;
         extras.forEach(p => {
             const selection = p.selection || p.forecast;
-            if (!selection) return;
+            if (!selection || !Array.isArray(selection)) return;
 
             // Determine if it should be treated as reduced
-            // Use the flag if present, or auto-detect if exactly 7 doubles
             const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
             const isReduced = p.isReduced || (doubleCount === 7);
 
             const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced });
 
-            if (ev.breakdown) {
+            if (ev && ev.breakdown) {
                 // REDUCED: Sum all prizes from the breakdown
                 Object.keys(ev.breakdown).forEach(h => {
                     const count = ev.breakdown[h];
                     if (count > 0 && legacyPrizes[h]) {
-                        totalExtraPrize += count * legacyPrizes[h];
+                        totalExtraPrize += count * parseFloat(legacyPrizes[h] || 0);
                     }
                 });
-            } else {
+            } else if (ev) {
                 // DIRECT: Highest hit prize
                 const hits = ev.hits;
                 let actualMinHits = jornada.minHitsToWin || 10;
@@ -793,7 +811,7 @@ class BoteManager {
                     actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
                 }
                 if (hits >= actualMinHits) {
-                    totalExtraPrize += legacyPrizes[hits] || 0;
+                    totalExtraPrize += parseFloat(legacyPrizes[hits] || 0);
                 }
             }
         });
