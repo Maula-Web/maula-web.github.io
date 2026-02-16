@@ -85,7 +85,8 @@ class ResultsManager {
                     isPardoned = p.pardoned || false;
 
                     try {
-                        let ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
+                        const isReduced = p.isReduced || false;
+                        let ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate, { isReduced });
 
                         // Late Logic: If late and NOT pardoned -> Hits = 0 -> Recalculate Score
                         if (isLate && !isPardoned) {
@@ -97,6 +98,9 @@ class ResultsManager {
                             points = ev.points;
                             bonus = ev.bonus;
                         }
+
+                        // Store breakdown for UI display (optional use in tooltips)
+                        p.tempBreakdown = ev.breakdown;
                     } catch (e) {
                         console.error(`Error evaluating forecast for M${m.id} J${j.number}`, e);
                     }
@@ -109,14 +113,25 @@ class ResultsManager {
 
                 // Calculate Prize Money - Field name can be prizes or prizeRates
                 const legacyPrizes = j.prizeRates || j.prizes || {};
-                let actualMinHits = j.minHitsToWin || 10;
-                if (legacyPrizes && Object.keys(legacyPrizes).length > 0) {
-                    actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
-                }
-
                 let prize = 0;
-                if (hits >= actualMinHits) {
-                    prize = legacyPrizes[hits] || 0;
+
+                if (p && p.tempBreakdown) {
+                    // REDUCED: Sum all prizes from the breakdown
+                    Object.keys(p.tempBreakdown).forEach(h => {
+                        const count = p.tempBreakdown[h];
+                        if (count > 0 && legacyPrizes[h]) {
+                            prize += count * legacyPrizes[h];
+                        }
+                    });
+                } else {
+                    // DIRECT / SIMPLE: Highest hit prize
+                    let actualMinHits = j.minHitsToWin || 10;
+                    if (legacyPrizes && Object.keys(legacyPrizes).length > 0) {
+                        actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
+                    }
+                    if (hits >= actualMinHits) {
+                        prize = legacyPrizes[hits] || 0;
+                    }
                 }
 
                 // Store

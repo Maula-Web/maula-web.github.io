@@ -22,6 +22,7 @@ class PronosticoManager {
     cacheDOM() {
         this.selMember = document.getElementById('sel-member');
         this.selJornada = document.getElementById('sel-jornada');
+        this.selMethod = document.getElementById('sel-method');
         this.container = document.getElementById('forecast-container');
         this.statusMsg = document.getElementById('status-message');
         this.costInfo = document.getElementById('cost-info');
@@ -338,6 +339,12 @@ class PronosticoManager {
         }
 
         const existing = this.pronosticos.find(p => p.jId == this.currentJornadaId && p.mId == this.currentMemberId);
+
+        // Update Method Dropdown
+        if (this.selMethod) {
+            this.selMethod.value = (existing && existing.isReduced) ? 'reducido' : 'directo';
+        }
+
         const currentSelections = existing ? existing.selection : Array(15).fill(null);
 
         // Fetch other members' forecasts for this jornada
@@ -600,12 +607,14 @@ class PronosticoManager {
             closeDate.setDate(closeDate.getDate() + 2);
             closeDate.setHours(23, 59, 59);
 
-            const now = new Date();
-            const isLockedRef = now > closeDate;
-            const isLate = now > deadline;
-
-            console.log("🔵 PASO 6: Estado de bloqueo");
-            console.log({ isLockedRef, isLate, correctionMode: this.correctionMode });
+            const isReduced = this.selMethod && this.selMethod.value === 'reducido';
+            if (isReduced) {
+                const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+                if (doubleCount !== 7) {
+                    alert(`Error: El método 'Reducida' requiere exactamente 7 dobles. Actualmente tienes ${doubleCount}.`);
+                    return;
+                }
+            }
 
             const id = `${this.currentJornadaId}_${this.currentMemberId}`;
             const record = {
@@ -613,6 +622,7 @@ class PronosticoManager {
                 jId: this.currentJornadaId,
                 mId: this.currentMemberId,
                 selection: selection,
+                isReduced: isReduced,
                 timestamp: new Date().toISOString(),
                 late: isLate
             };
@@ -1579,11 +1589,15 @@ class PronosticoManager {
             return;
         }
 
+        const doubles = selection.filter((s, i) => i < 14 && s.length === 2).length;
+        const isReduced = (doubles === 7);
+
         const data = {
             id: `${this.currentJornadaId}_${this.currentMemberId}`,
             jId: this.currentJornadaId,
             mId: this.currentMemberId,
             selection: selection,
+            isReduced: isReduced,
             date: new Date().toISOString()
         };
 

@@ -100,12 +100,98 @@ const ScoringSystem = {
         return r;
     },
 
-    // Returns { hits, points, bonus }
-    evaluateForecast: function (forecastSelection, officialResults, targetDate) {
-        let hits = 0;
+    // Official LAE Reductions Matrix (7 Doubles - 16 bets)
+    // Rows: Apuestas (1-16), Cols: Posiciones (1-7)
+    // matrix[apuesta][posicion]
+    reducciones: {
+        'R2': [ // 7 dobles - 16 apuestas
+            ['1', '1', '1', '1', '1', '1', '1'],
+            ['1', '1', '1', 'X', 'X', 'X', 'X'],
+            ['1', 'X', 'X', '1', '1', 'X', 'X'],
+            ['1', 'X', 'X', 'X', 'X', '1', '1'],
+            ['X', '1', 'X', '1', 'X', '1', 'X'],
+            ['X', '1', 'X', 'X', '1', 'X', '1'],
+            ['X', 'X', '1', '1', 'X', 'X', '1'],
+            ['X', 'X', '1', 'X', '1', '1', 'X'],
+            ['X', 'X', '1', '1', 'X', '1', 'X'],
+            ['X', 'X', '1', 'X', '1', 'X', '1'],
+            ['X', '1', 'X', '1', 'X', 'X', '1'],
+            ['X', '1', 'X', 'X', '1', '1', 'X'],
+            ['1', 'X', 'X', '1', '1', '1', '1'],
+            ['1', 'X', 'X', 'X', 'X', 'X', 'X'],
+            ['1', '1', '1', '1', '1', 'X', 'X'],
+            ['1', '1', '1', 'X', 'X', '1', '1']
+        ]
+    },
 
+    // Returns { hits, points, bonus, breakdown }
+    // options: { isReduced: bool, reductionType: 'R2', reducedIndices: [] }
+    evaluateForecast: function (forecastSelection, officialResults, targetDate, options = {}) {
+        const { isReduced = false, reductionType = 'R2' } = options;
+
+        // 1. Identify where the doubles/triples are in the selection
+        const multiIndices = [];
         forecastSelection.forEach((sel, idx) => {
-            if (idx >= 15) return; // Only first 15 matches count
+            if (idx < 14 && sel && sel.length > 1) {
+                multiIndices.push(idx);
+            }
+        });
+
+        // 2. Logic for Reduced Quiniela
+        // Only applies if specifically requested and we have exactly 7 doubles (for R2)
+        if (isReduced && multiIndices.length === 7 && this.reducciones[reductionType]) {
+            const matrix = this.reducciones[reductionType];
+            const betsHits = [];
+
+            // Evaluate each of the 16 bets
+            matrix.forEach(betRow => {
+                let currentHits = 0;
+                forecastSelection.forEach((sel, idx) => {
+                    if (idx >= 15) return;
+                    const res = officialResults[idx];
+                    if (!res || res === '' || res.toUpperCase() === 'POR DEFINIR') return;
+
+                    const rSign = this.normalizeSign(res);
+                    const rScore = String(res).trim().toUpperCase();
+
+                    let activeSign = sel;
+                    // If this match is part of the reduction, pick the sign based on matrix
+                    if (multiIndices.includes(idx)) {
+                        const matrixPos = multiIndices.indexOf(idx);
+                        const matrixSign = betRow[matrixPos]; // '1' or 'X'
+                        // '1' -> first sign of double, 'X' -> second sign
+                        activeSign = (matrixSign === '1') ? sel[0] : (sel[1] || sel[0]);
+                    }
+
+                    let isHit = false;
+                    if (idx === 14) {
+                        isHit = (rScore === activeSign) || (rSign === activeSign);
+                    } else {
+                        // For reduced column, it's a simple sign comparison
+                        isHit = activeSign.includes(rSign);
+                    }
+                    if (isHit) currentHits++;
+                });
+                betsHits.push(currentHits);
+            });
+
+            // The main result is the maximum hits achieved by any of the 16 bets
+            const hits = Math.max(...betsHits);
+            const points = this.calculateScore(hits, targetDate);
+
+            // Prize breakdown
+            const breakdown = { 14: 0, 13: 0, 12: 0, 11: 0, 10: 0 };
+            betsHits.forEach(h => {
+                if (h >= 10) breakdown[h]++;
+            });
+
+            return { hits, points, bonus: points - hits, breakdown };
+        }
+
+        // 3. Normal / Direct Multiple Logic (Current Default)
+        let hits = 0;
+        forecastSelection.forEach((sel, idx) => {
+            if (idx >= 15) return;
             const res = officialResults[idx];
             if (!res || res === '' || res.toUpperCase() === 'POR DEFINIR') return;
 
@@ -115,20 +201,15 @@ const ScoringSystem = {
 
             let isHit = false;
             if (idx === 14) {
-                // P15: Exact match for score OR sign match
                 isHit = (rScore === pred) || (rSign === pred);
             } else {
-                // 1-14: Sign inclusion (supports doubles '1X' etc)
                 isHit = pred.includes(rSign);
             }
-
             if (isHit) hits++;
         });
 
         const points = this.calculateScore(hits, targetDate);
-        const bonus = points - hits;
-
-        return { hits, points, bonus };
+        return { hits, points, bonus: points - hits, breakdown: null };
     }
 };
 
