@@ -1,8 +1,9 @@
 
 (async function () {
-    if (localStorage.getItem('doubles_injected_v1')) return;
+    // Force reinjection this time
+    localStorage.removeItem('doubles_injected_v1');
 
-    console.log("Iniciando inyección automática de quinielas de dobles...");
+    console.log("Iniciando inyección avanzada de quinielas de dobles...");
 
     const MISSING_DOUBLES = {
         1: { q1: ["1X", "1", "1X", "2", "1", "1", "1", "2", "1", "X2", "X", "1", "X2", "1", "0-2"], mId: 13 },
@@ -34,17 +35,30 @@
         const pronosticos = await window.DataService.getAll('pronosticos');
         const existingExtra = await window.DataService.getAll('pronosticos_extra');
 
-        const calculateWinners = (jNum) => {
+        const normalize = (r) => {
+            if (!r) return '';
+            const s = String(r).trim().toUpperCase();
+            if (s === '1' || s === 'X' || s === '2') return s;
+            if (s.includes('-')) {
+                const p = s.split('-');
+                const val = (x) => (x === 'M' || x === 'M+' ? 3 : parseInt(x) || 0);
+                const h = val(p[0]), a = val(p[1]);
+                return h > a ? '1' : (h < a ? '2' : 'X');
+            }
+            return s;
+        };
+
+        const calculateWinnerIds = (jNum) => {
             const j = jornadas.find(x => x.number === jNum);
             if (!j || !j.matches) return [];
-            const results = j.matches.map(m => m.result);
+            const results = j.matches.map(m => normalize(m.result));
             const counts = [];
             const jPronos = pronosticos.filter(p => String(p.jId) === String(j.id));
             jPronos.forEach(p => {
                 let hits = 0;
                 if (p.selection && Array.isArray(p.selection)) {
                     for (let i = 0; i < 14; i++) {
-                        if (results[i] && p.selection[i] && String(results[i]) === String(p.selection[i])) hits++;
+                        if (results[i] && p.selection[i] && String(p.selection[i]).includes(results[i])) hits++;
                     }
                 }
                 counts.push({ mId: p.mId, hits });
@@ -61,13 +75,16 @@
             let mId = data.mId;
             let m2Id = null;
 
-            if (!mId && jNum > 1) {
-                const winners = calculateWinners(jNum - 1);
-                if (winners.length > 0) mId = winners[0].mId;
-                if (data.q2 && winners.length > 1) m2Id = winners[1].mId;
-            } else if (jNum === 3 || jNum === 9) {
-                const winners = calculateWinners(jNum - 1);
-                if (winners.length > 1) m2Id = winners[1].mId;
+            if (jNum > 1) {
+                const winners = calculateWinnerIds(jNum - 1);
+                if (winners.length > 0) {
+                    mId = winners[0].mId;
+                    console.log(`J${jNum}: Ganador J${jNum - 1} es ID ${mId} (${winners[0].hits} ac)`);
+                    if (data.q2 && winners.length > 1) m2Id = winners[1].mId;
+                } else if (!mId) {
+                    mId = 13; // Fallback Luismi
+                    console.warn(`J${jNum}: No se encontró ganador para J${jNum - 1}. Usando ID 13.`);
+                }
             }
 
             if (mId) {
@@ -90,14 +107,8 @@
             }
         }
 
-        if (count > 0) {
-            console.log(`Inyectados ${count} registros de dobles con éxito.`);
-            localStorage.setItem('doubles_injected_v1', 'true');
-            // Refresh logic if needed, but usually once is enough
-        } else {
-            console.log("No se encontraron registros nuevos para inyectar.");
-            localStorage.setItem('doubles_injected_v1', 'true');
-        }
+        console.log(`Proceso completado. Registros inyectados: ${count}`);
+        localStorage.setItem('doubles_injected_v1', 'true');
     } catch (e) {
         console.error("Error en migración de dobles:", e);
     }
