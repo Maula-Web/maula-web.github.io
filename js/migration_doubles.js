@@ -1,9 +1,9 @@
 
 (async function () {
-    // Force reinjection this time
+    // Force reinjection to catch the manual assignment for J9
     localStorage.removeItem('doubles_injected_v1');
 
-    console.log("Iniciando inyección avanzada de quinielas de dobles...");
+    console.log("Iniciando inyección final de quinielas de dobles (Asignación J9)...");
 
     const MISSING_DOUBLES = {
         1: { q1: ["1X", "1", "1X", "2", "1", "1", "1", "2", "1", "X2", "X", "1", "X2", "1", "0-2"], mId: 13 },
@@ -13,8 +13,11 @@
             q2: ["X2", "1X", "2", "1", "X2", "1X", "1", "1", "1", "X", "1X", "1", "1X", "X2", "1-2"]
         },
         9: {
+            // Emilo is ID 5
             q1: ["1X", "X1", "12", "X1", "2X", "1X", "1", "1", "2", "1", "1", "1X", "1", "1", "0-2"],
-            q2: ["1X", "1", "1X", "12", "1", "1X", "1", "1", "X2", "1", "1", "1X", "1", "1X", "0-2"]
+            q2: ["1X", "1", "1X", "12", "1", "1X", "1", "1", "X2", "1", "1", "1X", "1", "1X", "0-2"],
+            mId: 13, // First column to Luismi (as fallback since J8 results missing)
+            m2Id: 5  // Second column to Emilio as requested
         },
         11: { q1: ["12", "1X", "1", "1", "2", "X2", "1X", "1", "1", "1X", "1X", "X", "1", "X2", "1-1"] },
         14: { q1: ["1", "1", "1X", "1", "X2", "1X", "X2", "2", "1", "1", "12", "1X", "X2", "2", "2-2"] },
@@ -73,17 +76,17 @@
             if (!j) continue;
 
             let mId = data.mId;
-            let m2Id = null;
+            let m2Id = data.m2Id;
 
-            if (jNum > 1) {
+            // Only calculate if not explicitly provided (mId is fallback for missing winners)
+            if (!mId && jNum > 1) {
                 const winners = calculateWinnerIds(jNum - 1);
                 if (winners.length > 0) {
                     mId = winners[0].mId;
                     console.log(`J${jNum}: Ganador J${jNum - 1} es ID ${mId} (${winners[0].hits} ac)`);
-                    if (data.q2 && winners.length > 1) m2Id = winners[1].mId;
-                } else if (!mId) {
+                    if (data.q2 && !m2Id && winners.length > 1) m2Id = winners[1].mId;
+                } else {
                     mId = 13; // Fallback Luismi
-                    console.warn(`J${jNum}: No se encontró ganador para J${jNum - 1}. Usando ID 13.`);
                 }
             }
 
@@ -107,7 +110,7 @@
             }
         }
 
-        console.log(`Proceso completado. Registros inyectados: ${count}`);
+        console.log(`Proceso completado. Registros nuevos inyectados: ${count}`);
         localStorage.setItem('doubles_injected_v1', 'true');
     } catch (e) {
         console.error("Error en migración de dobles:", e);
