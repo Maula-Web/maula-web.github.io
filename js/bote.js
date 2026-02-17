@@ -2341,6 +2341,7 @@ class BoteManager {
         thConcept.style.left = '0';
         thConcept.style.zIndex = '20';
         thConcept.style.background = 'var(--bote-header-bg-start, #ff9100)';
+        thConcept.style.color = '#333';
         trHead.appendChild(thConcept);
 
         evolutionData.forEach(j => {
@@ -2363,6 +2364,7 @@ class BoteManager {
             tdLabel.style.position = 'sticky';
             tdLabel.style.left = '0';
             tdLabel.style.background = 'var(--card-bg, #1a1a1a)';
+            tdLabel.style.color = '#333';
             tdLabel.style.zIndex = '15';
             tdLabel.style.borderRight = '2px solid rgba(255,145,0,0.3)';
             tr.appendChild(tdLabel);
