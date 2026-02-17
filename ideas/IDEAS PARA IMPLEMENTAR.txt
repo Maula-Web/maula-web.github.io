@@ -156,3 +156,268 @@ Si puedes acceder dime qué información reconoces y si te sirve para importar e
 En esta otra hoja: https://www.eduardolosilla.es/quiniela/ayudas/escrutinio
 tienes los resultados y los premios de manera histórica desde la jornada 1 u de temporadas pasadas pero es más dificil de obtener ya que cada jornada tiene su propio enlace. ¿Crees que puedes acceder a cada jornada e importar los datos que se guardan en esas hojas? Sería espectacular ya que aquí disponemos de toda la información necesaria para alimentar nuestra web.
 Insisto, no cambies nada de nuestra web. Sólo informame de si puedes y de qué resultados puedes obtener.
+
+
+Las vistas del bote no terminan de convencerme.
+La vista general aporta una visión de cada socio muy pobre. Dice el total de ingresos de cada uno
+
+
+
+
+QUINIELAS DE DOBLES QUE FALTAN
+
+J1
+DD 1	DD 2
+1	X
+1	
+1	X
+2	
+1	
+1	
+1	
+2	
+1	
+X	2
+X	
+1	
+X	2
+1	
+0-2
+
+J2
+DD 1	DD 2
+X	2
+1	
+2	
+1	X
+2	X
+1	
+2	
+1	X
+1	X
+2	
+1	
+1	X
+2	
+X	2
+1-1
+
+J3
+DD 1	DD 2	DD 3	DD 4
+2		X	2
+X		1	X
+X		2	
+1		1	
+1	X	X	2
+X	1	1	X
+1	X	1	
+1		1	
+1		1	
+X	1	X	
+X	1	1	X
+1	X	1	
+1		1	X
+1	X	X	2
+1-2
+
+J9
+DD 1	DD 2	DD 3	DD 4
+1	X	1	X
+X	1	1	
+1	2	1	X
+X	1	1	2
+2	X	1	
+1	X	1	X
+1		1	
+1		1	
+2		X	2
+1		1	
+1		1	
+1	X	1	X
+1		1	
+1		1	X
+0-2
+
+J11
+DD 1	DD 2
+1	2
+1	X
+1	
+1	
+2	
+X	2
+1	X
+1	
+1	
+1	X
+1	X
+X	
+1	
+X	2
+1-1
+
+J14
+DD 1	DD 2
+1	
+1	
+1	X
+1	
+X	2
+1	X
+X	2
+	2
+1	
+1	
+1	2
+1	X
+X	2
+	2
+2-2
+
+J16
+DD 1	DD 2
+X	
+1	
+1	
+2	
+1	X
+X	
+1	
+1	X
+2	
+2	
+1	X
+1	
+X	
+1	X
+1-0
+
+J17
+DD 1	DD 2
+1	X
+1	
+1	
+X	2
+2	X
+1	
+1	X
+1	X
+1	
+X	1
+2	X
+1	
+2	
+2	
+1-0
+
+J19
+DD 1	DD 2
+1	X
+1	
+1	
+1	X
+1	
+X	2
+X	2
+2	
+1	X
+X	2
+1	2
+2	
+X	
+X	
+1-M
+
+J22
+DD 1	DD 2
+1	X
+1	
+X	1
+1	
+2	
+1	
+2	X
+2	
+2	X
+X	1
+1	
+2	X
+1	X
+1	
+1-1
+
+J24
+DD 1	DD 2
+1	
+1	
+2	
+1	
+1	X
+X	2
+1	X
+2	
+X	2
+X	2
+1	
+1	
+1	2
+1	2
+1-2
+
+J26
+DD 1	DD 2
+1	X
+2	X
+2	
+X	2
+1	
+1	X
+1	
+1	
+2	
+X	
+1	
+1	
+1	
+1	
+1-1
+
+J28
+DD 1	DD 2
+1	
+X	2
+1	
+1	X
+1	
+1	2
+2	
+2	
+X	
+1	
+1	
+1	X
+1	
+X	
+1-0
+
+J32
+DD 1	DD 2
+1	X
+X	2
+X	2
+2	
+1	
+1	
+X	
+1	X
+2	1
+1	
+X	1
+1	
+1	X
+1	
+0-1
+
+
+
+
