@@ -379,8 +379,16 @@ class BoteManager {
             }
         }
 
-        // Plays doubles if won previous jornada
-        if (jornadaIndex > 0) {
+        // Plays doubles if there is a recorded pronostico_extra for this member/jornada
+        const hasExtra = this.pronosticosExtra.some(p =>
+            (String(p.jId) === String(jornada.id) || String(p.jId) === String(jornada.number)) &&
+            String(p.mId) === String(memberId)
+        );
+
+        if (hasExtra) {
+            costs.jugaDobles = true;
+        } else if (jornadaIndex > 0) {
+            // Fallback: Check if member won previous jornada (historical logic)
             const prevJornada = this.jornadas[jornadaIndex - 1];
             if (this.wasWinnerOfJornada(memberId, prevJornada)) {
                 costs.jugaDobles = true;
@@ -2254,23 +2262,11 @@ class BoteManager {
                 const numSocios = this.members.length;
 
                 // Doubles Count
-                let numDobles = 0;
-                if (jData.number > 1) {
-                    // We need to check who Played Doubles. Using 'jugaDobles' flag from movements is safest way.
-                    const doblesCount = movements.filter(m => m.jornadaNum === jData.number && m.jugaDobles).length;
-                    // Fallback if movements not populated correctly (e.g. no winner prev?)
-                    numDobles = doblesCount;
-                } else if (jData.number === 1) {
-                    // J1 might have initial doubles... usually 0 or manual.
-                    // The user mentioned J1 cost was 26.25 (19 * 0.75 + 12 = 26.25)
-                    // Let's assume J1 has 1 double if total cost suggests it.
-                    // But cleaner is to check if anyone played double.
-                    // For J1 we can assume 1 double (paid by Peña/Sponsor?) NO - Paid by Maula J0.
-                    // J1 Cost logic: (19 * 0.75) + 12 = 26.25. Yes.
-                    // So we force 1 double for J1?
-                    // Or check movements? Let's rely on movements.
-                    // IMPORTANT: J1 movements might not have 'jugaDobles' set if there is no J0 winner logic implemented yet.
-                    // Let's assume 1 double for J1 as per user feedback "cost was 26.25".
+                // We sum all members who played doubles in this jornada based on 'jugaDobles' flag
+                let numDobles = movements.filter(m => m.jornadaNum === jData.number && m.jugaDobles).length;
+
+                // Fallback for J1 if no record found (though we should have it now)
+                if (jData.number === 1 && numDobles === 0) {
                     numDobles = 1;
                 }
 
