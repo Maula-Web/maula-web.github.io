@@ -607,6 +607,10 @@ class PronosticoManager {
             closeDate.setDate(closeDate.getDate() + 2);
             closeDate.setHours(23, 59, 59);
 
+            const now = new Date();
+            const isLate = now > deadline;
+            const isLockedRef = now > closeDate;
+
             const isReduced = this.selMethod && this.selMethod.value === 'reducido';
             if (isReduced) {
                 const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
