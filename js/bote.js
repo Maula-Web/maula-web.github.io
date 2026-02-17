@@ -380,15 +380,16 @@ class BoteManager {
         }
 
         // Plays doubles if there is a recorded pronostico_extra for this member/jornada
-        const hasExtra = this.pronosticosExtra.some(p =>
-            (String(p.jId) === String(jornada.id) || String(p.jId) === String(jornada.number)) &&
-            String(p.mId) === String(memberId)
+        const matchesExtra = this.pronosticosExtra.filter(p =>
+            (String(p.jId) === String(jornada.id) || String(p.jId) === String(jornada.number))
         );
+        const hasExtra = matchesExtra.some(p => String(p.mId) === String(memberId));
 
         if (hasExtra) {
             costs.jugaDobles = true;
-        } else if (jornadaIndex > 0) {
+        } else if (matchesExtra.length === 0 && jornadaIndex > 0) {
             // Fallback: Check if member won previous jornada (historical logic)
+            // ONLY if NO extra columns are recorded for anyone in this jornada
             const prevJornada = this.jornadas[jornadaIndex - 1];
             if (this.wasWinnerOfJornada(memberId, prevJornada)) {
                 costs.jugaDobles = true;
