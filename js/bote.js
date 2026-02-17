@@ -495,7 +495,15 @@ class BoteManager {
             // User said 26.25. Maybe 19 members? 19 * 0.75 = 14.25. + 12 = 26.25.
             // So logic (numSocios * cCol) + cDob is correct IF numSocios is correct.
 
-            costs.sellado = -((numMembers * cCol) + cDob);
+            // Detection of multiple Double columns (Quinielas de dobles)
+            const extras = this.pronosticosExtra.filter(p => {
+                const pJ = String(p.jId || p.jornadaId || '');
+                return pJ === String(jornada.id) || pJ === String(jornada.number);
+            });
+            const numExtras = extras.length > 0 ? extras.length : 1;
+            const totalCDob = numExtras * cDob;
+
+            costs.sellado = -((numMembers * cCol) + totalCDob);
         }
 
         return costs;
@@ -904,15 +912,11 @@ class BoteManager {
         // INCOMES: Member Contribs + Penalties + Member Prizes + Doubles Prizes + Manual Ingresos
         const totalIngresos = movements.reduce((sum, m) => sum + (m.pennaIn || 0) + (m.ingresosManual || 0), 0);
 
-        // EXPENSES: Quiniela Costs + Repartos
+        // Calculate Expenses per Jornada (Quinielas + Dobles) using actual extra forecasts
         let totalGastosQuinielas = 0;
-
-        // Calculate Expenses per Jornada (Quinielas + Dobles)
         this.jornadas.forEach(j => {
             const played = (j.matches || []).some(m => m.result && m.result !== '');
             if (!played) return;
-
-            // Check No Sellado
             if (j.noSellado) return;
 
             const jDate = window.AppUtils.parseDate(j.date);
@@ -920,22 +924,28 @@ class BoteManager {
             const costDob = this.getHistoricalPrice('costeDobles', jDate);
             const numSocios = this.members.length;
 
-            let numDobles = 0;
-            if (j.number > 1) {
-                // Count played doubles
-                const doblesCount = movements.filter(m => m.jornadaNum === j.number && m.jugaDobles).length;
-                numDobles = doblesCount;
-            } else if (j.number === 1) {
-                // J1 assumption: 1 double
-                numDobles = 1;
-            }
+            // Count actual sealed double columns for this giornata
+            const extras = this.pronosticosExtra.filter(p => {
+                const pJ = String(p.jId || p.jornadaId || '');
+                return pJ === String(j.id) || pJ === String(j.number);
+            });
+            const numExtras = extras.length > 0 ? extras.length : 1;
 
-            totalGastosQuinielas += (numSocios * costCol) + (numDobles * costDob);
+            totalGastosQuinielas += (numSocios * costCol) + (numExtras * costDob);
         });
 
         const totalRepartos = (this.repartos || []).reduce((sum, r) => sum + (r.totalAmount || 0), 0);
         const totalGastos = totalGastosQuinielas + totalRepartos;
-        const boteTotal = totalIngresos - totalGastos - totalRepartos + this.config.boteInicial;
+
+        // Caja Real (Tesorería) = Dinero total acumulado menos gastos reales
+        const cajaReal = (this.config.boteInicial || 0) + totalIngresos - totalGastos;
+
+        // Caja Virtual (Suma de saldos de socios)
+        const totalSaldosVirtuales = this.members.reduce((sum, member) => {
+            const memberMovements = movements.filter(m => String(m.memberId) === String(member.id));
+            const saldo = memberMovements.length > 0 ? memberMovements[memberMovements.length - 1].boteAcumulado : 0;
+            return sum + saldo;
+        }, 0);
 
         // Calculate total prizes for the new card - SHOW RAW TOTAL without subtractions
         const totalPremios = movements.reduce((sum, m) => sum + (m.premios || 0) + (m.extraPrizes || 0), 0);
@@ -947,7 +957,12 @@ class BoteManager {
 
         const uniqueJornadasCount = playedJornadas.length;
 
-        document.getElementById('total-bote').textContent = boteTotal.toFixed(2) + ' €';
+        document.getElementById('total-bote').innerHTML = `
+            <div style="font-size: 1.8rem;">${cajaReal.toFixed(2)} €</div>
+            <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px;">
+                Suma Saldos: ${totalSaldosVirtuales.toFixed(2)} €
+            </div>
+        `;
         document.getElementById('total-ingresos').textContent = totalIngresos.toFixed(2) + ' €';
         document.getElementById('total-gastos').textContent = totalGastos.toFixed(2) + ' €';
         document.getElementById('total-premios').textContent = totalPremios.toFixed(2) + ' €';

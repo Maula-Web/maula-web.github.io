@@ -1,0 +1,64 @@
+He analizado a fondo el archivo Excel 20260210_Bote maula.xlsx y lo he comparado con la implementación actual de la web. Aquí tienes un resumen detallado de lo que he encontrado, las diferencias clave y mi valoración sobre si la web puede replicar este resultado.
+
+1. Estructura del Bote Oficial (Excel)
+El Excel es un sistema de "partida doble" simplificado por socio:
+
+INICIO (Columna G): Saldo inicial de cada socio (arrastrado de periodos anteriores o aportaciones iniciales).
+SUMA / INGRESOS (Columna H): Incluye la aportación periódica (fija de 50€ en muchos casos) más premios históricos o ingresos extra.
+RESTA / GASTOS (Columna I): Refleja lo que el socio ha "gastado" del bote (sellados de quinielas, penalizaciones).
+BOTE ACTUAL (Columna F): Resultado de SUMA - RESTA.
+Gestión por Jornadas (Columnas K en adelante): Cada jornada tiene dos sub-columnas: el coste del sellado asignado a ese socio y un número que parece ser el recuento de aciertos.
+2. Diferencias y Desafíos para la Web
+Lo que la web YA hace bien:
+Cálculo de Penalizaciones: La web ya calcula automáticamente los 0.10€, 0.20€, etc., según el número de "unos". En el Excel, veo que estas penalizaciones se suman manualmente en la columna de ingresos/gastos.
+Detección de Premios: La web ya importa premios de fuentes externas.
+Lo que falta o difiere (Diferencias Críticas):
+1. El "Fondo Inicial" y Aportaciones Manuales:
+
+En el Excel, cada socio tiene un saldo inicial (INICIO). En la web, el sistema asume que el bote empieza de cero o se alimenta de premios.
+Diferencia: El Excel usa fórmulas como =G19 + 30 + 38.25 + 38.25 + 50 + ... para registrar aportaciones de 50€ o ingresos por premios. En la web, deberíamos implementar un sistema de "Ingresos Manuales" para que el administrador pueda cargar esos 50€ periódicos de cada socio.
+2. Asignación del Coste del Sellado:
+
+En el Excel, cada jornada el coste del sellado (ej. 26.25€) se le resta a un socio específico (supongo que es el socio que ese día "paga" la quiniela común).
+Diferencia: Nuestra web actualmente reparte o visualiza los gastos de forma general. Para replicar el Excel, la web necesita saber qué socio es el responsable del sellado de la quiniela de dobles de cada jornada para restárselo de su "bolsa" individual.
+3. Repartos (Devoluciones):
+
+He visto que en el Excel hay una columna ? (Columna J) que suma muchísimas celdas. Parece ser un registro histórico de movimientos.
+Diferencia: En la web, el concepto de "Reparto" (devolver dinero del bote a los socios) está planteado pero no vinculado tan directamente a una resta del saldo individual de forma automática como lo hace tu fórmula de la columna J.
+3. Conclusiones y Preguntas
+¿Se puede replicar el resultado? Sí, pero con ajustes. Para que la web dé el mismo número que tu columna "BOTE" (Columna F), el funcionamiento debería ser:
+
+
+Cargar el Saldo Inicial: Necesitamos una función para establecer el saldo de cada socio a fecha X.
+Registrar la Aportación: Cuando un socio paga sus 50€, hay que "inyectarlos" en su saldo en la web.
+Vincular el Gasto del Sellado: Al guardar la quiniela de dobles, indicar: "Esta quiniela la paga [Socio X]". Esto restaría automáticamente los 26.25€ (o lo que corresponda) de su saldo.
+Dudas para entender mejor el Excel:
+
+Columna J (?): Veo que la fórmula es una suma gigantesca de celdas alternas (K3+M3+O3...). ¿Esto representa el total de dinero que ese socio ha aportado para sellar quinielas a lo largo del tiempo?
+Celdas con nombres (Fila 23): Veo nombres como LUIS, MART, MPM debajo de los totales de cada jornada. ¿Confirma esto que ese socio es el que "ha pagado" el sellado de esa jornada específica?
+Valores negativos: He visto que Juanjo (JJO) tiene un inicio de -6.10€. ¿La web debería permitir saldos negativos (deuda con la peña)?
+La web actual es muy buena calculando lo que debería pasar (puntos, penalizaciones), pero el Excel es tu libro contable de lo que ha pasado con el dinero real. Para unirlos, el siguiente paso sería fortalecer el módulo de "Movimientos de Saldo Individual".
+
+¿Te gustaría que profundice en alguna de estas partes o que diseñe cómo se vería la carga de saldos iniciales en la web?
+
+
+
+
+
+
+
+RESPUESTA
+
+Creo recordar que el saldo inicial te lo pasé para que lo inyectaras en los datos de la web. De hecho si te fijas el saldo de la J1 en la web coincide si le restas el coste del sellado de cada columna para cada socio (Compruebalo)
+
+Las aportaciones manuales, es verdad que faltan, pero el sistema para informarlas ya está implementado en el botón Registrar Ingreso (Comprueba si funcionarían igual que en el Excel).
+
+Dices que en el excel se resta el sellado del bote de cada socio. No consigo ver esa resta (Explicamela)
+
+Lo que dices de la columna J es correcto
+
+La fila 23 con nombres de socios representa el socio que sella la jornada. Recuerda que el dinero del sellado sale del bote de la Peña (Compruebalo en el Excel y revisa diferencias con web).
+
+Los valores negativos se permiten. Normalmente los socios regularizan la situación muy rápidamente.
+
+Explica lo de fortalecer el módulo de movimientos de saldo individual.
