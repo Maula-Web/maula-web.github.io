@@ -2242,71 +2242,59 @@ class BoteManager {
         const evolutionData = [];
 
         // Sort jornadas
-        const sortedJornadas = Object.values(jornadasMap).sort((a, b) => a.number - b.number);
+        const sortedJornadas = Object.values(jornadasMap).sort((a, b) => {
+            const numA = parseInt(a.number);
+            const numB = parseInt(b.number);
+            return numA - numB;
+        });
 
-        sortedJornadas.forEach(jData => {
+        sortedJornadas.forEach((jData, idx) => {
             jData.boteInicial = currentBote;
 
             const jDate = window.AppUtils.parseDate(jData.date);
-            const jornadaObj = this.jornadas.find(j => j.number === jData.number);
+            const jNum = parseInt(jData.number);
+            const jornadaObj = this.jornadas.find(j => parseInt(j.number) === jNum);
 
             if (jornadaObj && jornadaObj.noSellado) {
                 jData.costeQuinielas = 0;
             } else {
-                // Re-calculate costs accurately (Coste Quinielas)
-                // It equals: (Nº Socios Pagadores + Nº Socios Exentos) * Coste Columna + (Nº Socios Ganadores prev) * Coste Doble
-                // Assuming ALL active members play every jornada.
-                // Coste Columna is per member.
-
                 const costCol = this.getHistoricalPrice('costeColumna', jDate);
                 const costDob = this.getHistoricalPrice('costeDobles', jDate);
                 const numSocios = this.members.length;
 
-                // Doubles Count
-                // We sum all members who played doubles in this jornada based on 'jugaDobles' flag
-                let numDobles = movements.filter(m => m.jornadaNum === jData.number && m.jugaDobles).length;
+                // Doubles Count - Count members who played doubles columns in this jornada
+                const numDobles = movements.filter(m => parseInt(m.jornadaNum) === jNum && m.jugaDobles).length;
 
-                // Fallback for J1 if no record found (though we should have it now)
-                if (jData.number === 1 && numDobles === 0) {
-                    numDobles = 1;
-                }
+                // Fallback for J1 if no record found (ensure at least 1)
+                const effectiveNumDobles = (jNum === 1 && numDobles === 0) ? 1 : numDobles;
 
-                // Total Cost for this Jornada (Quinielas + Dobles)
-                const totalCost = (numSocios * costCol) + (numDobles * costDob);
-                jData.costeQuinielas = totalCost;
+                jData.costeQuinielas = (numSocios * costCol) + (effectiveNumDobles * costDob);
             }
 
-            // Repartos Logic
-            const prevJornada = sortedJornadas.find(j => j.number === jData.number - 1);
-            const prevDate = prevJornada ? window.AppUtils.parseDate(prevJornada.date) : new Date(0);
-            const currDate = window.AppUtils.parseDate(jData.date);
-            // Fix: If jDate parsing fails, assume order is correct
+            // Repartos Logic - Use index-based previous jornada to avoid gaps and duplicate counting
+            const prevJornada = idx > 0 ? sortedJornadas[idx - 1] : null;
+            const prevDate = prevJornada ? (window.AppUtils.parseDate(prevJornada.date) || new Date(0)) : new Date(0);
+            const currDate = jDate || new Date(0);
 
             const repartosInPeriod = this.repartos.filter(r => {
                 const rDate = new Date(r.date);
-                // Include repartos "up to" this jornada date that haven't been counted?
-                // Loose matching: if rDate is <= currDate and > prevDate
+                if (isNaN(rDate.getTime())) return false;
+
+                // If it's the first jornada, include all previous repartos
+                if (idx === 0) {
+                    return rDate <= currDate;
+                }
+                // Otherwise, include repartos between previous and current jornada
                 return rDate > prevDate && rDate <= currDate;
             });
-            const totalRepartos = repartosInPeriod.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
-            jData.repartos = totalRepartos;
 
-            // Bote Final Formula
-            // Bote Final = Inicial + Aportaciones + Penalizaciones + Premios + IngresosManuales - CosteQuinielas - Repartos
+            jData.repartos = repartosInPeriod.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
 
             // Calculate Manual Ingresos for this Jornada
             const manualIngresosJ = movements
-                .filter(m => m.jornadaNum === jData.number)
+                .filter(m => parseInt(m.jornadaNum) === jNum)
                 .reduce((sum, m) => sum + (m.ingresosManual || 0), 0);
 
-            // We can add it to 'aportaciones' for display or keep separate?
-            // User view has: Aportaciones, Penalizaciones, Premios...
-            // It might be better to sum it with Aportaciones or add a row.
-            // Let's add it to Aportaciones to keep table simple, or create 'Ingresos Extra'.
-            // Given the table columns: Aportaciones Socios.
-            // Let's add it to Aportaciones but maybe Rename label?
-            // "Aportaciones Socios" usually means the 1.50.
-            // Let's add it to a new field 'ingresosExtra' in jData and add a row in the table.
             jData.ingresosExtra = manualIngresosJ;
 
             const ingresosJ = jData.aportaciones + jData.penalizaciones + jData.premios + jData.ingresosExtra;
