@@ -123,6 +123,9 @@ class BoteManager {
 
         // Load repartos
         this.repartos = await window.DataService.getAll('repartos') || [];
+
+        // Load cierres vuelta (penalizaciones clasificacion)
+        this.cierresVuelta = await window.DataService.getAll('cierres_vuelta') || [];
     }
 
     async loadConfig() {
@@ -197,7 +200,8 @@ class BoteManager {
             // Combinar jornadas y repartos en una línea de tiempo
             const timeline = [
                 ...this.jornadas.map(j => ({ type: 'jornada', date: j.date, data: j })),
-                ...this.repartos.map(r => ({ type: 'reparto', date: r.date, data: r }))
+                ...this.repartos.map(r => ({ type: 'reparto', date: r.date, data: r })),
+                ...this.cierresVuelta.map(c => ({ type: 'cierre_vuelta', date: c.date, data: c }))
             ].sort((a, b) => {
                 const dA = window.AppUtils.parseDate(a.date) || new Date(0);
                 const dB = window.AppUtils.parseDate(b.date) || new Date(0);
@@ -288,6 +292,22 @@ class BoteManager {
                                 isReparto: true
                             });
                         }
+                    }
+                } else if (event.type === 'cierre_vuelta') {
+                    const c = event.data;
+                    const penaltyForMember = (c.penalizaciones || {})[member.id] || 0;
+                    if (penaltyForMember > 0) {
+                        boteAcumulado -= penaltyForMember;
+                        movements.push({
+                            type: 'cierre_vuelta',
+                            memberId: member.id,
+                            memberName: window.AppUtils.getMemberName(member),
+                            date: c.date,
+                            description: c.tipo === 'primera_vuelta' ? 'Penalización 1ª Vuelta' : 'Penalización Fin de Temporada',
+                            neto: -penaltyForMember,
+                            boteAcumulado: boteAcumulado,
+                            isCierreVuelta: true
+                        });
                     }
                 }
             });
@@ -2472,7 +2492,280 @@ class BoteManager {
         }
     }
 
+    // --- NEW: PENALIZACIONES DE CLASIFICACIÓN (CIERRES VUELTA) ---
 
+    openCierreVueltaModal() {
+        const modal = document.getElementById('modal-cierre-vuelta');
+        if (modal) modal.style.display = 'block';
+
+        // Popule list of journeys
+        const selectJ = document.getElementById('cierre-jornada-id');
+        if (selectJ) {
+            selectJ.innerHTML = '';
+            this.jornadas.forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j.id;
+                const d = window.AppUtils.parseDate(j.date);
+                const dStr = isNaN(d) ? '' : d.toLocaleDateString();
+                opt.textContent = `Jornada ${j.number}` + (dStr ? ` (${dStr})` : '');
+                selectJ.appendChild(opt);
+            });
+        }
+
+        // Set date to today
+        const fechaInput = document.getElementById('cierre-fecha');
+        if (fechaInput) fechaInput.valueAsDate = new Date();
+
+        this.showNuevaPenalizacionVueltaForm();
+    }
+
+    showNuevaPenalizacionVueltaForm() {
+        const panelNueva = document.getElementById('panel-nueva-penalizacion');
+        const panelHist = document.getElementById('panel-historico-penalizaciones');
+        const preview = document.getElementById('preview-cierre-container');
+
+        if (panelNueva) panelNueva.style.display = 'block';
+        if (panelHist) panelHist.style.display = 'none';
+        if (preview) preview.style.display = 'none';
+    }
+
+    loadHistoricoPenalizacionesVuelta() {
+        const panelNueva = document.getElementById('panel-nueva-penalizacion');
+        const panelHist = document.getElementById('panel-historico-penalizaciones');
+
+        if (panelNueva) panelNueva.style.display = 'none';
+        if (panelHist) panelHist.style.display = 'block';
+
+        const content = document.getElementById('historico-cierre-content');
+        if (!content) return;
+
+        if (!this.cierresVuelta || this.cierresVuelta.length === 0) {
+            content.innerHTML = '<p>No hay penalizaciones registradas.</p>';
+            return;
+        }
+
+        let html = '<table class="detail-table"><thead><tr><th>Fecha</th><th>Tipo</th><th>Jornada Límite</th><th>Total Retenido</th><th>Acciones</th></tr></thead><tbody>';
+
+        this.cierresVuelta.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(c => {
+            const total = Object.values(c.penalizaciones || {}).reduce((sum, v) => sum + v, 0);
+            const d = window.AppUtils.parseDate(c.date);
+            const dStr = isNaN(d) ? c.date : d.toLocaleDateString();
+
+            html += `<tr>
+                <td>${dStr}</td>
+                <td>${c.tipo === 'primera_vuelta' ? 'Primera Vuelta' : 'Fin Temporada'}</td>
+                <td>J${c.jornadaNum}</td>
+                <td><span style="color:#f44336; font-weight:bold;">${total.toFixed(2)} €</span></td>
+                <td><button class="btn-action" style="background:#f44336;" onclick="window.Bote.deleteCierreVuelta('${c.id}')">Eliminar</button></td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        content.innerHTML = html;
+    }
+
+    async deleteCierreVuelta(id) {
+        if (!confirm('¿Estás seguro de eliminar este registro? Al eliminarlo, se reintegrarán automáticamente todas las penalizaciones a los botes de los socios correspondientes.')) return;
+        try {
+            await window.DataService.delete('cierres_vuelta', id);
+            this.cierresVuelta = this.cierresVuelta.filter(c => c.id !== id);
+            this.loadHistoricoPenalizacionesVuelta();
+            this.render();
+            alert('Registro eliminado correctamente.');
+        } catch (e) { console.error(e); alert('Error al eliminar'); }
+    }
+
+    calcularClasificacionHasta(jornadaId) {
+        const jIdx = this.jornadas.findIndex(j => j.id === jornadaId);
+        if (jIdx === -1) return [];
+
+        // Inicializa estadísticas por socio
+        const stats = this.members.map(m => ({
+            id: m.id,
+            name: window.AppUtils.getMemberName(m),
+            puntos: 0,
+            ganadas: 0,
+            perdidas: 0
+        }));
+
+        // Simula la temporada hasta esa jornada
+        for (let i = 0; i <= jIdx; i++) {
+            const j = this.jornadas[i];
+
+            const matchesWithResult = (j.matches || []).filter(match => match.result && String(match.result).trim() !== '' && String(match.result).toLowerCase() !== 'por definir');
+            if (matchesWithResult.length === 0) continue;
+
+            stats.forEach(s => {
+                const isWin = this.wasWinnerOfJornada(s.id, j);
+                const isLoss = this.wasLoserOfJornada(s.id, j);
+                if (isWin) s.ganadas++;
+                if (isLoss) s.perdidas++;
+
+                const pronostico = this.pronosticos.find(p => (String(p.jId) === String(j.id) || String(p.jornadaId) === String(j.id)) && (String(p.mId) === String(s.id) || String(p.memberId) === String(s.id)));
+                if (pronostico) {
+                    const sel = pronostico.selection || pronostico.forecast;
+                    const aciertos = this.calculateAciertos(j.matches, sel);
+                    s.puntos += this.calculatePoints(aciertos, pronostico);
+                }
+            });
+        }
+
+        // Orden descendente por puntos. Si hay empate, por (ganadas - perdidas). Si persiste, por (ganadas).
+        stats.sort((a, b) => {
+            if (b.puntos !== a.puntos) return b.puntos - a.puntos;
+            const difA = a.ganadas - a.perdidas;
+            const difB = b.ganadas - b.perdidas;
+            if (difB !== difA) return difB - difA;
+            return b.ganadas - a.ganadas;
+        });
+
+        return stats;
+    }
+
+    previewCierreVuelta() {
+        const jIdSelect = document.getElementById('cierre-jornada-id');
+        if (!jIdSelect) return;
+        const jId = jIdSelect.value;
+
+        if (!jId) { alert('Selecciona una jornada límite'); return; }
+
+        const stats = this.calcularClasificacionHasta(jId);
+
+        // Tabla de baremos definida por la directiva
+        const penaltiesMap = [0, 0.50, 1.00, 1.40, 1.70, 1.90, 2.20, 2.40, 2.60, 2.80, 3.00];
+
+        // Asignación de rangos (teniendo en cuenta los empates efectivos)
+        let currentRank = 1;
+        stats.forEach((s, i) => {
+            if (i > 0) {
+                const prev = stats[i - 1];
+                if (prev.puntos === s.puntos && (prev.ganadas - prev.perdidas) === (s.ganadas - s.perdidas) && prev.ganadas === s.ganadas) {
+                    s.rank = prev.rank; // Empate total en los 3 criterios
+                } else {
+                    s.rank = currentRank;
+                }
+            } else {
+                s.rank = currentRank;
+            }
+            currentRank++;
+            s.rawRank = i + 1;
+        });
+
+        const N = stats.length;
+        this.currentPreviewCierre = {};
+
+        // Agrupación de empates para prorratear
+        const grouped = {};
+        stats.forEach(s => {
+            if (!grouped[s.rank]) grouped[s.rank] = [];
+            grouped[s.rank].push(s);
+        });
+
+        let positionPointer = 1;
+        for (const r in grouped) {
+            const group = grouped[r];
+            const size = group.length;
+
+            let totalPenaltyGroup = 0;
+            for (let k = 0; k < size; k++) {
+                const pos = positionPointer + k;
+                let penL = 0;
+
+                if (pos === 1) penL = 0;
+                else if (pos >= 2 && pos <= 11) penL = penaltiesMap[pos - 1];
+                else if (pos === N) penL = 5.00; // Último
+                else if (pos === N - 1) penL = 4.50; // Penúltimo
+                else if (pos === N - 2) penL = 4.00; // Antepenúltimo
+                else {
+                    // Desde el 12º hasta anterior al antepenúltimo (N-3)
+                    if (N > 23 && pos >= 20) {
+                        penL = 3.90;
+                    } else {
+                        penL = 3.10 + (pos - 12) * 0.10;
+                    }
+                }
+                totalPenaltyGroup += penL;
+            }
+
+            // "Si persiste el empate se pagará a medias" (Se suma el castigo de todas las posiciones bloqueadas y se divide)
+            const sharedPenalty = (size > 0) ? (totalPenaltyGroup / size) : 0;
+
+            group.forEach(s => {
+                s.penalty = sharedPenalty;
+                this.currentPreviewCierre[s.id] = sharedPenalty;
+            });
+
+            positionPointer += size;
+        }
+
+        // Render HTML Preview
+        let html = '<table class="detail-table"><thead><tr><th>Posición</th><th>Socio</th><th>Pts</th><th>G</th><th>P</th><th>Dif</th><th>Penalización</th></tr></thead><tbody>';
+
+        stats.forEach(s => {
+            const dif = s.ganadas - s.perdidas;
+            html += `<tr>
+                <td><b>${s.rank}º</b></td>
+                <td>${s.name}</td>
+                <td>${s.puntos}</td>
+                <td>${s.ganadas}</td>
+                <td>${s.perdidas}</td>
+                <td>${dif > 0 ? '+' : ''}${dif}</td>
+                <td style="color: ${s.penalty > 0 ? '#f44336' : '#4CAF50'}; font-weight: bold;">
+                    ${s.penalty > 0 ? '-' + s.penalty.toFixed(2) + ' €' : 'EXENTO'}
+                </td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+
+        const wrapper = document.getElementById('cierre-preview-table-wrapper');
+        const container = document.getElementById('preview-cierre-container');
+        if (wrapper) wrapper.innerHTML = html;
+        if (container) container.style.display = 'block';
+    }
+
+    async submitCierreVuelta(event) {
+        event.preventDefault();
+
+        if (!this.currentPreviewCierre || Object.keys(this.currentPreviewCierre).length === 0) {
+            alert('Por favor, primero previsualiza para calcular las retenciones.');
+            return;
+        }
+
+        const tipoSelect = document.getElementById('cierre-tipo');
+        const jIdSelect = document.getElementById('cierre-jornada-id');
+        const fechaInput = document.getElementById('cierre-fecha');
+
+        if (!tipoSelect || !jIdSelect || !fechaInput) return;
+
+        const tipo = tipoSelect.value;
+        const jornadaId = jIdSelect.value;
+        const fecha = fechaInput.value;
+        const jornadaObj = this.jornadas.find(j => j.id === jornadaId);
+
+        const record = {
+            id: 'cierre_clasif_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+            tipo: tipo,
+            jornadaId: jornadaId,
+            jornadaNum: jornadaObj ? jornadaObj.number : '?',
+            date: fecha,
+            penalizaciones: this.currentPreviewCierre,
+            temporada: this.config.temporadaActual || '2025-2026'
+        };
+
+        try {
+            await window.DataService.save('cierres_vuelta', record);
+            if (!this.cierresVuelta) this.cierresVuelta = [];
+            this.cierresVuelta.push(record);
+
+            this.closeModal('modal-cierre-vuelta');
+            this.render(); // Recalculate whole table
+            alert('Penalizaciones aplicadas de forma exitosa. Se han restado los importes automáticamente del saldo en la Tabla General.');
+        } catch (e) {
+            console.error(e);
+            alert('Error crítico al conectar con la base de datos.');
+        }
+    }
+
+    // --- END NEW ---
 
     showReducedBreakdown(memberId, jId) {
         const p = this.pronosticosExtra.find(x => String(x.mId || x.memberId) === String(memberId) && String(x.jId || x.jornadaId) === String(jId));
