@@ -166,8 +166,8 @@ class BoteManager {
 
         const initialBalances = {
             'Alvaro': 15, 'Carlos': 8.5, 'David Buzón': 56.29, 'Edu': 2, 'Emilio': 41.13,
-            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.30,
-            'Valdi': 2.30, 'Javi Mora': 57.88, 'Juan Antonio': 17.9, 'Juanjo': -6.1, 'Luismi': 24.75,
+            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.00,
+            'Valdi': 2.00, 'Javi Mora': 57.88, 'Juan Antonio': 17.90, 'Juanan': 17.90, 'Juanjo': -6.1, 'Luismi': 24.75,
             'Marcelo': 0, 'Martin': 15.1, 'Rafa': 4.45, 'Ramon': 2, 'Raul Romera': 8.95,
             'Samuel': 1.5
         };
@@ -1660,6 +1660,11 @@ class BoteManager {
         }
     }
 
+    toggleExcelTheme() {
+        this.useExcelTheme = !this.useExcelTheme;
+        this.render();
+    }
+
     /**
      * Render Excel View (Detailed History matching the legacy spreadsheet)
      */
@@ -1688,8 +1693,8 @@ class BoteManager {
         // Calculate Initial Botes correctly (since calculateMovements starts over)
         const initialBalances = {
             'Alvaro': 15, 'Carlos': 8.5, 'David Buzón': 56.29, 'Edu': 2, 'Emilio': 41.13,
-            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.30,
-            'Valdi': 2.30, 'Javi Mora': 57.88, 'Juan Antonio': 17.9, 'Juanjo': -6.1, 'Luismi': 24.75,
+            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.00,
+            'Valdi': 2.00, 'Javi Mora': 57.88, 'Juan Antonio': 17.90, 'Juanan': 17.90, 'Juanjo': -6.1, 'Luismi': 24.75,
             'Marcelo': 0, 'Martin': 15.1, 'Rafa': 4.45, 'Ramon': 2, 'Raul Romera': 8.95,
             'Samuel': 1.5
         };
@@ -1756,48 +1761,75 @@ class BoteManager {
             }
         });
 
+        const t = this.useExcelTheme;
+
+        // Theme Definitions
+        const hBg1 = t ? '#1E8449' : 'var(--bote-header-bg-start, #ff9100)';
+        const hBg2 = t ? '#1E8449' : 'var(--bote-header-bg-end, #ff6600)';
+        const subH1 = t ? '#27AE60' : '#2a2a2a';
+        const subH2 = t ? '#27AE60' : '#333';
+        const txtMain = t ? '#000' : '#fff';
+        const txtJ = t ? '#fff' : '#ff9100';
+
+        const bgSellados = t ? '#fff' : '#1a1a1a';
+        const bgName = t ? '#FEF9E7' : '#222';
+        const bgPeach = t ? '#FADBD8' : 'transparent';
+        const bgPurple = t ? '#E8DAEF' : 'transparent';
+        const bgBlueRow = t ? '#D6EAF8' : 'rgba(40,40,40,0.8)';
+
+        const cG = t ? '#117a65' : '#4caf50';
+        const cP = t ? '#c0392b' : '#f44336';
+
+        const borderC = t ? '#bdc3c7' : '#555';
+
         // Start HTML building
         let html = `
-        <div style="overflow-x: auto; max-width: 100%; border-radius: 8px; background: rgba(20,20,20,0.9); padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <p style="margin:0; opacity:0.8;">Réplica de ordenamiento y matriz de la hoja de cálculo de gestión histórica.</p>
+            <button class="btn-action" style="background: ${t ? '#2C3E50' : '#1E8449'}; color: white; padding: 6px 12px; border-radius: 4px; border:none; cursor:pointer;" onclick="window.Bote.toggleExcelTheme()">
+                ${t ? '🌙 Cambiar a Tema Oscuro' : '🟢 Cambiar a Colores Excel'}
+            </button>
+        </div>
+        <div style="overflow-x: auto; max-width: 100%; border-radius: 8px; background: ${t ? '#ecf0f1' : 'rgba(20,20,20,0.9)'}; padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
             <table class="bote-table" style="min-width: 2000px; font-size: 0.85rem; border-collapse: separate; border-spacing: 0;">
                 <thead>
-                    <tr style="background: var(--cuadrante-header-bg); color: white;">
+                    <tr style="background: ${hBg1}; color: white;">
                         <!-- Static Columns Header -->
-                        <th style="position: sticky; top:0; left: 0; z-index: 30; background: var(--bote-header-bg-start, #ff9100);">Sellados</th>
-                        <th style="position: sticky; top:0; left: 100px; z-index: 30; background: var(--bote-header-bg-start, #ff9100);">G</th>
-                        <th style="position: sticky; top:0; left: 140px; z-index: 30; background: var(--bote-header-bg-start, #ff9100);">P</th>
-                        <th style="position: sticky; top:0; left: 180px; z-index: 30; background: var(--bote-header-bg-start, #ff9100); border-right: 2px solid #fff; min-width: 150px;">Nombre</th>
-                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100);">Bote Inicial</th>
-                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100);">SUMA</th>
-                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100);">RESTA</th>
-                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100); border-right: 2px solid #fff;">Bote Final</th>
+                        <th style="position: sticky; top:0; left: 0; z-index: 30; background: ${hBg1};">Sellados</th>
+                        <th style="position: sticky; top:0; left: 100px; z-index: 30; background: ${hBg1};">G</th>
+                        <th style="position: sticky; top:0; left: 140px; z-index: 30; background: ${hBg1};">P</th>
+                        <th style="position: sticky; top:0; left: 180px; z-index: 30; background: ${hBg1}; border-right: 2px solid ${t ? '#117a65' : '#fff'}; min-width: 150px;">Nombre</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: ${hBg1};">Bote Inicial</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: ${hBg1};">SUMA</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: ${hBg1};">RESTA</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: ${hBg1}; border-right: 2px solid ${t ? '#117a65' : '#fff'};">Bote Final</th>
         `;
 
         // Iteration for Jornadas Header Dates
         jListPlayed.forEach(j => {
             const d = window.AppUtils.parseDate(j.date);
             const dStr = isNaN(d) ? '?' : d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
-            html += `<th colspan="2" style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-end, #ff6600); border-right: 1px solid rgba(255,255,255,0.2); text-align: center;">${dStr}</th>`;
+            html += `<th colspan="2" style="position: sticky; top:0; z-index: 20; background: ${hBg2}; border-right: 1px solid ${borderC}; text-align: center;">${dStr}</th>`;
         });
 
         html += `
                     </tr>
-                    <tr style="background: #2a2a2a;">
-                        <th style="position: sticky; top: 40px; left: 0; z-index: 29; background: #2a2a2a;"></th>
-                        <th style="position: sticky; top: 40px; left: 100px; z-index: 29; background: #2a2a2a;"></th>
-                        <th style="position: sticky; top: 40px; left: 140px; z-index: 29; background: #2a2a2a;"></th>
-                        <th style="position: sticky; top: 40px; left: 180px; z-index: 29; background: #2a2a2a; border-right: 2px solid #555;"></th>
-                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a;"></th>
-                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a;"></th>
-                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a;"></th>
-                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a; border-right: 2px solid #555;"></th>
+                    <tr style="background: ${subH1};">
+                        <th style="position: sticky; top: 40px; left: 0; z-index: 29; background: ${subH1};"></th>
+                        <th style="position: sticky; top: 40px; left: 100px; z-index: 29; background: ${subH1};"></th>
+                        <th style="position: sticky; top: 40px; left: 140px; z-index: 29; background: ${subH1};"></th>
+                        <th style="position: sticky; top: 40px; left: 180px; z-index: 29; background: ${subH1}; border-right: 2px solid ${borderC};"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH1};"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH1};"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH1};"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH1}; border-right: 2px solid ${borderC};"></th>
         `;
 
         // Sub Headers for Jornadas
         jListPlayed.forEach(j => {
             html += `
-                        <th style="position: sticky; top: 40px; z-index: 10; background: #333; color: #ff9100; text-align: center;">J${j.number}</th>
-                        <th style="position: sticky; top: 40px; z-index: 10; background: #333; color: #ff9100; border-right: 1px solid #555; text-align: center;">Ac.</th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH2}; color: ${txtJ}; text-align: center;">J${j.number}</th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH2}; color: ${txtJ}; border-right: 1px solid ${borderC}; text-align: center;">Ac.</th>
             `;
         });
 
@@ -1823,31 +1855,34 @@ class BoteManager {
 
         Object.values(memberData).sort((a, b) => getOrderIdx(a.name) - getOrderIdx(b.name)).forEach(md => {
             const sFinal = md.boteFinal.toFixed(2);
-            const colorSaldo = parseFloat(sFinal) < 0 ? '#f44336' : (parseFloat(sFinal) > 0 ? '#4caf50' : '#fff');
+            let colorSaldo = parseFloat(sFinal) < 0 ? cP : (parseFloat(sFinal) > 0 ? cG : (t ? '#000' : '#fff'));
+            if (t) colorSaldo = '#000'; // En excel los saldos son negros normales
+
+            const cellTextCol = t ? '#000' : '#fff';
 
             html += `
-                    <tr style="background: rgba(40,40,40,0.8);">
-                        <td style="position: sticky; left: 0; z-index: 5; background: #1a1a1a; font-size:0.75rem; color:#888;">${md.sellados.join(', ')}</td>
-                        <td style="position: sticky; left: 100px; z-index: 5; background: #1a1a1a; font-weight: bold; color:#4caf50;">${md.ganadas}</td>
-                        <td style="position: sticky; left: 140px; z-index: 5; background: #1a1a1a; font-weight: bold; color:#f44336;">${md.perdidas}</td>
-                        <td style="position: sticky; left: 180px; z-index: 5; background: #222; font-weight: bold; border-right: 2px solid #555;">${md.name}</td>
+                    <tr style="background: ${bgBlueRow}; color: ${txtMain};">
+                        <td style="position: sticky; left: 0; z-index: 5; background: ${bgSellados}; font-size:0.75rem; color:${t ? '#555' : '#888'}; border-bottom: 1px solid ${borderC};">${md.sellados.join(', ')}</td>
+                        <td style="position: sticky; left: 100px; z-index: 5; background: ${bgSellados}; font-weight: bold; color:${cG}; border-bottom: 1px solid ${borderC};">${md.ganadas}</td>
+                        <td style="position: sticky; left: 140px; z-index: 5; background: ${bgSellados}; font-weight: bold; color:${cP}; border-bottom: 1px solid ${borderC};">${md.perdidas}</td>
+                        <td style="position: sticky; left: 180px; z-index: 5; background: ${bgName}; font-weight: bold; border-right: 2px solid ${borderC}; border-bottom: 1px solid ${borderC}; color: ${cellTextCol};">${md.name}</td>
                         
-                        <td style="text-align: right;">${md.boteInicial.toFixed(2)}</td>
-                        <td style="text-align: right; color:#4caf50;">${md.ingresos.toFixed(2)}</td>
-                        <td style="text-align: right; color:#f44336;">${md.gastos.toFixed(2)}</td>
-                        <td style="text-align: right; border-right: 2px solid #555; font-weight:bold; color:${colorSaldo};">${sFinal}</td>
+                        <td style="text-align: right; background: ${bgPeach}; color: ${cellTextCol}; border-bottom: 1px solid ${borderC};">${md.boteInicial.toFixed(2)}</td>
+                        <td style="text-align: right; background: ${bgPeach}; color:${cG}; border-bottom: 1px solid ${borderC};">${md.ingresos.toFixed(2)}</td>
+                        <td style="text-align: right; background: ${bgPeach}; color:${cP}; border-bottom: 1px solid ${borderC};">${md.gastos.toFixed(2)}</td>
+                        <td style="text-align: right; border-right: 2px solid ${borderC}; font-weight:bold; background: ${bgPurple}; color:${colorSaldo}; border-bottom: 1px solid ${borderC};">${sFinal}</td>
             `;
 
             jListPlayed.forEach(j => {
                 const cost = md.jornadaCosts[j.number] !== undefined ? md.jornadaCosts[j.number].toFixed(2) : '-';
                 const hits = md.jornadaHits[j.number] !== undefined ? md.jornadaHits[j.number] : '-';
 
-                let textColor = cost !== '-' && parseFloat(cost) > 0 ? '#f44336' : '#9e9e9e';
-                if (cost === '0.00') textColor = '#9e9e9e';
+                let textColor = cost !== '-' && parseFloat(cost) > 0 ? cP : (t ? '#555' : '#9e9e9e');
+                if (cost === '0.00') textColor = (t ? '#555' : '#9e9e9e');
 
                 html += `
-                        <td style="text-align: right; color: ${textColor};">${cost !== '-' ? cost : ''}</td>
-                        <td style="text-align: center; border-right: 1px solid #555; color: #ff9100; font-weight: bold;">${hits !== '-' ? hits : ''}</td>
+                        <td style="text-align: right; color: ${textColor}; border-bottom: 1px solid ${borderC};">${cost !== '-' ? cost : ''}</td>
+                        <td style="text-align: center; border-right: 1px solid ${borderC}; color: ${txtJ}; font-weight: bold; border-bottom: 1px solid ${borderC}; background: ${t ? '#fff' : 'transparent'};">${hits !== '-' ? hits : ''}</td>
                 `;
             });
 
@@ -1861,12 +1896,21 @@ class BoteManager {
 
         // Filas del Cuadrante Inferior:
         const labels = ['TOTAL RECAUDACIÓN', 'GASTO TOTAL SELLADO', 'PREMIOS JORNADA', 'BOTE JORNADA'];
-        const colors = ['#fff', '#f44336', '#4caf50', '#ff9100'];
+
+        const footColorsT = ['#FADBD8', '#FADBD8', '#FCF3CF', '#D5F5E3']; // Colores Excel (peach, peach, yellow, green)
+        const footTextT = ['#d35400', '#c0392b', '#d4ac0d', '#27ae60'];
+
+        const footColorsFalse = ['#222', '#222', '#222', '#222']; // Colores Dark Mode
+        const footTextFalse = ['#fff', '#f44336', '#4caf50', '#ff9100'];
 
         labels.forEach((label, i) => {
-            html += `<tr style="background: rgba(40,40,40,1);">
-                <td colspan="7" style="position: sticky; left: 0; z-index: 5; text-align: right; font-weight: bold; color: ${colors[i]}; background: #222; border-right: 2px solid #555;">${label}</td>
-                <td style="border-right: 2px solid #555; background: #222;"></td>`;
+            const rowBg = t ? footColorsT[i] : 'rgba(40,40,40,1)';
+            const stickyBg = t ? footColorsT[i] : '#222';
+            const textC = t ? footTextT[i] : footTextFalse[i];
+
+            html += `<tr style="background: ${rowBg};">
+                <td colspan="7" style="position: sticky; left: 0; z-index: 5; text-align: right; font-weight: bold; color: ${textC}; background: ${stickyBg}; border-right: 2px solid ${borderC}; border-bottom: 2px solid ${borderC};">${label}</td>
+                <td style="border-right: 2px solid ${borderC}; background: ${stickyBg}; border-bottom: 2px solid ${borderC};"></td>`;
 
             jListPlayed.forEach(j => {
                 let val = '';
