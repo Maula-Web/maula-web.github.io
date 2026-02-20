@@ -930,6 +930,9 @@ class BoteManager {
             case 'evolucion':
                 this.renderVistaEvolucion(movements);
                 break;
+            case 'excel':
+                this.renderVistaExcel(movements);
+                break;
         }
     }
 
@@ -1655,6 +1658,196 @@ class BoteManager {
             console.error('Error deleting movement:', error);
             alert('Error al eliminar el movimiento');
         }
+    }
+
+    /**
+     * Render Excel View (Detailed History matching the legacy spreadsheet)
+     */
+    renderVistaExcel(movements) {
+        const container = document.getElementById('bote-content');
+        if (!container) return;
+
+        // Group movements by member
+        const memberData = {};
+        this.members.forEach(m => {
+            memberData[m.id] = {
+                member: m,
+                name: window.AppUtils.getMemberName(m),
+                ganadas: 0,
+                perdidas: 0,
+                sellados: [],
+                boteInicial: 0,
+                boteFinal: 0,
+                ingresos: 0,
+                gastos: 0,
+                jornadaCosts: {},
+                jornadaHits: {}
+            };
+        });
+
+        // Calculate Initial Botes correctly (since calculateMovements starts over)
+        const initialBalances = {
+            'Alvaro': 15, 'Carlos': 8.5, 'David Buzón': 56.29, 'Edu': 2, 'Emilio': 41.13,
+            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.30,
+            'Valdi': 2.30, 'Javi Mora': 57.88, 'Juan Antonio': 17.9, 'Juanjo': -6.1, 'Luismi': 24.75,
+            'Marcelo': 0, 'Martin': 15.1, 'Rafa': 4.45, 'Ramon': 2, 'Raul Romera': 8.95,
+            'Samuel': 1.5
+        };
+        const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        Object.values(memberData).forEach(md => {
+            const mName = md.name;
+            const entry = Object.entries(initialBalances).find(([k, v]) => norm(k) === norm(mName) || norm(mName).includes(norm(k)) || norm(k).includes(norm(mName)));
+            if (entry) {
+                md.boteInicial = entry[1];
+                md.ingresos += entry[1]; // Initially counts as income in the sum
+            }
+        });
+
+        const jListPlayed = this.jornadas.filter(j =>
+            (j.matches || []).some(m => String(m.result || '').trim().toLowerCase() !== '' && String(m.result || '').trim().toLowerCase() !== 'por definir')
+        ).sort((a, b) => a.number - b.number);
+
+        jListPlayed.forEach(j => {
+            // Calculate winners and losers
+            this.members.forEach(m => {
+                const md = memberData[m.id];
+                const isWin = this.wasWinnerOfJornada(m.id, j);
+                const isLoss = this.wasLoserOfJornada(m.id, j);
+                if (isWin) md.ganadas++;
+                if (isLoss) {
+                    md.perdidas++;
+                    const sustId = j.sustitutoSellado;
+                    if (sustId) {
+                        if (String(m.id) === String(sustId)) md.sellados.push(`J${j.number}`);
+                    } else {
+                        md.sellados.push(`J${j.number}`);
+                    }
+                } else if (j.sustitutoSellado && String(m.id) === String(j.sustitutoSellado)) {
+                    md.sellados.push(`J${j.number}`);
+                } else if (j.number === 1 && String(m.name).toLowerCase().includes('luismi')) {
+                    // Hardcoded J1 exception mapped from legacy logic
+                    md.sellados.push(`J1`);
+                }
+            });
+        });
+
+        movements.forEach(mov => {
+            const md = memberData[mov.memberId];
+            if (!md) return;
+
+            md.boteFinal = mov.boteAcumulado;
+
+            if (mov.type === 'jornada') {
+                const manual = mov.ingresosManual || 0;
+                const prizes = mov.premios || 0;
+                const extraPrizes = (mov.memberId === this.members[0].id) ? (mov.extraPrizes || 0) : 0;
+                const gastos = mov.totalGastos || 0;
+
+                md.ingresos += manual + prizes;
+                md.gastos += gastos;
+
+                md.jornadaCosts[mov.jornadaNum] = gastos;
+                md.jornadaHits[mov.jornadaNum] = mov.aciertos;
+            } else if (mov.type === 'reparto') {
+                md.gastos += Math.abs(mov.neto);
+            } else if (mov.type === 'cierre_vuelta') {
+                md.gastos += Math.abs(mov.neto);
+            }
+        });
+
+        // Start HTML building
+        let html = `
+        <div style="overflow-x: auto; max-width: 100%; border-radius: 8px; background: rgba(20,20,20,0.9); padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
+            <table class="bote-table" style="min-width: 2000px; font-size: 0.85rem; border-collapse: separate; border-spacing: 0;">
+                <thead>
+                    <tr style="background: var(--cuadrante-header-bg); color: white;">
+                        <!-- Static Columns Header -->
+                        <th style="position: sticky; top:0; left: 0; z-index: 30; background: var(--bote-header-bg-start, #ff9100);">Sellados</th>
+                        <th style="position: sticky; top:0; left: 100px; z-index: 30; background: var(--bote-header-bg-start, #ff9100);">G</th>
+                        <th style="position: sticky; top:0; left: 140px; z-index: 30; background: var(--bote-header-bg-start, #ff9100);">P</th>
+                        <th style="position: sticky; top:0; left: 180px; z-index: 30; background: var(--bote-header-bg-start, #ff9100); border-right: 2px solid #fff; min-width: 150px;">Nombre</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100);">Bote Inicial</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100);">SUMA</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100);">RESTA</th>
+                        <th style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-start, #ff9100); border-right: 2px solid #fff;">Bote Final</th>
+        `;
+
+        // Iteration for Jornadas Header Dates
+        jListPlayed.forEach(j => {
+            const d = window.AppUtils.parseDate(j.date);
+            const dStr = isNaN(d) ? '?' : d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+            html += `<th colspan="2" style="position: sticky; top:0; z-index: 20; background: var(--bote-header-bg-end, #ff6600); border-right: 1px solid rgba(255,255,255,0.2); text-align: center;">${dStr}</th>`;
+        });
+
+        html += `
+                    </tr>
+                    <tr style="background: #2a2a2a;">
+                        <th style="position: sticky; top: 40px; left: 0; z-index: 29; background: #2a2a2a;"></th>
+                        <th style="position: sticky; top: 40px; left: 100px; z-index: 29; background: #2a2a2a;"></th>
+                        <th style="position: sticky; top: 40px; left: 140px; z-index: 29; background: #2a2a2a;"></th>
+                        <th style="position: sticky; top: 40px; left: 180px; z-index: 29; background: #2a2a2a; border-right: 2px solid #555;"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a;"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a;"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a;"></th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: #2a2a2a; border-right: 2px solid #555;"></th>
+        `;
+
+        // Sub Headers for Jornadas
+        jListPlayed.forEach(j => {
+            html += `
+                        <th style="position: sticky; top: 40px; z-index: 10; background: #333; color: #ff9100; text-align: center;">J${j.number}</th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: #333; color: #ff9100; border-right: 1px solid #555; text-align: center;">Ac.</th>
+            `;
+        });
+
+        html += `
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        // Data Rows
+        Object.values(memberData).sort((a, b) => parseFloat(b.boteFinal) - parseFloat(a.boteFinal)).forEach(md => {
+            const sFinal = md.boteFinal.toFixed(2);
+            const colorSaldo = parseFloat(sFinal) < 0 ? '#f44336' : (parseFloat(sFinal) > 0 ? '#4caf50' : '#fff');
+
+            html += `
+                    <tr style="background: rgba(40,40,40,0.8);">
+                        <td style="position: sticky; left: 0; z-index: 5; background: #1a1a1a; font-size:0.75rem; color:#888;">${md.sellados.join(', ')}</td>
+                        <td style="position: sticky; left: 100px; z-index: 5; background: #1a1a1a; font-weight: bold; color:#4caf50;">${md.ganadas}</td>
+                        <td style="position: sticky; left: 140px; z-index: 5; background: #1a1a1a; font-weight: bold; color:#f44336;">${md.perdidas}</td>
+                        <td style="position: sticky; left: 180px; z-index: 5; background: #222; font-weight: bold; border-right: 2px solid #555;">${md.name}</td>
+                        
+                        <td style="text-align: right;">${md.boteInicial.toFixed(2)}</td>
+                        <td style="text-align: right; color:#4caf50;">${md.ingresos.toFixed(2)}</td>
+                        <td style="text-align: right; color:#f44336;">${md.gastos.toFixed(2)}</td>
+                        <td style="text-align: right; border-right: 2px solid #555; font-weight:bold; color:${colorSaldo};">${sFinal}</td>
+            `;
+
+            jListPlayed.forEach(j => {
+                const cost = md.jornadaCosts[j.number] !== undefined ? md.jornadaCosts[j.number].toFixed(2) : '-';
+                const hits = md.jornadaHits[j.number] !== undefined ? md.jornadaHits[j.number] : '-';
+
+                let textColor = cost !== '-' && parseFloat(cost) > 0 ? '#f44336' : '#9e9e9e';
+                if (cost === '0.00') textColor = '#9e9e9e';
+
+                html += `
+                        <td style="text-align: right; color: ${textColor};">${cost !== '-' ? cost : ''}</td>
+                        <td style="text-align: center; border-right: 1px solid #555; color: #ff9100; font-weight: bold;">${hits !== '-' ? hits : ''}</td>
+                `;
+            });
+
+            html += `</tr>`;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        </div>
+        `;
+
+        container.innerHTML = html;
     }
 
     /**

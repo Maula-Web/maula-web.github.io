@@ -38,6 +38,7 @@ El grupo juega una quiniela extra grupal combinada.
 
 - **Jugar Gratis en la jornada**: Un socio no paga su cuota individual en una ronda *sólo si el grupo en su conjunto ganó algún premio económico en la jornada anterior*. Ser el ganador de aciertos de la semana no da la gratuidad por sí mismo, la condición es que se haya ingresado dinero.
 - **Penalizaciones por "Unos"**: Existe un sistema que impone una multa monetaria (se resta de su bote) si un socio envía su boleto con una cantidad exagerada/restringida de signos "1". Un filtro de riesgo.
+- **Penalizaciones por Clasificación (Cierre de Vuelta/Temporada)**: Al final de la primera vuelta y al final de la temporada, se cobran penalizaciones a los socios basándose en su clasificación. Los cobros escalan desde el 2º clasificado (0,50€) hasta el último (5,00€), estando el 1º exento. En caso de empates en puntos, se desempata por la diferencia entre ganancias y pérdidas de cada ronda, luego a favor del de mayores ganancias totales, y si persiste el empate absoluto se dividirá la suma de las penalizaciones de los puestos compartidos entre los empatados.
 
 ## 4. Obtención de Datos: Partidos, Resultados y Escrutinio
 
