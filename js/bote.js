@@ -1808,7 +1808,20 @@ class BoteManager {
         `;
 
         // Data Rows
-        Object.values(memberData).sort((a, b) => parseFloat(b.boteFinal) - parseFloat(a.boteFinal)).forEach(md => {
+        const excelOrder = [
+            'Alvaro', 'Carlos', 'David Buzón', 'Edu', 'Emilio',
+            'F. Lozano', 'F. Ramirez', 'Heradio', 'JA Valdivieso', 'Valdi',
+            'Javi Mora', 'Juan Antonio', 'Juanjo', 'Luismi', 'Marcelo',
+            'Martin', 'Rafa', 'Ramon', 'Raul Romera', 'Samuel'
+        ];
+
+        const getOrderIdx = (name) => {
+            const nName = norm(name);
+            const idx = excelOrder.findIndex(o => norm(o) === nName || nName.includes(norm(o)) || norm(o).includes(nName));
+            return idx !== -1 ? idx : 999;
+        };
+
+        Object.values(memberData).sort((a, b) => getOrderIdx(a.name) - getOrderIdx(b.name)).forEach(md => {
             const sFinal = md.boteFinal.toFixed(2);
             const colorSaldo = parseFloat(sFinal) < 0 ? '#f44336' : (parseFloat(sFinal) > 0 ? '#4caf50' : '#fff');
 
