@@ -1811,7 +1811,7 @@ class BoteManager {
         const excelOrder = [
             'Alvaro', 'Carlos', 'David Buzón', 'Edu', 'Emilio',
             'F. Lozano', 'F. Ramirez', 'Heradio', 'JA Valdivieso', 'Valdi',
-            'Javi Mora', 'Juan Antonio', 'Juanjo', 'Luismi', 'Marcelo',
+            'Javi Mora', 'Juanan', 'Juan Antonio', 'Juanjo', 'Luismi', 'Marcelo',
             'Martin', 'Rafa', 'Ramon', 'Raul Romera', 'Samuel'
         ];
 
@@ -1851,6 +1851,84 @@ class BoteManager {
                 `;
             });
 
+
+
+            html += `</tr>`;
+        });
+
+        // Totals Footer Rows
+        html += `<tr style="background: transparent;"><td colspan="100%" style="height: 15px; border: none;"></td></tr>`;
+
+        // Filas del Cuadrante Inferior:
+        const labels = ['TOTAL RECAUDACIÓN', 'GASTO TOTAL SELLADO', 'PREMIOS JORNADA', 'BOTE JORNADA'];
+        const colors = ['#fff', '#f44336', '#4caf50', '#ff9100'];
+
+        labels.forEach((label, i) => {
+            html += `<tr style="background: rgba(40,40,40,1);">
+                <td colspan="7" style="position: sticky; left: 0; z-index: 5; text-align: right; font-weight: bold; color: ${colors[i]}; background: #222; border-right: 2px solid #555;">${label}</td>
+                <td style="border-right: 2px solid #555; background: #222;"></td>`;
+
+            jListPlayed.forEach(j => {
+                let val = '';
+                const jDate = window.AppUtils.parseDate(j.date);
+                const costCol = this.getHistoricalPrice('costeColumna', jDate);
+                const costDob = this.getHistoricalPrice('costeDobles', jDate);
+
+                if (label === 'TOTAL RECAUDACIÓN') {
+                    let rec = 0;
+                    Object.values(memberData).forEach(md => {
+                        if (md.jornadaCosts[j.number] !== undefined) rec += md.jornadaCosts[j.number];
+                    });
+                    val = rec.toFixed(2);
+                }
+                else if (label === 'GASTO TOTAL SELLADO') {
+                    const numSocios = this.members.length;
+                    const numDobles = movements.filter(m => parseInt(m.jornadaNum) === j.number && m.jugaDobles).length;
+                    const effDobles = (j.number === 1 && numDobles === 0) ? 1 : numDobles;
+                    const gasto = (numSocios * costCol) + (effDobles * costDob);
+                    val = gasto > 0 ? `-${gasto.toFixed(2)}` : '0.00';
+                }
+                else if (label === 'PREMIOS JORNADA') {
+                    let prem = 0;
+                    movements.filter(m => parseInt(m.jornadaNum) === j.number && m.type === 'jornada').forEach(m => {
+                        prem += (m.premios || 0);
+                        if (String(m.memberId) === String(this.members[0].id)) {
+                            prem += (m.extraPrizes || 0);
+                        }
+                    });
+                    val = prem > 0 ? `+${prem.toFixed(2)}` : '0.00';
+                }
+                else if (label === 'BOTE JORNADA') {
+                    // Recaudación - Gasto + Premios
+                    let rec = 0;
+                    Object.values(memberData).forEach(md => {
+                        if (md.jornadaCosts[j.number] !== undefined) rec += md.jornadaCosts[j.number];
+                    });
+
+                    const numSocios = this.members.length;
+                    const numDobles = movements.filter(m => parseInt(m.jornadaNum) === j.number && m.jugaDobles).length;
+                    const effDobles = (j.number === 1 && numDobles === 0) ? 1 : numDobles;
+                    const gasto = (numSocios * costCol) + (effDobles * costDob);
+
+                    let prem = 0;
+                    movements.filter(m => parseInt(m.jornadaNum) === j.number && m.type === 'jornada').forEach(m => {
+                        prem += (m.premios || 0);
+                        if (String(m.memberId) === String(this.members[0].id)) {
+                            prem += (m.extraPrizes || 0);
+                        }
+                    });
+
+                    const saldo = rec - gasto + prem;
+                    val = saldo > 0 ? `+${saldo.toFixed(2)}` : saldo.toFixed(2);
+                }
+
+                const cColor = parseFloat(val) < 0 ? '#f44336' : (parseFloat(val) > 0 ? '#4caf50' : '#888');
+
+                html += `
+                    <td style="text-align: right; font-weight: bold; color: ${cColor};">${val}</td>
+                    <td style="border-right: 1px solid #555; background: #333;"></td>
+                `;
+            });
             html += `</tr>`;
         });
 
