@@ -2575,7 +2575,7 @@ class BoteManager {
     }
 
     calcularClasificacionHasta(jornadaId) {
-        const jIdx = this.jornadas.findIndex(j => j.id === jornadaId);
+        const jIdx = this.jornadas.findIndex(j => String(j.id) === String(jornadaId));
         if (jIdx === -1) return [];
 
         // Inicializa estadísticas por socio
@@ -2629,6 +2629,11 @@ class BoteManager {
         if (!jId) { alert('Selecciona una jornada límite'); return; }
 
         const stats = this.calcularClasificacionHasta(jId);
+
+        if (!stats || stats.length === 0) {
+            alert('No se ha podido calcular la clasificación. Asegúrate de que la jornada seleccionada ya tiene resultados.');
+            return;
+        }
 
         // Tabla de baremos definida por la directiva
         const penaltiesMap = [0, 0.50, 1.00, 1.40, 1.70, 1.90, 2.20, 2.40, 2.60, 2.80, 3.00];
