@@ -17,27 +17,25 @@
             background: var(--resultados-cell-bg);
             position: relative;
             margin: 0 auto;
+            padding: 0 !important;
+            /* Fix for leaking scroll data */
         }
 
         .results-table {
             border-collapse: separate;
-            /* Allows sticky headers */
             border-spacing: 0;
             width: max-content;
-            /* Expand as needed */
             min-width: 100%;
         }
 
         .results-table th,
         .results-table td {
             padding: 0.5rem 0.7rem;
-            /* Slightly larger for better readability */
             text-align: center;
             border-bottom: 1px solid #eee;
             border-right: 1px solid #eee;
             white-space: nowrap;
             background-color: var(--resultados-cell-bg);
-            /* Prevent wrapping unless necessary */
         }
 
         .results-table tbody tr:nth-child(even) td {
@@ -46,8 +44,6 @@
 
         /* Desktop only: Maximize table width */
         @media (min-width: 1025px) {
-
-            /* Horizontal menu (default) */
             .results-wrapper {
                 width: calc(100vw - 140px);
                 max-width: calc(100vw - 140px);
@@ -59,10 +55,8 @@
                 overflow: visible;
             }
 
-            /* Vertical menu - account for 250px sidebar */
             body.layout-vertical .results-wrapper {
                 width: calc(100vw - 300px);
-                /* 250px sidebar + 50px margin */
                 max-width: calc(100vw - 300px);
             }
         }
@@ -77,32 +71,43 @@
             box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
             font-size: 0.85rem;
             height: 70px;
-            /* Base height for header */
         }
 
-        /* Summary Sticky Rows */
-        .row-total,
-        .row-hits,
-        .row-bonus,
-        .row-prizes {
+        /* Summary Sticky Rows - Applied to cells for better browser support */
+        .row-total td,
+        .row-total th,
+        .row-hits td,
+        .row-hits th,
+        .row-bonus td,
+        .row-bonus th,
+        .row-prizes td,
+        .row-prizes th {
             position: sticky;
             z-index: 9;
         }
 
-        .row-total {
+        .row-total td,
+        .row-total th {
             top: 70px;
+            height: 55px;
         }
 
-        .row-hits {
+        .row-hits td,
+        .row-hits th {
             top: 125px;
+            height: 35px;
         }
 
-        .row-bonus {
+        .row-bonus td,
+        .row-bonus th {
             top: 160px;
+            height: 35px;
         }
 
-        .row-prizes {
+        .row-prizes td,
+        .row-prizes th {
             top: 195px;
+            height: 35px;
             border-bottom: 3px solid var(--primary-purple);
         }
 
@@ -214,19 +219,23 @@
                 font-size: 0.75rem !important;
             }
 
-            .row-total {
+            .row-total td,
+            .row-total th {
                 top: 90px;
             }
 
-            .row-hits {
+            .row-hits td,
+            .row-hits th {
                 top: 135px;
             }
 
-            .row-bonus {
+            .row-bonus td,
+            .row-bonus th {
                 top: 165px;
             }
 
-            .row-prizes {
+            .row-prizes td,
+            .row-prizes th {
                 top: 195px;
             }
 
@@ -260,19 +269,23 @@
                 font-size: 0.75rem !important;
             }
 
-            .row-total {
+            .row-total td,
+            .row-total th {
                 top: 50px;
             }
 
-            .row-hits {
+            .row-hits td,
+            .row-hits th {
                 top: 85px;
             }
 
-            .row-bonus {
+            .row-bonus td,
+            .row-bonus th {
                 top: 110px;
             }
 
-            .row-prizes {
+            .row-prizes td,
+            .row-prizes th {
                 top: 135px;
             }
 
