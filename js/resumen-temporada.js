@@ -84,17 +84,32 @@ class ResumenManager {
             };
         });
 
-        const activeJornadas = this.jornadas.filter(j =>
-            j.active && j.matches && j.matches[0] && j.matches[0].result
-        );
+        // MISMO filtro que el Dashboard: active + resultado + isSunday
+        const activeJornadas = this.jornadas.filter(j => {
+            const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
+            const d = AppUtils.parseDate(j.date);
+            const isValidDate = d && AppUtils.isSunday(d);
+            return j.active && hasResult && isValidDate;
+        });
 
         activeJornadas.forEach(j => {
             const officialResults = j.matches.map(m => m.result);
             const jDate = AppUtils.parseDate(j.date);
             const minHits = j.minHitsToWin || 10;
 
+            // Detectar si es jornada PIG (Pleno al 15 con grandes clubes)
+            const pigTeams = ['Real Madrid', 'At. Madrid', 'Barcelona', 'FC Barcelona', 'Atlético de Madrid'];
+            const match15 = j.matches && j.matches[14];
+            const isPig15 = match15 &&
+                pigTeams.some(t => (match15.home || '').includes(t)) &&
+                pigTeams.some(t => (match15.away || '').includes(t));
+
             this.members.forEach(m => {
-                const p = this.pronosticos.find(pred => (pred.jId === j.id || pred.jornadaId === j.id) && (pred.mId === m.id || pred.memberId === m.id));
+                // Usar comparación laxa (==) igual que el Dashboard para tolerar string/number
+                const p = this.pronosticos.find(pred =>
+                    (pred.jId == j.id || pred.jornadaId == j.id) &&
+                    (pred.mId == m.id || pred.memberId == m.id)
+                );
                 let points = 0;
                 let hits = 0;
 
@@ -105,12 +120,19 @@ class ResumenManager {
 
                     if (isLate && !isPardoned) {
                         points = ScoringSystem.calculateScore(0, jDate);
+                        hits = 0;
                     } else {
                         const ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
-                        points = ev.points;
                         hits = ev.hits;
+                        points = ev.points;
 
-                        // Identify Prize
+                        // Lógica PIG: igual que el Dashboard, descontar el acierto del partido 15
+                        if (isPig15 && sel[14] && sel[14] === officialResults[14]) {
+                            hits = Math.max(0, hits - 1);
+                            points = ScoringSystem.calculateScore(hits, jDate);
+                        }
+
+                        // Premios (usando los hits ya ajustados por PIG)
                         if (hits >= minHits) {
                             const money = (j.prizeRates && j.prizeRates[hits]) || 0;
                             stats[m.id].prizes.push({
@@ -127,7 +149,7 @@ class ResumenManager {
                     x: 'J' + j.number,
                     y: stats[m.id].points,
                     jornadaId: j.id,
-                    memberId: m.id, // Store ID for lookup
+                    memberId: m.id,
                     jornadaNum: j.number,
                     dayPoints: points,
                     dayHits: hits
