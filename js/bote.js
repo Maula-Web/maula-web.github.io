@@ -1790,7 +1790,13 @@ class BoteManager {
                 ${t ? '🌙 Cambiar a Tema Oscuro' : '🟢 Cambiar a Colores Excel'}
             </button>
         </div>
-        <div style="overflow-x: auto; max-width: 100%; border-radius: 8px; background: ${t ? '#ecf0f1' : 'rgba(20,20,20,0.9)'}; padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
+        
+        <!-- Top Scrollbar -->
+        <div id="excel-top-scroll-container" style="overflow-x: auto; overflow-y: hidden; height: 16px; margin-bottom: 2px; display: block; border-radius: 8px 8px 0 0; background: ${t ? '#cbd5e0' : 'rgba(40,40,40,0.5)'};">
+            <div id="excel-top-scroll-content" style="height: 1px; width: 2000px;"></div>
+        </div>
+
+        <div id="excel-table-container" class="bote-table-container" style="overflow-x: auto; max-width: 100%; max-height: 70vh; border-radius: 0 0 8px 8px; background: ${t ? '#ecf0f1' : 'rgba(20,20,20,0.9)'}; padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
             <table class="bote-table" style="min-width: 2000px; font-size: 0.85rem; border-collapse: separate; border-spacing: 0;">
                 <thead>
                     <tr style="background: ${hBg1}; color: white;">
@@ -1983,6 +1989,30 @@ class BoteManager {
         `;
 
         container.innerHTML = html;
+
+        // Sync Scrolls logic
+        setTimeout(() => {
+            const topScroll = document.getElementById('excel-top-scroll-container');
+            const topContent = document.getElementById('excel-top-scroll-content');
+            const mainTable = document.getElementById('excel-table-container');
+            const tableEl = mainTable ? mainTable.querySelector('table') : null;
+
+            if (topScroll && mainTable && tableEl) {
+                // Set initial width to match table
+                if (topContent) topContent.style.width = tableEl.offsetWidth + 'px';
+
+                topScroll.onscroll = () => {
+                    if (mainTable.scrollLeft !== topScroll.scrollLeft) {
+                        mainTable.scrollLeft = topScroll.scrollLeft;
+                    }
+                };
+                mainTable.onscroll = () => {
+                    if (topScroll.scrollLeft !== mainTable.scrollLeft) {
+                        topScroll.scrollLeft = mainTable.scrollLeft;
+                    }
+                };
+            }
+        }, 300);
     }
 
     /**
