@@ -1769,7 +1769,7 @@ class BoteManager {
         const subH1 = t ? '#27AE60' : '#2a2a2a';
         const subH2 = t ? '#27AE60' : '#333';
         const txtMain = t ? '#000' : '#fff';
-        const txtJ = t ? '#333' : '#ff9100';
+        const txtJ = t ? '#000' : '#ff9100';
 
         const bgSellados = t ? '#fff' : '#1a1a1a';
         const bgName = t ? '#FEF9E7' : '#222';
@@ -1828,8 +1828,8 @@ class BoteManager {
         // Sub Headers for Jornadas
         jListPlayed.forEach(j => {
             html += `
-                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH2}; color: ${txtJ}; text-align: center;">J${j.number}</th>
-                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH2}; color: ${txtJ}; border-right: 1px solid ${borderC}; text-align: center;">Ac.</th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH2}; color: ${t ? '#fff !important' : txtJ}; text-align: center;">J${j.number}</th>
+                        <th style="position: sticky; top: 40px; z-index: 10; background: ${subH2}; color: ${t ? '#fff !important' : txtJ}; border-right: 1px solid ${borderC}; text-align: center;">Ac.</th>
             `;
         });
 
@@ -1882,7 +1882,7 @@ class BoteManager {
 
                 html += `
                         <td style="text-align: right; color: ${textColor}; border-bottom: 1px solid ${borderC};">${cost !== '-' ? cost : ''}</td>
-                        <td style="text-align: center; border-right: 1px solid ${borderC}; color: ${txtJ}; font-weight: bold; border-bottom: 1px solid ${borderC}; background: ${t ? '#fff' : 'transparent'};">${hits !== '-' ? hits : ''}</td>
+                        <td style="text-align: center; border-right: 1px solid ${borderC}; color: ${t ? '#000 !important' : txtJ}; font-weight: bold; border-bottom: 1px solid ${borderC}; background: ${t ? '#fff' : 'transparent'};">${hits !== '-' ? hits : ''}</td>
                 `;
             });
 
