@@ -1796,7 +1796,7 @@ class BoteManager {
             <div id="excel-top-scroll-content" style="height: 1px; width: 2000px;"></div>
         </div>
 
-        <div id="excel-table-container" class="bote-table-container" style="overflow-x: auto; max-width: 100%; max-height: 50vh; border-radius: 0 0 8px 8px; background: ${t ? '#ecf0f1' : 'rgba(20,20,20,0.9)'}; padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
+        <div id="excel-table-container" class="bote-table-container" style="overflow-x: auto; max-width: 100%; max-height: 50vh; border-radius: 0 0 8px 8px; background: ${t ? '#ecf0f1' : 'rgba(20,20,20,0.9)'}; padding: 0; border: 1px solid rgba(255,145,0,0.3);">
             <table class="bote-table" style="min-width: 2000px; font-size: 0.85rem; border-collapse: separate; border-spacing: 0;">
                 <thead>
                     <tr style="background: ${hBg1}; color: white;">
@@ -2077,7 +2077,7 @@ class BoteManager {
                 .cuadrante-cell-win { background-color: var(--cuadrante-win-bg, #1a73e8) !important; color: var(--cuadrante-win-text, #ffffff) !important; border: 3px solid var(--cuadrante-win-border, #ff9100) !important; font-weight: bold; }
                 .cuadrante-cell-loss { background-color: var(--cuadrante-loss-bg, #d93025) !important; color: var(--cuadrante-loss-text, #ffffff) !important; border: 2px solid var(--cuadrante-loss-border, #f44336) !important; }
             </style>
-            <div class="cuadrante-container" style="max-height: 58vh; overflow: auto; border: 1px solid var(--glass-border); border-radius: 12px; position: relative;">
+            <div class="cuadrante-container" style="max-height: 58vh; overflow: auto; border: 1px solid var(--glass-border); border-radius: 12px; position: relative; padding: 0;">
                 <table class="bote-table cuadrante-table" style="font-size: 0.8rem; min-width: 100%; border-collapse: separate; border-spacing: 0;">
                     <thead>
                         <tr>
