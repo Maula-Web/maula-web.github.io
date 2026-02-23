@@ -47,9 +47,9 @@
         .bote-header {
             background: linear-gradient(135deg, var(--bote-header-bg-start, #ff9100) 0%, var(--bote-header-bg-end, #ff6600) 100%);
             color: var(--bote-header-text, white);
-            padding: 1.5rem 1rem;
+            padding: 0.8rem 1rem;
             border-radius: 16px;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             text-align: center;
         }
@@ -83,7 +83,7 @@
             background: var(--bote-card-bg, rgba(30, 30, 30, 0.8));
             border: 2px solid var(--bote-card-border, rgba(255, 145, 0, 0.3));
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 0.75rem 1rem;
             text-align: center;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
@@ -162,14 +162,16 @@
             box-shadow: 0 0 0 3px rgba(255, 145, 0, 0.2);
         }
 
-        .bote-table-container {
+        .bote-view-card {
             background: rgba(20, 20, 20, 0.8);
             border: 1px solid rgba(255, 145, 0, 0.2);
             border-radius: 12px;
-            padding: 1.5rem;
-            overflow-x: auto;
+            padding: 1rem;
             margin-bottom: 2rem;
             backdrop-filter: blur(10px);
+            overflow: visible;
+            /* Let inner containers handle scroll */
+            position: relative;
         }
 
         .bote-table {
@@ -617,7 +619,7 @@
         </div>
 
         <!-- Tabla Principal -->
-        <div class="bote-table-container">
+        <div class="bote-view-card">
             <div id="bote-content">
                 <br><!-- ... -->
                 <p style="text-align: center; color: #888;">Cargando datos del bote...</p>
