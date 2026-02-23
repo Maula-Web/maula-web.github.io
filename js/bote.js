@@ -1769,7 +1769,7 @@ class BoteManager {
         const subH1 = t ? '#27AE60' : '#2a2a2a';
         const subH2 = t ? '#27AE60' : '#333';
         const txtMain = t ? '#000' : '#fff';
-        const txtJ = t ? '#fff' : '#ff9100';
+        const txtJ = t ? '#333' : '#ff9100';
 
         const bgSellados = t ? '#fff' : '#1a1a1a';
         const bgName = t ? '#FEF9E7' : '#222';

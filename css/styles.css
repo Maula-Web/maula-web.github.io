@@ -2407,7 +2407,7 @@ textarea:focus {
     min-width: 140px;
     text-align: center;
     border-bottom: 2px solid var(--input-border);
-    background-color: var(--pronosticos-table-head-col-bg);
+    background-color: var(--pronosticos-table-head-col-bg) !important;
     color: var(--pronosticos-table-head-col-text);
     /* Sticky Top */
     position: sticky;
