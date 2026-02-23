@@ -2360,7 +2360,7 @@ textarea:focus {
 /* Table container for internal scroll and sticky headers */
 .pronosticos-page .table-container,
 .bote-table-container {
-    max-height: 75vh;
+    max-height: 60vh;
     overflow: auto;
     border: 1px solid var(--input-border);
     border-radius: 8px;

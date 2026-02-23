@@ -1796,7 +1796,7 @@ class BoteManager {
             <div id="excel-top-scroll-content" style="height: 1px; width: 2000px;"></div>
         </div>
 
-        <div id="excel-table-container" class="bote-table-container" style="overflow-x: auto; max-width: 100%; max-height: 70vh; border-radius: 0 0 8px 8px; background: ${t ? '#ecf0f1' : 'rgba(20,20,20,0.9)'}; padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
+        <div id="excel-table-container" class="bote-table-container" style="overflow-x: auto; max-width: 100%; max-height: 58vh; border-radius: 0 0 8px 8px; background: ${t ? '#ecf0f1' : 'rgba(20,20,20,0.9)'}; padding: 10px; border: 1px solid rgba(255,145,0,0.3);">
             <table class="bote-table" style="min-width: 2000px; font-size: 0.85rem; border-collapse: separate; border-spacing: 0;">
                 <thead>
                     <tr style="background: ${hBg1}; color: white;">
