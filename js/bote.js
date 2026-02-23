@@ -2270,14 +2270,14 @@ class BoteManager {
                                 ${isActividad ? '🚀 Actividad' : '👥 Socios'}
                             </span>
                         </td>
-                        <td style="font-weight:bold; color: var(--primary-red); shadow: 0 0 10px rgba(217, 48, 37, 0.3);">${r.totalAmount.toFixed(2)}€</td>
+                        <td style="font-weight:bold; color: #ff1744; text-shadow: 0 0 8px rgba(255,23,68,0.4);">${r.totalAmount.toFixed(2)}€</td>
                         <td style="font-size: 0.85rem;">
                             ${isActividad ? '-' : `Reparto individual: ${(r.totalAmount / this.members.length).toFixed(2)}€`}
                         </td>
                         <td>
                            <div style="display:flex; gap:5px;">
                                <button onclick="window.Bote.openRepartoModal('${r.id}')" style="background: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid #2196f3; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Editar</button>
-                               <button onclick="window.Bote.deleteReparto('${r.id}')" style="background: rgba(217, 48, 37, 0.1); color: var(--primary-red); border: 1px solid var(--primary-red); padding: 4px 8px; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                               <button onclick="window.Bote.deleteReparto('${r.id}')" style="background: rgba(255, 23, 68, 0.15); color: #ff1744; border: 1px solid #ff1744; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Eliminar</button>
                            </div>
                         </td>
                     </tr>
