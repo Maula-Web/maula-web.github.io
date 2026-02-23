@@ -11,7 +11,9 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 - **Módulos JS (Carpeta `/js/`)**:
   - `bote.js`: Núcleo financiero de la peña (ingresos, repartos, costes variables, dobles, evolución del bote, penalizaciones). El archivo más grande y complejo.
   - `pronosticos.js`: Gestión de las apuestas individuales y la columna combinada (MAULA).
-  - `scoring.js`: Lógica de puntuación.
+  - `scoring.js`: Lógica de puntuación (bonificaciones, penalizaciones, lógica PIG/Pleno al 15).
+  - `resumen-temporada.js`: Clasificación acumulada de la temporada y estadísticas por socio.
+  - `dashboard.js`: Panel de inicio con el líder actual, próxima jornada y premios semanales.
   - `rss-importer.js`: Motor de extracción de datos, partidos y resultados desde fuentes de terceros.
   - `telegram-service.js`: Integración de notificaciones y recordatorios automatizados.
 
@@ -47,7 +49,31 @@ Para facilitar la transición del antiguo sistema de hojas de cálculo al entorn
 - **Cálculo Real, no Estático:** Esta vista **no** carga datos pasivos desde ningún archivo `.xlsx`. Toda la información (sellados, recaudación total, ingresos, gastos, premios, ganancias y pérdidas y cuotas de dobles variables) es fruto de la simulación iterativa en tiempo real de la base de datos de Firebase, pasando por el motor de transacciones hasta recrear los mismos resultados que emitiría una tabla tradicional.
 - **Orden Heredado:** Mantiene intencionadamente la matriz de ordenamiento de filas caprichosa original o "rara" de la peña (orden alfabético estricto, excepto variaciones históricas toleradas como la de `Valdi` situado cerca de la `J` por José Antonio Valdivieso) para ayudar a la agilidad visual y memoria de los gestores clásicos de la Peña.
 
-## 4. Obtención de Datos: Partidos, Resultados y Escrutinio
+## 4. Lógica de Puntuación — Reglas Críticas
+
+### 4.1. Fórmula General (`scoring.js`)
+
+`Puntos = Aciertos + Bonificación/Penalización`
+
+Las bonificaciones (10–15 aciertos) y penalizaciones (0–3 aciertos) son configurables desde el panel de Administración y se almacenan con historial por fecha en `localStorage`.
+
+### 4.2. Jornadas PIG (Pleno al 15 con Grandes Clubes)
+
+Cuando el partido número 15 (el Pleno al 15) enfrenta a equipos de primer nivel (Real Madrid, Barcelona, Atlético de Madrid), la jornada se marca internamente como **PIG**. En estos casos:
+
+- El partido 15 se **excluye del cómputo de puntos de clasificación** de la temporada.
+- Si un socio acierta ese partido, se le **descuenta 1 acierto** antes de calcular su puntuación, para no distorsionar el ranking con un acierto "fácil" o "privilegiado".
+- Esta lógica se aplica en `dashboard.js` y en `resumen-temporada.js` de forma idéntica.
+
+### 4.3. Consistencia entre Dashboard y Resumen Temporada
+
+**⚠️ Regla clave:** `dashboard.js` y `resumen-temporada.js` deben usar **exactamente el mismo algoritmo** para calcular la puntuación de cada socio. Las tres diferencias que causaron inconsistencias en el pasado (y que ya están corregidas) fueron:
+
+1. **Filtro de jornadas**: solo cuentan las jornadas con `j.active && resultado !== '' && AppUtils.isSunday(fecha)`. Sin el filtro de domingo, se incluían jornadas incorrectas.
+2. **Comparación de IDs**: usar `==` (laxa) en vez de `===` (estricta), porque Firestore puede devolver los IDs como string o como número indistintamente.
+3. **Lógica PIG**: aplicar el descuento del partido 15 en ambos módulos.
+
+## 5. Obtención de Datos: Partidos, Resultados y Escrutinio
 
 Históricamente el sistema ha consumido datos de diferentes administraciones de loterías y periódicos, enfrentando cortes y cambios de estructura (web scraping inestable).
 
@@ -56,7 +82,7 @@ Históricamente el sistema ha consumido datos de diferentes administraciones de 
 - **Adaptaciones Parches**: El fichero `rss-importer.js` cuenta con múltiples parches en la función `parseElPaisHTML` para procesar tablas irregulares sin guiones separadores entre equipos o en columnas asimétricas. Si algo falla importando, el culpable suele ser un cambio en el DOM del periódico.
 - **Conversión de Resultados**: Resultados de goleadas a veces salen como "M-0" o "2-M", el sistema debe normalizarlos a signos absolutos de quiniela (`1`, `X`, `2`) para poder baremar a los socios.
 
-## 5. Tabla de Resultados y "Columna MAULA"
+## 6. Tabla de Resultados y "Columna MAULA"
 
 En la Vista Cuadrante / Panel de Partidos o de Resultados se enfrentan los boletos introducidos por cada jugador con los resultados oficiales.
 
@@ -69,11 +95,23 @@ Se genera de forma sintética lo que sería el "voto popular" del grupo:
 3. Esto se repite para los 15 plenarios. Este pronóstico estadístico se enfrenta a la realidad, demostrando con frecuencia si la sabiduría popular de la peña es mejor que el voto individual de sus integrantes.
 4. **Desempates/Ganadores Semanales**: Cuando en la tabla de resultados varios miembros empatan a aciertos, se utilizan reglas algorítmicas (vía función `resolveTie`) para decidir quién recibe la corona o el farolillo rojo. A los ganadores/perdedores se les asignan identificadores de color específicos regidos en la "Identidad Visual". Aparte, se trackean jornadas especiales donde juegan equipos PIG (Madrid, Barça, Atleti) marcándolas mediante la función `checkIsPIG`.
 
-## 6. Comunicaciones y Notificaciones: Telegram
+## 7. Comunicaciones y Notificaciones: Telegram
 
 - Existe un servicio (`telegram-service.js`) que ejerce como "Bot", conectado a la API de Telegram.
 - **Por Fin es Jueves**: Una rutina con días, hora, fechas límite de intervalo ("Date Range") definibles, que lanza recordatorios a los socios para que rellenen su pronóstico si no lo han sellado todavía.
 - El administrador puede definir mediante el panel de control o por variables el mensaje customizado de ese aviso semanal.
+
+## 8. Funcionalidades Descartadas / Para el Futuro
+
+### Importación desde Google Sheets (Descartada temporalmente)
+
+Se desarrolló y luego eliminó una funcionalidad completa para importar pronósticos directamente desde las hojas de cálculo de Google Drive (carpeta "CAMPEONATO 2025-2026"). La implementación fue:
+
+- **Módulo**: `js/sheets-importer.js` (eliminado)
+- **Mecanismo**: Lectura de hojas públicas via URL de exportación CSV (`/gviz/tq?tqx=out:csv&sheet=...`) — sin API key ni autenticación.
+- **Flujo**: Selección de jornada → verificación de partidos (≥10/15 coincidencias) → modal de confirmación con tabla de pronósticos → guardado en Firestore con precedencia del Excel sobre la web.
+- **Por qué se eliminó**: Era una solución temporal para el final de la temporada 2025-2026 y no merecía el mantenimiento a largo plazo.
+- **Si se reactiva en el futuro**: La lógica completa está documentada aquí. El patrón de fetch es `https://docs.google.com/spreadsheets/d/{ID}/gviz/tq?tqx=out:csv&sheet={NombrePestaña}`. La estructura de la hoja "Pronósticos": fila 1 = nombres de socios (col B en adelante); filas 2-16 = signos (1/X/2). La hoja "Partidos": col A = equipo local, col B = equipo visitante, col C = resultado.
 
 ---
 
