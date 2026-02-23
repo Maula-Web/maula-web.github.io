@@ -2319,20 +2319,24 @@ textarea:focus {
     cursor: default;
 }
 
-/* Custom Scrollbar for Pronosticos Table */
+/* Custom Scrollbar for Large Tables */
 .pronosticos-page .table-container::-webkit-scrollbar,
+.bote-table-container::-webkit-scrollbar,
 #sticky-scrollbar-container::-webkit-scrollbar {
     height: 12px;
+    width: 12px;
     display: block !important;
 }
 
 .pronosticos-page .table-container::-webkit-scrollbar-track,
+.bote-table-container::-webkit-scrollbar-track,
 #sticky-scrollbar-container::-webkit-scrollbar-track {
     background: var(--pronosticos-scroll-track);
     border-radius: 10px;
 }
 
 .pronosticos-page .table-container::-webkit-scrollbar-thumb,
+.bote-table-container::-webkit-scrollbar-thumb,
 #sticky-scrollbar-container::-webkit-scrollbar-thumb {
     background: var(--pronosticos-scroll-thumb);
     border-radius: 10px;
@@ -2340,15 +2344,29 @@ textarea:focus {
 }
 
 .pronosticos-page .table-container::-webkit-scrollbar-thumb:hover,
+.bote-table-container::-webkit-scrollbar-thumb:hover,
 #sticky-scrollbar-container::-webkit-scrollbar-thumb:hover {
     background: var(--dark-red);
 }
 
 /* Ensure visibility on Firefox */
 .pronosticos-page .table-container,
+.bote-table-container,
 #sticky-scrollbar-container {
     scrollbar-width: auto;
     scrollbar-color: var(--pronosticos-scroll-thumb) var(--pronosticos-scroll-track);
+}
+
+/* Table container for internal scroll and sticky headers */
+.pronosticos-page .table-container,
+.bote-table-container {
+    max-height: 75vh;
+    overflow: auto;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    position: relative;
+    box-shadow: var(--shadow-sm);
 }
 
 /* Results Matrix Dark Graying */
@@ -2391,6 +2409,10 @@ textarea:focus {
     border-bottom: 2px solid var(--input-border);
     background-color: var(--pronosticos-table-head-col-bg);
     color: var(--pronosticos-table-head-col-text);
+    /* Sticky Top */
+    position: sticky;
+    top: 0;
+    z-index: 20;
 }
 
 .summary-sticky-col {
@@ -2400,6 +2422,13 @@ textarea:focus {
     background: var(--pronosticos-table-head-row-bg) !important;
     color: var(--pronosticos-table-head-row-text) !important;
     border-right: 2px solid var(--input-border);
+}
+
+/* Intersección: Cabecera pegajosa en ambas direcciones (Esquina superior izquierda) */
+th.summary-header-cell.summary-sticky-col {
+    z-index: 30;
+    top: 0;
+    left: 0;
 }
 
 .summary-jornada-info {
@@ -3361,7 +3390,7 @@ body.mobile-mode .p-divider {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 15px;
-    background: rgba(0,0,0,0.03);
+    background: rgba(0, 0, 0, 0.03);
     padding: 15px;
     border-radius: 8px;
     border: 1px solid var(--input-border);
@@ -3374,7 +3403,7 @@ body.mobile-mode .p-divider {
     background: var(--card-bg);
     padding: 10px;
     border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .prize-category {
@@ -3395,5 +3424,5 @@ body.mobile-mode .p-divider {
 }
 
 [data-theme="dark"] .prizes-grid-container {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }

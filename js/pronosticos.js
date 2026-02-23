@@ -53,10 +53,6 @@ class PronosticoManager {
         this.btnConfirmAudit = document.getElementById('btn-confirm-audit');
         this.btnCancelAudit = document.getElementById('btn-cancel-audit');
 
-        // Sticky Scrollbar Elements
-        this.stickyScrollContainer = document.getElementById('sticky-scrollbar-container');
-        this.stickyScrollContent = document.getElementById('sticky-scrollbar-content');
-
         // Collective View Modal
         this.btnViewJornada = document.getElementById('btn-view-jornada');
         this.viewJornadaModal = document.getElementById('view-jornada-modal');
@@ -87,25 +83,6 @@ class PronosticoManager {
                     if (jId && mId) {
                         this.selectAndLoad(jId, mId);
                     }
-                }
-            });
-        }
-
-        // Sync scroll events
-        if (this.summaryContainer && this.stickyScrollContainer) {
-            this.summaryContainer.addEventListener('scroll', () => {
-                if (!this.isSyncingSticky) {
-                    this.isSyncingFloating = true;
-                    this.stickyScrollContainer.scrollLeft = this.summaryContainer.scrollLeft;
-                    this.isSyncingFloating = false;
-                }
-            });
-
-            this.stickyScrollContainer.addEventListener('scroll', () => {
-                if (!this.isSyncingFloating) {
-                    this.isSyncingSticky = true;
-                    this.summaryContainer.scrollLeft = this.stickyScrollContainer.scrollLeft;
-                    this.isSyncingSticky = false;
                 }
             });
         }
@@ -163,7 +140,7 @@ class PronosticoManager {
         if (this.btnCopyForecast) this.btnCopyForecast.addEventListener('click', () => this.handleCopyForecast());
 
 
-        window.addEventListener('resize', () => this.updateStickyScrollbar());
+
     }
 
     async init() {
@@ -886,8 +863,7 @@ class PronosticoManager {
             tbody.appendChild(row);
         });
 
-        // After rendering, update floating scrollbar
-        setTimeout(() => this.updateStickyScrollbar(), 500);
+
     }
 
     async showJornadaForecasts(specificJId = null) {
@@ -956,12 +932,12 @@ class PronosticoManager {
 
             // Build Enhanced Table (Much LARGER as requested)
             let html = `
-                <table style="border-collapse: collapse; font-size: 1.05rem; background: #fff; width: auto; min-width: 95%; margin-bottom: 40px; border: 3px solid var(--primary-orange); border-radius: 8px; overflow: hidden;">
-                    <thead style="background: #e0e0e0; position: sticky; top: 0; z-index: 10;">
+                <table style="border-collapse: separate; border-spacing: 0; font-size: 1.05rem; background: #fff; width: auto; min-width: 95%; margin-bottom: 40px; border: 3px solid var(--primary-orange); border-radius: 8px;">
+                    <thead style="background: #e0e0e0; position: sticky; top: 0; z-index: 100;">
                         <tr>
-                            <th style="border: 1px solid #ccc; padding: 15px; min-width: 50px; color: #333; font-size: 1.1rem;">#</th>
-                            <th style="border: 1px solid #ccc; padding: 15px; text-align: right; min-width: 200px; color: #333; font-size: 1.1rem;">Local</th>
-                            <th style="border: 1px solid #ccc; padding: 15px; text-align: left; min-width: 200px; color: #333; font-size: 1.1rem;">Visitante</th>
+                            <th style="position: sticky; left: 0; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: 15px; min-width: 50px; color: #333; font-size: 1.1rem;">#</th>
+                            <th style="position: sticky; left: 50px; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: 15px; text-align: right; min-width: 200px; color: #333; font-size: 1.1rem;">Local</th>
+                            <th style="position: sticky; left: 250px; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: 15px; text-align: left; min-width: 200px; color: #333; font-size: 1.1rem;">Visitante</th>
             `;
 
             // Member Columns
@@ -1003,10 +979,10 @@ class PronosticoManager {
 
                 const officialResult = match.result || null;
 
-                html += `<tr style="background: ${bgColor}; ${rowStyle}">
-                    <td style="border: 1px solid #ccc; padding: 10px; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: 1.1rem;">${displayIdx}</td>
-                    <td style="border: 1px solid #ccc; padding: 10px 20px; text-align: right; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
-                    <td style="border: 1px solid #ccc; padding: 10px 20px; text-align: left; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
+                html += `<tr style="${rowStyle}">
+                    <td style="position: sticky; left: 0; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: 10px; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: 1.1rem;">${displayIdx}</td>
+                    <td style="position: sticky; left: 50px; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: 10px 20px; text-align: right; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
+                    <td style="position: sticky; left: 250px; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: 10px 20px; text-align: left; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
                 `;
 
                 // Individual Forecasts
@@ -1185,21 +1161,7 @@ class PronosticoManager {
     }
 
 
-    updateStickyScrollbar() {
-        if (!this.summaryContainer || !this.stickyScrollContainer || !this.summaryTable) return;
 
-        const tableWidth = this.summaryTable.offsetWidth;
-        const containerWidth = this.summaryContainer.offsetWidth;
-
-        if (tableWidth > containerWidth) {
-            this.stickyScrollContainer.style.display = 'block';
-            this.stickyScrollContent.style.width = tableWidth + 'px';
-            // Sync initial state
-            this.stickyScrollContainer.scrollLeft = this.summaryContainer.scrollLeft;
-        } else {
-            this.stickyScrollContainer.style.display = 'none';
-        }
-    }
     /**
      * REESCRITURA TOTAL: Lógica de elegibilidad para dobles.
      * Incluye sistema de DESEMPATE para garantizar un único ganador.
