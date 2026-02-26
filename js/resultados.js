@@ -89,11 +89,15 @@ class ResultsManager {
                         const isReduced = p.isReduced || false;
                         let ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate, { isReduced });
 
-                        // Determinar si la jornada está finalizada (j.active === false)
-                        const isFinished = j.active === false;
+                        // Determinar si la jornada está finalizada de forma más robusta
+                        const filledMatches = j.matches ? j.matches.filter(m => m.result && m.result.trim() !== '' && m.result.trim() !== '-').length : 0;
+                        const now = new Date();
+                        const isPastDate = jDate && (now.getTime() - jDate.getTime() > 2 * 24 * 60 * 60 * 1000); // Más de 2 días desde el día de la jornada
+
+                        const isFinished = (j.active === false) || (filledMatches === 15) || isPastDate;
 
                         // Late Logic: If late and NOT pardoned -> Hits = 0 -> Recalculate Score
-                        // SOLO se aplica si la jornada está finalizada, según petición del usuario
+                        // SOLO se aplica si la jornada está finalizada
                         if (isLate && !isPardoned && isFinished) {
                             hits = 0;
                             points = ScoringSystem.calculateScore(0, jDate);
@@ -101,11 +105,12 @@ class ResultsManager {
                         } else {
                             hits = ev.hits;
                             if (isFinished) {
-                                // Jornada finalizada: Aplicar bonificaciones y penalizaciones normales
+                                // Jornada finalizada: Aplicar bonificaciones y penalizaciones normales (incluyendo fallos 0-3)
                                 points = ev.points;
                                 bonus = ev.bonus;
                             } else {
                                 // Jornada en curso o futura: Solo mostrar aciertos reales, sin bonus/penalizaciones para no desvirtuar totales
+                                // Esto evita que aparezcan con -5 puntos por tener 0 aciertos mientras se está jugando
                                 points = hits;
                                 bonus = 0;
                             }
