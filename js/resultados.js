@@ -89,15 +89,26 @@ class ResultsManager {
                         const isReduced = p.isReduced || false;
                         let ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate, { isReduced });
 
+                        // Determinar si la jornada está finalizada (j.active === false)
+                        const isFinished = j.active === false;
+
                         // Late Logic: If late and NOT pardoned -> Hits = 0 -> Recalculate Score
-                        if (isLate && !isPardoned) {
+                        // SOLO se aplica si la jornada está finalizada, según petición del usuario
+                        if (isLate && !isPardoned && isFinished) {
                             hits = 0;
                             points = ScoringSystem.calculateScore(0, jDate);
                             bonus = points;
                         } else {
                             hits = ev.hits;
-                            points = ev.points;
-                            bonus = ev.bonus;
+                            if (isFinished) {
+                                // Jornada finalizada: Aplicar bonificaciones y penalizaciones normales
+                                points = ev.points;
+                                bonus = ev.bonus;
+                            } else {
+                                // Jornada en curso o futura: Solo mostrar aciertos reales, sin bonus/penalizaciones para no desvirtuar totales
+                                points = hits;
+                                bonus = 0;
+                            }
                         }
 
                         // Store breakdown for UI display (optional use in tooltips)
