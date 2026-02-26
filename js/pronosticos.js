@@ -270,6 +270,7 @@ class PronosticoManager {
         this.btnSave.style.display = 'none';
         this.statusMsg.textContent = '';
         this.deadlineInfo.textContent = '';
+        this._fullForecastNotified = false;
 
         // Ensure IDs are synced with selects if called from button
         if (this.selMember) this.currentMemberId = this.selMember.value;
@@ -323,6 +324,9 @@ class PronosticoManager {
         }
 
         const currentSelections = existing ? existing.selection : Array(15).fill(null);
+        if (currentSelections.filter(s => s !== null).length === 15) {
+            this._fullForecastNotified = true;
+        }
 
         // Fetch other members' forecasts for this jornada
         const othersForecasts = this.pronosticos.filter(p =>
@@ -595,6 +599,18 @@ class PronosticoManager {
                 // Update summary table in background
                 this.renderSummaryTable();
                 console.log("Auto-save silenciado OK (Late:", isLate, ")");
+
+                // NEW: Alert if completed
+                const isFull = selection.filter(s => s !== null).length === 15;
+                if (isFull && !this._fullForecastNotified) {
+                    this._fullForecastNotified = true;
+                    if (typeof FRASES_MAULA !== 'undefined' && FRASES_MAULA.length > 0) {
+                        const randomPhrase = FRASES_MAULA[Math.floor(Math.random() * FRASES_MAULA.length)];
+                        setTimeout(() => {
+                            alert('¡PRONÓSTICO COMPLETADO Y GUARDADO!\n\n' + randomPhrase);
+                        }, 100);
+                    }
+                }
 
             } catch (e) {
                 console.error("Auto-save error:", e);
