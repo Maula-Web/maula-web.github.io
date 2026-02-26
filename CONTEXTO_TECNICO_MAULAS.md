@@ -72,7 +72,7 @@ Cuando el partido número 15 (el Pleno al 15) enfrenta a equipos de primer nivel
 1. **Filtro de jornadas**: solo cuentan las jornadas con `j.active && resultado !== '' && AppUtils.isSunday(fecha)`. Sin el filtro de domingo, se incluían jornadas incorrectas.
 2. **Comparación de IDs**: usar `==` (laxa) en vez de `===` (estricta), porque Firestore puede devolver los IDs como string o como número indistintamente.
 3. **Lógica PIG**: aplicar el descuento del partido 15 en ambos módulos.
-4. **Roles de Jornada**: El dashboard muestra siempre quién tiene asignados los roles de "Sella la Quiniela" (✍️) y "Rellena de Dobles" (🎟️) para la jornada en curso o la siguiente disponible, especificando siempre el número de jornada para evitar confusiones.
+4. **Roles de Jornada**: El dashboard muestra siempre quién tiene asignados los roles de "Sella la Quiniela" (✍️) y "Rellena de Dobles" (🍻) para la jornada en curso o la siguiente disponible, especificando siempre el número de jornada para evitar confusiones.
 
 ## 5. Obtención de Datos: Partidos, Resultados y Escrutinio
 

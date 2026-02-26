@@ -269,7 +269,7 @@ class DashboardManager {
                             </div>
                         `}
                         <div style="margin-bottom:0.5rem;">
-                            <span style="font-size:1.2rem;">🎟️</span> 
+                            <span style="font-size:1.2rem;">🍻</span> 
                             <strong class="role-label">Rellena Dobles:</strong> <span class="role-winner" style="font-weight:bold;">${lastJornadaInfo.doblesEligibleNames.join(", ")}</span>
                         </div>
                         <div>
