@@ -324,7 +324,8 @@ class PronosticoManager {
         }
 
         const currentSelections = existing ? existing.selection : Array(15).fill(null);
-        if (currentSelections.filter(s => s !== null).length === 15) {
+        // Only consider the first 14 signs for the "completed" notification
+        if (currentSelections.slice(0, 14).filter(s => s !== null).length === 14) {
             this._fullForecastNotified = true;
         }
 
@@ -600,9 +601,9 @@ class PronosticoManager {
                 this.renderSummaryTable();
                 console.log("Auto-save silenciado OK (Late:", isLate, ")");
 
-                // NEW: Alert if completed
-                const isFull = selection.filter(s => s !== null).length === 15;
-                if (isFull && !this._fullForecastNotified) {
+                // NEW: Alert if completed (checking first 14 signs)
+                const isFull14 = selection.slice(0, 14).filter(s => s !== null).length === 14;
+                if (isFull14 && !this._fullForecastNotified) {
                     this._fullForecastNotified = true;
                     if (typeof FRASES_MAULA !== 'undefined' && FRASES_MAULA.length > 0) {
                         const randomPhrase = FRASES_MAULA[Math.floor(Math.random() * FRASES_MAULA.length)];
