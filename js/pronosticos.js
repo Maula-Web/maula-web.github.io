@@ -452,14 +452,26 @@ class PronosticoManager {
     selectOption(el, val) {
         const parent = el.parentElement;
         const idx = parseInt(parent.dataset.idx);
+        const isAlreadySelected = el.classList.contains('selected');
+
+        // Toggle Logic: Unselect if clicked again
         parent.querySelectorAll('.chk-option').forEach(c => c.classList.remove('selected'));
-        el.classList.add('selected');
+
+        let finalVal = val;
+        if (isAlreadySelected) {
+            finalVal = null;
+        } else {
+            el.classList.add('selected');
+        }
 
         // Update consensus in real-time
-        this.updateRowConsensus(idx, val);
+        this.updateRowConsensus(idx, finalVal);
 
         // Update cost/penalty
         this.updateCost();
+
+        // Trigger Auto-save
+        this.autoSave();
     }
 
     updateRowConsensus(idx, myVal) {
@@ -521,6 +533,73 @@ class PronosticoManager {
         }
 
         this.costInfo.innerHTML = `<span style="font-weight:bold; color:${color}; padding: 5px 10px; border-radius: 4px; background: rgba(0,0,0,0.05);">${msg}</span>`;
+    }
+
+    async autoSave() {
+        if (!this.currentMemberId || !this.currentJornadaId) return;
+
+        // Use a small timeout to debounce multiple clicks and avoid saturation
+        if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
+
+        this._autoSaveTimer = setTimeout(async () => {
+            try {
+                const rows = this.container.querySelectorAll('.p-options');
+                const selection = [];
+                rows.forEach((r) => {
+                    const sel = r.querySelector('.selected');
+                    selection.push(sel ? sel.textContent : null);
+                });
+
+                const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+                if (!jornada) return;
+
+                const deadline = this.calculateDeadline(jornada.date);
+                const dateObj = AppUtils.parseDate(jornada.date);
+                if (!dateObj) return;
+
+                const closeDate = new Date(dateObj);
+                closeDate.setDate(closeDate.getDate() + 2);
+                closeDate.setHours(23, 59, 59);
+
+                const now = new Date();
+                const isLate = now > deadline;
+                const isLockedRef = now > closeDate;
+
+                // Locked check: don't auto-save if locked unless in correctionMode
+                // Even in correctionMode, we might want to skip auto-save to ensure manual audit is used
+                if (isLockedRef) return;
+
+                const isReduced = this.selMethod && this.selMethod.value === 'reducido';
+                const id = `${this.currentJornadaId}_${this.currentMemberId}`;
+
+                const record = {
+                    id: id,
+                    jId: this.currentJornadaId,
+                    mId: this.currentMemberId,
+                    selection: selection,
+                    isReduced: isReduced,
+                    timestamp: new Date().toISOString(),
+                    late: isLate
+                };
+
+                await window.DataService.save('pronosticos', record);
+
+                // Sync local state
+                const idx = this.pronosticos.findIndex(p => p.id == record.id);
+                if (idx > -1) {
+                    this.pronosticos[idx] = { ...this.pronosticos[idx], ...record };
+                } else {
+                    this.pronosticos.push(record);
+                }
+
+                // Update summary table in background
+                this.renderSummaryTable();
+                console.log("Auto-save silenciado OK (Late:", isLate, ")");
+
+            } catch (e) {
+                console.error("Auto-save error:", e);
+            }
+        }, 800);
     }
 
     async saveForecast() {
