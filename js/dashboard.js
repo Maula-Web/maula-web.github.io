@@ -225,6 +225,16 @@ class DashboardManager {
             let nextRolesHtml = "";
             let lastJornadaPrizesHtml = "";
 
+            // Variables for upcoming/in-progress jornada
+            const nextJornadaData = this.getNextJornadaData();
+            let isNextJornadaInProgress = false;
+            const targetJNum = nextJornadaData ? nextJornadaData.number : (playedJornadas.length + 1);
+
+            if (nextJornadaData && nextJornadaData.matches) {
+                const matchesWithResults = nextJornadaData.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length;
+                isNextJornadaInProgress = matchesWithResults > 0 && matchesWithResults < 15;
+            }
+
             if (lastJornadaInfo) {
                 winnerText = lastJornadaInfo.winnerName;
                 loserText = lastJornadaInfo.loserName;
@@ -243,17 +253,7 @@ class DashboardManager {
                 `;
                 }
 
-                // Check if next jornada is in progress (has some but not all results)
-                const nextJornadaData = this.getNextJornadaData();
-                let isNextJornadaInProgress = false;
-
-                if (nextJornadaData && nextJornadaData.matches) {
-                    const matchesWithResults = nextJornadaData.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length;
-                    isNextJornadaInProgress = matchesWithResults > 0 && matchesWithResults < 15;
-                }
-
-                const targetJData = nextJornadaData || { number: playedJornadas.length + 1 };
-                const rolesTitle = isNextJornadaInProgress ? `Jornada ${targetJData.number} en curso` : `Roles Jornada ${targetJData.number}`;
+                const rolesTitle = isNextJornadaInProgress ? `Jornada ${targetJNum} en curso` : `Roles Jornada ${targetJNum}`;
 
                 nextRolesHtml = `
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
@@ -263,14 +263,18 @@ class DashboardManager {
                                     ⏳ ${rolesTitle}
                                 </div>
                             </div>
-                        ` : ''}
+                        ` : `
+                            <div style="font-size: 1rem; color: var(--dark-purple); font-weight: bold; margin-bottom: 0.8rem;">
+                                📋 Jornada ${targetJNum}
+                            </div>
+                        `}
                         <div style="margin-bottom:0.5rem;">
                             <span style="font-size:1.2rem;">🎟️</span> 
-                            <strong class="role-label">Rellena Dobles (J. ${targetJData.number}):</strong> <span class="role-winner" style="font-weight:bold;">${lastJornadaInfo.doblesEligibleNames.join(", ")}</span>
+                            <strong class="role-label">Rellena Dobles:</strong> <span class="role-winner" style="font-weight:bold;">${lastJornadaInfo.doblesEligibleNames.join(", ")}</span>
                         </div>
                         <div>
                             <span style="font-size:1.2rem;">✍️</span> 
-                            <strong class="role-label">Sella la Quiniela (J. ${targetJData.number}):</strong> <span class="role-loser" style="font-weight:bold;">${loserText}</span>
+                            <strong class="role-label">Sella la Quiniela:</strong> <span class="role-loser" style="font-weight:bold;">${loserText}</span>
                         </div>
                         ${pigHtml}
                         ${lastJornadaInfo.doublesHtml || ''}
@@ -326,7 +330,6 @@ class DashboardManager {
 
             }
 
-            const nextJornadaData = this.getNextJornadaData();
             const nextJornadaLabel = nextJornadaData ? `Jornada ${nextJornadaData.number} (${nextJornadaData.date})` : "Final de Temporada";
 
             let deadlineHtml = "";
