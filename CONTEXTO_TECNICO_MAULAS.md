@@ -10,10 +10,10 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 - **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`).
 - **Módulos JS (Carpeta `/js/`)**:
   - `bote.js`: Núcleo financiero de la peña (ingresos, repartos, costes variables, dobles, evolución del bote, penalizaciones). El archivo más grande y complejo.
-  - `pronosticos.js`: Gestión de las apuestas individuales y la columna combinada (MAULA).
+  - `pronosticos.js`: Gestión de las apuestas individuales y la columna combinada (MAULA). Incluye **auto-guardado silencioso**, lógica de desmarcado de signos y notificaciones de completado basadas en frases aleatorias.
   - `scoring.js`: Lógica de puntuación (bonificaciones, penalizaciones, lógica PIG/Pleno al 15).
   - `resumen-temporada.js`: Clasificación acumulada de la temporada y estadísticas por socio.
-  - `dashboard.js`: Panel de inicio con el líder actual, próxima jornada y premios semanales.
+  - `dashboard.js`: Panel de inicio con el líder actual, próxima jornada, premios semanales y **asignación dinámica de roles** (Sella/Rellena).
   - `rss-importer.js`: Motor de extracción de datos, partidos y resultados desde fuentes de terceros.
   - `telegram-service.js`: Integración de notificaciones y recordatorios automatizados.
 
@@ -72,6 +72,7 @@ Cuando el partido número 15 (el Pleno al 15) enfrenta a equipos de primer nivel
 1. **Filtro de jornadas**: solo cuentan las jornadas con `j.active && resultado !== '' && AppUtils.isSunday(fecha)`. Sin el filtro de domingo, se incluían jornadas incorrectas.
 2. **Comparación de IDs**: usar `==` (laxa) en vez de `===` (estricta), porque Firestore puede devolver los IDs como string o como número indistintamente.
 3. **Lógica PIG**: aplicar el descuento del partido 15 en ambos módulos.
+4. **Roles de Jornada**: El dashboard muestra siempre quién tiene asignados los roles de "Sella la Quiniela" (✍️) y "Rellena de Dobles" (🎟️) para la jornada en curso o la siguiente disponible, especificando siempre el número de jornada para evitar confusiones.
 
 ## 5. Obtención de Datos: Partidos, Resultados y Escrutinio
 
@@ -95,13 +96,29 @@ Se genera de forma sintética lo que sería el "voto popular" del grupo:
 3. Esto se repite para los 15 plenarios. Este pronóstico estadístico se enfrenta a la realidad, demostrando con frecuencia si la sabiduría popular de la peña es mejor que el voto individual de sus integrantes.
 4. **Desempates/Ganadores Semanales**: Cuando en la tabla de resultados varios miembros empatan a aciertos, se utilizan reglas algorítmicas (vía función `resolveTie`) para decidir quién recibe la corona o el farolillo rojo. A los ganadores/perdedores se les asignan identificadores de color específicos regidos en la "Identidad Visual". Aparte, se trackean jornadas especiales donde juegan equipos PIG (Madrid, Barça, Atleti) marcándolas mediante la función `checkIsPIG`.
 
-## 7. Comunicaciones y Notificaciones: Telegram
+## 7. Sistema de Pronósticos y Experiencia de Usuario (UX)
+
+El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos y mejorar la agilidad:
+
+- **Auto-guardado Silencioso**: No es necesario pulsar "Guardar". Cualquier cambio se registra en Firebase tras 800ms de inactividad del usuario.
+- **Control de Plazos Automático**: Si un socio modifica un signo después del `deadline` calculado (jueves 17:00), el registro se marca automáticamente como `late: true` para su posterior penalización.
+- **Lógica de Desmarcado**: Pinchando de nuevo en un signo seleccionado, este se desmarca (queda vacío), permitiendo rectificaciones parciales.
+- **Notificación de Éxito**: Al completar los **14 primeros signos**, salta una alerta con una frase maulera aleatoria (50ms de retardo) confirmando el guardado. El Pleno al 15 no dispara la alerta para permitir que se decida al final.
+- **Visualización Técnica**: La tabla resumen de la peña incluye un **doble scroll horizontal** (barra superior e inferior) para facilitar la consulta de columnas de socios sin desplazarse al final de la página.
+
+## 8. Comunicaciones y Notificaciones: Telegram
 
 - Existe un servicio (`telegram-service.js`) que ejerce como "Bot", conectado a la API de Telegram.
 - **Por Fin es Jueves**: Una rutina con días, hora, fechas límite de intervalo ("Date Range") definibles, que lanza recordatorios a los socios para que rellenen su pronóstico si no lo han sellado todavía.
 - El administrador puede definir mediante el panel de control o por variables el mensaje customizado de ese aviso semanal.
 
-## 8. Funcionalidades Descartadas / Para el Futuro
+## 9. Identidad Visual y Estilo
+
+- **Colores de Acción**: Los botones críticos de previsualización de cierres y cobros en el Bote utilizan un azul oscuro profundo (`#0d47a1`) para diferenciarse de acciones secundarias.
+- **Tipografía**: Basada en 'Inter', 'Montserrat' y 'Outfit' para máxima legibilidad en tablas densas de datos y paneles de control.
+- **Feedback Visual**: Las notificaciones de éxito y errores utilizan la paleta semántica estándar de la web (verde para éxitos, naranja para advertencias/retrasos, rojo para errores críticos).
+
+## 10. Funcionalidades Descartadas / Para el Futuro
 
 ### Importación desde Google Sheets (Descartada temporalmente)
 

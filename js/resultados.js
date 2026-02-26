@@ -24,23 +24,24 @@ class ResultsManager {
         const wrapper = document.getElementById('results-wrapper');
         const loading = document.getElementById('loading');
 
-        const finishedJornadas = this.jornadas.filter(j => {
-            // Show all jornadas that have AT LEAST ONE result in ANY match
-            if (!j.matches || j.matches.length === 0) return false;
-
-            // Check if ANY match has a result
-            const hasAnyResult = j.matches.some(m => m.result && m.result.trim() !== '');
-            return hasAnyResult;
+        const visibleJornadas = this.jornadas.filter(j => {
+            // Show all active jornadas, OR jornadas that have ANY result, OR jornadas with ANY forecasts
+            if (!j.active) {
+                const hasAnyResult = j.matches && j.matches.some(m => m.result && m.result.trim() !== '');
+                const hasAnyForecast = this.pronosticos.some(p => String(p.jId) === String(j.id));
+                return hasAnyResult || hasAnyForecast;
+            }
+            return true;
         }).sort((a, b) => b.number - a.number);
 
-        console.log(`ResultsManager: Found ${finishedJornadas.length} jornadas with results`);
-        const jornadaNums = finishedJornadas.map(j => j.number);
-        console.log(`Jornada numbers:`, jornadaNums);
+        console.log(`ResultsManager: Found ${visibleJornadas.length} visible jornadas`);
 
-        if (finishedJornadas.length === 0) {
-            loading.textContent = "No hay jornadas finalizadas con resultados todavía.";
+        if (visibleJornadas.length === 0) {
+            loading.textContent = "No hay jornadas configuradas todavía.";
             return;
         }
+
+        const finishedJornadas = visibleJornadas; // Renamed for compatibility with existing code
 
         // --- CALCULATION PHASE ---
         const memberStats = {};
