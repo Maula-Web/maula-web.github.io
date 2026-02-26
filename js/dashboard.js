@@ -252,38 +252,30 @@ class DashboardManager {
                     isNextJornadaInProgress = matchesWithResults > 0 && matchesWithResults < 15;
                 }
 
-                // Only show winner/loser if next jornada is NOT in progress
-                if (isNextJornadaInProgress) {
-                    nextRolesHtml = `
+                const targetJData = nextJornadaData || { number: playedJornadas.length + 1 };
+                const rolesTitle = isNextJornadaInProgress ? `Jornada ${targetJData.number} en curso` : `Roles Jornada ${targetJData.number}`;
+
+                nextRolesHtml = `
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
-                        <div style="padding: 1rem; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
-                            <div style="font-size: 0.95rem; color: #e65100; font-weight: 600; margin-bottom: 0.5rem;">
-                                ⏳ Jornada en curso
+                        ${isNextJornadaInProgress ? `
+                            <div style="padding: 0.8rem; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800; margin-bottom: 1rem;">
+                                <div style="font-size: 0.95rem; color: #e65100; font-weight: 600;">
+                                    ⏳ ${rolesTitle}
+                                </div>
                             </div>
-                            <div style="font-size: 0.85rem; color: #666;">
-                                Los roles de "Columnas de Dobles" y "Sella la Quiniela" se mostrarán cuando finalice la jornada.
-                            </div>
-                        </div>
-                        ${pigHtml}
-                        ${lastJornadaInfo.doublesHtml || ''}
-                    </div>
-                `;
-                } else {
-                    nextRolesHtml = `
-                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
+                        ` : ''}
                         <div style="margin-bottom:0.5rem;">
-                            <span style="font-size:1.2rem;">🍺</span> 
-                            <strong class="role-label">Columnas de Dobles:</strong> <span class="role-winner" style="font-weight:bold;">${lastJornadaInfo.doblesEligibleNames.join(", ")}</span>
+                            <span style="font-size:1.2rem;">🎟️</span> 
+                            <strong class="role-label">Rellena Dobles (J. ${targetJData.number}):</strong> <span class="role-winner" style="font-weight:bold;">${lastJornadaInfo.doblesEligibleNames.join(", ")}</span>
                         </div>
                         <div>
-                            <span style="font-size:1.2rem;">🥛</span> 
-                            <strong class="role-label">Sella la Quiniela por Maula:</strong> <span class="role-loser" style="font-weight:bold;">${loserText}</span>
+                            <span style="font-size:1.2rem;">✍️</span> 
+                            <strong class="role-label">Sella la Quiniela (J. ${targetJData.number}):</strong> <span class="role-loser" style="font-weight:bold;">${loserText}</span>
                         </div>
                         ${pigHtml}
                         ${lastJornadaInfo.doublesHtml || ''}
                     </div>
                 `;
-                }
 
                 // Last Jornada Prizes
                 const lastJNum = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : 0;
@@ -331,6 +323,7 @@ class DashboardManager {
                     </div>
                 </div>
             `;
+
             }
 
             const nextJornadaData = this.getNextJornadaData();
@@ -407,7 +400,7 @@ class DashboardManager {
                 ${lastJornadaPrizesHtml}
     
                 <div class="stat-wide-card">
-                    <h3 style="color:var(--dark-purple); font-weight:bold; font-size:1.1rem; margin-bottom:0.5rem;">PRÓXIMA JORNADA</h3>
+                    <h3 style="color:var(--dark-purple); font-weight:bold; font-size:1.1rem; margin-bottom:0.5rem;">${isNextJornadaInProgress ? 'JORNADA EN CURSO' : 'PRÓXIMA JORNADA'}</h3>
                     ${boteBadgeHtml}
                     <div style="font-size:1.2rem; margin-bottom:1rem;">${nextJornadaLabel}</div>
                     ${nextRolesHtml}
