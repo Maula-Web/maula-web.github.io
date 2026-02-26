@@ -74,6 +74,17 @@ Cuando el partido número 15 (el Pleno al 15) enfrenta a equipos de primer nivel
 3. **Lógica PIG**: aplicar el descuento del partido 15 en ambos módulos.
 4. **Roles de Jornada**: El dashboard muestra siempre quién tiene asignados los roles de "Sella la Quiniela" (✍️) y "Rellena de Dobles" (🍻) para la jornada en curso o la siguiente disponible, especificando siempre el número de jornada para evitar confusiones.
 
+### 4.4. Cálculo Diferido de Penalizaciones y Bonus
+
+Para evitar que la clasificación se desvirtúe durante el transcurso de una jornada (por ejemplo, mostrando -5 puntos a todos al empezar por tener 0 aciertos), se aplica un **Cálculo Diferido**:
+
+- **Jornada en Curso:** Mientras la jornada esté activa y con partidos por jugar, solo se muestran los **aciertos reales**. Los totales de temporada solo suman esos aciertos, sin aplicar bonus (10-15) ni penalizaciones (0-3 o por retraso).
+- **Jornada Finalizada:** Las bonificaciones y penalizaciones solo se consolidan cuando se considera que la jornada ha terminado. Los criterios para esto son:
+    1. Que tenga los **15 resultados oficiales** grabados.
+    2. Que el administrador la marque como **inactiva**.
+    3. Que hayan pasado más de **2 días** desde el domingo de la jornada (margen de cierre automático).
+- **Control Visual "Late":** La marca de `LATE` (fuera de plazo) es la única que aparece en tiempo real, aunque su efecto en puntos (bajar a 0 los aciertos) no se ejecute hasta el cierre de la jornada.
+
 ## 5. Obtención de Datos: Partidos, Resultados y Escrutinio
 
 Históricamente el sistema ha consumido datos de diferentes administraciones de loterías y periódicos, enfrentando cortes y cambios de estructura (web scraping inestable).
