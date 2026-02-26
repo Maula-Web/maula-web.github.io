@@ -351,7 +351,7 @@ class DashboardManager {
                     deadlineHtml = `
                     <div class="deadline-container" style="margin-top:1.5rem; padding:1rem; border-radius:8px;">
                         <div class="deadline-title" style="font-weight:bold; margin-bottom:0.5rem; font-size:0.9rem;">
-                            ⏳ Límite para rellenar: ${dayName} ${dateFormatted} 17:00h
+                            ⏳ Límite para rellenar Jornada ${nextJornadaData.number}: ${dayName} ${dateFormatted} 17:00h
                         </div>
                         <div id="countdown-timer" style="font-size:2.2rem; font-weight:800; font-family:monospace;">
                             --:--:--:--
