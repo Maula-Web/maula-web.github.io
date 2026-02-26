@@ -135,12 +135,8 @@ class PronosticoManager {
         }
 
 
-        // Doubles Save
         if (this.btnSaveDoubles) this.btnSaveDoubles.addEventListener('click', () => this.saveDoubles());
         if (this.btnCopyForecast) this.btnCopyForecast.addEventListener('click', () => this.handleCopyForecast());
-
-
-
     }
 
     async init() {
@@ -187,9 +183,6 @@ class PronosticoManager {
         });
 
         this.btnSave.addEventListener('click', () => this.saveForecast());
-        if (this.btnLoadForecast) {
-            this.btnLoadForecast.addEventListener('click', () => this.loadForecast());
-        }
     }
 
     selectAndLoad(jId, mId) {
@@ -609,7 +602,7 @@ class PronosticoManager {
                         const randomPhrase = FRASES_MAULA[Math.floor(Math.random() * FRASES_MAULA.length)];
                         setTimeout(() => {
                             alert('¡PRONÓSTICO COMPLETADO Y GUARDADO!\n\n' + randomPhrase);
-                        }, 100);
+                        }, 50);
                     }
                 }
 
@@ -959,7 +952,55 @@ class PronosticoManager {
             tbody.appendChild(row);
         });
 
+        // Horizontal Scroll Sync (Double Scrollbar)
+        this.applyDoubleScrollbar();
+    }
 
+    applyDoubleScrollbar() {
+        if (!this.summaryContainer || !this.summaryTable) return;
+
+        // Create or find the top scroll wrapper
+        let topWrapper = document.getElementById('top-scroll-wrapper');
+        if (!topWrapper) {
+            topWrapper = document.createElement('div');
+            topWrapper.id = 'top-scroll-wrapper';
+            topWrapper.style.overflowX = 'auto';
+            topWrapper.style.overflowY = 'hidden';
+            topWrapper.style.width = '100%';
+            topWrapper.style.height = '20px'; // Minimum height for scrollbar
+            topWrapper.innerHTML = '<div id="top-scroll-content" style="height:1px;"></div>';
+            this.summaryContainer.parentElement.insertBefore(topWrapper, this.summaryContainer);
+        }
+
+        const topContent = document.getElementById('top-scroll-content');
+        const container = this.summaryContainer;
+        const table = this.summaryTable;
+
+        // Sync contents width
+        const updateWidth = () => {
+            topContent.style.width = table.offsetWidth + 'px';
+        };
+
+        // Initial and on resize
+        updateWidth();
+        window.addEventListener('resize', updateWidth);
+
+        // Sync scroll events
+        let isSyncing = false;
+        topWrapper.onscroll = function () {
+            if (!isSyncing) {
+                isSyncing = true;
+                container.scrollLeft = topWrapper.scrollLeft;
+                isSyncing = false;
+            }
+        };
+        container.onscroll = function () {
+            if (!isSyncing) {
+                isSyncing = true;
+                topWrapper.scrollLeft = container.scrollLeft;
+                isSyncing = false;
+            }
+        };
     }
 
     async showJornadaForecasts(specificJId = null) {
