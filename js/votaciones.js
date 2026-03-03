@@ -260,7 +260,7 @@ class VotingSystem {
                 if (Array.isArray(voteVal)) {
                     if (voteVal.includes(idx)) c++;
                 } else {
-                    if (voteVal === idx) count++;
+                    if (voteVal === idx) c++;
                 }
             });
             return c;
