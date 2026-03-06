@@ -703,11 +703,11 @@ class PronosticoManager {
     }
 
     renderHelpMarks() {
+        // Deactivated for now as per user request
         if (!this.marksPhysical || !this.marksDigital) return;
         this.marksPhysical.innerHTML = '';
         this.marksDigital.innerHTML = '';
-
-        // SEARCH: Find the extra forecast for this jornada 
+        return;
         // We look for ANY member's extra forecast that has valid signs, since normally only one is filled.
         const pExtra = (this.pronosticosExtra || []).find(p =>
             (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) &&
