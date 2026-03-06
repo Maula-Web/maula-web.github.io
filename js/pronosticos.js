@@ -59,6 +59,7 @@ class PronosticoManager {
         this.viewJornadaTitle = document.getElementById('view-jornada-title');
         this.viewJornadaContent = document.getElementById('view-jornada-content');
         this.btnCloseViewJornada = document.getElementById('btnCloseViewJornada');
+        this.btnCloseMobileFloat = document.getElementById('btn-close-mobilefloat');
         this.selModalJornada = document.getElementById('sel-modal-jornada');
         this.btnPrevJornada = document.getElementById('btn-prev-jornada');
         this.btnNextJornada = document.getElementById('btn-next-jornada');
@@ -113,6 +114,11 @@ class PronosticoManager {
         }
         if (this.btnCloseViewJornada) {
             this.btnCloseViewJornada.addEventListener('click', () => {
+                this.viewJornadaModal.style.display = 'none';
+            });
+        }
+        if (this.btnCloseMobileFloat) {
+            this.btnCloseMobileFloat.addEventListener('click', () => {
                 this.viewJornadaModal.style.display = 'none';
             });
         }
@@ -1068,6 +1074,10 @@ class PronosticoManager {
             this.viewJornadaModal.style.zIndex = '999999';
 
             const isMobile = window.innerWidth <= 768;
+
+            if (this.btnCloseMobileFloat) {
+                this.btnCloseMobileFloat.style.display = isMobile ? 'block' : 'none';
+            }
 
             const fSizeTable = isMobile ? '0.8rem' : '1.05rem';
             const fSizeTh = isMobile ? '0.85rem' : '1.1rem';
