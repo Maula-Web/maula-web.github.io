@@ -66,6 +66,16 @@ class PronosticoManager {
         this.btnLoadForecast = document.getElementById('btn-load-forecast');
         this.btnClearForecast = document.getElementById('btn-clear-forecast');
 
+        // Help Doubles Modal
+        this.btnHelpDoubles = document.getElementById('btn-help-doubles');
+        this.helpModal = document.getElementById('help-doubles-modal');
+        this.btnCloseHelp = document.getElementById('btnCloseHelpDoubles');
+        this.mobileTabs = document.getElementById('mobile-help-tabs');
+        this.btnShowPhysical = document.getElementById('btn-show-physical');
+        this.btnShowDigital = document.getElementById('btn-show-digital');
+        this.physicalSection = document.getElementById('help-physical-section');
+        this.digitalSection = document.getElementById('help-digital-section');
+
 
         this.btnToggleSummary = document.getElementById('btn-toggle-summary');
         if (this.btnToggleSummary) {
@@ -144,6 +154,11 @@ class PronosticoManager {
 
         if (this.btnSaveDoubles) this.btnSaveDoubles.addEventListener('click', () => this.saveDoubles());
         if (this.btnCopyForecast) this.btnCopyForecast.addEventListener('click', () => this.handleCopyForecast());
+
+        if (this.btnHelpDoubles) this.btnHelpDoubles.addEventListener('click', () => this.showHelpDoubles());
+        if (this.btnCloseHelp) this.btnCloseHelp.addEventListener('click', () => this.helpModal.style.display = 'none');
+        if (this.btnShowPhysical) this.btnShowPhysical.addEventListener('click', () => this.switchHelpView('physical'));
+        if (this.btnShowDigital) this.btnShowDigital.addEventListener('click', () => this.switchHelpView('digital'));
     }
 
     async init() {
@@ -636,6 +651,41 @@ class PronosticoManager {
 
         // Trigger save immediately to persist the clearing
         this.saveForecast();
+    }
+
+    showHelpDoubles() {
+        if (!this.helpModal) return;
+        this.helpModal.style.display = 'flex';
+
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            if (this.mobileTabs) this.mobileTabs.style.display = 'flex';
+            this.switchHelpView('physical'); // Default to physical on mobile
+        } else {
+            if (this.mobileTabs) this.mobileTabs.style.display = 'none';
+            if (this.physicalSection) this.physicalSection.style.display = 'block';
+            if (this.digitalSection) this.digitalSection.style.display = 'block';
+        }
+    }
+
+    switchHelpView(view) {
+        if (!this.physicalSection || !this.digitalSection) return;
+
+        if (view === 'physical') {
+            this.physicalSection.style.display = 'block';
+            this.digitalSection.style.display = 'none';
+            this.btnShowPhysical.style.background = '#607d8b';
+            this.btnShowPhysical.style.color = 'white';
+            this.btnShowDigital.style.background = '#cfd8dc';
+            this.btnShowDigital.style.color = '#333';
+        } else {
+            this.physicalSection.style.display = 'none';
+            this.digitalSection.style.display = 'block';
+            this.btnShowPhysical.style.background = '#cfd8dc';
+            this.btnShowPhysical.style.color = '#333';
+            this.btnShowDigital.style.background = '#607d8b';
+            this.btnShowDigital.style.color = 'white';
+        }
     }
 
     async saveForecast() {

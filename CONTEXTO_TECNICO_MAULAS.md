@@ -113,8 +113,15 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
 
 - **Auto-guardado Silencioso**: No es necesario pulsar "Guardar". Cualquier cambio se registra en Firebase tras 800ms de inactividad del usuario.
 - **Control de Plazos Automático**: Si un socio modifica un signo después del `deadline` calculado (jueves 17:00), el registro se marca automáticamente como `late: true` para su posterior penalización.
-- **Lógica de Desmarcado**: Pinchando de nuevo en un signo seleccionado, este se desmarca (queda vacío), permitiendo rectificaciones parciales.
+- **Lógica de Desmarcado y Borrado Total**:
+  - Pinchando de nuevo en un signo seleccionado, este se desmarca (queda vacío).
+  - Se ha incorporado un botón de **"Borrar Todo el Pronóstico"** (`#btn-clear-forecast`) que permite vaciar todos los campos de una vez. La lógica de guardado permite persistir este estado vacío para facilitar el borrado manual de registros erróneos.
+- **Tratamiento de Pronósticos Vacíos ("No Juzgados")**: Para evitar penalizaciones injustas (puntos negativos por tener 0 aciertos) y ruido visual, cualquier pronóstico que esté totalmente vacío o solo contenga guiones (`"-"`) se detecta automáticamente como **"No jugado"** en toda la aplicación (Resultados, Resumen de Temporada y Dashboard).
 - **Notificación de Éxito**: Al completar los **14 primeros signos**, salta una alerta con una frase maulera aleatoria (50ms de retardo) confirmando el guardado. El Pleno al 15 no dispara la alerta para permitir que se decida al final.
+- **Adaptación y UX en Móvil**:
+  - **Sizing Dinámico**: En la vista colectiva de jornadas, el sistema detecta el ancho del dispositivo (`window.innerWidth <= 768`) y reduce proporcionalmente el tamaño de fuentes y celdas para optimizar la visibilidad.
+  - **Scroll Horizontal Nativo**: El contenedor del modal utiliza `display: block` y `-webkit-overflow-scrolling: touch` para garantizar un desplazamiento fluido de la tabla en pantallas pequeñas.
+  - **Botón de Cierre Flotante**: Se incluye un botón flotante (`Volver a Pronósticos`) en la parte inferior exclusivo para móviles, facilitando la navegación sin depender de la "X" superior de difícil alcance.
 - **Visualización Técnica**: La tabla resumen de la peña incluye un **doble scroll horizontal** (barra superior e inferior) para facilitar la consulta de columnas de socios sin desplazarse al final de la página.
 
 ## 8. Comunicaciones y Notificaciones: Telegram
