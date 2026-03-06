@@ -156,7 +156,10 @@ class PronosticoManager {
         if (this.btnCopyForecast) this.btnCopyForecast.addEventListener('click', () => this.handleCopyForecast());
 
         if (this.btnHelpDoubles) this.btnHelpDoubles.addEventListener('click', () => this.showHelpDoubles());
-        if (this.btnCloseHelp) this.btnCloseHelp.addEventListener('click', () => this.helpModal.style.display = 'none');
+        if (this.btnCloseHelp) this.btnCloseHelp.addEventListener('click', () => {
+            this.helpModal.style.display = 'none';
+            this.helpModal.classList.remove('active');
+        });
         if (this.btnShowPhysical) this.btnShowPhysical.addEventListener('click', () => this.switchHelpView('physical'));
         if (this.btnShowDigital) this.btnShowDigital.addEventListener('click', () => this.switchHelpView('digital'));
     }
@@ -655,7 +658,13 @@ class PronosticoManager {
 
     showHelpDoubles() {
         if (!this.helpModal) return;
+
+        // Force visibility and override any CSS opacity 0
         this.helpModal.style.display = 'flex';
+        this.helpModal.style.opacity = '1';
+        this.helpModal.style.visibility = 'visible';
+        this.helpModal.style.zIndex = '2000000';
+        this.helpModal.classList.add('active');
 
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
@@ -663,6 +672,7 @@ class PronosticoManager {
             this.switchHelpView('physical'); // Default to physical on mobile
         } else {
             if (this.mobileTabs) this.mobileTabs.style.display = 'none';
+            // On desktop show both side by side
             if (this.physicalSection) this.physicalSection.style.display = 'block';
             if (this.digitalSection) this.digitalSection.style.display = 'block';
         }
