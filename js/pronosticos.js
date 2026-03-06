@@ -631,14 +631,11 @@ class PronosticoManager {
         const options = this.container.querySelectorAll('.chk-option.selected');
         options.forEach(opt => opt.classList.remove('selected'));
 
-        // If in auto-save mode, this will trigger an auto-save with empty selection
-        // which we want to treat as a deletion/clearing.
-        if (this.autoSaveTimeout) {
-            this.scheduleAutoSave();
-        } else {
-            // Manual save call if we want to propagate immediately
-            this.saveForecast();
-        }
+        // Update cost/penalty display after clearing
+        this.updateCost();
+
+        // Trigger save immediately to persist the clearing
+        this.saveForecast();
     }
 
     async saveForecast() {
@@ -677,7 +674,10 @@ class PronosticoManager {
             console.log("🔵 PASO 3: Selección:", selection);
             console.log("¿Falta algo?", missing);
 
-            if (missing) {
+            // Allow saving if it's completely empty (Clearing action)
+            const isFullyEmpty = selection.every(s => s === null || s === '-');
+
+            if (missing && !isFullyEmpty) {
                 alert('Debes rellenar todos los resultados disponibles.');
                 return;
             }
