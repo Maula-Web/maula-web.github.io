@@ -64,6 +64,7 @@ class PronosticoManager {
         this.btnPrevJornada = document.getElementById('btn-prev-jornada');
         this.btnNextJornada = document.getElementById('btn-next-jornada');
         this.btnLoadForecast = document.getElementById('btn-load-forecast');
+        this.btnClearForecast = document.getElementById('btn-clear-forecast');
 
 
         this.btnToggleSummary = document.getElementById('btn-toggle-summary');
@@ -189,6 +190,9 @@ class PronosticoManager {
         });
 
         this.btnSave.addEventListener('click', () => this.saveForecast());
+        if (this.btnClearForecast) {
+            this.btnClearForecast.addEventListener('click', () => this.handleClearForecast());
+        }
     }
 
     selectAndLoad(jId, mId) {
@@ -267,6 +271,7 @@ class PronosticoManager {
         if (this.doublesSection) this.doublesSection.classList.add('hidden');
         if (this.doublesInfoHeader) this.doublesInfoHeader.style.display = 'none';
         this.btnSave.style.display = 'none';
+        if (this.btnClearForecast) this.btnClearForecast.style.display = 'none';
         this.statusMsg.textContent = '';
         this.deadlineInfo.textContent = '';
         this._fullForecastNotified = false;
@@ -426,6 +431,8 @@ class PronosticoManager {
         this.container.classList.remove('hidden');
         if (!isLocked) {
             this.btnSave.style.display = 'block';
+            if (this.btnClearForecast) this.btnClearForecast.style.display = 'inline-block';
+
             if (isLockedRef && this.correctionMode) {
                 this.btnSave.innerHTML = "🛠️ Guardar Corrección";
                 this.btnSave.style.backgroundColor = "var(--primary-orange)";
@@ -616,6 +623,22 @@ class PronosticoManager {
                 console.error("Auto-save error:", e);
             }
         }, 800);
+    }
+
+    handleClearForecast() {
+        if (!confirm('¿Estás seguro de que quieres borrar todos los signos de este pronóstico?')) return;
+
+        const options = this.container.querySelectorAll('.chk-option.selected');
+        options.forEach(opt => opt.classList.remove('selected'));
+
+        // If in auto-save mode, this will trigger an auto-save with empty selection
+        // which we want to treat as a deletion/clearing.
+        if (this.autoSaveTimeout) {
+            this.scheduleAutoSave();
+        } else {
+            // Manual save call if we want to propagate immediately
+            this.saveForecast();
+        }
     }
 
     async saveForecast() {
