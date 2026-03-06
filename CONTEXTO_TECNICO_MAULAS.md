@@ -113,6 +113,11 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
 
 - **Auto-guardado Silencioso**: No es necesario pulsar "Guardar". Cualquier cambio se registra en Firebase tras 800ms de inactividad del usuario.
 - **Control de Plazos Automático**: Si un socio modifica un signo después del `deadline` calculado (jueves 17:00), el registro se marca automáticamente como `late: true` para su posterior penalización.
+- **Ayuda al Sellado de Dobles (Sello de la Peña)**:
+  - Se ha implementado un sistema de **Marcado Dinámico** sobre imágenes reales (Boleto Físico e Interfaz Web de Loterías).
+  - **Universalidad**: El botón está disponible para todos los socios. El sistema busca automáticamente el pronóstico de dobles guardado para la jornada activa (independientemente de quién lo haya rellenado) y genera una "plantilla visual".
+  - **Marcas de Precisión**: Dibuja cruces rojas (`X`) sobre el boleto indicando los 14 signos, el Pleno al 15, el número de dobles en la columna de combinaciones y las casillas de reducción correspondientes.
+  - **UX Adaptativa**: El modal de ayuda aprovecha el máximo de pantalla en PC (98% ancho) y permite alternar vistas en dispositivos móviles mediante pestañas.
 - **Lógica de Desmarcado y Borrado Total**:
   - Pinchando de nuevo en un signo seleccionado, este se desmarca (queda vacío).
   - Se ha incorporado un botón de **"Borrar Todo el Pronóstico"** (`#btn-clear-forecast`) que permite vaciar todos los campos de una vez. La lógica de guardado permite persistir este estado vacío para facilitar el borrado manual de registros erróneos.

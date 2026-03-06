@@ -715,7 +715,7 @@ class PronosticoManager {
         );
 
         if (!pExtra || !pExtra.selection) {
-            const msg = '<div style="position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); color:white; background:rgba(0,0,0,0.85); padding:30px; border-radius:15px; font-size:1.2rem; text-align:center; width:80%; box-shadow:0 15px 40px rgba(0,0,0,0.5); z-index:1000; border:2px solid #ff9100;">⚠️ No se han encontrado dobles guardados para la Jornada ' + this.currentJornadaId + '.<br><br><span style="font-size:0.9rem; opacity:0.8;">Asegúrate de que alguien haya rellenado y guardado la quiniela de dobles primero.</span></div>';
+            const msg = '<div style="position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); color:white; background:rgba(0,0,0,0.85); padding:30px; border-radius:15px; font-size:1.2rem; text-align:center; width:80%; box-shadow:0 15px 40px rgba(0,0,0,0.5); z-index:1000; border:2px solid #00e5ff;">⚠️ No se han encontrado dobles guardados para la Jornada ' + this.currentJornadaId + '.<br><br><span style="font-size:0.9rem; opacity:0.8;">Asegúrate de que alguien haya rellenado y guardado la quiniela de dobles primero.</span></div>';
             this.marksPhysical.innerHTML = msg;
             this.marksDigital.innerHTML = msg;
             return;
@@ -725,10 +725,10 @@ class PronosticoManager {
         let doublesCount = 0;
         let doubleIndices = [];
 
-        // 1. PHYSICAL MARKS (reducidas.png) - RECALIBRATED FEB 2024
-        const rowStartY = 23.4;
-        const rowStepY = 4.49;
-        const colX = { '1': 10.5, 'X': 13.8, '2': 17.1 };
+        // 1. PHYSICAL MARKS (reducidas.png) - RECALIBRATED AGAIN
+        const rowStartY = 33.8;
+        const rowStepY = 3.90;
+        const colX = { '1': 15.5, 'X': 18.8, '2': 22.1 };
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return; // P15 separate
@@ -745,51 +745,51 @@ class PronosticoManager {
         });
 
         // Pleno al 15 (Physical)
-        const p15 = sel[14] || '';
+        const p15Val = sel[14] || '';
         const p15Y = 88.5;
-        const p15HomeX = { '0': 10.7, '1': 13.8, '2': 16.9, 'M': 20.0 };
-        const p15AwayX = { '0': 10.7, '1': 13.8, '2': 16.9, 'M': 23.3 };
-        if (p15 && p15.includes('-')) {
-            const [h, a] = p15.split('-');
-            if (p15HomeX[h]) this.drawX(this.marksPhysical, p15HomeX[h], p15Y);
-            if (p15AwayX[a]) this.drawX(this.marksPhysical, p15AwayX[a], p15Y + 3.2);
+        const p15HomeX = { '0': 15.1, '1': 17.5, '2': 19.9, 'M': 22.3 };
+        const p15AwayX = { '0': 15.1, '1': 17.5, '2': 19.9, 'M': 24.5 };
+        if (p15Val && p15Val.includes('-')) {
+            const [h, a] = p15Val.split('-');
+            if (p15HomeX[h]) this.drawX(this.marksPhysical, p15HomeX[h], p15Y, '1.1rem');
+            if (p15AwayX[a]) this.drawX(this.marksPhysical, p15AwayX[a], p15Y + 3.2, '1.1rem');
         }
 
         // Combinaciones (DOBLES matches count)
         if (doublesCount > 0 && doublesCount <= 14) {
-            const combX = 32.2;
+            const combX = 39.5;
             const combY = rowStartY + ((doublesCount - 1) * rowStepY);
-            this.drawX(this.marksPhysical, combX, combY, '1.4rem');
+            this.drawX(this.marksPhysical, combX, combY, '1.2rem');
         }
 
         // Reducciones (Indices column)
         if (doublesCount === 7 || doublesCount === 4) {
             doubleIndices.forEach(idx => {
-                const redX = 59.2;
+                const redX = 66.0;
                 const redY = rowStartY + ((idx - 1) * rowStepY);
-                this.drawX(this.marksPhysical, redX, redY, '1.4rem');
+                this.drawX(this.marksPhysical, redX, redY, '1.1rem');
             });
             if (doublesCount === 7) {
-                this.drawX(this.marksPhysical, 71.5, 36.8, '2.2rem'); // SEGUNDA reduction box
+                this.drawX(this.marksPhysical, 78.5, 41.5, '1.6rem'); // SEGUNDA reduction box
             }
         }
 
-        // 2. DIGITAL MARKS (interfaz_loterias) - RECALIBRATED
-        const digRowY = 28.3;
+        // 2. DIGITAL MARKS (interfaz_loterias) - RECALIBRATED Y
+        const digRowY = 14.5;
         const digStepY = 3.92;
-        const digColX = { '1': 66.8, 'X': 68.3, '2': 69.8 };
-        const digSysX = 75.3; // Partidos en Sistema
+        const digColX = { '1': 65.2, 'X': 66.7, '2': 68.2 };
+        const digSysX = 74.0;
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
             const posY = digRowY + (idx * digStepY);
-            if (sign.includes('1')) this.drawX(this.marksDigital, digColX['1'], posY, '0.9rem');
-            if (sign.includes('X')) this.drawX(this.marksDigital, digColX['X'], posY, '0.9rem');
-            if (sign.includes('2')) this.drawX(this.marksDigital, digColX['2'], posY, '0.9rem');
-            if (sign.length === 2) this.drawX(this.marksDigital, digSysX, posY, '0.9rem');
+            if (sign.includes('1')) this.drawX(this.marksDigital, digColX['1'], posY, '1rem');
+            if (sign.includes('X')) this.drawX(this.marksDigital, digColX['X'], posY, '1rem');
+            if (sign.includes('2')) this.drawX(this.marksDigital, digColX['2'], posY, '1rem');
+            if (sign.length === 2) this.drawX(this.marksDigital, digSysX, posY, '1rem');
         });
 
-        this.marksDigital.innerHTML += '<div style="position:absolute; top:20px; right:20px; background:rgba(211,47,47,0.95); color:white; padding:10px 20px; border-radius:30px; font-size:1rem; font-weight:900; box-shadow:0 8px 20px rgba(0,0,0,0.4); z-index:1000; border:2px solid #fff;">GUÍA: ' + doublesCount + ' DOBLES</div>';
+        this.marksDigital.innerHTML += '<div style="position:absolute; top:20px; right:20px; background:rgba(0, 71, 161, 0.95); color:white; padding:10px 20px; border-radius:30px; font-size:1rem; font-weight:900; box-shadow:0 8px 20px rgba(0,0,0,0.4); z-index:1000; border:2px solid #00e5ff;">GUÍA: ' + doublesCount + ' DOBLES</div>';
     }
 
     drawX(container, xPct, yPct, size = null) {
