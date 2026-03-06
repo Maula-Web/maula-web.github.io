@@ -23,26 +23,46 @@
             position: absolute;
             color: #00e5ff;
             font-weight: 1000;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            text-shadow: 0 0 3px #000, 0 0 8px rgba(0, 229, 255, 0.6);
+            text-shadow: 0 0 3px #000;
             line-height: 1;
             z-index: 100;
-            filter: drop-shadow(0 0 2px #000);
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #00e5ff;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
         }
 
         @media (max-width: 768px) {
             .help-mark-x {
-                font-size: 1rem;
-                text-shadow: 1px 1px 1px #fff;
+                font-size: 0.8rem;
+                width: 16px;
+                height: 16px;
+                border-width: 1px;
             }
         }
 
+        .help-mark-wrapper {
+            display: inline-block;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+        }
+
         .help-mark-wrapper img {
+            display: block;
             max-width: 100%;
             height: auto;
-            image-rendering: auto;
         }
     </style>
     <div class="main-container">
@@ -321,17 +341,16 @@
 
                     <!-- Physical Section -->
                     <div id="help-physical-section"
-                        style="flex:1; min-width:300px; border:1px solid #ddd; padding:15px; border-radius:8px;">
+                        style="flex:1; min-width:300px; border:1px solid #ddd; padding:15px; border-radius:8px; text-align:center;">
                         <h4 style="margin-top:0; color:#455a64; border-bottom:1px solid #eee; padding-bottom:5px;">📌
                             Boleto Físico (Administración)</h4>
-                        <div class="help-mark-wrapper" style="position:relative; width:100%;">
-                            <img src="IMAGENES/reducidas.png"
-                                style="width:100%; height:auto; border-radius:4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
+                        <div class="help-mark-wrapper">
+                            <img src="IMAGENES/reducidas.png">
                             <div id="marks-physical"
                                 style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">
                             </div>
                         </div>
-                        <div style="font-size:0.85rem; line-height:1.4; margin-top: 15px;">
+                        <div style="font-size:0.85rem; line-height:1.4; margin-top: 15px; text-align: left;">
                             <p><strong>Para 7 Dobles REDUCIDOS (Opción 2):</strong></p>
                             <ul>
                                 <li><strong>Pronósticos:</strong> Marca los 14 signos (7 de ellos llevarán doble).</li>
@@ -351,17 +370,16 @@
 
                     <!-- Digital Section -->
                     <div id="help-digital-section"
-                        style="flex:1; min-width:300px; border:1px solid #ddd; padding:15px; border-radius:8px;">
+                        style="flex:1; min-width:300px; border:1px solid #ddd; padding:15px; border-radius:8px; text-align:center;">
                         <h4 style="margin-top:0; color:#455a64; border-bottom:1px solid #eee; padding-bottom:5px;">💻
                             Interfaz Web (Loterías)</h4>
-                        <div class="help-mark-wrapper" style="position:relative; width:100%;">
-                            <img src="IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg"
-                                style="width:100%; height:auto; border-radius:4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
+                        <div class="help-mark-wrapper">
+                            <img src="IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg">
                             <div id="marks-digital"
                                 style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">
                             </div>
                         </div>
-                        <div style="font-size:0.85rem; line-height:1.4; margin-top: 15px;">
+                        <div style="font-size:0.85rem; line-height:1.4; margin-top: 15px; text-align: left;">
                             <p><strong>Proceso Digital:</strong></p>
                             <ol>
                                 <li>Selecciona <strong>MÉTODO: Reducido</strong>.</li>

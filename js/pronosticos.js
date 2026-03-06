@@ -725,18 +725,24 @@ class PronosticoManager {
         let doublesCount = 0;
         let doubleIndices = [];
 
-        // 1. PHYSICAL MARKS (reducidas.png) - RECALIBRATED AGAIN
-        const rowStartY = 33.8;
-        const rowStepY = 3.90;
-        const colX = { '1': 15.5, 'X': 18.8, '2': 22.1 };
+        // 1. PHYSICAL GRID (reducidas.png)
+        const physGrid = {
+            startY: 23.5,
+            stepY: 4.615,
+            cols: { '1': 18.15, 'X': 19.75, '2': 21.35 },
+            combX: 25.5,
+            redX: 59.2,
+            p15Y: 88.6,
+            p15Home: { '0': 18.2, '1': 19.8, '2': 21.4, 'M': 23.0 },
+            p15Away: { '0': 18.2, '1': 19.8, '2': 21.4, 'M': 25.3 }
+        };
 
         sel.forEach((sign, idx) => {
-            if (idx === 14) return; // P15 separate
-
-            const posY = rowStartY + (idx * rowStepY);
-            if (sign.includes('1')) this.drawX(this.marksPhysical, colX['1'], posY);
-            if (sign.includes('X')) this.drawX(this.marksPhysical, colX['X'], posY);
-            if (sign.includes('2')) this.drawX(this.marksPhysical, colX['2'], posY);
+            if (idx === 14) return;
+            const posY = physGrid.startY + (idx * physGrid.stepY);
+            if (sign.includes('1')) this.drawX(this.marksPhysical, physGrid.cols['1'], posY);
+            if (sign.includes('X')) this.drawX(this.marksPhysical, physGrid.cols['X'], posY);
+            if (sign.includes('2')) this.drawX(this.marksPhysical, physGrid.cols['2'], posY);
 
             if (sign.length === 2) {
                 doublesCount++;
@@ -744,49 +750,46 @@ class PronosticoManager {
             }
         });
 
-        // Pleno al 15 (Physical)
+        // P15 Physical
         const p15Val = sel[14] || '';
-        const p15Y = 88.5;
-        const p15HomeX = { '0': 15.1, '1': 17.5, '2': 19.9, 'M': 22.3 };
-        const p15AwayX = { '0': 15.1, '1': 17.5, '2': 19.9, 'M': 24.5 };
         if (p15Val && p15Val.includes('-')) {
             const [h, a] = p15Val.split('-');
-            if (p15HomeX[h]) this.drawX(this.marksPhysical, p15HomeX[h], p15Y, '1.1rem');
-            if (p15AwayX[a]) this.drawX(this.marksPhysical, p15AwayX[a], p15Y + 3.2, '1.1rem');
+            if (physGrid.p15Home[h]) this.drawX(this.marksPhysical, physGrid.p15Home[h], physGrid.p15Y);
+            if (physGrid.p15Away[a]) this.drawX(this.marksPhysical, physGrid.p15Away[a], physGrid.p15Y + 3.4);
         }
 
-        // Combinaciones (DOBLES matches count)
-        if (doublesCount > 0 && doublesCount <= 14) {
-            const combX = 39.5;
-            const combY = rowStartY + ((doublesCount - 1) * rowStepY);
-            this.drawX(this.marksPhysical, combX, combY, '1.2rem');
+        // Combinaciones physical
+        if (doublesCount > 0) {
+            const combY = physGrid.startY + ((doublesCount - 1) * physGrid.stepY);
+            this.drawX(this.marksPhysical, physGrid.combX, combY);
         }
 
-        // Reducciones (Indices column)
+        // Reducciones physical
         if (doublesCount === 7 || doublesCount === 4) {
             doubleIndices.forEach(idx => {
-                const redX = 66.0;
-                const redY = rowStartY + ((idx - 1) * rowStepY);
-                this.drawX(this.marksPhysical, redX, redY, '1.1rem');
+                const redY = physGrid.startY + ((idx - 1) * physGrid.stepY);
+                this.drawX(this.marksPhysical, physGrid.redX, redY);
             });
             if (doublesCount === 7) {
-                this.drawX(this.marksPhysical, 78.5, 41.5, '1.6rem'); // SEGUNDA reduction box
+                this.drawX(this.marksPhysical, 78.5, 41.5); // SEGUNDA reduction box
             }
         }
 
-        // 2. DIGITAL MARKS (interfaz_loterias) - RECALIBRATED Y
-        const digRowY = 14.5;
-        const digStepY = 3.92;
-        const digColX = { '1': 65.2, 'X': 66.7, '2': 68.2 };
-        const digSysX = 74.0;
+        // 2. DIGITAL GRID (interfaz_loterias)
+        const digGrid = {
+            startY: 23.5,
+            stepY: 4.02,
+            cols: { '1': 65.2, 'X': 66.8, '2': 68.3 },
+            sysX: 74.8
+        };
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
-            const posY = digRowY + (idx * digStepY);
-            if (sign.includes('1')) this.drawX(this.marksDigital, digColX['1'], posY, '1rem');
-            if (sign.includes('X')) this.drawX(this.marksDigital, digColX['X'], posY, '1rem');
-            if (sign.includes('2')) this.drawX(this.marksDigital, digColX['2'], posY, '1rem');
-            if (sign.length === 2) this.drawX(this.marksDigital, digSysX, posY, '1rem');
+            const posY = digGrid.startY + (idx * digGrid.stepY);
+            if (sign.includes('1')) this.drawX(this.marksDigital, digGrid.cols['1'], posY);
+            if (sign.includes('X')) this.drawX(this.marksDigital, digGrid.cols['X'], posY);
+            if (sign.includes('2')) this.drawX(this.marksDigital, digGrid.cols['2'], posY);
+            if (sign.length === 2) this.drawX(this.marksDigital, digGrid.sysX, posY);
         });
 
         this.marksDigital.innerHTML += '<div style="position:absolute; top:20px; right:20px; background:rgba(0, 71, 161, 0.95); color:white; padding:10px 20px; border-radius:30px; font-size:1rem; font-weight:900; box-shadow:0 8px 20px rgba(0,0,0,0.4); z-index:1000; border:2px solid #00e5ff;">GUÍA: ' + doublesCount + ' DOBLES</div>';
