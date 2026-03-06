@@ -725,16 +725,16 @@ class PronosticoManager {
         let doublesCount = 0;
         let doubleIndices = [];
 
-        // 1. PHYSICAL GRID (reducidas.png)
+        // 1. PHYSICAL GRID (reducidas.png) - RADICAL HORIZONTAL RECALIBRATION
         const physGrid = {
             startY: 23.5,
             stepY: 4.615,
-            cols: { '1': 18.15, 'X': 19.75, '2': 21.35 },
-            combX: 25.5,
-            redX: 59.2,
+            cols: { '1': 42.6, 'X': 45.9, '2': 49.2 },
+            combX: 53.7,
+            redX: 77.8,
             p15Y: 88.6,
-            p15Home: { '0': 18.2, '1': 19.8, '2': 21.4, 'M': 23.0 },
-            p15Away: { '0': 18.2, '1': 19.8, '2': 21.4, 'M': 25.3 }
+            p15Home: { '0': 42.6, '1': 45.9, '2': 49.2, 'M': 52.5 },
+            p15Away: { '0': 42.6, '1': 45.9, '2': 49.2, 'M': 55.8 }
         };
 
         sel.forEach((sign, idx) => {
@@ -771,16 +771,16 @@ class PronosticoManager {
                 this.drawX(this.marksPhysical, physGrid.redX, redY);
             });
             if (doublesCount === 7) {
-                this.drawX(this.marksPhysical, 78.5, 41.5); // SEGUNDA reduction box
+                this.drawX(this.marksPhysical, 88.0, 41.5); // SEGUNDA reduction box (Top Right)
             }
         }
 
-        // 2. DIGITAL GRID (interfaz_loterias)
+        // 2. DIGITAL GRID (interfaz_loterias) - LEFT SHIFT
         const digGrid = {
             startY: 23.5,
             stepY: 4.02,
-            cols: { '1': 65.2, 'X': 66.8, '2': 68.3 },
-            sysX: 74.8
+            cols: { '1': 60.5, 'X': 62.0, '2': 63.5 },
+            sysX: 72.1
         };
 
         sel.forEach((sign, idx) => {
@@ -795,13 +795,12 @@ class PronosticoManager {
         this.marksDigital.innerHTML += '<div style="position:absolute; top:20px; right:20px; background:rgba(0, 71, 161, 0.95); color:white; padding:10px 20px; border-radius:30px; font-size:1rem; font-weight:900; box-shadow:0 8px 20px rgba(0,0,0,0.4); z-index:1000; border:2px solid #00e5ff;">GUÍA: ' + doublesCount + ' DOBLES</div>';
     }
 
-    drawX(container, xPct, yPct, size = null) {
+    drawX(container, xPct, yPct) {
         const x = document.createElement('div');
         x.className = 'help-mark-x';
         x.textContent = 'X';
         x.style.left = xPct + '%';
         x.style.top = yPct + '%';
-        if (size) x.style.fontSize = size;
         container.appendChild(x);
     }
 
