@@ -726,44 +726,45 @@ class PronosticoManager {
         let doubleIndices = [];
 
         // ---------------------------------------------------------
-        // 1. PHYSICAL GRID (Basado en Excel A1:AG33 -> 33x33 celdas)
+        // 1. PHYSICAL GRID (Basado en Excel A1:AG33 con anchos variables)
         // ---------------------------------------------------------
-        const gT = 33;
-        const gP = (c) => ((c - 0.5) / gT) * 100;
-
-        const phys = {
-            c1: gP(10), cX: gP(11), c2: gP(12),
-            cP: gP(16), cU: gP(21),
-            p15Cols: { '0': gP(2), '1': gP(4), '2': gP(6), 'M': gP(8) },
-            p15R1: gP(28), p15R2: gP(29)
+        const physConfig = {
+            offsetX: 10.5, // Ajuste de margen izquierdo para Col A-I
+            offsetY: 29.5, // Ajuste de margen superior para Fila 1
+            stepX: 3.22,   // Ancho de tus celdas centrales (J, K, L...)
+            stepY: 1.96    // Alto de tus filas
         };
+
+        const getX = (colNum) => physConfig.offsetX + (colNum * physConfig.stepX);
+        const getY = (rowNum) => physConfig.offsetY + (rowNum * physConfig.stepY);
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
-            const r = 2 + (idx * 2);
-            const y = gP(r);
-            if (sign.includes('1')) this.drawX(this.marksPhysical, phys.c1, y);
-            if (sign.includes('X')) this.drawX(this.marksPhysical, phys.cX, y);
-            if (sign.includes('2')) this.drawX(this.marksPhysical, phys.c2, y);
+            const rExcel = 2 + (idx * 2); // Filas 2, 4, 6... 28
+            const y = getY(rExcel);
+            if (sign.includes('1')) this.drawX(this.marksPhysical, getX(10), y);
+            if (sign.includes('X')) this.drawX(this.marksPhysical, getX(11), y);
+            if (sign.includes('2')) this.drawX(this.marksPhysical, getX(12), y);
             if (sign.length === 2) {
                 doublesCount++;
                 doubleIndices.push(idx + 1);
             }
         });
 
-        // Pleno 15 y Otros
+        // Pleno 15 y Otros (B=2, D=4, F=6, H=8)
         const p15Val = sel[14] || '';
         if (p15Val.includes('-')) {
             const [h, a] = p15Val.split('-');
-            if (phys.p15Cols[h]) this.drawX(this.marksPhysical, phys.p15Cols[h], phys.p15R1);
-            if (phys.p15Cols[a]) this.drawX(this.marksPhysical, phys.p15Cols[a], phys.p15R2);
+            const pCols = { '0': 2, '1': 4, '2': 6, 'M': 8 };
+            if (pCols[h]) this.drawX(this.marksPhysical, getX(pCols[h]), getY(28));
+            if (pCols[a]) this.drawX(this.marksPhysical, getX(pCols[a]), getY(29));
         }
-        if (doublesCount === 7) this.drawX(this.marksPhysical, phys.cP, gP(14));
+        if (doublesCount === 7) this.drawX(this.marksPhysical, getX(16), getY(14)); // P14
         doubleIndices.forEach(idx => {
-            const y = gP(2 + ((idx - 1) * 2));
-            this.drawX(this.marksPhysical, phys.cU, y);
+            const y = getY(2 + ((idx - 1) * 2));
+            this.drawX(this.marksPhysical, getX(21), y); // U
         });
-        if (doublesCount === 7) this.drawX(this.marksPhysical, gP(26.5), gP(14.8));
+        if (doublesCount === 7) this.drawX(this.marksPhysical, getX(26.6), getY(14.8)); // Cuadro Opción 2
 
         // ---------------------------------------------------------
         // 2. DIGITAL GRID
