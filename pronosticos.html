@@ -18,6 +18,24 @@
     <script src="js/auth.js"></script>
     <script src="js/scoring.js"></script>
 
+    <style>
+        .help-mark-x {
+            position: absolute;
+            color: #d32f2f;
+            font-weight: 900;
+            font-size: 1.2rem;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            text-shadow: 1px 1px 0 #fff;
+            line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+            .help-mark-x {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
     <div class="main-container">
         <!-- Header -->
         <header class="header-actions">
@@ -297,9 +315,14 @@
                         style="flex:1; min-width:300px; border:1px solid #ddd; padding:15px; border-radius:8px;">
                         <h4 style="margin-top:0; color:#455a64; border-bottom:1px solid #eee; padding-bottom:5px;">📌
                             Boleto Físico (Administración)</h4>
-                        <img src="IMAGENES/reducidas.png"
-                            style="width:100%; height:auto; border-radius:4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom:15px;">
-                        <div style="font-size:0.85rem; line-height:1.4;">
+                        <div class="help-mark-wrapper" style="position:relative; width:100%;">
+                            <img src="IMAGENES/reducidas.png"
+                                style="width:100%; height:auto; border-radius:4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
+                            <div id="marks-physical"
+                                style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">
+                            </div>
+                        </div>
+                        <div style="font-size:0.85rem; line-height:1.4; margin-top: 15px;">
                             <p><strong>Para 7 Dobles REDUCIDOS (Opción 2):</strong></p>
                             <ul>
                                 <li><strong>Pronósticos:</strong> Marca los 14 signos (7 de ellos llevarán doble).</li>
@@ -322,9 +345,14 @@
                         style="flex:1; min-width:300px; border:1px solid #ddd; padding:15px; border-radius:8px;">
                         <h4 style="margin-top:0; color:#455a64; border-bottom:1px solid #eee; padding-bottom:5px;">💻
                             Interfaz Web (Loterías)</h4>
-                        <img src="IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg"
-                            style="width:100%; height:auto; border-radius:4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom:15px;">
-                        <div style="font-size:0.85rem; line-height:1.4;">
+                        <div class="help-mark-wrapper" style="position:relative; width:100%;">
+                            <img src="IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg"
+                                style="width:100%; height:auto; border-radius:4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
+                            <div id="marks-digital"
+                                style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">
+                            </div>
+                        </div>
+                        <div style="font-size:0.85rem; line-height:1.4; margin-top: 15px;">
                             <p><strong>Proceso Digital:</strong></p>
                             <ol>
                                 <li>Selecciona <strong>MÉTODO: Reducido</strong>.</li>
