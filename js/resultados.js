@@ -80,7 +80,12 @@ class ResultsManager {
                 let isLate = false;
                 let isPardoned = false;
 
+                let actuallyPlayed = false;
                 if (p && p.selection && Array.isArray(p.selection)) {
+                    actuallyPlayed = p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                }
+
+                if (actuallyPlayed) {
                     played = true;
                     isLate = p.late || false;
                     isPardoned = p.pardoned || false;

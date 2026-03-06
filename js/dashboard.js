@@ -93,7 +93,15 @@ class DashboardManager {
                     let isPig15 = false;
                     let pigHit = false;
 
+                    let actuallyPlayed = false;
                     if (p) {
+                        const sel = p.selection || p.forecasts || [];
+                        if (Array.isArray(sel)) {
+                            actuallyPlayed = sel.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                        }
+                    }
+
+                    if (actuallyPlayed) {
                         hasPronostico = true;
                         isLate = p.late || false;
                         isPardoned = p.pardoned || false;

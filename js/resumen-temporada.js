@@ -113,7 +113,15 @@ class ResumenManager {
                 let points = 0;
                 let hits = 0;
 
+                let actuallyPlayed = false;
                 if (p) {
+                    const sel = p.selection || p.forecasts || [];
+                    if (Array.isArray(sel)) {
+                        actuallyPlayed = sel.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                    }
+                }
+
+                if (actuallyPlayed) {
                     const sel = p.selection || p.forecasts || [];
                     const isLate = p.late;
                     const isPardoned = p.pardoned;

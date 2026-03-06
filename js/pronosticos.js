@@ -932,7 +932,12 @@ class PronosticoManager {
                 let cellClass = `summary-cell ${isEven ? 'col-even' : 'col-odd'}`;
                 let textStyle = '';
 
-                if (p && p.selection) {
+                let isPlayed = false;
+                if (p && p.selection && Array.isArray(p.selection)) {
+                    isPlayed = p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                }
+
+                if (isPlayed) {
                     const selection14 = p.selection.slice(0, 14);
                     const summary = selection14.map(s => s || '-').join('');
 
