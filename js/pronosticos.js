@@ -726,32 +726,45 @@ class PronosticoManager {
         let doubleIndices = [];
 
         // ---------------------------------------------------------
-        // 1. PHYSICAL GRID (Basado en Excel A1:AG33 con anchos variables)
+        // 1. PHYSICAL GRID (Ajustado a tu Excel A1:AG33 con anchos variables)
         // ---------------------------------------------------------
         const physConfig = {
-            offsetX: 10.5, // Ajuste de margen izquierdo para Col A-I
-            offsetY: 29.5, // Ajuste de margen superior para Fila 1
-            stepX: 3.22,   // Ancho de tus celdas centrales (J, K, L...)
-            stepY: 1.96    // Alto de tus filas
+            // Puntos de anclaje (X%) basados en tus celdas de Excel
+            x: {
+                2: 12.0,  // B (Pleno 15 - 0)
+                4: 15.2,  // D (Pleno 15 - 1)
+                6: 18.4,  // F (Pleno 15 - 2)
+                8: 21.6,  // H (Pleno 15 - M)
+                10: 53.8, // J (Signo 1)
+                11: 56.9, // K (Signo X)
+                12: 60.0, // L (Signo 2)
+                16: 67.2, // P (7 de Dobles)
+                21: 76.4, // U (Reducciones)
+                26.8: 88.0 // Cuadro Opción Reductora
+            },
+            yBase: 24.5, // Fila 2 de Excel
+            yStep: 2.38  // Alto de fila promedio
         };
 
-        const getX = (colNum) => physConfig.offsetX + (colNum * physConfig.stepX);
-        const getY = (rowNum) => physConfig.offsetY + (rowNum * physConfig.stepY);
+        const getX = (c) => physConfig.x[c] || 0;
+        const getY = (r) => physConfig.yBase + ((r - 2) * physConfig.yStep);
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
             const rExcel = 2 + (idx * 2); // Filas 2, 4, 6... 28
             const y = getY(rExcel);
+
             if (sign.includes('1')) this.drawX(this.marksPhysical, getX(10), y);
             if (sign.includes('X')) this.drawX(this.marksPhysical, getX(11), y);
             if (sign.includes('2')) this.drawX(this.marksPhysical, getX(12), y);
+
             if (sign.length === 2) {
                 doublesCount++;
                 doubleIndices.push(idx + 1);
             }
         });
 
-        // Pleno 15 y Otros (B=2, D=4, F=6, H=8)
+        // Pleno 15 y Otros (Filas 28 y 29)
         const p15Val = sel[14] || '';
         if (p15Val.includes('-')) {
             const [h, a] = p15Val.split('-');
@@ -759,15 +772,19 @@ class PronosticoManager {
             if (pCols[h]) this.drawX(this.marksPhysical, getX(pCols[h]), getY(28));
             if (pCols[a]) this.drawX(this.marksPhysical, getX(pCols[a]), getY(29));
         }
-        if (doublesCount === 7) this.drawX(this.marksPhysical, getX(16), getY(14)); // P14
+
+        if (doublesCount === 7) {
+            this.drawX(this.marksPhysical, getX(16), getY(14)); // P14 (7 dobles)
+            this.drawX(this.marksPhysical, getX(26.8), getY(14.8)); // Casilla Reducción
+        }
+
         doubleIndices.forEach(idx => {
             const y = getY(2 + ((idx - 1) * 2));
-            this.drawX(this.marksPhysical, getX(21), y); // U
+            this.drawX(this.marksPhysical, getX(21), y); // Columna U
         });
-        if (doublesCount === 7) this.drawX(this.marksPhysical, getX(26.6), getY(14.8)); // Cuadro Opción 2
 
         // ---------------------------------------------------------
-        // 2. DIGITAL GRID
+        // 2. DIGITAL GRID (Sincronizado también con desplazamiento lateral)
         // ---------------------------------------------------------
         const dig = { startY: 23.5, stepY: 4.02, c1: 60.5, cX: 62.1, c2: 63.7, sX: 72.2 };
         sel.forEach((sign, idx) => {
