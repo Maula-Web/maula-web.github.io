@@ -1067,24 +1067,49 @@ class PronosticoManager {
             this.viewJornadaModal.style.opacity = '1';
             this.viewJornadaModal.style.zIndex = '999999';
 
+            const isMobile = window.innerWidth <= 768;
+
+            const fSizeTable = isMobile ? '0.8rem' : '1.05rem';
+            const fSizeTh = isMobile ? '0.85rem' : '1.1rem';
+            const padTh = isMobile ? '6px' : '15px';
+            const padTdNum = isMobile ? '6px' : '10px';
+            const padTdTeam = isMobile ? '6px' : '10px 20px';
+            const padTdCell = isMobile ? '4px' : '8px';
+
+            const wNum = isMobile ? 35 : 50;
+            const wTeam = isMobile ? 85 : 200;
+            const wMember = isMobile ? 32 : 60;
+            const hMember = isMobile ? 120 : 220;
+            const fSizeMember = isMobile ? '0.8rem' : '0.95rem';
+            const fSizeCell = isMobile ? '0.9rem' : '1.25rem';
+
+            const strWNum = wNum + 'px';
+            const strWTeam = wTeam + 'px';
+            const strWMember = wMember + 'px';
+            const strHMember = hMember + 'px';
+
+            const leftNum = '0px';
+            const leftHome = wNum + 'px';
+            const leftAway = (wNum + wTeam) + 'px';
+
             // Build Enhanced Table (Much LARGER as requested)
             let html = `
-                <table style="border-collapse: separate; border-spacing: 0; font-size: 1.05rem; background: #fff; width: auto; min-width: 95%; margin-bottom: 40px; border: 3px solid var(--primary-orange); border-radius: 8px;">
+                <table style="border-collapse: separate; border-spacing: 0; font-size: ${fSizeTable}; background: #fff; width: auto; min-width: ${isMobile ? '100%' : '95%'}; margin-bottom: 40px; border: 3px solid var(--primary-orange); border-radius: 8px;">
                     <thead style="background: #e0e0e0; position: sticky; top: 0; z-index: 100;">
                         <tr>
-                            <th style="position: sticky; left: 0; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: 15px; min-width: 50px; color: #333; font-size: 1.1rem;">#</th>
-                            <th style="position: sticky; left: 50px; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: 15px; text-align: right; min-width: 200px; color: #333; font-size: 1.1rem;">Local</th>
-                            <th style="position: sticky; left: 250px; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: 15px; text-align: left; min-width: 200px; color: #333; font-size: 1.1rem;">Visitante</th>
+                            <th style="position: sticky; left: ${leftNum}; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: ${padTh}; min-width: ${strWNum}; max-width: ${strWNum}; color: #333; font-size: ${fSizeTh};">#</th>
+                            <th style="position: sticky; left: ${leftHome}; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: ${padTh}; text-align: right; min-width: ${strWTeam}; max-width: ${strWTeam}; color: #333; font-size: ${fSizeTh}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Local</th>
+                            <th style="position: sticky; left: ${leftAway}; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: ${padTh}; text-align: left; min-width: ${strWTeam}; max-width: ${strWTeam}; color: #333; font-size: ${fSizeTh}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Visitante</th>
             `;
 
             // Member Columns
             sortedMembers.forEach(m => {
-                html += `<th title="${m.name}" style="border: 1px solid #ccc; padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 60px; min-width: 60px; font-size: 0.95rem; color: #333; font-weight: 600; white-space: nowrap;">${m.name}</th>`;
+                html += `<th title="${m.name}" style="border: 1px solid #ccc; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${fSizeMember}; color: #333; font-weight: 600; white-space: nowrap; overflow:hidden;">${m.name}</th>`;
             });
 
             // Doubles Columns at the end
             allDoubles.forEach(() => {
-                html += `<th style="border: 2px solid var(--primary-orange); padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 60px; min-width: 60px; font-size: 1rem; color: #fff; background: var(--primary-orange); font-weight: bold; letter-spacing: 1px; white-space: nowrap;">Quiniela Dobles</th>`;
+                html += `<th style="border: 2px solid var(--primary-orange); padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${isMobile ? '0.8rem' : '1rem'}; color: #fff; background: var(--primary-orange); font-weight: bold; letter-spacing: 1px; white-space: nowrap;">Quiniela Dobles</th>`;
             });
 
             // "COLUMNA PERFECTA" Logic
@@ -1094,11 +1119,11 @@ class PronosticoManager {
 
             if (allResolved) {
                 perfectColumn = this.calculatePerfectColumn(jornada);
-                html += `<th style="border: 3px solid #ffd700; padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 70px; min-width: 70px; font-size: 0.9rem; color: #000; background: linear-gradient(to bottom, #ffd700, #ffecb3); font-weight: 900; letter-spacing: 1px; white-space: nowrap; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);">⭐ COLUMNA MAULA</th>`;
+                html += `<th style="border: 3px solid #ffd700; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${isMobile ? '0.8rem' : '0.9rem'}; color: #000; background: linear-gradient(to bottom, #ffd700, #ffecb3); font-weight: 900; letter-spacing: 1px; white-space: nowrap; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);">⭐ COLUMNA MAULA</th>`;
             }
 
             // Results Column Header
-            html += `<th style="border: 1px solid #333; padding: 10px; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 220px; width: 60px; min-width: 60px; font-size: 1.1rem; color: #fff; background: #333; font-weight: bold; letter-spacing: 1px; white-space: nowrap;">RESULTADO REAL</th>`;
+            html += `<th style="border: 1px solid #333; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${isMobile ? '0.9rem' : '1.1rem'}; color: #fff; background: #333; font-weight: bold; letter-spacing: 1px; white-space: nowrap;">RESULTADO REAL</th>`;
 
 
             html += `</tr></thead><tbody>`;
@@ -1117,16 +1142,16 @@ class PronosticoManager {
                 const officialResult = match.result || null;
 
                 html += `<tr style="${rowStyle}">
-                    <td style="position: sticky; left: 0; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: 10px; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: 1.1rem;">${displayIdx}</td>
-                    <td style="position: sticky; left: 50px; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: 10px 20px; text-align: right; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
-                    <td style="position: sticky; left: 250px; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: 10px 20px; text-align: left; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
+                    <td style="position: sticky; left: ${leftNum}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: ${padTdNum}; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: ${fSizeTh}; max-width: ${strWNum}; overflow: hidden;">${displayIdx}</td>
+                    <td style="position: sticky; left: ${leftHome}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: ${padTdTeam}; text-align: right; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
+                    <td style="position: sticky; left: ${leftAway}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: ${padTdTeam}; text-align: left; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
                 `;
 
                 // Individual Forecasts
                 sortedMembers.forEach(m => {
                     const f = allForecasts.find(p => String(p.mId || p.memberId) === String(m.id));
                     let sign = '-';
-                    let cellStyle = 'border: 1px solid #ccc; padding: 8px; text-align: center; width: 60px; min-width: 60px; font-weight: bold; font-size: 1.25rem;';
+                    let cellStyle = `border: 1px solid #ccc; padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: bold; font-size: ${fSizeCell};`;
 
                     if (f && f.selection && f.selection[idx]) {
                         sign = f.selection[idx];
@@ -1150,7 +1175,7 @@ class PronosticoManager {
                 // Doubles Forecasts (Extra columns)
                 allDoubles.forEach((db, dbIdx) => {
                     let sign = '-';
-                    let cellStyle = 'border: 2px solid var(--primary-orange); padding: 8px; text-align: center; width: 60px; min-width: 60px; font-weight: 900; font-size: 1.3rem; color: #fff; background: var(--primary-orange);';
+                    let cellStyle = `border: 2px solid var(--primary-orange); padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${fSizeCell}; color: #fff; background: var(--primary-orange);`;
 
                     if (db.selection && db.selection[idx]) {
                         sign = db.selection[idx];
@@ -1167,7 +1192,7 @@ class PronosticoManager {
                 // Perfect Column Cell
                 if (perfectColumn) {
                     const sign = perfectColumn[idx] || '-';
-                    let cellStyle = 'border: 3px solid #ffd700; padding: 8px; text-align: center; width: 70px; min-width: 70px; font-weight: 900; font-size: 1.4rem; color: #b8860b; background: #fffde7;';
+                    let cellStyle = `border: 3px solid #ffd700; padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${fSizeCell}; color: #b8860b; background: #fffde7;`;
                     const isHit = officialResult && sign === officialResult;
                     if (isHit) {
                         cellStyle += 'background: #ffd700; color: #000; border: 3px solid #ffa000;';
@@ -1178,7 +1203,7 @@ class PronosticoManager {
 
                 // Official Result Cell
                 const resVal = officialResult || '-';
-                html += `<td style="border: 1px solid #333; padding: 8px; text-align: center; width: 60px; min-width: 60px; font-weight: 900; font-size: 1.5rem; color: #fff; background: #444;">${resVal}</td>`;
+                html += `<td style="border: 1px solid #333; padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${isMobile ? '1.1rem' : '1.5rem'}; color: #fff; background: #444;">${resVal}</td>`;
 
 
                 html += `</tr>`;
@@ -1188,22 +1213,22 @@ class PronosticoManager {
 
             // SUMMARY ROW (Final Hits)
             html += `<tfoot style="background: #eee; position: sticky; bottom: 0; z-index: 10;">
-                <tr style="border-top: 3px solid #673ab7; height: 60px;">
-                    <td colspan="3" style="text-align: right; padding: 15px; font-weight: 900; color: #673ab7; font-size: 1.2rem; background: #f3e5f5;">TOTAL ACIERTOS:</td>
+                <tr style="border-top: 3px solid #673ab7; height: ${isMobile ? '40px' : '60px'};">
+                    <td colspan="3" style="text-align: right; padding: ${padTdNum}; font-weight: 900; color: #673ab7; font-size: ${isMobile ? '0.9rem' : '1.2rem'}; background: #f3e5f5;">TOTAL ACIERTOS:</td>
             `;
 
             sortedMembers.forEach(m => {
                 const hits = baseHitsCount[m.id];
-                html += `<td style="border: 1px solid #ccc; text-align: center; font-weight: 900; font-size: 1.5rem; color: #2e7d32; background: #e8f5e9;">${hits}</td>`;
+                html += `<td style="border: 1px solid #ccc; text-align: center; font-weight: 900; font-size: ${isMobile ? '1.1rem' : '1.5rem'}; color: #2e7d32; background: #e8f5e9;">${hits}</td>`;
             });
 
             allDoubles.forEach((_, idx) => {
                 const hits = doublesHitsCount[idx];
-                html += `<td style="border: 2px solid #673ab7; text-align: center; font-weight: 900; font-size: 1.6rem; color: #fff; background: #2e7d32;">${hits}</td>`;
+                html += `<td style="border: 2px solid #673ab7; text-align: center; font-weight: 900; font-size: ${isMobile ? '1.2rem' : '1.6rem'}; color: #fff; background: #2e7d32;">${hits}</td>`;
             });
 
             if (perfectColumn) {
-                html += `<td style="border: 3px solid #ffa000; text-align: center; font-weight: 900; font-size: 1.8rem; color: #000; background: #ffd700;">${perfectHits}</td>`;
+                html += `<td style="border: 3px solid #ffa000; text-align: center; font-weight: 900; font-size: ${isMobile ? '1.3rem' : '1.8rem'}; color: #000; background: #ffd700;">${perfectHits}</td>`;
             }
 
             // Empty cell for Results column in footer
