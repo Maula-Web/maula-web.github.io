@@ -418,8 +418,11 @@ window.TelegramService = {
                 return played;
             });
 
-            if (allPlayed) {
-                console.log(`Habemus: ¡Todos jugaron! Sending message for J${currentJ.number}...`);
+            if (allPlayed || forceResend) {
+                if (forceResend && !allPlayed) {
+                    console.log(`Habemus: FORCE SEND (${pending.length} members pending: ${pending.join(', ')})`);
+                }
+                console.log(`Habemus: Sending message for J${currentJ.number}...`);
                 const msg = (hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻').trim();
                 const res = await this.sendRaw(tg.token, tg.chatId, msg);
 

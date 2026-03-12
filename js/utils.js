@@ -3,7 +3,7 @@
  * Centralizes logic used across Jornadas, RSS Import, and PDF Import.
  */
 
-const AppUtils = {
+var AppUtils = window.AppUtils || {
 
     // --- DATE HELPERS ---
 
