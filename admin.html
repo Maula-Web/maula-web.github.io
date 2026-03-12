@@ -250,7 +250,7 @@
                             jugado</label>
                     </div>
                     <div style="margin-top:0.5rem;">
-                        <label style="display:block; margin-bottom:0.2rem;">Mensaje (Rana + Texto + Cerveza):</label>
+                        <label style="display:block; margin-bottom:0.2rem;">Mensaje:</label>
                         <textarea id="habemus-msg"
                             style="width:100%; height:80px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
                     </div>
@@ -258,6 +258,49 @@
                         style="width:100%; margin-top:0.5rem; background:#4caf50; color:white; font-weight:bold;">💾
                         Guardar Config Habemus</button>
                     <div id="habemus-save-msg"
+                        style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
+                        ¡Guardado!</div>
+                </form>
+            </div>
+
+            <!-- New Weekly Reminder Card (Restored) -->
+            <div class="config-card" style="border-top-color: #fbc02d;">
+                <h2>⏰ Aviso Semanal</h2>
+                <form id="reminder-form" style="font-size:0.9rem;">
+                    <div class="form-row">
+                        <label>Día de la semana</label>
+                        <select id="reminder-day" style="padding:2px; width: 100px;">
+                            <option value="1">Lunes</option>
+                            <option value="2">Martes</option>
+                            <option value="3">Miércoles</option>
+                            <option value="4" selected>Jueves</option>
+                            <option value="5">Viernes</option>
+                            <option value="6">Sábado</option>
+                            <option value="0">Domingo</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Hora de envío (0-23)</label>
+                        <input type="number" id="reminder-hour" min="0" max="23" value="9">
+                    </div>
+                    <div class="form-row">
+                        <label>Activo desde</label>
+                        <input type="date" id="reminder-start" style="width:120px;">
+                    </div>
+                    <div class="form-row">
+                        <label>Activo hasta</label>
+                        <input type="date" id="reminder-end" style="width:120px;">
+                    </div>
+                    <div style="margin-top:0.5rem;">
+                        <label style="display:block; margin-bottom:0.2rem;">Mensaje Personalizado:</label>
+                        <textarea id="reminder-msg"
+                            style="width:100%; height:80px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
+                        <small style="color:#888;">Usa {jornada} para el número de jornada.</small>
+                    </div>
+                    <button type="submit" class="btn-action"
+                        style="width:100%; margin-top:0.5rem; background:#fbc02d; color:#333; font-weight:bold;">💾
+                        Guardar Config Aviso</button>
+                    <div id="reminder-save-msg"
                         style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
                         ¡Guardado!</div>
                 </form>
@@ -364,15 +407,19 @@
             });
 
 
-            document.getElementById('reminder-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                saveReminderConfig();
-            });
+            if (document.getElementById('reminder-form')) {
+                document.getElementById('reminder-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    saveReminderConfig();
+                });
+            }
 
-            document.getElementById('habemus-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                saveHabemusConfig();
-            });
+            if (document.getElementById('habemus-form')) {
+                document.getElementById('habemus-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    saveHabemusConfig();
+                });
+            }
 
             loadReminderConfig();
             loadHabemusConfig();
