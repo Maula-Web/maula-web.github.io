@@ -371,9 +371,8 @@ class PronosticoManager {
 
             // Pleno Restriction
             if (idx === 14) {
-                const bigThree = ['Real Madrid', 'Atlético de Madrid', 'FC Barcelona'];
-                const isBigMatch = bigThree.includes(match.home) && bigThree.includes(match.away);
-                if (!isBigMatch) {
+                const isPigMatch = AppUtils.isPigMatch(match.home, match.away);
+                if (!isPigMatch) {
                     disabledStr = 'style="pointer-events:none; opacity:0.3; background:transparent;" title="Pleno deshabilitado"';
                 }
             }

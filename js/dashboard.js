@@ -109,15 +109,9 @@ class DashboardManager {
                         const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
 
                         // Check for PIG (Pleno al 15 is index 14)
-                        const pigTeams = ['Real Madrid', 'At. Madrid', 'Barcelona', 'FC Barcelona', 'Atlético de Madrid'];
                         const match15 = jornada.matches && jornada.matches[14];
-
-                        if (match15) {
-                            const home = match15.home || '';
-                            const away = match15.away || '';
-                            const isHomePig = pigTeams.some(t => home.includes(t));
-                            const isAwayPig = pigTeams.some(t => away.includes(t));
-                            if (isHomePig && isAwayPig) {
+                        if (match15 && window.AppUtils) {
+                            if (window.AppUtils.isPigMatch(match15.home, match15.away)) {
                                 isPig15 = true;
                             }
                         }

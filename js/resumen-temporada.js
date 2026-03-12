@@ -98,11 +98,8 @@ class ResumenManager {
             const minHits = j.minHitsToWin || 10;
 
             // Detectar si es jornada PIG (Pleno al 15 con grandes clubes)
-            const pigTeams = ['Real Madrid', 'At. Madrid', 'Barcelona', 'FC Barcelona', 'Atlético de Madrid'];
             const match15 = j.matches && j.matches[14];
-            const isPig15 = match15 &&
-                pigTeams.some(t => (match15.home || '').includes(t)) &&
-                pigTeams.some(t => (match15.away || '').includes(t));
+            const isPig15 = match15 && AppUtils.isPigMatch(match15.home, match15.away);
 
             this.members.forEach(m => {
                 // Usar comparación laxa (==) igual que el Dashboard para tolerar string/number

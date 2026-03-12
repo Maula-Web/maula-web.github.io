@@ -212,6 +212,27 @@ const AppUtils = {
     },
 
     /**
+     * Checks if a match is considered "PIG" (Pleno al 15 between big clubs)
+     * Robust check using normalization to handle accents, cases and variants.
+     */
+    isPigMatch(home, away) {
+        if (!home || !away) return false;
+        const pigTeams = ['real madrid', 'at. madrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético'];
+
+        const h = this.normalizeName(home);
+        const a = this.normalizeName(away);
+
+        const isPig = (normName) => {
+            return pigTeams.some(p => {
+                const pn = this.normalizeName(p);
+                return normName.includes(pn) || pn.includes(normName);
+            });
+        };
+
+        return isPig(h) && isPig(a);
+    },
+
+    /**
      * Returns the name to display for a member (Nickname if exists, Name otherwise)
      */
     getMemberName(member) {
