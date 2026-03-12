@@ -12,6 +12,8 @@
     <!-- DB Config -->
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/telegram-service.js"></script>
     <style>
         .admin-grid {
             display: grid;
@@ -254,12 +256,21 @@
                         <textarea id="habemus-msg"
                             style="width:100%; height:80px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
                     </div>
-                    <button type="submit" class="btn-action"
-                        style="width:100%; margin-top:0.5rem; background:#4caf50; color:white; font-weight:bold;">💾
-                        Guardar Config Habemus</button>
+                    <div style="display:flex; gap:5px; margin-top:0.5rem;">
+                        <button type="submit" class="btn-action"
+                            style="flex:1; background:#4caf50; color:white; font-weight:bold;">💾 Guardar</button>
+                        <button type="button" onclick="testHabemus()"
+                            style="flex:1; background:#673ab7; color:white; font-weight:bold; padding:5px; border:none; border-radius:4px; cursor:pointer;">📤
+                            Probar Envío</button>
+                        <button type="button" onclick="resetHabemusSent()"
+                            style="flex:1; background:#e53935; color:white; font-weight:bold; padding:5px; border:none; border-radius:4px; cursor:pointer;">🔄
+                            Reset</button>
+                    </div>
                     <div id="habemus-save-msg"
                         style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
                         ¡Guardado!</div>
+                    <small style="color:#888; font-size:0.7rem;">📤 Probar: envia el mensaje ahora. 🔄 Reset: permite
+                        enviar de nuevo si ya se envió.</small>
                 </form>
             </div>
 
@@ -714,6 +725,29 @@
 
             Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Actualizó Configuración Habemus Quinielam');
             console.log("Habemus config saved:", config);
+        }
+
+        async function testHabemus() {
+            if (!window.TelegramService) { alert('TelegramService no cargado.'); return; }
+            // Get most recent active jornada
+            const jornadas = await window.DataService.getAll('jornadas');
+            const active = jornadas.filter(j => j.active).sort((a, b) => b.number - a.number);
+            if (!active.length) { alert('No hay jornadas activas.'); return; }
+            const jId = active[0].id;
+            console.log('Habemus TEST: forcing send for jornada', jId);
+            await window.TelegramService.checkHabemusQuinielam(jId, true);
+            alert('Prueba ejecutada. Revisa la consola (F12) y el grupo de Telegram.');
+        }
+
+        async function resetHabemusSent() {
+            const jornadas = await window.DataService.getAll('jornadas');
+            const active = jornadas.filter(j => j.active).sort((a, b) => b.number - a.number);
+            if (!active.length) { alert('No hay jornadas activas.'); return; }
+            const j = active[0];
+            if (!confirm(`¿Reset "habemusSent" en Jornada ${j.number}? Permitirá enviar el mensaje de nuevo cuando todos completen.`)) return;
+            j.habemusSent = false;
+            await window.DataService.save('jornadas', j);
+            alert(`¡Reset hecho! La J${j.number} volverá a enviar el aviso cuando todos hayan jugado.`);
         }
 
         async function loadTelegramConfig() {
