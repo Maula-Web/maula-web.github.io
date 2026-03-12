@@ -1014,6 +1014,13 @@ class PronosticoManager {
         }
 
         this.renderSummaryTable(); // Refresh summary
+
+        // Check for Habemus Quinielam (Telegram)
+        if (window.TelegramService && !isCorrection) {
+            setTimeout(() => {
+                window.TelegramService.checkHabemusQuinielam(this.currentJornadaId);
+            }, 1000); // Small delay to ensure DB propagation
+        }
     }
 
     calculateDeadline(dateStr) {

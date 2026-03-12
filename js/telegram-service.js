@@ -369,6 +369,64 @@ window.TelegramService = {
         } catch (e) {
             console.error("TelegramService (Reminder) Error:", e);
         }
+    },
+    async checkHabemusQuinielam(jId) {
+        if (!window.DataService) return;
+
+        try {
+            // 1. Get Config
+            const config = await window.DataService.getAll('config');
+            const tg = config.find(c => c.id === 'telegram');
+            const hab = config.find(c => c.id === 'habemus');
+
+            if (!tg || !tg.enabled || !tg.token || !tg.chatId || !hab) return;
+
+            // 2. Check Date Range
+            const now = new Date();
+            if (hab.startDate) {
+                const start = new Date(hab.startDate);
+                if (now < start) return;
+            }
+            if (hab.endDate) {
+                const end = new Date(hab.endDate);
+                end.setHours(23, 59, 59, 999);
+                if (now > end) return;
+            }
+
+            // 3. Fetch Data
+            const members = await window.DataService.getAll('members');
+            const jornadas = await window.DataService.getAll('jornadas');
+            const pronosticos = await window.DataService.getAll('pronosticos');
+
+            const currentJ = jornadas.find(jor => jor.id == jId);
+            if (!currentJ || currentJ.habemusSent) return;
+
+            // 4. Verify all members have played
+            const allPlayed = members.every(m => {
+                const p = pronosticos.find(pred =>
+                    (pred.jId == currentJ.id || pred.jornadaId == currentJ.id) &&
+                    (pred.mId == m.id || pred.memberId == m.id)
+                );
+                if (!p || !p.selection || !Array.isArray(p.selection)) return false;
+                return p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+            });
+
+            if (allPlayed) {
+                console.log(`TelegramService: Sending Habemus Quinielam (J${currentJ.number})...`);
+
+                const msg = hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
+                const res = await this.sendRaw(tg.token, tg.chatId, msg);
+
+                if (res.ok) {
+                    currentJ.habemusSent = true;
+                    await window.DataService.save('jornadas', currentJ);
+                    console.log("TelegramService: Habemus message sent and logged.");
+                }
+            }
+
+        } catch (e) {
+            console.error("TelegramService (Habemus) Error:", e);
+        }
     }
 };
 
