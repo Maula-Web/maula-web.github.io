@@ -381,19 +381,7 @@ window.TelegramService = {
 
             if (!tg || !tg.enabled || !tg.token || !tg.chatId || !hab) return;
 
-            // 2. Check Date Range
-            const now = new Date();
-            if (hab.startDate) {
-                const start = new Date(hab.startDate);
-                if (now < start) return;
-            }
-            if (hab.endDate) {
-                const end = new Date(hab.endDate);
-                end.setHours(23, 59, 59, 999);
-                if (now > end) return;
-            }
-
-            // 3. Fetch Data
+            // 2. Fetch Data
             const members = await window.DataService.getAll('members');
             const jornadas = await window.DataService.getAll('jornadas');
             const pronosticos = await window.DataService.getAll('pronosticos');

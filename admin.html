@@ -244,14 +244,6 @@
             <div class="config-card" style="border-top-color: #4caf50;">
                 <h2>🐸 Habemus Quinielam</h2>
                 <form id="habemus-form" style="font-size:0.9rem;">
-                    <div class="form-row">
-                        <label>Activo desde</label>
-                        <input type="date" id="habemus-start" style="width:120px;">
-                    </div>
-                    <div class="form-row">
-                        <label>Activo hasta</label>
-                        <input type="date" id="habemus-end" style="width:120px;">
-                    </div>
                     <div style="margin-top:0.5rem;">
                         <label style="display:block; margin-bottom:0.2rem;">Mensaje (Rana + Texto + Cerveza):</label>
                         <textarea id="habemus-msg"
@@ -648,8 +640,6 @@
             const config = await window.DataService.getAll('config');
             const hab = config.find(c => c.id === 'habemus');
             if (hab) {
-                document.getElementById('habemus-start').value = hab.startDate || '';
-                document.getElementById('habemus-end').value = hab.endDate || '';
                 document.getElementById('habemus-msg').value = hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
             } else {
                 document.getElementById('habemus-msg').value = '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
@@ -659,8 +649,6 @@
         async function saveHabemusConfig() {
             const config = {
                 id: 'habemus',
-                startDate: document.getElementById('habemus-start').value,
-                endDate: document.getElementById('habemus-end').value,
                 message: document.getElementById('habemus-msg').value.trim()
             };
             await window.DataService.save('config', config);
