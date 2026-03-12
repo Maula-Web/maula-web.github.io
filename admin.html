@@ -244,10 +244,15 @@
             <div class="config-card" style="border-top-color: #4caf50;">
                 <h2>🐸 Habemus Quinielam</h2>
                 <form id="habemus-form" style="font-size:0.9rem;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:0.5rem;">
+                        <input type="checkbox" id="habemus-enabled" checked>
+                        <label for="habemus-enabled" style="font-weight:bold;">🔔 Notificar cuando todos hayan
+                            jugado</label>
+                    </div>
                     <div style="margin-top:0.5rem;">
                         <label style="display:block; margin-bottom:0.2rem;">Mensaje (Rana + Texto + Cerveza):</label>
                         <textarea id="habemus-msg"
-                            style="width:100%; height:60px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
+                            style="width:100%; height:80px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
                     </div>
                     <button type="submit" class="btn-action"
                         style="width:100%; margin-top:0.5rem; background:#4caf50; color:white; font-weight:bold;">💾
@@ -637,11 +642,13 @@
 
         async function loadHabemusConfig() {
             if (!window.DataService) return;
-            const config = await window.DataService.getAll('config');
-            const hab = config.find(c => c.id === 'habemus');
+            // Use getDoc instead of getAll to be more direct and robust
+            const hab = await window.DataService.getDoc('config', 'habemus');
             if (hab) {
+                document.getElementById('habemus-enabled').checked = hab.enabled !== false;
                 document.getElementById('habemus-msg').value = hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
             } else {
+                document.getElementById('habemus-enabled').checked = true;
                 document.getElementById('habemus-msg').value = '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
             }
         }
@@ -649,6 +656,7 @@
         async function saveHabemusConfig() {
             const config = {
                 id: 'habemus',
+                enabled: document.getElementById('habemus-enabled').checked,
                 message: document.getElementById('habemus-msg').value.trim()
             };
             await window.DataService.save('config', config);
@@ -658,6 +666,7 @@
             setTimeout(() => msg.style.display = 'none', 3000);
 
             Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, 'Actualizó Configuración Habemus Quinielam');
+            console.log("Habemus config saved:", config);
         }
 
         async function loadTelegramConfig() {

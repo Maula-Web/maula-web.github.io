@@ -375,11 +375,13 @@ window.TelegramService = {
 
         try {
             // 1. Get Config
-            const config = await window.DataService.getAll('config');
-            const tg = config.find(c => c.id === 'telegram');
-            const hab = config.find(c => c.id === 'habemus');
+            const tg = await window.DataService.getDoc('config', 'telegram');
+            const hab = await window.DataService.getDoc('config', 'habemus');
 
-            if (!tg || !tg.enabled || !tg.token || !tg.chatId || !hab) return;
+            if (!tg || !tg.token || !tg.chatId || !hab || hab.enabled === false) {
+                console.log("Habemus: Skip (Config missing or disabled)", { tgFound: !!tg, habFound: !!hab });
+                return;
+            }
 
             // 2. Fetch Data
             const members = await window.DataService.getAll('members');
@@ -387,29 +389,41 @@ window.TelegramService = {
             const pronosticos = await window.DataService.getAll('pronosticos');
 
             const currentJ = jornadas.find(jor => jor.id == jId);
-            if (!currentJ || currentJ.habemusSent) return;
+            if (!currentJ) return;
 
-            // 4. Verify all members have played
+            if (currentJ.habemusSent) {
+                console.log(`Habemus: Message already sent for J${currentJ.number}`);
+                return;
+            }
+
+            // 3. Verify all members have played
+            console.log(`Habemus: Checking participation for J${currentJ.number}... Total members: ${members.length}`);
+
+            const pending = [];
             const allPlayed = members.every(m => {
                 const p = pronosticos.find(pred =>
-                    (pred.jId == currentJ.id || pred.jornadaId == currentJ.id) &&
-                    (pred.mId == m.id || pred.memberId == m.id)
+                    (String(pred.jId) === String(currentJ.id) || String(pred.jornadaId) === String(currentJ.id)) &&
+                    (String(pred.mId) === String(m.id) || String(pred.memberId) === String(m.id))
                 );
-                if (!p || !p.selection || !Array.isArray(p.selection)) return false;
-                return p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                const played = p && p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                if (!played) pending.push(AppUtils.getMemberName(m));
+                return played;
             });
 
             if (allPlayed) {
-                console.log(`TelegramService: Sending Habemus Quinielam (J${currentJ.number})...`);
-
+                console.log(`TelegramService: All members played! Sending Habemus (J${currentJ.number})...`);
                 const msg = hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
                 const res = await this.sendRaw(tg.token, tg.chatId, msg);
 
                 if (res.ok) {
                     currentJ.habemusSent = true;
                     await window.DataService.save('jornadas', currentJ);
-                    console.log("TelegramService: Habemus message sent and logged.");
+                    console.log("TelegramService: Habemus message sent successfully.");
+                } else {
+                    console.error("TelegramService: Habemus send failed", res);
                 }
+            } else {
+                console.log(`Habemus: Pending members (${pending.length}): ${pending.join(', ')}`);
             }
 
         } catch (e) {
