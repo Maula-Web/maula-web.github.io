@@ -370,7 +370,7 @@ window.TelegramService = {
             console.error("TelegramService (Reminder) Error:", e);
         }
     },
-    async checkHabemusQuinielam(jId) {
+    async checkHabemusQuinielam(jId, forceResend = false) {
         if (!window.DataService) return;
 
         try {
@@ -378,8 +378,12 @@ window.TelegramService = {
             const tg = await window.DataService.getDoc('config', 'telegram');
             const hab = await window.DataService.getDoc('config', 'habemus');
 
-            if (!tg || !tg.token || !tg.chatId || !hab || hab.enabled === false) {
-                console.log("Habemus: Skip (Config missing or disabled)", { tgFound: !!tg, habFound: !!hab });
+            if (!tg || !tg.token || !tg.chatId) {
+                console.log("Habemus: No Telegram config found. Skipping.");
+                return;
+            }
+            if (!hab || hab.enabled === false) {
+                console.log("Habemus: Disabled in config. Skipping.");
                 return;
             }
 
@@ -388,16 +392,19 @@ window.TelegramService = {
             const jornadas = await window.DataService.getAll('jornadas');
             const pronosticos = await window.DataService.getAll('pronosticos');
 
-            const currentJ = jornadas.find(jor => jor.id == jId);
-            if (!currentJ) return;
+            const currentJ = jornadas.find(jor => String(jor.id) === String(jId));
+            if (!currentJ) {
+                console.log("Habemus: Jornada not found:", jId);
+                return;
+            }
 
-            if (currentJ.habemusSent) {
-                console.log(`Habemus: Message already sent for J${currentJ.number}`);
+            if (!forceResend && currentJ.habemusSent) {
+                console.log(`Habemus: Already sent for J${currentJ.number}. Use forceResend=true to override.`);
                 return;
             }
 
             // 3. Verify all members have played
-            console.log(`Habemus: Checking participation for J${currentJ.number}... Total members: ${members.length}`);
+            console.log(`Habemus: Checking J${currentJ.number}... Members: ${members.length}`);
 
             const pending = [];
             const allPlayed = members.every(m => {
@@ -405,25 +412,26 @@ window.TelegramService = {
                     (String(pred.jId) === String(currentJ.id) || String(pred.jornadaId) === String(currentJ.id)) &&
                     (String(pred.mId) === String(m.id) || String(pred.memberId) === String(m.id))
                 );
-                const played = p && p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                if (!played) pending.push(AppUtils.getMemberName(m));
+                const played = p && p.selection && Array.isArray(p.selection) &&
+                    p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                if (!played) pending.push(m.phone || m.name || `ID:${m.id}`);
                 return played;
             });
 
             if (allPlayed) {
-                console.log(`TelegramService: All members played! Sending Habemus (J${currentJ.number})...`);
-                const msg = hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
+                console.log(`Habemus: ¡Todos jugaron! Sending message for J${currentJ.number}...`);
+                const msg = (hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻').trim();
                 const res = await this.sendRaw(tg.token, tg.chatId, msg);
 
-                if (res.ok) {
+                if (res && res.ok) {
                     currentJ.habemusSent = true;
                     await window.DataService.save('jornadas', currentJ);
-                    console.log("TelegramService: Habemus message sent successfully.");
+                    console.log("Habemus: Message sent and jornada flagged ✅");
                 } else {
-                    console.error("TelegramService: Habemus send failed", res);
+                    console.error("Habemus: Telegram API error", res);
                 }
             } else {
-                console.log(`Habemus: Pending members (${pending.length}): ${pending.join(', ')}`);
+                console.log(`Habemus: ${pending.length} member(s) still pending: ${pending.join(', ')}`);
             }
 
         } catch (e) {
@@ -431,4 +439,3 @@ window.TelegramService = {
         }
     }
 };
-
