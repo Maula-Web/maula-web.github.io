@@ -232,6 +232,31 @@ class JornadaManager {
         }
     }
 
+    selectAdminPlenoOption(el, team, val) {
+        const parentGroup = el.parentElement;
+        const container = parentGroup.parentElement;
+        const isEditMode = this.btnSave.style.display !== 'none';
+        if (!isEditMode) return;
+        
+        const isAlreadySelected = el.classList.contains('selected');
+        parentGroup.querySelectorAll('.chk-option').forEach(c => c.classList.remove('selected'));
+        if (!isAlreadySelected) el.classList.add('selected');
+        
+        const hiddenInput = container.nextElementSibling;
+        if (hiddenInput && hiddenInput.classList.contains('inp-res')) {
+            const homeSel = container.querySelector('.pleno-home-group .selected');
+            const awaySel = container.querySelector('.pleno-away-group .selected');
+            const hVal = homeSel ? homeSel.textContent : '';
+            const aVal = awaySel ? awaySel.textContent : '';
+            
+            if (hVal || aVal) {
+                hiddenInput.value = `${hVal}-${aVal}`;
+            } else {
+                hiddenInput.value = '';
+            }
+        }
+    }
+
     renderMatches(matches) {
         this.matchesContainer.innerHTML = '';
 
@@ -264,6 +289,38 @@ class JornadaManager {
             const homeLogo = utilsAvailable ? AppUtils.getTeamLogo(home) : '';
             const awayLogo = utilsAvailable ? AppUtils.getTeamLogo(away) : '';
 
+            let optionsHtml = '';
+            if (!isPleno) {
+                optionsHtml = `
+                    <div class="admin-res-options" style="display:flex; gap:5px; flex:1; justify-content:center; align-items:center;">
+                        <div class="chk-option ${m.result === '1' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, '1')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">1</div>
+                        <div class="chk-option ${m.result === 'X' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, 'X')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">X</div>
+                        <div class="chk-option ${m.result === '2' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, '2')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">2</div>
+                    </div>
+                `;
+            } else {
+                const resParts = (m.result || '').split('-');
+                const homeRes = resParts[0] || '';
+                const awayRes = resParts[1] || '';
+                optionsHtml = `
+                    <div class="admin-res-options pleno-options" style="display:flex; gap:8px; flex:1; justify-content:center; align-items:center;">
+                        <div style="display:flex; gap:2px;" class="pleno-home-group">
+                            <div class="chk-option ${homeRes === '0' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'home', '0')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">0</div>
+                            <div class="chk-option ${homeRes === '1' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'home', '1')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">1</div>
+                            <div class="chk-option ${homeRes === '2' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'home', '2')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">2</div>
+                            <div class="chk-option ${homeRes === 'M' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'home', 'M')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">M</div>
+                        </div>
+                        <span style="color:#aaa; font-weight:bold;">-</span>
+                        <div style="display:flex; gap:2px;" class="pleno-away-group">
+                            <div class="chk-option ${awayRes === '0' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'away', '0')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">0</div>
+                            <div class="chk-option ${awayRes === '1' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'away', '1')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">1</div>
+                            <div class="chk-option ${awayRes === '2' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'away', '2')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">2</div>
+                            <div class="chk-option ${awayRes === 'M' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminPlenoOption(this, 'away', 'M')" style="width:20px; height:20px; font-size:0.75rem; line-height:20px; cursor:pointer;">M</div>
+                        </div>
+                    </div>
+                `;
+            }
+
             row.innerHTML = `
                 <span class="match-number">${isPleno ? 'P15' : idx + 1}</span>
                 
@@ -279,11 +336,7 @@ class JornadaManager {
                     <input type="text" placeholder="Visitante" class="inp-away" value="${away}" style="width:100%; box-sizing:border-box;">
                 </div>
 
-                <div class="admin-res-options" style="display:flex; gap:5px; flex:1; justify-content:center; align-items:center;">
-                    <div class="chk-option ${m.result === '1' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, '1')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">1</div>
-                    <div class="chk-option ${m.result === 'X' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, 'X')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">X</div>
-                    <div class="chk-option ${m.result === '2' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, '2')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">2</div>
-                </div>
+                ${optionsHtml}
                 <input type="hidden" class="inp-res" value="${m.result || ''}">
             `;
 
