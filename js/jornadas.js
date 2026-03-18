@@ -215,6 +215,23 @@ class JornadaManager {
         this.renderPrizes(jornada.prizes || {});
     }
 
+    selectAdminOption(el, val) {
+        const parent = el.parentElement;
+        const isEditMode = this.btnSave.style.display !== 'none';
+        if (!isEditMode) return;
+        
+        const isAlreadySelected = el.classList.contains('selected');
+        parent.querySelectorAll('.chk-option').forEach(c => c.classList.remove('selected'));
+        
+        const hiddenInput = parent.nextElementSibling;
+        if (isAlreadySelected) {
+            if (hiddenInput && hiddenInput.classList.contains('inp-res')) hiddenInput.value = '';
+        } else {
+            el.classList.add('selected');
+            if (hiddenInput && hiddenInput.classList.contains('inp-res')) hiddenInput.value = val;
+        }
+    }
+
     renderMatches(matches) {
         this.matchesContainer.innerHTML = '';
 
@@ -262,7 +279,12 @@ class JornadaManager {
                     <input type="text" placeholder="Visitante" class="inp-away" value="${away}" style="width:100%; box-sizing:border-box;">
                 </div>
 
-                <input type="text" placeholder="Res" class="inp-res" value="${m.result || ''}" style="flex:0.5; text-align:center; font-weight:bold; color:var(--primary-green); min-width:40px;" maxlength="3">
+                <div class="admin-res-options" style="display:flex; gap:5px; flex:1; justify-content:center; align-items:center;">
+                    <div class="chk-option ${m.result === '1' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, '1')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">1</div>
+                    <div class="chk-option ${m.result === 'X' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, 'X')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">X</div>
+                    <div class="chk-option ${m.result === '2' ? 'selected' : ''}" onclick="window.jornadaManager.selectAdminOption(this, '2')" style="width:25px; height:25px; font-size:0.85rem; line-height:25px; cursor:pointer;">2</div>
+                </div>
+                <input type="hidden" class="inp-res" value="${m.result || ''}">
             `;
 
             const inpHome = row.querySelector('.inp-home');
@@ -324,10 +346,17 @@ class JornadaManager {
         const inputs = this.form.querySelectorAll('input');
         inputs.forEach(inp => {
             if (inp.id === 'inp-season') return;
+            if (inp.type === 'hidden') return;
             inp.readOnly = !isEdit;
             if (inp.type === 'checkbox') inp.disabled = !isEdit;
             if (!isEdit) inp.style.border = 'none';
             else if (inp.type !== 'checkbox') inp.style.border = '1px solid #ddd';
+        });
+
+        const optionGroups = this.form.querySelectorAll('.admin-res-options');
+        optionGroups.forEach(group => {
+            group.style.opacity = isEdit ? '1' : '0.6';
+            group.style.pointerEvents = isEdit ? 'auto' : 'none';
         });
 
         // Also handle prize inputs
