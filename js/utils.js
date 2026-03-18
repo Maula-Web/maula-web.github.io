@@ -199,7 +199,25 @@ var AppUtils = window.AppUtils || {
             'real sporting': 'escudos/segunda/REAL-SPORTING-150x150.jpg',
             'sporting': 'escudos/segunda/REAL-SPORTING-150x150.jpg',
             'real zaragoza': 'escudos/segunda/REAL-ZARAGOZA-150x150.jpg',
-            'zaragoza': 'escudos/segunda/REAL-ZARAGOZA-150x150.jpg'
+            'zaragoza': 'escudos/segunda/REAL-ZARAGOZA-150x150.jpg',
+            'alcorcón': 'escudos/OTROS/ALCORCON.png',
+            'alcorcon': 'escudos/OTROS/ALCORCON.png',
+            'racing de ferrol': 'escudos/OTROS/FERROL.png',
+            'racing ferrol': 'escudos/OTROS/FERROL.png',
+            'ferrol': 'escudos/OTROS/FERROL.png',
+            'hércules': 'escudos/OTROS/HERCULES.png',
+            'hercules': 'escudos/OTROS/HERCULES.png',
+            'ibiza': 'escudos/OTROS/Ibiza.png',
+            'ud ibiza': 'escudos/OTROS/Ibiza.png',
+            'marbella': 'escudos/OTROS/MARBELLA.png',
+            'mérida': 'escudos/OTROS/Merida.png',
+            'merida': 'escudos/OTROS/Merida.png',
+            'ourense': 'escudos/OTROS/Ourense.png',
+            'ponferradina': 'escudos/OTROS/PONFERRADINA.png',
+            'real sociedad b': 'escudos/OTROS/REAL-SOCIEDAD-B.png',
+            'sanse': 'escudos/OTROS/REAL-SOCIEDAD-B.png',
+            'pontevedra': 'escudos/OTROS/pontevedra.png',
+            'zamora': 'escudos/OTROS/zamora.png'
         };
 
         // 1. Direct match
