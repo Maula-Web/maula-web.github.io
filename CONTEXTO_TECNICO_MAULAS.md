@@ -93,6 +93,7 @@ Históricamente el sistema ha consumido datos de diferentes administraciones de 
 - **El País (RSS, Web Parse o PDF)**: Es la fuente principal o secundaria para extraer aciertos, resultados (M-1, 2-M) y recompensas monetarias.
 - **Adaptaciones Parches**: El fichero `rss-importer.js` cuenta con múltiples parches en la función `parseElPaisHTML` para procesar tablas irregulares sin guiones separadores entre equipos o en columnas asimétricas. Si algo falla importando, el culpable suele ser un cambio en el DOM del periódico.
 - **Conversión de Resultados**: Resultados de goleadas a veces salen como "M-0" o "2-M", el sistema debe normalizarlos a signos absolutos de quiniela (`1`, `X`, `2`) para poder baremar a los socios.
+- **Rápida Introducción Manual**: Desde el panel de administración, los resultados se introducen cómodamente mediante botoneras interactivas (1, X, 2 para los 14 primeros partidos; y dos selectores independientes 0, 1, 2, M para el Pleno al 15 local y visitante). Toda esta ventana emergente es totalmente responsiva y escalable en dispositivos móviles.
 
 ## 6. Tabla de Resultados y "Columna MAULA"
 
@@ -128,6 +129,7 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
   - **Scroll Horizontal Nativo**: El contenedor del modal utiliza `display: block` y `-webkit-overflow-scrolling: touch` para garantizar un desplazamiento fluido de la tabla en pantallas pequeñas.
   - **Botón de Cierre Flotante**: Se incluye un botón flotante (`Volver a Pronósticos`) en la parte inferior exclusivo para móviles, facilitando la navegación sin depender de la "X" superior de difícil alcance.
 - **Visualización Técnica**: La tabla resumen de la peña incluye un **doble scroll horizontal** (barra superior e inferior) para facilitar la consulta de columnas de socios sin desplazarse al final de la página.
+- **Soporte Extendido de Escudos (`js/utils.js`)**: El sistema mapea y normaliza dinámicamente nombres de equipos hacia ficheros locales en múltiples directorios (`escudos/primera/`, `escudos/segunda/` y `escudos/OTROS/` incluyendo equipos como Alcorcón, Ibiza, Marbella, Mérida, Ferrol, Pontevedra, etc.).
 
 ## 8. Comunicaciones y Notificaciones: Telegram
 
