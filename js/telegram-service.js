@@ -355,6 +355,17 @@ window.TelegramService = {
                 let msg = rem.message || '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://peñamaulas.com)';
                 msg = msg.replace('{jornada}', targetJornada.number);
 
+                const hasPIG = targetJornada.matches && targetJornada.matches.some(m => m && AppUtils.isPigMatch(m.home, m.away));
+                if (hasPIG) {
+                    // Si existe el enlace al final, lo ponemos antes del enlace para que quede mejor
+                    const pigWarning = '\n\n⚠️ *¡ATENCIÓN! Esta jornada hay PIG (Partido de Interés General).* ¡Recuerda sellar también el PIG!';
+                    if (msg.includes('\n🔗')) {
+                        msg = msg.replace('\n🔗', pigWarning + '\n🔗');
+                    } else {
+                        msg += pigWarning;
+                    }
+                }
+
                 const res = await this.sendRaw(tg.token, tg.chatId, msg);
 
                 if (res.ok) {
