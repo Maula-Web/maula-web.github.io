@@ -136,6 +136,7 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
 - Existe un servicio (`telegram-service.js`) que ejerce como "Bot", conectado a la API de Telegram.
 - **Por Fin es Jueves**: Una rutina con días, hora, fechas límite de intervalo ("Date Range") definibles, que lanza recordatorios a los socios para que rellenen su pronóstico si no lo han sellado todavía.
 - El administrador puede definir mediante el panel de control o por variables el mensaje customizado de ese aviso semanal.
+- **Recordatorio Especial PIG**: Si la jornada activa es de tipo PIG (Pleno al 15 con Grandes Clubes), el mensaje de notificación incluirá automáticamente una coletilla extra recordando a los socios "sellar también el PIG".
 
 ## 9. Identidad Visual y Estilo
 
