@@ -265,7 +265,8 @@ class ResultsManager {
                     // If Bonus != 0, show it below.
                     let valDisplay = data.hits;
                     if (data.hits === 0 && data.potentialHits !== null) {
-                        valDisplay = `<span style="text-decoration:line-through; opacity:0.8; color:var(--resultados-hits-number);">${data.potentialHits}</span>`;
+                        // Penalty case: struck through in clear gray (visible on black)
+                        valDisplay = `<span style="text-decoration: line-through double; color: #bbb; opacity: 1;">${data.potentialHits}</span>`;
                     }
                     cellHtml = `<div style="font-size:1.3rem; font-weight:bold; color:var(--resultados-hits-number);">${valDisplay}</div>`;
 
@@ -296,15 +297,15 @@ class ResultsManager {
                     // Existing logic used maxScore/minScore of the JORNADA.
                     // Let's keep using POINTS for comparison coloring as it reflects the "match outcome".
 
+                    // Coloring based on POINTS
                     if (data.points === j.stats.maxScore) {
                         cellStyle += 'background-color:var(--resultados-winner-bg); color:var(--resultados-winner-text);';
                     } else if (data.points === j.stats.minScore) {
                         cellStyle += 'background-color:var(--resultados-loser-bg); color:var(--resultados-loser-text);';
                     }
-
-                    // Black/White for 0 Hits/Points logic
-                    if (data.hits === 0 && data.potentialHits === null) {
-                        // If 0 REAL hits, usually it's bad.
+                    
+                    // Black background only for PENALTY (not for natural 0)
+                    if (data.hits === 0 && data.potentialHits !== null) {
                         cellStyle += 'background-color:black; color:white;';
                     }
 

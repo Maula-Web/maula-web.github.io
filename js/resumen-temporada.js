@@ -480,7 +480,7 @@ class ResumenManager {
                             <div style="font-size:0.65rem; color:#777; font-weight:bold;">PUNTOS J.</div>
                         </div>
                         <div style="text-align:center;">
-                            <div style="font-size:1.4rem; font-weight:bold; color:#1976d2;">${jornadaData.potentialHits !== null ? `<s>${jornadaData.potentialHits}</s>` : jornadaData.dayHits}</div>
+                            <div style="font-size:1.4rem; font-weight:bold; color:#1976d2;">${jornadaData.potentialHits !== null ? `<span style="text-decoration: line-through double; color: #999;">${jornadaData.potentialHits}</span>` : jornadaData.dayHits}</div>
                             <div style="font-size:0.65rem; color:#777; font-weight:bold;">ACIERTOS J.</div>
                         </div>
                     </div>
