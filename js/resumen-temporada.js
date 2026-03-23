@@ -126,6 +126,8 @@ class ResumenManager {
                     if (isLate && !isPardoned) {
                         points = ScoringSystem.calculateScore(0, jDate);
                         hits = 0;
+                        const ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
+                        potentialHits = ev.hits;
                     } else {
                         const ev = ScoringSystem.evaluateForecast(sel, officialResults, jDate);
                         hits = ev.hits;
@@ -153,7 +155,8 @@ class ResumenManager {
                     memberId: m.id,
                     jornadaNum: j.number,
                     dayPoints: points,
-                    dayHits: hits
+                    dayHits: hits,
+                    potentialHits: (isLate && !isPardoned) ? potentialHits : null
                 });
             });
         });
@@ -477,7 +480,7 @@ class ResumenManager {
                             <div style="font-size:0.65rem; color:#777; font-weight:bold;">PUNTOS J.</div>
                         </div>
                         <div style="text-align:center;">
-                            <div style="font-size:1.4rem; font-weight:bold; color:#1976d2;">${jornadaData.dayHits}</div>
+                            <div style="font-size:1.4rem; font-weight:bold; color:#1976d2;">${jornadaData.potentialHits !== null ? `<s>${jornadaData.potentialHits}</s>` : jornadaData.dayHits}</div>
                             <div style="font-size:0.65rem; color:#777; font-weight:bold;">ACIERTOS J.</div>
                         </div>
                     </div>
@@ -718,6 +721,7 @@ class ResumenManager {
             y: pointData.y,
             dayPoints: pointData.dayPoints,
             dayHits: pointData.dayHits,
+            potentialHits: pointData.potentialHits,
             jornadaNum: pointData.jornadaNum
         };
 

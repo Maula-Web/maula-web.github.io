@@ -107,6 +107,7 @@ class ResultsManager {
                             hits = 0;
                             points = ScoringSystem.calculateScore(0, jDate);
                             bonus = points;
+                            p._potentialHits = ev.hits; // Guarda los aciertos potenciales para mostrarlos tachados
                         } else {
                             hits = ev.hits;
                             if (isFinished) {
@@ -157,7 +158,10 @@ class ResultsManager {
                 }
 
                 // Store
-                memberStats[m.id].jornadaData[j.id] = { hits, points, bonus, prize, isLate, isPardoned };
+                memberStats[m.id].jornadaData[j.id] = { 
+                    hits, points, bonus, prize, isLate, isPardoned,
+                    potentialHits: (p && p._potentialHits !== undefined) ? p._potentialHits : null 
+                };
 
                 if (hits !== -1) {
                     memberStats[m.id].grandTotal += points;
@@ -259,7 +263,11 @@ class ResultsManager {
                 if (data.hits !== -1) {
                     // MAIN CHANGE: Show HITS as main value
                     // If Bonus != 0, show it below.
-                    cellHtml = `<div style="font-size:1.3rem; font-weight:bold; color:var(--resultados-hits-number);">${data.hits}</div>`;
+                    let valDisplay = data.hits;
+                    if (data.hits === 0 && data.potentialHits !== null) {
+                        valDisplay = `<span style="text-decoration:line-through; opacity:0.8; color:var(--resultados-hits-number);">${data.potentialHits}</span>`;
+                    }
+                    cellHtml = `<div style="font-size:1.3rem; font-weight:bold; color:var(--resultados-hits-number);">${valDisplay}</div>`;
 
                     if (data.bonus !== 0) {
                         const bColor = data.bonus > 0 ? 'var(--resultados-bonus-positive)' : 'var(--resultados-bonus-negative)';
@@ -295,8 +303,8 @@ class ResultsManager {
                     }
 
                     // Black/White for 0 Hits/Points logic
-                    if (data.hits === 0) {
-                        // If 0 hits, usually it's bad.
+                    if (data.hits === 0 && data.potentialHits === null) {
+                        // If 0 REAL hits, usually it's bad.
                         cellStyle += 'background-color:black; color:white;';
                     }
 
