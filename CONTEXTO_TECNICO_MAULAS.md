@@ -57,13 +57,13 @@ Para facilitar la transición del antiguo sistema de hojas de cálculo al entorn
 
 Las bonificaciones (10–15 aciertos) y penalizaciones (0–3 aciertos) son configurables desde el panel de Administración y se almacenan con historial por fecha en `localStorage`.
 
-### 4.2. Jornadas PIG (Pleno al 15 con Grandes Clubes)
+### 4.2. Lógica del Pleno al 15 (PIG y Ordinarias)
 
-Cuando el partido número 15 (el Pleno al 15) enfrenta a equipos de primer nivel (Real Madrid, Barcelona, Atlético de Madrid), la jornada se marca internamente como **PIG**. En estos casos:
+Se ha establecido una regla global de exclusión para el partido número 15 (el Pleno al 15):
 
-- El partido 15 se **excluye del cómputo de puntos de clasificación** de la temporada.
-- Si un socio acierta ese partido, se le **descuenta 1 acierto** antes de calcular su puntuación, para no distorsionar el ranking con un acierto "fácil" o "privilegiado".
-- Esta lógica se aplica en `dashboard.js` y en `resumen-temporada.js` de forma idéntica.
+- **Exclusión Universal**: El partido 15 **NUNCA se computa en el recuento numérico de aciertos** (`hits`) utilizado para los puntos de la temporada. Los puntos se calculan exclusivamente sobre los 14 primeros partidos.
+- **Sin descuentos manuales**: Se ha eliminado la antigua lógica de "descontar 1 acierto" si se acertaba el PIG, ya que ahora el sistema base (en `scoring.js`) directamente ignora el índice 14 para la suma de aciertos.
+- **Jornadas PIG (Interés General)**: Cuando el pleno al 15 involucra a equipos grandes (Madrid, Barça, Atleti), la jornada se marca como PIG. En estos casos, aunque no sume puntos, el sistema realiza un **seguimiento detallado** de quién acierta y quién falla para su mención especial en informes y Telegram.
 
 ### 4.3. Consistencia entre Dashboard y Resumen Temporada
 
@@ -107,6 +107,10 @@ Se genera de forma sintética lo que sería el "voto popular" del grupo:
 2. El signo vencedor por **mayoría absoluta** pasa a ser el signo de la "Columna MAULA" para ese partido.
 3. Esto se repite para los 15 plenarios. Este pronóstico estadístico se enfrenta a la realidad, demostrando con frecuencia si la sabiduría popular de la peña es mejor que el voto individual de sus integrantes.
 4. **Desempates/Ganadores Semanales**: Cuando en la tabla de resultados varios miembros empatan a aciertos, se utilizan reglas algorítmicas (vía función `resolveTie`) para decidir quién recibe la corona o el farolillo rojo. A los ganadores/perdedores se les asignan identificadores de color específicos regidos en la "Identidad Visual". Aparte, se trackean jornadas especiales donde juegan equipos PIG (Madrid, Barça, Atleti) marcándolas mediante la función `checkIsPIG`.
+5. **Identificación de Penalizaciones en Tabla**:
+    - **Cero Natural (0 aciertos)**: La casilla mantiene el color normal (blanco o el color de Maula/líder) y muestra el "0".
+    - **Cero por Penalización (Retraso)**: La casilla se vuelve **negra con el número de aciertos potenciales tachado en gris** (ej: ~~12~~). Esto permite distinguir de un vistazo quién no acertó de quién fue sancionado.
+    - El tachado se aplica con un estilo evidente (`line-through double`) para evitar confusiones.
 
 ## 7. Sistema de Pronósticos y Experiencia de Usuario (UX)
 
@@ -130,6 +134,10 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
   - **Botón de Cierre Flotante**: Se incluye un botón flotante (`Volver a Pronósticos`) en la parte inferior exclusivo para móviles, facilitando la navegación sin depender de la "X" superior de difícil alcance.
 - **Visualización Técnica**: La tabla resumen de la peña incluye un **doble scroll horizontal** (barra superior e inferior) para facilitar la consulta de columnas de socios sin desplazarse al final de la página.
 - **Soporte Extendido de Escudos (`js/utils.js`)**: El sistema mapea y normaliza dinámicamente nombres de equipos hacia ficheros locales en múltiples directorios (`escudos/primera/`, `escudos/segunda/` y `escudos/OTROS/` incluyendo equipos como Alcorcón, Ibiza, Marbella, Mérida, Ferrol, Pontevedra, etc.).
+- **Auditoría de Correcciones**:
+  - Al modificar una jornada cerrada (Modo Corrección), se activa un **Modal de Auditoría** obligatorio de alta visibilidad (`z-index: 9,000,000`).
+  - La visibilidad de las ventanas se gestiona mediante la clase `.active`, asegurando que la opacidad pase a 1 y el sistema no quede bloqueado de forma invisible.
+  - Se registra el motivo del cambio en el log de modificaciones de Firebase.
 
 ## 8. Comunicaciones y Notificaciones: Telegram
 
@@ -137,6 +145,7 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
 - **Por Fin es Jueves**: Una rutina con días, hora, fechas límite de intervalo ("Date Range") definibles, que lanza recordatorios a los socios para que rellenen su pronóstico si no lo han sellado todavía.
 - El administrador puede definir mediante el panel de control o por variables el mensaje customizado de ese aviso semanal.
 - **Recordatorio Especial PIG**: Si la jornada activa es de tipo PIG (Pleno al 15 con Grandes Clubes), el mensaje de notificación incluirá automáticamente una coletilla extra recordando a los socios "sellar también el PIG".
+- **Informe Trimestral de Resultados**: Cuando finaliza una jornada, el bot envía el resumen detallado. Si hay PIG, se detalla la lista de socios bajo los epígrafes "✅ Acertantes" y "❌ Fallan". La sección de premio especial de dobles se identifica con una jarra de cerveza (`🍺`).
 
 ## 9. Identidad Visual y Estilo
 
