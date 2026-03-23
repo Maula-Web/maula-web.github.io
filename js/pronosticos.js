@@ -918,9 +918,6 @@ class PronosticoManager {
         this.auditReason.value = '';
         this.auditLateCheck.checked = isLateCurrent;
 
-        // Forzar que esté en el viewport
-        this.auditModal.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
         // Focus en el textarea
         setTimeout(() => {
             if (this.auditReason) this.auditReason.focus();
