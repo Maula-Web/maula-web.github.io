@@ -651,9 +651,8 @@ class BoteManager {
 
             let isHit = false;
             if (i === 14) {
-                // P15: Exact match for score strings (e.g. "1-0" === "1-0") 
-                // OR sign match as fallback if prediction is just a sign
-                isHit = (rScore === pred) || (rSign === pred);
+                // El partido 15 NUNCA suma aciertos
+                continue;
             } else {
                 // 1-14: Support for multiple signs (e.g. "1X" contains "1")
                 isHit = pred.includes(rSign);

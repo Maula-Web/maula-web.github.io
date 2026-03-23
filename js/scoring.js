@@ -166,7 +166,7 @@ const ScoringSystem = {
                     }
                 });
 
-                const totalRaw = regHits + (p15Hit ? 1 : 0);
+                const totalRaw = regHits; // El partido 15 nunca suma aciertos
                 const officialCat = (regHits === 14 && p15Hit) ? 15 : regHits;
                 betsData.push({ totalRaw, officialCat });
             });
@@ -202,7 +202,7 @@ const ScoringSystem = {
             }
         });
 
-        const hits = regHits + (p15Hit ? 1 : 0);
+        const hits = regHits; // El partido 15 nunca suma aciertos
         const officialHits = (regHits === 14 && p15Hit) ? 15 : regHits;
         const points = this.calculateScore(hits, targetDate);
         return { hits, points, bonus: points - hits, breakdown: null, officialHits };

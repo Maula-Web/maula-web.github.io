@@ -131,11 +131,7 @@ class ResumenManager {
                         hits = ev.hits;
                         points = ev.points;
 
-                        // Lógica PIG: igual que el Dashboard, descontar el acierto del partido 15
-                        if (isPig15 && sel[14] && sel[14] === officialResults[14]) {
-                            hits = Math.max(0, hits - 1);
-                            points = ScoringSystem.calculateScore(hits, jDate);
-                        }
+                        // Lógica PIG eliminada porque el partido 15 ya no suma aciertos en ScoringSystem
 
                         // Premios (usando los hits ya ajustados por PIG)
                         if (hits >= minHits) {

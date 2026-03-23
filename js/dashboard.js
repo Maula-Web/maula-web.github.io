@@ -135,12 +135,9 @@ class DashboardManager {
                             if (isPig15) {
                                 // Check if user hit the PIG (Match 15)
                                 // sel[14] is the forecast, officialResults[14] is the result
-                                if (sel[14] && sel[14] === officialResults[14]) {
+                                const rSign15 = window.ScoringSystem ? window.ScoringSystem.normalizeSign(officialResults[14]) : officialResults[14];
+                                if (sel[14] && sel[14] === rSign15) {
                                     pigHit = true;
-                                    // Remove this hit from classification stats
-                                    hits = Math.max(0, hits - 1);
-                                    // Recalculate points without this hit
-                                    points = window.ScoringSystem ? window.ScoringSystem.calculateScore(hits, jDate) : 0;
                                 }
                             }
                         }
