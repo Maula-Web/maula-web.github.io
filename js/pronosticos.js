@@ -113,7 +113,7 @@ class PronosticoManager {
         // Audit Modal Actions
         if (this.btnConfirmAudit) this.btnConfirmAudit.addEventListener('click', () => this.executeAuditSave());
         if (this.btnCancelAudit) this.btnCancelAudit.addEventListener('click', () => {
-            this.auditModal.style.display = 'none';
+            this.auditModal.classList.remove('active');
             document.body.style.overflow = '';
             this.pendingSaveData = null;
         });
@@ -914,7 +914,7 @@ class PronosticoManager {
         document.body.style.overflow = 'hidden';
 
         // Mostrar modal
-        this.auditModal.style.display = 'flex';
+        this.auditModal.classList.add('active');
         this.auditReason.value = '';
         this.auditLateCheck.checked = isLateCurrent;
 
@@ -973,7 +973,7 @@ class PronosticoManager {
             await this.performFinalSave(this.pendingSaveData, isForceLate, true);
 
             // 5. Success Flow: Close modal
-            this.auditModal.style.display = 'none';
+            this.auditModal.classList.remove('active');
             document.body.style.overflow = ''; // Restaurar scroll
             this.pendingSaveData = null;
 
