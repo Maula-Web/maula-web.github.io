@@ -157,7 +157,7 @@ window.TelegramService = {
                 msg += `${medal}${r.name}: *${r.hits}* ac. (${r.points} pts)${r.prize > 0 ? ` 💰 *${r.prize.toFixed(2)}€*` : ''}\n`;
             });
 
-            msg += `\n🎟️ Quiniela de dobles: *${eligibleNames}*`;
+            msg += `\n🍺 Quiniela de dobles: *${eligibleNames}*`;
             msg += `\n✍️ Sella: *${loser.name}*\n`;
 
             if (isPigJornada) {
@@ -165,7 +165,7 @@ window.TelegramService = {
                 const fallantes = currentResults.filter(r => !r.pigHit && r.played).map(r => r.name);
                 msg += `\n*🐽 PIG (PLENO AL 15):*\n`;
                 msg += `✅ Acertantes: ${acertantes.length > 0 ? acertantes.join(", ") : 'Ninguno'}\n`;
-                msg += `❌ Fallantes: ${fallantes.length > 0 ? fallantes.join(", ") : 'Ninguno'}\n`;
+                msg += `❌ Fallan: ${fallantes.length > 0 ? fallantes.join(", ") : 'Ninguno'}\n`;
             }
 
             // Extras / Doubles
@@ -182,8 +182,6 @@ window.TelegramService = {
                 });
             }
 
-            msg += `\n🎟️ Quiniela de dobles: *${winner.name}*`;
-            msg += `\n✍️ Sella: *${loser.name}*`;
 
             // Full Global Ranking
             const fullRanking = Object.values(globalStats).sort((a, b) => b.totalPoints - a.totalPoints);
