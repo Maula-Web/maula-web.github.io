@@ -698,8 +698,7 @@ class ResumenManager {
             const dSel = doublesP.selection || [];
             let hits = 0;
             dSel.forEach((sel, idx) => {
-                const res = officialResults[idx];
-                if (res && sel && sel.includes(res)) hits++;
+                if (idx < 14 && officialResults[idx] && sel && sel.includes(officialResults[idx])) hits++;
             });
 
             matchesHtml += `
@@ -747,8 +746,7 @@ class ResumenManager {
                 const sel = p.selection || [];
                 if (officialResults.length > 0) {
                     sel.forEach((s, idx) => {
-                        const res = officialResults[idx];
-                        if (res && s && s.includes(res)) hits++;
+                        if (idx < 14 && officialResults[idx] && s && s.includes(officialResults[idx])) hits++;
                     });
                 }
 

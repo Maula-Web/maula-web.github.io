@@ -3186,7 +3186,7 @@ class BoteManager {
             bets.push({
                 num: bIdx + 1,
                 selection: betSelection,
-                hits: regHits + (p15Hit ? 1 : 0),
+                hits: regHits, // El partido 15 nunca suma aciertos habituales
                 isWinner: regHits >= 10
             });
         });

@@ -60,6 +60,8 @@ window.TelegramService = {
             const jDate = AppUtils.parseDate(currentJ.date);
             const minHits = currentJ.minHitsToWin || 10;
 
+            const isPigJornada = currentJ.matches && currentJ.matches[14] && AppUtils.isPigMatch(currentJ.matches[14].home, currentJ.matches[14].away);
+
             const currentResults = members.map(m => {
                 const p = pronosticos.find(pred => (pred.jId == currentJ.id || pred.jornadaId == currentJ.id) && (pred.mId == m.id || pred.memberId == m.id));
                 let hits = 0;
@@ -67,6 +69,7 @@ window.TelegramService = {
                 let played = false;
                 let isLate = false;
                 let isPardoned = false;
+                let pigHit = false;
 
                 if (p) {
                     played = true;
@@ -79,6 +82,14 @@ window.TelegramService = {
                         const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
                         hits = ev.hits;
                         points = ev.points;
+
+                        if (isPigJornada) {
+                            const rSign15 = ScoringSystem.normalizeSign(officialResults[14]);
+                            const pred15 = String(p.selection[14] || '').trim().toUpperCase();
+                            if (pred15 && (pred15 === rSign15 || pred15 === String(officialResults[14]).trim().toUpperCase())) {
+                                pigHit = true;
+                            }
+                        }
                     }
                 }
 
@@ -91,7 +102,8 @@ window.TelegramService = {
                     prize,
                     played,
                     isLate,
-                    isPardoned
+                    isPardoned,
+                    pigHit
                 };
             });
 
@@ -146,7 +158,15 @@ window.TelegramService = {
             });
 
             msg += `\n🎟️ Quiniela de dobles: *${eligibleNames}*`;
-            msg += `\n✍️ Sella: *${loser.name}*`;
+            msg += `\n✍️ Sella: *${loser.name}*\n`;
+
+            if (isPigJornada) {
+                const acertantes = currentResults.filter(r => r.pigHit).map(r => r.name);
+                const fallantes = currentResults.filter(r => !r.pigHit && r.played).map(r => r.name);
+                msg += `\n*🐽 PIG (PLENO AL 15):*\n`;
+                msg += `✅ Acertantes: ${acertantes.length > 0 ? acertantes.join(", ") : 'Ninguno'}\n`;
+                msg += `❌ Fallantes: ${fallantes.length > 0 ? fallantes.join(", ") : 'Ninguno'}\n`;
+            }
 
             // Extras / Doubles
             const extras = pronosticosExtra.filter(p => (p.jId == currentJ.id || p.jornadaId == currentJ.id));
@@ -156,7 +176,7 @@ window.TelegramService = {
                     let hCount = 0;
                     const sel = p.selection || [];
                     sel.forEach((s, idx) => {
-                        if (officialResults[idx] && s && s.includes(officialResults[idx])) hCount++;
+                        if (idx < 14 && officialResults[idx] && s && s.includes(officialResults[idx])) hCount++;
                     });
                     msg += `🔹 Resultado: *${hCount}* aciertos\n`;
                 });

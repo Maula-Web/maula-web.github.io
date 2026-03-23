@@ -136,7 +136,8 @@ class DashboardManager {
                                 // Check if user hit the PIG (Match 15)
                                 // sel[14] is the forecast, officialResults[14] is the result
                                 const rSign15 = window.ScoringSystem ? window.ScoringSystem.normalizeSign(officialResults[14]) : officialResults[14];
-                                if (sel[14] && sel[14] === rSign15) {
+                                const pred15 = String(sel[14] || '').trim().toUpperCase();
+                                if (pred15 && (pred15 === rSign15 || pred15 === String(officialResults[14]).trim().toUpperCase())) {
                                     pigHit = true;
                                 }
                             }
@@ -626,6 +627,7 @@ class DashboardManager {
                 const selection = df.selection || [];
                 let hits = 0;
                 selection.forEach((sel, idx) => {
+                    if (idx >= 14) return; // Exclude Pleno al 15
                     const res = officialResults[idx];
                     if (res && sel && sel.includes(res)) {
                         hits++;
