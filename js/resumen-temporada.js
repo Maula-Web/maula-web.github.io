@@ -16,8 +16,7 @@ class ResumenManager {
         if (window.DataService) await window.DataService.init();
 
         this.members = await window.DataService.getAll('members');
-        this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Global sort by member ID
-        this.jornadas = await window.DataService.getAll('jornadas');
+        if (this.members) this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)); 
         this.jornadas = await window.DataService.getAll('jornadas');
         this.pronosticos = await window.DataService.getAll('pronosticos');
         this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
@@ -41,26 +40,33 @@ class ResumenManager {
         const selector = document.getElementById('season-selector');
         if (!selector) return;
 
-        // Extract all seasons from jornadas
-        const seasons = [...new Set(this.jornadas.map(j => j.season).filter(s => !!s))];
+        // Extract and deduplicate
+        let seasons = [...new Set(this.jornadas.map(j => j.season).filter(s => !!s))];
         if (seasons.length === 0) {
-            // Support old jornadas without season field
-            seasons.push('2025-2026');
+            seasons = ['2025-2026'];
         }
-        seasons.sort((a, b) => b.localeCompare(a)); // Descending
+        seasons.sort((a, b) => b.localeCompare(a));
 
         selector.innerHTML = seasons.map(s => `<option value="${s}">${s}</option>`).join('');
         
-        // Default to active season
-        if (window.AppUtils && window.AppUtils.activeSeason) {
-            this.currentSeason = window.AppUtils.activeSeason;
-            selector.value = this.currentSeason;
+        // Priority for initialization:
+        // 1. Selector value if it matches AppUtils.activeSeason
+        // 2. AppUtils.activeSeason
+        // 3. First available option in selector
+        const activeS = (window.AppUtils && window.AppUtils.activeSeason) || '2025-2026';
+        
+        if (seasons.includes(activeS)) {
+            this.currentSeason = activeS;
+            selector.value = activeS;
         } else {
-            this.currentSeason = selector.value;
+            this.currentSeason = selector.value || seasons[0];
         }
+
+        console.log("ResumenManager: Initialized with season", this.currentSeason, "from options", seasons);
 
         selector.addEventListener('change', (e) => {
             this.currentSeason = e.target.value;
+            console.log("ResumenManager: Changed season to", this.currentSeason);
             this.refreshData();
         });
     }
@@ -131,13 +137,13 @@ class ResumenManager {
             const d = AppUtils.parseDate(j.date);
             const isValidDate = d && AppUtils.isSunday(d);
             
-            // Season check: If no j.season, assume 2025-2026 for legacy data
             const jSeason = j.season || '2025-2026';
             const seasonMatch = jSeason === this.currentSeason;
 
-            // Important: We ignore 'active' check here to allow browsing historical data.
             return seasonMatch && hasResult && isValidDate;
         });
+
+        console.log(`ResumenManager: Found ${activeJornadas.length} jornadas for season ${this.currentSeason} (Total checked: ${this.jornadas.length})`);
 
         activeJornadas.forEach(j => {
             const officialResults = j.matches.map(m => m.result);
