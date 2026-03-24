@@ -124,8 +124,8 @@ var AppUtils = window.AppUtils || {
         const keywords = [
             'real madrid', 'barcelona', 'atlético', 'at. madrid', 'sevilla', 'betis',
             'real sociedad', 'athletic', 'valencia', 'villarreal', 'girona', 'osasuna',
-            'celta', 'mallorca', 'rayo', 'getafe', 'alavés', 'palmas', 'leganés',
-            'espanyol', 'valladolid', 'leganes', 'bilbao'
+            'celta', 'mallorca', 'rayo', 'getafe', 'alavés', 'espanyol', 'elche', 
+            'levante', 'oviedo', 'bilbao'
         ];
         const norm = this.normalizeName(name);
         // Simple inclusion check on normalized strings

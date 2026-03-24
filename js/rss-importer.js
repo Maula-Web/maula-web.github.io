@@ -671,11 +671,11 @@ class QuinielaScraper {
         const spanishTeams = [
             'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
             'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
-            'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'LAS PALMAS', 'LEGANÉS',
-            'ESPANYOL', 'VALLADOLID', 'RACING', 'EIBAR', 'OVIEDO', 'R.OVIEDO', 'SPORTING',
-            'ZARAGOZA', 'BURGOS', 'MIRANDÉS', 'LEVANTE', 'TENERIFE', 'HUESCA', 'ALBACETE',
-            'CARTAGENA', 'FERROL', 'CASTELLÓN', 'CÓRDOBA', 'MÁLAGA', 'ELDA', 'ELDENSE',
-            'ALMERÍA', 'CÁDIZ', 'GRANADA'
+            'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE', 
+            'LEVANTE', 'OVIEDO', 'R.OVIEDO', 'SPORTING', 'ZARAGOZA', 'BURGOS', 'MIRANDÉS', 
+            'TENERIFE', 'HUESCA', 'ALBACETE', 'CARTAGENA', 'FERROL', 'CASTELLÓN', 
+            'CÓRDOBA', 'MÁLAGA', 'ELDA', 'ELDENSE', 'ALMERÍA', 'CÁDIZ', 'GRANADA', 
+            'VALLADOLID', 'LEGANÉS', 'LAS PALMAS', 'RACING'
         ];
 
         let matchCount = 0;
@@ -721,8 +721,8 @@ class QuinielaScraper {
         const primeraKeywords = [
             'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
             'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
-            'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'LAS PALMAS', 'LEGANÉS',
-            'ESPANYOL', 'VALLADOLID'
+            'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE', 
+            'LEVANTE', 'OVIEDO', 'BILBAO'
         ];
 
         return matches.some(m => {
