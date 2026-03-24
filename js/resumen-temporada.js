@@ -7,6 +7,7 @@ class ResumenManager {
         // Selection state
         this.selectedMembers = new Set();
         this.chart = null;
+        this.currentSeason = ''; // Selected season
 
         this.init();
     }
@@ -22,6 +23,8 @@ class ResumenManager {
         this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
 
         this.jornadas.sort((a, b) => a.number - b.number);
+        
+        this.initSeasonSelector();
         this.data = this.calculateData();
 
         this.createModal();
@@ -31,6 +34,44 @@ class ResumenManager {
         this.renderGlobalStats();
 
         // Auto select top 4 logic moved here to ensure data is ready
+        this.autoSelectTop4();
+    }
+
+    initSeasonSelector() {
+        const selector = document.getElementById('season-selector');
+        if (!selector) return;
+
+        // Extract all seasons from jornadas
+        const seasons = [...new Set(this.jornadas.map(j => j.season).filter(s => !!s))];
+        if (seasons.length === 0) {
+            // Support old jornadas without season field
+            seasons.push('2025-2026');
+        }
+        seasons.sort((a, b) => b.localeCompare(a)); // Descending
+
+        selector.innerHTML = seasons.map(s => `<option value="${s}">${s}</option>`).join('');
+        
+        // Default to active season
+        if (window.AppUtils && window.AppUtils.activeSeason) {
+            this.currentSeason = window.AppUtils.activeSeason;
+            selector.value = this.currentSeason;
+        } else {
+            this.currentSeason = selector.value;
+        }
+
+        selector.addEventListener('change', (e) => {
+            this.currentSeason = e.target.value;
+            this.refreshData();
+        });
+    }
+
+    refreshData() {
+        this.data = this.calculateData();
+        this.selectedMembers.clear();
+        this.renderTotalsList();
+        
+        // Re-calculate stats and render
+        this.renderGlobalStats();
         this.autoSelectTop4();
     }
 
@@ -84,12 +125,18 @@ class ResumenManager {
             };
         });
 
-        // MISMO filtro que el Dashboard: active + resultado + isSunday
+        // MISMO filtro que el Dashboard pero filtrando por TEMPORADA
         const activeJornadas = this.jornadas.filter(j => {
             const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
             const d = AppUtils.parseDate(j.date);
             const isValidDate = d && AppUtils.isSunday(d);
-            return j.active && hasResult && isValidDate;
+            
+            // Season check: If no j.season, assume 2025-2026 for legacy data
+            const jSeason = j.season || '2025-2026';
+            const seasonMatch = jSeason === this.currentSeason;
+
+            // Important: We ignore 'active' check here to allow browsing historical data.
+            return seasonMatch && hasResult && isValidDate;
         });
 
         activeJornadas.forEach(j => {

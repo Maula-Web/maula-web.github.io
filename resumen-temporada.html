@@ -23,11 +23,19 @@
     <div class="main-container">
         <!-- Header -->
         <header class="header-actions">
-            <div>
-                <a href="index.html" class="btn-back">← Volver al Inicio</a>
-                <h1 class="page-title">Resumen Temporada 2025-2026 <span id="current-datetime"
-                        style="display:block; font-size:1rem; font-weight:400; color:#666; margin-top:0.2rem;"></span>
-                </h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <a href="index.html" class="btn-back">← Volver al Inicio</a>
+                    <h1 class="page-title">Histórico de Temporadas <span id="current-datetime"
+                            style="display:block; font-size:1rem; font-weight:400; color:#666; margin-top:0.2rem;"></span>
+                    </h1>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #f48100;">
+                    <label style="font-size: 0.8rem; font-weight: bold; color: #666; display: block; margin-bottom: 2px;">SELECCIONAR TEMPORADA:</label>
+                    <select id="season-selector" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; color: #333; min-width: 150px;">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
             </div>
         </header>
 

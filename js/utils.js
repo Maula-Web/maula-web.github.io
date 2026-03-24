@@ -124,40 +124,15 @@ var AppUtils = window.AppUtils || {
      * Used for filtering
      */
     isLaLigaTeam(name) {
-        let keywords = [];
-
-        if (this.currentTeams && Array.isArray(this.currentTeams.primera)) {
-            // Use dynamic list if loaded
-            keywords = this.currentTeams.primera;
-        } else {
-            // Hardcoded fallback ONLY (v0.1)
-            keywords = [
-                'real madrid', 'barcelona', 'atlético', 'at. madrid', 'sevilla', 'betis',
-                'real sociedad', 'athletic', 'valencia', 'villarreal', 'girona', 'osasuna',
-                'celta', 'mallorca', 'rayo', 'getafe', 'alavés', 'espanyol', 'elche',
-                'levante', 'oviedo', 'bilbao'
-            ];
-        }
-
+        const keywords = [
+            'real madrid', 'barcelona', 'atlético', 'at. madrid', 'sevilla', 'betis',
+            'real sociedad', 'athletic', 'valencia', 'villarreal', 'girona', 'osasuna',
+            'celta', 'mallorca', 'rayo', 'getafe', 'alavés', 'espanyol', 'elche', 
+            'levante', 'oviedo', 'bilbao'
+        ];
         const norm = this.normalizeName(name);
         // Simple inclusion check on normalized strings
         return keywords.some(k => norm.includes(this.normalizeName(k)));
-    },
-
-    /**
-     * Loads the team config from Firestore
-     */
-    async initTeams() {
-        if (!window.DataService) return;
-        try {
-            this.currentTeams = await window.DataService.getCurrentTeams();
-            this.activeSeason = await window.DataService.getActiveSeason();
-            if (this.currentTeams) {
-                console.log(`AppUtils: Teams loaded for season ${this.activeSeason}`);
-            }
-        } catch (e) {
-            console.warn("AppUtils: Error loading teams from DB", e);
-        }
     },
 
     /**
@@ -322,9 +297,6 @@ window.AppUtils = AppUtils;
  * Injected automatically since utils.js is present on all pages.
  */
 document.addEventListener('DOMContentLoaded', async () => {
-    // 0. Load Teams Config (New Season Logic)
-    if (AppUtils.initTeams) await AppUtils.initTeams();
-
     // Create Clock Element
     const clockId = 'maulas-global-clock';
     if (!document.getElementById(clockId)) {
