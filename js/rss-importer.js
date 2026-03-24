@@ -155,6 +155,12 @@ class QuinielaScraper {
                     continue;
                 }
 
+                // 2b. Validate Primera Division (Maulas competition only uses jornadas with Primera teams)
+                if (!this.hasPrimeraTeams(jData.matches)) {
+                    console.log(`Skipping J${jData.number}: No Primera Division teams found. This is likely a Segunda-only or International jornada.`);
+                    continue;
+                }
+
                 // 3. Already exists? 
                 const existing = this.jornadas.find(j => j.number === jData.number);
                 if (existing) {
@@ -694,6 +700,36 @@ class QuinielaScraper {
         // If at least 40% of teams are recognized, it's Spanish league. 
         // (Premier League or Serie A would have close to 0%)
         return percentage > 0.4;
+    }
+
+    /**
+     * More strict check: At least one team must be from Primera Division (LaLiga EA).
+     * This prevents importing "Segunda-only" or "International" jornadas.
+     */
+    hasPrimeraTeams(matches) {
+        if (!matches || matches.length === 0) return false;
+
+        // Use AppUtils if available (it has the up-to-date Primera keywords)
+        if (window.AppUtils && typeof window.AppUtils.isLaLigaTeam === 'function') {
+            return matches.some(m =>
+                window.AppUtils.isLaLigaTeam(m.home) ||
+                window.AppUtils.isLaLigaTeam(m.away)
+            );
+        }
+
+        // Fallback list of 1st Division teams (2025-2026)
+        const primeraKeywords = [
+            'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
+            'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
+            'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'LAS PALMAS', 'LEGANÉS',
+            'ESPANYOL', 'VALLADOLID'
+        ];
+
+        return matches.some(m => {
+            const h = m.home.toUpperCase();
+            const a = m.away.toUpperCase();
+            return primeraKeywords.some(k => h.includes(k) || a.includes(k));
+        });
     }
 
     cleanTeamName(name) {
