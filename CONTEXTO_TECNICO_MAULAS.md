@@ -95,6 +95,14 @@ Históricamente el sistema ha consumido datos de diferentes administraciones de 
 - **Conversión de Resultados**: Resultados de goleadas a veces salen como "M-0" o "2-M", el sistema debe normalizarlos a signos absolutos de quiniela (`1`, `X`, `2`) para poder baremar a los socios.
 - **Rápida Introducción Manual**: Desde el panel de administración, los resultados se introducen cómodamente mediante botoneras interactivas (1, X, 2 para los 14 primeros partidos; y dos selectores independientes 0, 1, 2, M para el Pleno al 15 local y visitante). Toda esta ventana emergente es totalmente responsiva y escalable en dispositivos móviles.
 
+### 5.4. Filtro de Relevancia por División
+
+Para evitar la importación de jornadas que no corresponden a la competición principal de la Peña (como jornadas exclusivas de Segunda División o parones internacionales de selecciones), el sistema aplica un filtro estricto:
+
+- **Regla Primera División**: Una jornada solo se importa si al menos uno de sus 15 partidos involucra a un equipo de la **Primera División española (LaLiga EA Sports)**.
+- **Implementación**: El método `hasPrimeraTeams` en `rss-importer.js` realiza esta comprobación cruzando los equipos de la jornada con el listado de palabras clave definido en `AppUtils.isLaLigaTeam` (`js/utils.js`).
+- **Mantenimiento Estacional**: Dado que hay ascensos y descensos, el listado de equipos en `js/utils.js` (y su fallback en `rss-importer.js`) **debe actualizarse manualmente al inicio de cada temporada** para reflejar los 20 equipos que componen la Primera División ese año. Si el sistema empieza a importar jornadas de Segunda por error (como ocurrió con la J51 de la temporada 25/26), es señal de que la lista contiene equipos descendidos como Valladolid, Leganés o Las Palmas.
+
 ## 6. Tabla de Resultados y "Columna MAULA"
 
 En la Vista Cuadrante / Panel de Partidos o de Resultados se enfrentan los boletos introducidos por cada jugador con los resultados oficiales.

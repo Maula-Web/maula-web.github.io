@@ -198,6 +198,39 @@ class DataService {
         await this.db.collection('config').doc('scoring').set(rules);
     }
 
+    // --- TEAMS & SEASONS ---
+    async getCurrentTeams() {
+        // Try current season config
+        const activeDoc = await this.db.collection('config').doc('active_season').get();
+        const activeSeason = activeDoc.exists ? activeDoc.data().id : '2025-2026';
+        
+        const teamsDoc = await this.db.collection('config').doc(`teams_${activeSeason.replace(/-/g, '_')}`).get();
+        if (teamsDoc.exists) return teamsDoc.data();
+        
+        return null; // Fallback to hardcoded in utils.js
+    }
+
+    async saveTeams(season, data) {
+        const id = `teams_${season.replace(/-/g, '_')}`;
+        await this.db.collection('config').doc(id).set({
+            season,
+            ...data,
+            updatedAt: new Date().toISOString()
+        });
+    }
+
+    async getActiveSeason() {
+        const doc = await this.db.collection('config').doc('active_season').get();
+        return doc.exists ? doc.data().id : '2025-2026';
+    }
+
+    async setActiveSeason(season) {
+        await this.db.collection('config').doc('active_season').set({
+            id: season,
+            updatedAt: new Date().toISOString()
+        });
+    }
+
     // Auth Helpers
     async logAction(user, action) {
         const log = {

@@ -216,29 +216,77 @@
             </div>
 
             <!-- 2. Config (Middle Column) -->
-            <div class="config-card">
-                <h2>⚙️ Puntuaciones</h2>
-                <form id="config-form">
-                    <h3 style="font-size:0.9rem; margin-bottom:0.5rem; color:#444;">Bonificaciones</h3>
-                    <div class="form-row"><label>15 Aciertos</label> <input type="number" id="bonus15"></div>
-                    <div class="form-row"><label>14 Aciertos</label> <input type="number" id="bonus14"></div>
-                    <div class="form-row"><label>13 Aciertos</label> <input type="number" id="bonus13"></div>
-                    <div class="form-row"><label>12 Aciertos</label> <input type="number" id="bonus12"></div>
-                    <div class="form-row"><label>11 Aciertos</label> <input type="number" id="bonus11"></div>
-                    <div class="form-row"><label>10 Aciertos</label> <input type="number" id="bonus10"></div>
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div class="config-card">
+                    <h2>⚙️ Puntuaciones</h2>
+                    <form id="config-form">
+                        <h3 style="font-size:0.9rem; margin-bottom:0.5rem; color:#444;">Bonificaciones</h3>
+                        <div class="form-row"><label>15 Aciertos</label> <input type="number" id="bonus15"></div>
+                        <div class="form-row"><label>14 Aciertos</label> <input type="number" id="bonus14"></div>
+                        <div class="form-row"><label>13 Aciertos</label> <input type="number" id="bonus13"></div>
+                        <div class="form-row"><label>12 Aciertos</label> <input type="number" id="bonus12"></div>
+                        <div class="form-row"><label>11 Aciertos</label> <input type="number" id="bonus11"></div>
+                        <div class="form-row"><label>10 Aciertos</label> <input type="number" id="bonus10"></div>
 
-                    <h3 style="font-size:0.9rem; margin-bottom:0.5rem; margin-top:0.8rem; color:#444;">Penalizaciones
-                    </h3>
-                    <div class="form-row"><label>3 Aciertos</label> <input type="number" id="penalty3"></div>
-                    <div class="form-row"><label>2 Aciertos</label> <input type="number" id="penalty2"></div>
-                    <div class="form-row"><label>1 Aciertos</label> <input type="number" id="penalty1"></div>
-                    <div class="form-row"><label>0 Aciertos</label> <input type="number" id="penalty0"></div>
+                        <h3 style="font-size:0.9rem; margin-bottom:0.5rem; margin-top:0.8rem; color:#444;">Penalizaciones
+                        </h3>
+                        <div class="form-row"><label>3 Aciertos</label> <input type="number" id="penalty3"></div>
+                        <div class="form-row"><label>2 Aciertos</label> <input type="number" id="penalty2"></div>
+                        <div class="form-row"><label>1 Aciertos</label> <input type="number" id="penalty1"></div>
+                        <div class="form-row"><label>0 Aciertos</label> <input type="number" id="penalty0"></div>
 
-                    <button type="submit" class="btn-action" style="width:100%; margin-top:0.5rem;">💾 Guardar</button>
-                    <div id="save-msg"
-                        style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
-                        ¡Guardado!</div>
-                </form>
+                        <button type="submit" class="btn-action" style="width:100%; margin-top:0.5rem;">💾 Guardar Puntos</button>
+                        <div id="save-msg"
+                            style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
+                            ¡Guardado!</div>
+                    </form>
+                </div>
+
+                <!-- Temporadas y Equipos Card -->
+                <div class="config-card" style="border-top-color: #ff9800;">
+                    <h2 style="color: #ef6c00;">🏆 Temporadas y Equipos</h2>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display:block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px;">Temporada Activa:</label>
+                        <div style="display:flex; gap: 5px;">
+                            <input type="text" id="active-season-input" placeholder="Ej: 2026-2027" style="flex:1; padding: 5px;">
+                            <button onclick="saveActiveSeason()" class="btn-action" style="background:#ff9800;">Set</button>
+                        </div>
+                        <p style="font-size: 0.7rem; color: #666; margin-top: 5px;">⚠️ Cambiar esto afectará qué equipos se consideran de Primera/Segunda.</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <!-- Primera Division Table -->
+                        <div>
+                            <h3 style="font-size: 0.8rem; color: #1a237e; border-bottom: 1px solid #1a237e; padding-bottom: 2px;">1ª DIVISIÓN</h3>
+                            <div class="team-list-container" id="list-primera" style="max-height: 250px; overflow-y: auto; border: 1px solid #eee; margin-bottom: 5px;">
+                                <!-- Teams loop -->
+                            </div>
+                            <div style="display:flex; gap:2px;">
+                                <input type="text" id="add-primera-input" placeholder="Equipo..." style="width: 100%; font-size: 0.8rem; padding: 2px;">
+                                <button onclick="addTeam('primera')" class="btn-action" style="padding: 2px 5px;">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Segunda Division Table -->
+                        <div>
+                            <h3 style="font-size: 0.8rem; color: #2e7d32; border-bottom: 1px solid #2e7d32; padding-bottom: 2px;">2ª DIVISIÓN</h3>
+                            <div class="team-list-container" id="list-segunda" style="max-height: 250px; overflow-y: auto; border: 1px solid #eee; margin-bottom: 5px;">
+                                <!-- Teams loop -->
+                            </div>
+                            <div style="display:flex; gap:2px;">
+                                <input type="text" id="add-segunda-input" placeholder="Equipo..." style="width: 100%; font-size: 0.8rem; padding: 2px;">
+                                <button onclick="addTeam('segunda')" class="btn-action" style="padding: 2px 5px; background: #2e7d32;">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="saveTeamsConfig()" class="btn-action" style="width: 100%; margin-top: 1rem; background: #ef6c00; font-weight: bold;">
+                        💾 GUARDAR EQUIPOS TEMPORADA
+                    </button>
+                    <div id="teams-save-msg" style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
+                        ¡Equipos guardados!</div>
+                </div>
             </div>
 
             <!-- Habemus Quinielam Config Card -->
@@ -433,6 +481,7 @@
 
             loadReminderConfig();
             loadHabemusConfig();
+            loadTeamsAdmin();
 
             // Doc Upload logic
             const fileInput = document.getElementById('doc-file-input');
@@ -1052,6 +1101,115 @@
                 if (!el.disabled) el.focus();
             }
         };
+
+        // --- TEAMS & SEASONS ADMIN LOGIC ---
+        let currentAdminTeams = { primera: [], segunda: [] };
+        let currentAdminSeason = '';
+
+        async function loadTeamsAdmin() {
+            if (!window.DataService) return;
+            
+            const season = await window.DataService.getActiveSeason();
+            currentAdminSeason = season;
+            document.getElementById('active-season-input').value = season;
+
+            const teams = await window.DataService.getCurrentTeams();
+            if (teams) {
+                currentAdminTeams = {
+                    primera: teams.primera || [],
+                    segunda: teams.segunda || []
+                };
+            } else {
+                // Initialize with current hardcoded if not in DB
+                currentAdminTeams = {
+                    primera: [
+                        'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
+                        'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
+                        'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE', 
+                        'LEVANTE', 'OVIEDO', 'BILBAO'
+                    ],
+                    segunda: [
+                        'SPORTING', 'ZARAGOZA', 'BURGOS', 'MIRANDÉS', 'TENERIFE', 'HUESCA', 'ALBACETE',
+                        'CARTAGENA', 'FERROL', 'CASTELLÓN', 'CÓRDOBA', 'MÁLAGA', 'ELDA', 'ELDENSE',
+                        'ALMERÍA', 'CÁDIZ', 'GRANADA', 'VALLADOLID', 'LEGANÉS', 'LAS PALMAS', 'RACING', 'EIBAR'
+                    ]
+                };
+            }
+            renderTeamLists();
+        }
+
+        function renderTeamLists() {
+            const pCont = document.getElementById('list-primera');
+            const sCont = document.getElementById('list-segunda');
+            
+            renderList(pCont, currentAdminTeams.primera, 'primera');
+            renderList(sCont, currentAdminTeams.segunda, 'segunda');
+        }
+
+        function renderList(container, list, category) {
+            container.innerHTML = '';
+            list.sort().forEach((team, index) => {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.justifyContent = 'space-between';
+                div.style.padding = '3px 5px';
+                div.style.fontSize = '0.75rem';
+                div.style.borderBottom = '1px solid #f9f9f9';
+                div.innerHTML = `
+                    <span>${team}</span>
+                    <button onclick="removeTeam('${category}', ${index})" style="background:none; border:none; color:red; cursor:pointer;">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.addTeam = function(category) {
+            const input = document.getElementById(`add-${category}-input`);
+            const name = input.value.trim().toUpperCase();
+            if (name && !currentAdminTeams[category].includes(name)) {
+                currentAdminTeams[category].push(name);
+                input.value = '';
+                renderTeamLists();
+            }
+        };
+
+        window.removeTeam = function(category, index) {
+            currentAdminTeams[category].splice(index, 1);
+            renderTeamLists();
+        };
+
+        window.saveActiveSeason = async function() {
+            const season = document.getElementById('active-season-input').value.trim();
+            if (!season) return;
+            
+            if (confirm(`¿Cambiar la temporada activa a ${season}?`)) {
+                await window.DataService.setActiveSeason(season);
+                alert("Temporada activa actualizada. Recargando equipos...");
+                loadTeamsAdmin();
+            }
+        };
+
+        window.saveTeamsConfig = async function() {
+            const season = document.getElementById('active-season-input').value.trim();
+            if (!season) return;
+
+            try {
+                await window.DataService.saveTeams(season, currentAdminTeams);
+                const msg = document.getElementById('teams-save-msg');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
+                
+                Auth.logAction(JSON.parse(sessionStorage.getItem('maulas_user')).name, `Actualizó equipos temporada ${season}`);
+                
+                // Refresh local AppUtils cache if on same page
+                if (window.AppUtils && window.AppUtils.initTeams) {
+                    await window.AppUtils.initTeams();
+                }
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        };
+
     </script>
 </body>
 
