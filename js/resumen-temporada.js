@@ -164,6 +164,10 @@ class ResumenManager {
                 let hits = 0;
 
                 let actuallyPlayed = false;
+                let isLate = false;
+                let isPardoned = false;
+                let potentialHits = null;
+
                 if (p) {
                     const sel = p.selection || p.forecasts || [];
                     if (Array.isArray(sel)) {
@@ -173,8 +177,8 @@ class ResumenManager {
 
                 if (actuallyPlayed) {
                     const sel = p.selection || p.forecasts || [];
-                    const isLate = p.late;
-                    const isPardoned = p.pardoned;
+                    isLate = p.late || false;
+                    isPardoned = p.pardoned || false;
 
                     if (isLate && !isPardoned) {
                         points = ScoringSystem.calculateScore(0, jDate);
