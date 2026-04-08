@@ -114,8 +114,14 @@ Se genera de forma sintética lo que sería el "voto popular" del grupo:
 1. Para el Partido 1, se suma cuántos socios han votado '1', cuántos 'X', cuántos '2'.
 2. El signo vencedor por **mayoría absoluta** pasa a ser el signo de la "Columna MAULA" para ese partido.
 3. Esto se repite para los 15 plenarios. Este pronóstico estadístico se enfrenta a la realidad, demostrando con frecuencia si la sabiduría popular de la peña es mejor que el voto individual de sus integrantes.
-4. **Desempates/Ganadores Semanales**: Cuando en la tabla de resultados varios miembros empatan a aciertos, se utilizan reglas algorítmicas (vía función `resolveTie`) para decidir quién recibe la corona o el farolillo rojo. A los ganadores/perdedores se les asignan identificadores de color específicos regidos en la "Identidad Visual". Aparte, se trackean jornadas especiales donde juegan equipos PIG (Madrid, Barça, Atleti) marcándolas mediante la función `checkIsPIG`.
-5. **Identificación de Penalizaciones en Tabla**:
+4. **Desempates/Ganadores Semanales**: Cuando en la tabla de resultados varios miembros empatan a aciertos, se utilizan reglas algorítmicas (vía función `resolveTie`) para decidir quién recibe la corona o el farolillo rojo. El desempate se realiza mirando hacia atrás en las jornadas anteriores (**Puntos Históricos**) de forma recursiva hasta deshacer el empate. Si persiste, el ganador es el de menor ID (socio más antiguo) y el perdedor el de mayor ID.
+5. **Ordenación de la Lista de Resultados (Informes)**: Para que el mensaje de resultados sea coherente con la elección del ganador y el perdedor, la lista se ordena siguiendo este orden estricto de prioridad:
+    - **Estado de Penalización**: Los "Offenders" (no jugados o sellados tarde sin perdón) aparecen siempre al final de la lista, independientemente de sus puntos.
+    - **Puntos de la Jornada**: Orden descendente.
+    - **Aciertos de la Jornada**: Orden descendente.
+    - **Desempate por Historial**: Si hay empate en puntos/aciertos, se comparan los puntos de jornadas anteriores (J-1, J-2...) una a una.
+    - **Fallback ID**: Menor ID arriba, mayor ID abajo.
+6. **Identificación de Penalizaciones en Tabla**:
     - **Cero Natural (0 aciertos)**: La casilla mantiene el color normal (blanco o el color de Maula/líder) y muestra el "0".
     - **Cero por Penalización (Retraso)**: La casilla se vuelve **negra con el número de aciertos potenciales tachado en gris** (ej: ~~12~~). Esto permite distinguir de un vistazo quién no acertó de quién fue sancionado.
     - El tachado se aplica con un estilo evidente (`line-through double`) para evitar confusiones.
@@ -153,7 +159,7 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
 - **Por Fin es Jueves**: Una rutina con días, hora, fechas límite de intervalo ("Date Range") definibles, que lanza recordatorios a los socios para que rellenen su pronóstico si no lo han sellado todavía.
 - El administrador puede definir mediante el panel de control o por variables el mensaje customizado de ese aviso semanal.
 - **Recordatorio Especial PIG**: Si la jornada activa es de tipo PIG (Pleno al 15 con Grandes Clubes), el mensaje de notificación incluirá automáticamente una coletilla extra recordando a los socios "sellar también el PIG".
-- **Informe Trimestral de Resultados**: Cuando finaliza una jornada, el bot envía el resumen detallado. Si hay PIG, se detalla la lista de socios bajo los epígrafes "✅ Acertantes" y "❌ Fallan". La sección de premio especial de dobles se identifica con una jarra de cerveza (`🍺`).
+- **Informe de Resultados**: Cuando finaliza una jornada, el bot envía el resumen detallado. La lista de socios sigue las reglas de ordenación y desempate históricas (punto 6.5) para que el podio (🥇, 🥈, 🥉) y el encargado de sellar (✍️) coincidan con el orden visual. Si hay PIG, se detalla la lista de socios bajo los epígrafes "✅ Acertantes" y "❌ Fallan". La sección de premio especial de dobles se identifica con una jarra de cerveza (`🍺`).
 
 ## 9. Identidad Visual y Estilo
 
