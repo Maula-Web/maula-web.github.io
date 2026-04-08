@@ -148,11 +148,20 @@ window.TelegramService = {
 
             msg += `*📊 RESULTADOS:* \n`;
             // Sort results using official tie-break rules:
-            // 1. Current points
-            // 2. Current hits
-            // 3. Historical points (backwards)
-            // 4. Fallback: Lower ID
+            // 1. Offenders (missing/late) always go to the bottom
+            // 2. Points (current jornada)
+            // 3. Hits (current jornada)
+            // 4. Historical points (backwards)
+            // 5. Fallback: Lower ID
             const sortedResults = [...currentResults].sort((a, b) => {
+                const isOffenderA = !a.played || (a.isLate && !a.isPardoned && a.hits < minHits);
+                const isOffenderB = !b.played || (b.isLate && !b.isPardoned && b.hits < minHits);
+
+                // Offenders always at the bottom
+                if (isOffenderA !== isOffenderB) {
+                    return isOffenderA ? 1 : -1;
+                }
+
                 if (b.points !== a.points) return b.points - a.points;
                 if (b.hits !== a.hits) return b.hits - a.hits;
 
