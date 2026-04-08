@@ -147,7 +147,28 @@ window.TelegramService = {
             msg += `📅 _${currentJ.date}_\n\n`;
 
             msg += `*📊 RESULTADOS:* \n`;
-            [...currentResults].sort((a, b) => b.points - a.points || b.hits - a.hits || a.id - b.id).forEach((r, idx) => {
+            // Sort results using official tie-break rules:
+            // 1. Current points
+            // 2. Current hits
+            // 3. Historical points (backwards)
+            // 4. Fallback: Lower ID
+            const sortedResults = [...currentResults].sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (b.hits !== a.hits) return b.hits - a.hits;
+
+                // Tie-breaker: Historical points
+                const hA = memberHistory[a.id] || [];
+                const hB = memberHistory[b.id] || [];
+                for (let i = hA.length - 2; i >= 0; i--) {
+                    const ptsA = hA[i] ? hA[i].points : 0;
+                    const ptsB = hB[i] ? hB[i].points : 0;
+                    if (ptsB !== ptsA) return ptsB - ptsA;
+                }
+
+                return a.id - b.id;
+            });
+
+            sortedResults.forEach((r, idx) => {
                 let medal = '';
                 if (idx === 0) medal = '🥇 ';
                 else if (idx === 1) medal = '🥈 ';
