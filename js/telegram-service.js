@@ -499,5 +499,18 @@ window.TelegramService = {
         } catch (e) {
             console.error("TelegramService (Habemus) Error:", e);
         }
+    },
+    async sendPardonNotification(forgiverName, forgivenName, jornadaNumber) {
+        if (!window.DataService) return;
+        try {
+            const config = await window.DataService.getAll('config');
+            const tg = config.find(c => c.id === 'telegram');
+            if (!tg || !tg.token || !tg.chatId) return;
+
+            const msg = `ℹ️ El socio *${forgiverName}* ha perdonado la sanción por sellar tarde de la *Jornada ${jornadaNumber}* al socio *${forgivenName}*.`;
+            return await this.sendRaw(tg.token, tg.chatId, msg);
+        } catch (e) {
+            console.error("TelegramService (Pardon) Error:", e);
+        }
     }
 };

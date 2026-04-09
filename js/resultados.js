@@ -336,6 +336,25 @@ class ResultsManager {
         if (p) {
             p.pardoned = true;
             await window.DataService.save('pronosticos', p);
+
+            // Send Telegram Notification
+            try {
+                const forgiverData = JSON.parse(sessionStorage.getItem('maulas_user'));
+                const forgiverName = AppUtils.getMemberName(forgiverData);
+                
+                const forgiven = this.members.find(m => String(m.id) === String(mId));
+                const forgivenName = AppUtils.getMemberName(forgiven);
+
+                const jornada = this.jornadas.find(j => String(j.id) === String(jId));
+                const jNum = jornada ? jornada.number : '?';
+
+                if (window.TelegramService) {
+                    await window.TelegramService.sendPardonNotification(forgiverName, forgivenName, jNum);
+                }
+            } catch (e) {
+                console.error("Error sending pardon notification:", e);
+            }
+
             this.calculateAndRender();
         }
     }
