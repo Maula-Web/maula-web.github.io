@@ -160,6 +160,7 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
 - El administrador puede definir mediante el panel de control o por variables el mensaje customizado de ese aviso semanal.
 - **Recordatorio Especial PIG**: Si la jornada activa es de tipo PIG (Pleno al 15 con Grandes Clubes), el mensaje de notificación incluirá automáticamente una coletilla extra recordando a los socios "sellar también el PIG".
 - **Informe de Resultados**: Cuando finaliza una jornada, el bot envía el resumen detallado. La lista de socios sigue las reglas de ordenación y desempate históricas (punto 6.5) para que el podio (🥇, 🥈, 🥉) y el encargado de sellar (✍️) coincidan con el orden visual. Si hay PIG, se detalla la lista de socios bajo los epígrafes "✅ Acertantes" y "❌ Fallan". La sección de premio especial de dobles se identifica con una jarra de cerveza (`🍺`).
+- **Notificación de Perdón**: Cuando un administrador anula/perdona una sanción por retraso desde la tabla de resultados, el bot envía un mensaje indicando qué socio ha perdonado a quién y de qué jornada se trata. Este mensaje es de carácter informativo obligatorio y no se puede desactivar desde el panel de configuración (siempre que Telegram esté activo).
 
 ## 9. Identidad Visual y Estilo
 
