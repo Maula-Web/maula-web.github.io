@@ -703,33 +703,40 @@ class QuinielaScraper {
     }
 
     /**
-     * More strict check: At least one team must be from Primera Division (LaLiga EA).
-     * This prevents importing "Segunda-only" or "International" jornadas.
+     * More strict check: At least 5 teams must be from Primera Division (LaLiga EA).
+     * This prevents importing "Segunda-only", "International" or "Mixed" jornadas 
+     * that don't belong to the main competition.
      */
     hasPrimeraTeams(matches) {
         if (!matches || matches.length === 0) return false;
 
+        let count = 0;
+        
         // Use AppUtils if available (it has the up-to-date Primera keywords)
         if (window.AppUtils && typeof window.AppUtils.isLaLigaTeam === 'function') {
-            return matches.some(m =>
-                window.AppUtils.isLaLigaTeam(m.home) ||
-                window.AppUtils.isLaLigaTeam(m.away)
-            );
+            matches.forEach(m => {
+                if (window.AppUtils.isLaLigaTeam(m.home)) count++;
+                if (window.AppUtils.isLaLigaTeam(m.away)) count++;
+            });
+        } else {
+            // Fallback list of 1st Division teams (2025-2026)
+            const primeraKeywords = [
+                'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
+                'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
+                'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE', 
+                'LEVANTE', 'OVIEDO', 'BILBAO'
+            ];
+
+            matches.forEach(m => {
+                const h = m.home.toUpperCase();
+                const a = m.away.toUpperCase();
+                if (primeraKeywords.some(k => h.includes(k))) count++;
+                if (primeraKeywords.some(k => a.includes(k))) count++;
+            });
         }
 
-        // Fallback list of 1st Division teams (2025-2026)
-        const primeraKeywords = [
-            'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
-            'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
-            'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE', 
-            'LEVANTE', 'OVIEDO', 'BILBAO'
-        ];
-
-        return matches.some(m => {
-            const h = m.home.toUpperCase();
-            const a = m.away.toUpperCase();
-            return primeraKeywords.some(k => h.includes(k) || a.includes(k));
-        });
+        console.log(`[Importer] Found ${count} Primera Division teams in the matches list.`);
+        return count >= 5;
     }
 
     cleanTeamName(name) {
