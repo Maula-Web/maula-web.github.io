@@ -182,6 +182,15 @@ Se desarrolló y luego eliminó una funcionalidad completa para importar pronós
 
 ---
 
+## 11. Rendimiento y Optimización (Arquitectura JS)
+
+Conforme la base de datos de la peña ha ido creciendo a lo largo de las jornadas, se han implementado optimizaciones críticas en la capa de procesamiento (front-end JavaScript) para asegurar una carga instantánea y fluida, especialmente en dispositivos móviles:
+
+- **Indexación mediante HashMaps (O(1))**: Se ha abandonado la búsqueda lineal múltiple (`Array.find()` y `Array.filter()`) al cruzar jornadas, miembros y pronósticos en `dashboard.js` y `pronosticos.js`. El sistema ahora construye diccionarios (`Map`) en memoria tras la descarga inicial de Firebase. Para asegurar retrocompatibilidad con registros antiguos, asigna a cada pronóstico claves múltiples cruzando posibles campos (`jId` vs `jornadaId`, `mId` vs `memberId`). Esto reduce millones de iteraciones de cálculo en el hilo principal de JavaScript a búsquedas directas en O(1), previniendo bloqueos del navegador y la "congelación" inicial de la interfaz en los smartphones.
+- **Tolerancia a Arrays Dispersos (NoSQL)**: Debido a que las estructuras de array en Firebase pueden contener "huecos" (slots `undefined` o `null`) originados por manipulaciones manuales del histórico, todos los bucles de renderizado principal integran salvaguardas preventivas. Si el mapa no encuentra un dato válido, los algoritmos de puntuación asumen "No jugado", manteniendo intacta la estabilidad visual del panel.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

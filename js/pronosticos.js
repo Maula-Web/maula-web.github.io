@@ -1181,6 +1181,7 @@ class PronosticoManager {
             topWrapper.id = 'top-scroll-wrapper';
             topWrapper.style.overflowX = 'auto';
             topWrapper.style.overflowY = 'hidden';
+            topWrapper.style.WebkitOverflowScrolling = 'touch'; // Habilita inercia
             topWrapper.style.width = '100%';
             topWrapper.style.height = '20px'; // Minimum height for scrollbar
             topWrapper.innerHTML = '<div id="top-scroll-content" style="height:1px;"></div>';
@@ -1201,19 +1202,26 @@ class PronosticoManager {
         window.addEventListener('resize', updateWidth);
 
         // Sync scroll events
-        let isSyncing = false;
+        // Sync scroll events with requestAnimationFrame to not kill momentum
+        let isSyncingLeft = false;
+        let isSyncingRight = false;
+        
         topWrapper.onscroll = function () {
-            if (!isSyncing) {
-                isSyncing = true;
-                container.scrollLeft = topWrapper.scrollLeft;
-                isSyncing = false;
+            if (!isSyncingLeft) {
+                isSyncingRight = true;
+                window.requestAnimationFrame(() => {
+                    container.scrollLeft = topWrapper.scrollLeft;
+                    setTimeout(() => { isSyncingRight = false; }, 10);
+                });
             }
         };
         container.onscroll = function () {
-            if (!isSyncing) {
-                isSyncing = true;
-                topWrapper.scrollLeft = container.scrollLeft;
-                isSyncing = false;
+            if (!isSyncingRight) {
+                isSyncingLeft = true;
+                window.requestAnimationFrame(() => {
+                    topWrapper.scrollLeft = container.scrollLeft;
+                    setTimeout(() => { isSyncingLeft = false; }, 10);
+                });
             }
         };
     }

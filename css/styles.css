@@ -2363,6 +2363,7 @@ textarea:focus {
 .bote-table-container {
     max-height: 60vh;
     overflow: auto;
+    -webkit-overflow-scrolling: touch; /* Habilita inercia en iOS/Safari móvil */
     border: 1px solid var(--input-border);
     border-radius: 8px;
     background: var(--card-bg);
