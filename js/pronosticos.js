@@ -1056,6 +1056,17 @@ class PronosticoManager {
         });
         thead.appendChild(headerRow);
 
+        // OPTIMIZATION: Build Maps for O(1) lookups
+        const pronosticosMap = new Map();
+        const jornadasConPronostico = new Set();
+        
+        this.pronosticos.forEach(p => {
+            const jId = String(p.jId || p.jornadaId);
+            const mId = String(p.mId || p.memberId);
+            pronosticosMap.set(`${jId}_${mId}`, p);
+            jornadasConPronostico.add(jId);
+        });
+
         // 3. Sort Jornadas (descending) & Filter empty ones
         let sortedJornadas = [...this.jornadas].sort((a, b) => b.number - a.number);
 
@@ -1066,9 +1077,7 @@ class PronosticoManager {
             const hasMatches = j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
 
             // Check if jornada has any forecasts saved
-            const hasForecasts = this.pronosticos.some(p =>
-                String(p.jId) === String(j.id) || String(p.jornadaId) === String(j.id)
-            );
+            const hasForecasts = jornadasConPronostico.has(String(j.id));
 
             return hasMatches || hasForecasts;
         });
@@ -1102,11 +1111,9 @@ class PronosticoManager {
             row.appendChild(stickyTd);
 
             sortedMembers.forEach((m, index) => {
-                // Use String comparison to handle both string and number IDs
-                const p = this.pronosticos.find(pr =>
-                    (String(pr.jId) === String(j.id) || String(pr.jornadaId) === String(j.id)) &&
-                    (String(pr.mId) === String(m.id) || String(pr.memberId) === String(m.id))
-                );
+                const jIdStr = String(j.id);
+                const mIdStr = String(m.id);
+                const p = pronosticosMap.get(`${jIdStr}_${mIdStr}`);
                 const isEven = index % 2 !== 0;
 
                 let cellContent = '-';

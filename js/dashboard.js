@@ -73,16 +73,31 @@ class DashboardManager {
             let totalSeasonMoney = 0;
 
             // Process all played jornadas
+            // OPTIMIZATION: Build a Map for O(1) lookups instead of O(N^2)
+            const pronosticosMap = new Map();
+            this.pronosticos.forEach(pr => {
+                const jIdStr = String(pr.jId || pr.jornadaId);
+                const mIdStr = String(pr.mId || pr.memberId);
+                pronosticosMap.set(`${jIdStr}_${mIdStr}`, pr);
+            });
+
+            const extrasMap = new Map();
+            if (this.pronosticosExtra && this.pronosticosExtra.length > 0) {
+                this.pronosticosExtra.forEach(pr => {
+                    const jIdStr = String(pr.jId || pr.jornadaId);
+                    if (!extrasMap.has(jIdStr)) extrasMap.set(jIdStr, []);
+                    extrasMap.get(jIdStr).push(pr);
+                });
+            }
+
             playedJornadas.forEach((jornada, index) => {
                 const jornadaResults = [];
                 const jDate = AppUtils.parseDate(jornada.date);
 
                 this.members.forEach(member => {
                     const mIdStr = String(member.id);
-                    const p = this.pronosticos.find(pr =>
-                        (pr.jornadaId == jornada.id || pr.jId == jornada.id) &&
-                        (pr.memberId == member.id || pr.mId == member.id)
-                    );
+                    const jIdStr = String(jornada.id);
+                    const p = pronosticosMap.get(`${jIdStr}_${mIdStr}`);
 
                     let hits = -1;
                     let points = 0;
@@ -175,10 +190,7 @@ class DashboardManager {
 
                 // ADDITION: Count Extra Column prizes (Doubles) in the season total
                 if (this.pronosticosExtra && this.pronosticosExtra.length > 0) {
-                    const extras = this.pronosticosExtra.filter(p => {
-                        const pJ = String(p.jId || p.jornadaId || '');
-                        return pJ === String(jornada.id) || pJ === String(jornada.number);
-                    });
+                    const extras = extrasMap.get(String(jornada.id)) || extrasMap.get(String(jornada.number)) || [];
 
                     extras.forEach(p => {
                         const sel = p.selection || p.forecasts || [];
