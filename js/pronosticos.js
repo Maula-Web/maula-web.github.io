@@ -1103,10 +1103,10 @@ class PronosticoManager {
             return;
         }
 
-        // 4. Build Rows
+        // 4. Build Rows using string concatenation for maximum performance
+        let tbodyHtml = '';
+        
         sortedJornadas.forEach(j => {
-            const row = document.createElement('tr');
-
             // Format date with Year: "dd/mm/yyyy"
             let dateFormatted = j.date;
             try {
@@ -1117,14 +1117,11 @@ class PronosticoManager {
                 }
             } catch (e) { }
 
-            // First col sticky
-            const stickyTd = document.createElement('td');
-            stickyTd.className = 'summary-sticky-col summary-jornada-info';
-            stickyTd.innerHTML = `
-                <div class="summary-j-num">J${j.number}</div>
-                <div class="summary-j-date">${dateFormatted}</div>
-            `;
-            row.appendChild(stickyTd);
+            let rowHtml = `<tr>
+                <td class="summary-sticky-col summary-jornada-info">
+                    <div class="summary-j-num">J${j.number}</div>
+                    <div class="summary-j-date">${dateFormatted}</div>
+                </td>`;
 
             sortedMembers.forEach((m, index) => {
                 const jIdStr = String(j.id);
@@ -1133,8 +1130,7 @@ class PronosticoManager {
                 const isEven = index % 2 !== 0;
 
                 let cellContent = '-';
-                let cellClass = `summary-cell ${isEven ? 'col-even' : 'col-odd'}`;
-                let textStyle = '';
+                let cellClass = `summary-cell ${isEven ? 'col-even' : 'col-odd'} hoverable-cell`;
 
                 let isPlayed = false;
                 if (p && p.selection && Array.isArray(p.selection)) {
@@ -1154,18 +1150,14 @@ class PronosticoManager {
                     cellContent = `<span class="summary-no-data">-</span>`;
                 }
 
-                const td = document.createElement('td');
-                td.className = cellClass;
-                td.dataset.jid = j.id;
-                td.dataset.mid = m.id;
-                td.innerHTML = cellContent;
-                td.onmouseover = function () { this.style.filter = 'brightness(0.9)'; };
-                td.onmouseout = function () { this.style.filter = 'none'; };
-                row.appendChild(td);
+                rowHtml += `<td class="${cellClass}" data-jid="${j.id}" data-mid="${m.id}">${cellContent}</td>`;
             });
 
-            tbody.appendChild(row);
+            rowHtml += '</tr>';
+            tbodyHtml += rowHtml;
         });
+        
+        tbody.innerHTML = tbodyHtml;
 
         // Horizontal Scroll Sync (Double Scrollbar)
         this.applyDoubleScrollbar();

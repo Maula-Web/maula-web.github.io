@@ -2405,7 +2405,7 @@ textarea:focus {
 }
 
 /* Responsive Design */
-/* Summary Table Refined */
+
 .summary-header-cell {
     padding: 1rem;
     min-width: 140px;
@@ -2457,7 +2457,11 @@ th.summary-header-cell.summary-sticky-col {
     padding: 0.6rem;
     border-bottom: 1px solid var(--input-border);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, filter 0.2s;
+}
+
+.hoverable-cell:hover {
+    filter: brightness(0.9);
 }
 
 .summary-cell.col-even {
