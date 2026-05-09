@@ -1060,12 +1060,28 @@ class PronosticoManager {
         const pronosticosMap = new Map();
         const jornadasConPronostico = new Set();
         
-        this.pronosticos.forEach(p => {
-            const jId = String(p.jId || p.jornadaId);
-            const mId = String(p.mId || p.memberId);
-            pronosticosMap.set(`${jId}_${mId}`, p);
-            jornadasConPronostico.add(jId);
-        });
+        if (this.pronosticos && Array.isArray(this.pronosticos)) {
+            this.pronosticos.forEach(p => {
+                if (!p) return;
+                const jIds = [];
+                if (p.jId !== undefined && p.jId !== null) jIds.push(String(p.jId));
+                if (p.jornadaId !== undefined && p.jornadaId !== null) jIds.push(String(p.jornadaId));
+                
+                const mIds = [];
+                if (p.mId !== undefined && p.mId !== null) mIds.push(String(p.mId));
+                if (p.memberId !== undefined && p.memberId !== null) mIds.push(String(p.memberId));
+
+                jIds.forEach(j => {
+                    jornadasConPronostico.add(j);
+                    mIds.forEach(m => {
+                        const key = `${j}_${m}`;
+                        if (!pronosticosMap.has(key)) {
+                            pronosticosMap.set(key, p);
+                        }
+                    });
+                });
+            });
+        }
 
         // 3. Sort Jornadas (descending) & Filter empty ones
         let sortedJornadas = [...this.jornadas].sort((a, b) => b.number - a.number);

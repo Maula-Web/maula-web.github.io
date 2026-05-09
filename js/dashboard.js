@@ -75,18 +75,45 @@ class DashboardManager {
             // Process all played jornadas
             // OPTIMIZATION: Build a Map for O(1) lookups instead of O(N^2)
             const pronosticosMap = new Map();
-            this.pronosticos.forEach(pr => {
-                const jIdStr = String(pr.jId || pr.jornadaId);
-                const mIdStr = String(pr.mId || pr.memberId);
-                pronosticosMap.set(`${jIdStr}_${mIdStr}`, pr);
-            });
+            if (this.pronosticos && Array.isArray(this.pronosticos)) {
+                this.pronosticos.forEach(pr => {
+                    if (!pr) return;
+                    const jIds = [];
+                    if (pr.jId !== undefined && pr.jId !== null) jIds.push(String(pr.jId));
+                    if (pr.jornadaId !== undefined && pr.jornadaId !== null) jIds.push(String(pr.jornadaId));
+                    
+                    const mIds = [];
+                    if (pr.mId !== undefined && pr.mId !== null) mIds.push(String(pr.mId));
+                    if (pr.memberId !== undefined && pr.memberId !== null) mIds.push(String(pr.memberId));
+
+                    jIds.forEach(j => {
+                        mIds.forEach(m => {
+                            const key = `${j}_${m}`;
+                            if (!pronosticosMap.has(key)) {
+                                pronosticosMap.set(key, pr);
+                            }
+                        });
+                    });
+                });
+            }
 
             const extrasMap = new Map();
-            if (this.pronosticosExtra && this.pronosticosExtra.length > 0) {
+            if (this.pronosticosExtra && Array.isArray(this.pronosticosExtra) && this.pronosticosExtra.length > 0) {
                 this.pronosticosExtra.forEach(pr => {
-                    const jIdStr = String(pr.jId || pr.jornadaId);
-                    if (!extrasMap.has(jIdStr)) extrasMap.set(jIdStr, []);
-                    extrasMap.get(jIdStr).push(pr);
+                    if (!pr) return;
+                    const jIds = [];
+                    if (pr.jId !== undefined && pr.jId !== null) jIds.push(String(pr.jId));
+                    if (pr.jornadaId !== undefined && pr.jornadaId !== null) jIds.push(String(pr.jornadaId));
+                    
+                    jIds.forEach(jIdStr => {
+                        if (jIdStr && jIdStr !== 'undefined') {
+                            if (!extrasMap.has(jIdStr)) extrasMap.set(jIdStr, []);
+                            // Only add if not already in the array to prevent duplicates if jId == jornadaId
+                            if (!extrasMap.get(jIdStr).includes(pr)) {
+                                extrasMap.get(jIdStr).push(pr);
+                            }
+                        }
+                    });
                 });
             }
 
