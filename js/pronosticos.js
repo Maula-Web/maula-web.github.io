@@ -1192,6 +1192,19 @@ class PronosticoManager {
         const container = this.summaryContainer;
         const table = this.summaryTable;
 
+        // En móviles/tablets, el doble scrollbar no es necesario y rompe la inercia nativa de iOS.
+        const isTouch = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 1024;
+        
+        if (isTouch) {
+            topWrapper.style.display = 'none';
+            // Limpiamos los eventos por si se redimensiona la pantalla
+            container.onscroll = null;
+            topWrapper.onscroll = null;
+            return;
+        } else {
+            topWrapper.style.display = 'block';
+        }
+
         // Sync contents width
         const updateWidth = () => {
             topContent.style.width = table.offsetWidth + 'px';
@@ -1201,8 +1214,7 @@ class PronosticoManager {
         updateWidth();
         window.addEventListener('resize', updateWidth);
 
-        // Sync scroll events
-        // Sync scroll events with requestAnimationFrame to not kill momentum
+        // Sync scroll events for Desktop (Mouse)
         let isSyncingLeft = false;
         let isSyncingRight = false;
         
