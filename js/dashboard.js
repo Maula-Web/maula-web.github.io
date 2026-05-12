@@ -143,6 +143,7 @@ class DashboardManager {
                         }
                     }
 
+                    let potentialHits = null;
                     if (actuallyPlayed) {
                         hasPronostico = true;
                         isLate = p.late || false;
@@ -164,7 +165,6 @@ class DashboardManager {
                             ev = window.ScoringSystem.evaluateForecast(sel, officialResults, jDate);
                         }
 
-                        let potentialHits = null;
                         if (isLate && !isPardoned) {
                             hits = 0;
                             points = window.ScoringSystem ? window.ScoringSystem.calculateScore(0, jDate) : 0;
