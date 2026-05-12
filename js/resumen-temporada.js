@@ -599,6 +599,7 @@ class ResumenManager {
             if (j.rate < minRate) minRate = j.rate;
         });
 
+        const barWidth = jornadaList.length > 35 ? '40px' : (jornadaList.length > 25 ? '48px' : '55px');
         const jPerformanceHtml = jornadaList.map(j => {
             const isBest = j.rate === maxRate && maxRate !== -1;
             const isWorst = j.rate === minRate && minRate !== 101;
@@ -607,7 +608,7 @@ class ResumenManager {
             const bgColor = isBest ? '#e1f5fe' : (isWorst ? '#ffcdd2' : '#c5e1a5');
 
             return `
-                <div style="flex: 0 0 55px; display:flex; flex-direction:column; align-items:center; border-radius:4px; padding:4px; background:${isBest || isWorst ? bgColor : 'transparent'};">
+                <div style="flex: 0 0 ${barWidth}; display:flex; flex-direction:column; align-items:center; border-radius:4px; padding:4px; background:${isBest || isWorst ? bgColor : 'transparent'};">
                     <div style="font-size:0.6rem; font-weight:bold; color:var(--resumen-performance-text); text-align:center; line-height:1.1;">
                         J${j.num}<br>${j.rate.toFixed(0)}%
                     </div>

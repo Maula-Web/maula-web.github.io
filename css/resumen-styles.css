@@ -31,6 +31,11 @@
     gap: 1.5rem;
     margin-top: 1rem;
     width: 100%;
+    min-width: 0;
+}
+
+.dashboard-container > div {
+    min-width: 0;
 }
 
 /* Stats Detail Grids */
@@ -38,6 +43,11 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+    min-width: 0;
+}
+
+.stats-detail-main-grid > div {
+    min-width: 0;
 }
 
 .stats-sub-grid {
@@ -466,4 +476,24 @@
         min-width: 0 !important;
         width: 100% !important;
     }
+}
+
+/* Custom Scrollbar for Performance Section */
+[style*="overflow-x:auto"] {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-orange) rgba(0,0,0,0.05);
+}
+
+[style*="overflow-x:auto"]::-webkit-scrollbar {
+    height: 6px;
+}
+
+[style*="overflow-x:auto"]::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+}
+
+[style*="overflow-x:auto"]::-webkit-scrollbar-thumb {
+    background-color: var(--primary-orange);
+    border-radius: 10px;
 }
