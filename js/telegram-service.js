@@ -82,13 +82,13 @@ window.TelegramService = {
                         const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
                         hits = ev.hits;
                         points = ev.points;
+                    }
 
-                        if (isPigJornada) {
-                            const rSign15 = ScoringSystem.normalizeSign(officialResults[14]);
-                            const pred15 = String(p.selection[14] || '').trim().toUpperCase();
-                            if (pred15 && (pred15 === rSign15 || pred15 === String(officialResults[14]).trim().toUpperCase())) {
-                                pigHit = true;
-                            }
+                    if (isPigJornada && p.selection) {
+                        const rSign15 = ScoringSystem.normalizeSign(officialResults[14]);
+                        const pred15 = String(p.selection[14] || '').trim().toUpperCase();
+                        if (pred15 && (pred15 === rSign15 || pred15 === String(officialResults[14]).trim().toUpperCase())) {
+                            pigHit = true;
                         }
                     }
                 }

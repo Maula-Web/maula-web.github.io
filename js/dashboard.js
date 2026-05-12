@@ -172,16 +172,14 @@ class DashboardManager {
                             hits = ev.hits;
                             points = ev.points;
                             bonus = ev.bonus;
+                        }
 
-                            // Exclude PIG from classification if it's Pleno al 15
-                            if (isPig15) {
-                                // Check if user hit the PIG (Match 15)
-                                // sel[14] is the forecast, officialResults[14] is the result
-                                const rSign15 = window.ScoringSystem ? window.ScoringSystem.normalizeSign(officialResults[14]) : officialResults[14];
-                                const pred15 = String(sel[14] || '').trim().toUpperCase();
-                                if (pred15 && (pred15 === rSign15 || pred15 === String(officialResults[14]).trim().toUpperCase())) {
-                                    pigHit = true;
-                                }
+                        // Check PIG hit status regardless of late sealing (only affects bote, not hits count for PIG display)
+                        if (isPig15) {
+                            const rSign15 = window.ScoringSystem ? window.ScoringSystem.normalizeSign(officialResults[14]) : officialResults[14];
+                            const pred15 = String(sel[14] || '').trim().toUpperCase();
+                            if (pred15 && (pred15 === rSign15 || pred15 === String(officialResults[14]).trim().toUpperCase())) {
+                                pigHit = true;
                             }
                         }
                     } else {
