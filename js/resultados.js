@@ -165,7 +165,9 @@ class ResultsManager {
 
                 if (hits !== -1) {
                     memberStats[m.id].grandTotal += points;
-                    memberStats[m.id].baseTotal += hits;
+                    // Fix: Use potentialHits for baseTotal if late, so it matches the real performance
+                    const hitsToSum = (memberStats[m.id].jornadaData[j.id].potentialHits !== null) ? memberStats[m.id].jornadaData[j.id].potentialHits : hits;
+                    memberStats[m.id].baseTotal += hitsToSum;
                     memberStats[m.id].bonusTotal += bonus;
                     memberStats[m.id].prizeTotal += prize;
 

@@ -164,10 +164,12 @@ class DashboardManager {
                             ev = window.ScoringSystem.evaluateForecast(sel, officialResults, jDate);
                         }
 
+                        let potentialHits = null;
                         if (isLate && !isPardoned) {
                             hits = 0;
                             points = window.ScoringSystem ? window.ScoringSystem.calculateScore(0, jDate) : 0;
                             bonus = points;
+                            potentialHits = ev.hits;
                         } else {
                             hits = ev.hits;
                             points = ev.points;
@@ -197,6 +199,7 @@ class DashboardManager {
                         hasPronostico: hasPronostico,
                         pigHit: pigHit, // Store pig status
                         isPig15: isPig15, // Store if this row belongs to a PIG jornada
+                        potentialHits: potentialHits,
                         runningTotal: 0
                     });
 
@@ -234,7 +237,9 @@ class DashboardManager {
                 jornadaResults.forEach(r => {
                     if (memberStats[r.memberId]) {
                         memberStats[r.memberId].totalPoints += r.points;
-                        memberStats[r.memberId].totalHits += r.hits;
+                        // Use potentialHits if available (for late sealers), and ensure we don't subtract -1 for non-played jornadas
+                        const hitsToSum = (r.potentialHits !== null) ? r.potentialHits : (r.hits === -1 ? 0 : r.hits);
+                        memberStats[r.memberId].totalHits += hitsToSum;
                         r.runningTotal = memberStats[r.memberId].totalPoints;
                     }
                 });
