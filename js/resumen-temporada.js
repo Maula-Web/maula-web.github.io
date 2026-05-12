@@ -8,6 +8,9 @@ class ResumenManager {
         this.selectedMembers = new Set();
         this.chart = null;
         this.currentSeason = ''; // Selected season
+        this.viewJornadasCount = 0; // Current zoom level (window size)
+        this.viewOffset = 0; // Start index for the window
+        this.totalJornadasInSeason = 0;
 
         this.init();
     }
@@ -27,6 +30,7 @@ class ResumenManager {
         this.data = this.calculateData();
 
         this.createModal();
+        this.initZoomSlider();
         this.renderTotalsList();
 
         // Show global stats by default
@@ -74,6 +78,8 @@ class ResumenManager {
     refreshData() {
         this.data = this.calculateData();
         this.selectedMembers.clear();
+        this.viewJornadasCount = 0; // Reset zoom on season change
+        this.viewOffset = 0;
         this.renderTotalsList();
         
         // Re-calculate stats and render
@@ -98,6 +104,79 @@ class ResumenManager {
             }
         });
         if (inputs.length > 0) this.renderChart();
+    }
+
+    initZoomSlider() {
+        const zoomSlider = document.getElementById('chart-zoom-slider');
+        const offsetSlider = document.getElementById('chart-offset-slider');
+        const controls = document.getElementById('zoom-controls');
+        
+        if (!zoomSlider || !offsetSlider || !controls) return;
+
+        zoomSlider.addEventListener('input', (e) => {
+            const newSize = parseInt(e.target.value);
+            
+            // Adjust offset to keep the window somewhat centered or at least within bounds
+            const oldSize = this.viewJornadasCount;
+            this.viewJornadasCount = newSize;
+            
+            // If we are making window smaller, we try to keep the end point fixed (more intuitive for zoom)
+            // Or just ensure it doesn't overflow
+            const maxOffset = this.totalJornadasInSeason - this.viewJornadasCount;
+            if (this.viewOffset > maxOffset) this.viewOffset = maxOffset;
+            
+            this.renderChart();
+        });
+
+        offsetSlider.addEventListener('input', (e) => {
+            this.viewOffset = parseInt(e.target.value);
+            this.renderChart();
+        });
+    }
+
+    updateZoomSliderUI() {
+        const zoomSlider = document.getElementById('chart-zoom-slider');
+        const offsetSlider = document.getElementById('chart-offset-slider');
+        const zoomLabel = document.getElementById('chart-zoom-label');
+        const offsetLabel = document.getElementById('chart-offset-label');
+        const controls = document.getElementById('zoom-controls');
+
+        if (!zoomSlider || !offsetSlider || !zoomLabel || !offsetLabel || !controls) return;
+
+        if (this.totalJornadasInSeason <= 5) {
+            controls.style.display = 'none';
+            return;
+        }
+
+        controls.style.display = 'flex';
+        
+        // Window Size Slider
+        zoomSlider.max = this.totalJornadasInSeason;
+        zoomSlider.value = this.viewJornadasCount;
+
+        if (this.viewJornadasCount >= this.totalJornadasInSeason) {
+            zoomLabel.textContent = "Toda la temporada";
+            document.getElementById('offset-controls').style.opacity = '0.3';
+            document.getElementById('offset-controls').style.pointerEvents = 'none';
+        } else {
+            zoomLabel.textContent = `${this.viewJornadasCount} jornadas`;
+            document.getElementById('offset-controls').style.opacity = '1';
+            document.getElementById('offset-controls').style.pointerEvents = 'auto';
+        }
+
+        // Offset Slider
+        const maxOffset = this.totalJornadasInSeason - this.viewJornadasCount;
+        offsetSlider.max = maxOffset;
+        offsetSlider.value = this.viewOffset;
+        
+        const firstJ = this.viewOffset + 1;
+        const lastJ = this.viewOffset + this.viewJornadasCount;
+        
+        const { jornadas } = this.calculateData();
+        const startNum = jornadas[this.viewOffset] ? jornadas[this.viewOffset].number : firstJ;
+        const endNum = jornadas[this.viewOffset + this.viewJornadasCount - 1] ? jornadas[this.viewOffset + this.viewJornadasCount - 1].number : lastJ;
+
+        offsetLabel.textContent = `J${startNum} — J${endNum}`;
     }
 
     createModal() {
@@ -304,7 +383,26 @@ class ResumenManager {
         if (!ctx) return;
 
         const { stats, jornadas } = this.calculateData();
-        const labels = jornadas.map(j => 'J' + j.number);
+        
+        // --- ZOOM & SLIDING WINDOW LOGIC ---
+        this.totalJornadasInSeason = jornadas.length;
+        
+        // Window Size (Zoom)
+        if (this.viewJornadasCount === 0 || this.viewJornadasCount > this.totalJornadasInSeason) {
+            this.viewJornadasCount = this.totalJornadasInSeason;
+        }
+        
+        // Offset (Sliding)
+        const maxOffset = this.totalJornadasInSeason - this.viewJornadasCount;
+        if (this.viewOffset > maxOffset) this.viewOffset = maxOffset;
+        if (this.viewOffset < 0) this.viewOffset = 0;
+        
+        const filteredJornadas = jornadas.slice(this.viewOffset, this.viewOffset + this.viewJornadasCount);
+        const startIndex = this.viewOffset;
+        
+        this.updateZoomSliderUI();
+
+        const labels = filteredJornadas.map(j => 'J' + j.number);
 
         const datasets = [];
         this.members.forEach((m, i) => {
@@ -314,10 +412,13 @@ class ResumenManager {
                 const fixedColors = ['#2b5788', '#2e7d32', '#c30000', '#fbc02d'];
                 const color = fixedColors[i % 4];
 
+                // Filter history data to match jornadas
+                const filteredHistory = s.history.slice(startIndex);
+
                 datasets.push({
                     label: s.name,
-                    data: s.history.map(h => h.y),
-                    fullData: s.history,
+                    data: filteredHistory.map(h => h.y),
+                    fullData: filteredHistory,
                     borderColor: color,
                     backgroundColor: 'transparent',
                     tension: 0.3,

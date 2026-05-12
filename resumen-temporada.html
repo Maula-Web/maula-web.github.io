@@ -44,7 +44,21 @@
 
             <!-- Evolution Chart -->
             <div class="dashboard-card chart-card">
-                <h2 class="card-title">Evolución de Puntuaciones</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 2px solid var(--pastel-accent-orange); padding-bottom: 0.5rem;">
+                    <h2 class="card-title" style="margin: 0; border: none;">Evolución de Puntuaciones</h2>
+                    <div id="zoom-controls" style="display: none; flex-direction: column; gap: 4px; background: #f8f9fa; padding: 8px 15px; border-radius: 12px; border: 1px solid #eee;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.65rem; font-weight: 800; color: #666; text-transform: uppercase; width: 50px;">Ventana:</label>
+                            <input type="range" id="chart-zoom-slider" min="5" max="100" value="100" style="width: 100px; cursor: pointer; accent-color: #f48100;">
+                            <span id="chart-zoom-label" style="font-size: 0.75rem; font-weight: bold; color: #f48100; min-width: 80px;">Toda la temporada</span>
+                        </div>
+                        <div id="offset-controls" style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.65rem; font-weight: 800; color: #666; text-transform: uppercase; width: 50px;">Desplazar:</label>
+                            <input type="range" id="chart-offset-slider" min="0" max="100" value="0" style="width: 100px; cursor: pointer; accent-color: #2b5788;">
+                            <span id="chart-offset-label" style="font-size: 0.75rem; font-weight: bold; color: #2b5788; min-width: 80px;">J1 — J40</span>
+                        </div>
+                    </div>
+                </div>
                 <div class="chart-wrapper">
                     <canvas id="evolutionChart"></canvas>
                 </div>
