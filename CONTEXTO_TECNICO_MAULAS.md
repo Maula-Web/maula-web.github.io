@@ -12,7 +12,8 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
   - `bote.js`: Núcleo financiero de la peña (ingresos, repartos, costes variables, dobles, evolución del bote, penalizaciones). El archivo más grande y complejo.
   - `pronosticos.js`: Gestión de las apuestas individuales y la columna combinada (MAULA). Incluye **auto-guardado silencioso**, lógica de desmarcado de signos y notificaciones de completado basadas en frases aleatorias.
   - `scoring.js`: Lógica de puntuación (bonificaciones, penalizaciones, lógica PIG/Pleno al 15).
-  - `resumen-temporada.js`: Clasificación acumulada de la temporada y estadísticas por socio.
+  - `resumen-temporada.js`: Clasificación acumulada de la temporada y estadísticas detalladas por socio, incluyendo herramientas de **visualización avanzada (Zoom y Ventana Deslizante)** para las gráficas.
+  - `resultados.js`: Generación de la tabla de resultados acumulada (Aciertos Base) y gestión de penalizaciones.
   - `dashboard.js`: Panel de inicio con el líder actual, próxima jornada, premios semanales y **asignación dinámica de roles** (Sella/Rellena).
   - `rss-importer.js`: Motor de extracción de datos, partidos y resultados desde fuentes de terceros.
   - `telegram-service.js`: Integración de notificaciones y recordatorios automatizados.
@@ -69,10 +70,9 @@ Se ha establecido una regla global de exclusión para el partido número 15 (el 
 
 **⚠️ Regla clave:** `dashboard.js` y `resumen-temporada.js` deben usar **exactamente el mismo algoritmo** para calcular la puntuación de cada socio. Las tres diferencias que causaron inconsistencias en el pasado (y que ya están corregidas) fueron:
 
-1. **Filtro de jornadas**: solo cuentan las jornadas con `j.active && resultado !== '' && AppUtils.isSunday(fecha)`. Sin el filtro de domingo, se incluían jornadas incorrectas.
-2. **Comparación de IDs**: usar `==` (laxa) en vez de `===` (estricta), porque Firestore puede devolver los IDs como string o como número indistintamente.
-3. **Lógica PIG**: aplicar el descuento del partido 15 en ambos módulos.
-4. **Roles de Jornada**: El dashboard muestra siempre quién tiene asignados los roles de "Sella la Quiniela" (✍️) y "Rellena de Dobles" (🍻) para la jornada en curso o la siguiente disponible, especificando siempre el número de jornada para evitar confusiones.
+4. **Aciertos Base (Consistencia Estadística)**: El sistema utiliza `potentialHits` para asegurar que los aciertos reales de un socio que sella tarde se contabilicen en las estadísticas acumuladas (aunque sume 0 puntos). Esto garantiza que el total de "Aciertos Base" coincida con la suma visual de la tabla.
+5. **Lógica PIG Independiente**: La validación de aciertos en el partido PIG se ha desacoplado de la penalización por retraso. Un socio que sella tarde puede fallar los puntos de la jornada pero seguir siendo un "Acertante PIG" si su pronóstico fue correcto, computando para el Bote de la peña.
+6. **Roles de Jornada**: El dashboard muestra siempre quién tiene asignados los roles de "Sella la Quiniela" (✍️) y "Rellena de Dobles" (🍻) para la jornada en curso o la siguiente disponible, especificando siempre el número de jornada para evitar confusiones.
 
 ### 4.4. Cálculo Diferido de Penalizaciones y Bonus
 
@@ -125,6 +125,15 @@ Se genera de forma sintética lo que sería el "voto popular" del grupo:
     - **Cero Natural (0 aciertos)**: La casilla mantiene el color normal (blanco o el color de Maula/líder) y muestra el "0".
     - **Cero por Penalización (Retraso)**: La casilla se vuelve **negra con el número de aciertos potenciales tachado en gris** (ej: ~~12~~). Esto permite distinguir de un vistazo quién no acertó de quién fue sancionado.
     - El tachado se aplica con un estilo evidente (`line-through double`) para evitar confusiones.
+    - **Cálculo de Totales**: Para el sumatorio de "Aciertos Base", el sistema prioriza los `potentialHits` sobre los `hits` penalizados (0) para reflejar el rendimiento real.
+
+### 6.7. Visualización Avanzada en Gráficas
+
+El Resumen de Temporada incluye herramientas para manejar la densidad de datos en temporadas largas:
+
+- **Ventana Deslizante (Sliding Window)**: Permite seleccionar un número de jornadas (ej. 10) y desplazar esa ventana a lo largo de toda la temporada para analizar tramos específicos.
+- **Zoom Vertical Automático**: El eje Y de la gráfica no empieza obligatoriamente en cero (`beginAtZero: false`), sino que se ajusta dinámicamente al rango de puntos de los socios visibles, maximizando la claridad de las diferencias de puntuación.
+- **Barras de Rendimiento Adaptativas**: El ancho de las barras en el gráfico de rendimiento por jornada se reduce automáticamente (de 55px a 40px) conforme aumenta el número de jornadas jugadas para evitar desbordamientos visuales.
 
 ## 7. Sistema de Pronósticos y Experiencia de Usuario (UX)
 
