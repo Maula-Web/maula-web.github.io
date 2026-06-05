@@ -198,7 +198,7 @@ class QuinielaScraper {
                     const newJornada = {
                         id: Date.now() + jData.number, // Ensure unique ID
                         number: jData.number,
-                        season: '2025-2026',
+                        season: '2026-2027',
                         date: jData.dateStr,
                         matches: jData.matches,
                         active: true
@@ -719,12 +719,14 @@ class QuinielaScraper {
                 if (window.AppUtils.isLaLigaTeam(m.away)) count++;
             });
         } else {
-            // Fallback list of 1st Division teams (2025-2026)
+            // Fallback list of 1st Division teams (2026-2027)
+            // Bajan: Real Oviedo, Girona, Mallorca
+            // Suben: Real Racing Club, RC Deportivo (tercer ascendido pendiente)
             const primeraKeywords = [
                 'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
-                'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'GIRONA', 'OSASUNA',
-                'CELTA', 'MALLORCA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE', 
-                'LEVANTE', 'OVIEDO', 'BILBAO'
+                'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'OSASUNA',
+                'CELTA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE',
+                'LEVANTE', 'BILBAO', 'RACING', 'DEPORTIVO'
             ];
 
             matches.forEach(m => {

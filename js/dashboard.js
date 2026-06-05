@@ -42,7 +42,7 @@ class DashboardManager {
             const activeMembers = this.members.length;
 
             // 2. Temporada
-            const season = "2025-2026";
+            const season = "2026-2027";
 
             // 3. Jornadas Jugadas (Completed)
             // A jornada is considered played if it has matches AND first match has result AND it is a Sunday.

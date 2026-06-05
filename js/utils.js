@@ -6,7 +6,7 @@
 var AppUtils = window.AppUtils || {
 
     currentTeams: null, // Dynamic list from Firestore
-    activeSeason: '2025-2026',
+    activeSeason: '2026-2027',
 
     // --- DATE HELPERS ---
 
@@ -124,11 +124,14 @@ var AppUtils = window.AppUtils || {
      * Used for filtering
      */
     isLaLigaTeam(name) {
+        // Lista de equipos de Primera División 2026-2027
+        // Bajan: Real Oviedo, Girona, Mallorca
+        // Suben: Real Racing Club, RC Deportivo (tercer ascendido pendiente)
         const keywords = [
             'real madrid', 'barcelona', 'atlético', 'at. madrid', 'sevilla', 'betis',
-            'real sociedad', 'athletic', 'valencia', 'villarreal', 'girona', 'osasuna',
-            'celta', 'mallorca', 'rayo', 'getafe', 'alavés', 'espanyol', 'elche', 
-            'levante', 'oviedo', 'bilbao'
+            'real sociedad', 'athletic', 'valencia', 'villarreal', 'osasuna',
+            'celta', 'rayo', 'getafe', 'alavés', 'espanyol', 'elche',
+            'levante', 'bilbao', 'racing', 'deportivo'
         ];
         const norm = this.normalizeName(name);
         // Simple inclusion check on normalized strings

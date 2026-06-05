@@ -47,7 +47,7 @@ class ResumenManager {
         // Extract and deduplicate
         let seasons = [...new Set(this.jornadas.map(j => j.season).filter(s => !!s))];
         if (seasons.length === 0) {
-            seasons = ['2025-2026'];
+            seasons = ['2026-2027'];
         }
         seasons.sort((a, b) => b.localeCompare(a));
 
@@ -57,7 +57,7 @@ class ResumenManager {
         // 1. Selector value if it matches AppUtils.activeSeason
         // 2. AppUtils.activeSeason
         // 3. First available option in selector
-        const activeS = (window.AppUtils && window.AppUtils.activeSeason) || '2025-2026';
+        const activeS = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
         
         if (seasons.includes(activeS)) {
             this.currentSeason = activeS;
@@ -216,7 +216,7 @@ class ResumenManager {
             const d = AppUtils.parseDate(j.date);
             const isValidDate = d && AppUtils.isSunday(d);
             
-            const jSeason = j.season || '2025-2026';
+            const jSeason = j.season || '2026-2027';
             const seasonMatch = jSeason === this.currentSeason;
 
             return seasonMatch && hasResult && isValidDate;

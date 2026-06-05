@@ -202,7 +202,7 @@ class DataService {
     async getCurrentTeams() {
         // Try current season config
         const activeDoc = await this.db.collection('config').doc('active_season').get();
-        const activeSeason = activeDoc.exists ? activeDoc.data().id : '2025-2026';
+        const activeSeason = activeDoc.exists ? activeDoc.data().id : '2026-2027';
         
         const teamsDoc = await this.db.collection('config').doc(`teams_${activeSeason.replace(/-/g, '_')}`).get();
         if (teamsDoc.exists) return teamsDoc.data();
@@ -221,7 +221,7 @@ class DataService {
 
     async getActiveSeason() {
         const doc = await this.db.collection('config').doc('active_season').get();
-        return doc.exists ? doc.data().id : '2025-2026';
+        return doc.exists ? doc.data().id : '2026-2027';
     }
 
     async setActiveSeason(season) {

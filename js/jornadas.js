@@ -41,7 +41,7 @@ class JornadaManager {
 
     checkForUpdates() {
         setTimeout(() => {
-            console.log("Datos cargados desde fichero externo (2025-2026)");
+            console.log("Datos cargados desde fichero externo (2026-2027)");
         }, 1000);
     }
 
@@ -192,7 +192,7 @@ class JornadaManager {
         const newJornada = {
             id: Date.now(),
             number: nextNum,
-            season: '2025-2026',
+            season: '2026-2027',
             date: 'Por definir',
             matches: Array(15).fill(null).map(() => ({ home: '', away: '', result: '' }))
         };
@@ -484,7 +484,7 @@ class JornadaManager {
         const jornadaData = {
             id: this.currentJornadaId || Date.now(),
             number: parseInt(this.inpNumber.value) || 0,
-            season: '2025-2026',
+            season: '2026-2027',
             date: dateStr,
             matches: matches,
             prizes: prizes,

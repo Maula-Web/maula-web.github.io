@@ -102,6 +102,7 @@ Para evitar la importación de jornadas que no corresponden a la competición pr
 - **Regla Primera División**: Una jornada solo se importa si al menos **5 equipos** de sus 15 partidos pertenecen a la **Primera División española (LaLiga EA Sports)**. Este umbral evita que partidos aislados de otras competiciones disparen la importación.
 - **Implementación**: El método `hasPrimeraTeams` en `rss-importer.js` realiza esta comprobación cruzando los equipos de la jornada con el listado de palabras clave definido en `AppUtils.isLaLigaTeam` (`js/utils.js`).
 - **Mantenimiento Estacional**: Dado que hay ascensos y descensos, el listado de equipos en `js/utils.js` (y su fallback en `rss-importer.js`) **debe actualizarse manualmente al inicio de cada temporada** para reflejar los 20 equipos que componen la Primera División ese año. Si el sistema empieza a importar jornadas de Segunda por error (como ocurrió con la J51 de la temporada 25/26), es señal de que la lista contiene equipos descendidos como Valladolid, Leganés o Las Palmas.
+- **Temporada 2026-2027 (ACTIVA)**: Bajan Real Oviedo, Girona y Mallorca. Suben Real Racing Club y RC Deportivo (un ascendido más pendiente de confirmar). La lista `isLaLigaTeam` ya está actualizada en `utils.js` y `rss-importer.js`.
 
 ## 6. Tabla de Resultados y "Columna MAULA"
 

@@ -21,7 +21,7 @@ class BoteManager {
             costeDobles: 12.00,
             aportacionSemanal: 1.50,
             boteInicial: 0.00,
-            temporadaActual: '2025-2026'
+            temporadaActual: '2026-2027'
         };
         this.cashPayments = []; // New - Tracks sellados paid in cash
         this.repartos = []; // New - Tracks profit distributions
@@ -165,11 +165,11 @@ class BoteManager {
         const movements = [];
 
         const initialBalances = {
-            'Alvaro': 15, 'Carlos': 8.5, 'David Buzón': 56.29, 'Edu': 2, 'Emilio': 41.13,
-            'F. Lozano': 2, 'F. Ramirez': 42.91, 'Heradio': 10.22, 'JA Valdivieso': 2.00,
-            'Valdi': 2.00, 'Javi Mora': 57.88, 'Juan Antonio': 17.90, 'Juanan': 17.90, 'Juanjo': -6.1, 'Luismi': 24.75,
-            'Marcelo': 0, 'Martin': 15.1, 'Rafa': 4.45, 'Ramon': 2, 'Raul Romera': 8.95,
-            'Samuel': 1.5
+            'Alvaro': 0, 'Carlos': 0, 'David Buzón': 0, 'Edu': 0, 'Emilio': 0,
+            'F. Lozano': 0, 'F. Ramirez': 0, 'Heradio': 0, 'JA Valdivieso': 0,
+            'Valdi': 0, 'Javi Mora': 0, 'Juan Antonio': 0, 'Juanan': 0, 'Juanjo': 0, 'Luismi': 0,
+            'Marcelo': 0, 'Martin': 0, 'Rafa': 0, 'Ramon': 0, 'Raul Romera': 0,
+            'Samuel': 0
         };
 
         // Pre-calculate exemptions per jornada
@@ -3110,7 +3110,7 @@ class BoteManager {
             jornadaNum: jornadaObj ? jornadaObj.number : '?',
             date: fecha,
             penalizaciones: this.currentPreviewCierre,
-            temporada: this.config.temporadaActual || '2025-2026'
+            temporada: this.config.temporadaActual || '2026-2027'
         };
 
         try {
