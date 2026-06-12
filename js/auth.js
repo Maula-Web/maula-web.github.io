@@ -277,9 +277,11 @@ const Auth = {
             sidebar.className = 'sidebar-menu';
 
             // Reconstruct the full menu with logo
+            const activeSeason = (window.AppUtils && AppUtils.activeSeason) || '2026-2027';
             sidebar.innerHTML = `
-                <div class="header-logo" onclick="window.location.href='index.html'" style="cursor:pointer">
-                    <img src="LOGO_MAULAS.png?v=2" alt="Logotipo Peña Maulas">
+                <div class="header-logo-wrap" onclick="window.location.href='index.html'" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Logotipo Peña Maulas" style="display:block;">
+                    <span class="season-badge">${activeSeason}</span>
                 </div>
                 <div class="menu-toggle" id="mobile-menu-toggle">
                     <span></span>
