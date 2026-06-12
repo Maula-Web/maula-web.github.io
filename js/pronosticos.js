@@ -171,7 +171,8 @@ class PronosticoManager {
 
         this.members = await window.DataService.getAll('members');
         this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Global sort by member ID
-        this.jornadas = await window.DataService.getAll('jornadas');
+        const allJ = await window.DataService.getAll('jornadas');
+        this.jornadas = allJ.filter(j => j.season === AppUtils.activeSeason);
         this.pronosticos = await window.DataService.getAll('pronosticos');
         this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || []; // New Collection
 

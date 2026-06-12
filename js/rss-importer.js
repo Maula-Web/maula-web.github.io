@@ -25,7 +25,8 @@ class QuinielaScraper {
     async init() {
         if (window.DataService) {
             await window.DataService.init();
-            this.jornadas = await window.DataService.getAll('jornadas');
+            const allJ = await window.DataService.getAll('jornadas');
+            this.jornadas = allJ.filter(j => j.season === AppUtils.activeSeason);
         }
     }
 

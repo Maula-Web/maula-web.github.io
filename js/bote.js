@@ -97,14 +97,21 @@ class BoteManager {
 
     async loadData() {
         this.members = await window.DataService.getAll('members');
-        this.jornadas = await window.DataService.getAll('jornadas');
-        this.pronosticos = await window.DataService.getAll('pronosticos');
+        const allJ = await window.DataService.getAll('jornadas');
+        this.jornadas = allJ.filter(j => j.season === AppUtils.activeSeason);
 
         // Ordenar socios por Número de Socio (ID)
         this.members.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         // Sort jornadas by number
         this.jornadas.sort((a, b) => a.number - b.number);
+
+        // Set of active jornada IDs for filtering related data
+        const activeJIds = new Set(this.jornadas.map(j => String(j.id)));
+
+        // Filter pronosticos to active season
+        const allPron = await window.DataService.getAll('pronosticos');
+        this.pronosticos = allPron.filter(p => activeJIds.has(String(p.jId || p.jornadaId)));
 
         // Load bote movements
         const boteCollection = await window.DataService.getAll('bote');
@@ -118,14 +125,17 @@ class BoteManager {
         const cashCollection = await window.DataService.getAll('reembolsos_efectivo');
         this.cashPayments = cashCollection || [];
 
-        // Load extra forecasts (Doubles Column)
-        this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
+        // Load extra forecasts (Doubles Column) - filter by active season jornadas
+        const allExtra = await window.DataService.getAll('pronosticos_extra') || [];
+        this.pronosticosExtra = allExtra.filter(p => activeJIds.has(String(p.jId || p.jornadaId)));
 
-        // Load repartos
-        this.repartos = await window.DataService.getAll('repartos') || [];
+        // Load repartos - filter by active season (using season field if present, or include all if not tagged)
+        const allRepartos = await window.DataService.getAll('repartos') || [];
+        this.repartos = allRepartos.filter(r => !r.season || r.season === AppUtils.activeSeason);
 
-        // Load cierres vuelta (penalizaciones clasificacion)
-        this.cierresVuelta = await window.DataService.getAll('cierres_vuelta') || [];
+        // Load cierres vuelta - filter by active season jornadas
+        const allCierres = await window.DataService.getAll('cierres_vuelta') || [];
+        this.cierresVuelta = allCierres.filter(c => !c.season || c.season === AppUtils.activeSeason);
     }
 
     async loadConfig() {

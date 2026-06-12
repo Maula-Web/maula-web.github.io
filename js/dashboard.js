@@ -16,7 +16,8 @@ class DashboardManager {
             } else {
                 this.members = [];
             }
-            this.jornadas = await window.DataService.getAll('jornadas');
+            const allJ = await window.DataService.getAll('jornadas');
+            this.jornadas = allJ.filter(j => j.season === AppUtils.activeSeason);
             this.pronosticos = await window.DataService.getAll('pronosticos');
             this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
 

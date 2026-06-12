@@ -20,7 +20,8 @@ class JornadaManager {
     }
 
     async loadData() {
-        this.jornadas = await window.DataService.getAll('jornadas');
+        const allJ = await window.DataService.getAll('jornadas');
+        this.jornadas = allJ.filter(j => j.season === AppUtils.activeSeason);
     }
 
     startClock() {
@@ -192,7 +193,7 @@ class JornadaManager {
         const newJornada = {
             id: Date.now(),
             number: nextNum,
-            season: '2026-2027',
+            season: (window.AppUtils && AppUtils.activeSeason) || '2026-2027',
             date: 'Por definir',
             matches: Array(15).fill(null).map(() => ({ home: '', away: '', result: '' }))
         };
