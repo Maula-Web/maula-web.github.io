@@ -676,7 +676,7 @@ class QuinielaScraper {
             'LEVANTE', 'OVIEDO', 'R.OVIEDO', 'SPORTING', 'ZARAGOZA', 'BURGOS', 'MIRANDÉS', 
             'TENERIFE', 'HUESCA', 'ALBACETE', 'CARTAGENA', 'FERROL', 'CASTELLÓN', 
             'CÓRDOBA', 'MÁLAGA', 'ELDA', 'ELDENSE', 'ALMERÍA', 'CÁDIZ', 'GRANADA', 
-            'VALLADOLID', 'LEGANÉS', 'LAS PALMAS', 'RACING'
+            'VALLADOLID', 'LEGANÉS', 'LAS PALMAS', 'RACING', 'EIBAR', 'CEUTA', 'ANDORRA', 'SABADELL'
         ];
 
         let matchCount = 0;
@@ -722,12 +722,12 @@ class QuinielaScraper {
         } else {
             // Fallback list of 1st Division teams (2026-2027)
             // Bajan: Real Oviedo, Girona, Mallorca
-            // Suben: Real Racing Club, RC Deportivo (tercer ascendido pendiente)
+            // Suben: Real Racing Club, RC Deportivo, Málaga CF
             const primeraKeywords = [
                 'REAL MADRID', 'BARCELONA', 'ATLÉTICO', 'AT.MADRID', 'SEVILLA', 'BETIS',
                 'R.SOCIEDAD', 'ATHLETIC', 'ATH.CLUB', 'VALENCIA', 'VILLARREAL', 'OSASUNA',
                 'CELTA', 'RAYO', 'GETAFE', 'ALAVÉS', 'ESPANYOL', 'ELCHE',
-                'LEVANTE', 'BILBAO', 'RACING', 'DEPORTIVO'
+                'LEVANTE', 'BILBAO', 'RACING', 'DEPORTIVO', 'MÁLAGA', 'MALAGA'
             ];
 
             matches.forEach(m => {

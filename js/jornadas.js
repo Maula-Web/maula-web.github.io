@@ -137,12 +137,16 @@ class JornadaManager {
     populateTeamsCache() {
         const teams = new Set();
         const commonTeams = [
-            'Real Madrid', 'Barcelona', 'Atlético de Madrid', 'Sevilla', 'Real Betis',
-            'Real Sociedad', 'Athletic Club', 'Valencia', 'Villarreal', 'Girona', 'Osasuna',
-            'Celta de Vigo', 'Mallorca', 'Rayo Vallecano', 'Getafe', 'Alavés', 'UD Las Palmas', 'Leganés',
-            'Espanyol', 'Real Valladolid', 'Racing Santander', 'Eibar', 'Real Oviedo', 'Real Sporting',
-            'Real Zaragoza', 'Burgos', 'Mirandés', 'Levante', 'Tenerife', 'Huesca', 'Albacete',
-            'Cartagena', 'Ferrol', 'Castellón', 'Córdoba', 'Málaga'
+            'Real Madrid', 'FC Barcelona', 'Villarreal', 'Atlético de Madrid', 'Real Betis',
+            'Celta de Vigo', 'Real Sociedad', 'Getafe', 'Athletic Club', 'Valencia',
+            'Sevilla', 'Rayo Vallecano', 'Osasuna', 'Espanyol', 'Alavés', 'Levante',
+            'Elche', 'Racing de Santander', 'Deportivo de La Coruña', 'Málaga',
+            'Real Oviedo', 'RCD Mallorca', 'Girona FC', 'UD Almería', 'UD Las Palmas',
+            'CD Castellón', 'FC Burgos', 'SD Eibar', 'Córdoba CF', 'Sporting de Gijón',
+            'AD Ceuta', 'Albacete Balompié', 'FC Andorra', 'Granada CF', 'Real Sociedad B',
+            'CD Leganés', 'Real Valladolid', 'Cádiz CF', 'CD Tenerife', 'Eldense',
+            'Celta Fortuna', 'CD Sabadell', 'Real Zaragoza', 'Mirandés', 'Cartagena',
+            'Ferrol', 'Huesca'
         ];
 
         commonTeams.forEach(t => teams.add(AppUtils.formatTeamName(t)));
