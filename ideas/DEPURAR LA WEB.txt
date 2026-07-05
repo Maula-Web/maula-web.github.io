@@ -1,0 +1,219 @@
+Hazme un guión de lo que le tengo que decir a antigravity para mejorar la web.
+Dame los puntos que le tengo que indicar, por orden.
+
+Después de leer el documento, mi consejo es que no intentes mejorar la web "a lo grande". Es el error más habitual cuando se trabaja con IA. Lo mejor es seguir un plan de pequeñas mejoras, donde cada fase deje la aplicación funcionando exactamente igual, pero internamente más sólida.
+
+Este sería el orden que yo seguiría.
+
+FASE 0 (OBLIGATORIA)
+
+Antes de tocar nada.
+
+Pídele:
+
+Analiza completamente el proyecto, pero NO modifiques ningún archivo todavía. Quiero un informe indicando:
+
+Dónde hay código duplicado.
+Qué funciones hacen lo mismo en distintos archivos.
+Qué archivos dependen unos de otros.
+Qué partes consideras más delicadas.
+Qué cambios propones realizar por fases.
+
+No implementes nada hasta que yo lo apruebe.
+
+Esta fase sirve para que Antigravity piense antes de escribir código.
+
+FASE 1
+Crear un núcleo común de reglas
+
+Objetivo:
+
+Que todas las pantallas calculen exactamente igual.
+
+Pídele:
+
+Quiero que toda la lógica común de cálculo de puntuaciones, aciertos, potentialHits, PIG, penalizaciones y clasificación viva en un único lugar.
+
+No cambies ninguna regla.
+
+Solo quiero eliminar código duplicado.
+
+Haz el cambio poco a poco y manteniendo compatibilidad.
+
+FASE 2
+Separar la lógica del dibujo de la pantalla
+
+Ahora seguramente ocurre esto:
+
+Calcular puntos
+↓
+
+Crear HTML
+
+↓
+
+Guardar Firebase
+
+↓
+
+Volver a calcular
+
+Todo mezclado.
+
+Pídele:
+
+Separa la lógica de negocio del renderizado.
+
+Las funciones que calculan datos no deben modificar el HTML.
+
+Las funciones que crean HTML no deben calcular reglas.
+
+No cambies el aspecto visual.
+
+FASE 3
+Revisar el sistema del bote
+
+Esta es la parte más delicada.
+
+Pídele:
+
+Analiza la arquitectura del bote.
+
+Comprueba si todos los movimientos financieros pueden reconstruirse correctamente.
+
+Detecta posibles cálculos repetidos o innecesarios.
+
+Propón una arquitectura más robusta sin cambiar el funcionamiento actual.
+
+Que proponga primero.
+
+Que no programe todavía.
+
+FASE 4
+Optimizar Firebase
+
+Aquí suele haber bastante margen.
+
+Pídele:
+
+Analiza todas las llamadas a Firebase.
+
+Detecta consultas repetidas.
+
+Detecta datos que se descargan varias veces.
+
+Detecta posibilidades de cache en memoria.
+
+No cambies la lógica de negocio.
+
+FASE 5
+Optimizar velocidad
+
+Pídele:
+
+Analiza qué funciones consumen más tiempo.
+
+Busca bucles innecesarios.
+
+Busca cálculos repetidos.
+
+Busca recorridos de arrays que puedan convertirse en búsquedas mediante Map.
+
+Optimiza únicamente donde exista una mejora clara.
+
+FASE 6
+Auditoría de reglas
+
+Muy importante.
+
+Pídele:
+
+Recorre todo el proyecto buscando reglas duplicadas.
+
+Comprueba que dashboard, resultados, resumen de temporada y Telegram utilizan exactamente las mismas reglas.
+
+Señala cualquier diferencia.
+
+FASE 7
+Revisar funciones enormes
+
+Seguro que tienes funciones de cientos de líneas.
+
+Pídele:
+
+Localiza todas las funciones de más de 150 líneas.
+
+Propón dividirlas en funciones pequeñas.
+
+No cambies el comportamiento.
+
+FASE 8
+Organización del proyecto
+
+Cuando todo funcione.
+
+Pídele:
+
+Propón una reorganización lógica de carpetas y archivos.
+
+No quiero cambiar de tecnología.
+
+Quiero seguir usando Vanilla JS.
+
+Solo quiero un proyecto más fácil de mantener.
+
+FASE 9
+Sistema de comprobaciones
+
+Esta fase la dejaría casi para el final.
+
+Pídele:
+
+Quiero un sistema sencillo para comprobar automáticamente las reglas críticas del proyecto.
+
+Empezar solo con:
+
+puntuación
+PIG
+late
+no jugado
+potentialHits
+desempates
+FASE 10
+Limpieza final
+
+Cuando todo esté estable.
+
+Pídele:
+
+Busca:
+
+código muerto
+funciones que ya no se usan
+variables innecesarias
+imports sin utilizar
+archivos obsoletos
+
+Haz una propuesta antes de borrar nada.
+
+Una norma que yo pondría SIEMPRE en todos los prompts
+
+Esta frase vale oro:
+
+Antes de modificar cualquier archivo:
+
+Explica qué vas a hacer.
+Explica por qué.
+Indica qué archivos vas a modificar.
+Explica los riesgos.
+Espera mi aprobación antes de escribir código.
+
+Con eso evitarás muchos cambios inesperados.
+
+Un consejo más
+
+Yo añadiría una Fase 0.5 que, viendo cómo has construido el proyecto, puede darte muchísimo valor:
+
+Lee completamente el archivo CONTEXTO_TECNICO_MAULAS.md y utilízalo como la fuente de verdad de las reglas de negocio. Si encuentras diferencias entre el código y ese documento, no las corrijas automáticamente. Haz una lista detallada de las discrepancias para que yo decida cuál es la versión correcta.
+
+Así conseguirás que Antigravity deje de "adivinar" las reglas y empiece a trabajar tomando como referencia la documentación que ya has creado. Creo que esa será una de las mejoras más rentables para un proyecto con tanta lógica de negocio como el tuyo.

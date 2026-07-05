@@ -41,38 +41,11 @@ class ResumenManager {
     }
 
     initSeasonSelector() {
-        const selector = document.getElementById('season-selector');
-        if (!selector) return;
-
-        // Extract and deduplicate
-        let seasons = [...new Set(this.jornadas.map(j => j.season).filter(s => !!s))];
-        if (seasons.length === 0) {
-            seasons = ['2026-2027'];
-        }
-        seasons.sort((a, b) => b.localeCompare(a));
-
-        selector.innerHTML = seasons.map(s => `<option value="${s}">${s}</option>`).join('');
-        
-        // Priority for initialization:
-        // 1. Selector value if it matches AppUtils.activeSeason
-        // 2. AppUtils.activeSeason
-        // 3. First available option in selector
+        // Temporada fija: siempre se muestran los datos de la temporada activa.
+        // El selector de temporadas ha sido eliminado de la interfaz.
         const activeS = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
-        
-        if (seasons.includes(activeS)) {
-            this.currentSeason = activeS;
-            selector.value = activeS;
-        } else {
-            this.currentSeason = selector.value || seasons[0];
-        }
-
-        console.log("ResumenManager: Initialized with season", this.currentSeason, "from options", seasons);
-
-        selector.addEventListener('change', (e) => {
-            this.currentSeason = e.target.value;
-            console.log("ResumenManager: Changed season to", this.currentSeason);
-            this.refreshData();
-        });
+        this.currentSeason = activeS;
+        console.log("ResumenManager: Initialized with fixed season", this.currentSeason);
     }
 
     refreshData() {
