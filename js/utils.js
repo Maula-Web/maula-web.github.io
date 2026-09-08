@@ -253,11 +253,24 @@ var AppUtils = window.AppUtils || {
     },
 
     /**
+     * Returns true if a team name represents a female team.
+     * Female teams are marked with "(F)" anywhere in their name.
+     */
+    isFemaleTeam(name) {
+        if (!name) return false;
+        return /\(F\)/i.test(String(name));
+    },
+
+    /**
      * Checks if a match is considered "PIG" (Pleno al 15 between big clubs)
      * Robust check using normalization to handle accents, cases and variants.
+     * Female teams (marked with "(F)") are explicitly excluded.
      */
     isPigMatch(home, away) {
         if (!home || !away) return false;
+        // Female teams are never PIG
+        if (this.isFemaleTeam(home) || this.isFemaleTeam(away)) return false;
+
         const pigTeams = ['real madrid', 'at. madrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético'];
 
         const h = this.normalizeName(home);

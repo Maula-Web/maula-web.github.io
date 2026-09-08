@@ -28,6 +28,8 @@ class BoteManager {
         this.engine = new BoteEngine(this.config);
         this.checkIsPIG = (m) => {
             if (!m) return false;
+            // Female teams (marked with "(F)") are never PIG
+            if (/\(F\)/i.test(String(m.home || '')) || /\(F\)/i.test(String(m.away || ''))) return false;
             const h = (m.home || '').toLowerCase();
             const a = (m.away || '').toLowerCase();
             const isMadrid = (t) => t.includes('madrid') && !t.includes('atlet') && !t.includes('at.');
@@ -1415,6 +1417,8 @@ class BoteManager {
 
         const checkIsPIG = (m) => {
             if (!m) return false;
+            // Female teams (marked with "(F)") are never PIG
+            if (/\(F\)/i.test(String(m.home || '')) || /\(F\)/i.test(String(m.away || ''))) return false;
             const h = m.home || '', a = m.away || '';
             const isMadrid = (t) => { const tl = t.toLowerCase(); return tl.includes('madrid') && !tl.includes('atlet') && !tl.includes('at.'); };
             const isBarca = (t) => { const tl = t.toLowerCase(); return tl.includes('barcelona') || tl.includes('barça') || tl.includes('barca') || tl.includes('fcb'); };
@@ -1599,6 +1603,51 @@ class BoteManager {
             await this.loadData();
             this.render();
         } catch (e) { console.error('Migration v23 failed:', e); }
+
+        // Migration v24: Fix past jornadas where female teams were incorrectly treated as PIG
+        const migV24Done = localStorage.getItem('bote_maintenance_v24');
+        if (!migV24Done) {
+            try {
+                console.log('Running migration v24 (Female team PIG fix)...');
+                const allJ = await window.DataService.getAll('jornadas');
+                const isFemale = (name) => /\(F\)/i.test(String(name || ''));
+                let fixedCount = 0;
+                for (const j of allJ) {
+                    if (!j.matches) continue;
+                    // Check if any match in this jornada has a female team and was being treated as PIG
+                    const hasFemaleMatch = j.matches.some(m => isFemale(m && m.home) || isFemale(m && m.away));
+                    if (!hasFemaleMatch) continue;
+
+                    // Check if any of these female matches was the pigMatchIndex (or would be detected as PIG)
+                    const pigIdx = j.pigMatchIndex !== undefined ? j.pigMatchIndex : -1;
+                    const pigMatch = pigIdx >= 0 ? j.matches[pigIdx] : null;
+                    const pigMatchIsFemale = pigMatch && (isFemale(pigMatch.home) || isFemale(pigMatch.away));
+
+                    // Also detect via engine if no explicit pigMatchIndex
+                    const detectedPigIdx = j.matches.findIndex(m => {
+                        if (!m || isFemale(m.home) || isFemale(m.away)) return false;
+                        return this.engine.checkIsPIG(m);
+                    });
+
+                    if (pigMatchIsFemale) {
+                        // Was explicitly set to a female match - fix it
+                        if (detectedPigIdx !== -1) {
+                            await window.DataService.update('jornadas', j.id, { pigMatchIndex: detectedPigIdx });
+                        } else {
+                            await window.DataService.update('jornadas', j.id, { pigMatchIndex: -1 });
+                        }
+                        fixedCount++;
+                        console.log(`Migration v24: Fixed jornada J${j.number} (${j.id})`);
+                    }
+                }
+                console.log(`Migration v24 complete. Fixed ${fixedCount} jornada(s).`);
+                localStorage.setItem('bote_maintenance_v24', 'true');
+                if (fixedCount > 0) {
+                    await this.loadData();
+                    this.render();
+                }
+            } catch (e) { console.error('Migration v24 failed:', e); }
+        }
     }
 
     showPenaltyDetail(memberName, jNum, detailHtml) {
