@@ -254,11 +254,12 @@ var AppUtils = window.AppUtils || {
 
     /**
      * Returns true if a team name represents a female team.
-     * Female teams are marked with "(F)" anywhere in their name.
+     * Female teams are usually marked with "(F)" anywhere in their name,
+     * but we also catch variations like "( F )", "Femenino", or "Fem".
      */
     isFemaleTeam(name) {
         if (!name) return false;
-        return /\(F\)/i.test(String(name));
+        return /\(\s*F\s*\)/i.test(String(name)) || /femenino/i.test(String(name)) || /\bfem\b/i.test(String(name));
     },
 
     /**

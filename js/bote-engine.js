@@ -285,8 +285,13 @@ class BoteEngine {
 
             let pigIdx = -1;
             if (jornada.pigMatchIndex !== undefined) {
-                pigIdx = jornada.pigMatchIndex;
-            } else {
+                const explicitMatch = jornada.matches[jornada.pigMatchIndex];
+                const isFemale = explicitMatch && (/\(F\)/i.test(String(explicitMatch.home)) || /\(F\)/i.test(String(explicitMatch.away)));
+                if (!isFemale) {
+                    pigIdx = jornada.pigMatchIndex;
+                }
+            }
+            if (pigIdx === -1) {
                 pigIdx = (jornada.matches || []).slice(0, 15).findIndex(m => this.checkIsPIG(m));
             }
 
@@ -595,8 +600,9 @@ class BoteEngine {
 
     checkIsPIG(match) {
         if (!match || !match.home || !match.away) return false;
-        // Female teams (marked with "(F)") are never PIG
-        if (/\(F\)/i.test(String(match.home)) || /\(F\)/i.test(String(match.away))) return false;
+        // Female teams are never PIG
+        const isFemale = (n) => /\(\s*F\s*\)/i.test(String(n)) || /femenino/i.test(String(n)) || /\bfem\b/i.test(String(n));
+        if (isFemale(match.home) || isFemale(match.away)) return false;
         const pigTeams = ['real madrid', 'at. madrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético'];
         const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
         const h = norm(match.home);
