@@ -87,7 +87,7 @@ class BoteEngine {
                     const costs = this.calculateJornadaCosts(member.id, members, jornadas, pronosticos, pronosticosExtra, cashPayments, jornada, pronostico, jornadaIndex, infoRedist);
                     const prizes = this.getPrizesForMemberJornada(member.id, jornada, pronosticos);
                     const manualIngresos = this.getManualIngresosForJornada(member.id, jornada, ingresos);
-                    const penalties = costs.penalizacionUnos + (costs.penalizacionBajosAciertos || 0) + (costs.penalizacionPIG || 0);
+                    const penalties = costs.penalizacionUnos + (costs.penalizacionBajosAciertos || 0) + (costs.penalizacionPIG || 0) + (costs.penalizacionMaula || 0);
 
                     const isSelladoInCash = cashPayments.some(cp => String(cp.memberId) === mIdStr && String(cp.jornadaId) === String(jornada.id));
 
@@ -112,6 +112,7 @@ class BoteEngine {
                         penalizacionUnos: costs.penalizacionUnos,
                         penalizacionBajosAciertos: costs.penalizacionBajosAciertos,
                         penalizacionPIG: costs.penalizacionPIG,
+                        penalizacionMaula: costs.penalizacionMaula || 0,
                         sellado: costs.sellado,
                         premios: prizes,
                         extraPrizes: extraPrizes,
@@ -207,6 +208,7 @@ class BoteEngine {
             penalizacionUnos: 0,
             penalizacionBajosAciertos: 0,
             penalizacionPIG: 0,
+            penalizacionMaula: 0,
             sellado: 0,
             aciertos: 0,
             exento: false,
@@ -311,6 +313,7 @@ class BoteEngine {
             costs.penalizacionUnos = 0;
             costs.penalizacionBajosAciertos = 0;
             costs.penalizacionPIG = 0;
+            costs.penalizacionMaula = 0;
         }
 
         if (jornada.noSellado) {
@@ -361,6 +364,7 @@ class BoteEngine {
             const totalCDob = numExtras * cDob;
 
             costs.sellado = -((numMembers * cCol) + totalCDob);
+            costs.penalizacionMaula = this.calculateHistoricalPenalty('maula', null, jDate);
         }
 
         return costs;
@@ -374,9 +378,11 @@ class BoteEngine {
     }
 
     calculateHistoricalPenalty(type, value, date) {
+        const defaultMaulaVal = this.config.penalizacionMaula !== undefined ? parseFloat(this.config.penalizacionMaula) : 1.00;
         if (!date || isNaN(date.getTime())) {
             if (type === 'unos' && value >= 10) return this.calculatePenalizacionUnos(value);
             if (type === 'pig') return this.config.penalizacionPIG || 1.00;
+            if (type === 'maula' || type === 'perdedor') return defaultMaulaVal;
             if (type === 'bajos_aciertos') return { 0: 1.0, 1: 0.8, 2: 0.6, 3: 0.4 }[value] || 0;
             return 0;
         }
@@ -391,6 +397,7 @@ class BoteEngine {
             if (!setting) {
                 if (type === 'unos' && value >= 10) return this.calculatePenalizacionUnos(value);
                 if (type === 'pig') return this.config.penalizacionPIG || 1.00;
+                if (type === 'maula' || type === 'perdedor') return defaultMaulaVal;
                 if (type === 'bajos_aciertos') {
                     return { 0: 1.0, 1: 0.8, 2: 0.6, 3: 0.4 }[value] || 0;
                 }
@@ -406,6 +413,9 @@ class BoteEngine {
         }
         if (type === 'pig') {
             return setting.value !== undefined ? parseFloat(setting.value) : 1.00;
+        }
+        if (type === 'maula' || type === 'perdedor') {
+            return setting.value !== undefined ? parseFloat(setting.value) : defaultMaulaVal;
         }
         return 0;
     }

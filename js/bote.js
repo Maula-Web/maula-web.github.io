@@ -20,6 +20,7 @@ class BoteManager {
             costeColumna: 0.75,
             costeDobles: 10.50,
             aportacionSemanal: 1.50,
+            penalizacionMaula: 1.00,
             boteInicial: 0.00,
             temporadaActual: '2026-2027'
         };
@@ -141,6 +142,9 @@ class BoteManager {
 
         if (boteConfig) {
             this.config = { ...this.config, ...boteConfig };
+            if (this.config.penalizacionMaula === undefined) {
+                this.config.penalizacionMaula = 1.00;
+            }
             // FIX: Enforce 10.50 for costeDobles so sellado is 26.25 (15.75 singles + 10.50 double)
             this.config.costeDobles = 10.50;
             if (this.config.history && this.config.history['costeDobles']) {
@@ -148,6 +152,7 @@ class BoteManager {
             }
         } else {
             this.config.costeDobles = 10.50;
+            this.config.penalizacionMaula = 1.00;
         }
         
         if (this.engine) this.engine.config = this.config;
@@ -489,7 +494,7 @@ class BoteManager {
 
         // Total Ingresos for the Peña = Contributions + Penalties + Member Prizes + Extra Prizes
         const totalIngresos = jornadaMovements.reduce((sum, m) => {
-            const penalties = (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0);
+            const penalties = (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0);
             return sum + (m.aportacion || 0) + penalties + (m.premios || 0);
         }, 0) + extraPrizes;
 
@@ -534,7 +539,7 @@ class BoteManager {
                             <th rowspan="2">Socio</th>
                             <th rowspan="2">Aciertos</th>
                             <th rowspan="2">PAGA</th>
-                            <th colspan="3" style="text-align:center; background: #e65100;">Penalizaciones</th>
+                            <th colspan="4" style="text-align:center; background: #e65100;">Penalizaciones</th>
                             <th rowspan="2">Premios</th>
                             <th rowspan="2" style="background: #e65100; font-size: 0.7rem;">Reembolso Sellado</th>
                             <th rowspan="2">Neto</th>
@@ -544,6 +549,7 @@ class BoteManager {
                             <th style="background: #ff9100; font-size: 0.65rem;">Unos</th>
                             <th style="background: #ff9100; font-size: 0.65rem;">Bajos</th>
                             <th style="background: #ff9100; font-size: 0.65rem;">PIG</th>
+                            <th style="background: #ff9100; font-size: 0.65rem;">Sellar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -568,10 +574,11 @@ class BoteManager {
                     <tr>
                         <td><strong>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}</strong></td>
                         <td style="font-weight:900;">${m.aciertos}</td>
-                        <td class="positive" style="font-weight:bold;">${(m.aportacion + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0)).toFixed(2)}€</td>
+                        <td class="positive" style="font-weight:bold;">${(m.aportacion + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0)).toFixed(2)}€</td>
                         <td class="negative">${(m.penalizacionUnos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionBajosAciertos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionPIG || 0).toFixed(1)}€</td>
+                        <td class="negative">${(m.penalizacionMaula || 0).toFixed(1)}€</td>
                         <td class="positive" title="Premio acumulado en el Bote Peña">${m.premios.toFixed(2)}€</td>
                         <td>${selladoUI}</td>
                         <td class="${m.neto >= 0 ? 'positive' : 'negative'}">${m.neto.toFixed(2)}€</td>
@@ -771,6 +778,10 @@ class BoteManager {
         document.getElementById('config-bote-inicial').value = this.config.boteInicial;
 
         const history = this.config.penalties_history || {};
+        const maulaSetting = (history.maula || []).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        const elMaula = document.getElementById('config-penalizacion-maula');
+        if (elMaula) elMaula.value = maulaSetting ? maulaSetting.value : (this.config.penalizacionMaula !== undefined ? this.config.penalizacionMaula : 1.00);
+
         const pigSetting = (history.pig || []).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
         document.getElementById('config-penalizacion-pig').value = pigSetting ? pigSetting.value : 1.00;
 
@@ -957,6 +968,14 @@ class BoteManager {
         // Advanced Penalties History
         if (!this.config.penalties_history) this.config.penalties_history = {};
 
+        // Perdedor / Sellar
+        const elMaulaVal = document.getElementById('config-penalizacion-maula');
+        if (elMaulaVal) {
+            const maulaValue = parseFloat(elMaulaVal.value);
+            this.config.penalizacionMaula = maulaValue;
+            this.addPenaltyToHistory('maula', { date: today, value: maulaValue });
+        }
+
         // PIG
         const pigValue = parseFloat(document.getElementById('config-penalizacion-pig').value);
         this.addPenaltyToHistory('pig', { date: today, value: pigValue });
@@ -1007,10 +1026,10 @@ class BoteManager {
     exportData() {
         const movements = this.calculateAllMovements();
 
-        let csv = 'Socio,Jornada,Fecha,Aciertos,Aportación,Columna,Pen.1s,Pen.Bajos,PIG,Sellado,Premios,Total Ingresos,Total Gastos,Neto,Bote Acumulado,Exento,Juega Dobles\n';
+        let csv = 'Socio,Jornada,Fecha,Aciertos,Aportación,Columna,Pen.1s,Pen.Bajos,PIG,Pen.Sellar,Sellado,Premios,Total Ingresos,Total Gastos,Neto,Bote Acumulado,Exento,Juega Dobles\n';
 
         movements.forEach(m => {
-            csv += `${m.memberName},${m.jornadaNum},${m.jornadaDate},${m.aciertos},${m.aportacion},${m.costeColumna},${m.penalizacionUnos},${m.penalizacionBajosAciertos},${m.penalizacionPIG},${m.sellado},${m.premios},${m.totalIngresos},${m.totalGastos},${m.neto},${m.boteAcumulado},${m.exento ? 'Sí' : 'No'},${m.jugaDobles ? 'Sí' : 'No'}\n`;
+            csv += `${m.memberName},${m.jornadaNum},${m.jornadaDate},${m.aciertos},${m.aportacion},${m.costeColumna},${m.penalizacionUnos},${m.penalizacionBajosAciertos},${m.penalizacionPIG},${m.penalizacionMaula || 0},${m.sellado},${m.premios},${m.totalIngresos},${m.totalGastos},${m.neto},${m.boteAcumulado},${m.exento ? 'Sí' : 'No'},${m.jugaDobles ? 'Sí' : 'No'}\n`;
         });
 
         // Download
@@ -1506,7 +1525,7 @@ class BoteManager {
                 let style = '';
 
                 if (mov) {
-                    const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0);
+                    const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0);
                     const payment = mov.aportacion + penalties;
 
                     cellContent = `<div style="font-size:1.1rem; font-weight:900; color: inherit;">${payment.toFixed(1)}€</div>`;
@@ -1525,6 +1544,7 @@ class BoteManager {
                         if (mov.penalizacionUnos > 0) tooltip.push(`• Exceso de Unos: ${mov.penalizacionUnos.toFixed(2)}€`);
                         if (mov.penalizacionBajosAciertos > 0) tooltip.push(`• Bajos Aciertos: ${mov.penalizacionBajosAciertos.toFixed(2)}€`);
                         if (mov.penalizacionPIG > 0) tooltip.push(`• Fallo en PIG: ${mov.penalizacionPIG.toFixed(2)}€`);
+                        if (mov.penalizacionMaula > 0) tooltip.push(`• Pen. Sellador: ${mov.penalizacionMaula.toFixed(2)}€`);
                         clickHandler = `onclick="window.Bote.showPenaltyDetail('${member.name}', ${j.number}, '${tooltip.join('<br>')}')"`;
                     }
 
@@ -2037,7 +2057,7 @@ class BoteManager {
             if (m.type === 'jornada' && jornadasMap[m.jornadaNum]) {
                 const jData = jornadasMap[m.jornadaNum];
                 jData.aportaciones += (m.aportacion || 0);
-                jData.penalizaciones += (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0);
+                jData.penalizaciones += (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0);
                 // Note: m.premios are prizes kept by member (usually). Wait, in current model prizes > 0 make member EXEMPT from paying next time, but prizes go to the member? No, "peñaIn" includes prizes?
                 // Let's re-read calculateAllMovements.
                 // pennaIn: costs.aportacion + penalties + prizes + extraPrizes.
