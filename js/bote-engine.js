@@ -534,23 +534,26 @@ class BoteEngine {
             return false;
         }
 
-        const jornadaPronosticos = pronosticos.filter(p => (p.jId === prevJornada.id || p.jornadaId === prevJornada.id));
+        const jornadaPronosticos = pronosticos.filter(p =>
+            (String(p.jId || p.jornadaId) === String(prevJornada.id) ||
+                parseInt(p.jId || p.jornadaId) === prevJornada.number)
+        );
         if (jornadaPronosticos.length === 0) return false;
 
         const scores = jornadaPronosticos.map(p => {
             const currentSelection = p.selection || p.forecast;
             const aciertos = this.calculateAciertos(prevJornada.matches, currentSelection);
             const points = this.calculatePoints(aciertos, p);
-            return { memberId: p.memberId || p.mId, points: points };
+            return { memberId: String(p.memberId || p.mId), points: points };
         });
 
         const minPoints = Math.min(...scores.map(s => s.points));
         const losers = scores.filter(s => s.points === minPoints);
 
-        if (losers.length === 1) return losers[0].memberId === memberId;
+        if (losers.length === 1) return losers[0].memberId === String(memberId);
 
         const finalLoserId = this.resolveTie(losers.map(l => l.memberId), prevJornada.number - 1, 'min', jornadas, pronosticos);
-        return finalLoserId === memberId;
+        return String(finalLoserId) === String(memberId);
     }
 
     resolveTie(memberIds, jornadaNum, type, jornadas, pronosticos) {
@@ -560,8 +563,11 @@ class BoteEngine {
         if (!prevJornada) return this.resolveTie(memberIds, jornadaNum - 1, type, jornadas, pronosticos);
 
         const scores = memberIds.map(mId => {
-            const pronostico = pronosticos.find(p => (p.jId === prevJornada.id || p.jornadaId === prevJornada.id) && (p.mId === mId || p.memberId === mId));
-            if (!pronostico) return { mId, points: 0 };
+            const pronostico = pronosticos.find(p => 
+                (String(p.jId || p.jornadaId) === String(prevJornada.id) || parseInt(p.jId || p.jornadaId) === prevJornada.number) && 
+                String(p.mId || p.memberId) === String(mId)
+            );
+            if (!pronostico) return { mId: String(mId), points: 0 };
             const currentSelection = pronostico.selection || pronostico.forecast;
             const aciertos = this.calculateAciertos(prevJornada.matches, currentSelection);
             const points = this.calculatePoints(aciertos, pronostico);
