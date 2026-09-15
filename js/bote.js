@@ -439,7 +439,7 @@ class BoteManager {
             html += `
                 <tr>
                     <td><strong>${summary.nickname || summary.name}</strong></td>
-                    <td class="positive">${summary.totalIngresos.toFixed(2)} €</td>
+                    <td class="${summary.totalIngresos < 0 ? 'negative' : 'positive'}">${summary.totalIngresos.toFixed(2)} €</td>
                     <td class="negative">${summary.totalGastos.toFixed(2)} €</td>
                     <td class="${boteClass}">${summary.bote.toFixed(2)} €</td>
                     <td>
@@ -680,7 +680,7 @@ class BoteManager {
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
                     <div style="padding:0.5rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
                         <div style="font-size:0.6rem; opacity:0.6; text-transform:uppercase;">Ingresos (+)</div>
-                        <div class="positive" style="font-weight:bold;">${memberMovements.reduce((s, m) => s + m.totalIngresos, 0).toFixed(2)}€</div>
+                        <div class="${memberMovements.reduce((s, m) => s + m.totalIngresos, 0) < 0 ? 'negative' : 'positive'}" style="font-weight:bold;">${memberMovements.reduce((s, m) => s + m.totalIngresos, 0).toFixed(2)}€</div>
                     </div>
                     <div style="padding:0.5rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
                         <div style="font-size:0.6rem; opacity:0.6; text-transform:uppercase;">Gastos (-)</div>
@@ -714,7 +714,7 @@ class BoteManager {
             memberMovements.forEach(m => {
                 const selladoReembolso = (!m.isSelladoInCash && m.sellado < 0) ? Math.abs(m.sellado) : 0;
                 const totalIn = (m.totalIngresos || 0) + selladoReembolso;
-                const totalOut = m.totalGastos || Math.abs(m.neto < 0 ? m.neto : 0) || 0; // Capture negative neto for repartos/cierres
+                const totalOut = m.totalGastos || (m.isIngresoLibre ? 0 : Math.abs(m.neto < 0 ? m.neto : 0)) || 0;
                 
                 let jText = m.jornadaNum !== undefined && m.jornadaNum !== null ? m.jornadaNum : '-';
                 let dateText = m.jornadaDate || m.date || '-';
@@ -725,8 +725,8 @@ class BoteManager {
                 if (m.isIngresoLibre) jText = 'ING';
 
                 let ingresoUI = '-';
-                if (totalIn > 0) {
-                    ingresoUI = '+' + totalIn.toFixed(2) + '€';
+                if (totalIn !== 0) {
+                    ingresoUI = (totalIn > 0 ? '+' : '') + totalIn.toFixed(2) + '€';
                     if (selladoReembolso > 0) {
                         ingresoUI += ' <span title="Reembolso de Sellado" style="font-size:0.7rem; cursor:help;">🎟️</span>';
                     }
@@ -739,7 +739,7 @@ class BoteManager {
                         <td style="padding:0.75rem;"><strong title="${m.description || ''}">${jText}</strong></td>
                         <td style="padding:0.75rem; font-size:0.8rem; opacity:0.7;">${dateText}</td>
                         <td style="padding:0.75rem; text-align:center;">${aciertosUI}</td>
-                        <td class="positive" style="padding:0.75rem; text-align:right; font-weight:bold;">${ingresoUI}</td>
+                        <td class="${totalIn < 0 ? 'negative' : 'positive'}" style="padding:0.75rem; text-align:right; font-weight:bold;">${ingresoUI}</td>
                         <td class="negative" style="padding:0.75rem; text-align:right;">${totalOut > 0 ? '-' + totalOut.toFixed(2) + '€' : '0.00€'}</td>
                         <td style="padding:0.75rem; text-align:right; font-weight:900; color: ${m.boteAcumulado >= 0 ? '#4CAF50' : '#ff5252'}; background:rgba(255,255,255,0.02);">${m.boteAcumulado.toFixed(2)}€</td>
                     </tr>
@@ -856,7 +856,7 @@ class BoteManager {
                 <tr>
                     <td>${fecha}</td>
                     <td>${memberName}</td>
-                    <td class="positive">${parseFloat(ingreso.cantidad).toFixed(2)} €</td>
+                    <td class="${parseFloat(ingreso.cantidad) >= 0 ? 'positive' : 'negative'}">${parseFloat(ingreso.cantidad).toFixed(2)} €</td>
                     <td>${ingreso.metodo}</td>
                     <td>${concepto}</td>
                     <td>
