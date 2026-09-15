@@ -125,6 +125,7 @@ class BoteEngine {
                         exento: costs.exento,
                         jugaDobles: costs.jugaDobles,
                         isSelladoInCash: isSelladoInCash,
+                        isLoser: costs.isLoser,
                         pennaIn: costs.aportacion + penalties + prizes + extraPrizes,
                         pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
                     });
@@ -321,11 +322,11 @@ class BoteEngine {
             return costs;
         }
 
-        let isMaula = false;
+        let isSealer = false;
         if (jornadaIndex > 0) {
             const prevJornada = jornadas[jornadaIndex - 1];
             if (this.wasLoserOfJornada(memberId, prevJornada, members, jornadas, pronosticos)) {
-                isMaula = true;
+                isSealer = true;
             }
         } else if (jornada.number === 1) {
             const member = members.find(m => String(m.id) === String(memberId));
@@ -333,9 +334,9 @@ class BoteEngine {
                 const nameLow = member.name.toLowerCase();
                 const is2026 = (this.config.temporadaActual || '').includes('2026');
                 if (is2026 && nameLow === 'edu') {
-                    isMaula = true;
+                    isSealer = true;
                 } else if (!is2026 && nameLow.includes('luismi')) {
-                    isMaula = true;
+                    isSealer = true;
                 }
             }
         }
@@ -343,14 +344,14 @@ class BoteEngine {
         const sustitutoId = jornada.sustitutoSellado;
         if (sustitutoId) {
             if (String(memberId) === String(sustitutoId)) {
-                isMaula = true;
+                isSealer = true;
                 costs.isSustituto = true;
-            } else if (isMaula) {
-                isMaula = false;
+            } else if (isSealer) {
+                isSealer = false;
             }
         }
 
-        if (isMaula) {
+        if (isSealer) {
             const cCol = this.getHistoricalPrice('costeColumna', jDate);
             const cDob = this.getHistoricalPrice('costeDobles', jDate);
 
@@ -364,6 +365,17 @@ class BoteEngine {
             const totalCDob = numExtras * cDob;
 
             costs.sellado = -((numMembers * cCol) + totalCDob);
+        }
+
+        let isCurrentLoser = false;
+        if (jornadaPlayed) {
+            if (this.wasLoserOfJornada(memberId, jornada, members, jornadas, pronosticos)) {
+                isCurrentLoser = true;
+                costs.isLoser = true;
+            }
+        }
+
+        if (isCurrentLoser) {
             costs.penalizacionMaula = this.calculateHistoricalPenalty('maula', null, jDate);
         }
 
