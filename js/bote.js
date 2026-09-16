@@ -718,7 +718,7 @@ class BoteManager {
                 
                 let jText = m.jornadaNum !== undefined && m.jornadaNum !== null ? m.jornadaNum : '-';
                 let dateText = m.jornadaDate || m.date || '-';
-                let aciertosUI = m.aciertos !== undefined ? `${m.aciertos}${m.exento ? ' <span title="Exento" style="color:#ff9100;">🎁</span>' : ''}${m.premios > 0 ? ' <span title="Premio" style="color:#81c784;">🏆</span>' : ''}${m.isLoser ? ' <span title="Perdedor de la jornada" style="font-size:1.1rem;">💩</span>' : ''}` : '-';
+                let aciertosUI = m.aciertos !== undefined ? `${m.aciertos}${m.exento ? ' <span title="Exento" style="color:#ff9100;">🎁</span>' : ''}${m.premios > 0 ? ' <span title="Premio" style="color:#81c784;">🏆</span>' : ''}${m.isLoser ? ' <span title="Perdedor de la jornada" style="font-size:1.1rem;">💀</span>' : ''}` : '-';
                 
                 if (m.isReparto) jText = 'REP';
                 if (m.isCierreVuelta) jText = 'PEN';
@@ -1529,7 +1529,7 @@ class BoteManager {
                     const payment = mov.aportacion + penalties;
 
                     cellContent = `<div style="font-size:1.1rem; font-weight:900; color: inherit;">${payment.toFixed(1)}€</div>`;
-                    cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${mov.isLoser ? ' 💩' : ''}</div>`;
+                    cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${mov.isLoser ? ' 💀' : ''}</div>`;
                     if (mov.premios > 0) {
                         cellContent += `<div style="background: rgba(76, 175, 80, 0.2); color: #81c784; font-weight: bold; font-size: 0.75rem; margin-top:4px; padding: 2px 4px; border-radius: 4px; border: 1px solid #4CAF50;">+${mov.premios.toFixed(2)}€ 🏆</div>`;
                     }

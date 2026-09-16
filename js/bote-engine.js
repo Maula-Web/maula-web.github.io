@@ -546,44 +546,104 @@ class BoteEngine {
             return false;
         }
 
-        const jornadaPronosticos = pronosticos.filter(p =>
-            (String(p.jId || p.jornadaId) === String(prevJornada.id) ||
-                parseInt(p.jId || p.jornadaId) === prevJornada.number)
-        );
-        if (jornadaPronosticos.length === 0) return false;
+        const prizeThreshold = prevJornada.minHitsToWin || 10;
+        const jDate = window.AppUtils ? window.AppUtils.parseDate(prevJornada.date) : new Date(prevJornada.date);
 
-        const scores = jornadaPronosticos.map(p => {
-            const currentSelection = p.selection || p.forecast;
-            const aciertos = this.calculateAciertos(prevJornada.matches, currentSelection);
-            const points = this.calculatePoints(aciertos, p);
-            return { memberId: String(p.memberId || p.mId), points: points };
+        // Build results for ALL members
+        const memberResults = (members || []).map(m => {
+            const mIdStr = String(m.id);
+            const p = pronosticos ? pronosticos.find(pr =>
+                (String(pr.jId || pr.jornadaId) === String(prevJornada.id) || parseInt(pr.jId || pr.jornadaId) === prevJornada.number) &&
+                String(pr.mId || pr.memberId) === mIdStr
+            ) : null;
+
+            let hasPronostico = false;
+            let isLate = false;
+            let isPardoned = false;
+            let hits = 0;
+            let points = 0;
+
+            if (p) {
+                if (window.ScoringSystem && typeof window.ScoringSystem.evaluateMember === 'function') {
+                    const ev = window.ScoringSystem.evaluateMember(m, prevJornada, p, { forceFinished: true });
+                    if (ev.played) {
+                        hasPronostico = true;
+                        isLate = ev.isLate;
+                        isPardoned = ev.isPardoned;
+                        hits = ev.hits;
+                        points = ev.points;
+                    }
+                } else {
+                    const sel = p.selection || p.forecast;
+                    if (sel && Array.isArray(sel) && sel.some(s => s && String(s).trim() !== '' && String(s) !== '-')) {
+                        hasPronostico = true;
+                        isLate = p.late || false;
+                        isPardoned = p.pardoned || false;
+                        hits = this.calculateAciertos(prevJornada.matches, sel);
+                        points = this.calculatePoints(hits, p);
+                    }
+                }
+            }
+
+            return {
+                memberId: mIdStr,
+                hits,
+                points,
+                isLate,
+                isPardoned,
+                hasPronostico
+            };
         });
 
-        const minPoints = Math.min(...scores.map(s => s.points));
-        const losers = scores.filter(s => s.points === minPoints);
+        if (memberResults.length === 0) return false;
 
-        if (losers.length === 1) return losers[0].memberId === String(memberId);
+        // Condition A: Offenders (Missing pronostico or unpardoned late with hits < prizeThreshold)
+        const offenders = memberResults.filter(r =>
+            !r.hasPronostico || (r.isLate && !r.isPardoned && r.hits < prizeThreshold)
+        );
 
-        const finalLoserId = this.resolveTie(losers.map(l => l.memberId), prevJornada.number - 1, 'min', jornadas, pronosticos);
+        let maulaCandidates = [];
+        if (offenders.length > 0) {
+            maulaCandidates = offenders;
+        } else {
+            // Condition B: Lowest points
+            const minPoints = Math.min(...memberResults.map(r => r.points));
+            maulaCandidates = memberResults.filter(r => r.points === minPoints);
+        }
+
+        if (maulaCandidates.length === 1) {
+            return String(maulaCandidates[0].memberId) === String(memberId);
+        }
+
+        // Tie-break: Recursive check & deterministic fallback (higher memberId)
+        const finalLoserId = this.resolveTie(maulaCandidates.map(c => c.memberId), prevJornada.number - 1, 'min', jornadas, pronosticos);
         return String(finalLoserId) === String(memberId);
     }
 
     resolveTie(memberIds, jornadaNum, type, jornadas, pronosticos) {
-        if (memberIds.length <= 1 || jornadaNum <= 0) return memberIds[0];
+        if (memberIds.length <= 1 || jornadaNum <= 0) {
+            if (!memberIds || memberIds.length === 0) return null;
+            return [...memberIds].sort((a, b) => Number(b) - Number(a))[0];
+        }
 
         const prevJornada = jornadas.find(j => j.number === jornadaNum);
         if (!prevJornada) return this.resolveTie(memberIds, jornadaNum - 1, type, jornadas, pronosticos);
 
         const scores = memberIds.map(mId => {
-            const pronostico = pronosticos.find(p => 
+            const pronostico = pronosticos ? pronosticos.find(p => 
                 (String(p.jId || p.jornadaId) === String(prevJornada.id) || parseInt(p.jId || p.jornadaId) === prevJornada.number) && 
                 String(p.mId || p.memberId) === String(mId)
-            );
-            if (!pronostico) return { mId: String(mId), points: 0 };
+            ) : null;
+
+            if (!pronostico) return { mId: String(mId), points: -5 };
+
             const currentSelection = pronostico.selection || pronostico.forecast;
+            if (!currentSelection || !Array.isArray(currentSelection)) return { mId: String(mId), points: -5 };
+
             const aciertos = this.calculateAciertos(prevJornada.matches, currentSelection);
-            const points = this.calculatePoints(aciertos, pronostico);
-            return { mId, points };
+            const jDate = window.AppUtils ? window.AppUtils.parseDate(prevJornada.date) : new Date(prevJornada.date);
+            const points = window.ScoringSystem ? window.ScoringSystem.calculateScore(aciertos, jDate) : this.calculatePoints(aciertos, pronostico);
+            return { mId: String(mId), points };
         });
 
         const targetPoints = (type === 'max') ? Math.max(...scores.map(s => s.points)) : Math.min(...scores.map(s => s.points));
