@@ -572,7 +572,7 @@ class BoteManager {
 
                 html += `
                     <tr>
-                        <td><strong>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}${(m.isLoser || m.penalizacionMaula > 0) ? ' 💀' : ''}${(m.isSealer || m.sellado < 0) ? ' 🎟️' : ''}</strong></td>
+                        <td><strong>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}${(m.isSealer || m.sellado < 0) ? ' 💀' : ''}</strong></td>
                         <td style="font-weight:900;">${m.aciertos}</td>
                         <td class="positive" style="font-weight:bold;">${(m.aportacion + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0)).toFixed(2)}€</td>
                         <td class="negative">${(m.penalizacionUnos || 0).toFixed(1)}€</td>
@@ -1540,7 +1540,7 @@ class BoteManager {
                     const payment = mov.aportacion + penalties;
 
                     cellContent = `<div style="font-size:1.1rem; font-weight:900; color: inherit;">${payment.toFixed(1)}€</div>`;
-                    cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${(mov.isSealer || mov.sellado < 0) ? ' 💀' : ''}</div>`;
+                    cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${(mov.isLoser || mov.penalizacionMaula > 0) ? ' 💀' : ''}</div>`;
                     if (mov.premios > 0) {
                         cellContent += `<div style="background: rgba(76, 175, 80, 0.2); color: #81c784; font-weight: bold; font-size: 0.75rem; margin-top:4px; padding: 2px 4px; border-radius: 4px; border: 1px solid #4CAF50;">+${mov.premios.toFixed(2)}€ 🏆</div>`;
                     }
