@@ -262,19 +262,35 @@ class BoteEngine {
             }
         }
 
-        const matchesExtra = pronosticosExtra ? pronosticosExtra.filter(p =>
-            (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number) || parseInt(p.jId || p.jornadaId) === jornada.number) &&
-            p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
-        ) : [];
+        if (jornada.number === 1) {
+            const member = members.find(m => String(m.id) === String(memberId));
+            if (member && member.name) {
+                const nameLow = member.name.toLowerCase();
+                if (nameLow.includes('alvaro') || nameLow.includes('álvaro')) {
+                    costs.jugaDobles = true;
+                }
+            }
+        } else {
+            const myExtra = pronosticosExtra ? pronosticosExtra.find(p =>
+                (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number) || parseInt(p.jId || p.jornadaId) === jornada.number) &&
+                String(p.mId || p.memberId) === String(memberId) &&
+                p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
+            ) : null;
 
-        if (matchesExtra.length > 0) {
-            const officialExtra = matchesExtra[matchesExtra.length - 1];
-            const extraOwnerId = officialExtra ? String(officialExtra.mId || officialExtra.memberId) : null;
-            costs.jugaDobles = (extraOwnerId !== null && String(memberId) === extraOwnerId);
-        } else if (jornadaIndex > 0) {
-            const prevJornada = jornadas[jornadaIndex - 1];
-            if (this.wasWinnerOfJornada(memberId, prevJornada, members, jornadas, pronosticos)) {
+            if (myExtra) {
                 costs.jugaDobles = true;
+            } else if (jornadaIndex > 0) {
+                const anyExtra = pronosticosExtra ? pronosticosExtra.some(p =>
+                    (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number) || parseInt(p.jId || p.jornadaId) === jornada.number) &&
+                    p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
+                ) : false;
+
+                if (!anyExtra) {
+                    const prevJornada = jornadas[jornadaIndex - 1];
+                    if (this.wasWinnerOfJornada(memberId, prevJornada, members, jornadas, pronosticos)) {
+                        costs.jugaDobles = true;
+                    }
+                }
             }
         }
 
