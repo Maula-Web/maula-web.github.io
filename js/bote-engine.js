@@ -126,6 +126,7 @@ class BoteEngine {
                         jugaDobles: costs.jugaDobles,
                         isSelladoInCash: isSelladoInCash,
                         isLoser: costs.isLoser,
+                        isSealer: costs.isSealer || (costs.sellado < 0),
                         pennaIn: costs.aportacion + penalties + prizes + extraPrizes,
                         pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
                     });
@@ -354,6 +355,7 @@ class BoteEngine {
         }
 
         if (isSealer) {
+            costs.isSealer = true;
             const cCol = this.getHistoricalPrice('costeColumna', jDate);
             const cDob = this.getHistoricalPrice('costeDobles', jDate);
 
@@ -711,15 +713,9 @@ class BoteEngine {
 
     calculatePoints(aciertos, pronostico) {
         let points = aciertos;
-        const selection = pronostico.selection || pronostico.forecast;
 
         if (aciertos <= 3) points -= (4 - aciertos);
         if (pronostico.isLate && !pronostico.pardoned) points -= 2;
-
-        if (selection && Array.isArray(selection)) {
-            const numUnos = selection.slice(0, 14).filter(f => f === '1').length;
-            if (numUnos >= 10) points -= 1;
-        }
 
         return points;
     }
