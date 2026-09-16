@@ -718,11 +718,19 @@ class BoteManager {
                 
                 let jText = m.jornadaNum !== undefined && m.jornadaNum !== null ? m.jornadaNum : '-';
                 let dateText = m.jornadaDate || m.date || '-';
-                let aciertosUI = m.aciertos !== undefined ? `${m.aciertos}${m.exento ? ' <span title="Exento" style="color:#ff9100;">🎁</span>' : ''}${m.premios > 0 ? ' <span title="Premio" style="color:#81c784;">🏆</span>' : ''}${(m.isSealer || m.sellado < 0) ? ' <span title="Sellador de la quiniela" style="font-size:1.1rem;">💀</span>' : ''}` : '-';
+                let aciertosUI = m.aciertos !== undefined ? `${m.aciertos}${m.exento ? ' <span title="Exento" style="color:#ff9100;">🎁</span>' : ''}${m.premios > 0 ? ' <span title="Premio" style="color:#81c784;">🏆</span>' : ''}` : '-';
                 
                 if (m.isReparto) jText = 'REP';
                 if (m.isCierreVuelta) jText = 'PEN';
                 if (m.isIngresoLibre) jText = 'ING';
+
+                let jBadge = `<strong title="${m.description || ''}">${jText}</strong>`;
+                if (m.jugaDobles) {
+                    jBadge += ` <span title="Juega Quiniela de Dobles" style="font-size:1.05rem;">2️⃣</span>`;
+                }
+                if (m.isSealer || m.sellado < 0) {
+                    jBadge += ` <span title="Sellador de la quiniela" style="font-size:1.05rem;">💀</span>`;
+                }
 
                 let ingresoUI = '-';
                 if (totalIn !== 0) {
@@ -736,7 +744,7 @@ class BoteManager {
 
                 html += `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${m.isIngresoLibre ? 'background: rgba(76, 175, 80, 0.1);' : m.isReparto ? 'background: rgba(33, 150, 243, 0.1);' : m.isCierreVuelta ? 'background: rgba(255, 82, 82, 0.1);' : ''}">
-                        <td style="padding:0.75rem;"><strong title="${m.description || ''}">${jText}</strong></td>
+                        <td style="padding:0.75rem;">${jBadge}</td>
                         <td style="padding:0.75rem; font-size:0.8rem; opacity:0.7;">${dateText}</td>
                         <td style="padding:0.75rem; text-align:center;">${aciertosUI}</td>
                         <td class="${totalIn < 0 ? 'negative' : 'positive'}" style="padding:0.75rem; text-align:right; font-weight:bold;">${ingresoUI}</td>
