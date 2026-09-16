@@ -261,14 +261,16 @@ class BoteEngine {
             }
         }
 
-        const matchesExtra = pronosticosExtra.filter(p =>
-            (String(p.jId) === String(jornada.id) || String(p.jId) === String(jornada.number))
-        );
-        const hasExtra = matchesExtra.some(p => String(p.mId) === String(memberId));
+        const matchesExtra = pronosticosExtra ? pronosticosExtra.filter(p =>
+            (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number))
+        ) : [];
 
-        if (hasExtra) {
-            costs.jugaDobles = true;
-        } else if (matchesExtra.length === 0 && jornadaIndex > 0) {
+        if (matchesExtra.length > 0) {
+            const validExtras = matchesExtra.filter(p => p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'));
+            const latestExtra = validExtras.length > 0 ? validExtras[validExtras.length - 1] : matchesExtra[matchesExtra.length - 1];
+            const extraOwnerId = latestExtra ? String(latestExtra.mId || latestExtra.memberId) : null;
+            costs.jugaDobles = (extraOwnerId !== null && String(memberId) === extraOwnerId);
+        } else if (jornadaIndex > 0) {
             const prevJornada = jornadas[jornadaIndex - 1];
             if (this.wasWinnerOfJornada(memberId, prevJornada, members, jornadas, pronosticos)) {
                 costs.jugaDobles = true;
@@ -519,23 +521,73 @@ class BoteEngine {
             return false;
         }
 
-        const jornadaPronosticos = pronosticos.filter(p =>
-            (String(p.jId || p.jornadaId) === String(prevJornada.id) ||
-                parseInt(p.jId || p.jornadaId) === prevJornada.number)
-        );
-        if (jornadaPronosticos.length === 0) return false;
+        const prizeThreshold = prevJornada.minHitsToWin || 10;
 
-        const scores = jornadaPronosticos.map(p => {
-            const currentSelection = p.selection || p.forecast;
-            const aciertos = this.calculateAciertos(prevJornada.matches, currentSelection);
-            const points = this.calculatePoints(aciertos, p);
-            return { memberId: String(p.memberId || p.mId), points: points };
+        // Build member results for prevJornada
+        const memberResults = (members || []).map(m => {
+            const mIdStr = String(m.id);
+            const p = pronosticos ? pronosticos.find(pr =>
+                (String(pr.jId || pr.jornadaId) === String(prevJornada.id) || parseInt(pr.jId || pr.jornadaId) === prevJornada.number) &&
+                String(pr.mId || pr.memberId) === mIdStr
+            ) : null;
+
+            let hasPronostico = false;
+            let isLate = false;
+            let isPardoned = false;
+            let hits = 0;
+            let points = 0;
+
+            if (p) {
+                if (window.ScoringSystem && typeof window.ScoringSystem.evaluateMember === 'function') {
+                    const ev = window.ScoringSystem.evaluateMember(m, prevJornada, p, { forceFinished: true });
+                    if (ev.played) {
+                        hasPronostico = true;
+                        isLate = ev.isLate;
+                        isPardoned = ev.isPardoned;
+                        hits = ev.hits;
+                        points = ev.points;
+                    }
+                } else {
+                    const sel = p.selection || p.forecast;
+                    if (sel && Array.isArray(sel) && sel.some(s => s && String(s).trim() !== '' && String(s) !== '-')) {
+                        hasPronostico = true;
+                        isLate = p.late || false;
+                        isPardoned = p.pardoned || false;
+                        hits = this.calculateAciertos(prevJornada.matches, sel);
+                        points = this.calculatePoints(hits, p);
+                    }
+                }
+            }
+
+            return {
+                memberId: mIdStr,
+                hits,
+                points,
+                isLate,
+                isPardoned,
+                hasPronostico
+            };
         });
 
-        const maxPoints = Math.max(...scores.map(s => s.points));
-        const winners = scores.filter(s => s.points === maxPoints);
+        if (memberResults.length === 0) return false;
 
-        if (winners.length === 1) return String(winners[0].memberId) === String(memberId);
+        // Eligible for winner: must have valid forecast, or if late must be pardoned or hits >= prizeThreshold
+        const eligibleForWinner = memberResults.filter(r => {
+            if (!r.hasPronostico) return false;
+            if (!r.isLate) return true;
+            if (r.isPardoned) return true;
+            if (r.hits >= prizeThreshold) return true;
+            return false;
+        });
+
+        if (eligibleForWinner.length === 0) return false;
+
+        const maxPoints = Math.max(...eligibleForWinner.map(r => r.points));
+        const winners = eligibleForWinner.filter(r => r.points === maxPoints);
+
+        if (winners.length === 1) {
+            return String(winners[0].memberId) === String(memberId);
+        }
 
         const finalWinnerId = this.resolveTie(winners.map(w => w.memberId), prevJornada.number - 1, 'max', jornadas, pronosticos);
         return String(finalWinnerId) === String(memberId);
@@ -623,7 +675,11 @@ class BoteEngine {
     resolveTie(memberIds, jornadaNum, type, jornadas, pronosticos) {
         if (memberIds.length <= 1 || jornadaNum <= 0) {
             if (!memberIds || memberIds.length === 0) return null;
-            return [...memberIds].sort((a, b) => Number(b) - Number(a))[0];
+            if (type === 'max') {
+                return [...memberIds].sort((a, b) => Number(a) - Number(b))[0];
+            } else {
+                return [...memberIds].sort((a, b) => Number(b) - Number(a))[0];
+            }
         }
 
         const prevJornada = jornadas.find(j => j.number === jornadaNum);
