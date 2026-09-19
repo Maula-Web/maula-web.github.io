@@ -3720,3 +3720,68 @@ body.mobile-mode .p-divider {
 [data-theme="dark"] .pronosticos-page .doubles-p15-badge.empty {
     background: #546e7a;
 }
+
+/* ==========================================================================
+   DICE SYSTEM (EL DADO DE QUINIELAS 🎲)
+   ========================================================================== */
+.table-socio-header-dice {
+    min-width: 140px;
+    text-align: center;
+}
+
+.dice-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dice-active {
+    background: rgba(103, 58, 183, 0.12);
+    color: #673ab7;
+    border: 1px solid rgba(103, 58, 183, 0.35);
+}
+
+.dice-inactive {
+    background: rgba(158, 158, 158, 0.1);
+    color: #757575;
+    border: 1px solid rgba(158, 158, 158, 0.25);
+}
+
+.dice-exhausted {
+    background: rgba(244, 67, 54, 0.1);
+    color: #d32f2f;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.sf-dice-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    line-height: 1;
+    margin-right: 4px;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+[data-theme="dark"] .dice-active {
+    background: rgba(179, 136, 255, 0.15);
+    color: #d1c4e9;
+    border-color: rgba(179, 136, 255, 0.4);
+}
+
+[data-theme="dark"] .dice-inactive {
+    background: rgba(255, 255, 255, 0.05);
+    color: #aaa;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .dice-exhausted {
+    background: rgba(239, 83, 80, 0.2);
+    color: #ef9a9a;
+    border-color: rgba(239, 83, 80, 0.4);
+}

@@ -16,6 +16,14 @@ class DashboardManager {
             this.pronosticos = data.pronosticos;
             this.pronosticosExtra = data.pronosticosExtra;
 
+            if (window.DiceService) {
+                try {
+                    await window.DiceService.checkAndApplyDice(this.members, this.jornadas, this.pronosticos);
+                } catch (errDice) {
+                    console.error("Error ejecutando DiceService en dashboard:", errDice);
+                }
+            }
+
             // Ensure Rules are loaded
             if (window.ScoringSystem && window.ScoringSystem.getConfig) {
                 window.ScoringSystem.getConfig();

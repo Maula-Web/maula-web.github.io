@@ -12,6 +12,15 @@ class JornadaManager {
         if (window.DataService) {
             await window.DataService.init();
             await this.loadData();
+            if (window.DiceService) {
+                try {
+                    const members = await window.DataService.getAll('members');
+                    const pronosticos = await window.DataService.getAll('pronosticos');
+                    await window.DiceService.checkAndApplyDice(members, this.jornadas, pronosticos);
+                } catch (errDice) {
+                    console.error("Error aplicando dado en jornadas:", errDice);
+                }
+            }
         }
 
         this.renderGrid();
@@ -537,6 +546,14 @@ class JornadaManager {
 
         this.saveSingle(jornadaData);
         this.renderGrid();
+
+        if (window.DiceService && window.DataService) {
+            window.DataService.getAll('members').then(members => {
+                window.DataService.getAll('pronosticos').then(pronosticos => {
+                    window.DiceService.checkAndApplyDice(members, this.jornadas, pronosticos);
+                });
+            }).catch(err => console.error("Error aplicando dado tras guardar jornada:", err));
+        }
 
         // TELEGRAM REPORT TRIGGER
         const isFinished = jornadaData.matches.every(m => m.result && m.result.trim() !== '');

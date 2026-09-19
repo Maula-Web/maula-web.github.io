@@ -197,6 +197,14 @@ class PronosticoManager {
         this.pronosticos = data.pronosticos;
         this.pronosticosExtra = data.pronosticosExtra;
 
+        if (window.DiceService) {
+            try {
+                await window.DiceService.checkAndApplyDice(this.members, this.jornadas, this.pronosticos);
+            } catch (errDice) {
+                console.error("Error ejecutando DiceService:", errDice);
+            }
+        }
+
         this.populateDropdowns();
         this.renderSummaryTable();
         this.bindEvents();
@@ -301,9 +309,15 @@ class PronosticoManager {
 
         const member = this.members.find(m => String(m.id) === String(this.currentMemberId));
         const jornada = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
+        const existing = this.pronosticos.find(p => (String(p.jId) === String(this.currentJornadaId) || String(p.jornadaId) === String(this.currentJornadaId)) && (String(p.mId) === String(this.currentMemberId) || String(p.memberId) === String(this.currentMemberId)));
 
         const memberName = member ? AppUtils.getMemberName(member) : `Socio #${this.currentMemberId}`;
         const jornadaText = jornada ? `Jornada ${jornada.number} (${jornada.date})` : `Jornada #${this.currentJornadaId}`;
+        const diceBadgeHtml = (existing && existing.isDice) ? `
+            <span style="background: rgba(103, 58, 183, 0.12); color: #673ab7; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(103, 58, 183, 0.3); display: inline-flex; align-items: center; gap: 6px;" title="Rellenado automáticamente por El Dado de Quinielas">
+                🎲 <span>Relleno con Dado</span>
+            </span>
+        ` : '';
 
         this.activeSelectionInfo.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -313,6 +327,7 @@ class PronosticoManager {
                 <span style="background: rgba(25, 118, 210, 0.1); color: var(--primary-color, #1976d2); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(25, 118, 210, 0.25); display: inline-flex; align-items: center; gap: 6px;">
                     📅 <span>${jornadaText}</span>
                 </span>
+                ${diceBadgeHtml}
                 <button type="button" id="btn-close-forecast" style="background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3); border-radius: 20px; padding: 5px 12px; font-size: 0.85rem; color: #d32f2f; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: all 0.2s;" title="Cerrar pronóstico">
                     ✖ Cerrar
                 </button>
@@ -434,7 +449,9 @@ class PronosticoManager {
             this.container.style.border = "none";
             // Si la jornada no está bloqueada, el aviso FUERA DE PLAZO no se muestra al abrir
             // (a menos que ya se hubiera guardado con retraso anteriormente de forma informativa).
-            if (existing && existing.late) {
+            if (existing && existing.isDice) {
+                this.statusMsg.innerHTML = '<span class="badge-dice" style="background: rgba(103, 58, 183, 0.12); color: #673ab7; border: 1.5px solid #673ab7; font-weight: bold; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">🎲 PRONÓSTICO AUTORRELLENADO CON DADO</span>';
+            } else if (existing && existing.late) {
                 this.statusMsg.innerHTML = '<span class="badge-late">⚠️ PRONÓSTICO ENVIADO CON RETRASO</span>';
             } else {
                 this.statusMsg.innerHTML = '';
@@ -982,7 +999,8 @@ class PronosticoManager {
                 selection: selection,
                 isReduced: isReduced,
                 timestamp: new Date().toISOString(),
-                late: isLate
+                late: isLate,
+                isDice: false
             };
 
             console.log("🔵 PASO 7: Verificando si necesita auditoría");
@@ -1299,10 +1317,12 @@ class PronosticoManager {
 
                     const lateClass = p.late ? ' late' : '';
                     const lateTitle = p.late ? ' (Enviado con retraso)' : '';
+                    const diceBadge = p.isDice ? '<span class="sf-dice-badge" title="Relleno con Dado 🎲">🎲</span>' : '';
                     const p15Badge = p15Val ? `<span class="sf-p15-badge" title="Pleno al 15: ${p15Val}">P15: ${p15Val}</span>` : '';
 
                     cellContent = `
-                        <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}">
+                        <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}${p.isDice ? ' (Relleno con Dado 🎲)' : ''}">
+                            ${diceBadge}
                             <span class="sf-block">${b1}</span>
                             <span class="sf-sep">|</span>
                             <span class="sf-block">${b2}</span>
@@ -1572,7 +1592,9 @@ class PronosticoManager {
 
             // Member Columns
             sortedMembers.forEach(m => {
-                html += `<th title="${m.name}" style="border: 1px solid #ccc; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${fSizeMember}; color: #333; font-weight: 600; white-space: nowrap; overflow:hidden;">${m.name}</th>`;
+                const f = allForecasts.find(p => String(p.mId || p.memberId) === String(m.id));
+                const diceIcon = (f && f.isDice) ? ' 🎲' : '';
+                html += `<th title="${m.name}${diceIcon ? ' (Relleno con Dado)' : ''}" style="border: 1px solid #ccc; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${fSizeMember}; color: #333; font-weight: 600; white-space: nowrap; overflow:hidden;">${m.name}${diceIcon}</th>`;
             });
 
             // Doubles Columns at the end
