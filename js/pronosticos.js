@@ -22,6 +22,7 @@ class PronosticoManager {
     cacheDOM() {
         this.selMember = document.getElementById('sel-member');
         this.selJornada = document.getElementById('sel-jornada');
+        this.activeSelectionInfo = document.getElementById('active-selection-info');
         this.selMethod = document.getElementById('sel-method');
         this.container = document.getElementById('forecast-container');
         this.statusMsg = document.getElementById('status-message');
@@ -98,12 +99,23 @@ class PronosticoManager {
                         if (mId) {
                             this.selectAndLoad(jId, mId);
                         } else if (cell.dataset.isdoubles) {
-                            if (this.selJornada) {
-                                const parsedJId = parseInt(jId) || jId;
-                                this.currentJornadaId = parsedJId;
-                                this.selJornada.value = parsedJId;
-                                this.loadForecast();
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            const parsedJId = parseInt(jId) || jId;
+                            const jornada = this.jornadas.find(j => j.id == parsedJId);
+                            let targetMemberId = null;
+                            if (jornada && typeof this.checkEligibility === 'function') {
+                                for (const m of this.members) {
+                                    const elig = this.checkEligibility(jornada.number, m.id);
+                                    if (elig && elig.eligible) {
+                                        targetMemberId = m.id;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!targetMemberId && this.members && this.members.length > 0) {
+                                targetMemberId = this.members[0].id;
+                            }
+                            if (targetMemberId) {
+                                this.selectAndLoad(parsedJId, targetMemberId);
                             }
                         }
                     }
@@ -188,6 +200,7 @@ class PronosticoManager {
         this.populateDropdowns();
         this.renderSummaryTable();
         this.bindEvents();
+        this.updateActiveSelectionUI();
     }
 
     // ... (populateDropdowns, updateCorrectionUI, etc remains same) ...
@@ -209,15 +222,19 @@ class PronosticoManager {
     }
 
     bindEvents() {
-        this.selMember.addEventListener('change', (e) => {
-            this.currentMemberId = e.target.value; // Remove parseInt for flexibility
-            this.loadForecast();
-        });
+        if (this.selMember) {
+            this.selMember.addEventListener('change', (e) => {
+                this.currentMemberId = e.target.value;
+                this.loadForecast();
+            });
+        }
 
-        this.selJornada.addEventListener('change', (e) => {
-            this.currentJornadaId = e.target.value; // Remove parseInt for flexibility
-            this.loadForecast();
-        });
+        if (this.selJornada) {
+            this.selJornada.addEventListener('change', (e) => {
+                this.currentJornadaId = e.target.value;
+                this.loadForecast();
+            });
+        }
 
         this.btnSave.addEventListener('click', () => this.saveForecast());
         if (this.btnClearForecast) {
@@ -226,33 +243,34 @@ class PronosticoManager {
     }
 
     selectAndLoad(jId, mId) {
-        // Convert to proper types (IDs are usually generated strings or numbers, assuming check matches)
-        // Check types in arrays. Firestore IDs are strings, but code used parseInt sometimes.
-        // Let's rely on loose comparison or convert if needed. 
-        // Based on existing code: `this.currentJornadaId = parseInt(e.target.value);`
-        // So we should parse.
         const parsedJId = parseInt(jId) || jId;
         const parsedMId = parseInt(mId) || mId;
 
         this.currentJornadaId = parsedJId;
         this.currentMemberId = parsedMId;
 
-        // Try to sync Dropdowns
+        // Try to sync Dropdowns if present
         if (this.selJornada) {
             const opt = this.selJornada.querySelector(`option[value="${parsedJId}"]`);
             if (opt) {
                 this.selJornada.value = parsedJId;
             } else {
-                // If the jornada is not in the dropdown (e.g. inactive),
-                // we might want to add a temp option or just accept it won't match visually
-                console.warn('Jornada not in dropdown (maybe inactive)');
-                this.selJornada.value = ''; // Reset or keep previous?
+                this.selJornada.value = '';
             }
         }
 
         if (this.selMember) {
             const opt = this.selMember.querySelector(`option[value="${parsedMId}"]`);
             if (opt) this.selMember.value = parsedMId;
+        }
+
+        // Highlight active cell in summary table
+        if (this.summaryTable) {
+            this.summaryTable.querySelectorAll('.summary-cell.active-cell').forEach(c => c.classList.remove('active-cell'));
+            const activeCell = this.summaryTable.querySelector(`td.summary-cell[data-jid="${parsedJId}"][data-mid="${parsedMId}"]`);
+            if (activeCell) {
+                activeCell.classList.add('active-cell');
+            }
         }
 
         this.loadForecast();
@@ -268,31 +286,72 @@ class PronosticoManager {
         }, 500);
     }
 
+    updateActiveSelectionUI() {
+        if (!this.activeSelectionInfo) return;
+
+        if (!this.currentMemberId || !this.currentJornadaId) {
+            this.activeSelectionInfo.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.95rem; flex-wrap: wrap;">
+                    <span style="font-size: 1.2rem;">👇</span>
+                    <span>Haz clic en una casilla del <strong>Resumen de Pronósticos</strong> inferior para ver o rellenar la quiniela.</span>
+                    <button type="button" onclick="const sc = document.getElementById('summary-container'); if(sc) sc.scrollIntoView({behavior: 'smooth'});" style="background: var(--primary-color, #1976d2); color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                        Ir a la tabla ⬇️
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        const member = this.members.find(m => String(m.id) === String(this.currentMemberId));
+        const jornada = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
+
+        const memberName = member ? AppUtils.getMemberName(member) : `Socio #${this.currentMemberId}`;
+        const jornadaText = jornada ? `Jornada ${jornada.number} (${jornada.date})` : `Jornada #${this.currentJornadaId}`;
+
+        this.activeSelectionInfo.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="background: var(--primary-color, #1976d2); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    👤 <span>${memberName}</span>
+                </span>
+                <span style="background: rgba(25, 118, 210, 0.1); color: var(--primary-color, #1976d2); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(25, 118, 210, 0.25); display: inline-flex; align-items: center; gap: 6px;">
+                    📅 <span>${jornadaText}</span>
+                </span>
+                <button type="button" onclick="const sc = document.getElementById('summary-container'); if(sc) sc.scrollIntoView({behavior: 'smooth'});" style="background: transparent; border: 1px dashed var(--input-border, #ccc); border-radius: 20px; padding: 4px 10px; font-size: 0.85rem; color: var(--text-secondary, #666); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Ir al resumen para elegir otro socio o jornada">
+                    🔄 Cambiar pronóstico ⬇️
+                </button>
+            </div>
+        `;
+    }
+
     populateDropdowns() {
-        const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        if (this.selMember) {
+            const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-        sortedMembers.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m.id;
-            opt.textContent = AppUtils.getMemberName(m);
-            this.selMember.appendChild(opt);
-        });
+            sortedMembers.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = AppUtils.getMemberName(m);
+                this.selMember.appendChild(opt);
+            });
+        }
 
-        // Filter journeys that have matches informed (at least one team name set)
-        const informedJornadas = this.jornadas.filter(j => {
-            // Must be active AND have matches with at least one home team name
-            return j.active && j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
-        });
+        if (this.selJornada) {
+            // Filter journeys that have matches informed (at least one team name set)
+            const informedJornadas = this.jornadas.filter(j => {
+                // Must be active AND have matches with at least one home team name
+                return j.active && j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
+            });
 
-        // Sort by number descending (most recent first)
-        const sortedJornadas = informedJornadas.sort((a, b) => b.number - a.number);
+            // Sort by number descending (most recent first)
+            const sortedJornadas = informedJornadas.sort((a, b) => b.number - a.number);
 
-        sortedJornadas.forEach(j => {
-            const opt = document.createElement('option');
-            opt.value = j.id;
-            opt.textContent = `Jornada ${j.number} - ${j.date}`;
-            this.selJornada.appendChild(opt);
-        });
+            sortedJornadas.forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j.id;
+                opt.textContent = `Jornada ${j.number} - ${j.date}`;
+                this.selJornada.appendChild(opt);
+            });
+        }
     }
 
     loadForecast() {
@@ -306,14 +365,22 @@ class PronosticoManager {
         this.deadlineInfo.textContent = '';
         this._fullForecastNotified = false;
 
-        // Ensure IDs are synced with selects if called from button
-        if (this.selMember) this.currentMemberId = this.selMember.value;
-        if (this.selJornada) this.currentJornadaId = this.selJornada.value;
+        // Ensure IDs are synced with selects if they exist and have a value
+        if (this.selMember && this.selMember.value) this.currentMemberId = this.selMember.value;
+        if (this.selJornada && this.selJornada.value) this.currentJornadaId = this.selJornada.value;
 
-        if (!this.currentMemberId || !this.currentJornadaId) return;
+        if (!this.currentMemberId || !this.currentJornadaId) {
+            this.updateActiveSelectionUI();
+            return;
+        }
 
         const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
-        if (!jornada) return;
+        if (!jornada) {
+            this.updateActiveSelectionUI();
+            return;
+        }
+
+        this.updateActiveSelectionUI();
 
         const deadline = this.calculateDeadline(jornada.date);
         const now = new Date();

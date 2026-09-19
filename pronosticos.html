@@ -103,25 +103,12 @@
 
             <!-- LEFT COLUMN: Forecast Area -->
             <div id="left-column" class="pronosticos-left-column">
-                <!-- Selection Bar -->
-                <div class="selection-bar">
-                    <div class="dropdown-group">
-                        <label for="sel-member">Socio</label>
-                        <select id="sel-member">
-                            <option value="">-- Seleccionar Socio --</option>
-                            <!-- Populated by JS -->
-                        </select>
+                <!-- Selection Bar / Active Selection Display -->
+                <div class="selection-bar" id="selection-bar">
+                    <div id="active-selection-info" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1;">
+                        <!-- Filled by JS -->
                     </div>
-                    <div class="dropdown-group">
-                        <label for="sel-jornada">Jornada</label>
-                        <select id="sel-jornada">
-                            <option value="">-- Seleccionar Jornada --</option>
-                            <!-- Populated by JS -->
-                        </select>
-                    </div>
-
-
-                    <div id="deadline-info" style="color: #666; font-size: 0.9rem; flex: 1; padding-left: 1rem;">
+                    <div id="deadline-info" style="color: #666; font-size: 0.9rem; padding-left: 0.5rem;">
                         <!-- Filled by JS -->
                     </div>
                 </div>

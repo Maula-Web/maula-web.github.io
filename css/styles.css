@@ -2495,6 +2495,12 @@ th.summary-header-cell.summary-sticky-col {
     filter: brightness(0.9);
 }
 
+.summary-cell.active-cell {
+    outline: 2px solid var(--primary-color, #1976d2) !important;
+    outline-offset: -2px !important;
+    box-shadow: inset 0 0 0 2px rgba(25, 118, 210, 0.3) !important;
+}
+
 .summary-cell.col-even {
     background-color: var(--pronosticos-table-col-even-bg);
     color: var(--pronosticos-table-col-even-text);
