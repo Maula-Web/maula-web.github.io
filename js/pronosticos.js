@@ -451,10 +451,16 @@ class PronosticoManager {
             `;
             this.container.appendChild(row);
 
-            // Add Dividers: 4-5 (idx 3), 8-9 (idx 7), 11-12 (idx 10), 14-15 (idx 13)
+            // Add Block Dividers: 4, 4, 3, 3 + Pleno al 15
+            // 4-5 (idx 3), 8-9 (idx 7), 11-12 (idx 10), 14-15 (idx 13)
             if ([3, 7, 10, 13].includes(idx)) {
                 const divider = document.createElement('div');
-                divider.className = "p-divider";
+                if (idx === 13) {
+                    divider.className = "p-divider p-divider-p15";
+                    divider.innerHTML = `<span class="boleto-block-label">PLENO AL 15</span>`;
+                } else {
+                    divider.className = "p-divider p-divider-block";
+                }
                 this.container.appendChild(divider);
             }
         });
@@ -1457,17 +1463,21 @@ class PronosticoManager {
             sortedMembers.forEach(m => baseHitsCount[m.id] = 0);
             allDoubles.forEach((_, idx) => doublesHitsCount[idx] = 0);
 
+            const totalCols = 3 + sortedMembers.length + allDoubles.length + (perfectColumn ? 1 : 0) + 1;
+
             jornada.matches.forEach((match, idx) => {
                 const displayIdx = idx === 14 ? 'P15' : idx + 1;
-                const rowStyle = [3, 7, 10, 13].includes(idx) ? 'border-bottom: 4px solid var(--primary-orange);' : 'border-bottom: 1px solid #ddd;';
+                const isBlockEnd = [3, 7, 10, 13].includes(idx);
+                const isP15Divider = idx === 13;
+                const blockBottomBorder = isBlockEnd ? (isP15Divider ? 'border-bottom: 4px solid var(--primary-orange, #ff9100) !important;' : 'border-bottom: 3px solid #757575 !important;') : '';
                 const bgColor = idx % 2 === 0 ? '#fff' : '#f5f5f5';
 
                 const officialResult = match.result || null;
 
-                html += `<tr style="${rowStyle}">
-                    <td style="position: sticky; left: ${leftNum}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: ${padTdNum}; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: ${fSizeTh}; max-width: ${strWNum}; overflow: hidden;">${displayIdx}</td>
-                    <td style="position: sticky; left: ${leftHome}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: ${padTdTeam}; text-align: right; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
-                    <td style="position: sticky; left: ${leftAway}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; padding: ${padTdTeam}; text-align: left; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
+                html += `<tr>
+                    <td style="position: sticky; left: ${leftNum}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; ${blockBottomBorder} padding: ${padTdNum}; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: ${fSizeTh}; max-width: ${strWNum}; overflow: hidden;">${displayIdx}</td>
+                    <td style="position: sticky; left: ${leftHome}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; ${blockBottomBorder} padding: ${padTdTeam}; text-align: right; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
+                    <td style="position: sticky; left: ${leftAway}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; ${blockBottomBorder} padding: ${padTdTeam}; text-align: left; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
                 `;
 
                 // Individual Forecasts
@@ -1492,7 +1502,7 @@ class PronosticoManager {
                         }
                     }
 
-                    html += `<td style="${cellStyle}">${sign}</td>`;
+                    html += `<td style="${cellStyle} ${blockBottomBorder}">${sign}</td>`;
                 });
 
                 // Doubles Forecasts (Extra columns)
@@ -1509,7 +1519,7 @@ class PronosticoManager {
                             doublesHitsCount[dbIdx]++;
                         }
                     }
-                    html += `<td style="${cellStyle}">${sign}</td>`;
+                    html += `<td style="${cellStyle} ${blockBottomBorder}">${sign}</td>`;
                 });
 
                 // Perfect Column Cell
@@ -1521,15 +1531,32 @@ class PronosticoManager {
                         cellStyle += 'background: #ffd700; color: #000; border: 3px solid #ffa000;';
                         perfectHits++;
                     }
-                    html += `<td style="${cellStyle}">${sign}</td>`;
+                    html += `<td style="${cellStyle} ${blockBottomBorder}">${sign}</td>`;
                 }
 
                 // Official Result Cell
                 const resVal = officialResult || '-';
-                html += `<td style="border: 1px solid #333; padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${isMobile ? '1.1rem' : '1.5rem'}; color: #fff; background: #444;">${resVal}</td>`;
-
+                html += `<td style="border: 1px solid #333; ${blockBottomBorder} padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${isMobile ? '1.1rem' : '1.5rem'}; color: #fff; background: #444;">${resVal}</td>`;
 
                 html += `</tr>`;
+
+                if (isBlockEnd) {
+                    if (isP15Divider) {
+                        html += `
+                            <tr class="table-block-divider table-p15-divider">
+                                <td colspan="${totalCols}" style="background: linear-gradient(90deg, #e65100, #ff9100, #e65100); height: 26px; text-align: center; color: #fff; font-size: ${isMobile ? '0.75rem' : '0.85rem'}; font-weight: 900; letter-spacing: 2px; padding: 3px 0; border-top: 2px solid #bf360c; border-bottom: 2px solid #bf360c;">
+                                    ★ PLENO AL 15 ★
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        html += `
+                            <tr class="table-block-divider">
+                                <td colspan="${totalCols}" style="background: repeating-linear-gradient(45deg, #e0e0e0, #e0e0e0 10px, #eeeeee 10px, #eeeeee 20px); height: 10px; border-top: 2px solid #9e9e9e; border-bottom: 2px solid #9e9e9e; padding: 0;"></td>
+                            </tr>
+                        `;
+                    }
+                }
             });
 
             html += `</tbody>`;
@@ -1868,12 +1895,16 @@ class PronosticoManager {
             `;
             this.doublesContainer.appendChild(row);
 
-            // Add Dividers: 4-5 (idx 3), 8-9 (idx 7), 11-12 (idx 10), 14-15 (idx 13)
+            // Add Block Dividers: 4, 4, 3, 3 + Pleno al 15
+            // 4-5 (idx 3), 8-9 (idx 7), 11-12 (idx 10), 14-15 (idx 13)
             if ([3, 7, 10, 13].includes(idx)) {
                 const divider = document.createElement('div');
-                divider.style.height = "2px";
-                divider.style.backgroundColor = "#ccc";
-                divider.style.margin = "5px 0";
+                if (idx === 13) {
+                    divider.className = "p-divider p-divider-p15";
+                    divider.innerHTML = `<span class="boleto-block-label">PLENO AL 15</span>`;
+                } else {
+                    divider.className = "p-divider p-divider-block";
+                }
                 this.doublesContainer.appendChild(divider);
             }
         });

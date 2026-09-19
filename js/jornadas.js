@@ -300,12 +300,6 @@ class JornadaManager {
             row.className = 'match-row';
             row.style.alignItems = 'center';
 
-            if (isPleno) {
-                row.style.borderTop = '2px solid #ddd';
-                row.style.marginTop = '10px';
-                row.style.paddingTop = '10px';
-            }
-
             if (!m) m = { home: '', away: '', result: '' }; // Safety fallback
 
             // Safe call to AppUtils
@@ -393,6 +387,19 @@ class JornadaManager {
             });
 
             this.matchesContainer.appendChild(row);
+
+            // Add Block Dividers: 4, 4, 3, 3 + Pleno al 15
+            // 4-5 (idx 3), 8-9 (idx 7), 11-12 (idx 10), 14-15 (idx 13)
+            if ([3, 7, 10, 13].includes(idx)) {
+                const divider = document.createElement('div');
+                if (idx === 13) {
+                    divider.className = "p-divider p-divider-p15";
+                    divider.innerHTML = `<span class="boleto-block-label">PLENO AL 15</span>`;
+                } else {
+                    divider.className = "p-divider p-divider-block";
+                }
+                this.matchesContainer.appendChild(divider);
+            }
         });
     }
 
