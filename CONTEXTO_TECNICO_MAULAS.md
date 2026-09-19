@@ -44,7 +44,11 @@ El grupo juega una quiniela extra grupal combinada.
 ### 3.3. Jugar Gratis y Penalizaciones
 
 - **Jugar Gratis en la jornada**: Un socio no paga su cuota individual en una ronda *sólo si el grupo en su conjunto ganó algún premio económico en la jornada anterior*. Ser el ganador de aciertos de la semana no da la gratuidad por sí mismo, la condición es que se haya ingresado dinero.
-- **Penalizaciones por "Unos"**: Existe un sistema que impone una multa monetaria (se resta de su bote) si un socio envía su boleto con una cantidad exagerada/restringida de signos "1". Un filtro de riesgo.
+- **Penalización por Perder la Jornada (Maula)**: El socio que queda último en la jornada (determinado mediante `wasLoserOfJornada`, priorizando infractores por retraso o no jugado y desempatando por menor puntuación e histórico) recibe la penalización monetaria de perdedor (`penalizacionMaula`, por defecto 1,00€ o el valor histórico configurado). Dicha penalización se añade a su aportación semanal en el Bote y, además, le asigna automáticamente la responsabilidad de sellar la quiniela de la peña en la jornada siguiente (`isSealer = true`).
+- **Penalizaciones Semanales en Boleto**:
+  - **Por "Unos"**: Multa monetaria progresiva si un socio envía su boleto con 10 o más signos '1' (desde 0,10€ hasta 1,00€).
+  - **Por Bajos Aciertos**: Multa si el socio obtiene entre 0 y 3 aciertos en la jornada.
+  - **Por Fallo en PIG**: Penalización monetaria por fallar el partido de interés general catalogado.
 - **Penalizaciones por Clasificación (Cierre de Vuelta/Temporada)**: Al final de la primera vuelta y al final de la temporada, se cobran penalizaciones a los socios basándose en su clasificación. Los cobros escalan desde el 2º clasificado (0,50€) hasta el último (5,00€), estando el 1º exento. En caso de empates en puntos, se desempata por la diferencia entre ganancias y pérdidas de cada ronda, luego a favor del de mayores ganancias totales, y si persiste el empate absoluto se dividirá la suma de las penalizaciones de los puestos compartidos entre los empatados.
 
 ### 3.4. Vista Excel y Retrospectiva Histórica
@@ -220,8 +224,8 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
   - **En cuanto haya al menos un signo registrado**: La jornada se bloquea de forma total e irrevocable para los socios. **No se permite rellenar ni modificar ninguna quiniela**. Los selectores de signos quedan deshabilitados, el botón de guardar se oculta y el sistema muestra la advertencia `🔒 JORNADA EN JUEGO - NO SE ADMITEN PRONÓSTICOS`.
 - **Modo Corrección Exclusivo para Administradores**: La única forma de introducir o alterar un pronóstico una vez que hay al menos un resultado registrado es mediante la activación manual del **Modo Corrección** por parte de un administrador (con motivo justificado en el modal de auditoría).
 
-### 7.2. El Dado de Quinielas (🎲 `DiceService`)
-Para situaciones en las que un socio se encuentra de viaje, en el extranjero o sin cobertura móvil/internet y no podrá rellenar manualmente la quiniela, se ha incorporado una alternativa automatizada lúdica y justa:
+### 7.2. El Dado de Quinielas (🎲 `DiceService` - Propuesto por Buzón)
+Ideado a propuesta del socio **Buzón** para situaciones en las que un socio se encuentra de viaje, en el extranjero o sin cobertura móvil/internet y no podrá rellenar manualmente la quiniela, se ha incorporado una alternativa automatizada lúdica y justa:
 
 - **Configuración en Ficha de Socio (`socios.html`)**: El socio o el administrador puede definir un rango de fechas (`fechaInicio` a `fechaFin`, formato `YYYY-MM-DD`) y conmutar un interruptor para activar/desactivar el Dado.
 - **Relleno Automático**: Durante ese rango de fechas, cualquier jornada que entre en juego se rellenará automáticamente al azar para ese socio:
@@ -235,6 +239,8 @@ Para situaciones en las que un socio se encuentra de viaje, en el extranjero o s
   - **Exención de Sanción**: Los pronósticos generados por el Dado **NUNCA se marcan como tarde (`late: false`)**, permitiendo al socio puntuar con normalidad.
 
 ### 7.3. Refinamientos de Usabilidad (UX)
+- **Separadores de Bloques en Boleto (Idea de Juanjo)**: Inserción de líneas divisorias agrupando los partidos según la distribución tradicional del boleto físico (bloques de 4, 4, 3 y 3 partidos, más el bloque destacado para el Pleno al 15), aportando orden visual y haciendo mucho más cómoda y familiar la comprobación de pronósticos.
+- **Ampliación de Pantalla en Resultados Partidos**: Contenedor ensanchado al 96% (máximo 2500px) con distribución flexible para evitar que los botones de acción se corten o requieran barras de desplazamiento horizontal.
 - **Claridad en Pronósticos**: Al consultar un pronóstico ya completado, se sustituyó el confuso botón "Cambiar pronóstico" por un explícito botón **"Cerrar"** que cierra la ficha directamente.
 - **Limpieza de Enlaces**: Se retiró el texto/enlace redundante "Ir a la tabla" en el encabezado de pronósticos.
 - **Escudos Femeninos y Normalización**: Incorporación de escudos oficiales de la Liga Femenina en `escudos/Femeninos/` (`Badalona (f)`, `Logroño (f)`, `Madrid CFF (f)`) y enriquecimiento del mapa de alias en `utils.js` para admitir variantes abreviadas habituales de la prensa (`Rayo V.`, `R. Madrid`, `R. Sociedad`, `R. Valladolid`, etc.).
