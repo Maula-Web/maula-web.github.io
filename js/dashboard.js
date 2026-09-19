@@ -257,14 +257,15 @@ class DashboardManager {
 
                     pigHtml = `
                     <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
-                        <div style="font-size:0.9rem; margin-bottom:0.3rem;"><strong>🐽 PIG (Pleno al 15)</strong></div>
+                        <div style="font-size:0.9rem; margin-bottom:0.3rem;"><strong>🐷 PIG (Pleno al 15)</strong></div>
                         <div style="font-size:0.85rem; color:#2e7d32;">✅ ${acertantes || 'Ninguno'}</div>
                         <div style="font-size:0.85rem; color:#c62828;">❌ ${fallantes || 'Ninguno'}</div>
                     </div>
                 `;
                 }
 
-                const rolesTitle = isNextJornadaInProgress ? `Jornada ${targetJNum} en curso` : `Roles Jornada ${targetJNum}`;
+                const nextHasPig = nextJornadaData && nextJornadaData.matches && nextJornadaData.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
+                const rolesTitle = isNextJornadaInProgress ? `Jornada ${targetJNum}${nextHasPig ? ' 🐷' : ''} en curso` : `Roles Jornada ${targetJNum}${nextHasPig ? ' 🐷' : ''}`;
 
                 nextRolesHtml = `
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left;">
@@ -275,9 +276,10 @@ class DashboardManager {
                                 </div>
                             </div>
                         ` : `
-                            <div style="font-size: 1rem; color: var(--dark-purple); font-weight: bold; margin-bottom: 0.8rem;">
-                                📋 Jornada ${targetJNum}
+                            <div style="font-size: 1rem; color: var(--dark-purple); font-weight: bold; margin-bottom: 0.4rem;">
+                                📋 Jornada ${targetJNum}${nextHasPig ? ' 🐷' : ''}
                             </div>
+                            ${nextHasPig ? '<div style="font-size: 0.85rem; color: #d81b60; font-weight: bold; margin-bottom: 0.6rem;">🐷 ¡Atención! Esta jornada incluye partido PIG (Pleno al 15)</div>' : ''}
                         `}
                         <div style="margin-bottom:0.5rem;">
                             <span style="font-size:1.2rem;">🍻</span> 

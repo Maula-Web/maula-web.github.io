@@ -194,7 +194,7 @@ window.TelegramService = {
             if (isPigJornada) {
                 const acertantes = currentResults.filter(r => r.pigHit).map(r => r.name);
                 const fallantes = currentResults.filter(r => !r.pigHit && r.played).map(r => r.name);
-                msg += `\n*🐽 PIG (PLENO AL 15):*\n`;
+                msg += `\n*🐷 PIG (PLENO AL 15):*\n`;
                 msg += `✅ Acertantes: ${acertantes.length > 0 ? acertantes.join(", ") : 'Ninguno'}\n`;
                 msg += `❌ Fallan: ${fallantes.length > 0 ? fallantes.join(", ") : 'Ninguno'}\n`;
             }
@@ -410,7 +410,7 @@ window.TelegramService = {
                 const hasPIG = targetJornada.matches && targetJornada.matches.some(m => m && AppUtils.isPigMatch(m.home, m.away));
                 if (hasPIG) {
                     // Si existe el enlace al final, lo ponemos antes del enlace para que quede mejor
-                    const pigWarning = '\n\n⚠️ *¡ATENCIÓN! Esta jornada hay PIG (Partido de Interés General).* ¡Recuerda sellar también el PIG!';
+                    const pigWarning = '\n\n⚠️ *¡ATENCIÓN! Esta jornada hay PIG 🐷 (Partido de Interés General).* ¡Recuerda sellar también el PIG 🐷!';
                     if (msg.includes('\n🔗')) {
                         msg = msg.replace('\n🔗', pigWarning + '\n🔗');
                     } else {

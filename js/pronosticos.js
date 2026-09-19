@@ -380,8 +380,9 @@ class PronosticoManager {
             }
 
             // Pleno Restriction
+            let isPigMatch = false;
             if (idx === 14) {
-                const isPigMatch = AppUtils.isPigMatch(match.home, match.away);
+                isPigMatch = typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(match.home, match.away);
                 if (!isPigMatch) {
                     disabledStr = 'style="pointer-events:none; opacity:0.3; background:transparent;" title="Pleno deshabilitado"';
                 }
@@ -419,7 +420,7 @@ class PronosticoManager {
 
             row.innerHTML = `
                 <div class="p-match-info">
-                    <span class="p-match-num">${displayIdx}</span>
+                    <span class="p-match-num">${displayIdx}${isPigMatch ? ' 🐷' : ''}</span>
                     <div class="match-team home-team">
                         <span class="team-name">${match.home}</span>
                         <img src="${homeLogo}" class="team-logo" onerror="this.style.display='none'">
@@ -429,6 +430,7 @@ class PronosticoManager {
                         <img src="${awayLogo}" class="team-logo" onerror="this.style.display='none'">
                         <span class="team-name">${match.away}</span>
                     </div>
+                    ${isPigMatch ? '<span style="font-size:0.75rem; background:#ffecb3; color:#e65100; border-radius:4px; padding:2px 6px; font-weight:bold; margin-left:6px;" title="Partido de Interés General">🐷 PIG</span>' : ''}
                 </div>
 
                 <div class="p-others">
@@ -1138,9 +1140,10 @@ class PronosticoManager {
                 }
             } catch (e) { }
 
+            const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
             let rowHtml = `<tr>
                 <td class="summary-sticky-col summary-jornada-info">
-                    <div class="summary-j-num">J${j.number}</div>
+                    <div class="summary-j-num">J${j.number}${hasPig ? ' 🐷' : ''}</div>
                     <div class="summary-j-date">${dateFormatted}</div>
                 </td>`;
 

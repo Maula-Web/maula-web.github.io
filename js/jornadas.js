@@ -104,6 +104,7 @@ class JornadaManager {
 
             const filledMatches = j.matches.filter(m => m.result).length;
             const hasTeams = j.matches.some(m => m.home !== '' || m.away !== '');
+            const hasPig = j.matches && j.matches.some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
             const statusColor = filledMatches === 15 ? '#2e7d32' : '#f57f17';
             const statusText = filledMatches === 15 ? 'Finalizada' : (filledMatches > 0 ? 'En Juego' : 'Pendiente');
@@ -121,12 +122,13 @@ class JornadaManager {
 
             card.innerHTML = `
                 <div class="jornada-header">
-                    <span class="jornada-number">Jornada ${j.number}</span>
+                    <span class="jornada-number">Jornada ${j.number}${hasPig ? ' 🐷' : ''}</span>
                     <span class="jornada-date">${j.date}</span>
                 </div>
                 <div style="font-size:0.9rem; color:#555;">
                     <div class="jornada-season">${j.season}</div>
                     <div class="${filledMatches === 15 ? 'jornada-status-finished' : 'jornada-status-pending'}">${statusText}</div>
+                    ${hasPig ? '<div style="font-size:0.8rem; color:#d81b60; font-weight:bold; margin-top:0.2rem;">🐷 Partido PIG</div>' : ''}
                     ${!hasTeams ? '<div style="font-size:0.8rem; color:#999; margin-top:0.2rem;">(Sin partidos definidos)</div>' : ''}
                 </div>
             `;
@@ -216,6 +218,24 @@ class JornadaManager {
         this.inpId.value = jornada.id || '';
         this.inpDate.value = jornada.date;
         if (this.inpActive) this.inpActive.checked = jornada.active !== false; // Active by default
+
+        const hasPig = jornada.matches && jornada.matches.some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
+        const modalTitle = document.getElementById('modal-title');
+        let pigBadge = document.getElementById('modal-pig-badge');
+        if (hasPig) {
+            if (!pigBadge && modalTitle) {
+                pigBadge = document.createElement('span');
+                pigBadge.id = 'modal-pig-badge';
+                pigBadge.style.cssText = 'font-size:0.8rem; background:#fce4ec; color:#c2185b; padding:2px 8px; border-radius:4px; font-weight:bold; vertical-align:middle; margin-left:6px;';
+                pigBadge.innerHTML = '🐷 PIG';
+                modalTitle.appendChild(pigBadge);
+            } else if (pigBadge) {
+                pigBadge.style.display = 'inline-block';
+            }
+        } else if (pigBadge) {
+            pigBadge.style.display = 'none';
+        }
+
         this.renderMatches(jornada.matches);
         this.renderPrizes(jornada.prizes || {});
     }
@@ -326,8 +346,13 @@ class JornadaManager {
                 `;
             }
 
+            const isPigMatch = utilsAvailable && AppUtils.isPigMatch(home, away);
+
             row.innerHTML = `
-                <span class="match-number">${isPleno ? 'P15' : idx + 1}</span>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span class="match-number">${isPleno ? 'P15' : idx + 1}${isPigMatch ? ' 🐷' : ''}</span>
+                    ${isPigMatch ? '<span style="font-size:0.75rem; background:#ffecb3; color:#e65100; border-radius:4px; padding:2px 5px; font-weight:bold;">🐷 PIG</span>' : ''}
+                </div>
                 
                 <div style="display:flex; align-items:center; flex:2; gap:5px;">
                     <img src="${homeLogo}" class="team-logo home-logo-img" onerror="this.style.display='none'" style="${homeLogo ? 'display:inline-block' : 'display:none'}">

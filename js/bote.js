@@ -548,7 +548,7 @@ class BoteManager {
                         <tr>
                             <th style="background: #ff9100; font-size: 0.65rem;">Unos</th>
                             <th style="background: #ff9100; font-size: 0.65rem;">Bajos</th>
-                            <th style="background: #ff9100; font-size: 0.65rem;">PIG</th>
+                            <th style="background: #ff9100; font-size: 0.65rem;" title="Penalización Fallo en PIG 🐷">🐷 PIG</th>
                             <th style="background: #ff9100; font-size: 0.65rem;">Sellar</th>
                         </tr>
                     </thead>
@@ -577,7 +577,7 @@ class BoteManager {
                         <td class="positive" style="font-weight:bold;">${(m.aportacion + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0)).toFixed(2)}€</td>
                         <td class="negative">${(m.penalizacionUnos || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionBajosAciertos || 0).toFixed(1)}€</td>
-                        <td class="negative">${(m.penalizacionPIG || 0).toFixed(1)}€</td>
+                        <td class="negative" title="${m.penalizacionPIG > 0 ? 'Fallo en PIG 🐷: -' + m.penalizacionPIG.toFixed(1) + '€' : ''}">${(m.penalizacionPIG || 0).toFixed(1)}€</td>
                         <td class="negative">${(m.penalizacionMaula || 0).toFixed(1)}€</td>
                         <td class="positive" title="Premio acumulado en el Bote Peña">${m.premios.toFixed(2)}€</td>
                         <td>${selladoUI}</td>
@@ -742,13 +742,21 @@ class BoteManager {
                     ingresoUI = '+' + m.neto.toFixed(2) + '€';
                 }
 
+                const outDetails = [];
+                if (m.aportacion > 0) outDetails.push(`• Aportación: ${m.aportacion.toFixed(2)}€`);
+                if (m.penalizacionUnos > 0) outDetails.push(`• Exceso Unos: ${m.penalizacionUnos.toFixed(2)}€`);
+                if (m.penalizacionBajosAciertos > 0) outDetails.push(`• Bajos Aciertos: ${m.penalizacionBajosAciertos.toFixed(2)}€`);
+                if (m.penalizacionPIG > 0) outDetails.push(`• Fallo en PIG 🐷: ${m.penalizacionPIG.toFixed(2)}€`);
+                if (m.penalizacionMaula > 0) outDetails.push(`• Pen. Sellador: ${m.penalizacionMaula.toFixed(2)}€`);
+                const outTitle = outDetails.join('\n');
+
                 html += `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${m.isIngresoLibre ? 'background: rgba(76, 175, 80, 0.1);' : m.isReparto ? 'background: rgba(33, 150, 243, 0.1);' : m.isCierreVuelta ? 'background: rgba(255, 82, 82, 0.1);' : ''}">
                         <td style="padding:0.75rem;">${jBadge}</td>
                         <td style="padding:0.75rem; font-size:0.8rem; opacity:0.7;">${dateText}</td>
                         <td style="padding:0.75rem; text-align:center;">${aciertosUI}</td>
                         <td class="${totalIn < 0 ? 'negative' : 'positive'}" style="padding:0.75rem; text-align:right; font-weight:bold;">${ingresoUI}</td>
-                        <td class="negative" style="padding:0.75rem; text-align:right;">${totalOut > 0 ? '-' + totalOut.toFixed(2) + '€' : '0.00€'}</td>
+                        <td class="negative" title="${outTitle}" style="padding:0.75rem; text-align:right;">${totalOut > 0 ? '-' + totalOut.toFixed(2) + '€' : '0.00€'}</td>
                         <td style="padding:0.75rem; text-align:right; font-weight:900; color: ${m.boteAcumulado >= 0 ? '#4CAF50' : '#ff5252'}; background:rgba(255,255,255,0.02);">${m.boteAcumulado.toFixed(2)}€</td>
                     </tr>
                 `;
@@ -1034,7 +1042,7 @@ class BoteManager {
     exportData() {
         const movements = this.calculateAllMovements();
 
-        let csv = 'Socio,Jornada,Fecha,Aciertos,Aportación,Columna,Pen.1s,Pen.Bajos,PIG,Pen.Sellar,Sellado,Premios,Total Ingresos,Total Gastos,Neto,Bote Acumulado,Exento,Juega Dobles\n';
+        let csv = 'Socio,Jornada,Fecha,Aciertos,Aportación,Columna,Pen.1s,Pen.Bajos,PIG 🐷,Pen.Sellar,Sellado,Premios,Total Ingresos,Total Gastos,Neto,Bote Acumulado,Exento,Juega Dobles\n';
 
         movements.forEach(m => {
             csv += `${m.memberName},${m.jornadaNum},${m.jornadaDate},${m.aciertos},${m.aportacion},${m.costeColumna},${m.penalizacionUnos},${m.penalizacionBajosAciertos},${m.penalizacionPIG},${m.penalizacionMaula || 0},${m.sellado},${m.premios},${m.totalIngresos},${m.totalGastos},${m.neto},${m.boteAcumulado},${m.exento ? 'Sí' : 'No'},${m.jugaDobles ? 'Sí' : 'No'}\n`;
@@ -1552,7 +1560,7 @@ class BoteManager {
                         const tooltip = [];
                         if (mov.penalizacionUnos > 0) tooltip.push(`• Exceso de Unos: ${mov.penalizacionUnos.toFixed(2)}€`);
                         if (mov.penalizacionBajosAciertos > 0) tooltip.push(`• Bajos Aciertos: ${mov.penalizacionBajosAciertos.toFixed(2)}€`);
-                        if (mov.penalizacionPIG > 0) tooltip.push(`• Fallo en PIG: ${mov.penalizacionPIG.toFixed(2)}€`);
+                        if (mov.penalizacionPIG > 0) tooltip.push(`• Fallo en PIG 🐷: ${mov.penalizacionPIG.toFixed(2)}€`);
                         if (mov.penalizacionMaula > 0) tooltip.push(`• Pen. Sellador: ${mov.penalizacionMaula.toFixed(2)}€`);
                         clickHandler = `onclick="window.Bote.showPenaltyDetail('${member.name}', ${j.number}, '${tooltip.join('<br>')}')"`;
                     }

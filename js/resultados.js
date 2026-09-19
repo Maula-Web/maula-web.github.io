@@ -188,9 +188,10 @@ class ResultsManager {
 
         // Jornada Rows
         finishedJornadas.forEach(j => {
+            const hasPig = j.matches && j.matches.some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
             tbodyHtml += `<tr>`;
             tbodyHtml += `<td style="font-size:0.9rem; border-right:2px solid #ddd;">
-                            <div style="font-weight:bold; color:var(--resultados-jornada-number);">Jornada ${j.number}</div>
+                            <div style="font-weight:bold; color:var(--resultados-jornada-number);">Jornada ${j.number}${hasPig ? ' 🐷' : ''}</div>
                             <div style="color:var(--resultados-jornada-date); font-size:0.8rem;">${j.date}</div>
                           </td>`;
 
