@@ -728,11 +728,8 @@ class BoteManager {
                 if (m.jugaDobles) {
                     jBadge += ` <span title="Juega Quiniela de Dobles" style="font-size:1.05rem;">2️⃣</span>`;
                 }
-                if (m.isLoser || m.penalizacionMaula > 0) {
-                    jBadge += ` <span title="Perdedor de la jornada (Penalizado)" style="font-size:1.05rem;">💀</span>`;
-                }
                 if (m.isSealer || m.sellado < 0) {
-                    jBadge += ` <span title="Sellador de la quiniela" style="font-size:1.05rem;">🎟️</span>`;
+                    jBadge += ` <span title="Sellador de la quiniela" style="font-size:1.05rem;">💀</span>`;
                 }
 
                 let ingresoUI = '-';
@@ -1539,8 +1536,9 @@ class BoteManager {
                     const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0);
                     const payment = mov.aportacion + penalties;
 
+                    const isLoser = mov.isLoser || (mov.penalizacionMaula > 0) || this.wasLoserOfJornada(member.id, j);
                     cellContent = `<div style="font-size:1.1rem; font-weight:900; color: inherit;">${payment.toFixed(1)}€</div>`;
-                    cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${(mov.isLoser || mov.penalizacionMaula > 0) ? ' 💀' : ''}</div>`;
+                    cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${isLoser ? ' 💀' : ''}</div>`;
                     if (mov.premios > 0) {
                         cellContent += `<div style="background: rgba(76, 175, 80, 0.2); color: #81c784; font-weight: bold; font-size: 0.75rem; margin-top:4px; padding: 2px 4px; border-radius: 4px; border: 1px solid #4CAF50;">+${mov.premios.toFixed(2)}€ 🏆</div>`;
                     }
@@ -1561,7 +1559,7 @@ class BoteManager {
 
                     if (this.wasWinnerOfJornada(member.id, j)) {
                         cellClass = 'cuadrante-cell-win';
-                    } else if (this.wasLoserOfJornada(member.id, j)) {
+                    } else if (isLoser) {
                         cellClass = 'cuadrante-cell-loss';
                     }
 
