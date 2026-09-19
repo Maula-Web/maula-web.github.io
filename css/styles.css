@@ -1345,6 +1345,19 @@ body {
 
 .jornadas-page .main-container {
     background: var(--jornadas-main-card-bg);
+    max-width: 2500px;
+    width: 96%;
+}
+
+.jornadas-page .header-actions {
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.jornadas-page .action-buttons {
+    overflow-x: visible;
+    flex-wrap: wrap;
+    padding-bottom: 0;
 }
 
 .pronosticos-page .main-container {
