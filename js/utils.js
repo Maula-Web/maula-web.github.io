@@ -240,7 +240,33 @@ var AppUtils = window.AppUtils || {
             'real sociedad b': 'escudos/OTROS/REAL-SOCIEDAD-B.png',
             'sanse': 'escudos/OTROS/REAL-SOCIEDAD-B.png',
             'pontevedra': 'escudos/OTROS/pontevedra.png',
-            'zamora': 'escudos/OTROS/zamora.png'
+            'zamora': 'escudos/OTROS/zamora.png',
+
+            // Femeninos
+            'badalona (f)': 'escudos/Femeninos/Badalona (f).png',
+            'badalona w. (f)': 'escudos/Femeninos/Badalona (f).png',
+            'badalona w.': 'escudos/Femeninos/Badalona (f).png',
+            'badalona w': 'escudos/Femeninos/Badalona (f).png',
+            'badalona': 'escudos/Femeninos/Badalona (f).png',
+            'levante badalona': 'escudos/Femeninos/Badalona (f).png',
+            'levante badalona (f)': 'escudos/Femeninos/Badalona (f).png',
+
+            'logroño (f)': 'escudos/Femeninos/Logroño (f).png',
+            'logrono (f)': 'escudos/Femeninos/Logroño (f).png',
+            'logroño': 'escudos/Femeninos/Logroño (f).png',
+            'logrono': 'escudos/Femeninos/Logroño (f).png',
+            'dux logroño': 'escudos/Femeninos/Logroño (f).png',
+            'dux logroño (f)': 'escudos/Femeninos/Logroño (f).png',
+            'dux logrono': 'escudos/Femeninos/Logroño (f).png',
+            'dux logrono (f)': 'escudos/Femeninos/Logroño (f).png',
+
+            'madrid cff (f)': 'escudos/Femeninos/Madrid CFF (f).png',
+            'madrid cff': 'escudos/Femeninos/Madrid CFF (f).png',
+            'madrid c.f.f. (f)': 'escudos/Femeninos/Madrid CFF (f).png',
+            'madrid c.f.f.': 'escudos/Femeninos/Madrid CFF (f).png',
+            'madrid cf (f)': 'escudos/Femeninos/Madrid CFF (f).png',
+            'madrid cf': 'escudos/Femeninos/Madrid CFF (f).png',
+            'madrid fem': 'escudos/Femeninos/Madrid CFF (f).png'
         };
 
         // 1. Direct match

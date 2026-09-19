@@ -157,7 +157,7 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
   - **Scroll Horizontal Nativo**: El contenedor del modal utiliza `display: block` y `-webkit-overflow-scrolling: touch` para garantizar un desplazamiento fluido de la tabla en pantallas pequeñas.
   - **Botón de Cierre Flotante**: Se incluye un botón flotante (`Volver a Pronósticos`) en la parte inferior exclusivo para móviles, facilitando la navegación sin depender de la "X" superior de difícil alcance.
 - **Visualización Técnica**: La tabla resumen de la peña incluye un **doble scroll horizontal** (barra superior e inferior) para facilitar la consulta de columnas de socios sin desplazarse al final de la página.
-- **Soporte Extendido de Escudos (`js/utils.js`)**: El sistema mapea y normaliza dinámicamente nombres de equipos hacia ficheros locales en múltiples directorios (`escudos/primera/`, `escudos/segunda/` y `escudos/OTROS/` incluyendo equipos como Alcorcón, Ibiza, Marbella, Mérida, Ferrol, Pontevedra, etc.).
+- **Soporte Extendido de Escudos (`js/utils.js`)**: El sistema mapea y normaliza dinámicamente nombres de equipos hacia ficheros locales en múltiples directorios (`escudos/primera/`, `escudos/segunda/`, `escudos/OTROS/` y `escudos/Femeninos/` incluyendo equipos como Badalona, Logroño, Madrid CFF, Alcorcón, Ibiza, Marbella, Mérida, Ferrol, Pontevedra, etc.).
 - **Auditoría de Correcciones**:
   - Al modificar una jornada cerrada (Modo Corrección), se activa un **Modal de Auditoría** obligatorio de alta visibilidad (`z-index: 9,000,000`).
   - La visibilidad de las ventanas se gestiona mediante la clase `.active`, asegurando que la opacidad pase a 1 y el sistema no quede bloqueado de forma invisible.
