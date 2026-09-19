@@ -74,6 +74,24 @@ class JornadaManager {
         this.inpDate = document.getElementById('inp-date');
         this.inpActive = document.getElementById('inp-active');
         this.teamsCache = [];
+
+        // Text Importer DOM Elements
+        this.btnImportMatches = document.getElementById('btn-import-matches') || document.getElementById('btn-import-pdf');
+        this.modalImport = document.getElementById('modal-import-matches');
+        this.btnCloseImportModal = document.getElementById('btn-close-import-modal');
+        this.importInputStep = document.getElementById('import-input-step');
+        this.importSummaryStep = document.getElementById('import-summary-step');
+        this.importTextarea = document.getElementById('import-matches-textarea');
+        this.importErrorMsg = document.getElementById('import-error-msg');
+        this.btnAnalyzeImport = document.getElementById('btn-analyze-import');
+        this.btnCancelImport = document.getElementById('btn-cancel-import');
+        this.importSummaryHeader = document.getElementById('import-summary-header');
+        this.importWarningsCard = document.getElementById('import-warnings-card');
+        this.importMatchesList = document.getElementById('import-matches-list');
+        this.btnDiscardImport = document.getElementById('btn-discard-import');
+        this.btnBackToText = document.getElementById('btn-back-to-text');
+        this.btnConfirmCreateJornada = document.getElementById('btn-confirm-create-jornada');
+        this.pendingImportData = null;
     }
 
     bindEvents() {
@@ -84,8 +102,18 @@ class JornadaManager {
         if (this.btnDelete) this.btnDelete.addEventListener('click', () => this.deleteCurrentJornada());
         if (this.btnDeleteAll) this.btnDeleteAll.addEventListener('click', () => this.deleteAllJornadas());
 
+        // Text Importer Events
+        if (this.btnImportMatches) this.btnImportMatches.addEventListener('click', () => this.openImportTextModal());
+        if (this.btnCloseImportModal) this.btnCloseImportModal.addEventListener('click', () => this.closeImportTextModal());
+        if (this.btnCancelImport) this.btnCancelImport.addEventListener('click', () => this.closeImportTextModal());
+        if (this.btnAnalyzeImport) this.btnAnalyzeImport.addEventListener('click', () => this.handleAnalyzeText());
+        if (this.btnDiscardImport) this.btnDiscardImport.addEventListener('click', () => this.handleDiscardImport());
+        if (this.btnBackToText) this.btnBackToText.addEventListener('click', () => this.handleBackToText());
+        if (this.btnConfirmCreateJornada) this.btnConfirmCreateJornada.addEventListener('click', () => this.handleConfirmCreateJornada());
+
         window.addEventListener('click', (e) => {
             if (e.target === this.modal) this.closeModal();
+            if (e.target === this.modalImport) this.closeImportTextModal();
         });
     }
 
@@ -613,6 +641,234 @@ class JornadaManager {
     async saveSingle(jornada) {
         if (!window.DataService) return;
         await window.DataService.save('jornadas', jornada);
+    }
+
+    // --- TEXT IMPORTER METHODS ---
+    openImportTextModal() {
+        if (!this.modalImport) return;
+        this.pendingImportData = null;
+        if (this.importTextarea) this.importTextarea.value = '';
+        if (this.importErrorMsg) {
+            this.importErrorMsg.style.display = 'none';
+            this.importErrorMsg.innerHTML = '';
+        }
+        if (this.importInputStep) this.importInputStep.style.display = 'block';
+        if (this.importSummaryStep) this.importSummaryStep.style.display = 'none';
+        this.modalImport.style.display = 'flex';
+        this.modalImport.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (this.importTextarea) this.importTextarea.focus();
+    }
+
+    closeImportTextModal() {
+        if (!this.modalImport) return;
+        this.modalImport.style.display = 'none';
+        this.modalImport.classList.remove('active');
+        document.body.style.overflow = '';
+        this.pendingImportData = null;
+    }
+
+    handleAnalyzeText() {
+        if (!this.importTextarea) return;
+        const raw = this.importTextarea.value.trim();
+
+        if (!raw) {
+            if (this.importErrorMsg) {
+                this.importErrorMsg.innerHTML = '⚠️ Por favor, pega el texto de la jornada antes de analizar.';
+                this.importErrorMsg.style.display = 'block';
+            }
+            return;
+        }
+
+        if (typeof TextImporterService === 'undefined') {
+            alert('Error: No se encontró el servicio TextImporterService.');
+            return;
+        }
+
+        const parsed = TextImporterService.parseMatchesText(raw);
+
+        if (!parsed.success && parsed.errors.length > 0) {
+            if (this.importErrorMsg) {
+                this.importErrorMsg.innerHTML = `<strong>⚠️ No se pudo interpretar la jornada completa:</strong><ul style="margin:5px 0 0 0; padding-left:20px;">${parsed.errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+                this.importErrorMsg.style.display = 'block';
+            }
+            return;
+        }
+
+        if (this.importErrorMsg) {
+            this.importErrorMsg.style.display = 'none';
+            this.importErrorMsg.innerHTML = '';
+        }
+
+        this.pendingImportData = parsed;
+        this.renderImportSummary(parsed);
+
+        if (this.importInputStep) this.importInputStep.style.display = 'none';
+        if (this.importSummaryStep) this.importSummaryStep.style.display = 'block';
+    }
+
+    renderImportSummary(parsed) {
+        if (!this.importSummaryHeader || !this.importMatchesList) return;
+
+        const existing = this.jornadas.find(j => j.number === parsed.jNum);
+        const isSunday = parsed.isSunday;
+
+        let dateBadge = '';
+        if (parsed.dateStr) {
+            if (isSunday === true) {
+                dateBadge = '<span style="background:rgba(46,125,50,0.12); color:#2e7d32; border:1px solid rgba(46,125,50,0.3); padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">📅 Domingo</span>';
+            } else if (isSunday === false) {
+                dateBadge = '<span style="background:rgba(255,152,0,0.15); color:#e65100; border:1px solid rgba(255,152,0,0.4); padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">⚠️ No es domingo</span>';
+            }
+        }
+
+        let existingBanner = '';
+        if (existing) {
+            existingBanner = `
+                <div style="background:rgba(33,150,243,0.1); border:1px solid rgba(33,150,243,0.3); border-radius:6px; padding:0.6rem 0.8rem; margin-top:0.8rem; color:#1976d2; font-size:0.85rem;">
+                    ℹ️ <strong>Atención:</strong> Ya existe una <strong>Jornada ${parsed.jNum}</strong> registrada. Si confirmas, se actualizarán los partidos con los nuevos datos.
+                </div>
+            `;
+        }
+
+        this.importSummaryHeader.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <span style="font-size:1.2rem; font-weight:900; color:var(--primary-color, #1976d2);">Jornada ${parsed.jNum}</span>
+                    <span style="font-size:0.85rem; color:var(--text-secondary, #666); margin-left:8px;">(Temporada 2026-2027)</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-weight:600; color:var(--text-main, #333); font-size:0.95rem;">${parsed.dateStr || 'Sin fecha'}</span>
+                    ${dateBadge}
+                </div>
+            </div>
+            ${existingBanner}
+        `;
+
+        // Warnings
+        if (parsed.warnings && parsed.warnings.length > 0) {
+            this.importWarningsCard.innerHTML = `
+                <ul style="margin:0; padding-left:1.2rem; list-style-type:disc;">
+                    ${parsed.warnings.map(w => `<li>${w}</li>`).join('')}
+                </ul>
+            `;
+            this.importWarningsCard.style.display = 'block';
+        } else {
+            this.importWarningsCard.style.display = 'none';
+        }
+
+        // Matches list
+        let matchesHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+        parsed.matches.forEach((m, idx) => {
+            const num = idx + 1;
+            const isP15 = idx === 14;
+            const numLabel = isP15 ? 'P15' : `${num}`;
+            const numStyle = isP15 
+                ? 'background: linear-gradient(135deg, #e65100, #ff9100); color: white; font-weight: 900;' 
+                : 'background: var(--input-bg, #eee); color: var(--text-main, #333); font-weight: bold;';
+
+            if (!m) {
+                matchesHtml += `
+                    <div style="display:flex; align-items:center; padding:6px 10px; border-radius:6px; background:rgba(244,67,54,0.06); border:1px dashed #ef9a9a;">
+                        <span style="width:36px; height:24px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; font-size:0.8rem; margin-right:10px; ${numStyle}">${numLabel}</span>
+                        <span style="color:#d32f2f; font-size:0.85rem; font-style:italic;">⚠️ Partido no detectado</span>
+                    </div>
+                `;
+                return;
+            }
+
+            const homeLogo = typeof AppUtils !== 'undefined' ? AppUtils.getTeamLogo(m.home) : '';
+            const awayLogo = typeof AppUtils !== 'undefined' ? AppUtils.getTeamLogo(m.away) : '';
+            const isPig = isP15 && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away);
+
+            const pigBadge = isPig ? '<span style="background:rgba(233,30,99,0.12); color:#c2185b; border:1px solid rgba(233,30,99,0.3); border-radius:10px; padding:1px 6px; font-size:0.75rem; font-weight:bold; margin-left:6px;">🐷 PIG</span>' : '';
+
+            matchesHtml += `
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 10px; border-radius:6px; background:var(--pastel-bg, #fcfcfc); border:1px solid var(--input-border, #eee); font-size:0.9rem;">
+                    <div style="display:flex; align-items:center; flex:1; overflow:hidden;">
+                        <span style="width:36px; height:24px; min-width:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; font-size:0.8rem; margin-right:12px; ${numStyle}">${numLabel}</span>
+                        <div style="display:flex; align-items:center; gap:8px; flex:1; justify-content:flex-end; text-align:right;">
+                            <span style="font-weight:600; color:var(--text-main, #333); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.home}</span>
+                            ${homeLogo ? `<img src="${homeLogo}" style="width:20px; height:20px; object-fit:contain;" alt="">` : ''}
+                        </div>
+                        <span style="margin:0 10px; color:#aaa; font-weight:bold; font-size:0.8rem;">vs</span>
+                        <div style="display:flex; align-items:center; gap:8px; flex:1; justify-content:flex-start; text-align:left;">
+                            ${awayLogo ? `<img src="${awayLogo}" style="width:20px; height:20px; object-fit:contain;" alt="">` : ''}
+                            <span style="font-weight:600; color:var(--text-main, #333); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.away}</span>
+                        </div>
+                    </div>
+                    ${pigBadge}
+                </div>
+            `;
+        });
+        matchesHtml += '</div>';
+        this.importMatchesList.innerHTML = matchesHtml;
+    }
+
+    async handleConfirmCreateJornada() {
+        if (!this.pendingImportData) return;
+
+        const parsed = this.pendingImportData;
+        const existingIdx = this.jornadas.findIndex(j => j.number === parsed.jNum);
+        const existing = existingIdx > -1 ? this.jornadas[existingIdx] : null;
+
+        const jornadaData = {
+            id: existing ? existing.id : Date.now(),
+            number: parsed.jNum,
+            season: '2026-2027',
+            date: parsed.dateStr || (existing ? existing.date : 'Por definir'),
+            matches: parsed.matches,
+            prizes: existing ? (existing.prizes || {}) : {},
+            active: existing ? existing.active : true
+        };
+
+        if (existingIdx > -1) {
+            this.jornadas[existingIdx] = jornadaData;
+        } else {
+            this.jornadas.push(jornadaData);
+        }
+
+        if (this.btnConfirmCreateJornada) {
+            this.btnConfirmCreateJornada.disabled = true;
+            this.btnConfirmCreateJornada.textContent = '⏳ Guardando...';
+        }
+
+        try {
+            await this.saveSingle(jornadaData);
+            this.renderGrid();
+
+            // Trigger dice for absent members if applicable
+            if (window.DiceService && window.DataService) {
+                try {
+                    const members = await window.DataService.getAll('members');
+                    const pronosticos = await window.DataService.getAll('pronosticos');
+                    await window.DiceService.checkAndApplyDice(members, this.jornadas, pronosticos);
+                } catch (errDice) {
+                    console.error("Error aplicando dado tras importar partidos:", errDice);
+                }
+            }
+
+            this.closeImportTextModal();
+            alert(`✅ Jornada ${jornadaData.number} creada y guardada correctamente.`);
+        } catch (err) {
+            console.error("Error al guardar jornada importada:", err);
+            alert("Error al guardar la jornada: " + err.message);
+        } finally {
+            if (this.btnConfirmCreateJornada) {
+                this.btnConfirmCreateJornada.disabled = false;
+                this.btnConfirmCreateJornada.textContent = '✅ Confirmar y Crear Jornada';
+            }
+        }
+    }
+
+    handleDiscardImport() {
+        this.pendingImportData = null;
+        this.closeImportTextModal();
+    }
+
+    handleBackToText() {
+        if (this.importSummaryStep) this.importSummaryStep.style.display = 'none';
+        if (this.importInputStep) this.importInputStep.style.display = 'block';
     }
 
     refreshData(silent = false) {

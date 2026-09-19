@@ -187,12 +187,20 @@ var AppUtils = window.AppUtils || {
             'osasuna': 'escudos/primera/OSASUNA-150x150.png',
             'rayo vallecano': 'escudos/primera/RAYO-VALLECANO-150x150.png',
             'rayo': 'escudos/primera/RAYO-VALLECANO-150x150.png',
+            'rayo v.': 'escudos/primera/RAYO-VALLECANO-150x150.png',
+            'rayo v': 'escudos/primera/RAYO-VALLECANO-150x150.png',
             'real madrid': 'escudos/primera/REAL-MADRID-150x150.png',
+            'r. madrid': 'escudos/primera/REAL-MADRID-150x150.png',
+            'r.madrid': 'escudos/primera/REAL-MADRID-150x150.png',
             'real sociedad': 'escudos/primera/REAL-SOCIEDAD-150x150.png',
+            'r. sociedad': 'escudos/primera/REAL-SOCIEDAD-150x150.png',
+            'r.sociedad': 'escudos/primera/REAL-SOCIEDAD-150x150.png',
             'sevilla': 'escudos/primera/SEVILLA-150x150.png',
             'valencia': 'escudos/primera/VALENCIA-150x150.png',
             'real valladolid': 'escudos/segunda/Real-Valladolid-CF.png',
             'valladolid': 'escudos/segunda/Real-Valladolid-CF.png',
+            'r. valladolid': 'escudos/segunda/Real-Valladolid-CF.png',
+            'r.valladolid': 'escudos/segunda/Real-Valladolid-CF.png',
             'villarreal': 'escudos/primera/VILLARREAL-150x150.png',
             'albacete': 'escudos/segunda/ALBACETE-150x150.png',
             'andorra': 'escudos/segunda/ANDORRA-150x150.png',
@@ -298,7 +306,7 @@ var AppUtils = window.AppUtils || {
         // Female teams are never PIG
         if (this.isFemaleTeam(home) || this.isFemaleTeam(away)) return false;
 
-        const pigTeams = ['real madrid', 'at. madrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético'];
+        const pigTeams = ['real madrid', 'r. madrid', 'r.madrid', 'at. madrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético'];
 
         const h = this.normalizeName(home);
         const a = this.normalizeName(away);

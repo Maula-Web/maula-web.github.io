@@ -30,9 +30,8 @@
             </div>
 
             <div class="action-buttons">
-                <button id="btn-import-pdf" class="btn-action" style="background: #e65100; color: white;"
-                    onclick="startPDFImport()">
-                    📄 Importar Partidos
+                <button id="btn-import-matches" class="btn-action" style="background: #e65100; color: white;">
+                    📋 Importar Partidos
                 </button>
                 <button id="btn-import-rss" class="btn-action" style="background: var(--primary-green); color: white;"
                     onclick="startRSSImport()">
@@ -120,6 +119,63 @@
         </div>
     </div>
 
+    <!-- Modal for Text Import (Matches) -->
+    <div id="modal-import-matches" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:99999; justify-content:center; align-items:center;">
+        <div class="modal import-modal-content" style="background:var(--card-bg, #fff); border-radius:12px; max-width:650px; width:95%; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 15px 35px rgba(0,0,0,0.35);">
+            <!-- Modal Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:1.2rem 1.5rem; border-bottom:1px solid var(--input-border, #eee); background:var(--card-bg, #fff);">
+                <h2 style="margin:0; font-size:1.3rem; display:flex; align-items:center; gap:8px; color:var(--text-main, #333);">
+                    📋 <span>Importar Partidos desde Texto</span>
+                </h2>
+                <button type="button" id="btn-close-import-modal" class="btn-action" style="background:#f5f5f5; color:#555; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">✖</button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div style="padding:1.5rem; overflow-y:auto; flex:1;">
+                <!-- Step 1: Text Input View -->
+                <div id="import-input-step">
+                    <p style="margin-top:0; color:var(--text-secondary, #666); font-size:0.9rem; line-height:1.4;">
+                        Pega aquí el texto copiado de la web (Revista Quinielista u otra fuente) que contenga el número de jornada, fecha y lista de partidos:
+                    </p>
+                    <textarea id="import-matches-textarea" rows="11" placeholder="Ejemplo:&#10;Jornada: 8&#10; 20/09/2026&#10;1º  Osasuna  Rayo V.&#10;2º  Athletic Club  Alavés...&#10;...&#10;15º  At. Madrid&#10;R. Madrid" style="width:100%; box-sizing:border-box; padding:0.8rem; border-radius:8px; border:1.5px solid var(--input-border, #ccc); font-family:monospace; font-size:0.85rem; line-height:1.4; resize:vertical; background:var(--input-bg, #fafafa); color:var(--text-main, #333);"></textarea>
+                    
+                    <div id="import-error-msg" style="display:none; margin-top:1rem; padding:0.8rem 1rem; border-radius:8px; background:rgba(244, 67, 54, 0.1); border:1px solid rgba(244, 67, 54, 0.3); color:#d32f2f; font-size:0.85rem;"></div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:1.2rem;">
+                        <button type="button" id="btn-cancel-import" class="btn-action" style="background:#eee; color:#444;">Cancelar</button>
+                        <button type="button" id="btn-analyze-import" class="btn-action" style="background:#e65100; color:white; font-weight:bold;">🔍 Analizar Texto</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Summary / Preview View -->
+                <div id="import-summary-step" style="display:none;">
+                    <!-- Summary info card -->
+                    <div id="import-summary-header" style="background:var(--pastel-bg, #f5f5f5); border:1px solid var(--input-border, #ddd); border-radius:8px; padding:1rem; margin-bottom:1.2rem;">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <!-- Warnings card (if any) -->
+                    <div id="import-warnings-card" style="display:none; margin-bottom:1.2rem; padding:0.8rem 1rem; border-radius:8px; background:rgba(255, 152, 0, 0.12); border:1px solid rgba(255, 152, 0, 0.35); color:#e65100; font-size:0.85rem;">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <h4 style="margin:0 0 0.8rem 0; color:var(--text-main, #333); font-size:1rem;">⚽ Resumen de Partidos a Crear (15)</h4>
+                    <div id="import-matches-list" style="max-height:280px; overflow-y:auto; border:1px solid var(--input-border, #eee); border-radius:8px; padding:0.5rem; background:var(--card-bg, #fff);">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; gap:10px; flex-wrap:wrap;">
+                        <button type="button" id="btn-discard-import" class="btn-action" style="background:#ffebee; color:#d32f2f; border:1px solid rgba(244,67,54,0.3);">❌ Desechar</button>
+                        <div style="display:flex; gap:10px;">
+                            <button type="button" id="btn-back-to-text" class="btn-action" style="background:#eee; color:#444;">✏️ Volver a Editar</button>
+                            <button type="button" id="btn-confirm-create-jornada" class="btn-action btn-add" style="background:#2e7d32; color:white; font-weight:bold;">✅ Confirmar y Crear Jornada</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="theme-controls">
         <button class="theme-toggle-btn" id="themeToggle" title="Cambiar Tema">🌙</button>
     </div>
@@ -129,6 +185,7 @@
     <!-- PDF Importer removed (See Web Scraper in rss-importer.js) -->
     <script src="js/telegram-service.js"></script>
     <script src="js/dice-service.js"></script>
+    <script src="js/text-importer.js"></script>
     <script src="js/jornadas.js"></script>
 
     <!-- Theme handled by auth.js -->

@@ -1083,4 +1083,10 @@ window.quinielaScraper = new QuinielaScraper();
 
 // Mapear funciones antiguas a las nuevas
 window.startRSSImport = () => window.quinielaScraper.startResultImport(); // "Importar Resultados"
-window.startPDFImport = () => window.quinielaScraper.startMatchImport();  // "Importar Partidos"
+window.startPDFImport = () => {
+    if (window.jornadaManager && typeof window.jornadaManager.openImportTextModal === 'function') {
+        window.jornadaManager.openImportTextModal();
+    } else if (window.quinielaScraper) {
+        window.quinielaScraper.startMatchImport();
+    }
+};
