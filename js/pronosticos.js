@@ -1169,13 +1169,33 @@ class PronosticoManager {
 
                 if (isPlayed) {
                     const selection14 = p.selection.slice(0, 14);
-                    const summary = selection14.map(s => s || '-').join('');
+                    const b1 = selection14.slice(0, 4).map(s => s || '-').join('');
+                    const b2 = selection14.slice(4, 8).map(s => s || '-').join('');
+                    const b3 = selection14.slice(8, 11).map(s => s || '-').join('');
+                    const b4 = selection14.slice(11, 14).map(s => s || '-').join('');
 
-                    if (p.late) {
-                        cellContent = `<div class="summary-forecast late" title="Enviado con retraso">${summary}</div>`;
-                    } else {
-                        cellContent = `<div class="summary-forecast">${summary}</div>`;
+                    let p15Val = '';
+                    if (p.selection && p.selection[14]) {
+                        const raw = String(p.selection[14]).trim();
+                        if (raw && raw !== '-') p15Val = raw;
                     }
+
+                    const lateClass = p.late ? ' late' : '';
+                    const lateTitle = p.late ? ' (Enviado con retraso)' : '';
+                    const p15Badge = p15Val ? `<span class="sf-p15-badge" title="Pleno al 15: ${p15Val}">P15: ${p15Val}</span>` : '';
+
+                    cellContent = `
+                        <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}">
+                            <span class="sf-block">${b1}</span>
+                            <span class="sf-sep">|</span>
+                            <span class="sf-block">${b2}</span>
+                            <span class="sf-sep">|</span>
+                            <span class="sf-block">${b3}</span>
+                            <span class="sf-sep">|</span>
+                            <span class="sf-block">${b4}</span>
+                            ${p15Badge}
+                        </div>
+                    `;
                 } else {
                     cellContent = `<span class="summary-no-data">-</span>`;
                 }
@@ -1213,9 +1233,11 @@ class PronosticoManager {
                         }
                     }
 
+                    const isBlockEnd = [3, 7, 10].includes(idx);
                     const subClass = isSubActive ? 'sign-sub active' : 'sign-sub empty';
+                    const blockEndClass = isBlockEnd ? ' block-end' : '';
                     gridColsHtml += `
-                        <div class="doubles-col">
+                        <div class="doubles-col${blockEndClass}">
                             <span class="sign-main">${mainSign}</span>
                             <span class="${subClass}">${subSign}</span>
                         </div>
