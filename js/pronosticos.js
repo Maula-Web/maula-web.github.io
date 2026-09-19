@@ -294,9 +294,6 @@ class PronosticoManager {
                 <div style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.95rem; flex-wrap: wrap;">
                     <span style="font-size: 1.2rem;">👇</span>
                     <span>Haz clic en una casilla del <strong>Resumen de Pronósticos</strong> inferior para ver o rellenar la quiniela.</span>
-                    <button type="button" onclick="const sc = document.getElementById('summary-container'); if(sc) sc.scrollIntoView({behavior: 'smooth'});" style="background: var(--primary-color, #1976d2); color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                        Ir a la tabla ⬇️
-                    </button>
                 </div>
             `;
             return;
@@ -316,11 +313,34 @@ class PronosticoManager {
                 <span style="background: rgba(25, 118, 210, 0.1); color: var(--primary-color, #1976d2); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(25, 118, 210, 0.25); display: inline-flex; align-items: center; gap: 6px;">
                     📅 <span>${jornadaText}</span>
                 </span>
-                <button type="button" onclick="const sc = document.getElementById('summary-container'); if(sc) sc.scrollIntoView({behavior: 'smooth'});" style="background: transparent; border: 1px dashed var(--input-border, #ccc); border-radius: 20px; padding: 4px 10px; font-size: 0.85rem; color: var(--text-secondary, #666); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Ir al resumen para elegir otro socio o jornada">
-                    🔄 Cambiar pronóstico ⬇️
+                <button type="button" id="btn-close-forecast" style="background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3); border-radius: 20px; padding: 5px 12px; font-size: 0.85rem; color: #d32f2f; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: all 0.2s;" title="Cerrar pronóstico">
+                    ✖ Cerrar
                 </button>
             </div>
         `;
+
+        const btnClose = this.activeSelectionInfo.querySelector('#btn-close-forecast');
+        if (btnClose) {
+            btnClose.addEventListener('click', () => this.closeForecast());
+        }
+    }
+
+    closeForecast() {
+        this.currentMemberId = null;
+        this.currentJornadaId = null;
+        this.container.innerHTML = '';
+        this.container.classList.add('hidden');
+        if (this.doublesSection) this.doublesSection.classList.add('hidden');
+        if (this.doublesInfoHeader) this.doublesInfoHeader.style.display = 'none';
+        this.btnSave.style.display = 'none';
+        if (this.btnClearForecast) this.btnClearForecast.style.display = 'none';
+        this.statusMsg.textContent = '';
+        this.deadlineInfo.textContent = '';
+        if (this.costInfo) this.costInfo.textContent = '';
+        if (this.summaryTable) {
+            this.summaryTable.querySelectorAll('.summary-cell.active-cell').forEach(c => c.classList.remove('active-cell'));
+        }
+        this.updateActiveSelectionUI();
     }
 
     populateDropdowns() {
