@@ -1082,7 +1082,13 @@ class QuinielaScraper {
 window.quinielaScraper = new QuinielaScraper();
 
 // Mapear funciones antiguas a las nuevas
-window.startRSSImport = () => window.quinielaScraper.startResultImport(); // "Importar Resultados"
+window.startRSSImport = () => {
+    if (window.jornadaManager && typeof window.jornadaManager.openImportResultsModal === 'function') {
+        window.jornadaManager.openImportResultsModal();
+    } else if (window.quinielaScraper) {
+        window.quinielaScraper.startResultImport();
+    }
+};
 window.startPDFImport = () => {
     if (window.jornadaManager && typeof window.jornadaManager.openImportTextModal === 'function') {
         window.jornadaManager.openImportTextModal();

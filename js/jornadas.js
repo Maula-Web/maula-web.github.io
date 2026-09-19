@@ -75,7 +75,7 @@ class JornadaManager {
         this.inpActive = document.getElementById('inp-active');
         this.teamsCache = [];
 
-        // Text Importer DOM Elements
+        // Text Importer DOM Elements (Matches)
         this.btnImportMatches = document.getElementById('btn-import-matches') || document.getElementById('btn-import-pdf');
         this.modalImport = document.getElementById('modal-import-matches');
         this.btnCloseImportModal = document.getElementById('btn-close-import-modal');
@@ -92,6 +92,25 @@ class JornadaManager {
         this.btnBackToText = document.getElementById('btn-back-to-text');
         this.btnConfirmCreateJornada = document.getElementById('btn-confirm-create-jornada');
         this.pendingImportData = null;
+
+        // Text Importer DOM Elements (Results & Prizes)
+        this.btnImportResults = document.getElementById('btn-import-results') || document.getElementById('btn-import-rss');
+        this.modalImportResults = document.getElementById('modal-import-results');
+        this.btnCloseResultsModal = document.getElementById('btn-close-results-modal');
+        this.importResultsInputStep = document.getElementById('import-results-input-step');
+        this.importResultsSummaryStep = document.getElementById('import-results-summary-step');
+        this.importResultsTextarea = document.getElementById('import-results-textarea');
+        this.importResultsErrorMsg = document.getElementById('import-results-error-msg');
+        this.btnAnalyzeResultsImport = document.getElementById('btn-analyze-results-import');
+        this.btnCancelResultsImport = document.getElementById('btn-cancel-results-import');
+        this.importResultsSummaryHeader = document.getElementById('import-results-summary-header');
+        this.importResultsWarningsCard = document.getElementById('import-results-warnings-card');
+        this.importResultsMatchesList = document.getElementById('import-results-matches-list');
+        this.importResultsPrizesList = document.getElementById('import-results-prizes-list');
+        this.btnDiscardResultsImport = document.getElementById('btn-discard-results-import');
+        this.btnBackToResultsText = document.getElementById('btn-back-to-results-text');
+        this.btnConfirmImportResults = document.getElementById('btn-confirm-import-results');
+        this.pendingResultsData = null;
     }
 
     bindEvents() {
@@ -102,7 +121,7 @@ class JornadaManager {
         if (this.btnDelete) this.btnDelete.addEventListener('click', () => this.deleteCurrentJornada());
         if (this.btnDeleteAll) this.btnDeleteAll.addEventListener('click', () => this.deleteAllJornadas());
 
-        // Text Importer Events
+        // Text Importer Events (Matches)
         if (this.btnImportMatches) this.btnImportMatches.addEventListener('click', () => this.openImportTextModal());
         if (this.btnCloseImportModal) this.btnCloseImportModal.addEventListener('click', () => this.closeImportTextModal());
         if (this.btnCancelImport) this.btnCancelImport.addEventListener('click', () => this.closeImportTextModal());
@@ -111,9 +130,19 @@ class JornadaManager {
         if (this.btnBackToText) this.btnBackToText.addEventListener('click', () => this.handleBackToText());
         if (this.btnConfirmCreateJornada) this.btnConfirmCreateJornada.addEventListener('click', () => this.handleConfirmCreateJornada());
 
+        // Text Importer Events (Results & Prizes)
+        if (this.btnImportResults) this.btnImportResults.addEventListener('click', () => this.openImportResultsModal());
+        if (this.btnCloseResultsModal) this.btnCloseResultsModal.addEventListener('click', () => this.closeImportResultsModal());
+        if (this.btnCancelResultsImport) this.btnCancelResultsImport.addEventListener('click', () => this.closeImportResultsModal());
+        if (this.btnAnalyzeResultsImport) this.btnAnalyzeResultsImport.addEventListener('click', () => this.handleAnalyzeResultsText());
+        if (this.btnDiscardResultsImport) this.btnDiscardResultsImport.addEventListener('click', () => this.handleDiscardResultsImport());
+        if (this.btnBackToResultsText) this.btnBackToResultsText.addEventListener('click', () => this.handleBackToResultsText());
+        if (this.btnConfirmImportResults) this.btnConfirmImportResults.addEventListener('click', () => this.handleConfirmImportResults());
+
         window.addEventListener('click', (e) => {
             if (e.target === this.modal) this.closeModal();
             if (e.target === this.modalImport) this.closeImportTextModal();
+            if (e.target === this.modalImportResults) this.closeImportResultsModal();
         });
     }
 
@@ -869,6 +898,330 @@ class JornadaManager {
     handleBackToText() {
         if (this.importSummaryStep) this.importSummaryStep.style.display = 'none';
         if (this.importInputStep) this.importInputStep.style.display = 'block';
+    }
+
+    // --- RESULTS & PRIZES IMPORTER METHODS ---
+    openImportResultsModal() {
+        if (!this.modalImportResults) return;
+        this.pendingResultsData = null;
+        if (this.importResultsTextarea) this.importResultsTextarea.value = '';
+        if (this.importResultsErrorMsg) {
+            this.importResultsErrorMsg.style.display = 'none';
+            this.importResultsErrorMsg.innerHTML = '';
+        }
+        if (this.importResultsInputStep) this.importResultsInputStep.style.display = 'block';
+        if (this.importResultsSummaryStep) this.importResultsSummaryStep.style.display = 'none';
+        this.modalImportResults.style.display = 'flex';
+        this.modalImportResults.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (this.importResultsTextarea) this.importResultsTextarea.focus();
+    }
+
+    closeImportResultsModal() {
+        if (!this.modalImportResults) return;
+        this.modalImportResults.style.display = 'none';
+        this.modalImportResults.classList.remove('active');
+        document.body.style.overflow = '';
+        this.pendingResultsData = null;
+    }
+
+    handleAnalyzeResultsText() {
+        if (!this.importResultsTextarea) return;
+        const raw = this.importResultsTextarea.value.trim();
+
+        if (!raw) {
+            if (this.importResultsErrorMsg) {
+                this.importResultsErrorMsg.innerHTML = '⚠️ Por favor, pega el texto de resultados antes de analizar.';
+                this.importResultsErrorMsg.style.display = 'block';
+            }
+            return;
+        }
+
+        if (typeof TextImporterService === 'undefined' || typeof TextImporterService.parseResultsText !== 'function') {
+            alert('Error: TextImporterService.parseResultsText no está disponible.');
+            return;
+        }
+
+        const parsed = TextImporterService.parseResultsText(raw);
+
+        if (!parsed.success && parsed.errors.length > 0) {
+            if (this.importResultsErrorMsg) {
+                this.importResultsErrorMsg.innerHTML = `<strong>⚠️ No se pudieron interpretar los resultados:</strong><ul style="margin:5px 0 0 0; padding-left:20px;">${parsed.errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+                this.importResultsErrorMsg.style.display = 'block';
+            }
+            return;
+        }
+
+        if (this.importResultsErrorMsg) {
+            this.importResultsErrorMsg.style.display = 'none';
+            this.importResultsErrorMsg.innerHTML = '';
+        }
+
+        this.pendingResultsData = parsed;
+        this.renderResultsSummary(parsed);
+
+        if (this.importResultsInputStep) this.importResultsInputStep.style.display = 'none';
+        if (this.importResultsSummaryStep) this.importResultsSummaryStep.style.display = 'block';
+    }
+
+    renderResultsSummary(parsed) {
+        if (!this.importResultsSummaryHeader || !this.importResultsMatchesList || !this.importResultsPrizesList) return;
+
+        const existing = this.jornadas.find(j => j.number === parsed.jNum);
+        const isSunday = parsed.isSunday;
+
+        let dateBadge = '';
+        if (parsed.dateStr) {
+            if (isSunday === true) {
+                dateBadge = '<span style="background:rgba(46,125,50,0.12); color:#2e7d32; border:1px solid rgba(46,125,50,0.3); padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">📅 Domingo</span>';
+            } else if (isSunday === false) {
+                dateBadge = '<span style="background:rgba(255,152,0,0.15); color:#e65100; border:1px solid rgba(255,152,0,0.4); padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;">⚠️ No es domingo</span>';
+            }
+        }
+
+        let existingBanner = '';
+        if (existing) {
+            existingBanner = `
+                <div style="background:rgba(33,150,243,0.1); border:1px solid rgba(33,150,243,0.3); border-radius:6px; padding:0.6rem 0.8rem; margin-top:0.8rem; color:#1976d2; font-size:0.85rem;">
+                    ℹ️ <strong>Jornada encontrada:</strong> Ya existe la <strong>Jornada ${parsed.jNum}</strong> registrada. Al confirmar, se actualizarán los resultados de sus partidos y su desglose de premios.
+                </div>
+            `;
+        } else {
+            existingBanner = `
+                <div style="background:rgba(76,175,80,0.1); border:1px solid rgba(76,175,80,0.3); border-radius:6px; padding:0.6rem 0.8rem; margin-top:0.8rem; color:#2e7d32; font-size:0.85rem;">
+                    ✨ <strong>Nueva Jornada:</strong> La <strong>Jornada ${parsed.jNum}</strong> no existe en el sistema. Al confirmar, se creará completa con estos resultados y premios.
+                </div>
+            `;
+        }
+
+        this.importResultsSummaryHeader.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <span style="font-size:1.2rem; font-weight:900; color:var(--primary-green, #2e7d32);">Jornada ${parsed.jNum}</span>
+                    <span style="font-size:0.85rem; color:var(--text-secondary, #666); margin-left:8px;">(Temporada 2026-2027)</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-weight:600; color:var(--text-main, #333); font-size:0.95rem;">${parsed.dateStr || 'Sin fecha'}</span>
+                    ${dateBadge}
+                </div>
+            </div>
+            ${existingBanner}
+        `;
+
+        // Warnings
+        if (parsed.warnings && parsed.warnings.length > 0) {
+            this.importResultsWarningsCard.innerHTML = `
+                <ul style="margin:0; padding-left:1.2rem; list-style-type:disc;">
+                    ${parsed.warnings.map(w => `<li>${w}</li>`).join('')}
+                </ul>
+            `;
+            this.importResultsWarningsCard.style.display = 'block';
+        } else {
+            this.importResultsWarningsCard.style.display = 'none';
+        }
+
+        // Matches list
+        let matchesHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+        parsed.matches.forEach((m, idx) => {
+            const num = idx + 1;
+            const isP15 = idx === 14;
+            const numLabel = isP15 ? 'P15' : `${num}`;
+            const numStyle = isP15 
+                ? 'background: linear-gradient(135deg, #e65100, #ff9100); color: white; font-weight: 900;' 
+                : 'background: var(--input-bg, #eee); color: var(--text-main, #333); font-weight: bold;';
+
+            if (!m) {
+                matchesHtml += `
+                    <div style="display:flex; align-items:center; padding:6px 10px; border-radius:6px; background:rgba(244,67,54,0.06); border:1px dashed #ef9a9a;">
+                        <span style="width:36px; height:24px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; font-size:0.8rem; margin-right:10px; ${numStyle}">${numLabel}</span>
+                        <span style="color:#d32f2f; font-size:0.85rem; font-style:italic;">⚠️ Partido no detectado</span>
+                    </div>
+                `;
+                return;
+            }
+
+            const homeLogo = typeof AppUtils !== 'undefined' ? AppUtils.getTeamLogo(m.home) : '';
+            const awayLogo = typeof AppUtils !== 'undefined' ? AppUtils.getTeamLogo(m.away) : '';
+            const isPig = isP15 && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away);
+            const pigBadge = isPig ? '<span style="background:rgba(233,30,99,0.12); color:#c2185b; border:1px solid rgba(233,30,99,0.3); border-radius:10px; padding:1px 6px; font-size:0.75rem; font-weight:bold; margin-right:6px;">🐷 PIG</span>' : '';
+
+            // Sign Badge Styling
+            let badgeStyle = 'background:#eee; color:#333;';
+            if (m.result === '1') {
+                badgeStyle = 'background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7;';
+            } else if (m.result === 'X') {
+                badgeStyle = 'background:#fff8e1; color:#f57f17; border:1px solid #ffe082;';
+            } else if (m.result === '2') {
+                badgeStyle = 'background:#ffebee; color:#c62828; border:1px solid #ef9a9a;';
+            } else if (isP15) {
+                badgeStyle = 'background: linear-gradient(135deg, #e65100, #ff9100); color: white; border:none;';
+            }
+
+            matchesHtml += `
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 10px; border-radius:6px; background:var(--pastel-bg, #fcfcfc); border:1px solid var(--input-border, #eee); font-size:0.9rem;">
+                    <div style="display:flex; align-items:center; flex:1; overflow:hidden;">
+                        <span style="width:36px; height:24px; min-width:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; font-size:0.8rem; margin-right:12px; ${numStyle}">${numLabel}</span>
+                        <div style="display:flex; align-items:center; gap:8px; flex:1; justify-content:flex-end; text-align:right;">
+                            <span style="font-weight:600; color:var(--text-main, #333); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.home}</span>
+                            ${homeLogo ? `<img src="${homeLogo}" style="width:20px; height:20px; object-fit:contain;" alt="">` : ''}
+                        </div>
+                        <span style="margin:0 10px; font-weight:bold; color:var(--text-secondary, #555); font-size:0.85rem; background:var(--input-bg, #eee); padding:2px 8px; border-radius:4px; min-width:44px; text-align:center;">${m.score || '-'}</span>
+                        <div style="display:flex; align-items:center; gap:8px; flex:1; justify-content:flex-start; text-align:left;">
+                            ${awayLogo ? `<img src="${awayLogo}" style="width:20px; height:20px; object-fit:contain;" alt="">` : ''}
+                            <span style="font-weight:600; color:var(--text-main, #333); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.away}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; margin-left:12px;">
+                        ${pigBadge}
+                        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:26px; padding:0 6px; border-radius:6px; font-weight:bold; font-size:0.9rem; ${badgeStyle}">${m.result || '-'}</span>
+                    </div>
+                </div>
+            `;
+        });
+        matchesHtml += '</div>';
+        this.importResultsMatchesList.innerHTML = matchesHtml;
+
+        // Prizes Table
+        const formatEuro = typeof AppUtils !== 'undefined' ? AppUtils.formatEuro : (val) => val.toLocaleString('es-ES') + ' €';
+        const prizesDetails = parsed.prizesDetails || [
+            { category: '15', label: 'Pleno al 15', winners: 0, amount: parsed.prizes['15'] || 0 },
+            { category: '14', label: '1ª (14 Aciertos)', winners: 0, amount: parsed.prizes['14'] || 0 },
+            { category: '13', label: '2ª (13 Aciertos)', winners: 0, amount: parsed.prizes['13'] || 0 },
+            { category: '12', label: '3ª (12 Aciertos)', winners: 0, amount: parsed.prizes['12'] || 0 },
+            { category: '11', label: '4ª (11 Aciertos)', winners: 0, amount: parsed.prizes['11'] || 0 },
+            { category: '10', label: '5ª (10 Aciertos)', winners: 0, amount: parsed.prizes['10'] || 0 }
+        ];
+
+        let prizesHtml = `
+            <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
+                <thead>
+                    <tr style="border-bottom:2px solid var(--input-border, #ddd); color:var(--text-secondary, #666);">
+                        <th style="padding:6px 10px;">Categoría</th>
+                        <th style="padding:6px 10px; text-align:center;">Acertantes</th>
+                        <th style="padding:6px 10px; text-align:right;">Premio</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        prizesDetails.forEach((pd, pidx) => {
+            const rowBg = pidx % 2 === 0 ? 'background:var(--pastel-bg, #fafafa);' : 'background:var(--card-bg, #fff);';
+            const formattedAmount = formatEuro(pd.amount);
+            const winnersDisplay = (pd.winners !== null && pd.winners !== undefined) ? pd.winners.toLocaleString('es-ES') : '-';
+            const isHighlight = pd.category === '15' || pd.category === '14';
+            const catStyle = isHighlight ? 'font-weight:bold; color:var(--text-main, #333);' : 'color:var(--text-main, #444);';
+            const prizeStyle = pd.amount > 0 ? 'font-weight:bold; color:#2e7d32;' : 'color:var(--text-secondary, #888);';
+
+            prizesHtml += `
+                <tr style="${rowBg} border-bottom:1px solid var(--input-border, #eee);">
+                    <td style="padding:7px 10px; ${catStyle}">${pd.label}</td>
+                    <td style="padding:7px 10px; text-align:center; color:var(--text-secondary, #555);">${winnersDisplay}</td>
+                    <td style="padding:7px 10px; text-align:right; ${prizeStyle}">${formattedAmount}</td>
+                </tr>
+            `;
+        });
+
+        prizesHtml += `
+                </tbody>
+            </table>
+        `;
+        this.importResultsPrizesList.innerHTML = prizesHtml;
+    }
+
+    async handleConfirmImportResults() {
+        if (!this.pendingResultsData) return;
+
+        const parsed = this.pendingResultsData;
+        const existingIdx = this.jornadas.findIndex(j => j.number === parsed.jNum);
+        const existing = existingIdx > -1 ? this.jornadas[existingIdx] : null;
+
+        let matches;
+        if (existing && existing.matches && existing.matches.length === 15) {
+            matches = existing.matches.map((em, idx) => {
+                const pm = parsed.matches[idx];
+                return {
+                    home: em.home || (pm ? pm.home : ''),
+                    away: em.away || (pm ? pm.away : ''),
+                    score: pm && pm.score ? pm.score : (em.score || ''),
+                    result: pm && pm.result ? pm.result : (em.result || '')
+                };
+            });
+        } else {
+            matches = parsed.matches.map(m => ({
+                home: m ? m.home : '',
+                away: m ? m.away : '',
+                score: m ? m.score : '',
+                result: m ? m.result : ''
+            }));
+        }
+
+        const jornadaData = {
+            id: existing ? existing.id : Date.now(),
+            number: parsed.jNum,
+            season: '2026-2027',
+            date: parsed.dateStr || (existing ? existing.date : 'Por definir'),
+            matches: matches,
+            prizes: parsed.prizes,
+            active: existing ? existing.active : true
+        };
+
+        if (existingIdx > -1) {
+            this.jornadas[existingIdx] = jornadaData;
+        } else {
+            this.jornadas.push(jornadaData);
+        }
+
+        if (this.btnConfirmImportResults) {
+            this.btnConfirmImportResults.disabled = true;
+            this.btnConfirmImportResults.textContent = '⏳ Guardando resultados...';
+        }
+
+        try {
+            await this.saveSingle(jornadaData);
+            this.renderGrid();
+
+            // Trigger dice for absent members if applicable
+            if (window.DiceService && window.DataService) {
+                try {
+                    const members = await window.DataService.getAll('members');
+                    const pronosticos = await window.DataService.getAll('pronosticos');
+                    await window.DiceService.checkAndApplyDice(members, this.jornadas, pronosticos);
+                } catch (errDice) {
+                    console.error("Error aplicando dado tras importar resultados:", errDice);
+                }
+            }
+
+            // Telegram Report trigger if all 15 matches finished
+            const isFinished = jornadaData.matches.every(m => m.result && m.result.trim() !== '');
+            if (isFinished && window.TelegramService) {
+                try {
+                    await window.TelegramService.sendJornadaReport(jornadaData.id);
+                } catch (errTg) {
+                    console.error("Error enviando reporte Telegram tras importar resultados:", errTg);
+                }
+            }
+
+            this.closeImportResultsModal();
+            alert(`✅ Jornada ${jornadaData.number}: Resultados y premios importados correctamente.`);
+        } catch (err) {
+            console.error("Error al guardar resultados importados:", err);
+            alert("Error al guardar resultados: " + err.message);
+        } finally {
+            if (this.btnConfirmImportResults) {
+                this.btnConfirmImportResults.disabled = false;
+                this.btnConfirmImportResults.textContent = '✅ Confirmar e Importar Resultados';
+            }
+        }
+    }
+
+    handleDiscardResultsImport() {
+        this.pendingResultsData = null;
+        this.closeImportResultsModal();
+    }
+
+    handleBackToResultsText() {
+        if (this.importResultsSummaryStep) this.importResultsSummaryStep.style.display = 'none';
+        if (this.importResultsInputStep) this.importResultsInputStep.style.display = 'block';
     }
 
     refreshData(silent = false) {
