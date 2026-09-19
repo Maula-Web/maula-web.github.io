@@ -402,18 +402,14 @@ class PronosticoManager {
 
         this.updateActiveSelectionUI();
 
-        const deadline = this.calculateDeadline(jornada.date);
-        const now = new Date();
-        const isLate = now > deadline;
-
-        const dateObj = AppUtils.parseDate(jornada.date);
-        const closeDate = new Date(dateObj);
-        closeDate.setDate(closeDate.getDate() + 2);
-        closeDate.setHours(23, 59, 59); // Close at end of Tuesday
-        const isLockedRef = now > closeDate;
+        const { isLockedRef, isFinished, hasStarted } = this.isJornadaLocked(jornada);
 
         // CORRECTION OVERRIDE: If Mode is Active, ignore lock
         const isLocked = this.correctionMode ? false : isLockedRef;
+
+        const deadline = this.calculateDeadline(jornada.date);
+        const now = new Date();
+        const isLate = deadline ? (now > deadline) : false;
 
         if (deadline) {
             const dStr = deadline.toLocaleDateString() + ' ' + deadline.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -422,22 +418,28 @@ class PronosticoManager {
                 `<span style="color:var(--primary-green)">Cierre: ${dStr}</span>`;
         }
 
+        const existing = this.pronosticos.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
+
         if (isLockedRef) {
             if (this.correctionMode) {
-                this.statusMsg.innerHTML = '<span class="badge-late" style="border:2px solid var(--primary-orange); color:var(--primary-orange);">🛠️ EDITANDO JORNADA CERRADA (Modo Corrección)</span>';
+                const label = isFinished ? 'JORNADA CERRADA' : 'JORNADA EN JUEGO';
+                this.statusMsg.innerHTML = `<span class="badge-late" style="border:2px solid var(--primary-orange); color:var(--primary-orange);">🛠️ EDITANDO ${label} (Modo Corrección)</span>`;
                 this.container.style.border = "2px dashed var(--primary-orange)";
             } else {
-                this.statusMsg.innerHTML = '<span class="badge-locked">🔒 JORNADA FINALIZADA - NO SE ADMITEN CAMBIOS</span>';
+                const label = isFinished ? 'JORNADA FINALIZADA' : 'JORNADA EN JUEGO';
+                this.statusMsg.innerHTML = `<span class="badge-locked">🔒 ${label} - NO SE ADMITEN CAMBIOS</span>`;
                 this.container.style.border = "none";
             }
-        } else if (isLate) {
-            this.statusMsg.innerHTML = '<span class="badge-late">⚠️ FUERA DE PLAZO - SE MARCARÁ COMO RETRASADO</span>';
-            this.container.style.border = "none";
         } else {
             this.container.style.border = "none";
+            // Si la jornada no está bloqueada, el aviso FUERA DE PLAZO no se muestra al abrir
+            // (a menos que ya se hubiera guardado con retraso anteriormente de forma informativa).
+            if (existing && existing.late) {
+                this.statusMsg.innerHTML = '<span class="badge-late">⚠️ PRONÓSTICO ENVIADO CON RETRASO</span>';
+            } else {
+                this.statusMsg.innerHTML = '';
+            }
         }
-
-        const existing = this.pronosticos.find(p => p.jId == this.currentJornadaId && p.mId == this.currentMemberId);
 
         // Update Method Dropdown
         if (this.selMethod) {
@@ -605,6 +607,17 @@ class PronosticoManager {
         // Update cost/penalty
         this.updateCost();
 
+        // Si estamos fuera de plazo y se cambia el pronóstico:
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        if (jornada) {
+            const deadline = this.calculateDeadline(jornada.date);
+            const isLate = deadline ? (new Date() > deadline) : false;
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLate && (!isLockedRef || this.correctionMode)) {
+                this.statusMsg.innerHTML = '<span class="badge-late">⚠️ FUERA DE PLAZO - SE MARCARÁ COMO RETRASADO</span>';
+            }
+        }
+
         // Trigger Auto-save
         this.autoSave();
     }
@@ -688,21 +701,13 @@ class PronosticoManager {
                 const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
                 if (!jornada) return;
 
-                const deadline = this.calculateDeadline(jornada.date);
-                const dateObj = AppUtils.parseDate(jornada.date);
-                if (!dateObj) return;
-
-                const closeDate = new Date(dateObj);
-                closeDate.setDate(closeDate.getDate() + 2);
-                closeDate.setHours(23, 59, 59);
-
-                const now = new Date();
-                const isLate = now > deadline;
-                const isLockedRef = now > closeDate;
-
-                // Locked check: don't auto-save if locked unless in correctionMode
-                // Even in correctionMode, we might want to skip auto-save to ensure manual audit is used
+                const { isLockedRef } = this.isJornadaLocked(jornada);
+                // Locked check: don't auto-save if locked (in correctionMode, require manual save/audit modal)
                 if (isLockedRef) return;
+
+                const deadline = this.calculateDeadline(jornada.date);
+                const now = new Date();
+                const isLate = deadline ? (now > deadline) : false;
 
                 const isReduced = this.selMethod && this.selMethod.value === 'reducido';
                 const id = `${this.currentJornadaId}_${this.currentMemberId}`;
@@ -949,21 +954,16 @@ class PronosticoManager {
             }
             console.log("Jornada encontrada:", jornada.number);
 
-            console.log("🔵 PASO 5: Calculando fechas");
-            const deadline = this.calculateDeadline(jornada.date);
-            const dateObj = AppUtils.parseDate(jornada.date);
-            if (!dateObj) {
-                alert("Error en el formato de fecha de la jornada.");
+            console.log("🔵 PASO 5: Comprobando estado de bloqueo");
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLockedRef && !this.correctionMode) {
+                alert("Esta jornada está bloqueada y no admite cambios sin activar el Modo Corrección.");
                 return;
             }
 
-            const closeDate = new Date(dateObj);
-            closeDate.setDate(closeDate.getDate() + 2);
-            closeDate.setHours(23, 59, 59);
-
+            const deadline = this.calculateDeadline(jornada.date);
             const now = new Date();
-            const isLate = now > deadline;
-            const isLockedRef = now > closeDate;
+            const isLate = deadline ? (now > deadline) : false;
 
             const isReduced = this.selMethod && this.selMethod.value === 'reducido';
             if (isReduced) {
@@ -1123,6 +1123,36 @@ class PronosticoManager {
                 window.TelegramService.checkHabemusQuinielam(this.currentJornadaId);
             }, 1000); // Small delay to ensure DB propagation
         }
+    }
+
+    isJornadaLocked(jornada) {
+        if (!jornada) return { isLockedRef: false, isFinished: false, hasStarted: false };
+
+        const now = new Date();
+        const dateObj = AppUtils.parseDate(jornada.date);
+        let isPastCloseDate = false;
+        if (dateObj) {
+            const closeDate = new Date(dateObj);
+            closeDate.setDate(closeDate.getDate() + 2);
+            closeDate.setHours(23, 59, 59);
+            isPastCloseDate = now > closeDate;
+        }
+
+        const hasStarted = Array.isArray(jornada.matches) && jornada.matches.some(m => {
+            if (!m || !m.result) return false;
+            const r = String(m.result).trim();
+            return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+        });
+
+        const isFinished = isPastCloseDate || (Array.isArray(jornada.matches) && jornada.matches.length === 15 && jornada.matches.every(m => {
+            if (!m || !m.result) return false;
+            const r = String(m.result).trim();
+            return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+        }));
+
+        const isLockedRef = isFinished || hasStarted;
+
+        return { isLockedRef, isFinished, hasStarted };
     }
 
     calculateDeadline(dateStr) {
@@ -2147,6 +2177,15 @@ class PronosticoManager {
     }
 
     async saveDoubles() {
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        if (jornada) {
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLockedRef && !this.correctionMode) {
+                alert("Esta jornada está bloqueada y no admite cambios en la quiniela de dobles sin activar el Modo Corrección.");
+                return;
+            }
+        }
+
         if (!this.updateDoublesCounters()) {
             alert('La combinación no es válida. \n\nPara poder guardar, debes seleccionar EXACTAMENTE:\n- 7 Dobles (y 0 Triples)\nO bien\n- 4 Dobles (y 0 Triples)');
             return;
@@ -2200,23 +2239,27 @@ class PronosticoManager {
             date: new Date().toISOString()
         };
 
-        this.btnSaveDoubles.textContent = 'Guardando...';
-        this.btnSaveDoubles.disabled = true;
-
         try {
+            this.btnSaveDoubles.disabled = true;
+            this.btnSaveDoubles.textContent = 'Guardando...';
+
             await window.DataService.save('pronosticos_extra', data);
 
-            // Update local cache
+            // Update in-memory state
             const existingIdx = this.pronosticosExtra.findIndex(p => p.id === data.id);
             if (existingIdx >= 0) this.pronosticosExtra[existingIdx] = data;
             else this.pronosticosExtra.push(data);
 
+            this.doublesStatus.textContent = '✅ Quiniela de dobles guardada correctamente.';
+            this.doublesStatus.className = 'success-message';
+            this.btnSaveDoubles.textContent = '✅ ¡Guardado con Éxito!';
+            this.btnSaveDoubles.style.backgroundColor = '#4caf50';
+
+            // Refresh summary table to show the new/updated doubles row
             this.renderSummaryTable();
 
-            this.doublesStatus.textContent = '¡Guardado correctamente!';
-            this.doublesStatus.style.color = 'green';
             setTimeout(() => {
-                this.doublesStatus.textContent = '';
+                this.btnSaveDoubles.style.backgroundColor = '';
                 this.btnSaveDoubles.textContent = '💾 Guardar Quiniela de Dobles';
                 this.btnSaveDoubles.disabled = false;
             }, 3000);
@@ -2229,6 +2272,15 @@ class PronosticoManager {
         }
     }
     handleCopyForecast() {
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        if (jornada) {
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLockedRef && !this.correctionMode) {
+                alert("Esta jornada está bloqueada y no admite cambios sin activar el Modo Corrección.");
+                return;
+            }
+        }
+
         // 1. Get Normal Forecast
         const normalRows = this.container.querySelectorAll('.p-options');
         const normalSelections = [];
