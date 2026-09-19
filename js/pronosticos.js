@@ -441,8 +441,13 @@ class PronosticoManager {
                 this.statusMsg.innerHTML = `<span class="badge-late" style="border:2px solid var(--primary-orange); color:var(--primary-orange);">🛠️ EDITANDO ${label} (Modo Corrección)</span>`;
                 this.container.style.border = "2px dashed var(--primary-orange)";
             } else {
-                const label = isFinished ? 'JORNADA FINALIZADA' : 'JORNADA EN JUEGO';
-                this.statusMsg.innerHTML = `<span class="badge-locked">🔒 ${label} - NO SE ADMITEN CAMBIOS</span>`;
+                const hasExistingForecast = existing && Array.isArray(existing.selection) && existing.selection.some(s => s && String(s).trim() !== '' && String(s).trim() !== '-');
+                if (!hasExistingForecast && (hasStarted || isFinished)) {
+                    this.statusMsg.innerHTML = `<span class="badge-locked" style="background:#d32f2f; color:white; border: 1.5px solid #b71c1c; font-weight: bold; padding: 6px 14px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">🔒 JORNADA EN JUEGO (HAY RESULTADOS) - NO SE ADMITEN PRONÓSTICOS</span>`;
+                } else {
+                    const label = isFinished ? 'JORNADA FINALIZADA' : 'JORNADA EN JUEGO';
+                    this.statusMsg.innerHTML = `<span class="badge-locked">🔒 ${label} - NO SE ADMITEN CAMBIOS</span>`;
+                }
                 this.container.style.border = "none";
             }
         } else {
@@ -604,6 +609,15 @@ class PronosticoManager {
     }
 
     selectOption(el, val) {
+        // Bloqueo estricto: si la jornada está bloqueada (en juego con resultados o finalizada) sin Modo Corrección, no permitir selección
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        if (jornada) {
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLockedRef && !this.correctionMode) {
+                return;
+            }
+        }
+
         const parent = el.parentElement;
         const idx = parseInt(parent.dataset.idx);
         const isAlreadySelected = el.classList.contains('selected');
@@ -625,7 +639,6 @@ class PronosticoManager {
         this.updateCost();
 
         // Si estamos fuera de plazo y se cambia el pronóstico:
-        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
         if (jornada) {
             const deadline = this.calculateDeadline(jornada.date);
             const isLate = deadline ? (new Date() > deadline) : false;
@@ -772,6 +785,15 @@ class PronosticoManager {
     }
 
     handleClearForecast() {
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        if (jornada) {
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLockedRef && !this.correctionMode) {
+                alert("No se puede borrar el pronóstico porque la jornada está bloqueada.");
+                return;
+            }
+        }
+
         if (!confirm('¿Estás seguro de que quieres borrar todos los signos de este pronóstico?')) return;
 
         const options = this.container.querySelectorAll('.chk-option.selected');
@@ -972,9 +994,16 @@ class PronosticoManager {
             console.log("Jornada encontrada:", jornada.number);
 
             console.log("🔵 PASO 5: Comprobando estado de bloqueo");
-            const { isLockedRef } = this.isJornadaLocked(jornada);
+            const { isLockedRef, hasStarted, isFinished } = this.isJornadaLocked(jornada);
             if (isLockedRef && !this.correctionMode) {
-                alert("Esta jornada está bloqueada y no admite cambios sin activar el Modo Corrección.");
+                const existing = this.pronosticos.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
+                const hasExisting = existing && Array.isArray(existing.selection) && existing.selection.some(s => s && String(s).trim() !== '' && String(s).trim() !== '-');
+
+                if (!hasExisting && hasStarted) {
+                    alert("No es posible rellenar la quiniela: la jornada ya cuenta con resultados de partidos registrados. Solo se admiten pronósticos con retraso antes de que comience la jornada.");
+                } else {
+                    alert("Esta jornada está bloqueada y no admite cambios sin activar el Modo Corrección.");
+                }
                 return;
             }
 
@@ -1157,12 +1186,16 @@ class PronosticoManager {
         }
 
         const hasStarted = Array.isArray(jornada.matches) && jornada.matches.some(m => {
-            if (!m || !m.result) return false;
-            const r = String(m.result).trim();
-            return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+            if (!m) return false;
+            const r = (m.result !== undefined && m.result !== null) ? String(m.result).trim() : '';
+            const isResultValid = r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+            const s = (m.score !== undefined && m.score !== null) ? String(m.score).trim() : '';
+            const isScoreValid = s !== '' && s !== '-' && s.toLowerCase() !== 'por definir';
+            return isResultValid || isScoreValid;
         });
 
-        const isFinished = isPastCloseDate || (Array.isArray(jornada.matches) && jornada.matches.length === 15 && jornada.matches.every(m => {
+        const isExplicitInactive = jornada.active === false;
+        const isFinished = isExplicitInactive || isPastCloseDate || (Array.isArray(jornada.matches) && jornada.matches.length === 15 && jornada.matches.every(m => {
             if (!m || !m.result) return false;
             const r = String(m.result).trim();
             return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
@@ -2201,9 +2234,13 @@ class PronosticoManager {
     async saveDoubles() {
         const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
         if (jornada) {
-            const { isLockedRef } = this.isJornadaLocked(jornada);
+            const { isLockedRef, hasStarted } = this.isJornadaLocked(jornada);
             if (isLockedRef && !this.correctionMode) {
-                alert("Esta jornada está bloqueada y no admite cambios en la quiniela de dobles sin activar el Modo Corrección.");
+                if (hasStarted) {
+                    alert("No se puede guardar la quiniela de dobles: la jornada ya cuenta con resultados registrados.");
+                } else {
+                    alert("Esta jornada está bloqueada y no admite cambios en la quiniela de dobles sin activar el Modo Corrección.");
+                }
                 return;
             }
         }
@@ -2296,9 +2333,13 @@ class PronosticoManager {
     handleCopyForecast() {
         const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
         if (jornada) {
-            const { isLockedRef } = this.isJornadaLocked(jornada);
+            const { isLockedRef, hasStarted } = this.isJornadaLocked(jornada);
             if (isLockedRef && !this.correctionMode) {
-                alert("Esta jornada está bloqueada y no admite cambios sin activar el Modo Corrección.");
+                if (hasStarted) {
+                    alert("No se puede copiar el pronóstico: la jornada ya cuenta con resultados registrados.");
+                } else {
+                    alert("Esta jornada está bloqueada y no admite cambios sin activar el Modo Corrección.");
+                }
                 return;
             }
         }

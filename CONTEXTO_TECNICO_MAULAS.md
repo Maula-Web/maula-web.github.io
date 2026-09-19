@@ -9,14 +9,18 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 - **Frontend**: HTML5, CSS (Vanilla), JS (Vanilla). Sin frameworks pesados.
 - **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`).
 - **Módulos JS (Carpeta `/js/`)**:
-  - `bote.js`: Núcleo financiero de la peña (ingresos, repartos, costes variables, dobles, evolución del bote, penalizaciones). El archivo más grande y complejo.
-  - `pronosticos.js`: Gestión de las apuestas individuales y la columna combinada (MAULA). Incluye **auto-guardado silencioso**, lógica de desmarcado de signos y notificaciones de completado basadas en frases aleatorias.
+  - `bote.js`: Interfaz de usuario del bote, desglose visual de saldos, extractos, gráficos y simulación histórica de la peña.
+  - `bote-engine.js`: Motor matemático desacoplado de finanzas (saldos individuales, costes variables de dobles, exenciones automáticas, timeline de transacciones, repartos y liquidaciones de temporada).
+  - `dice-service.js`: Servicio del "Dado de Quinielas" (🎲), automatización de sellado aleatorio para socios ausentes o de viaje dentro de rangos de fechas definidos (máximo 3 jornadas por temporada).
+  - `text-importer.js`: Analizador inteligente de texto copiado de webs externas (Revista Quinielista y Loterías y Apuestas del Estado) para importar jornadas, partidos, resultados y desglose oficial de premios por categoría.
+  - `pronosticos.js`: Gestión de las apuestas individuales y la columna combinada (MAULA). Incluye auto-guardado silencioso, lógica de desmarcado de signos, bloqueo de jornadas iniciadas, indicador visual del Dado y notificaciones.
   - `scoring.js`: Lógica de puntuación (bonificaciones, penalizaciones, lógica PIG/Pleno al 15).
   - `resumen-temporada.js`: Clasificación acumulada de la temporada y estadísticas detalladas por socio, incluyendo herramientas de **visualización avanzada (Zoom y Ventana Deslizante)** para las gráficas.
   - `resultados.js`: Generación de la tabla de resultados acumulada (Aciertos Base) y gestión de penalizaciones.
   - `dashboard.js`: Panel de inicio con el líder actual, próxima jornada, premios semanales y **asignación dinámica de roles** (Sella/Rellena).
-  - `rss-importer.js`: Motor de extracción de datos, partidos y resultados desde fuentes de terceros.
-  - `telegram-service.js`: Integración de notificaciones y recordatorios automatizados.
+  - `rss-importer.js`: Motor histórico de extracción de datos, partidos y resultados desde fuentes de terceros (redirigido a `text-importer.js`).
+  - `telegram-service.js`: Integración de notificaciones, informes de resultados y recordatorios automatizados.
+  - `votaciones.js`: Módulo de propuestas, quórum y votaciones democráticas de la peña con edición de fechas límite e integración con Telegram.
 
 ## 3. Lógica Financiera y Gestión del Bote (Crítico)
 
@@ -49,6 +53,16 @@ Para facilitar la transición del antiguo sistema de hojas de cálculo al entorn
 
 - **Cálculo Real, no Estático:** Esta vista **no** carga datos pasivos desde ningún archivo `.xlsx`. Toda la información (sellados, recaudación total, ingresos, gastos, premios, ganancias y pérdidas y cuotas de dobles variables) es fruto de la simulación iterativa en tiempo real de la base de datos de Firebase, pasando por el motor de transacciones hasta recrear los mismos resultados que emitiría una tabla tradicional.
 - **Orden Heredado:** Mantiene intencionadamente la matriz de ordenamiento de filas caprichosa original o "rara" de la peña (orden alfabético estricto, excepto variaciones históricas toleradas como la de `Valdi` situado cerca de la `J` por José Antonio Valdivieso) para ayudar a la agilidad visual y memoria de los gestores clásicos de la Peña.
+
+### 3.5. Desacoplamiento del Motor Financiero (`bote-engine.js`)
+
+Para optimizar el rendimiento y la mantenibilidad, todo el núcleo matemático del Bote se ha desacoplado de la interfaz gráfica (`bote.js`) y reside en la clase `BoteEngine` (`js/bote-engine.js`):
+
+- **Motor Puro e Independiente**: La clase `BoteEngine` no manipula el DOM; recibe los datos planos (`members`, `jornadas`, `pronosticos`, `pronosticosExtra`, `repartos`, `cierresVuelta`, `ingresos`, `cashPayments`) y calcula determinísticamente la cronología completa de movimientos (`calculateAllMovements`).
+- **Línea de Tiempo Unificada**: Ordena cronológicamente jornadas, ingresos manuales libres (sin jornada asignada), cobros de cierres de vuelta y repartos extraordinarios.
+- **Exenciones Automatizadas de Pago**: En cada jornada `j`, el motor determina automáticamente si el socio ganó algún premio económico en la jornada inmediata anterior `j-1` (`getPrizesForMemberJornada > 0`). Si ganó premio, queda exento de pagar su cuota semanal (0.75€).
+- **Cómputo de Premios por Categoría (`jornada.prizes`)**: Los premios individuales se calculan cruzando los aciertos del socio con el objeto oficial de premios de la jornada (`'15'`, `'14'`, `'13'`, `'12'`, `'11'`, `'10'`). Este desglose se importa de forma exacta desde la web oficial de Loterías y Apuestas del Estado mediante el nuevo importador de resultados.
+- **Columna de Dobles y Reducciones Comunitarias**: `getExtraPrizesForJornada` escruta las apuestas múltiples comunitarias cruzando combinaciones y premios para computar los ingresos comunales de la peña.
 
 ## 4. Lógica de Puntuación — Reglas Críticas
 
@@ -103,6 +117,42 @@ Para evitar la importación de jornadas que no corresponden a la competición pr
 - **Implementación**: El método `hasPrimeraTeams` en `rss-importer.js` realiza esta comprobación cruzando los equipos de la jornada con el listado de palabras clave definido en `AppUtils.isLaLigaTeam` (`js/utils.js`).
 - **Mantenimiento Estacional**: Dado que hay ascensos y descensos, el listado de equipos en `js/utils.js` (y su fallback en `rss-importer.js`) **debe actualizarse manualmente al inicio de cada temporada** para reflejar los 20 equipos que componen la Primera División ese año. Si el sistema empieza a importar jornadas de Segunda por error (como ocurrió con la J51 de la temporada 25/26), es señal de que la lista contiene equipos descendidos como Valladolid, Leganés o Las Palmas.
 - **Temporada 2026-2027 (ACTIVA)**: Bajan Real Oviedo, Girona y Mallorca. Suben Real Racing Club y RC Deportivo (un ascendido más pendiente de confirmar). La lista `isLaLigaTeam` ya está actualizada en `utils.js` y `rss-importer.js`.
+
+### 5.5. Nuevo Sistema de Importación por Pegado de Texto (`text-importer.js`)
+
+Debido a que las webs y servicios externos de scraping (RSS, PDF y páginas de periódicos) sufrieron cortes definitivos o alteraciones estructurales continuas, se implementó una solución robusta y autosuficiente basada en el **análisis inteligente de texto copiado y pegado** (`js/text-importer.js`):
+
+#### A. Importar Partidos (Fuente: Revista Quinielista)
+- **Método**: `TextImporterService.parseMatchesText(rawText)`.
+- **Extracción Automática**:
+  - **Número de Jornada**: Detecta patrones como `Jornada:\n8` o `Jornada 8`.
+  - **Fecha**: Extrae fechas tipo `20/09/2026` y avisa si no cae en domingo (regla Maula).
+  - **Entidades HTML**: Descodifica automáticamente entidades tanto numéricas como con nombre (`Alav&#233;s` -> `Alavés`, `Castell&#243;n` -> `Castellón`, `M&#225;laga` -> `Málaga`).
+  - **Partidos 1 al 14**: Extrae local y visitante descartando ordinales (`1º`), columnas repetidas de porcentajes y signos.
+  - **Pleno al 15 en 2 Líneas**: Resuelve el formato típico de Revista Quinielista donde el equipo local va en una línea (`15º At. Madrid`) y el visitante en la siguiente (`R. Madrid`).
+  - **Detección PIG**: Reconoce alias abreviados (`R. Madrid`, `Rayo V.`, etc.) identificando inmediatamente si el partido 15 es PIG (`🐷 PIG`).
+
+#### B. Importar Resultados y Premios (Fuente: Web Oficial Loterías y Apuestas del Estado)
+- **Método**: `TextImporterService.parseResultsText(rawText)`.
+- **Extracción Automática**:
+  - **Jornada y Fecha Oficial**: Extrae el número de jornada (`Jornada 7ª` -> `7`) y fecha oficial del evento.
+  - **Marcadores y Signos 1X2**: Extrae el marcador real de cada partido (ej: `2 - 1`) y el signo oficial de la quiniela correspondiente (`1`, `X`, `2`). Si faltase el signo, se deriva automáticamente del marcador.
+  - **Pleno al 15 (`1-M`)**: Interpreta marcadores como `1 - 3` y los signos oficiales combinados (`1-M`, `M-1`, `0-0`, `M-M`, etc., donde 3 o más goles equivalen a `M`).
+  - **Limpieza de Nombres**: Elimina sufijos masculinos como `(m)` (`Rayo Vallecano (m)` -> `Rayo Vallecano`) y normaliza identificadores femeninos como `(F)`.
+  - **Desglose de Premios por Categoría**: Extrae para las 6 categorías (`Pleno al 15`, `14`, `13`, `12`, `11`, `10 aciertos`) el número de acertantes y el importe exacto en euros (ej: `211.710,36 €` -> `211710.36`). Se guarda en `jornada.prizes` para el reparto en el Bote.
+
+#### C. Flujo de Usuario de Doble Paso (Preview & Confirm)
+1. **Paso 1 (Pegado y Análisis)**: El usuario pega el texto sin formatear en el modal y pulsa `Analizar`. Si hay errores estructurales, se detallan con advertencias claras.
+2. **Paso 2 (Resumen Interactivo)**: Muestra una ficha completa con:
+   - Estado de la jornada (si actualizará una existente o creará una nueva).
+   - Lista numerada de los 15 partidos con escudos, marcadores e insignias de colores para signos (`1`, `X`, `2`, `1-M`).
+   - Tabla con desglose de premios (categoría, acertantes y euros).
+   - Opciones: `Confirmar` (persiste en la base de datos), `Volver a Editar` o `Desechar`.
+3. **Automatizaciones al Confirmar**:
+   - Actualiza o crea la jornada en Firebase (`DataService`).
+   - Ejecuta el **Dado de Quinielas** para socios ausentes si procede.
+   - Si los 15 partidos tienen resultado grabado, envía de inmediato el **Informe Completo a Telegram**.
+4. **Optimización de Pantalla**: La pantalla `jornadas.html` se ha ensanchado al 96% (máx. 2500px) con botonera flexible (`flex-wrap: wrap`) para mostrar todos los botones (`📋 Importar Partidos`, `📥 Importar Resultados`, `➕ Nueva Jornada`, `🗑️ Borrar TODO`) sin cortes ni barras de desplazamiento horizontal.
 
 ## 6. Tabla de Resultados y "Columna MAULA"
 
@@ -163,6 +213,32 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
   - La visibilidad de las ventanas se gestiona mediante la clase `.active`, asegurando que la opacidad pase a 1 y el sistema no quede bloqueado de forma invisible.
   - Se registra el motivo del cambio en el log de modificaciones de Firebase.
 
+### 7.1. Bloqueo Inteligente de Jornadas Iniciadas y Relleno Fuera de Plazo
+- **Protección de Integridad**: Si en la pantalla de Resultados Partidos (`jornadas.html` o base de datos) ya se ha informado el resultado/signo de **al menos un partido** para esa jornada, la jornada entra automáticamente en estado `hasStarted` y queda **completamente bloqueada**.
+- **Regla Estricta para Rellenar Fuera de Plazo**:
+  - **Antes del primer resultado**: Un socio que llegue tarde (después del cierre/deadline) **SÍ puede rellenar su quiniela** con retraso (`late: true`, penalización aplicable según el sistema de puntuación) siempre y cuando todavía **NO se haya registrado ningún signo ni resultado** en dicha jornada.
+  - **En cuanto haya al menos un signo registrado**: La jornada se bloquea de forma total e irrevocable para los socios. **No se permite rellenar ni modificar ninguna quiniela**. Los selectores de signos quedan deshabilitados, el botón de guardar se oculta y el sistema muestra la advertencia `🔒 JORNADA EN JUEGO - NO SE ADMITEN PRONÓSTICOS`.
+- **Modo Corrección Exclusivo para Administradores**: La única forma de introducir o alterar un pronóstico una vez que hay al menos un resultado registrado es mediante la activación manual del **Modo Corrección** por parte de un administrador (con motivo justificado en el modal de auditoría).
+
+### 7.2. El Dado de Quinielas (🎲 `DiceService`)
+Para situaciones en las que un socio se encuentra de viaje, en el extranjero o sin cobertura móvil/internet y no podrá rellenar manualmente la quiniela, se ha incorporado una alternativa automatizada lúdica y justa:
+
+- **Configuración en Ficha de Socio (`socios.html`)**: El socio o el administrador puede definir un rango de fechas (`fechaInicio` a `fechaFin`, formato `YYYY-MM-DD`) y conmutar un interruptor para activar/desactivar el Dado.
+- **Relleno Automático**: Durante ese rango de fechas, cualquier jornada que entre en juego se rellenará automáticamente al azar para ese socio:
+  - **Partidos 1 al 14**: Se asignan signos `1`, `X` o `2` generados pseudoaleatoriamente.
+  - **Pleno al 15 (PIG)**: Solo se rellena al azar (`1`, `X`, `2`) si la jornada está catalogada como de Interés General (PIG). Si es una jornada ordinaria, el Pleno al 15 se deja deshabilitado (`null`).
+  - **Columna de Dobles**: Si al socio le correspondía esa jornada la responsabilidad de rellenar la combinación comunal de dobles, esta **se deja en blanco** para no comprometer el dinero grupal de la peña con selecciones aleatorias.
+- **Límite Estricto por Temporada (Máximo 3 Jornadas)**: Para evitar el absentismo reiterado, el sistema impone un tope inquebrantable de **3 jornadas por temporada**. Aunque el rango de fechas siga activo o el socio lo reactive, una vez alcanzadas las 3 jornadas selladas por Dado, el sistema rechazará más rellenos automáticos.
+- **Tratamiento del Pronóstico**:
+  - Se marca internamente con la bandera `isDice: true`.
+  - Muestra visualmente el icono de un dado (`🎲`) en su fila de pronóstico.
+  - **Exención de Sanción**: Los pronósticos generados por el Dado **NUNCA se marcan como tarde (`late: false`)**, permitiendo al socio puntuar con normalidad.
+
+### 7.3. Refinamientos de Usabilidad (UX)
+- **Claridad en Pronósticos**: Al consultar un pronóstico ya completado, se sustituyó el confuso botón "Cambiar pronóstico" por un explícito botón **"Cerrar"** que cierra la ficha directamente.
+- **Limpieza de Enlaces**: Se retiró el texto/enlace redundante "Ir a la tabla" en el encabezado de pronósticos.
+- **Escudos Femeninos y Normalización**: Incorporación de escudos oficiales de la Liga Femenina en `escudos/Femeninos/` (`Badalona (f)`, `Logroño (f)`, `Madrid CFF (f)`) y enriquecimiento del mapa de alias en `utils.js` para admitir variantes abreviadas habituales de la prensa (`Rayo V.`, `R. Madrid`, `R. Sociedad`, `R. Valladolid`, etc.).
+
 ## 8. Comunicaciones y Notificaciones: Telegram
 
 - Existe un servicio (`telegram-service.js`) que ejerce como "Bot", conectado a la API de Telegram.
@@ -170,6 +246,8 @@ El módulo `pronosticos.js` ha evolucionado para minimizar la pérdida de datos 
 - El administrador puede definir mediante el panel de control o por variables el mensaje customizado de ese aviso semanal.
 - **Recordatorio Especial PIG**: Si la jornada activa es de tipo PIG (Pleno al 15 con Grandes Clubes), el mensaje de notificación incluirá automáticamente una coletilla extra recordando a los socios "sellar también el PIG".
 - **Informe de Resultados**: Cuando finaliza una jornada, el bot envía el resumen detallado. La lista de socios sigue las reglas de ordenación y desempate históricas (punto 6.5) para que el podio (🥇, 🥈, 🥉) y el encargado de sellar (✍️) coincidan con el orden visual. Si hay PIG, se detalla la lista de socios bajo los epígrafes "✅ Acertantes" y "❌ Fallan". La sección de premio especial de dobles se identifica con una jarra de cerveza (`🍺`).
+- **Disparo Automático tras Importar Resultados**: Al confirmar la importación de resultados desde texto oficial en `jornadas.html`, si todos los 15 partidos tienen resultado grabado, el sistema ejecuta de inmediato `TelegramService.sendJornadaReport(jornada.id)`, manteniendo el canal de Telegram puntualmente informado.
+- **Notificación de Votaciones**: El bot avisa tanto de la apertura de una nueva votación como del cierre y escrutinio final. Si una votación se prorroga, el indicador `tgNotified` se resetea para enviar el resultado cuando expire el nuevo plazo.
 - **Notificación de Perdón**: Cuando un administrador anula/perdona una sanción por retraso desde la tabla de resultados, el bot envía un mensaje indicando qué socio ha perdonado a quién y de qué jornada se trata. Este mensaje es de carácter informativo obligatorio y no se puede desactivar desde el panel de configuración (siempre que Telegram esté activo).
 
 ## 9. Identidad Visual y Estilo
@@ -198,6 +276,19 @@ Conforme la base de datos de la peña ha ido creciendo a lo largo de las jornada
 
 - **Indexación mediante HashMaps (O(1))**: Se ha abandonado la búsqueda lineal múltiple (`Array.find()` y `Array.filter()`) al cruzar jornadas, miembros y pronósticos en `dashboard.js` y `pronosticos.js`. El sistema ahora construye diccionarios (`Map`) en memoria tras la descarga inicial de Firebase. Para asegurar retrocompatibilidad con registros antiguos, asigna a cada pronóstico claves múltiples cruzando posibles campos (`jId` vs `jornadaId`, `mId` vs `memberId`). Esto reduce millones de iteraciones de cálculo en el hilo principal de JavaScript a búsquedas directas en O(1), previniendo bloqueos del navegador y la "congelación" inicial de la interfaz en los smartphones.
 - **Tolerancia a Arrays Dispersos (NoSQL)**: Debido a que las estructuras de array en Firebase pueden contener "huecos" (slots `undefined` o `null`) originados por manipulaciones manuales del histórico, todos los bucles de renderizado principal integran salvaguardas preventivas. Si el mapa no encuentra un dato válido, los algoritmos de puntuación asumen "No jugado", manteniendo intacta la estabilidad visual del panel.
+
+---
+
+## 12. Votaciones y Gobernanza Democrática (`votaciones.js`)
+
+Para dirimir decisiones comunitarias de la Peña (cambios de estatutos, fechas de eventos, reparto extraordinario del bote o nuevas reglas), la plataforma dispone de un módulo de votaciones democráticas (`votaciones.html` y `js/votaciones.js`):
+
+- **Propuestas y Quórum**: Cualquier socio autenticado o administrador puede proponer una votación estableciendo título, descripción, opciones personalizadas (por defecto "Sí" / "No"), elección simple o múltiple (`allowMultiple`) y el umbral de aprobación requerido (`threshold` en %, por defecto 50%).
+- **Gestión Dinámica de Plazos**:
+  - El creador de la votación o un administrador pueden modificar y prorrogar la fecha y hora límite de una votación activa mediante el modal interactivo `#edit-deadline-modal`.
+  - Las votaciones vencidas (`isFinished = true`) quedan irrevocablemente cerradas y su escrutinio se consolida.
+  - **Sincronización con Telegram**: Al prorrogar el plazo de una votación activa, el indicador `tgNotified` se restablece a `false` para asegurar que el bot de Telegram emita el informe de resultados cuando se alcance el nuevo vencimiento.
+- **Integración con Telegram WebApp**: Los socios pueden emitir sus votos directamente desde la aplicación de Telegram o a través de la interfaz web con sincronización en tiempo real en Firestore (`DataService.save('votaciones', ...)`).
 
 ---
 
