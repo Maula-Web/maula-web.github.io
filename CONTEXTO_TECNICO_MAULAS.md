@@ -7,8 +7,10 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 ## 2. Arquitectura y Tecnologías
 
 - **Frontend**: HTML5, CSS (Vanilla), JS (Vanilla). Sin frameworks pesados.
-- **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`).
+- **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`) con persistencia offline en IndexedDB (`db.enablePersistence({ synchronizeTabs: true })`).
+- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons.
 - **Módulos JS (Carpeta `/js/`)**:
+  - `auth.js`: Autenticación, control de accesos, inyección de iconos/metadatos PWA y registro del Service Worker en toda la aplicación.
   - `bote.js`: Interfaz de usuario del bote, desglose visual de saldos, extractos, gráficos y simulación histórica de la peña.
   - `bote-engine.js`: Motor matemático desacoplado de finanzas (saldos individuales, costes variables de dobles, exenciones automáticas, timeline de transacciones, repartos y liquidaciones de temporada).
   - `dice-service.js`: Servicio del "Dado de Quinielas" (🎲), automatización de sellado aleatorio para socios ausentes o de viaje dentro de rangos de fechas definidos (máximo 3 jornadas por temporada).
@@ -300,6 +302,41 @@ Para dirimir decisiones comunitarias de la Peña (cambios de estatutos, fechas d
   - Las votaciones vencidas (`isFinished = true`) quedan irrevocablemente cerradas y su escrutinio se consolida.
   - **Sincronización con Telegram**: Al prorrogar el plazo de una votación activa, el indicador `tgNotified` se restablece a `false` para asegurar que el bot de Telegram emita el informe de resultados cuando se alcance el nuevo vencimiento.
 - **Integración con Telegram WebApp**: Los socios pueden emitir sus votos directamente desde la aplicación de Telegram o a través de la interfaz web con sincronización en tiempo real en Firestore (`DataService.save('votaciones', ...)`).
+
+---
+
+## 13. Progressive Web App (PWA) e Instalación Móvil
+
+Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e independizar la plataforma de pestañas de navegador convencionales, la web se ha convertido íntegramente en una PWA:
+
+### 13.1. Manifiesto y Metadatos de Aplicación (`manifest.json`)
+- **Modo de visualización**: `standalone`, ocultando barras de navegación del navegador para una experiencia 100% como app nativa.
+- **Orientación preferida**: `portrait-primary`.
+- **Tema y Fondo**: `theme_color: "#1976d2"`, `background_color: "#121212"`.
+- **Identidad**: `name: "Peña Quinielista Las Maulas"`, `short_name: "Peña Maulas"`.
+
+### 13.2. Iconografía Adaptativa y Apple Touch Icons
+- **iOS Safari**: `apple-touch-icon.png` (180x180 px con esquinas redondeadas y fondo oscuro) y `apple-touch-icon-precomposed.png`. Al pulsar "Añadir a pantalla de inicio" en iPhone/iPad, se utiliza el logotipo oficial de Las Maulas sin bordes extraños.
+- **Android**: Iconos de alta resolución `icons/icon-192x192.png` e `icons/icon-512x512.png`, acompañados de versiones "maskable" (`icons/icon-maskable-192x192.png` e `icons/icon-maskable-512x512.png`) con margen de seguridad del 10% para adaptarse a cualquier recorte circular, cuadrado o squircle del launcher del móvil.
+- **Escritorio**: `favicon.ico`, `icons/favicon-32x32.png` y `icons/favicon-16x16.png`.
+
+### 13.3. Service Worker (`service-worker.js`)
+- **App Shell Pre-caching**: Al instalarse, el Service Worker descarga y almacena en caché todos los ficheros HTML, CSS, JavaScript propios, logotipos e iconos, además de las librerías CDN de Firebase (`firebase-app-compat.js` y `firebase-firestore-compat.js`).
+- **Instalación Resiliente**: Emplea `Promise.allSettled` para que un fallo puntual de red en un recurso secundario no interrumpa la activación de la caché.
+- **Estrategia de Navegación HTML**: `Network-First` con fallback a caché (`index.html`), garantizando que si hay conexión siempre se sirva la última versión, pero si el usuario no tiene cobertura, la app cargue de inmediato desde la caché local.
+- **Estrategia de Archivos Estáticos**: `Stale-While-Revalidate` para CSS, JS, imágenes y fuentes, logrando aperturas instantáneas con actualización en segundo plano.
+- **Exclusión de APIs en Tiempo Real**: No intercepta las conexiones de `firestore.googleapis.com` ni `api.telegram.org` para no interferir en la latencia de las lecturas y escrituras en vivo.
+- **Limpieza de Versiones Antiguas**: El evento `activate` purga de forma automática cualquier versión anterior de la caché (`maulas-pwa-*`), manteniendo limpio el almacenamiento del dispositivo.
+
+### 13.4. Persistencia Offline en Firestore (`js/firebase-init.js`)
+- Se ha habilitado `db.enablePersistence({ synchronizeTabs: true })`.
+- Cuando el usuario pierde conexión, las consultas a la base de datos se responden desde la base de datos local de IndexedDB del navegador.
+- En cuanto la conexión a Internet se restablece, las operaciones pendientes se sincronizan de forma transparente con la nube.
+
+### 13.5. Copias de Seguridad del Proyecto
+- **Script de Respaldo de Firestore**: `scripts/backup_firestore.js`, que descarga todas las colecciones activas mediante la API REST de Firestore a archivos JSON individuales dentro de `BACKUP_DATOS_YYYY-MM-DD/`.
+- **Copia Comprimida de Seguridad**: Archivo ZIP íntegro en `D:\PROYECTO_MAULAS_BACKUP_YYYY-MM-DD.zip` conteniendo todo el código fuente, base de datos exportada, recursos multimedia e historial.
+- **Control de Versiones Local**: Tag de Git `v1.0-pre-pwa` y rama de seguridad `backup-pre-pwa` antes de aplicar cambios arquitecturales.
 
 ---
 
