@@ -153,6 +153,12 @@
 
         .bote-controls select {
             min-width: 200px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 2.5rem;
         }
 
         .bote-controls button {
@@ -185,8 +191,8 @@
             padding: 1rem;
             margin-bottom: 2rem;
             backdrop-filter: blur(10px);
-            overflow: visible;
-            /* Let inner containers handle scroll */
+            overflow-x: auto;
+            /* Horizontal scroll for wide tables on mobile */
             position: relative;
         }
 
@@ -643,15 +649,6 @@
             <select id="temporada-select" style="display: none;">
                 <option value="2026-2027">Temporada 2026-2027</option>
             </select>
-            <select id="vista-select">
-                <option value="general">Vista General</option>
-                <option value="detalle">Detalle por Socio</option>
-                <option value="evolucion">Evolución Bote Peña</option>
-                <option value="cuadrante">Cuadrante (Resumen Total)</option>
-                <option value="excel">Vista Excel (Histórico Detallado)</option>
-                <option value="repartos">Reparto de Ganancias</option>
-                <option value="premios_dobles">Premios Dobles (Historial)</option>
-            </select>
             <div class="bote-actions-grid">
                 <button onclick="window.Bote.openIngresoModal()">➕ Registrar Ingreso</button>
                 <button onclick="window.Bote.openGestionIngresosModal()">📋 Gestionar Ingresos</button>
@@ -661,6 +658,15 @@
                 <button onclick="window.Bote.openCierreVueltaModal()">🏆 Penalización Clasificación</button>
                 <button onclick="window.Bote.exportData()">📊 Exportar Datos</button>
             </div>
+            <select id="vista-select">
+                <option value="general">Vista General</option>
+                <option value="detalle">Detalle por Socio</option>
+                <option value="evolucion">Evolución Bote Peña</option>
+                <option value="cuadrante">Cuadrante (Resumen Total)</option>
+                <option value="excel">Vista Excel (Histórico Detallado)</option>
+                <option value="repartos">Reparto de Ganancias</option>
+                <option value="premios_dobles">Premios Dobles (Historial)</option>
+            </select>
         </div>
 
         <!-- Tabla Principal -->
