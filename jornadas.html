@@ -18,6 +18,60 @@
     <meta name="application-name" content="Peña Maulas">
     <meta name="theme-color" content="#1976d2">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ── Jornada modal header: mobile responsive ── */
+        @media (max-width: 600px) {
+            #modal-header-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 0.6rem;
+            }
+
+            #modal-title {
+                font-size: 1.1rem;
+                flex-wrap: wrap;
+            }
+
+            #modal-title input[type="number"] {
+                width: 55px !important;
+                font-size: 1rem !important;
+            }
+
+            #modal-header-btns {
+                width: 100%;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 0.4rem !important;
+                justify-content: flex-start !important;
+            }
+
+            #modal-header-btns .btn-action {
+                flex: 1 1 auto;
+                min-width: 80px;
+                font-size: 0.8rem !important;
+                padding: 0.35rem 0.6rem !important;
+                text-align: center;
+            }
+        }
+
+        /* Tablet: allow buttons to wrap without collapsing to column */
+        @media (min-width: 601px) and (max-width: 900px) {
+            #modal-header-row {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            #modal-header-btns {
+                flex-wrap: wrap !important;
+                gap: 0.4rem !important;
+            }
+
+            #modal-header-btns .btn-action {
+                font-size: 0.82rem !important;
+                padding: 0.35rem 0.7rem !important;
+            }
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -70,7 +124,7 @@
     <div id="jornada-modal" class="modal-overlay">
         <div class="modal">
             <form id="jornada-form">
-                <div
+                <div id="modal-header-row"
                     style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:1rem;">
                     <h2 id="modal-title" style="margin:0; display:flex; align-items:center; gap:8px;">
                         <span>Jornada</span>
@@ -79,7 +133,7 @@
                         <span id="modal-mode-badge"
                             style="font-size:0.8rem; background:#eee; padding:2px 8px; border-radius:4px; vertical-align: middle;">Vista</span>
                     </h2>
-                    <div style="display:flex; gap:10px;">
+                    <div id="modal-header-btns" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
                         <button type="button" id="btn-edit-mode" class="btn-action"
                             style="background: #fff9c4; color:#f57f17;">✏️ Editar</button>
                         <button type="submit" id="btn-save-jornada" class="btn-action btn-add" style="display:none;">💾
