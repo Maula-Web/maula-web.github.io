@@ -457,6 +457,29 @@ const Auth = {
         ensureMeta('apple-mobile-web-app-title', 'Peña Maulas');
         ensureMeta('application-name', 'Peña Maulas');
         ensureMeta('theme-color', '#1976d2');
+
+        // Register Service Worker for PWA (offline caching & native installation)
+        this.registerServiceWorker();
+    },
+
+    registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            const register = () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then((reg) => {
+                        console.log('PWA: Service Worker registrado con éxito:', reg.scope);
+                    })
+                    .catch((err) => {
+                        console.warn('PWA: Aviso al registrar Service Worker:', err);
+                    });
+            };
+
+            if (document.readyState === 'complete') {
+                register();
+            } else {
+                window.addEventListener('load', register);
+            }
+        }
     }
 };
 

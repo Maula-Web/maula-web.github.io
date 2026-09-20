@@ -13,4 +13,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Enable offline persistence for Firestore (IndexedDB cache)
+db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+    if (err.code === 'failed-precondition') {
+        console.warn('Firestore offline persistence: multiple tabs open');
+    } else if (err.code === 'unimplemented') {
+        console.warn('Firestore offline persistence not supported by browser');
+    } else {
+        console.warn('Firestore offline persistence notice:', err);
+    }
+});
+
 window.db = db; // Expose globally
