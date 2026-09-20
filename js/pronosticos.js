@@ -1746,7 +1746,7 @@ class PronosticoManager {
                     } else {
                         html += `
                             <tr class="table-block-divider">
-                                <td colspan="${totalCols}" style="background: repeating-linear-gradient(45deg, #e0e0e0, #e0e0e0 10px, #eeeeee 10px, #eeeeee 20px); height: 10px; border-top: 2px solid #9e9e9e; border-bottom: 2px solid #9e9e9e; padding: 0;"></td>
+                                <td colspan="${totalCols}" style="background: #ff3600; height: 2px; border: none; padding: 0;"></td>
                             </tr>
                         `;
                     }

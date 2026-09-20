@@ -3367,8 +3367,8 @@ body.mobile-mode .p-options .chk-option {
 
 body.mobile-mode .p-divider {
     margin: 2px 0 !important;
-    height: 1px !important;
-    background-color: #eee !important;
+    height: 2px !important;
+    background-color: #ff3600 !important;
 }
 
 /* Forecast Elements */
@@ -3419,14 +3419,13 @@ body.mobile-mode .p-divider {
 }
 
 .p-divider-block {
-    height: 8px;
-    background: repeating-linear-gradient(45deg, rgba(128, 128, 128, 0.2), rgba(128, 128, 128, 0.2) 8px, rgba(128, 128, 128, 0.08) 8px, rgba(128, 128, 128, 0.08) 16px);
-    border-top: 2px solid rgba(150, 150, 150, 0.5);
-    border-bottom: 2px solid rgba(150, 150, 150, 0.5);
+    height: 2px;
+    background: #ff3600;
+    border: none;
     margin: 14px 0;
     width: 100%;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .p-divider-p15 {
@@ -3443,7 +3442,7 @@ body.mobile-mode .p-divider {
 .p-divider-p15::after {
     content: '';
     flex: 1;
-    border-bottom: 3px solid var(--primary-orange, #ff9100);
+    border-bottom: 2px solid #ff3600;
 }
 
 .boleto-block-label {
@@ -3461,8 +3460,8 @@ body.mobile-mode .p-divider {
 
 @media (max-width: 768px) {
     .p-divider-block {
-        margin: 10px 0;
-        height: 6px;
+        margin: 8px 0;
+        height: 2px;
     }
     .p-divider-p15 {
         margin: 14px 0 10px 0;
