@@ -1,5 +1,8 @@
 const Auth = {
     async checkContext() {
+        // Ensure App Icons, PWA Manifest and mobile web app meta tags
+        this.injectAppIconsAndMeta();
+
         // Run Theme Logic INSTANTLY (variables on documentElement)
         this.applySavedTheme();
 
@@ -406,6 +409,54 @@ const Auth = {
                 document.body.style.overflow = '';
             });
         });
+    },
+
+    injectAppIconsAndMeta() {
+        if (!document.head) return;
+
+        const ensureLink = (rel, href, sizes = null, type = null) => {
+            let selector = `link[rel="${rel}"]`;
+            if (sizes) selector += `[sizes="${sizes}"]`;
+            let el = document.head.querySelector(selector);
+            if (!el) {
+                el = document.createElement('link');
+                el.rel = rel;
+                if (sizes) el.sizes = sizes;
+                if (type) el.type = type;
+                el.href = href;
+                document.head.appendChild(el);
+            }
+        };
+
+        const ensureMeta = (name, content) => {
+            let el = document.head.querySelector(`meta[name="${name}"]`);
+            if (!el) {
+                el = document.createElement('meta');
+                el.name = name;
+                el.content = content;
+                document.head.appendChild(el);
+            }
+        };
+
+        // Apple Touch Icons (iOS Safari "Añadir a pantalla de inicio")
+        ensureLink('apple-touch-icon', 'apple-touch-icon.png', '180x180');
+        ensureLink('apple-touch-icon', 'apple-touch-icon.png');
+        ensureLink('apple-touch-icon-precomposed', 'apple-touch-icon-precomposed.png');
+
+        // Standard Favicons
+        ensureLink('icon', 'icons/favicon-32x32.png', '32x32', 'image/png');
+        ensureLink('icon', 'icons/favicon-16x16.png', '16x16', 'image/png');
+
+        // Web App Manifest (Android Chrome / Chromium)
+        ensureLink('manifest', 'manifest.json');
+
+        // Mobile Web App Capability
+        ensureMeta('mobile-web-app-capable', 'yes');
+        ensureMeta('apple-mobile-web-app-capable', 'yes');
+        ensureMeta('apple-mobile-web-app-status-bar-style', 'black-translucent');
+        ensureMeta('apple-mobile-web-app-title', 'Peña Maulas');
+        ensureMeta('application-name', 'Peña Maulas');
+        ensureMeta('theme-color', '#1976d2');
     }
 };
 

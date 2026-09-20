@@ -239,6 +239,11 @@ Ideado a propuesta del socio **Buzón** para situaciones en las que un socio se 
   - **Exención de Sanción**: Los pronósticos generados por el Dado **NUNCA se marcan como tarde (`late: false`)**, permitiendo al socio puntuar con normalidad.
 
 ### 7.3. Refinamientos de Usabilidad (UX)
+- **Instalación como Web App y Acceso Directo Móvil (A2HS - Add to Home Screen)**:
+  - Configuración completa para que al guardar la web en el escritorio del móvil aparezca el logotipo oficial de la Peña (`LOGO_MAULAS.png`).
+  - **Soporte iOS (Safari)**: Generación de `apple-touch-icon.png` (180x180) y variantes para iPad/iPhone sobre fondo blanco sólido `#ffffff` con márgenes de seguridad proporcionales (85%), evitando que iOS rellene las transparencias con fondo negro.
+  - **Soporte Android (Chrome / Chromium)**: Creación de `manifest.json` con iconos estándar (192x192, 512x512) e iconos adaptativos "maskable" (con escala de seguridad al 70% para no recortar la corona ni las estrellas en máscaras circulares o squircle).
+  - **Favicon y Metadatos**: Generación de `favicon.ico` (32x32) y `favicon-16x16.png`, además de inyección dual: estática en el `<head>` de todas las páginas HTML y dinámica universal mediante `Auth.injectAppIconsAndMeta()` en `auth.js`.
 - **Separadores de Bloques en Boleto (Idea de Juanjo)**: Inserción de líneas divisorias agrupando los partidos según la distribución tradicional del boleto físico (bloques de 4, 4, 3 y 3 partidos, más el bloque destacado para el Pleno al 15), aportando orden visual y haciendo mucho más cómoda y familiar la comprobación de pronósticos.
 - **Ampliación de Pantalla en Resultados Partidos**: Contenedor ensanchado al 96% (máximo 2500px) con distribución flexible para evitar que los botones de acción se corten o requieran barras de desplazamiento horizontal.
 - **Claridad en Pronósticos**: Al consultar un pronóstico ya completado, se sustituyó el confuso botón "Cambiar pronóstico" por un explícito botón **"Cerrar"** que cierra la ficha directamente.
