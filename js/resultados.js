@@ -134,7 +134,7 @@ class ResultsManager {
         // First col: Fixed width for 'Temporada'
         // Other cols: Auto or equal percentage? 
         // Better: min-width and allow wrap.
-        theadHtml += `<tr><th style="width:120px; min-width:120px; white-space:nowrap; z-index:3; padding:10px; color:var(--resultados-header-text);">Temporada 2026-2027</th>`;
+        theadHtml += `<tr><th class="col-temporada" style="z-index:3; padding:8px 4px; color:var(--resultados-header-text); line-height:1.2; text-align:center;">Temporada<br>2026-2027</th>`;
 
         sortedMembers.forEach(m => {
             // Apply equal sizing

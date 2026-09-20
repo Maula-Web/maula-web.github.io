@@ -13911,7 +13911,7 @@
     "_createTime": "2026-09-15T13:42:41.131693Z",
     "_updateTime": "2026-09-19T17:51:28.878513Z",
     "jId": 1789054862274,
-    "pardoned": true,
+    "pardoned": false,
     "timestamp": "2026-09-19T17:51:16.144Z",
     "id": "1789054862274_1",
     "selection": [
@@ -13933,7 +13933,7 @@
     ],
     "tempBreakdown": null,
     "isReduced": false,
-    "late": true,
+    "late": false,
     "mId": 1
   },
   {
