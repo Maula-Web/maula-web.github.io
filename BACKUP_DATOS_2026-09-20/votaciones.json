@@ -1,0 +1,62 @@
+[
+  {
+    "_id": "VOTE-1772127742812",
+    "_createTime": "2026-02-26T17:42:22.432598Z",
+    "_updateTime": "2026-03-03T15:01:36.964661Z",
+    "creatorName": "Lozano",
+    "options": [
+      "SI",
+      "NO"
+    ],
+    "threshold": 51,
+    "deadline": "2026-03-01T21:00:00.000Z",
+    "votes": {
+      "3": 0,
+      "6": 0,
+      "7": 0,
+      "12": 0
+    },
+    "allowMultiple": false,
+    "creatorId": 6,
+    "tgNotified": true,
+    "description": "¿Perdonamos la penalzación a Rafa en la Jornada 45?",
+    "title": "Perdonar Penalización a Rafa en jornada 45 2025-2026",
+    "id": "VOTE-1772127742812",
+    "createdAt": "2026-02-26T17:42:22.812Z"
+  },
+  {
+    "_id": "VOTE-1787812230284",
+    "_createTime": "2026-08-27T06:30:30.540898Z",
+    "_updateTime": "2026-09-03T17:00:07.124847Z",
+    "createdAt": "2026-08-27T06:30:30.284Z",
+    "votes": {
+      "3": 0,
+      "4": 1,
+      "5": 1,
+      "6": 0,
+      "7": 0,
+      "8": 1,
+      "9": 0,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 0,
+      "17": 1,
+      "18": 0,
+      "19": 1
+    },
+    "creatorName": "Lozano",
+    "tgNotified": true,
+    "creatorId": 6,
+    "allowMultiple": false,
+    "title": "¿Se deben tener en cuenta los partidos de equipos femeninos en el PIG?",
+    "deadline": "2026-09-03T17:00:00.000Z",
+    "id": "VOTE-1787812230284",
+    "description": "",
+    "threshold": 51,
+    "options": [
+      "Si",
+      "No"
+    ]
+  }
+]

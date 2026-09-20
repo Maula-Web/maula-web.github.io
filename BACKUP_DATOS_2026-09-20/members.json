@@ -1,0 +1,211 @@
+[
+  {
+    "_id": "1",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:29:16.337376Z",
+    "email": "alvaro@maulas.com",
+    "joinedDate": "2026-01-27T16:05:54.524Z",
+    "id": 1,
+    "tgNick": "",
+    "phone": "Alvaro",
+    "name": "Alvaro"
+  },
+  {
+    "_id": "10",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-29T12:00:29.441464Z",
+    "joinedDate": "2026-01-27T16:05:54.525Z",
+    "id": 10,
+    "phone": "Javi",
+    "email": "javiermora@maulas.com",
+    "name": "Javier Mora",
+    "tgNick": ""
+  },
+  {
+    "_id": "11",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:30:23.549654Z",
+    "name": "Juan Antonio",
+    "email": "juanantonio@maulas.com",
+    "tgNick": "",
+    "phone": "Juanan",
+    "id": 11,
+    "joinedDate": "2026-01-27T16:05:54.526Z"
+  },
+  {
+    "_id": "12",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:30:31.143111Z",
+    "id": 12,
+    "email": "juanjo@maulas.com",
+    "tgNick": "",
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "phone": "Juanjo",
+    "name": "Juanjo"
+  },
+  {
+    "_id": "13",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:30:37.695619Z",
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "phone": "Luismi",
+    "name": "Luismi",
+    "email": "luismi@maulas.com",
+    "id": 13,
+    "tgNick": ""
+  },
+  {
+    "_id": "14",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:30:47.186368Z",
+    "phone": "Marcelo",
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "email": "marcelo@maulas.com",
+    "name": "Marcelo",
+    "id": 14,
+    "tgNick": ""
+  },
+  {
+    "_id": "15",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:30:54.111921Z",
+    "email": "martin@maulas.com",
+    "tgNick": "",
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "name": "Martín",
+    "phone": "Martín",
+    "id": 15
+  },
+  {
+    "_id": "16",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:31:01.950664Z",
+    "email": "rafa@maulas.com",
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "id": 16,
+    "tgNick": "",
+    "phone": "Rafa",
+    "name": "Rafa"
+  },
+  {
+    "_id": "17",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:31:10.082023Z",
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "id": 17,
+    "tgNick": "",
+    "phone": "Ramón",
+    "email": "ramon@maulas.com",
+    "name": "Ramón"
+  },
+  {
+    "_id": "18",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:31:16.488185Z",
+    "phone": "Romera",
+    "tgNick": "",
+    "name": "Raúl Romera",
+    "id": 18,
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "email": "raulromera@maulas.com"
+  },
+  {
+    "_id": "19",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:31:21.746783Z",
+    "tgNick": "",
+    "id": 19,
+    "joinedDate": "2026-01-27T16:05:54.526Z",
+    "name": "Samuel",
+    "email": "samuel@maulas.com",
+    "phone": "Samu"
+  },
+  {
+    "_id": "2",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-09-08T21:02:08.185391Z",
+    "joinedDate": "2026-01-27T16:05:54.525Z",
+    "tgNick": "Cmarinhas",
+    "id": 2,
+    "phone": "Mauliñas ",
+    "email": "carlos@maulas.com",
+    "name": "Carlos"
+  },
+  {
+    "_id": "3",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:29:32.428440Z",
+    "tgNick": "",
+    "name": "David Buzón",
+    "id": 3,
+    "email": "davidbuzon@maulas.com",
+    "joinedDate": "2026-01-27T16:05:54.525Z",
+    "phone": "Buzón"
+  },
+  {
+    "_id": "4",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:29:38.437386Z",
+    "phone": "Edu",
+    "tgNick": "",
+    "joinedDate": "2026-01-27T16:05:54.525Z",
+    "email": "edu@maulas.com",
+    "id": 4,
+    "name": "Edu"
+  },
+  {
+    "_id": "5",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-09-08T18:23:42.911144Z",
+    "name": "Emilio",
+    "phone": "Emilio",
+    "tgNick": "",
+    "id": 5,
+    "email": "emilio@maulas.com",
+    "joinedDate": "2026-01-27T16:05:54.525Z"
+  },
+  {
+    "_id": "6",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:08:46.308171Z",
+    "tgNick": "Fernandolozanor",
+    "email": "lozano@maulas.com",
+    "joinedDate": "2026-01-27T16:05:54.525Z",
+    "id": 6,
+    "phone": "Lozano",
+    "name": "Fernando Lozano"
+  },
+  {
+    "_id": "7",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:29:54.275211Z",
+    "tgNick": "",
+    "id": 7,
+    "name": "Fernando Ramírez",
+    "email": "fernandoramirez@maulas.com",
+    "phone": "Ramirez",
+    "joinedDate": "2026-01-27T16:05:54.525Z"
+  },
+  {
+    "_id": "8",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-09-08T18:20:53.061445Z",
+    "name": "Heradio",
+    "email": "heradio@maulas.com",
+    "tgNick": "",
+    "id": 8,
+    "phone": "Heradio",
+    "joinedDate": "2026-01-27T16:05:54.525Z"
+  },
+  {
+    "_id": "9",
+    "_createTime": "2025-12-14T20:33:00.785382Z",
+    "_updateTime": "2026-01-27T16:30:10.641909Z",
+    "email": "javaldivieso@maulas.com",
+    "tgNick": "",
+    "id": 9,
+    "name": "JA Valdivieso",
+    "joinedDate": "2026-01-27T16:05:54.525Z",
+    "phone": "Valdi"
+  }
+]
