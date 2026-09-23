@@ -652,7 +652,7 @@ class BoteManager {
     /**
      * Show detailed modal for a specific member
      */
-    showSocioDetalle(memberId) {
+    showSocioDetalle(memberId, sortOrder) {
         console.log('Opening details for member:', memberId);
         const member = this.members.find(m => String(m.id) === String(memberId));
         if (!member) {
@@ -660,7 +660,14 @@ class BoteManager {
             return;
         }
 
+        // Remember sort preference (default: ASC = oldest first)
+        if (sortOrder === undefined) {
+            sortOrder = this._detalleSortOrder || 'asc';
+        }
+        this._detalleSortOrder = sortOrder;
+
         const movements = this.calculateAllMovements();
+        // Engine always returns movements in chronological ASC order per member
         const memberMovements = movements.filter(m => String(m.memberId) === String(member.id));
         const memberName = member.name;
 
@@ -675,29 +682,48 @@ class BoteManager {
 
         title.textContent = `Movimientos de ${memberName}`;
 
+        // Apply display order (boteAcumulado values come from engine in ASC order and are kept as-is)
+        const displayMovements = sortOrder === 'desc' ? [...memberMovements].reverse() : memberMovements;
+
+        const totalIngresos = memberMovements.reduce((s, m) => s + m.totalIngresos, 0);
+        const totalGastos  = memberMovements.reduce((s, m) => s + m.totalGastos, 0);
+        const boteActual   = memberMovements.length > 0 ? memberMovements[memberMovements.length - 1].boteAcumulado : 0;
+
         let html = `
             <div style="margin-bottom: 1.5rem; text-align:center;">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
                     <div style="padding:0.5rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
                         <div style="font-size:0.6rem; opacity:0.6; text-transform:uppercase;">Ingresos (+)</div>
-                        <div class="${memberMovements.reduce((s, m) => s + m.totalIngresos, 0) < 0 ? 'negative' : 'positive'}" style="font-weight:bold;">${memberMovements.reduce((s, m) => s + m.totalIngresos, 0).toFixed(2)}€</div>
+                        <div class="${totalIngresos < 0 ? 'negative' : 'positive'}" style="font-weight:bold;">${totalIngresos.toFixed(2)}€</div>
                     </div>
                     <div style="padding:0.5rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
                         <div style="font-size:0.6rem; opacity:0.6; text-transform:uppercase;">Gastos (-)</div>
-                        <div class="negative" style="font-weight:bold;">${memberMovements.reduce((s, m) => s + m.totalGastos, 0).toFixed(2)}€</div>
+                        <div class="negative" style="font-weight:bold;">${totalGastos.toFixed(2)}€</div>
                     </div>
                     <div style="padding:0.5rem; background:rgba(255,145,0,0.1); border-radius:8px; border:1px solid var(--primary-color);">
                         <div style="font-size:0.6rem; color:var(--primary-color); text-transform:uppercase;">Bote Actual</div>
-                        <div style="font-weight:900; color:var(--primary-color); font-size:1.1rem;">${memberMovements.length > 0 ? memberMovements[memberMovements.length - 1].boteAcumulado.toFixed(2) : '0.00'}€</div>
+                        <div style="font-weight:900; color:var(--primary-color); font-size:1.1rem;">${boteActual.toFixed(2)}€</div>
                     </div>
                 </div>
             </div>
-            
+
+            <div style="display:flex; justify-content:flex-end; align-items:center; gap:0.5rem; margin-bottom:0.6rem;">
+                <label style="font-size:0.8rem; opacity:0.7;">Orden:</label>
+                <select onchange="window.Bote.showSocioDetalle('${memberId}', this.value)"
+                        style="appearance:none; -webkit-appearance:none;
+                               background: rgba(30,30,30,0.9) url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22%3E%3Cpath d=%22M1 1l5 5 5-5%22 stroke=%22%23ffffff%22 stroke-width=%222%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E') no-repeat right 10px center;
+                               border:1px solid rgba(255,145,0,0.4); border-radius:6px;
+                               color:#fff; padding:0.3rem 2rem 0.3rem 0.6rem; font-size:0.85rem; cursor:pointer;">
+                    <option value="asc" ${sortOrder === 'asc' ? 'selected' : ''}>⬆ Más antiguo primero</option>
+                    <option value="desc" ${sortOrder === 'desc' ? 'selected' : ''}>⬇ Más reciente primero</option>
+                </select>
+            </div>
+
             <div style="flex:1; min-height:400px; max-height: 65vh; overflow-y: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);">
                 <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
                     <thead style="position: sticky; top:0; background: var(--primary-color); z-index: 10;">
                         <tr>
-                            <th style="padding:0.75rem; text-align:left;">J</th>
+                            <th style="padding:0.75rem; text-align:left;">Jornada</th>
                             <th style="padding:0.75rem; text-align:left;">Fecha</th>
                             <th style="padding:0.75rem; text-align:center;">Ac.</th>
                             <th style="padding:0.75rem; text-align:right;">Ingreso</th>
@@ -708,21 +734,21 @@ class BoteManager {
                     <tbody>
         `;
 
-        if (memberMovements.length === 0) {
+        if (displayMovements.length === 0) {
             html += '<tr><td colspan="6" style="text-align:center; padding:2rem;">No hay movimientos</td></tr>';
         } else {
-            memberMovements.forEach(m => {
+            displayMovements.forEach(m => {
                 const selladoReembolso = (!m.isSelladoInCash && m.sellado < 0) ? Math.abs(m.sellado) : 0;
                 const totalIn = (m.totalIngresos || 0) + selladoReembolso;
                 const totalOut = m.totalGastos || (m.isIngresoLibre ? 0 : Math.abs(m.neto < 0 ? m.neto : 0)) || 0;
-                
+
                 let jText = m.jornadaNum !== undefined && m.jornadaNum !== null ? m.jornadaNum : '-';
                 let dateText = m.jornadaDate || m.date || '-';
                 let aciertosUI = m.aciertos !== undefined ? `${m.aciertos}${m.exento ? ' <span title="Exento" style="color:#ff9100;">🎁</span>' : ''}${m.premios > 0 ? ' <span title="Premio" style="color:#81c784;">🏆</span>' : ''}` : '-';
-                
+
                 if (m.isReparto) jText = 'REP';
                 if (m.isCierreVuelta) jText = 'PEN';
-                if (m.isIngresoLibre) jText = 'ING';
+                if (m.isIngresoLibre) jText = 'INGRESO';
 
                 let jBadge = `<strong title="${m.description || ''}">${jText}</strong>`;
                 if (m.jugaDobles) {
@@ -770,7 +796,7 @@ class BoteManager {
         `;
 
         content.innerHTML = html;
-        modal.style.display = 'flex'; // Use flex for centering
+        modal.style.display = 'flex';
         modal.style.zIndex = '9999';
         console.log('Details modal opened successfully');
     }
