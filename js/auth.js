@@ -108,11 +108,16 @@ const Auth = {
 
     // Helper to avoid dependency on AppUtils if it's not loaded yet
     parseDate(dateStr) {
-        if (!dateStr || dateStr.toLowerCase() === 'por definir') return null;
-        if (dateStr.match(/\d+[\/-]\d+[\/-]\d+/)) {
-            const parts = dateStr.split(/[\/-]/);
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+        if (window.AppUtils && window.AppUtils.parseDate) {
+            return window.AppUtils.parseDate(dateStr);
         }
+        if (!dateStr || dateStr.toLowerCase() === 'por definir') return null;
+        if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+        const trimmed = String(dateStr).trim();
+        const isoMatch = trimmed.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+        if (isoMatch) return new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+        const dmyMatch = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+        if (dmyMatch) return new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10));
         const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
         let clean = dateStr.toLowerCase().replace(/\s+/g, ' ');
         const mIdx = months.findIndex(m => clean.includes(m));

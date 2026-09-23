@@ -62,9 +62,15 @@ class BoteEngine {
                 ...cierresVuelta.map(c => ({ type: 'cierre_vuelta', date: c.date, data: c })),
                 ...ingresosLibres.map(i => ({ type: 'ingreso_libre', date: i.fecha || i.date, data: i }))
             ].sort((a, b) => {
-                const dA = window.AppUtils.parseDate(a.date) || new Date(0);
-                const dB = window.AppUtils.parseDate(b.date) || new Date(0);
-                return dA - dB;
+                const parse = (d) => (window.AppUtils && window.AppUtils.parseDate ? window.AppUtils.parseDate(d) : new Date(d)) || new Date(0);
+                const dA = parse(a.date);
+                const dB = parse(b.date);
+                const diff = dA - dB;
+                if (diff !== 0) return diff;
+                // Si la fecha coincide, los ingresos libres van antes que los gastos de jornada
+                if (a.type === 'ingreso_libre' && b.type !== 'ingreso_libre') return -1;
+                if (b.type === 'ingreso_libre' && a.type !== 'ingreso_libre') return 1;
+                return 0;
             });
 
             timeline.forEach(event => {
@@ -107,6 +113,7 @@ class BoteEngine {
                         jornadaId: jornada.id,
                         jornadaNum: jornada.number,
                         jornadaDate: jornada.date,
+                        date: jornada.date,
                         aportacion: costs.aportacion,
                         costeColumna: costs.columna,
                         penalizacionUnos: costs.penalizacionUnos,

@@ -249,29 +249,26 @@ class BoteManager {
     }
 
     parseDate(dateStr) {
-        if (!dateStr || dateStr.toLowerCase() === 'por definir') return null;
+        if (window.AppUtils && window.AppUtils.parseDate) {
+            return window.AppUtils.parseDate(dateStr);
+        }
+        if (!dateStr) return null;
+        if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+        const trimmed = String(dateStr).trim();
+        if (trimmed.toLowerCase() === 'por definir') return null;
 
-        // Try DD/MM/YYYY or DD-MM-YYYY
-        if (dateStr.match(/\d+[\/-]\d+[\/-]\d+/)) {
-            const parts = dateStr.split(/[\/-]/);
-            if (parts.length === 3) {
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            }
+        const isoMatch = trimmed.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+        if (isoMatch) {
+            return new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
         }
 
-        // Try text format
-        const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-            'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-        let clean = dateStr.toLowerCase().replace(/\s+/g, ' ');
-        const mIdx = months.findIndex(m => clean.includes(m));
-        const day = parseInt(clean.match(/\d+/));
-        const year = parseInt(clean.match(/\d{4}/)) || new Date().getFullYear();
-
-        if (!isNaN(day) && mIdx !== -1) {
-            return new Date(year, mIdx, day);
+        const dmyMatch = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+        if (dmyMatch) {
+            return new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10));
         }
 
-        return null;
+        const fallback = new Date(trimmed);
+        return isNaN(fallback.getTime()) ? null : fallback;
     }
 
     /**
@@ -667,9 +664,21 @@ class BoteManager {
         this._detalleSortOrder = sortOrder;
 
         const movements = this.calculateAllMovements();
-        // Engine always returns movements in chronological ASC order per member
         const memberMovements = movements.filter(m => String(m.memberId) === String(member.id));
         const memberName = member.name;
+
+        // Ensure strictly chronological ASC sort by parsed date regardless of origin
+        const getMvDate = (m) => {
+            const raw = m.jornadaDate || m.date;
+            return (window.AppUtils && window.AppUtils.parseDate ? window.AppUtils.parseDate(raw) : new Date(raw)) || new Date(0);
+        };
+        memberMovements.sort((a, b) => {
+            const diff = getMvDate(a) - getMvDate(b);
+            if (diff !== 0) return diff;
+            if (a.isIngresoLibre && !b.isIngresoLibre) return -1;
+            if (!a.isIngresoLibre && b.isIngresoLibre) return 1;
+            return 0;
+        });
 
         const modal = document.getElementById('modal-detalle-socio');
         const content = document.getElementById('detalle-socio-content');
@@ -743,7 +752,9 @@ class BoteManager {
                 const totalOut = m.totalGastos || (m.isIngresoLibre ? 0 : Math.abs(m.neto < 0 ? m.neto : 0)) || 0;
 
                 let jText = m.jornadaNum !== undefined && m.jornadaNum !== null ? m.jornadaNum : '-';
-                let dateText = m.jornadaDate || m.date || '-';
+                let dateRaw = m.jornadaDate || m.date || '-';
+                let dateParsed = window.AppUtils && window.AppUtils.parseDate ? window.AppUtils.parseDate(dateRaw) : null;
+                let dateText = dateParsed ? `${String(dateParsed.getDate()).padStart(2, '0')}/${String(dateParsed.getMonth() + 1).padStart(2, '0')}/${dateParsed.getFullYear()}` : dateRaw;
                 let aciertosUI = m.aciertos !== undefined ? `${m.aciertos}${m.exento ? ' <span title="Exento" style="color:#ff9100;">🎁</span>' : ''}${m.premios > 0 ? ' <span title="Premio" style="color:#81c784;">🏆</span>' : ''}` : '-';
 
                 if (m.isReparto) jText = 'REP';
