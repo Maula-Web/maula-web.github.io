@@ -709,13 +709,11 @@ class JornadaManager {
             }
         }
 
-        const originalText = this.btnSave.innerHTML;
-        this.btnSave.innerHTML = '✅ Guardado';
-        this.btnSave.disabled = true;
-        setTimeout(() => {
-            this.btnSave.innerHTML = originalText;
-            this.btnSave.disabled = false;
-        }, 1500);
+        // Re-render data and return to view mode for this jornada
+        this.fillModalData(jornadaData);
+        this.toggleEditMode(false);
+        this.btnSave.innerHTML = '💾 Guardar';
+        this.btnSave.disabled = false;
     }
 
 

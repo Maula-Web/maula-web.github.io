@@ -406,6 +406,7 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 - **Seguridad en Edición**: Durante la edición de resultados (`editMode === true`), los botones de navegación quedan automáticamente desactivados (`disabled = true`, opacidad reducida y cursor bloqueado) para evitar que el usuario cambie involuntariamente de jornada perdiendo los cambios no guardados.
 - **Límites de Jornadas**: Los botones se deshabilitan adecuadamente al alcanzar la primera o la última jornada registrada.
 - **Reinicio de Desplazamiento**: Al cambiar de jornada mediante estos botones, el cuerpo del modal restablece su desplazamiento (`scrollTop = 0`), posicionando al usuario al inicio de la jornada entrante.
+- **Retorno Automático a Modo Vista al Guardar**: Al pulsar el botón **Guardar** (`btnSave`), tras persistir los datos en Firestore y gestionar el aviso opcional de Telegram, el modal regresa inmediatamente al estado de visualización (**"Vista"**), bloqueando los inputs contra modificaciones accidentales, reactivando los botones de navegación ◀ y ▶ y mostrando nuevamente el botón **✏️ Editar**.
 
 ### 14.2. Aviso y Confirmación de Envío a Telegram
 - Al guardar los resultados de una jornada (`saveJornada`), si se detecta que los **15 partidos** (incluido el Pleno al 15) están completamente cumplimentados, el sistema muestra un cuadro de diálogo interactivo de confirmación (`confirm`):
