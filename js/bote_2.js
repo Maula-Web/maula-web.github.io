@@ -1655,24 +1655,18 @@ class BoteAppController {
 
             <!-- Tabla de Partidos con Pronóstico como Columna al Principio junto a las 16 Apuestas -->
             <div class="space-y-2">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-1">
+                <div class="flex items-center justify-between gap-1.5 pb-1">
                     <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
                         <span>📊</span> Matriz de Reducción: Pronóstico vs 16 Apuestas Desarrolladas
                     </h4>
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold flex items-center gap-1">
-                            🏆 Columnas premiadas (≥10 ac.) destacadas en oro
-                        </span>
-                        <span class="text-[11px] text-slate-400">Aciertos en salmón</span>
-                    </div>
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 max-h-[62vh] shadow-inner">
                     <table class="w-full text-center text-xs border-collapse select-none">
                         <thead class="sticky top-0 z-30 bg-slate-950 shadow-md">
                             <tr class="bg-slate-950 text-slate-300 font-bold border-b border-slate-700 text-xs">
                                 <th class="p-1.5 sm:p-2 text-center sticky left-0 z-40 bg-slate-950 w-7 sm:w-8 border-r border-slate-800">#</th>
-                                <th class="p-1.5 sm:p-2 text-left sticky left-[28px] sm:left-[32px] z-40 bg-slate-950 min-w-[125px] sm:min-w-[150px] max-w-[170px] border-r border-slate-800">Partido</th>
-                                <th class="p-1.5 sm:p-2 text-center sticky left-[153px] sm:left-[182px] z-40 bg-purple-950 text-purple-200 border-r-2 border-purple-500/70 min-w-[60px] sm:min-w-[68px]">
+                                <th class="p-1.5 sm:p-2 text-left bg-slate-950 min-w-[200px] sm:min-w-[280px] border-r border-slate-800">Partido</th>
+                                <th class="p-1.5 sm:p-2 text-center bg-purple-950 text-purple-200 border-r-2 border-purple-500/70 min-w-[65px] sm:min-w-[75px]">
                                     <div class="flex flex-col items-center">
                                         <span>Pronóstico</span>
                                         <span class="text-[9px] text-purple-400 font-normal">7 Dobles</span>
@@ -1711,10 +1705,10 @@ class BoteAppController {
                                         <td class="p-1 sm:p-1.5 text-center font-sans font-bold text-slate-400 sticky left-0 z-10 bg-slate-950/95 border-r border-slate-800">
                                             ${isP15 ? 'P15' : (idx + 1)}
                                         </td>
-                                        <td class="p-1 sm:p-1.5 text-left font-sans text-slate-200 sticky left-[28px] sm:left-[32px] z-10 bg-slate-950/95 border-r border-slate-800 whitespace-nowrap overflow-hidden text-ellipsis max-w-[125px] sm:max-w-[150px]" title="${m.home} - ${m.away}">
+                                        <td class="p-1.5 sm:p-2 text-left font-sans text-slate-200 bg-slate-950/95 border-r border-slate-800 whitespace-nowrap min-w-[200px] sm:min-w-[280px]" title="${m.home} - ${m.away}">
                                             ${m.home} - ${m.away}
                                         </td>
-                                        <td class="p-1 sm:p-1.5 text-center sticky left-[153px] sm:left-[182px] z-10 bg-purple-950/95 border-r-2 border-purple-500/70">
+                                        <td class="p-1 sm:p-1.5 text-center bg-purple-950/95 border-r-2 border-purple-500/70">
                                             <span class="inline-block px-1.5 py-0.5 rounded font-black text-xs ${isDouble ? 'bg-purple-500/30 text-purple-200 border border-purple-400/40 shadow-sm' : 'text-slate-300'}">
                                                 ${pronosticoSign}
                                             </span>
@@ -1753,10 +1747,10 @@ class BoteAppController {
                         </tbody>
                         <tfoot class="sticky bottom-0 z-30 bg-slate-950 border-t-2 border-slate-700 font-sans text-xs shadow-lg">
                             <tr>
-                                <th colspan="2" class="p-2 sm:px-3 text-right font-bold text-white sticky left-0 z-40 bg-slate-950 border-r border-slate-800">
+                                <th colspan="2" class="p-2 sm:px-3 text-right font-bold text-white bg-slate-950 border-r border-slate-800">
                                     Aciertos Totales:
                                 </th>
-                                <th class="p-2 sm:px-3 text-center sticky left-[153px] sm:left-[182px] z-40 bg-purple-950 border-r-2 border-purple-500/70 text-[11px] text-purple-300 font-semibold">
+                                <th class="p-2 sm:px-3 text-center bg-purple-950 border-r-2 border-purple-500/70 text-[11px] text-purple-300 font-semibold">
                                     16 Ap.
                                 </th>
                                 ${bets.map(b => {
@@ -1799,10 +1793,10 @@ class BoteAppController {
         const modalDialog = document.querySelector('#modal-reducida-detalle > div');
         if (modalDialog) {
             const screenW = window.innerWidth;
-            if (screenW >= 1400) {
-                modalDialog.style.maxWidth = 'min(1360px, 96vw)';
+            if (screenW >= 1200) {
+                modalDialog.style.maxWidth = 'min(1420px, 96vw)';
             } else if (screenW >= 1024) {
-                modalDialog.style.maxWidth = 'min(1180px, 96vw)';
+                modalDialog.style.maxWidth = 'min(1240px, 96vw)';
             } else {
                 modalDialog.style.maxWidth = '96vw';
             }
