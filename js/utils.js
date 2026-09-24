@@ -337,37 +337,152 @@ var AppUtils = window.AppUtils || {
 
     /**
      * Returns true if a team name represents a female team.
-     * Female teams are usually marked with "(F)" anywhere in their name,
-     * but we also catch variations like "( F )", "Femenino", or "Fem".
+     * Handles all real-world variations:
+     * - Parenthesized or bracketed: "(F)", "(f)", "( F )", "(Fem)", "(fem.)", "[F]", etc.
+     * - Explicit keywords: "Femenino", "Femenina", "Femení", "Fem", "Féminas"
+     * - Trailing suffix: " F", " f", " - F", " / F", " F." (e.g. "R.Madrid F", "Barcelona f", "At.Madrid F")
      */
     isFemaleTeam(name) {
         if (!name) return false;
-        return /\(\s*F\s*\)/i.test(String(name)) || /femenino/i.test(String(name)) || /\bfem\b/i.test(String(name));
+        const s = String(name).trim();
+        // 1. Parentheses or brackets containing F or Fem: (F), (f), (Fem), [F], etc.
+        if (/[\(\[\{]\s*f(?:em[a-z]*)?\.?\s*[\)\]\}]/i.test(s)) return true;
+        // 2. Trailing F: e.g. 'R.Madrid F', 'R.Madrid f', 'At.Madrid F.', 'Madrid CCF F'
+        if (/(?:[\s\-_/]+)f\.?$/i.test(s)) return true;
+        // 3. Normalized text check for words: femenino, femenina, femeni, feminas, fem
+        const unaccented = s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (/\b(?:femenin[oa]s?|femeni|feminas|fem)\b/i.test(unaccented)) return true;
+        return false;
     },
 
     /**
-     * Checks if a match is considered "PIG" (Pleno al 15 between big clubs)
-     * Robust check using normalization to handle accents, cases and variants.
-     * Female teams (marked with "(F)") are explicitly excluded.
+     * Returns true if a team name represents a reserve/filial team (e.g. B, Castilla, Filial).
+     * Reserve teams are not PIG.
      */
-    isPigMatch(home, away) {
-        if (!home || !away) return false;
-        // Female teams are never PIG
-        if (this.isFemaleTeam(home) || this.isFemaleTeam(away)) return false;
+    isReserveTeam(name) {
+        if (!name) return false;
+        const s = String(name).trim();
+        return /\b(?:[b-d]|castilla|filial|juvenil)\b/i.test(s);
+    },
 
-        const pigTeams = ['real madrid', 'r. madrid', 'r.madrid', 'at. madrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético'];
+    /**
+     * Unifies and standardizes a team name:
+     * - Normalizes common abbreviations (R.Madrid -> Real Madrid, At.Madrid -> Atlético, etc.)
+     * - Standardizes female teams to always end with " (F)"
+     */
+    normalizeTeamName(name) {
+        if (!name) return '';
+        const raw = String(name).trim();
+        const female = this.isFemaleTeam(raw);
 
-        const h = this.normalizeName(home);
-        const a = this.normalizeName(away);
+        // If female, strip the female tag from the base name
+        let base = raw;
+        if (female) {
+            base = base
+                .replace(/[\(\[\{]\s*f(?:em[a-z]*)?\.?\s*[\)\]\}]/gi, '')
+                .replace(/(?:[\s\-_/]+)f\.?$/gi, '')
+                .replace(/(?:^|\s|[\-_/])(?:femenin[oa]s?|femen[íi]|f[ée]minas|fem)(?:$|\s|[\-_/])/gi, ' ')
+                .trim();
+        }
 
-        const isPig = (normName) => {
-            return pigTeams.some(p => {
-                const pn = this.normalizeName(p);
-                return normName.includes(pn) || pn.includes(normName);
-            });
+        const map = {
+            'R Madrid': 'Real Madrid',
+            'RMadrid': 'Real Madrid',
+            'R. Madrid': 'Real Madrid',
+            'R.Madrid': 'Real Madrid',
+            'R Sociedad': 'Real Sociedad',
+            'RSociedad': 'Real Sociedad',
+            'R. Sociedad': 'Real Sociedad',
+            'R.Sociedad': 'Real Sociedad',
+            'R Zaragoza': 'Real Zaragoza',
+            'RZaragoza': 'Real Zaragoza',
+            'R Oviedo': 'Real Oviedo',
+            'ROviedo': 'Real Oviedo',
+            'R Racing': 'Racing',
+            'R Sporting': 'Sporting',
+            'RSporting': 'Sporting',
+            'R. Sporting': 'Sporting',
+            'R.Sporting': 'Sporting',
+            'At Madrid': 'Atlético',
+            'AtMadrid': 'Atlético',
+            'At. Madrid': 'Atlético',
+            'At.Madrid': 'Atlético',
+            'Atlético de Madrid': 'Atlético',
+            'Atletico de Madrid': 'Atlético',
+            'Atlético Madrid': 'Atlético',
+            'Atletico Madrid': 'Atlético',
+            'FC Barcelona': 'Barcelona',
+            'F.C. Barcelona': 'Barcelona',
+            'Barça': 'Barcelona',
+            'Barca': 'Barcelona',
+            'Rayo V': 'Rayo Vallecano',
+            'RayoV': 'Rayo Vallecano',
+            'Espanyol': 'RCD Espanyol',
+            'Athletic': 'Athletic Club',
+            'Ath Club': 'Athletic Club',
+            'CultLeonesa': 'Cultural Leonesa',
+            'Castellon': 'Castellón',
+            'Alaves': 'Alavés',
+            'Malaga': 'Málaga',
+            'Cadiz': 'Cádiz',
+            'Cordoba': 'Córdoba',
+            'La Coruña': 'Deportivo',
+            'Elda': 'Eldense'
         };
 
-        return isPig(h) && isPig(a);
+        const cleanBase = base.replace(/\./g, ' ').replace(/\s+/g, ' ').trim();
+        let mapped = map[base] || map[cleanBase] || base;
+
+        return female ? `${mapped} (F)` : mapped;
+    },
+
+    /**
+     * Determines which of the 3 PIG clubs a team name corresponds to:
+     * - 'REAL_MADRID'
+     * - 'ATLETICO_MADRID'
+     * - 'BARCELONA'
+     * Returns null if not a PIG club, or if it is a female team or reserve team.
+     */
+    getPigClub(name) {
+        if (!name || this.isFemaleTeam(name) || this.isReserveTeam(name)) return null;
+
+        const norm = this.normalizeName(name);
+
+        // 1. Real Madrid
+        // Matches: 'realmadrid', 'rmadrid'
+        if (/^(?:realmadrid|rmadrid)$/.test(norm)) {
+            return 'REAL_MADRID';
+        }
+
+        // 2. Atlético de Madrid
+        // Matches: 'atleticodemadrid', 'atleticomadrid', 'atmadrid', 'atletico'
+        // Does NOT match: 'atleticobaleares', 'atleticosanluqueno', etc.
+        if (/^(?:atletico(?:de)?madrid|atmadrid|atletico)$/.test(norm)) {
+            return 'ATLETICO_MADRID';
+        }
+
+        // 3. Barcelona
+        // Matches: 'barcelona', 'fcbarcelona', 'barca', 'futbolclubbarcelona'
+        if (/^(?:(?:fc|futbolclub)?barcelona|barca)$/.test(norm)) {
+            return 'BARCELONA';
+        }
+
+        return null;
+    },
+
+    /**
+     * Checks if a match is considered "PIG" (Partido de Interés General).
+     * Requirements:
+     * 1. Both teams must be from the big 3: Real Madrid, Atlético de Madrid, Barcelona.
+     * 2. The two teams must be distinct clubs (e.g. Real Madrid vs Barcelona, At.Madrid vs Real Madrid, etc.)
+     * 3. Female teams NEVER activate PIG (e.g. Real Madrid (F) vs Barcelona (F) is NOT PIG).
+     * 4. Reserve/filial teams NEVER activate PIG (e.g. Real Madrid Castilla or Celta B is NOT PIG).
+     */
+    isPigMatch(home, away) {
+        const clubHome = this.getPigClub(home);
+        const clubAway = this.getPigClub(away);
+        if (!clubHome || !clubAway) return false;
+        return clubHome !== clubAway;
     },
 
     /**

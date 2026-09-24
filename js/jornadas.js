@@ -650,9 +650,11 @@ class JornadaManager {
         const matchRows = this.matchesContainer.querySelectorAll('.match-row');
         const matches = [];
         matchRows.forEach(row => {
+            const rawHome = (row.querySelector('.inp-home').value || '').trim();
+            const rawAway = (row.querySelector('.inp-away').value || '').trim();
             matches.push({
-                home: row.querySelector('.inp-home').value,
-                away: row.querySelector('.inp-away').value,
+                home: (typeof AppUtils !== 'undefined' && AppUtils.normalizeTeamName) ? AppUtils.normalizeTeamName(rawHome) : rawHome,
+                away: (typeof AppUtils !== 'undefined' && AppUtils.normalizeTeamName) ? AppUtils.normalizeTeamName(rawAway) : rawAway,
                 result: row.querySelector('.inp-res').value
             });
         });

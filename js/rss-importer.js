@@ -876,6 +876,10 @@ class QuinielaScraper {
     }
 
     cleanTeamName(name) {
+        if (!name) return '';
+        if (typeof AppUtils !== 'undefined' && AppUtils.normalizeTeamName) {
+            return AppUtils.normalizeTeamName(name);
+        }
         let clean = name.trim().replace(/\./g, ''); // Remove dots first
 
         // Normalization Map for ElQuinielista abbreviations

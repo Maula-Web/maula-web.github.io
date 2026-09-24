@@ -461,6 +461,33 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 
 ---
 
+## 16. Reglas de Partido de Interés General (PIG) y Equipos Femeninos (v1.4)
+
+### 16.1. Definición y Reglas de Activación de PIG
+- **Equipos que activan PIG**: Únicamente los tres grandes clubes masculinos de fútbol profesional español:
+  1. **Real Madrid** (variantes aceptadas: `Real Madrid`, `R. Madrid`, `R.Madrid`, `RMadrid`).
+  2. **Atlético de Madrid** (variantes aceptadas: `Atlético de Madrid`, `Atletico de Madrid`, `Atlético Madrid`, `At. Madrid`, `At.Madrid`, `AtMadrid`, `Atlético`).
+  3. **Barcelona** (variantes aceptadas: `Barcelona`, `FC Barcelona`, `F.C. Barcelona`, `Barça`, `Barca`, `Futbol Club Barcelona`).
+- **Condición de Partido PIG (`AppUtils.isPigMatch`)**: El partido (típicamente evaluado para el Pleno al 15) es PIG **si y solo si** ambos contrincantes pertenecen a dos de estos tres clubes masculinos distintos entre sí (ej. Real Madrid vs Barcelona, Atlético vs Real Madrid, Barcelona vs Atlético).
+- **Exclusión de Filiales**: Los equipos filiales o de categorías inferiores (`Castilla`, `Celta B`, `R.Sociedad B`, etc.) no activan el PIG (`AppUtils.isReserveTeam`).
+
+### 16.2. Exclusión y Normalización de Equipos Femeninos
+- **Regla Estricta**: Los partidos de fútbol femenino **NUNCA activan el PIG**, con independencia de que los clubes enfrentados sean Real Madrid, Barcelona o Atlético de Madrid.
+- **Detección Exhaustiva de Variantes Femeninas (`AppUtils.isFemaleTeam`)**:
+  - Reconoce etiquetas entre paréntesis o corchetes: `(F)`, `(f)`, `( F )`, `(Fem)`, `(fem.)`, `[F]`, etc.
+  - Reconoce palabras clave en castellano y catalán con o sin tilde: `femenino`, `femenina`, `femení`, `feminas`, `féminas`, `fem`.
+  - Reconoce sufijos abreviados al final del nombre: ` F`, ` f`, ` - F`, ` / F`, ` F.` (ej. `R.Madrid F`, `R.Madrid f`, `At.Madrid F`, `Deportivo F`, `Madrid CCF F`).
+- **Estandarización y Unificación de Nombres (`AppUtils.normalizeTeamName`)**:
+  - Al importar jornadas desde fuentes externas (`rss-importer.js`) o al guardarlas manualmente en el modal de administración de jornadas (`jornadas.js`), los nombres de los equipos femeninos se limpian eliminando duplicidades y se unifican bajo el formato oficial estándar con sufijo ` (F)`:
+    - `R.Madrid F` / `R.Madrid f` / `R.Madrid (f)` $\rightarrow$ `Real Madrid (F)`
+    - `At.Madrid F` / `At. Madrid (F)` $\rightarrow$ `Atlético (F)`
+    - `Barcelona (f)` / `Barcelona F` $\rightarrow$ `Barcelona (F)`
+    - `Deportivo F` $\rightarrow$ `Deportivo (F)`
+    - `Madrid CCF F` $\rightarrow$ `Madrid CCF (F)`
+- **Impacto Sistémico**: Toda la aplicación (cálculo de botes, pantalla de pronósticos, resultados, resumen de temporada, dado de quinielas y notificaciones automáticas de Telegram) utiliza de forma homogénea las funciones centralizadas de `window.AppUtils`.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
