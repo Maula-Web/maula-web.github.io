@@ -24,6 +24,10 @@ class BoteAppController {
         this.isLive = false;
         this.liveData = null;
         this.engine = null;
+        this.sociosViewMode = 'table';
+        this.chartFlujo = null;
+        this.chartSocios = null;
+        this.chartJornadas = null;
         this.init();
     }
 
@@ -352,6 +356,15 @@ class BoteAppController {
                 tab.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60';
             }
         });
+
+        // Actualizar gráficos según la vista activa
+        if (viewName === 'flujo') {
+            setTimeout(() => this.renderFlujoChart(), 60);
+        } else if (viewName === 'jornadas') {
+            setTimeout(() => this.renderJornadasChart(), 60);
+        } else if (viewName === 'socios' && this.sociosViewMode === 'chart') {
+            setTimeout(() => this.renderSociosChart(), 60);
+        }
     }
 
     renderAll() {
@@ -364,6 +377,13 @@ class BoteAppController {
         this.renderPremiosDobles();
         this.renderGestionIngresos();
         this.renderModalGestionJornada();
+
+        // Renderizar gráficos si los contenedores están disponibles
+        setTimeout(() => {
+            this.renderFlujoChart();
+            this.renderJornadasChart();
+            if (this.sociosViewMode === 'chart') this.renderSociosChart();
+        }, 100);
     }
 
     renderSummaryCards() {
@@ -2028,6 +2048,362 @@ class BoteAppController {
         link.href = URL.createObjectURL(blob);
         link.download = `Bote_Maulas_${this.currentSeason}_${new Date().toISOString().split('T')[0]}.csv`;
         link.click();
+    }
+
+    // =========================================================================
+    // CUADROS DE MANDO / GRÁFICOS (Chart.js)
+    // =========================================================================
+
+    setSociosViewMode(mode) {
+        this.sociosViewMode = mode;
+        const btnTable = document.getElementById('btn-socios-mode-table');
+        const btnChart = document.getElementById('btn-socios-mode-chart');
+        const tableCont = document.getElementById('socios-table-container');
+        const chartCont = document.getElementById('socios-chart-container');
+
+        if (mode === 'chart') {
+            if (btnChart) {
+                btnChart.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all';
+            }
+            if (btnTable) {
+                btnTable.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white text-xs flex items-center gap-1.5 transition-all';
+            }
+            if (tableCont) tableCont.classList.add('hidden');
+            if (chartCont) chartCont.classList.remove('hidden');
+            setTimeout(() => this.renderSociosChart(), 50);
+        } else {
+            if (btnTable) {
+                btnTable.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all';
+            }
+            if (btnChart) {
+                btnChart.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white text-xs flex items-center gap-1.5 transition-all';
+            }
+            if (chartCont) chartCont.classList.add('hidden');
+            if (tableCont) tableCont.classList.remove('hidden');
+        }
+    }
+
+    renderSociosChart() {
+        if (typeof Chart === 'undefined') return;
+        const canvas = document.getElementById('chart-socios-saldos');
+        if (!canvas) return;
+
+        if (this.chartSocios) {
+            this.chartSocios.destroy();
+            this.chartSocios = null;
+        }
+
+        const data = this.getSeasonData();
+        // Ordenar socios por saldo descendente para efecto ranking / leaderboard
+        const members = [...data.memberSummaries].sort((a, b) => b.saldo - a.saldo);
+
+        const labels = members.map(m => m.name);
+        const saldos = members.map(m => m.saldo);
+        const bgColors = members.map(m => {
+            if (m.saldo >= 40) return 'rgba(16, 185, 129, 0.85)'; // Emerald
+            if (m.saldo >= 10) return 'rgba(245, 158, 11, 0.85)'; // Amber
+            return 'rgba(244, 63, 94, 0.85)'; // Rose
+        });
+        const borderColors = members.map(m => {
+            if (m.saldo >= 40) return '#10b981';
+            if (m.saldo >= 10) return '#f59e0b';
+            return '#f43f5e';
+        });
+
+        const ctx = canvas.getContext('2d');
+        this.chartSocios = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Saldo Actual',
+                    data: saldos,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                    maxBarThickness: 20
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(245, 158, 11, 0.4)',
+                        borderWidth: 1,
+                        padding: 10,
+                        boxPadding: 4,
+                        callbacks: {
+                            label: (context) => {
+                                const m = members[context.dataIndex];
+                                return [
+                                    ` Saldo: ${m.saldo.toFixed(2)} €`,
+                                    ` Ingresos: +${m.totIn.toFixed(2)} €`,
+                                    ` Gastos & Multas: -${m.totOut.toFixed(2)} €`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { family: 'JetBrains Mono', size: 11 },
+                            callback: (v) => v + ' €'
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#e2e8f0',
+                            font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }
+                        }
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements && elements.length > 0) {
+                        const idx = elements[0].index;
+                        const m = members[idx];
+                        if (m) this.openMemberExtract(m.id);
+                    }
+                }
+            }
+        });
+    }
+
+    toggleJornadasChart() {
+        const wrapper = document.getElementById('jornadas-chart-wrapper');
+        const text = document.getElementById('text-toggle-jornadas-chart');
+        const icon = document.getElementById('icon-toggle-jornadas-chart');
+        if (!wrapper) return;
+        const isHidden = wrapper.classList.toggle('hidden');
+        if (text) text.textContent = isHidden ? 'Mostrar Gráfico' : 'Ocultar Gráfico';
+        if (icon) icon.textContent = isHidden ? '▼' : '▲';
+        if (!isHidden) {
+            setTimeout(() => this.renderJornadasChart(), 50);
+        }
+    }
+
+    renderJornadasChart() {
+        if (typeof Chart === 'undefined') return;
+        const canvas = document.getElementById('chart-jornadas-sellado');
+        if (!canvas) return;
+
+        if (this.chartJornadas) {
+            this.chartJornadas.destroy();
+            this.chartJornadas = null;
+        }
+
+        const data = this.getSeasonData();
+        const summaries = data.jornadaSummaries || [];
+        if (summaries.length === 0) return;
+
+        const labels = summaries.map(j => `J${j.number}`);
+        const recaudacion = summaries.map(j => j.recaudacion);
+        const sellado = summaries.map(j => j.gastoSellado);
+        const neto = summaries.map(j => j.neto);
+
+        const ctx = canvas.getContext('2d');
+        this.chartJornadas = new Chart(ctx, {
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Recaudación (Cuotas + Multas)',
+                        data: recaudacion,
+                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                        borderColor: '#10b981',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                        order: 2
+                    },
+                    {
+                        type: 'bar',
+                        label: 'Coste Sellado LAE (24,75 €)',
+                        data: sellado,
+                        backgroundColor: 'rgba(244, 63, 94, 0.75)',
+                        borderColor: '#f43f5e',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                        order: 2
+                    },
+                    {
+                        type: 'line',
+                        label: 'Superávit Semanal (Margen Neto)',
+                        data: neto,
+                        borderColor: '#f59e0b',
+                        backgroundColor: '#f59e0b',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: '#090d16',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.3,
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#cbd5e1',
+                            font: { family: 'Plus Jakarta Sans', size: 11 },
+                            boxWidth: 12,
+                            padding: 12
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255, 145, 0, 0.4)',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: (context) => ` ${context.dataset.label}: ${context.raw >= 0 ? '+' : ''}${context.raw.toFixed(2)} €`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' }
+                        }
+                    },
+                    y: {
+                        grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { family: 'JetBrains Mono', size: 11 },
+                            callback: (v) => v + ' €'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    toggleFlujoChart() {
+        const wrapper = document.getElementById('flujo-chart-wrapper');
+        const text = document.getElementById('text-toggle-flujo-chart');
+        const icon = document.getElementById('icon-toggle-flujo-chart');
+        if (!wrapper) return;
+        const isHidden = wrapper.classList.toggle('hidden');
+        if (text) text.textContent = isHidden ? 'Mostrar Gráfico' : 'Ocultar Gráfico';
+        if (icon) icon.textContent = isHidden ? '▼' : '▲';
+        if (!isHidden) {
+            setTimeout(() => this.renderFlujoChart(), 50);
+        }
+    }
+
+    renderFlujoChart() {
+        if (typeof Chart === 'undefined') return;
+        const canvas = document.getElementById('chart-flujo-evolucion');
+        if (!canvas) return;
+
+        if (this.chartFlujo) {
+            this.chartFlujo.destroy();
+            this.chartFlujo = null;
+        }
+
+        const data = this.getSeasonData();
+        const summaries = data.jornadaSummaries || [];
+
+        const BOTE_INICIAL = 738.68;
+        const labels = ['Inicio'];
+        const values = [BOTE_INICIAL];
+
+        let running = BOTE_INICIAL;
+        summaries.forEach(j => {
+            labels.push(`J${j.number}`);
+            running += (j.neto || 0);
+            values.push(parseFloat(running.toFixed(2)));
+        });
+
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+        gradient.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
+        gradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+        this.chartFlujo = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Bote Total de la Peña',
+                    data: values,
+                    borderColor: '#f59e0b',
+                    borderWidth: 2.5,
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: '#090d16',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(245, 158, 11, 0.4)',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: (context) => {
+                                const val = context.raw;
+                                const diff = val - BOTE_INICIAL;
+                                return [
+                                    ` Bote Acumulado: ${val.toFixed(2)} €`,
+                                    ` Crecimiento Neto: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} €`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' }
+                        }
+                    },
+                    y: {
+                        min: Math.floor(BOTE_INICIAL - 20),
+                        grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { family: 'JetBrains Mono', size: 11 },
+                            callback: (v) => v + ' €'
+                        }
+                    }
+                }
+            }
+        });
     }
 }
 

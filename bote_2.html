@@ -28,6 +28,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
+    <!-- Chart.js 4.4 para Cuadros de Mando -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
         :root {
@@ -416,7 +418,7 @@
                 </p>
             </div>
 
-            <!-- Barra de Filtros -->
+            <!-- Barra de Filtros y Modo de Vista -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-slate-400 font-semibold">Filtrar:</span>
@@ -426,10 +428,39 @@
                         <button onclick="window.BoteApp.filterMembers('negative')" data-filter="negative" class="px-3 py-1 rounded-lg font-semibold bg-slate-800 text-rose-400 hover:bg-slate-700">En Deuda</button>
                     </div>
                 </div>
+
+                <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800 self-start sm:self-center">
+                    <button onclick="window.BoteApp.setSociosViewMode('table')" id="btn-socios-mode-table" class="px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all">
+                        <span>📋</span> Tabla
+                    </button>
+                    <button onclick="window.BoteApp.setSociosViewMode('chart')" id="btn-socios-mode-chart" class="px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white text-xs flex items-center gap-1.5 transition-all">
+                        <span>📊</span> Gráfico Comparativo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gráfico Comparativo de Socios (Semáforo de Saldos) -->
+            <div id="socios-chart-container" class="glass-panel p-4 sm:p-5 space-y-3 hidden border-amber-500/30">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-800 gap-2">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                            <span>📊</span> Comparativa de Saldos por Socio
+                        </h3>
+                        <p class="text-xs text-slate-400">Verde: Saldo desahogado (>40€) • Amarillo: Normal (10€-40€) • Rojo: Saldo bajo / en deuda (&lt;10€)</p>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> >40 €</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> 10-40 €</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> &lt;10 €</span>
+                    </div>
+                </div>
+                <div class="relative w-full h-[480px] sm:h-[520px]">
+                    <canvas id="chart-socios-saldos"></canvas>
+                </div>
             </div>
 
             <!-- Tabla de Socios -->
-            <div class="glass-panel overflow-hidden">
+            <div id="socios-table-container" class="glass-panel overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm border-collapse">
                         <thead>
@@ -473,6 +504,28 @@
             <!-- Tarjeta de cabecera financiera de la jornada -->
             <div class="glass-panel p-4 sm:p-5 border-orange-500/30 bg-gradient-to-r from-orange-950/20 via-slate-900/80 to-slate-900/80" id="jornada-header-card">
                 <!-- Inyectado por JS -->
+            </div>
+
+            <!-- Gráfico Comparativo: Recaudación vs Sellado por Jornada (Plegable) -->
+            <div class="glass-panel p-4 sm:p-5 space-y-3 border-orange-500/30">
+                <div class="flex items-center justify-between cursor-pointer select-none" onclick="window.BoteApp.toggleJornadasChart()">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-base sm:text-lg">📊</span>
+                        <div>
+                            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                                Comparativa Semanal: Recaudación vs Coste de Sellado
+                            </h3>
+                            <p class="text-[11px] text-slate-400">Verde: Recaudación total • Rojo: Sellado oficial (24,75 €) • Amarillo: Margen neto</p>
+                        </div>
+                    </div>
+                    <button class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 flex items-center gap-1 transition-all" id="btn-toggle-jornadas-chart">
+                        <span id="text-toggle-jornadas-chart">Ocultar Gráfico</span>
+                        <span id="icon-toggle-jornadas-chart">▲</span>
+                    </button>
+                </div>
+                <div id="jornadas-chart-wrapper" class="relative w-full h-60 sm:h-64 pt-2">
+                    <canvas id="chart-jornadas-sellado"></canvas>
+                </div>
             </div>
 
             <!-- Desglose por socios de la jornada -->
@@ -628,6 +681,28 @@
                     </div>
                     <div class="text-2xl font-extrabold text-rose-400 mt-1 font-mono">24,75 € / jor</div>
                     <p class="text-[11px] text-slate-400 mt-1">19 sencillas + 1 dobles</p>
+                </div>
+            </div>
+
+            <!-- Gráfico de Evolución del Fondo Común (Bote de la Peña) -->
+            <div class="glass-panel p-4 sm:p-5 space-y-3 border-amber-500/30">
+                <div class="flex items-center justify-between cursor-pointer select-none" onclick="window.BoteApp.toggleFlujoChart()">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-base sm:text-lg">📈</span>
+                        <div>
+                            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                                Curva de Crecimiento del Bote de la Peña
+                            </h3>
+                            <p class="text-[11px] text-slate-400">Evolución del saldo real en caja desde el fondo inicial (738,68 €) hasta el cierre actual</p>
+                        </div>
+                    </div>
+                    <button class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 flex items-center gap-1 transition-all" id="btn-toggle-flujo-chart">
+                        <span id="text-toggle-flujo-chart">Ocultar Gráfico</span>
+                        <span id="icon-toggle-flujo-chart">▲</span>
+                    </button>
+                </div>
+                <div id="flujo-chart-wrapper" class="relative w-full h-60 sm:h-64 pt-2">
+                    <canvas id="chart-flujo-evolucion"></canvas>
                 </div>
             </div>
 
