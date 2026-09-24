@@ -1074,7 +1074,12 @@
                     </h3>
                     <p class="text-xs text-slate-400">Aportaciones registradas en la temporada activa</p>
                 </div>
-                <button onclick="window.BoteApp.closeModal('modal-gestion-ingresos')" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">✕</button>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.BoteApp.openModal('modal-ingreso')" class="primary-glow text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs hover:brightness-110 active:scale-95 transition-all flex items-center gap-1">
+                        ➕ Nuevo Ingreso
+                    </button>
+                    <button onclick="window.BoteApp.closeModal('modal-gestion-ingresos')" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">✕</button>
+                </div>
             </div>
             <div class="p-4 sm:p-5 overflow-y-auto flex-1">
                 <table class="w-full text-left text-xs sm:text-sm border-collapse">
@@ -1085,6 +1090,7 @@
                             <th class="p-2.5 sm:p-3 text-right">Cantidad</th>
                             <th class="p-2.5 sm:p-3">Método</th>
                             <th class="p-2.5 sm:p-3">Concepto</th>
+                            <th class="p-2.5 sm:p-3 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60" id="gestion-ingresos-table-body">
@@ -1128,82 +1134,140 @@
 
     <!-- MODAL 5: ⚙️ CONFIGURACIÓN DE TARIFAS -->
     <div id="modal-config" onclick="if(event.target === this) window.BoteApp.closeModal('modal-config')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-2xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
+        <div class="glass-panel w-full max-w-3xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                         <span>⚙️</span> Configuración de Precios & Penalizaciones
                     </h3>
-                    <p class="text-xs text-slate-400">Valores aplicados por el motor de cálculo del Bote</p>
+                    <p class="text-xs text-slate-400">Personaliza las tarifas, penalizaciones y el bote inicial aplicados por el motor de cálculo</p>
                 </div>
                 <button onclick="window.BoteApp.closeModal('modal-config')" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">✕</button>
             </div>
-            <div class="p-4 sm:p-5 overflow-y-auto space-y-5 text-xs sm:text-sm">
-                <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2.5">Precios Base de la Peña</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                            <label class="block text-xs text-slate-400 mb-1">Aportación Semanal</label>
-                            <div class="text-base sm:text-lg font-mono font-bold text-white">1,50 € / socio</div>
+            <form id="form-config" onsubmit="window.BoteApp.submitConfig(event)" class="flex flex-col flex-1 overflow-hidden">
+                <div class="p-4 sm:p-6 overflow-y-auto space-y-6 text-xs sm:text-sm flex-1">
+                    <!-- Sección 1: Precios Base y Cuotas -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-1.5">
+                            <span>🎟️</span> Precios Base, Cuotas y Bote Inicial
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 focus-within:border-amber-500/50 transition-colors">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Aportación Semanal (€)</label>
+                                <input type="number" id="config-aportacion" step="0.01" min="0" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 font-mono font-bold text-white text-base focus:outline-none focus:border-amber-500">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Cuota fija semanal por socio</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 focus-within:border-amber-500/50 transition-colors">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Columna Normal (€)</label>
+                                <input type="number" id="config-coste-columna" step="0.01" min="0" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 font-mono font-bold text-white text-base focus:outline-none focus:border-amber-500">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Coste oficial apuesta sencilla</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 focus-within:border-amber-500/50 transition-colors">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Columna Dobles (€)</label>
+                                <input type="number" id="config-coste-dobles" step="0.01" min="0" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 font-mono font-bold text-white text-base focus:outline-none focus:border-amber-500">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Coste 16 apuestas reducidas</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 focus-within:border-amber-500/50 transition-colors">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Bote Inicial Temporada (€)</label>
+                                <input type="number" id="config-bote-inicial" step="0.01" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 font-mono font-bold text-amber-400 text-base focus:outline-none focus:border-amber-500">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Fondo de apertura en caja</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 focus-within:border-amber-500/50 transition-colors sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Coste Extra por Socio Exento (€)</label>
+                                <input type="number" id="config-extra-exento" step="0.01" min="0" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 font-mono font-bold text-white text-base focus:outline-none focus:border-amber-500">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Sobrecoste aplicado si no hay compensación externa</span>
+                            </div>
                         </div>
-                        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                            <label class="block text-xs text-slate-400 mb-1">Columna Ordinaria</label>
-                            <div class="text-base sm:text-lg font-mono font-bold text-white">0,75 €</div>
+                    </div>
+
+                    <!-- Sección 2: Penalizaciones Generales -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-rose-400 mb-3 flex items-center gap-1.5">
+                            <span>⚠️</span> Penalizaciones Generales
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 focus-within:border-rose-500/50 transition-colors">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">💀 Maula / Perdedor / Sellador (€)</label>
+                                <input type="number" id="config-penalizacion-maula" step="0.10" min="0" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 font-mono font-bold text-rose-400 text-base focus:outline-none focus:border-rose-500">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Multa al socio en última posición</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 focus-within:border-rose-500/50 transition-colors">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">🐷 Fallo en Partido Interés General (PIG) (€)</label>
+                                <input type="number" id="config-penalizacion-pig" step="0.10" min="0" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 font-mono font-bold text-rose-400 text-base focus:outline-none focus:border-rose-500">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Multa por no acertar el partido clave</span>
+                            </div>
                         </div>
-                        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                            <label class="block text-xs text-slate-400 mb-1">Columna Dobles</label>
-                            <div class="text-base sm:text-lg font-mono font-bold text-white">10,50 €</div>
+                    </div>
+
+                    <!-- Sección 3: Penalización por Bajos Aciertos -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-pink-400 mb-3 flex items-center gap-1.5">
+                            <span>📉</span> Penalizaciones por Bajos Aciertos (0 a 3 aciertos)
+                        </h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">0 Aciertos (€)</label>
+                                <input type="number" id="config-pen-0" step="0.10" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2.5 py-1 font-mono font-bold text-pink-400 text-sm focus:outline-none focus:border-pink-500">
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">1 Acierto (€)</label>
+                                <input type="number" id="config-pen-1" step="0.10" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2.5 py-1 font-mono font-bold text-pink-400 text-sm focus:outline-none focus:border-pink-500">
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">2 Aciertos (€)</label>
+                                <input type="number" id="config-pen-2" step="0.10" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2.5 py-1 font-mono font-bold text-pink-400 text-sm focus:outline-none focus:border-pink-500">
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">3 Aciertos (€)</label>
+                                <input type="number" id="config-pen-3" step="0.10" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2.5 py-1 font-mono font-bold text-pink-400 text-sm focus:outline-none focus:border-pink-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 4: Penalización por Exceso de "Unos" -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300 mb-3 flex items-center gap-1.5">
+                            <span>1️⃣</span> Penalizaciones por Exceso de Unos (10 a 15 unos)
+                        </h4>
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">10 Unos (€)</label>
+                                <input type="number" id="config-unos-10" step="0.05" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 font-mono font-bold text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">11 Unos (€)</label>
+                                <input type="number" id="config-unos-11" step="0.05" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 font-mono font-bold text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">12 Unos (€)</label>
+                                <input type="number" id="config-unos-12" step="0.05" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 font-mono font-bold text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">13 Unos (€)</label>
+                                <input type="number" id="config-unos-13" step="0.05" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 font-mono font-bold text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">14 Unos (€)</label>
+                                <input type="number" id="config-unos-14" step="0.05" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 font-mono font-bold text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">15 Unos (€)</label>
+                                <input type="number" id="config-unos-15" step="0.05" min="0" class="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 font-mono font-bold text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2.5">Penalizaciones Oficiales</h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">Maula / Perdedor</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+1,00 €</span>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">🐷 Fallo PIG</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+1,00 €</span>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">0 Aciertos</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+3,00 €</span>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">1 Acierto</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+2,00 €</span>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">2 Aciertos</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+1,00 €</span>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">3 Aciertos</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+0,50 €</span>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">10 Unos</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+0,10 €</span>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <span class="text-slate-400 block">14 Unos</span>
-                            <span class="font-bold font-mono text-rose-400 text-sm">+1,00 €</span>
-                        </div>
-                    </div>
+                <!-- Footer con botones de acción -->
+                <div class="p-4 sm:p-5 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between shrink-0">
+                    <button type="button" onclick="window.BoteApp.closeModal('modal-config')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-semibold transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="primary-glow text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20">
+                        <span>💾</span> Guardar Configuración
+                    </button>
                 </div>
-
-                <div class="p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs space-y-1">
-                    <strong class="text-amber-400 block font-bold flex items-center gap-1.5">
-                        <span>⚙️</span> Vigencia Temporal de Precios y Penalizaciones
-                    </strong>
-                    <p class="leading-relaxed">
-                        Los precios y penalizaciones se calculan aplicando los registros históricos en la fecha de cada jornada, garantizando que nunca se rompan los cálculos de temporadas o semanas pasadas.
-                    </p>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -1212,23 +1276,36 @@
         <div class="glass-panel w-full max-w-md border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                    <span>💰</span> Reparto de Ganancias
+                    <span>💰</span> Realizar Reparto de Ganancias
                 </h3>
                 <button onclick="window.BoteApp.closeModal('modal-reparto')" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">✕</button>
             </div>
-            <div class="p-4 sm:p-5 space-y-4 text-xs sm:text-sm">
-                <p class="text-slate-300 leading-relaxed">
-                    Un reparto extrae fondos de la caja colectiva de la peña y los distribuye equitativamente entre los socios activos.
+            <form onsubmit="window.BoteApp.submitReparto(event)" class="p-4 sm:p-5 space-y-4 text-xs sm:text-sm">
+                <p class="text-slate-300 leading-relaxed text-xs">
+                    Un reparto extrae fondos de la caja colectiva de la peña y los abona equitativamente a las huchas individuales de los socios activos.
                 </p>
-                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                    <label class="block text-xs text-slate-400 font-semibold">Importe Total a Repartir (€)</label>
-                    <input type="number" step="0.01" min="1" placeholder="Ej: 190.00 (10€ por socio)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <label class="block text-xs text-slate-300 font-semibold">Importe Total a Repartir (€)</label>
+                    <input type="number" id="reparto-importe-total" step="0.01" min="1" required placeholder="Ej: 190.00" oninput="window.BoteApp.updateRepartoCalc()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono font-bold text-base focus:outline-none focus:border-orange-500">
+                    <div id="reparto-calc-info" class="text-xs text-emerald-400 font-medium">
+                        Importe por socio: 0,00 € / socio (19 socios)
+                    </div>
                 </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="window.BoteApp.closeModal('modal-reparto')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300">Cerrar</button>
-                    <button type="button" onclick="alert('Función de reparto lista para registrar una vez acordado en asamblea.'); window.BoteApp.closeModal('modal-reparto');" class="primary-glow text-slate-950 font-bold px-4 py-2 rounded-xl">Ejecutar Reparto</button>
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <label class="block text-xs text-slate-300 font-semibold">Concepto del Reparto</label>
+                    <input type="text" id="reparto-concepto" placeholder="Ej: Reparto de beneficios Jornada 8" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
                 </div>
-            </div>
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <label class="block text-xs text-slate-300 font-semibold">Fecha de Aplicación</label>
+                    <input type="date" id="reparto-fecha" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                    <button type="button" onclick="window.BoteApp.closeModal('modal-reparto')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-colors">Cancelar</button>
+                    <button type="submit" class="primary-glow text-slate-950 font-bold px-4 py-2 rounded-xl text-xs hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 shadow-lg shadow-orange-500/20">
+                        <span>💰</span> Ejecutar Reparto
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

@@ -23,11 +23,40 @@ class BoteAppController {
         this.searchQuery = '';
         this.isLive = false;
         this.liveData = null;
+        this.rawSeasonData = null;
         this.engine = null;
         this.sociosViewMode = 'table';
         this.chartFlujo = null;
         this.chartSocios = null;
         this.chartJornadas = null;
+        this.config = {
+            costeColumna: 0.75,
+            costeDobles: 10.50,
+            aportacionSemanal: 1.50,
+            costeExtraExento: 0.20,
+            boteInicial: 738.68,
+            penalizacionMaula: 1.00,
+            penalizacionPIG: 1.00,
+            temporadaActual: '2026-2027',
+            penalties_history: {
+                bajos_aciertos: [{
+                    date: '2026-08-01',
+                    values: { 0: 3.00, 1: 2.00, 2: 1.00, 3: 0.50 }
+                }],
+                unos: [{
+                    date: '2026-08-01',
+                    values: { 10: 0.10, 11: 0.20, 12: 0.30, 13: 0.50, 14: 1.00, 15: 2.00 }
+                }],
+                pig: [{
+                    date: '2026-08-01',
+                    value: 1.00
+                }],
+                maula: [{
+                    date: '2026-08-01',
+                    value: 1.00
+                }]
+            }
+        };
         this.init();
     }
 
@@ -179,30 +208,22 @@ class BoteAppController {
      */
     async loadLiveFirebaseData() {
         try {
+            await this.loadConfig();
             if (window.DataService) {
                 await window.DataService.init();
                 const seasonData = await window.DataService.loadSeasonData();
-                const configDoc = await window.DataService.getConfig();
-                const config = {
-                    costeColumna: (configDoc && configDoc.costeColumna) || 0.75,
-                    costeDobles: (configDoc && configDoc.costeDobles) || 10.50,
-                    aportacionSemanal: (configDoc && configDoc.aportacionSemanal) || 1.50,
-                    penalizacionMaula: (configDoc && configDoc.penalizacionMaula) || 1.00,
-                    temporadaActual: (configDoc && configDoc.temporadaActual) || '2026-2027'
-                };
-
                 const cashPayments = await window.DataService.getAll('reembolsos_efectivo') || [];
                 const repartos = await window.DataService.getAll('repartos') || [];
                 const cierresVuelta = await window.DataService.getAll('cierres_vuelta') || [];
                 const ingresos = await window.DataService.getAll('ingresos') || [];
 
                 if (window.BoteEngine) {
-                    this.engine = new window.BoteEngine(config);
+                    this.engine = new window.BoteEngine(this.config);
                     const members = seasonData.members || [];
                     const jornadas = (seasonData.jornadas || []).filter(j => (j.season || '2026-2027') === this.currentSeason);
                     const pronosticos = seasonData.pronosticos || [];
                     const pronosticosExtra = seasonData.pronosticosExtra || [];
-                    this.rawSeasonData = seasonData;
+                    this.rawSeasonData = { ...seasonData, members, jornadas, pronosticos, pronosticosExtra, cashPayments, repartos, cierresVuelta, ingresos };
 
                     const movements = this.engine.calculateAllMovements(
                         members,
@@ -218,7 +239,7 @@ class BoteAppController {
                     // Reconstruir estructura compatible de alto rendimiento
                     this.liveData = this.buildSeasonModelFromMovements(
                         this.currentSeason,
-                        config,
+                        this.config,
                         members,
                         jornadas,
                         movements,
@@ -1157,14 +1178,14 @@ class BoteAppController {
         if (!pop || !title || !body) return;
 
         const data = this.getSeasonData();
-        const BOTE_INICIAL = 738.68;
+        const BOTE_INICIAL = this.getBoteInicial();
 
         if (type === 'inicial') {
             title.textContent = '🌱 Bote Inicial Temporada';
             body.innerHTML = `
                 <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-2 text-amber-200">
                     <div class="text-[11px] font-semibold text-amber-300">Fondo de Apertura (Agosto 2026)</div>
-                    <div class="text-base font-black font-mono mt-0.5 text-amber-400">+738,68 €</div>
+                    <div class="text-base font-black font-mono mt-0.5 text-amber-400">+${BOTE_INICIAL.toFixed(2)} €</div>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Socios aportantes:</span>
@@ -1405,8 +1426,8 @@ class BoteAppController {
         if (!tbody) return;
         tbody.innerHTML = '';
 
-        // Constante del Bote Inicial al arrancar la temporada (18 aportaciones iniciales de socios)
-        const BOTE_INICIAL = 738.68;
+        // Bote Inicial al arrancar la temporada
+        const BOTE_INICIAL = this.getBoteInicial();
 
         let saldoAcumuladoPeña = 0;
         let totalCrecimiento = 0;
@@ -2004,7 +2025,7 @@ class BoteAppController {
         tbody.innerHTML = '';
 
         if (!data.ingresos || data.ingresos.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No hay ingresos registrados</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No hay ingresos registrados</td></tr>';
             return;
         }
 
@@ -2018,6 +2039,11 @@ class BoteAppController {
                 <td class="p-3 text-right font-mono font-bold text-emerald-400">+${parseFloat(i.cantidad || 0).toFixed(2)} €</td>
                 <td class="p-3 capitalize text-slate-300">${i.metodo || 'bizum'}</td>
                 <td class="p-3 text-slate-400">${i.concepto || 'Aportación manual'}</td>
+                <td class="p-3 text-center">
+                    <button onclick="window.BoteApp.deleteIngreso('${i.id}')" class="px-2 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Eliminar este ingreso">
+                        <span>🗑️</span> Eliminar
+                    </button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -2241,12 +2267,307 @@ class BoteAppController {
         }
     }
 
+    getBoteInicial() {
+        return (this.config && this.config.boteInicial !== undefined) ? parseFloat(this.config.boteInicial) : 738.68;
+    }
+
+    async loadConfig() {
+        let boteConfig = null;
+        try {
+            if (window.DataService) {
+                boteConfig = await window.DataService.getDoc('config', 'bote_config');
+            }
+        } catch (e) {
+            console.warn('Error cargando bote_config desde base de datos:', e);
+        }
+        if (!boteConfig) {
+            const local = localStorage.getItem('bote_config');
+            if (local) {
+                try { boteConfig = JSON.parse(local); } catch (e) { }
+            }
+        }
+        if (boteConfig) {
+            this.config = { ...this.config, ...boteConfig };
+            if (boteConfig.penalties_history) {
+                this.config.penalties_history = { ...this.config.penalties_history, ...boteConfig.penalties_history };
+            }
+        }
+        if (this.engine) this.engine.config = this.config;
+    }
+
+    async saveConfig() {
+        try {
+            localStorage.setItem('bote_config', JSON.stringify(this.config));
+            if (window.DataService) {
+                await window.DataService.save('config', {
+                    id: 'bote_config',
+                    ...this.config
+                });
+            }
+        } catch (e) {
+            console.warn('Error guardando bote_config:', e);
+        }
+        if (this.engine) this.engine.config = this.config;
+    }
+
+    addPenaltyToHistory(type, entry) {
+        if (!this.config.penalties_history) this.config.penalties_history = {};
+        if (!this.config.penalties_history[type]) this.config.penalties_history[type] = [];
+        const existing = this.config.penalties_history[type].find(e => e.date === entry.date);
+        if (existing) {
+            Object.assign(existing, entry);
+        } else {
+            this.config.penalties_history[type].push(entry);
+        }
+        this.config.penalties_history[type].sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    populateConfigModal() {
+        const c = this.config;
+        const setValue = (id, val) => {
+            const el = document.getElementById(id);
+            if (el && val !== undefined) el.value = val;
+        };
+
+        setValue('config-aportacion', c.aportacionSemanal !== undefined ? c.aportacionSemanal : 1.50);
+        setValue('config-coste-columna', c.costeColumna !== undefined ? c.costeColumna : 0.75);
+        setValue('config-coste-dobles', c.costeDobles !== undefined ? c.costeDobles : 10.50);
+        setValue('config-extra-exento', c.costeExtraExento !== undefined ? c.costeExtraExento : 0.20);
+        setValue('config-bote-inicial', c.boteInicial !== undefined ? c.boteInicial : 738.68);
+        setValue('config-penalizacion-maula', c.penalizacionMaula !== undefined ? c.penalizacionMaula : 1.00);
+        setValue('config-penalizacion-pig', c.penalizacionPIG !== undefined ? c.penalizacionPIG : 1.00);
+
+        const history = c.penalties_history || {};
+        const lowSetting = (history.bajos_aciertos || []).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        if (lowSetting && lowSetting.values) {
+            setValue('config-pen-0', lowSetting.values[0] !== undefined ? lowSetting.values[0] : 3.00);
+            setValue('config-pen-1', lowSetting.values[1] !== undefined ? lowSetting.values[1] : 2.00);
+            setValue('config-pen-2', lowSetting.values[2] !== undefined ? lowSetting.values[2] : 1.00);
+            setValue('config-pen-3', lowSetting.values[3] !== undefined ? lowSetting.values[3] : 0.50);
+        } else {
+            setValue('config-pen-0', 3.00);
+            setValue('config-pen-1', 2.00);
+            setValue('config-pen-2', 1.00);
+            setValue('config-pen-3', 0.50);
+        }
+
+        const unosSetting = (history.unos || []).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        if (unosSetting && unosSetting.values) {
+            for (let i = 10; i <= 15; i++) {
+                setValue(`config-unos-${i}`, unosSetting.values[i] !== undefined ? unosSetting.values[i] : (i === 10 ? 0.10 : i === 11 ? 0.20 : i === 12 ? 0.30 : i === 13 ? 0.50 : i === 14 ? 1.00 : 2.00));
+            }
+        } else {
+            setValue('config-unos-10', 0.10);
+            setValue('config-unos-11', 0.20);
+            setValue('config-unos-12', 0.30);
+            setValue('config-unos-13', 0.50);
+            setValue('config-unos-14', 1.00);
+            setValue('config-unos-15', 2.00);
+        }
+    }
+
+    async submitConfig(e) {
+        if (e && e.preventDefault) e.preventDefault();
+
+        const getValue = (id, fallback) => {
+            const el = document.getElementById(id);
+            return el ? parseFloat(el.value) : fallback;
+        };
+
+        this.config.aportacionSemanal = getValue('config-aportacion', 1.50);
+        this.config.costeColumna = getValue('config-coste-columna', 0.75);
+        this.config.costeDobles = getValue('config-coste-dobles', 10.50);
+        this.config.costeExtraExento = getValue('config-extra-exento', 0.20);
+        this.config.boteInicial = getValue('config-bote-inicial', 738.68);
+        this.config.penalizacionMaula = getValue('config-penalizacion-maula', 1.00);
+        this.config.penalizacionPIG = getValue('config-penalizacion-pig', 1.00);
+
+        if (!this.config.penalties_history) this.config.penalties_history = {};
+        const today = new Date().toISOString().split('T')[0];
+
+        const lowValues = {
+            0: getValue('config-pen-0', 3.00),
+            1: getValue('config-pen-1', 2.00),
+            2: getValue('config-pen-2', 1.00),
+            3: getValue('config-pen-3', 0.50)
+        };
+        this.addPenaltyToHistory('bajos_aciertos', { date: today, values: lowValues });
+
+        const unosValues = {};
+        for (let i = 10; i <= 15; i++) {
+            unosValues[i] = getValue(`config-unos-${i}`, 0);
+        }
+        this.addPenaltyToHistory('unos', { date: today, values: unosValues });
+        this.addPenaltyToHistory('pig', { date: today, value: this.config.penalizacionPIG });
+        this.addPenaltyToHistory('maula', { date: today, value: this.config.penalizacionMaula });
+
+        try {
+            await this.saveConfig();
+            this.closeModal('modal-config');
+
+            // Recalcular todo el motor con la nueva configuración
+            if (this.isLive) {
+                await this.loadLiveFirebaseData();
+            } else {
+                this.recalculateCurrentModel();
+            }
+            this.renderAll();
+            alert('✅ Configuración guardada y recalculada con éxito. Todos los balances, cuotas y penalizaciones han sido actualizados.');
+        } catch (err) {
+            console.error('Error al guardar configuración:', err);
+            alert('Hubo un error al guardar la configuración.');
+        }
+    }
+
+    recalculateCurrentModel() {
+        if (this.rawSeasonData && window.BoteEngine) {
+            this.engine = new window.BoteEngine(this.config);
+            const members = this.rawSeasonData.members || [];
+            const jornadas = (this.rawSeasonData.jornadas || []).filter(j => (j.season || '2026-2027') === this.currentSeason);
+            const pronosticos = this.rawSeasonData.pronosticos || [];
+            const pronosticosExtra = this.rawSeasonData.pronosticosExtra || [];
+            const cashPayments = this.rawSeasonData.cashPayments || [];
+            const repartos = this.rawSeasonData.repartos || [];
+            const cierresVuelta = this.rawSeasonData.cierresVuelta || [];
+            const ingresos = this.rawSeasonData.ingresos || [];
+
+            const movements = this.engine.calculateAllMovements(
+                members, jornadas, pronosticos, pronosticosExtra,
+                repartos, cierresVuelta, ingresos, cashPayments
+            );
+            this.liveData = this.buildSeasonModelFromMovements(
+                this.currentSeason, this.config, members, jornadas, movements, ingresos, cashPayments, pronosticos
+            );
+        }
+    }
+
+    async deleteIngreso(ingresoId) {
+        const data = this.getSeasonData();
+        const ingreso = (data.ingresos || []).find(i => String(i.id) === String(ingresoId));
+        const member = ingreso ? data.memberSummaries.find(m => String(m.id) === String(ingreso.memberId)) : null;
+        const memberName = member ? member.name : (ingreso ? `Socio #${ingreso.memberId}` : '');
+        const cantidad = ingreso ? parseFloat(ingreso.cantidad || 0).toFixed(2) : '0.00';
+
+        if (!confirm(`¿Estás seguro de que deseas eliminar el ingreso de ${cantidad} € de ${memberName}?`)) {
+            return;
+        }
+
+        try {
+            if (window.DataService) {
+                await window.DataService.delete('ingresos', ingresoId);
+            }
+            if (data.ingresos) {
+                data.ingresos = data.ingresos.filter(i => String(i.id) !== String(ingresoId));
+            }
+            if (this.rawSeasonData && this.rawSeasonData.ingresos) {
+                this.rawSeasonData.ingresos = this.rawSeasonData.ingresos.filter(i => String(i.id) !== String(ingresoId));
+            }
+            if (this.isLive) {
+                await this.loadLiveFirebaseData();
+            } else {
+                this.recalculateCurrentModel();
+            }
+            this.renderAll();
+            this.renderGestionIngresos();
+            alert('✅ Ingreso eliminado correctamente.');
+        } catch (err) {
+            console.error('Error al eliminar ingreso:', err);
+            alert('Hubo un error al eliminar el ingreso.');
+        }
+    }
+
+    updateRepartoCalc() {
+        const inputTotal = document.getElementById('reparto-importe-total');
+        const info = document.getElementById('reparto-calc-info');
+        if (!inputTotal || !info) return;
+
+        const data = this.getSeasonData();
+        const numSocios = (data.memberSummaries || []).length || 19;
+        const total = parseFloat(inputTotal.value) || 0;
+        const perMember = total / numSocios;
+
+        info.textContent = `Importe por socio: ${perMember.toFixed(2)} € / socio (${numSocios} socios)`;
+    }
+
+    async submitReparto(e) {
+        if (e && e.preventDefault) e.preventDefault();
+
+        const inputTotal = document.getElementById('reparto-importe-total');
+        const inputConcepto = document.getElementById('reparto-concepto');
+        const inputFecha = document.getElementById('reparto-fecha');
+
+        const total = parseFloat(inputTotal ? inputTotal.value : 0) || 0;
+        if (total <= 0) {
+            alert('Por favor, indica un importe válido superior a 0.');
+            return;
+        }
+
+        const data = this.getSeasonData();
+        const numSocios = (data.memberSummaries || []).length || 19;
+        const perMember = total / numSocios;
+        const concepto = (inputConcepto && inputConcepto.value.trim()) || 'Reparto de Ganancias';
+        const fecha = (inputFecha && inputFecha.value) || new Date().toISOString().split('T')[0];
+
+        if (!confirm(`¿Confirmas realizar un reparto de ${total.toFixed(2)} € (${perMember.toFixed(2)} € a cada uno de los ${numSocios} socios) con fecha ${fecha}?`)) {
+            return;
+        }
+
+        const repartoDoc = {
+            id: 'reparto_' + Date.now(),
+            date: fecha,
+            type: 'socios',
+            totalAmount: total,
+            description: concepto,
+            season: this.currentSeason
+        };
+
+        try {
+            if (window.DataService) {
+                await window.DataService.save('repartos', repartoDoc);
+            }
+            if (this.rawSeasonData) {
+                if (!this.rawSeasonData.repartos) this.rawSeasonData.repartos = [];
+                this.rawSeasonData.repartos.push(repartoDoc);
+            }
+            if (this.isLive) {
+                await this.loadLiveFirebaseData();
+            } else {
+                data.memberSummaries.forEach(m => {
+                    m.saldo += perMember;
+                    m.totIn += perMember;
+                    m.breakdown.ingresosManuales += perMember;
+                });
+                data.summary.totalSaldosVirtuales += total;
+                data.summary.totalIngresos += total;
+            }
+
+            this.closeModal('modal-reparto');
+            this.renderAll();
+            alert(`✅ Reparto de ${total.toFixed(2)} € registrado con éxito (${perMember.toFixed(2)} € abonados al saldo de cada socio).`);
+        } catch (err) {
+            console.error('Error saving reparto:', err);
+            alert('Hubo un error al registrar el reparto en la base de datos.');
+        }
+    }
+
     toggleToolsDropdown() {
         const dd = document.getElementById('tools-dropdown');
         if (dd) dd.classList.toggle('hidden');
     }
 
     openModal(modalId) {
+        if (modalId === 'modal-config') {
+            this.populateConfigModal();
+        } else if (modalId === 'modal-gestion-ingresos') {
+            this.renderGestionIngresos();
+        } else if (modalId === 'modal-gestion-jornada') {
+            this.renderModalGestionJornada();
+        } else if (modalId === 'modal-reparto') {
+            const fechaInput = document.getElementById('reparto-fecha');
+            if (fechaInput && !fechaInput.value) fechaInput.value = new Date().toISOString().split('T')[0];
+            this.updateRepartoCalc();
+        }
+
         const el = document.getElementById(modalId);
         if (el) {
             el.classList.remove('hidden');
@@ -2557,7 +2878,7 @@ class BoteAppController {
         const data = this.getSeasonData();
         const summaries = data.jornadaSummaries || [];
 
-        const BOTE_INICIAL = 738.68;
+        const BOTE_INICIAL = this.getBoteInicial();
         const labels = ['Inicio'];
         const values = [BOTE_INICIAL];
 
