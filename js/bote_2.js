@@ -1694,8 +1694,8 @@ class BoteAppController {
                         <thead class="sticky top-0 z-30 bg-slate-950 shadow-md">
                             <tr class="bg-slate-950 text-slate-300 font-bold border-b border-slate-700 text-xs">
                                 <th class="p-1.5 sm:p-2 text-center sticky left-0 z-40 bg-slate-950 w-7 sm:w-8 border-r border-slate-800">#</th>
-                                <th class="p-1.5 sm:p-2 text-left bg-slate-950 min-w-[200px] sm:min-w-[280px] border-r border-slate-800">Partido</th>
-                                <th class="p-1.5 sm:p-2 text-center bg-purple-950 text-purple-200 border-r-2 border-purple-500/70 min-w-[65px] sm:min-w-[75px]">
+                                <th class="p-1.5 sm:p-2 text-left bg-slate-950 min-w-[200px] sm:min-w-[250px] border-r border-slate-800">Partido</th>
+                                <th class="p-1.5 sm:p-2 text-center bg-purple-950 text-purple-200 border-r-2 border-purple-500/70 min-w-[60px] sm:min-w-[68px]">
                                     <div class="flex flex-col items-center">
                                         <span>Pronóstico</span>
                                         <span class="text-[9px] text-purple-400 font-normal">7 Dobles</span>
@@ -1704,19 +1704,19 @@ class BoteAppController {
                                 ${bets.map(b => {
                                     const isWin = b.hits >= 10;
                                     return isWin ? `
-                                        <th class="p-1 sm:p-1.5 min-w-[46px] sm:min-w-[52px] font-mono text-center bg-gradient-to-b from-amber-500/40 to-amber-500/20 border-x-2 border-t-2 border-amber-400 text-amber-300 font-black shadow-md">
+                                        <th class="p-1 sm:p-1.5 min-w-[44px] sm:min-w-[48px] font-mono text-center bg-gradient-to-b from-amber-500/40 to-amber-500/20 border-x-2 border-t-2 border-amber-400 text-amber-300 font-black shadow-md">
                                             <div class="flex flex-col items-center">
                                                 <span class="text-[8px] sm:text-[9px] px-1 py-0.2 rounded-full bg-amber-400 text-slate-950 font-black whitespace-nowrap shadow-sm">🏆 PREMIO</span>
                                                 <span class="text-amber-200 font-extrabold text-xs whitespace-nowrap">Ap.${b.num}</span>
                                             </div>
                                         </th>
                                     ` : `
-                                        <th class="p-1 sm:p-1.5 min-w-[44px] sm:min-w-[50px] font-mono text-center text-slate-400 border-x border-slate-800/60">
+                                        <th class="p-1 sm:p-1.5 min-w-[40px] sm:min-w-[45px] font-mono text-center text-slate-400 border-x border-slate-800/60">
                                             <span class="whitespace-nowrap text-xs" title="Apuesta #${b.num} (${b.hits} aciertos)">Ap.${b.num}</span>
                                         </th>
                                     `;
                                 }).join('')}
-                                <th class="p-1.5 sm:p-2 text-center bg-slate-900 border-l border-slate-700 text-amber-300 min-w-[50px] sm:min-w-[60px]">
+                                <th class="p-1.5 sm:p-2 text-center bg-slate-900 border-l border-slate-700 text-amber-300 min-w-[48px] sm:min-w-[54px]">
                                     Resultado
                                 </th>
                             </tr>
@@ -1734,7 +1734,7 @@ class BoteAppController {
                                         <td class="p-1 sm:p-1.5 text-center font-sans font-bold text-slate-400 sticky left-0 z-10 bg-slate-950/95 border-r border-slate-800">
                                             ${isP15 ? 'P15' : (idx + 1)}
                                         </td>
-                                        <td class="p-1.5 sm:p-2 text-left font-sans text-slate-200 bg-slate-950/95 border-r border-slate-800 whitespace-nowrap min-w-[200px] sm:min-w-[280px]" title="${m.home} - ${m.away}">
+                                        <td class="p-1.5 sm:p-2 text-left font-sans text-slate-200 bg-slate-950/95 border-r border-slate-800 whitespace-nowrap min-w-[200px] sm:min-w-[250px]" title="${m.home} - ${m.away}">
                                             ${m.home} - ${m.away}
                                         </td>
                                         <td class="p-1 sm:p-1.5 text-center bg-purple-950/95 border-r-2 border-purple-500/70">
@@ -1749,7 +1749,7 @@ class BoteAppController {
                                             
                                             if (isWin) {
                                                 return `
-                                                    <td class="p-1 sm:p-1.5 text-center bg-amber-500/15 border-x-2 border-amber-400/50 min-w-[46px] sm:min-w-[52px]">
+                                                    <td class="p-1 sm:p-1.5 text-center bg-amber-500/15 border-x-2 border-amber-400/50 min-w-[44px] sm:min-w-[48px]">
                                                         <span class="inline-block w-6 h-6 leading-6 rounded font-black text-xs ${isHit ? 'bg-gradient-to-br from-amber-400 to-[#ff8a65] text-slate-950 shadow-md ring-1 ring-amber-300 scale-105' : 'text-slate-400 font-bold'}">
                                                             ${s}
                                                         </span>
@@ -1757,7 +1757,7 @@ class BoteAppController {
                                                 `;
                                             } else {
                                                 return `
-                                                    <td class="p-1 sm:p-1.5 text-center border-x border-slate-800/40 min-w-[44px] sm:min-w-[50px]">
+                                                    <td class="p-1 sm:p-1.5 text-center border-x border-slate-800/40 min-w-[40px] sm:min-w-[45px]">
                                                         <span class="inline-block w-6 h-6 leading-6 rounded font-black text-xs ${isHit ? 'bg-[#ff8a65] text-slate-950 shadow-sm' : 'text-slate-500'}">
                                                             ${s}
                                                         </span>
@@ -1765,7 +1765,7 @@ class BoteAppController {
                                                 `;
                                             }
                                         }).join('')}
-                                        <td class="p-1 sm:p-1.5 text-center bg-slate-900/90 border-l border-slate-700">
+                                        <td class="p-1 sm:p-1.5 text-center bg-slate-900/90 border-l border-slate-700 min-w-[48px] sm:min-w-[54px]">
                                             <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 font-black">
                                                 ${res || '-'}
                                             </span>
@@ -1779,26 +1779,26 @@ class BoteAppController {
                                 <th colspan="2" class="p-2 sm:px-3 text-right font-bold text-white bg-slate-950 border-r border-slate-800">
                                     Aciertos Totales:
                                 </th>
-                                <th class="p-2 sm:px-3 text-center bg-purple-950 border-r-2 border-purple-500/70 text-[11px] text-purple-300 font-semibold">
+                                <th class="p-2 sm:px-3 text-center bg-purple-950 border-r-2 border-purple-500/70 text-[11px] text-purple-300 font-semibold min-w-[60px] sm:min-w-[68px]">
                                     16 Ap.
                                 </th>
                                 ${bets.map(b => {
                                     const isWin = b.hits >= 10;
                                     return isWin ? `
-                                        <th class="p-1 sm:p-1.5 text-center font-mono bg-gradient-to-t from-amber-500/50 via-amber-500/30 to-amber-500/20 border-x-2 border-b-2 border-amber-400 min-w-[46px] sm:min-w-[52px]">
+                                        <th class="p-1 sm:p-1.5 text-center font-mono bg-gradient-to-t from-amber-500/50 via-amber-500/30 to-amber-500/20 border-x-2 border-b-2 border-amber-400 min-w-[44px] sm:min-w-[48px]">
                                             <div class="flex flex-col items-center">
-                                                <span class="px-2 py-1 rounded text-xs font-black bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 shadow-xl ring-2 ring-amber-400/60 scale-105 inline-flex items-center gap-0.5 whitespace-nowrap">
+                                                <span class="px-1.5 py-0.5 rounded text-xs font-black bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 shadow-xl ring-2 ring-amber-400/60 inline-flex items-center gap-0.5 whitespace-nowrap">
                                                     🏆 ${b.hits} ac.
                                                 </span>
                                             </div>
                                         </th>
                                     ` : `
-                                        <th class="p-1 sm:p-1.5 text-center font-mono text-slate-400 border-x border-slate-800/60 min-w-[44px] sm:min-w-[50px]">
-                                            <span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-800 text-slate-300 whitespace-nowrap inline-block">${b.hits} ac.</span>
+                                        <th class="p-1 sm:p-1.5 text-center font-mono text-slate-400 border-x border-slate-800/60 min-w-[40px] sm:min-w-[45px]">
+                                            <span class="px-1.5 py-0.5 rounded text-xs font-semibold bg-slate-800 text-slate-300 whitespace-nowrap inline-block">${b.hits} ac.</span>
                                         </th>
                                     `;
                                 }).join('')}
-                                <th class="p-1.5 sm:p-2 text-center bg-slate-900 text-slate-400 text-[10px] font-semibold border-l border-slate-700">
+                                <th class="p-1.5 sm:p-2 text-center bg-slate-900 text-slate-400 text-[10px] font-semibold border-l border-slate-700 min-w-[48px] sm:min-w-[54px]">
                                     LAE
                                 </th>
                             </tr>
@@ -1822,12 +1822,14 @@ class BoteAppController {
         const modalDialog = document.querySelector('#modal-reducida-detalle > div');
         if (modalDialog) {
             const screenW = window.innerWidth;
-            if (screenW >= 1200) {
-                modalDialog.style.maxWidth = 'min(1420px, 96vw)';
-            } else if (screenW >= 1024) {
-                modalDialog.style.maxWidth = 'min(1240px, 96vw)';
+            if (screenW >= 1400) {
+                modalDialog.style.maxWidth = 'min(1720px, 98vw)';
+            } else if (screenW >= 1100) {
+                modalDialog.style.maxWidth = 'min(1500px, 98vw)';
+            } else if (screenW >= 900) {
+                modalDialog.style.maxWidth = 'min(1320px, 98vw)';
             } else {
-                modalDialog.style.maxWidth = '96vw';
+                modalDialog.style.maxWidth = '98vw';
             }
         }
     }
