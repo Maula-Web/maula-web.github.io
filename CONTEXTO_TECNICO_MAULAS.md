@@ -399,6 +399,36 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 
 ---
 
+## 14. Gestión de Resultados de Jornadas y Panel de Administración (v1.2)
+
+### 14.1. Navegación Secuencial en Modal de Jornadas
+- En el modal de visualización/edición de jornadas (`#jornada-modal` en `jornadas.html` y `js/jornadas.js`), se han incorporado botones de navegación rápida **◀ Anterior** y **Siguiente ▶** (`#btn-modal-prev-jornada`, `#btn-modal-next-jornada`).
+- **Seguridad en Edición**: Durante la edición de resultados (`editMode === true`), los botones de navegación quedan automáticamente desactivados (`disabled = true`, opacidad reducida y cursor bloqueado) para evitar que el usuario cambie involuntariamente de jornada perdiendo los cambios no guardados.
+- **Límites de Jornadas**: Los botones se deshabilitan adecuadamente al alcanzar la primera o la última jornada registrada.
+- **Reinicio de Desplazamiento**: Al cambiar de jornada mediante estos botones, el cuerpo del modal restablece su desplazamiento (`scrollTop = 0`), posicionando al usuario al inicio de la jornada entrante.
+
+### 14.2. Aviso y Confirmación de Envío a Telegram
+- Al guardar los resultados de una jornada (`saveJornada`), si se detecta que los **15 partidos** (incluido el Pleno al 15) están completamente cumplimentados, el sistema muestra un cuadro de diálogo interactivo de confirmación (`confirm`):
+  *"⚽ Se han completado todos los resultados de la jornada. ¿Deseas enviar el informe oficial de resultados al canal de Telegram ahora?"*
+- El informe oficial a Telegram únicamente se despacha si el usuario pulsa **Aceptar**, evitando envíos automáticos no deseados mientras se realizan pruebas o correcciones.
+
+### 14.3. Arquitectura del Modal y Corrección de Scroll (PC, Móviles y Tablets)
+- **Aislamiento de Desplazamiento**: El contenedor modal (`#jornada-modal .modal`) se estructura como columna flex (`display: flex; flex-direction: column; max-height: 90vh; overflow: hidden;`) con esquinas redondeadas limpias.
+- **Cabecera Fija y Sólida**: `#modal-header-row` posee fondo 100% opaco (`background: #1e1e1e !important;`) y separación por borde inferior, permaneciendo estática en la cúspide del modal.
+- **Cuerpo con Scroll Independiente**: El contenido desplazable (temporada, fecha, estado, cuadrícula de partidos y premios) está confinado en `#modal-body-scrollable` con `overflow-y: auto` e inercia táctil (`-webkit-overflow-scrolling: touch;`). El contenido se recorta por debajo de la cabecera, haciendo físicamente imposible que los resultados o inputs se visualicen por detrás o asomen por encima de la barra de título en ordenadores, teléfonos o tabletas.
+
+### 14.4. Contraste de Etiqueta Vista / Editando
+- Para evitar la falta de visibilidad en temas claros y oscuros, la etiqueta de modo (`#modal-mode-badge`) cuenta con estilos de alto contraste diferenciados:
+  - **Modo "Vista"**: Fondo claro/grisáceo (`#e2e8f0`) con texto en **gris oscuro** (`#333333`) y borde sutil.
+  - **Modo "Editando"**: Fondo pastel rojizo (`#ffebee`) con texto en **rojo brillante** (`#d32f2f`) y borde contrastado.
+
+### 14.5. Seguridad en Borrado de Datos y Zona de Administración
+- **Eliminación del Botón Peligroso en Resultados**: El botón "Borrar TODO" ha sido eliminado de la barra superior de `jornadas.html`, mitigando el riesgo de borrados accidentales por parte de los usuarios o administradores en la vista pública.
+- **Reubicación Protegida en Administración**: Se ha integrado una tarjeta específica de **"🗑️ Borrado de Jornadas"** en el panel de Administración (`admin.html`), restringida tras el inicio de sesión del Administrador.
+- **Mecanismo de Doble Confirmación con Palabra Clave**: Para ejecutar el borrado masivo de jornadas, el administrador debe confirmar la advertencia inicial y teclear explícitamente la palabra **"BORRAR"**. Cualquier discrepancia cancela la operación. Además, la acción queda registrada en el historial de logs (`Auth.logAction`).
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

@@ -69,6 +69,9 @@ class JornadaManager {
         this.btnSave = document.getElementById('btn-save-jornada');
         this.btnDelete = document.getElementById('btn-delete-jornada');
         this.btnDeleteAll = document.getElementById('btn-delete-all-jornadas');
+        this.btnPrevJornadaModal = document.getElementById('btn-modal-prev-jornada');
+        this.btnNextJornadaModal = document.getElementById('btn-modal-next-jornada');
+        this.modalBodyScrollable = document.getElementById('modal-body-scrollable');
 
         this.inpNumber = document.getElementById('inp-jornada-num');
         this.inpId = document.getElementById('inp-jornada-id');
@@ -121,6 +124,8 @@ class JornadaManager {
         if (this.btnEdit) this.btnEdit.addEventListener('click', () => this.toggleEditMode(true));
         if (this.btnDelete) this.btnDelete.addEventListener('click', () => this.deleteCurrentJornada());
         if (this.btnDeleteAll) this.btnDeleteAll.addEventListener('click', () => this.deleteAllJornadas());
+        if (this.btnPrevJornadaModal) this.btnPrevJornadaModal.addEventListener('click', () => this.navigateJornada(-1));
+        if (this.btnNextJornadaModal) this.btnNextJornadaModal.addEventListener('click', () => this.navigateJornada(1));
 
         // Text Importer Events (Matches)
         if (this.btnImportMatches) this.btnImportMatches.addEventListener('click', () => this.openImportTextModal());
@@ -259,6 +264,9 @@ class JornadaManager {
         this.toggleEditMode(false);
         this.modal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Lock scroll
+
+        if (this.modalBodyScrollable) this.modalBodyScrollable.scrollTop = 0;
+        this.updateNavButtons(false);
     }
 
     openModalNew() {
@@ -278,6 +286,69 @@ class JornadaManager {
 
         this.btnDelete.style.display = 'none';
         this.btnEdit.style.display = 'none';
+        if (this.modalBodyScrollable) this.modalBodyScrollable.scrollTop = 0;
+        this.updateNavButtons(true);
+    }
+
+    navigateJornada(direction) {
+        // If in edit mode, prevent changing jornada
+        const isEditMode = this.btnSave && this.btnSave.style.display !== 'none';
+        if (isEditMode) return;
+
+        if (!this.jornadas || this.jornadas.length === 0) return;
+
+        const sorted = [...this.jornadas]
+            .filter(j => {
+                if (j.date && j.date.toLowerCase() !== 'por definir') {
+                    const d = AppUtils.parseDate(j.date);
+                    if (d && !AppUtils.isSunday(d)) return false;
+                }
+                return true;
+            })
+            .sort((a, b) => (parseInt(a.number) || 0) - (parseInt(b.number) || 0));
+
+        const currentIdx = sorted.findIndex(j => j.id == this.currentJornadaId);
+        if (currentIdx === -1) return;
+
+        const targetIdx = currentIdx + direction;
+        if (targetIdx >= 0 && targetIdx < sorted.length) {
+            const targetJornada = sorted[targetIdx];
+            this.openModalView(targetJornada.id);
+        }
+    }
+
+    updateNavButtons(isEdit = false) {
+        if (!this.btnPrevJornadaModal || !this.btnNextJornadaModal) return;
+
+        if (isEdit) {
+            this.btnPrevJornadaModal.disabled = true;
+            this.btnNextJornadaModal.disabled = true;
+            return;
+        }
+
+        if (!this.jornadas || this.jornadas.length === 0) {
+            this.btnPrevJornadaModal.disabled = true;
+            this.btnNextJornadaModal.disabled = true;
+            return;
+        }
+
+        const sorted = [...this.jornadas]
+            .filter(j => {
+                if (j.date && j.date.toLowerCase() !== 'por definir') {
+                    const d = AppUtils.parseDate(j.date);
+                    if (d && !AppUtils.isSunday(d)) return false;
+                }
+                return true;
+            })
+            .sort((a, b) => (parseInt(a.number) || 0) - (parseInt(b.number) || 0));
+
+        const currentIdx = sorted.findIndex(j => j.id == this.currentJornadaId);
+
+        const hasPrev = currentIdx > 0;
+        const hasNext = currentIdx >= 0 && currentIdx < sorted.length - 1;
+
+        this.btnPrevJornadaModal.disabled = !hasPrev;
+        this.btnNextJornadaModal.disabled = !hasNext;
     }
 
     fillModalData(jornada) {
@@ -532,17 +603,31 @@ class JornadaManager {
             this.inpNumber.style.background = isEdit ? '#fff' : 'transparent';
         }
 
+        const badge = document.getElementById('modal-mode-badge');
         if (isEdit) {
             this.btnEdit.style.display = 'none';
             this.btnSave.style.display = 'inline-block';
             this.btnDelete.style.display = 'inline-block';
-            if (document.getElementById('modal-mode-badge')) document.getElementById('modal-mode-badge').textContent = "Editando";
+            if (badge) {
+                badge.textContent = "Editando";
+                badge.className = "badge-mode badge-editando";
+                badge.style.color = "#d32f2f";
+                badge.style.backgroundColor = "#ffebee";
+                badge.style.borderColor = "#ffcdd2";
+            }
         } else {
             this.btnEdit.style.display = 'inline-block';
             this.btnSave.style.display = 'none';
             this.btnDelete.style.display = 'none';
-            if (document.getElementById('modal-mode-badge')) document.getElementById('modal-mode-badge').textContent = "Vista";
+            if (badge) {
+                badge.textContent = "Vista";
+                badge.className = "badge-mode badge-vista";
+                badge.style.color = "#333333";
+                badge.style.backgroundColor = "#e2e8f0";
+                badge.style.borderColor = "#cbd5e1";
+            }
         }
+        this.updateNavButtons(isEdit);
     }
 
     saveJornada(e) {
@@ -614,11 +699,14 @@ class JornadaManager {
         }
 
         // TELEGRAM REPORT TRIGGER
-        const isFinished = jornadaData.matches.every(m => m.result && m.result.trim() !== '');
+        const isFinished = jornadaData.matches && jornadaData.matches.length === 15 && jornadaData.matches.every(m => m && m.result && m.result.trim() !== '');
         if (isFinished && window.TelegramService) {
-            // Optional: Show a message or do it silently if enabled in config
-            // The service already checks for tg.enabled
-            window.TelegramService.sendJornadaReport(jornadaData.id);
+            const sendTg = confirm('⚽ Se han completado todos los resultados de la jornada.\n\n¿Deseas enviar el informe oficial de resultados al canal de Telegram ahora?');
+            if (sendTg) {
+                window.TelegramService.sendJornadaReport(jornadaData.id).catch(err => {
+                    console.error("Error al enviar reporte a Telegram:", err);
+                });
+            }
         }
 
         const originalText = this.btnSave.innerHTML;

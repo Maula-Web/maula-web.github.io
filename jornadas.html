@@ -24,12 +24,165 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700&family=Raleway:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* ── Jornada modal header: mobile responsive ── */
+        /* ── Jornadas Modal Layout & Scroll Fix ── */
+        #jornada-modal.modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        #jornada-modal.modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        #jornada-modal .modal {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            max-height: 90vh;
+            background: #242424 !important;
+            color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0;
+            margin: auto;
+            transform: none;
+        }
+
+        #jornada-modal #jornada-form {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        #jornada-modal #modal-header-row {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e1e !important;
+            padding: 0.9rem 1.4rem;
+            margin: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            z-index: 50;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        #jornada-modal #modal-body-scrollable {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 1.2rem 1.5rem 2.5rem 1.5rem;
+        }
+
+        /* Nav buttons for jornadas in modal */
+        .btn-jornada-nav {
+            background: #374151 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            padding: 4px 10px !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            font-weight: bold !important;
+            font-size: 0.95rem !important;
+            line-height: 1 !important;
+            min-width: 36px !important;
+            height: 32px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .btn-jornada-nav:hover:not(:disabled) {
+            background: #4b5563 !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .btn-jornada-nav:disabled {
+            opacity: 0.3 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            background: #2a2a2a !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Mode Badge: Vista (gris oscuro) vs Editando (rojo) */
+        .badge-mode {
+            font-size: 0.8rem;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .badge-vista {
+            background-color: #e2e8f0 !important;
+            color: #333333 !important; /* Gris oscuro */
+            border-color: #cbd5e1 !important;
+        }
+
+        .badge-editando {
+            background-color: #ffebee !important;
+            color: #d32f2f !important; /* Rojo */
+            border-color: #ffcdd2 !important;
+        }
+
+        /* ── Jornada modal responsive: Mobile & Tablet ── */
         @media (max-width: 600px) {
-            #modal-header-row {
+            #jornada-modal.modal-overlay {
+                padding: 6px;
+            }
+
+            #jornada-modal .modal {
+                width: 100% !important;
+                height: 95vh !important;
+                max-height: 95vh !important;
+                border-radius: 12px;
+            }
+
+            #jornada-modal #modal-header-row {
                 flex-direction: column !important;
                 align-items: flex-start !important;
                 gap: 0.6rem;
+                padding: 0.7rem 0.9rem !important;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+            }
+
+            .modal-header-nav-title {
+                width: 100%;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                gap: 6px !important;
+                flex-wrap: wrap;
             }
 
             #modal-title {
@@ -38,7 +191,7 @@
             }
 
             #modal-title input[type="number"] {
-                width: 55px !important;
+                width: 50px !important;
                 font-size: 1rem !important;
             }
 
@@ -54,16 +207,27 @@
                 flex: 1 1 auto;
                 min-width: 80px;
                 font-size: 0.8rem !important;
-                padding: 0.35rem 0.6rem !important;
+                padding: 0.4rem 0.6rem !important;
                 text-align: center;
+            }
+
+            #jornada-modal #modal-body-scrollable {
+                padding: 0.8rem 0.8rem 2rem 0.8rem !important;
             }
         }
 
-        /* Tablet: allow buttons to wrap without collapsing to column */
+        /* Tablet */
         @media (min-width: 601px) and (max-width: 900px) {
+            #jornada-modal .modal {
+                width: 96% !important;
+                height: 92vh !important;
+                max-height: 92vh !important;
+            }
+
             #modal-header-row {
                 flex-wrap: wrap;
                 gap: 0.5rem;
+                padding: 0.8rem 1.1rem !important;
             }
 
             #modal-header-btns {
@@ -72,8 +236,8 @@
             }
 
             #modal-header-btns .btn-action {
-                font-size: 0.82rem !important;
-                padding: 0.35rem 0.7rem !important;
+                font-size: 0.85rem !important;
+                padding: 0.4rem 0.8rem !important;
             }
         }
     </style>
@@ -110,10 +274,6 @@
                 <button id="btn-new-jornada" class="btn-action btn-add">
                     ➕ Nueva Jornada
                 </button>
-                <button id="btn-delete-all-jornadas" class="btn-action"
-                    style="background:#d32f2f; color:white; margin-left:10px;">
-                    🗑️ Borrar TODO
-                </button>
             </div>
         </header>
 
@@ -129,61 +289,65 @@
     <div id="jornada-modal" class="modal-overlay">
         <div class="modal">
             <form id="jornada-form">
-                <div id="modal-header-row"
-                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:1rem;">
-                    <h2 id="modal-title" style="margin:0; display:flex; align-items:center; gap:8px;">
-                        <span>Jornada</span>
-                        <input type="number" id="inp-jornada-num" min="1" max="999"
-                            style="width:70px; font-size:1.2rem; font-weight:bold; border:1px solid transparent; background:transparent; color:inherit; padding:2px 5px; border-radius:4px;">
-                        <span id="modal-mode-badge"
-                            style="font-size:0.8rem; background:#eee; padding:2px 8px; border-radius:4px; vertical-align: middle;">Vista</span>
-                    </h2>
+                <div id="modal-header-row">
+                    <div class="modal-header-nav-title" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <button type="button" id="btn-modal-prev-jornada" class="btn-action btn-jornada-nav" title="Jornada anterior">◀</button>
+                        <h2 id="modal-title" style="margin:0; display:flex; align-items:center; gap:6px;">
+                            <span>Jornada</span>
+                            <input type="number" id="inp-jornada-num" min="1" max="999"
+                                style="width:60px; font-size:1.2rem; font-weight:bold; border:1px solid transparent; background:transparent; color:inherit; padding:2px 5px; border-radius:4px; text-align:center;">
+                        </h2>
+                        <button type="button" id="btn-modal-next-jornada" class="btn-action btn-jornada-nav" title="Jornada siguiente">▶</button>
+                        <span id="modal-mode-badge" class="badge-mode badge-vista">Vista</span>
+                    </div>
                     <div id="modal-header-btns" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
                         <button type="button" id="btn-edit-mode" class="btn-action"
-                            style="background: #fff9c4; color:#f57f17;">✏️ Editar</button>
-                        <button type="submit" id="btn-save-jornada" class="btn-action btn-add" style="display:none;">💾
+                            style="background: #fff9c4; color:#f57f17; font-weight:600; border:none; padding:6px 14px; border-radius:6px;">✏️ Editar</button>
+                        <button type="submit" id="btn-save-jornada" class="btn-action btn-add" style="display:none; font-weight:600; padding:6px 14px; border-radius:6px;">💾
                             Guardar</button>
                         <button type="button" id="btn-close-modal" class="btn-action"
-                            style="background: #f5f5f5; color:#333;">Cerrar</button>
+                            style="background: #f5f5f5; color:#333; font-weight:600; border:none; padding:6px 14px; border-radius:6px;">Cerrar</button>
                     </div>
                 </div>
 
-                <input type="hidden" id="inp-jornada-id">
+                <div id="modal-body-scrollable">
+                    <input type="hidden" id="inp-jornada-id">
 
-                <div class="form-group" style="display:flex; gap:1rem;">
-                    <div style="flex:1">
-                        <label for="inp-season">Temporada</label>
-                        <input type="text" id="inp-season" value="2026-2027" readonly>
-                    </div>
-                    <div style="flex:1">
-                        <label for="inp-date">Fecha</label>
-                        <input type="text" id="inp-date" placeholder="Ej: 23-24 Agosto">
+                    <div class="form-group" style="display:flex; gap:1rem;">
+                        <div style="flex:1">
+                            <label for="inp-season">Temporada</label>
+                            <input type="text" id="inp-season" value="2026-2027" readonly>
+                        </div>
+                        <div style="flex:1">
+                            <label for="inp-date">Fecha</label>
+                            <input type="text" id="inp-date" placeholder="Ej: 23-24 Agosto">
+                        </div>
+
+                        <div
+                            style="flex:0.5; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                            <label for="inp-active" style="margin-bottom:5px;">Activa</label>
+                            <input type="checkbox" id="inp-active" style="width:25px; height:25px; cursor:pointer;">
+                        </div>
                     </div>
 
-                    <div
-                        style="flex:0.5; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                        <label for="inp-active" style="margin-bottom:5px;">Activa</label>
-                        <input type="checkbox" id="inp-active" style="width:25px; height:25px; cursor:pointer;">
+                    <div class="form-group">
+                        <label>Partidos y Resultados (Quiniela)</label>
+                        <div id="matches-container" class="matches-grid-container">
+                            <!-- 15 Matches Rows generated by JS -->
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Partidos y Resultados (Quiniela)</label>
-                    <div id="matches-container" class="matches-grid-container">
-                        <!-- 15 Matches Rows generated by JS -->
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <label>Premios por Categoría (€)</label>
+                        <div id="prizes-container" class="prizes-grid-container">
+                            <!-- Prizes Rows generated by JS -->
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group" style="margin-top: 2rem;">
-                    <label>Premios por Categoría (€)</label>
-                    <div id="prizes-container" class="prizes-grid-container">
-                        <!-- Prizes Rows generated by JS -->
+                    <div class="modal-actions" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button type="button" id="btn-delete-jornada" class="delete-btn" style="margin-right:auto;">Eliminar
+                            Jornada</button>
                     </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" id="btn-delete-jornada" class="delete-btn" style="margin-right:auto;">Eliminar
-                        Jornada</button>
                 </div>
             </form>
         </div>

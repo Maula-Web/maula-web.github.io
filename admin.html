@@ -187,6 +187,20 @@
                         ¡Plantilla guardada!</div>
                 </div>
 
+                <div class="config-card" style="border-top-color: #d32f2f;">
+                    <h2 style="color: #d32f2f;">🗑️ Borrado de Jornadas</h2>
+                    <p style="font-size: 0.75rem; color: #666; margin-bottom: 0.8rem;">
+                        Elimina todas las jornadas y resultados del sistema. Operación reservada exclusivamente al Administrador, protegida por doble confirmación de seguridad.
+                    </p>
+                    <button id="btn-delete-all-jornadas-admin" onclick="deleteAllJornadasAdmin()" class="btn-action"
+                        style="width:100%; background:#d32f2f; color:white; font-weight:bold; padding:8px; border-radius:4px; border:none; cursor:pointer;">
+                        🗑️ BORRAR TODAS LAS JORNADAS
+                    </button>
+                    <div id="delete-jornadas-msg"
+                        style="text-align:center; color:#d32f2f; margin-top:5px; font-size:0.8rem; display:none;">
+                    </div>
+                </div>
+
                 <div class="config-card">
                     <h2>📢 Telegram Bots</h2>
                     <form id="telegram-form" style="font-size:0.9rem;">
@@ -1008,6 +1022,54 @@
                 alert("Error: " + e.message);
                 btn.disabled = false;
                 btn.textContent = "GRABAR SOCIOS ACTUALES COMO DEFAULT";
+            }
+        };
+
+        window.deleteAllJornadasAdmin = async function () {
+            if (!confirm('⚠️ PELIGRO CRÍTICO:\n\n¿Estás seguro de que quieres BORRAR TODA LA INFORMACIÓN DE JORNADAS?\n\nEsta acción eliminará todas las jornadas y sus resultados registrados y no se puede deshacer.')) {
+                return;
+            }
+            const confirmWord = prompt('Para confirmar el borrado total e irreversible de todas las jornadas, escribe la palabra "BORRAR":');
+            if (confirmWord !== 'BORRAR') {
+                alert('Operación cancelada. No se ha modificado ninguna jornada.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-delete-all-jornadas-admin');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Borrando jornadas...';
+            }
+
+            try {
+                if (window.DataService) {
+                    const jornadas = await window.DataService.getAll('jornadas');
+                    let count = 0;
+                    for (const j of jornadas) {
+                        await window.DataService.delete('jornadas', j.id);
+                        count++;
+                    }
+                    if (window.Auth && window.Auth.logAction) {
+                        const user = JSON.parse(sessionStorage.getItem('maulas_user') || '{}');
+                        await Auth.logAction(user.name || 'Admin', `Eliminó todas las jornadas (${count} jornadas)`);
+                    }
+                    alert(`Se han eliminado correctamente ${count} jornadas del sistema.`);
+                    const msg = document.getElementById('delete-jornadas-msg');
+                    if (msg) {
+                        msg.style.display = 'block';
+                        msg.textContent = `¡${count} jornadas eliminadas!`;
+                        setTimeout(() => { msg.style.display = 'none'; }, 4000);
+                    }
+                    if (typeof loadLogs === 'function') await loadLogs();
+                }
+            } catch (err) {
+                console.error('Error al borrar todas las jornadas:', err);
+                alert('Error al borrar las jornadas: ' + err.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '🗑️ BORRAR TODAS LAS JORNADAS';
+                }
             }
         };
 
