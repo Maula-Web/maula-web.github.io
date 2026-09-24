@@ -802,7 +802,17 @@ class BoteAppController {
 
         theadRow.innerHTML = `
             <th class="p-2.5 sm:p-3 text-left sticky-left-col bg-slate-950 min-w-[140px] border-r border-slate-800 text-xs">Socio</th>
-            <th class="p-2.5 sm:p-3 text-right bg-slate-900 min-w-[85px] border-r border-slate-800 text-amber-400 text-xs" title="Saldo neto total acumulado en el bote">Saldo Actual ℹ️</th>
+            <th class="p-2.5 sm:p-3 text-right bg-slate-900 min-w-[110px] border-r border-slate-800 text-amber-400 text-xs group relative cursor-help select-none">
+                <span class="inline-flex items-center gap-1">Saldo Actual <span class="text-[11px] text-amber-400">ℹ️</span></span>
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                    <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                        <span>🏦</span> Saldo Disponible en Hucha
+                    </strong>
+                    <p class="leading-relaxed">
+                        Saldo individual consolidado de cada socio en la temporada actual. Se actualiza automáticamente tras cada jornada liquidada y al registrar recargas por Bizum.
+                    </p>
+                </div>
+            </th>
         `;
 
         data.jornadaSummaries.forEach(j => {

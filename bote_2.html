@@ -111,10 +111,12 @@
 
         thead {
             position: relative;
-            z-index: 10;
+            z-index: 30;
         }
-        thead tr th.group:hover {
-            z-index: 40 !important;
+        thead tr th.group:hover,
+        thead tr th.group:focus-within {
+            z-index: 100 !important;
+            position: relative;
         }
 
         .primary-glow {
@@ -512,9 +514,39 @@
                         <thead>
                             <tr class="bg-slate-900/90 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
                                 <th class="p-3 sm:px-4">Socio</th>
-                                <th class="p-3 sm:px-4 text-right" title="Bote inicial + aportaciones Bizum recibidas">Ingresos (In) ℹ️</th>
-                                <th class="p-3 sm:px-4 text-right" title="Cuotas semanales de quiniela + penalizaciones cobradas">Gastos & Multas (Out) ℹ️</th>
-                                <th class="p-3 sm:px-4 text-right" title="Saldo disponible en la hucha personal del socio">Saldo Actual ℹ️</th>
+                                <th class="p-3 sm:px-4 text-right group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Ingresos (In) <span class="text-[11px] text-emerald-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>📥</span> Total Ingresos (In)
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Fondo inicial transferido al arrancar la temporada más todas las recargas de saldo registradas por Bizum o transferencia bancaria.
+                                        </p>
+                                    </div>
+                                </th>
+                                <th class="p-3 sm:px-4 text-right group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Gastos & Multas (Out) <span class="text-[11px] text-rose-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>📤</span> Gastos y Multas (Out)
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Total acumulado descontado de la hucha: cuotas semanales de quiniela (1,50 € por jornada) más multas por exceso de unos, bajos aciertos o fallos en PIG.
+                                        </p>
+                                    </div>
+                                </th>
+                                <th class="p-3 sm:px-4 text-right group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Saldo Actual <span class="text-[11px] text-amber-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>🏦</span> Saldo Actual en Hucha
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Dinero real disponible en la hucha personal del socio: (Ingresos) - (Gastos & Multas) + Premios. Si baja de 10,00 €, se recomienda recargar saldo por Bizum.
+                                        </p>
+                                    </div>
+                                </th>
                                 <th class="p-3 sm:px-4 text-center">Estado</th>
                                 <th class="p-3 sm:px-4 text-center">Acciones</th>
                             </tr>
@@ -592,14 +624,74 @@
                         <thead>
                             <tr class="bg-slate-900/90 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
                                 <th class="p-2.5 sm:px-4">Socio</th>
-                                <th class="p-2.5 sm:px-4 text-center" title="Aciertos obtenidos en el boleto de 14">Ac. ℹ️</th>
-                                <th class="p-2.5 sm:px-4 text-right" title="Cuota de participación en la quiniela (0€ si cobró premio la jornada previa)">Cuota ℹ️</th>
-                                <th class="p-2.5 sm:px-4 text-center" title="Multas por exceso de unos, bajos aciertos o fallo en PIG">Penalizaciones ℹ️</th>
-                                <th class="p-2.5 sm:px-4 text-right" title="Suma total de cuota + penalizaciones">Total Paga ℹ️</th>
+                                <th class="p-2.5 sm:px-4 text-center group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Ac. <span class="text-[11px] text-cyan-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-cyan-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-cyan-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>🎯</span> Aciertos de la Jornada
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Aciertos conseguidos en los 14 primeros partidos del boleto semanal. Define al ganador de la jornada y posibles penalizaciones por bajos aciertos (0 a 3 aciertos).
+                                        </p>
+                                    </div>
+                                </th>
+                                <th class="p-2.5 sm:px-4 text-right group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Cuota <span class="text-[11px] text-emerald-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>🎟️</span> Cuota de Participación (1,50 €)
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Aportación fija semanal de cada socio para el sellado de boletos. Si el socio obtuvo premio oficial la jornada anterior, juega gratis esta semana (0,00 € 🎁).
+                                        </p>
+                                    </div>
+                                </th>
+                                <th class="p-2.5 sm:px-4 text-center group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Penalizaciones <span class="text-[11px] text-amber-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>⚠️</span> Multas y Penalizaciones
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Multas aplicadas en la jornada: exceso de unos (+10 unos = 0,50 €), bajos aciertos (0-3 = 0,50 €), fallo en Partido de Interés General (PIG = 0,50 €) o Maula semanal.
+                                        </p>
+                                    </div>
+                                </th>
+                                <th class="p-2.5 sm:px-4 text-right group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Total Paga <span class="text-[11px] text-rose-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>💳</span> Total a Pagar en la Jornada
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Importe total deducido del saldo del socio en esta jornada: Cuota semanal (1,50 € o 0 €) más la suma de todas las penalizaciones acumuladas.
+                                        </p>
+                                    </div>
+                                </th>
                                 <th class="p-2.5 sm:px-4 text-right">Premios</th>
-                                <th class="p-2.5 sm:px-4 text-right" title="Elige si el reembolso de sellado va al Bote del socio o se envía por Bizum">Reembolso Sellado ℹ️</th>
+                                <th class="p-2.5 sm:px-4 text-right group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Reembolso Sellado <span class="text-[11px] text-purple-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>🔄</span> Reembolso de Sellado (24,75 €)
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Devolución del coste oficial de sellado abonado en loterías por el sellador oficial (💀). Puedes elegir si se abona a su Bote virtual o se liquida por Bizum.
+                                        </p>
+                                    </div>
+                                </th>
                                 <th class="p-2.5 sm:px-4 text-right">Neto</th>
-                                <th class="p-2.5 sm:px-4 text-right bg-slate-900 font-extrabold text-amber-400" title="Saldo del socio tras procesar esta jornada">Bote Final ℹ️</th>
+                                <th class="p-2.5 sm:px-4 text-right bg-slate-900 font-extrabold text-amber-400 group relative cursor-help select-none">
+                                    <span class="inline-flex items-center gap-1">Bote Final <span class="text-[11px] text-amber-400">ℹ️</span></span>
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                        <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                            <span>💰</span> Bote Final del Socio
+                                        </strong>
+                                        <p class="leading-relaxed">
+                                            Saldo disponible en la hucha personal del socio tras consolidar todos los ingresos, cuotas, penalizaciones, premios y reembolsos de esta jornada.
+                                        </p>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60" id="jornada-table-body">
