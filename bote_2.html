@@ -260,18 +260,27 @@
             </div>
         </header>
 
-        <!-- Bento Grid Financiero (5 Tarjetas con explicaciones claras) -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <!-- Bento Grid Financiero (5 Tarjetas con explicaciones enriquecidas sin cortes) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 relative z-20">
             
             <!-- Hero Card: Bote Total en Caja (2 columnas en pantallas grandes) -->
-            <div class="lg:col-span-2 glass-panel p-4 sm:p-5 relative overflow-hidden flex flex-col justify-between border-amber-500/40 bg-gradient-to-br from-amber-950/20 via-slate-900/60 to-slate-900/80">
-                <div class="absolute -right-8 -top-8 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                <div class="flex items-start justify-between">
+            <div class="lg:col-span-2 glass-panel p-4 sm:p-5 relative flex flex-col justify-between border-amber-500/40 bg-gradient-to-br from-amber-950/20 via-slate-900/60 to-slate-900/80">
+                <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                    <div class="absolute -right-8 -top-8 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl"></div>
+                </div>
+                <div class="flex items-start justify-between relative z-10">
                     <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400/90 flex items-center gap-1.5" title="Dinero físico total acumulado en la cuenta de la peña (sumatorio de ingresos reales menos gastos oficiales de sellado)">
-                            <span class="w-2 h-2 rounded-full bg-amber-400 pulse-soft"></span>
-                            Bote Total de la Peña (Caja Real) ℹ️
-                        </span>
+                        <div class="group relative inline-block cursor-help">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400/90 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-400 pulse-soft"></span>
+                                Bote Total de la Peña (Caja Real) <span class="text-xs">ℹ️</span>
+                            </span>
+                            <!-- Tooltip estilo informativo -->
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                                <strong class="text-amber-400 block mb-1">🏦 ¿Qué es la Caja Real de la Peña?</strong>
+                                Es el dinero físico total disponible en la cuenta bancaria de la peña. Se obtiene sumando el Bote Inicial de temporada, todas las aportaciones por Bizum/transferencias recibidas, las cuotas recaudadas y premios, y restando los gastos oficiales de sellado en loterías.
+                            </div>
+                        </div>
                         <div class="text-3xl sm:text-4xl font-extrabold text-white mt-1 tracking-tight font-mono" id="card-caja-real">
                             0,00 €
                         </div>
@@ -281,18 +290,24 @@
                     </div>
                 </div>
 
-                <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center gap-2 text-slate-300" title="Suma de las huchas individuales de los 19 socios">
+                <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs relative z-10">
+                    <div class="group relative cursor-help flex items-center gap-2 text-slate-300">
                         <span>Suma de saldos de socios:</span>
                         <span class="font-mono font-bold text-white" id="card-suma-saldos">0,00 €</span>
+                        <span class="text-xs text-amber-400">ℹ️</span>
+                        <!-- Tooltip explicativo saldo socios -->
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 bottom-full mb-2 w-72 p-3 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                            <strong class="text-amber-400 block mb-1">👥 Huchas de los 19 Socios</strong>
+                            Es la suma total del saldo virtual acumulado en las cuentas individuales de todos los socios.
+                        </div>
                     </div>
                     <div class="group relative cursor-help">
                         <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1">
                             Superávit Peña: +104,72 € ℹ️
                         </span>
-                        <!-- Tooltip explicativo de superávit -->
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-72 p-3 bg-slate-900 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
-                            <strong class="text-amber-400 block mb-1">¿Por qué hay superávit en caja?</strong>
+                        <!-- Tooltip explicativo de superávit corregido (sin corte) -->
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-80 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                            <strong class="text-emerald-400 block mb-1">📈 ¿Por qué hay superávit en caja?</strong>
                             Es el margen acumulado en la hucha común: en cada jornada se recaudan cuotas superiores al coste de sellado (28,50 € vs 24,75 €) más las penalizaciones pagadas por socios que alimentan el fondo colectivo de la peña.
                         </div>
                     </div>
@@ -300,10 +315,17 @@
             </div>
 
             <!-- Card: Ingresos Totales -->
-            <div class="glass-panel p-4 sm:p-5 flex flex-col justify-between">
-                <div class="flex items-start justify-between">
-                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400" title="Total de cuotas ordinarias, penalizaciones e ingresos manuales/Bizum">Total Ingresos ℹ️</span>
+            <div class="glass-panel p-4 sm:p-5 flex flex-col justify-between relative">
+                <div class="group relative cursor-help flex items-start justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                        Total Ingresos <span class="text-xs">ℹ️</span>
+                    </span>
                     <span class="p-1.5 sm:p-2 rounded-lg bg-emerald-500/10 text-emerald-400 text-base sm:text-lg">📈</span>
+                    <!-- Tooltip ingresos -->
+                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                        <strong class="text-emerald-400 block mb-1">📥 Desglose de Ingresos</strong>
+                        Suma de aportaciones semanales fijas de quiniela (1,50 € por socio), penalizaciones cobradas e ingresos manuales o recargas directas por Bizum y transferencias.
+                    </div>
                 </div>
                 <div class="mt-2">
                     <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono" id="card-total-ingresos">
@@ -314,10 +336,17 @@
             </div>
 
             <!-- Card: Gastos Totales -->
-            <div class="glass-panel p-4 sm:p-5 flex flex-col justify-between">
-                <div class="flex items-start justify-between">
-                    <span class="text-xs font-bold uppercase tracking-wider text-rose-400" title="Coste total pagado en administraciones por sellar quinielas ordinarias y dobles">Total Gastos ℹ️</span>
+            <div class="glass-panel p-4 sm:p-5 flex flex-col justify-between relative">
+                <div class="group relative cursor-help flex items-start justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1">
+                        Total Gastos <span class="text-xs">ℹ️</span>
+                    </span>
                     <span class="p-1.5 sm:p-2 rounded-lg bg-rose-500/10 text-rose-400 text-base sm:text-lg">📉</span>
+                    <!-- Tooltip gastos -->
+                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                        <strong class="text-rose-400 block mb-1">📤 Coste Oficial de Sellado</strong>
+                        Gasto real pagado en la administración de lotería en cada jornada: 19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 € por jornada.
+                    </div>
                 </div>
                 <div class="mt-2">
                     <div class="text-2xl sm:text-3xl font-extrabold text-rose-400 font-mono" id="card-total-gastos">
@@ -328,10 +357,17 @@
             </div>
 
             <!-- Card: Premios Acumulados -->
-            <div class="glass-panel p-4 sm:p-5 flex flex-col justify-between">
-                <div class="flex items-start justify-between">
-                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400" title="Premios oficiales ganados por apuestas sencillas o columnas de dobles">Premios Ganados ℹ️</span>
+            <div class="glass-panel p-4 sm:p-5 flex flex-col justify-between relative">
+                <div class="group relative cursor-help flex items-start justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                        Premios Ganados <span class="text-xs">ℹ️</span>
+                    </span>
                     <span class="p-1.5 sm:p-2 rounded-lg bg-amber-500/10 text-amber-400 text-base sm:text-lg">🏆</span>
+                    <!-- Tooltip premios -->
+                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                        <strong class="text-amber-400 block mb-1">🏆 Premios Oficiales LAE</strong>
+                        Importe total acumulado de premios oficiales de Loterías del Estado cobrados por las apuestas sencillas y la columna de dobles.
+                    </div>
                 </div>
                 <div class="mt-2">
                     <div class="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono" id="card-total-premios">
@@ -343,10 +379,10 @@
 
         </section>
 
-        <!-- Barra de Navegación de Vistas -->
-        <nav class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+        <!-- Barra de Navegación de Vistas (Buscador eliminado según solicitud) -->
+        <nav class="flex items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-900/90 border border-slate-800">
             <!-- Pestañas -->
-            <div class="flex items-center gap-1 overflow-x-auto py-0.5 no-scrollbar" id="nav-tabs">
+            <div class="flex items-center gap-1 overflow-x-auto py-0.5 no-scrollbar w-full justify-start sm:justify-start" id="nav-tabs">
                 <button onclick="window.BoteApp.switchView('socios')" data-view="socios" class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20">
                     <span>👥</span> Socios <span class="text-[11px] px-1.5 py-0.5 rounded-full bg-slate-950/30 text-slate-950 font-extrabold" id="badge-socios-count">19</span>
                 </button>
@@ -362,12 +398,6 @@
                 <button onclick="window.BoteApp.switchView('premios')" data-view="premios" class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60">
                     <span>🏆</span> Dobles & Premios
                 </button>
-            </div>
-
-            <!-- Buscador Rápido -->
-            <div class="relative min-w-[180px] px-2 sm:px-0">
-                <input type="text" id="global-search" oninput="window.BoteApp.handleSearch(this.value)" placeholder="Buscar socio..." class="w-full bg-slate-950/80 text-xs sm:text-sm text-slate-200 border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 sm:py-2 focus:outline-none focus:border-orange-500 transition-colors">
-                <span class="absolute left-4 sm:left-2.5 top-2 sm:top-2.5 text-slate-500 text-xs">🔍</span>
             </div>
         </nav>
 
@@ -513,28 +543,65 @@
              ================================================================= -->
         <main id="view-flujo" class="view-content hidden space-y-4">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-                <div class="glass-panel p-4 sm:p-5">
-                    <span class="text-xs font-bold uppercase text-slate-400" title="Promedio semanal recaudado entre todos los socios">Recaudación Media Semanal ℹ️</span>
-                    <div class="text-2xl font-extrabold text-white mt-1 font-mono">33,67 € / jor</div>
-                    <p class="text-xs text-emerald-400 mt-1">Supera el coste semanal fijo</p>
+            <!-- Tarjetas de Resumen de Flujo de Caja con Bote Inicial claramente expuesto -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-20">
+                <div class="glass-panel p-4 sm:p-5 relative">
+                    <div class="group relative cursor-help flex items-start justify-between">
+                        <span class="text-xs font-bold uppercase text-amber-400 flex items-center gap-1">🌱 Bote Inicial Temporada <span class="text-xs">ℹ️</span></span>
+                        <span class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 text-base">🌱</span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                            <strong class="text-amber-400 block mb-1">🌱 Saldo Inicial de Temporada</strong>
+                            Importe total de partida aportado por los socios y traspasado desde la temporada anterior al arrancar la temporada 2026-2027.
+                        </div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-white mt-1 font-mono" id="flujo-bote-inicial">738,68 €</div>
+                    <p class="text-[11px] text-slate-400 mt-1">Fondo de partida de la peña</p>
                 </div>
-                <div class="glass-panel p-4 sm:p-5">
-                    <span class="text-xs font-bold uppercase text-slate-400" title="Coste total de sellado semanal en administraciones">Coste Sellado Semanal ℹ️</span>
+
+                <div class="glass-panel p-4 sm:p-5 relative">
+                    <div class="group relative cursor-help flex items-start justify-between">
+                        <span class="text-xs font-bold uppercase text-emerald-400 flex items-center gap-1">📈 Crecimiento Neto <span class="text-xs">ℹ️</span></span>
+                        <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-base">📈</span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                            <strong class="text-emerald-400 block mb-1">📈 Superávit Acumulado</strong>
+                            Margen neto generado semana a semana tras cobrar cuotas/multas y restar el sellado de los boletos.
+                        </div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-emerald-400 mt-1 font-mono" id="flujo-crecimiento-neto">+104,72 €</div>
+                    <p class="text-[11px] text-emerald-400/80 mt-1">Margen ganado en 6 jornadas</p>
+                </div>
+
+                <div class="glass-panel p-4 sm:p-5 relative">
+                    <div class="group relative cursor-help flex items-start justify-between">
+                        <span class="text-xs font-bold uppercase text-amber-300 flex items-center gap-1">🏦 Bote Total Acumulado <span class="text-xs">ℹ️</span></span>
+                        <span class="p-1.5 rounded-lg bg-amber-500/10 text-amber-300 text-base">🏦</span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-80 p-3 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                            <strong class="text-amber-400 block mb-1">🏦 Bote Total Actual de la Peña</strong>
+                            Resultado exacto de sumar el Bote Inicial (738,68 €) más el crecimiento neto acumulado (+104,72 €).
+                        </div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-amber-400 mt-1 font-mono" id="flujo-bote-total-acumulado">843,40 €</div>
+                    <p class="text-[11px] text-slate-400 mt-1">Bote Inicial + Superávit actual</p>
+                </div>
+
+                <div class="glass-panel p-4 sm:p-5 relative">
+                    <div class="group relative cursor-help flex items-start justify-between">
+                        <span class="text-xs font-bold uppercase text-rose-400 flex items-center gap-1">Coste Sellado Semanal <span class="text-xs">ℹ️</span></span>
+                        <span class="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 text-base">🎟️</span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                            <strong class="text-rose-400 block mb-1">🎟️ Coste Fijo de Sellado</strong>
+                            19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 € por jornada.
+                        </div>
+                    </div>
                     <div class="text-2xl font-extrabold text-rose-400 mt-1 font-mono">24,75 € / jor</div>
-                    <p class="text-xs text-slate-400 mt-1">19 sencillas (14,25€) + 1 dobles (10,50€)</p>
-                </div>
-                <div class="glass-panel p-4 sm:p-5">
-                    <span class="text-xs font-bold uppercase text-slate-400" title="Margen que se acumula en la hucha común de la peña tras sellar">Superávit Medio Semanal ℹ️</span>
-                    <div class="text-2xl font-extrabold text-emerald-400 mt-1 font-mono">+8,92 € / jor</div>
-                    <p class="text-xs text-slate-400 mt-1">Aporte al bote de reserva colectivo</p>
+                    <p class="text-[11px] text-slate-400 mt-1">19 sencillas + 1 dobles</p>
                 </div>
             </div>
 
             <div class="glass-panel overflow-hidden">
                 <div class="p-3 sm:p-4 border-b border-slate-800">
                     <h3 class="font-bold text-white text-sm sm:text-base">Evolución Cronológica de la Tesorería de la Peña</h3>
-                    <p class="text-xs text-slate-400">Balance acumulado jornada a jornada en la hucha colectiva</p>
+                    <p class="text-xs text-slate-400">Balance acumulado jornada a jornada sumado al saldo inicial de partida</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs sm:text-sm border-collapse">
@@ -546,8 +613,15 @@
                                 <th class="p-3 sm:px-4 text-right text-amber-400">Penalizaciones</th>
                                 <th class="p-3 sm:px-4 text-right text-emerald-400">Premios</th>
                                 <th class="p-3 sm:px-4 text-right text-rose-400">Sellado</th>
-                                <th class="p-3 sm:px-4 text-right">Balance Neto</th>
-                                <th class="p-3 sm:px-4 text-right font-extrabold text-amber-400">Bote Acumulado Peña</th>
+                                <th class="p-3 sm:px-4 text-right">Margen Neto</th>
+                                <th class="p-3 sm:px-4 text-right font-extrabold text-amber-400 group relative cursor-help">
+                                    <span class="inline-flex items-center gap-1">Bote Acumulado Peña ℹ️</span>
+                                    <!-- Tooltip estilo enriquecido en cabecera -->
+                                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 text-left normal-case font-normal pointer-events-none">
+                                        <strong class="text-amber-400 block mb-1">🏦 ¿Cómo se calcula el Bote Acumulado?</strong>
+                                        Arranca con el Bote Inicial de temporada (738,68 € procedentes de las aportaciones iniciales de socios). En cada jornada se le suma el margen neto generado: (Cuotas + Penalizaciones + Premios) - (Sellado de 24,75 €). Así se refleja el dinero físico real que tiene la peña tras cada jornada.
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60" id="flujo-table-body">
@@ -608,9 +682,9 @@
          ===================================================================== -->
 
     <!-- MODAL 1: 📄 EXTRACTO BANCARIO DEL SOCIO -->
-    <div id="modal-extracto-socio" onclick="if(event.target === this) window.BoteApp.closeModal('modal-extracto-socio')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-extracto-socio" onclick="if(event.target === this) window.BoteApp.closeModal('modal-extracto-socio')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
         <div class="glass-panel w-full max-w-3xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
-            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center font-bold text-lg sm:text-xl" id="extracto-avatar">
                         A
@@ -634,9 +708,9 @@
     </div>
 
     <!-- MODAL 2: ➕ REGISTRAR INGRESO / APORTACIÓN -->
-    <div id="modal-ingreso" onclick="if(event.target === this) window.BoteApp.closeModal('modal-ingreso')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-ingreso" onclick="if(event.target === this) window.BoteApp.closeModal('modal-ingreso')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
         <div class="glass-panel w-full max-w-lg border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
-            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                     <span>➕</span> Registrar Aportación / Ingreso
                 </h3>
@@ -680,9 +754,9 @@
     </div>
 
     <!-- MODAL 3: 📋 GESTIONAR INGRESOS REGISTRADOS -->
-    <div id="modal-gestion-ingresos" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-ingresos')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-gestion-ingresos" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-ingresos')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
         <div class="glass-panel w-full max-w-4xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
-            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                         <span>📋</span> Registro Histórico de Ingresos Manuales
@@ -711,9 +785,9 @@
     </div>
 
     <!-- MODAL 4: 🛠️ GESTIONAR SELLADO DE JORNADA (Reembolso Bote vs Bizum) -->
-    <div id="modal-gestion-jornada" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-jornada')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-gestion-jornada" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-jornada')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
         <div class="glass-panel w-full max-w-3xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
-            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                         <span>🛠️</span> Gestión de Sellado y Reembolsos
@@ -742,9 +816,9 @@
     </div>
 
     <!-- MODAL 5: ⚙️ CONFIGURACIÓN DE TARIFAS -->
-    <div id="modal-config" onclick="if(event.target === this) window.BoteApp.closeModal('modal-config')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-config" onclick="if(event.target === this) window.BoteApp.closeModal('modal-config')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
         <div class="glass-panel w-full max-w-2xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
-            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                         <span>⚙️</span> Configuración de Precios & Penalizaciones
@@ -818,9 +892,9 @@
     </div>
 
     <!-- MODAL 6: 💰 NUEVO REPARTO DE GANANCIAS -->
-    <div id="modal-reparto" onclick="if(event.target === this) window.BoteApp.closeModal('modal-reparto')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-reparto" onclick="if(event.target === this) window.BoteApp.closeModal('modal-reparto')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
         <div class="glass-panel w-full max-w-md border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
-            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                     <span>💰</span> Reparto de Ganancias
                 </h3>
@@ -843,7 +917,7 @@
     </div>
 
     <!-- MODAL 7: 🔑 ACCESO EVALUADOR (Fernando o Marcelo) -->
-    <div id="modal-auth-evaluador" onclick="if(event.target === this) window.BoteApp.closeModal('modal-auth-evaluador')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-auth-evaluador" onclick="if(event.target === this) window.BoteApp.closeModal('modal-auth-evaluador')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
         <div class="glass-panel w-full max-w-sm border-amber-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden p-6 text-center space-y-4 m-auto">
             <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-2xl font-bold">
                 🔑
@@ -864,6 +938,29 @@
             </div>
             <div class="pt-2">
                 <button onclick="window.BoteApp.closeModal('modal-auth-evaluador')" class="text-xs text-slate-500 hover:text-slate-300">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 8: 📋 DESGLOSE DE QUINIELA REDUCIDA (7 DOBLES) -->
+    <div id="modal-reducida-detalle" onclick="if(event.target === this) window.BoteApp.closeModal('modal-reducida-detalle')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-4xl max-h-[90vh] flex flex-col border-purple-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-purple-950/40 to-slate-900 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold text-lg sm:text-xl">
+                        📋
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-extrabold text-white" id="reducida-modal-titulo">Desglose de Quiniela Reducida</h2>
+                        <p class="text-xs text-slate-400" id="reducida-modal-subtitulo">16 apuestas combinadas (7 dobles) - Coste 10,50 € asumido por la Peña</p>
+                    </div>
+                </div>
+                <button onclick="window.BoteApp.closeModal('modal-reducida-detalle')" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-base font-bold transition-all">
+                    ✕
+                </button>
+            </div>
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm" id="reducida-modal-content">
+                <!-- Inyectado por JS -->
             </div>
         </div>
     </div>

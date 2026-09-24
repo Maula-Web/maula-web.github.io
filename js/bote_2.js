@@ -171,6 +171,7 @@ class BoteAppController {
                     const jornadas = (seasonData.jornadas || []).filter(j => (j.season || '2026-2027') === this.currentSeason);
                     const pronosticos = seasonData.pronosticos || [];
                     const pronosticosExtra = seasonData.pronosticosExtra || [];
+                    this.rawSeasonData = seasonData;
 
                     const movements = this.engine.calculateAllMovements(
                         members,
@@ -530,6 +531,9 @@ class BoteAppController {
                             <span class="flex items-center gap-1.5 text-slate-300" title="Socio con más aciertos que jugó la quiniela de dobles">
                                 <span class="text-emerald-400 font-bold">👑 Ganador:</span> ${jSummary.winnerName || 'N/A'}
                             </span>
+                            <button onclick="window.BoteApp.showReducedBreakdown('${jSummary.winnerId || ''}', ${jSummary.number})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold transition-all shadow-sm" title="Ver desglose oficial de las 16 apuestas reducidas de 7 dobles">
+                                <span>📋</span> Ver Reducción (7 dobles)
+                            </button>
                             <span class="text-slate-600">•</span>
                             <span class="flex items-center gap-1.5 text-slate-300" title="Socio perdedor o designado para sellar físicamente la quiniela">
                                 <span class="text-rose-400 font-bold">💀 Sellador:</span> ${jSummary.loserName || 'N/A'} (Reembolso de sellado)
@@ -880,15 +884,38 @@ class BoteAppController {
         if (!tbody) return;
         tbody.innerHTML = '';
 
+        // Constante del Bote Inicial al arrancar la temporada (18 aportaciones iniciales de socios)
+        const BOTE_INICIAL = 738.68;
+
         let saldoAcumuladoPeña = 0;
+        let totalCrecimiento = 0;
+
+        // Fila 0: Bote Inicial de la Temporada
+        const tr0 = document.createElement('tr');
+        tr0.className = 'bg-amber-500/10 border-b border-amber-500/20 text-xs sm:text-sm font-semibold hover:bg-amber-500/15 transition-colors';
+        tr0.innerHTML = `
+            <td class="p-3 font-bold text-amber-300 flex items-center gap-1.5">
+                <span>🌱</span> Inicio Temporada
+            </td>
+            <td class="p-3 text-slate-400 font-mono">Agosto 2026</td>
+            <td class="p-3 text-right font-mono text-emerald-400 font-bold" colspan="2">Aportaciones Iniciales Socios (Bote Inicial)</td>
+            <td class="p-3 text-right font-mono text-slate-500">-</td>
+            <td class="p-3 text-right font-mono text-slate-500">-</td>
+            <td class="p-3 text-right font-mono font-bold text-amber-300">+${BOTE_INICIAL.toFixed(2)} €</td>
+            <td class="p-3 text-right font-mono font-black text-amber-400 bg-amber-500/15">${BOTE_INICIAL.toFixed(2)} €</td>
+        `;
+        tbody.appendChild(tr0);
 
         data.jornadaSummaries.forEach(j => {
             const cuotasBase = j.numSocios * (j.costeColumna || 0.75);
             const penalties = Math.max(0, j.recaudacion - (j.numSocios * 1.50));
             saldoAcumuladoPeña += j.neto;
+            totalCrecimiento += j.neto;
+
+            const boteTotalJornada = BOTE_INICIAL + saldoAcumuladoPeña;
 
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-900/60 text-xs sm:text-sm';
+            tr.className = 'hover:bg-slate-900/60 text-xs sm:text-sm transition-colors border-b border-slate-800/40';
             tr.innerHTML = `
                 <td class="p-3 font-bold text-white">Jornada ${j.number}</td>
                 <td class="p-3 text-slate-400">${j.date}</td>
@@ -897,39 +924,377 @@ class BoteAppController {
                 <td class="p-3 text-right font-mono ${j.premios > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600'}">${j.premios > 0 ? '+' + j.premios.toFixed(2) + ' €' : '-'}</td>
                 <td class="p-3 text-right font-mono text-rose-400">-${j.gastoSellado.toFixed(2)} €</td>
                 <td class="p-3 text-right font-mono font-bold ${j.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${j.neto >= 0 ? '+' : ''}${j.neto.toFixed(2)} €</td>
-                <td class="p-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40">${saldoAcumuladoPeña.toFixed(2)} €</td>
+                <td class="p-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40">
+                    <div>${boteTotalJornada.toFixed(2)} €</div>
+                    <div class="text-[10px] ${saldoAcumuladoPeña >= 0 ? 'text-emerald-400/80' : 'text-rose-400/80'} font-normal">
+                        (Crec: ${saldoAcumuladoPeña >= 0 ? '+' : ''}${saldoAcumuladoPeña.toFixed(2)} €)
+                    </div>
+                </td>
             `;
             tbody.appendChild(tr);
         });
+
+        // Actualizar tarjetas de métricas en Flujo de Caja
+        const cardBoteInicial = document.getElementById('flujo-bote-inicial');
+        const cardCrecimiento = document.getElementById('flujo-crecimiento-neto');
+        const cardBoteTotal = document.getElementById('flujo-bote-total-acumulado');
+
+        if (cardBoteInicial) cardBoteInicial.textContent = BOTE_INICIAL.toFixed(2) + ' €';
+        if (cardCrecimiento) {
+            cardCrecimiento.textContent = (totalCrecimiento >= 0 ? '+' : '') + totalCrecimiento.toFixed(2) + ' €';
+            cardCrecimiento.className = `text-lg sm:text-xl font-extrabold ${totalCrecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono`;
+        }
+        if (cardBoteTotal) cardBoteTotal.textContent = (BOTE_INICIAL + totalCrecimiento).toFixed(2) + ' €';
     }
 
     renderPremiosDobles() {
         const grid = document.getElementById('premios-dobles-grid');
         if (!grid) return;
         grid.innerHTML = `
-            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
+            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 hover:border-purple-500/40 transition-all">
                 <div class="flex justify-between items-center">
-                    <strong class="text-white">Jornada 3 (30/08/2026)</strong>
+                    <strong class="text-white text-sm sm:text-base">Jornada 3 (30/08/2026)</strong>
                     <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10 Aciertos</span>
                 </div>
-                <div class="text-xs text-slate-400">Pronosticador: <strong>Luismi</strong> (Ganador de J2)</div>
+                <div class="text-xs text-slate-400">Pronosticador: <strong class="text-white">Luismi</strong> <span class="text-slate-500">(Ganador de J2)</span></div>
                 <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                    <span class="text-slate-400">Premio LAE:</span>
-                    <strong class="font-mono text-emerald-400 text-sm">+2,32 €</strong>
+                    <span class="text-slate-400">Premio Oficial LAE:</span>
+                    <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+2,32 €</strong>
+                </div>
+                <button onclick="window.BoteApp.showReducedBreakdown(13, 3)" class="w-full py-2 px-3 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                    <span>🔍</span> Ver Desglose de Reducción (16 Apuestas)
+                </button>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 hover:border-purple-500/40 transition-all">
+                <div class="flex justify-between items-center">
+                    <strong class="text-white text-sm sm:text-base">Jornada 4 (06/09/2026)</strong>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10 Aciertos</span>
+                </div>
+                <div class="text-xs text-slate-400">Pronosticador: <strong class="text-white">Fernando Lozano</strong> <span class="text-slate-500">(Ganador de J3)</span></div>
+                <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
+                    <span class="text-slate-400">Premio Oficial LAE:</span>
+                    <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+3,40 €</strong>
+                </div>
+                <button onclick="window.BoteApp.showReducedBreakdown(6, 4)" class="w-full py-2 px-3 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                    <span>🔍</span> Ver Desglose de Reducción (16 Apuestas)
+                </button>
+            </div>
+        `;
+    }
+
+    showReducedBreakdown(memberId, jornadaNum) {
+        jornadaNum = parseInt(jornadaNum) || 3;
+
+        // Datos de contingencia precisos para quinielas de dobles con 7 dobles reducidos (R2)
+        const FALLBACK_REDUCIDAS = {
+            3: {
+                memberId: 13,
+                memberName: "Luismi",
+                jornadaNum: 3,
+                date: "30/08/2026",
+                selection: ["2", "X", "X", "1", "1X", "X1", "1X", "1", "1", "X1", "X1", "1X", "1", "1X", "1-2"],
+                matches: [
+                    { home: "Valencia", away: "Barcelona", result: "2" },
+                    { home: "Mallorca", away: "Real Madrid", result: "X" },
+                    { home: "Betis", away: "Girona", result: "X" },
+                    { home: "Athletic Club", away: "Getafe", result: "1" },
+                    { home: "Celta de Vigo", away: "Alavés", result: "1" },
+                    { home: "Las Palmas", away: "Sevilla", result: "X" },
+                    { home: "Osasuna", away: "Leganés", result: "1" },
+                    { home: "Real Sociedad", away: "Rayo Vallecano", result: "2" },
+                    { home: "Valladolid", away: "Espanyol", result: "1" },
+                    { home: "Villarreal", away: "At. Madrid", result: "X" },
+                    { home: "Racing Santander", away: "Almería", result: "X" },
+                    { home: "Deportivo", away: "Real Oviedo", result: "2" },
+                    { home: "Castellón", away: "Eibar", result: "1" },
+                    { home: "Burgos", away: "Cartagena", result: "1" },
+                    { home: "Sporting Gijón", away: "Levante", result: "1-2" }
+                ],
+                prizes: { "10": 2.32, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0 }
+            },
+            4: {
+                memberId: 6,
+                memberName: "Fernando Lozano",
+                jornadaNum: 4,
+                date: "06/09/2026",
+                selection: ["1X", "1", "1X", "12", "1", "1X", "1", "1", "X2", "1", "1", "1X", "1", "1X", "0-2"],
+                matches: [
+                    { home: "Real Madrid", away: "Betis", result: "1" },
+                    { home: "Barcelona", away: "Valladolid", result: "1" },
+                    { home: "Athletic Club", away: "At. Madrid", result: "2" },
+                    { home: "Espanyol", away: "Rayo Vallecano", result: "1" },
+                    { home: "Valencia", away: "Villarreal", result: "X" },
+                    { home: "Leganés", away: "Mallorca", result: "2" },
+                    { home: "Alavés", away: "Las Palmas", result: "1" },
+                    { home: "Osasuna", away: "Celta de Vigo", result: "1" },
+                    { home: "Sevilla", away: "Girona", result: "2" },
+                    { home: "Getafe", away: "Real Sociedad", result: "X" },
+                    { home: "Levante", away: "Eibar", result: "1" },
+                    { home: "Real Oviedo", away: "Racing Santander", result: "2" },
+                    { home: "Cartagena", away: "Levante", result: "1" },
+                    { home: "Elche", away: "Córdoba", result: "1" },
+                    { home: "Tenerife", away: "Racing Ferrol", result: "0-2" }
+                ],
+                prizes: { "10": 3.40, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0 }
+            }
+        };
+
+        let targetData = FALLBACK_REDUCIDAS[jornadaNum] || FALLBACK_REDUCIDAS[3];
+
+        // Si tenemos datos en vivo de Firebase con pronósticos extra:
+        if (this.rawSeasonData) {
+            const rawJornadas = this.rawSeasonData.jornadas || [];
+            const rawExtras = this.rawSeasonData.pronosticosExtra || [];
+            const rawMembers = this.rawSeasonData.members || [];
+
+            const liveJ = rawJornadas.find(jor => jor.number === jornadaNum || String(jor.id) === String(jornadaNum));
+            if (liveJ) {
+                const liveP = rawExtras.find(x => String(x.jId || x.jornadaId) === String(liveJ.id) && (!memberId || String(x.mId || x.memberId) === String(memberId))) ||
+                              rawExtras.find(x => String(x.jId || x.jornadaId) === String(liveJ.id));
+                if (liveP && liveP.selection && liveJ.matches && liveJ.matches.length >= 15) {
+                    const mem = rawMembers.find(m => String(m.id) === String(liveP.mId || liveP.memberId));
+                    targetData = {
+                        memberId: liveP.mId || liveP.memberId,
+                        memberName: mem ? mem.name : (targetData.memberName || 'Socio'),
+                        jornadaNum: liveJ.number,
+                        date: liveJ.date,
+                        selection: liveP.selection || liveP.forecast,
+                        matches: liveJ.matches,
+                        prizes: liveJ.prizes || targetData.prizes || {}
+                    };
+                }
+            }
+        }
+
+        const selection = targetData.selection;
+        const matches = targetData.matches;
+        const prizes = targetData.prizes || {};
+
+        // Extraer índices de los dobles
+        const multiIndices = [];
+        selection.forEach((sel, idx) => {
+            if (idx < 14 && sel && sel.length > 1) multiIndices.push(idx);
+        });
+
+        // Matriz oficial de reducción autorizada de 7 dobles (R2 - 16 apuestas)
+        const matrix = (window.ScoringSystem && window.ScoringSystem.reducciones && window.ScoringSystem.reducciones['R2']) || [
+            ['1', '1', '1', '1', '1', '1', '1'],
+            ['1', '1', '1', 'X', 'X', 'X', 'X'],
+            ['1', 'X', 'X', '1', '1', 'X', 'X'],
+            ['1', 'X', 'X', 'X', 'X', '1', '1'],
+            ['X', '1', 'X', '1', 'X', '1', 'X'],
+            ['X', '1', 'X', 'X', '1', 'X', '1'],
+            ['X', 'X', '1', '1', 'X', 'X', '1'],
+            ['X', 'X', '1', 'X', '1', '1', 'X'],
+            ['1', '1', 'X', '1', 'X', 'X', '1'],
+            ['1', '1', 'X', 'X', '1', '1', 'X'],
+            ['1', 'X', '1', '1', 'X', '1', 'X'],
+            ['1', 'X', '1', 'X', '1', 'X', '1'],
+            ['X', '1', '1', '1', '1', 'X', 'X'],
+            ['X', '1', '1', 'X', 'X', '1', '1'],
+            ['X', 'X', 'X', '1', '1', '1', '1'],
+            ['X', 'X', 'X', 'X', 'X', 'X', 'X']
+        ];
+
+        const normalize = (r) => {
+            if (!r) return '';
+            const s = String(r).trim().toUpperCase();
+            if (s === '1' || s === 'X' || s === '2') return s;
+            if (s.includes('-')) {
+                const p = s.split('-');
+                const val = (x) => (x === 'M' || x === 'M+' ? 3 : parseInt(x) || 0);
+                const h = val(p[0]), a = val(p[1]);
+                return h > a ? '1' : (h < a ? '2' : 'X');
+            }
+            return s;
+        };
+
+        const bets = [];
+        const hitsCount = { 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0 };
+
+        matrix.forEach((betRow, bIdx) => {
+            let regHits = 0;
+            let p15Hit = false;
+
+            const betSelection = selection.map((sel, idx) => {
+                if (idx >= 15) return sel;
+                const mIdx = multiIndices.indexOf(idx);
+                if (mIdx !== -1) {
+                    return (betRow[mIdx] === '1') ? sel[0] : (sel[1] || sel[0]);
+                }
+                return sel;
+            });
+
+            betSelection.forEach((sel, idx) => {
+                if (idx >= 15) return;
+                const m = matches[idx];
+                const res = m ? (m.result || '') : '';
+                if (!res) return;
+                const rSign = normalize(res);
+                const rScore = String(res).trim().toUpperCase();
+
+                if (idx < 14) {
+                    if (sel.includes(rSign)) regHits++;
+                } else if (idx === 14) {
+                    p15Hit = (rScore === sel || rSign === sel);
+                }
+            });
+
+            if (regHits >= 10) {
+                if (regHits === 14 && p15Hit) {
+                    hitsCount[15] = (hitsCount[15] || 0) + 1;
+                } else {
+                    hitsCount[regHits] = (hitsCount[regHits] || 0) + 1;
+                }
+            }
+
+            bets.push({
+                num: bIdx + 1,
+                selection: betSelection,
+                hits: regHits,
+                p15Hit: p15Hit,
+                isWinner: regHits >= 10
+            });
+        });
+
+        // Calcular premio total
+        let totalPrizeValue = 0;
+        [15, 14, 13, 12, 11, 10].forEach(h => {
+            const count = hitsCount[h] || 0;
+            const pVal = prizes[h] || 0;
+            totalPrizeValue += count * pVal;
+        });
+
+        // 4. Renderizar HTML en el modal
+        let html = `
+            <!-- Pronóstico Original (15 signos con los 7 dobles resaltados) -->
+            <div class="p-4 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <span>🎯</span> Pronóstico Original de Dobles (${targetData.memberName})
+                    </span>
+                    <span class="text-[11px] text-purple-400 font-semibold">7 dobles marcados (16 combinaciones)</span>
+                </div>
+                <div class="grid grid-cols-5 sm:grid-cols-15 gap-1.5 text-center">
+                    ${selection.slice(0, 15).map((s, idx) => {
+                        const isDouble = idx < 14 && s && s.length > 1;
+                        return `
+                            <div class="p-1 rounded-lg ${isDouble ? 'bg-purple-600/40 border border-purple-400/50' : 'bg-slate-800/80 border border-slate-700/50'}">
+                                <div class="text-[9px] text-slate-400 font-bold mb-0.5">${idx === 14 ? 'P15' : 'P' + (idx + 1)}</div>
+                                <div class="font-black text-xs sm:text-sm ${isDouble ? 'text-purple-200' : 'text-slate-200'} font-mono">${s}</div>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
-            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
-                <div class="flex justify-between items-center">
-                    <strong class="text-white">Jornada 4 (06/09/2026)</strong>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10 Aciertos</span>
+
+            <!-- Resumen de Premios Obtenidos -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between sm:col-span-2">
+                    <div>
+                        <div class="text-[11px] text-slate-400 font-semibold">Resumen de Premios Oficiales LAE</div>
+                        <div class="flex flex-wrap gap-2 mt-1.5">
+                            ${[15, 14, 13, 12, 11, 10].filter(h => (hitsCount[h] || 0) > 0).map(h => {
+                                const count = hitsCount[h];
+                                const pVal = prizes[h] || 0;
+                                return `
+                                    <span class="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-200 border border-purple-500/30 text-xs font-bold flex items-center gap-1">
+                                        <span>🏆</span> ${count} de ${h} aciertos: <strong class="text-emerald-400 ml-1">+${(count * pVal).toFixed(2)} €</strong>
+                                    </span>
+                                `;
+                            }).join('') || '<span class="text-xs text-slate-500">Sin premios oficiales (menos de 10 aciertos)</span>'}
+                        </div>
+                    </div>
                 </div>
-                <div class="text-xs text-slate-400">Pronosticador: <strong>Fernando Lozano</strong> (Ganador de J3)</div>
-                <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                    <span class="text-slate-400">Premio LAE:</span>
-                    <strong class="font-mono text-emerald-400 text-sm">+3,40 €</strong>
+                <div class="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex flex-col justify-center items-center text-center">
+                    <span class="text-[11px] text-emerald-400 font-semibold uppercase tracking-wider">Premio Total Ganado</span>
+                    <span class="text-2xl font-black text-emerald-400 font-mono mt-0.5">+${totalPrizeValue.toFixed(2)} €</span>
+                </div>
+            </div>
+
+            <!-- Tabla de las 16 Apuestas Desarrolladas -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                        <span>📊</span> Desglose de las 16 Apuestas de la Reducción
+                    </h4>
+                    <span class="text-[11px] text-slate-400">Aciertos resaltados en color salmón</span>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/40">
+                    <table class="w-full text-center text-xs">
+                        <thead>
+                            <tr class="bg-slate-800/80 text-slate-300 font-semibold border-b border-slate-700">
+                                <th class="p-2 sm:px-3 text-left">Apuesta</th>
+                                ${Array.from({ length: 15 }).map((_, i) => `
+                                    <th class="p-2 w-7 sm:w-8 font-mono ${i === 14 ? 'text-amber-300' : ''}">${i === 14 ? 'P15' : (i + 1)}</th>
+                                `).join('')}
+                                <th class="p-2 sm:px-3 text-right bg-slate-800 font-bold text-white">Aciertos</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/40 font-mono">
+                            ${bets.map(b => {
+                                const isWin = b.hits >= 10;
+                                return `
+                                    <tr class="${isWin ? 'bg-amber-500/10 hover:bg-amber-500/15' : 'hover:bg-slate-800/30'} transition-colors">
+                                        <td class="p-2 sm:px-3 text-left font-sans font-bold ${isWin ? 'text-amber-300' : 'text-slate-400'}">
+                                            #${b.num} ${isWin ? '🏆' : ''}
+                                        </td>
+                                        ${b.selection.map((s, idx) => {
+                                            const m = matches[idx];
+                                            const res = m ? (m.result || '') : '';
+                                            const rSign = normalize(res);
+                                            const isHit = idx < 14 ? s.includes(rSign) : (s === res || s === rSign);
+                                            return `
+                                                <td class="p-1 sm:p-2">
+                                                    <span class="inline-block w-6 h-6 leading-6 rounded font-black text-xs ${isHit ? 'bg-[#ff8a65] text-slate-950 shadow-sm' : 'text-slate-500'}">
+                                                        ${s}
+                                                    </span>
+                                                </td>
+                                            `;
+                                        }).join('')}
+                                        <td class="p-2 sm:px-3 text-right">
+                                            <span class="px-2 py-0.5 rounded-md font-black text-xs ${isWin ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}">
+                                                ${b.hits}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Resultados Oficiales de los 15 Partidos -->
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>⚽</span> Resultados Oficiales de la Jornada ${targetData.jornadaNum}
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                    ${matches.slice(0, 15).map((m, idx) => `
+                        <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
+                            <span class="text-slate-300 truncate max-w-[160px]">
+                                <strong class="text-slate-500 font-mono mr-1">${idx === 14 ? 'P15' : (idx + 1)}.</strong>
+                                ${m.home} - ${m.away}
+                            </span>
+                            <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 font-black font-mono">
+                                ${m.result || '-'}
+                            </span>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
+
+        const title = document.getElementById('reducida-modal-titulo');
+        const subtitle = document.getElementById('reducida-modal-subtitulo');
+        const content = document.getElementById('reducida-modal-content');
+
+        if (title) title.textContent = `Desglose Reducción - Jornada ${targetData.jornadaNum} - ${targetData.memberName}`;
+        if (subtitle) subtitle.textContent = `16 apuestas combinadas (7 dobles) - Coste 10,50 € asumido íntegramente por la Peña`;
+        if (content) content.innerHTML = html;
+
+        this.openModal('modal-reducida-detalle');
     }
 
     renderGestionIngresos() {
