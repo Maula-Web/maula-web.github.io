@@ -1704,15 +1704,15 @@ class BoteAppController {
                                 ${bets.map(b => {
                                     const isWin = b.hits >= 10;
                                     return isWin ? `
-                                        <th class="p-1 sm:p-1.5 min-w-[34px] sm:min-w-[40px] font-mono text-center bg-gradient-to-b from-amber-500/40 to-amber-500/20 border-x-2 border-t-2 border-amber-400 text-amber-300 font-black shadow-md">
+                                        <th class="p-1 sm:p-1.5 min-w-[46px] sm:min-w-[52px] font-mono text-center bg-gradient-to-b from-amber-500/40 to-amber-500/20 border-x-2 border-t-2 border-amber-400 text-amber-300 font-black shadow-md">
                                             <div class="flex flex-col items-center">
                                                 <span class="text-[8px] sm:text-[9px] px-1 py-0.2 rounded-full bg-amber-400 text-slate-950 font-black whitespace-nowrap shadow-sm">🏆 PREMIO</span>
-                                                <span class="text-amber-200 font-extrabold text-xs">Ap.${b.num}</span>
+                                                <span class="text-amber-200 font-extrabold text-xs whitespace-nowrap">Ap.${b.num}</span>
                                             </div>
                                         </th>
                                     ` : `
-                                        <th class="p-1 sm:p-1.5 min-w-[26px] sm:min-w-[30px] font-mono text-center text-slate-400 border-x border-slate-800/60">
-                                            <span title="Apuesta #${b.num} (${b.hits} aciertos)">Ap.${b.num}</span>
+                                        <th class="p-1 sm:p-1.5 min-w-[44px] sm:min-w-[50px] font-mono text-center text-slate-400 border-x border-slate-800/60">
+                                            <span class="whitespace-nowrap text-xs" title="Apuesta #${b.num} (${b.hits} aciertos)">Ap.${b.num}</span>
                                         </th>
                                     `;
                                 }).join('')}
@@ -1749,7 +1749,7 @@ class BoteAppController {
                                             
                                             if (isWin) {
                                                 return `
-                                                    <td class="p-1 sm:p-1.5 text-center bg-amber-500/15 border-x-2 border-amber-400/50">
+                                                    <td class="p-1 sm:p-1.5 text-center bg-amber-500/15 border-x-2 border-amber-400/50 min-w-[46px] sm:min-w-[52px]">
                                                         <span class="inline-block w-6 h-6 leading-6 rounded font-black text-xs ${isHit ? 'bg-gradient-to-br from-amber-400 to-[#ff8a65] text-slate-950 shadow-md ring-1 ring-amber-300 scale-105' : 'text-slate-400 font-bold'}">
                                                             ${s}
                                                         </span>
@@ -1757,7 +1757,7 @@ class BoteAppController {
                                                 `;
                                             } else {
                                                 return `
-                                                    <td class="p-1 sm:p-1.5 text-center border-x border-slate-800/40">
+                                                    <td class="p-1 sm:p-1.5 text-center border-x border-slate-800/40 min-w-[44px] sm:min-w-[50px]">
                                                         <span class="inline-block w-6 h-6 leading-6 rounded font-black text-xs ${isHit ? 'bg-[#ff8a65] text-slate-950 shadow-sm' : 'text-slate-500'}">
                                                             ${s}
                                                         </span>
@@ -1785,16 +1785,16 @@ class BoteAppController {
                                 ${bets.map(b => {
                                     const isWin = b.hits >= 10;
                                     return isWin ? `
-                                        <th class="p-1 sm:p-1.5 text-center font-mono bg-gradient-to-t from-amber-500/50 via-amber-500/30 to-amber-500/20 border-x-2 border-b-2 border-amber-400">
+                                        <th class="p-1 sm:p-1.5 text-center font-mono bg-gradient-to-t from-amber-500/50 via-amber-500/30 to-amber-500/20 border-x-2 border-b-2 border-amber-400 min-w-[46px] sm:min-w-[52px]">
                                             <div class="flex flex-col items-center">
-                                                <span class="px-2 py-1 rounded text-xs font-black bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 shadow-xl ring-2 ring-amber-400/60 scale-105 flex items-center gap-0.5">
+                                                <span class="px-2 py-1 rounded text-xs font-black bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 shadow-xl ring-2 ring-amber-400/60 scale-105 inline-flex items-center gap-0.5 whitespace-nowrap">
                                                     🏆 ${b.hits} ac.
                                                 </span>
                                             </div>
                                         </th>
                                     ` : `
-                                        <th class="p-1 sm:p-1.5 text-center font-mono text-slate-400 border-x border-slate-800/60">
-                                            <span class="px-1.5 py-0.5 rounded text-xs font-semibold bg-slate-800 text-slate-400">${b.hits} ac.</span>
+                                        <th class="p-1 sm:p-1.5 text-center font-mono text-slate-400 border-x border-slate-800/60 min-w-[44px] sm:min-w-[50px]">
+                                            <span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-800 text-slate-300 whitespace-nowrap inline-block">${b.hits} ac.</span>
                                         </th>
                                     `;
                                 }).join('')}
