@@ -536,33 +536,59 @@ class BoteAppController {
                             ${jSummary.premios > 0 ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">🏆 Jornada Premiada</span>' : ''}
                         </div>
                         <div class="flex flex-wrap items-center gap-3 mt-2 text-xs sm:text-sm">
-                            <span class="flex items-center gap-1.5 text-slate-300" title="Socio con más aciertos que jugó la quiniela de dobles">
-                                <span class="text-emerald-400 font-bold">👑 Ganador:</span> ${jSummary.winnerName || 'N/A'}
-                            </span>
+                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300">
+                                <span class="text-emerald-400 font-bold">👑 Ganador:</span> 
+                                <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || 'N/A'}</span>
+                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                                    <strong class="text-emerald-400 block mb-1 font-bold">👑 Ganador de la Jornada</strong>
+                                    Socio con más aciertos. Obtiene el derecho a pronosticar la quiniela de 7 dobles de la siguiente jornada (coste de 10,50 € pagado al 100% por la peña).
+                                </div>
+                            </div>
                             ${doblesBtn}
                             <span class="text-slate-600">•</span>
-                            <span class="flex items-center gap-1.5 text-slate-300" title="Socio perdedor o designado para sellar físicamente la quiniela">
-                                <span class="text-rose-400 font-bold">💀 Sellador:</span> ${jSummary.loserName || 'N/A'} (Reembolso de sellado)
-                            </span>
+                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300">
+                                <span class="text-rose-400 font-bold">💀 Sellador:</span> 
+                                <span class="underline decoration-dotted decoration-slate-500">${jSummary.loserName || 'N/A'}</span>
+                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                                    <strong class="text-rose-400 block mb-1 font-bold">💀 Sellador Oficial</strong>
+                                    Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de 24,75 € en su hucha personal o por Bizum.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center">
-                        <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800" title="Suma de cuotas individuales pagadas por los socios">
-                            <span class="text-[11px] text-slate-400 block font-semibold">Recaudado ℹ️</span>
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-colors">
+                            <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Recaudado ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold text-emerald-400 font-mono">+${jSummary.recaudacion.toFixed(2)} €</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                                <strong class="text-emerald-400 block mb-1 font-bold">📥 Recaudación de la Jornada</strong>
+                                Suma de cuotas semanales de los 19 socios más las penalizaciones aplicadas por exceso de unos, bajos aciertos o fallos en PIG.
+                            </div>
                         </div>
-                        <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800" title="Coste real pagado en la administración de lotería (19 sencillas + 1 de dobles)">
-                            <span class="text-[11px] text-slate-400 block font-semibold">Coste Sellado ℹ️</span>
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/40 transition-colors">
+                            <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Coste Sellado ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2)} €</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                                <strong class="text-rose-400 block mb-1 font-bold">🎟️ Gasto Oficial de Sellado</strong>
+                                Coste total pagado en la administración de loterías: 19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 €.
+                            </div>
                         </div>
-                        <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800" title="Premios oficiales de LAE obtenidos en esta jornada">
-                            <span class="text-[11px] text-slate-400 block font-semibold">Premios ℹ️</span>
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 transition-colors">
+                            <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Premios ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold text-amber-400 font-mono">+${jSummary.premios.toFixed(2)} €</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                                <strong class="text-amber-400 block mb-1 font-bold">🏆 Premios Oficiales LAE</strong>
+                                Importe oficial de premios de Loterías del Estado en esta jornada (por pronósticos individuales o por la quiniela de dobles).
+                            </div>
                         </div>
-                        <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800" title="Superávit semanal que engrosa la hucha común de la peña">
-                            <span class="text-[11px] text-slate-400 block font-semibold">Neto Peña ℹ️</span>
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-colors">
+                            <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Neto Peña ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold ${netoColor} font-mono">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2)} €</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                                <strong class="text-emerald-400 block mb-1 font-bold">📈 Superávit Neto Semanal</strong>
+                                Margen neto semanal que se incorpora a la hucha colectiva de la peña tras descontar los 24,75 € de sellado oficial.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1573,27 +1599,6 @@ class BoteAppController {
 
         // 4. Renderizar HTML en el modal
         let html = `
-            <!-- Pronóstico Original (15 signos con los 7 dobles resaltados) -->
-            <div class="p-4 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <span>🎯</span> Pronóstico Original de Dobles (${targetData.memberName})
-                    </span>
-                    <span class="text-[11px] text-purple-400 font-semibold">7 dobles marcados (16 combinaciones)</span>
-                </div>
-                <div class="grid grid-cols-5 sm:grid-cols-15 gap-1.5 text-center">
-                    ${selection.slice(0, 15).map((s, idx) => {
-                        const isDouble = idx < 14 && s && s.length > 1;
-                        return `
-                            <div class="p-1 rounded-lg ${isDouble ? 'bg-purple-600/40 border border-purple-400/50' : 'bg-slate-800/80 border border-slate-700/50'}">
-                                <div class="text-[9px] text-slate-400 font-bold mb-0.5">${idx === 14 ? 'P15' : 'P' + (idx + 1)}</div>
-                                <div class="font-black text-xs sm:text-sm ${isDouble ? 'text-purple-200' : 'text-slate-200'} font-mono">${s}</div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            </div>
-
             <!-- Resumen de Premios Obtenidos -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between sm:col-span-2">
@@ -1618,76 +1623,114 @@ class BoteAppController {
                 </div>
             </div>
 
-            <!-- Tabla de las 16 Apuestas Desarrolladas -->
+            <!-- Tarjeta explicativa de la reducción (Formato Superávit Peña) -->
+            <div class="p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs space-y-1">
+                <strong class="text-purple-300 block font-bold flex items-center gap-1.5">
+                    <span>🟣</span> ¿Cómo funciona la Reducción Autorizada R2 (7 dobles - 16 apuestas)?
+                </strong>
+                <p class="leading-relaxed">
+                    La quiniela base pronosticada por <strong>${targetData.memberName}</strong> contiene 7 dobles (que al directo serían 128 apuestas = 96,00 €). El método oficial de reducción autorizada de LAE optimiza la jugada en exactamente <strong>16 apuestas estratégicas (coste 10,50 € pagado al 100% por la peña)</strong> asegurando el 100% al 13 si se aciertan los 14 signos y altas garantías de 14. En la tabla se compara el <strong>pronóstico base</strong> junto a las <strong>16 apuestas</strong> generadas y el <strong>resultado oficial</strong> de cada partido.
+                </p>
+            </div>
+
+            <!-- Tabla de Partidos con Pronóstico como Columna al Principio junto a las 16 Apuestas -->
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                        <span>📊</span> Desglose de las 16 Apuestas de la Reducción
+                        <span>📊</span> Matriz de Reducción: Pronóstico vs 16 Apuestas Desarrolladas
                     </h4>
-                    <span class="text-[11px] text-slate-400">Aciertos resaltados en color salmón</span>
+                    <span class="text-[11px] text-slate-400">Aciertos resaltados en salmón</span>
                 </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/40">
-                    <table class="w-full text-center text-xs">
-                        <thead>
-                            <tr class="bg-slate-800/80 text-slate-300 font-semibold border-b border-slate-700">
-                                <th class="p-2 sm:px-3 text-left">Apuesta</th>
-                                ${Array.from({ length: 15 }).map((_, i) => `
-                                    <th class="p-2 w-7 sm:w-8 font-mono ${i === 14 ? 'text-amber-300' : ''}">${i === 14 ? 'P15' : (i + 1)}</th>
-                                `).join('')}
-                                <th class="p-2 sm:px-3 text-right bg-slate-800 font-bold text-white">Aciertos</th>
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 max-h-[60vh] shadow-inner">
+                    <table class="w-full text-center text-xs border-collapse">
+                        <thead class="sticky top-0 z-30 bg-slate-950 shadow-md">
+                            <tr class="bg-slate-950 text-slate-300 font-bold border-b border-slate-700 text-xs">
+                                <th class="p-2 sm:px-3 text-center sticky left-0 z-40 bg-slate-950 min-w-[34px] border-r border-slate-800">#</th>
+                                <th class="p-2 sm:px-3 text-left sticky left-[34px] z-40 bg-slate-950 min-w-[140px] sm:min-w-[170px] border-r border-slate-800">Partido</th>
+                                <th class="p-2 sm:px-3 text-center sticky left-[174px] sm:left-[204px] z-40 bg-purple-950 text-purple-200 border-r-2 border-purple-500/60 min-w-[70px]">
+                                    <div class="flex flex-col items-center">
+                                        <span>Pronóstico</span>
+                                        <span class="text-[9px] text-purple-400 font-normal">7 Dobles</span>
+                                    </div>
+                                </th>
+                                ${bets.map(b => {
+                                    const isWin = b.hits >= 10;
+                                    return `
+                                        <th class="p-1 sm:p-2 min-w-[32px] sm:min-w-[36px] font-mono text-center ${isWin ? 'bg-amber-500/20 text-amber-300 font-black' : 'text-slate-400'}">
+                                            <span title="Apuesta #${b.num} (${b.hits} aciertos)">Ap.${b.num}</span>
+                                        </th>
+                                    `;
+                                }).join('')}
+                                <th class="p-2 sm:px-3 text-center bg-slate-900 border-l border-slate-700 text-amber-300 min-w-[55px]">
+                                    Resultado
+                                </th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/40 font-mono">
-                            ${bets.map(b => {
-                                const isWin = b.hits >= 10;
+                        <tbody class="divide-y divide-slate-800 font-mono text-xs">
+                            ${matches.slice(0, 15).map((m, idx) => {
+                                const isP15 = idx === 14;
+                                const pronosticoSign = selection[idx] || '-';
+                                const isDouble = idx < 14 && pronosticoSign && pronosticoSign.length > 1;
+                                const res = m ? (m.result || '') : '';
+                                const rSign = normalize(res);
+
                                 return `
-                                    <tr class="${isWin ? 'bg-amber-500/10 hover:bg-amber-500/15' : 'hover:bg-slate-800/30'} transition-colors">
-                                        <td class="p-2 sm:px-3 text-left font-sans font-bold ${isWin ? 'text-amber-300' : 'text-slate-400'}">
-                                            #${b.num} ${isWin ? '🏆' : ''}
+                                    <tr class="${isP15 ? 'bg-purple-950/20 border-t-2 border-purple-500/50 font-bold' : 'hover:bg-slate-800/40'} transition-colors">
+                                        <td class="p-2 sm:px-3 text-center font-sans font-bold text-slate-400 sticky left-0 z-10 bg-slate-950/95 border-r border-slate-800">
+                                            ${isP15 ? 'P15' : (idx + 1)}
                                         </td>
-                                        ${b.selection.map((s, idx) => {
-                                            const m = matches[idx];
-                                            const res = m ? (m.result || '') : '';
-                                            const rSign = normalize(res);
+                                        <td class="p-2 sm:px-3 text-left font-sans text-slate-200 sticky left-[34px] z-10 bg-slate-950/95 border-r border-slate-800 whitespace-nowrap overflow-hidden text-ellipsis max-w-[140px] sm:max-w-[170px]" title="${m.home} - ${m.away}">
+                                            ${m.home} - ${m.away}
+                                        </td>
+                                        <td class="p-2 sm:px-3 text-center sticky left-[174px] sm:left-[204px] z-10 bg-purple-950/95 border-r-2 border-purple-500/60">
+                                            <span class="inline-block px-1.5 py-0.5 rounded font-black text-xs ${isDouble ? 'bg-purple-500/30 text-purple-200 border border-purple-400/40 shadow-sm' : 'text-slate-300'}">
+                                                ${pronosticoSign}
+                                            </span>
+                                        </td>
+                                        ${bets.map(b => {
+                                            const s = b.selection[idx] || '';
                                             const isHit = idx < 14 ? s.includes(rSign) : (s === res || s === rSign);
                                             return `
-                                                <td class="p-1 sm:p-2">
+                                                <td class="p-1 sm:p-2 text-center ${b.hits >= 10 ? 'bg-amber-500/5' : ''}">
                                                     <span class="inline-block w-6 h-6 leading-6 rounded font-black text-xs ${isHit ? 'bg-[#ff8a65] text-slate-950 shadow-sm' : 'text-slate-500'}">
                                                         ${s}
                                                     </span>
                                                 </td>
                                             `;
                                         }).join('')}
-                                        <td class="p-2 sm:px-3 text-right">
-                                            <span class="px-2 py-0.5 rounded-md font-black text-xs ${isWin ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}">
-                                                ${b.hits}
+                                        <td class="p-2 sm:px-3 text-center bg-slate-900/90 border-l border-slate-700">
+                                            <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 font-black">
+                                                ${res || '-'}
                                             </span>
                                         </td>
                                     </tr>
                                 `;
                             }).join('')}
                         </tbody>
+                        <tfoot class="sticky bottom-0 z-30 bg-slate-950 border-t-2 border-slate-700 font-sans text-xs shadow-lg">
+                            <tr>
+                                <th colspan="2" class="p-2.5 sm:px-3 text-right font-bold text-white sticky left-0 z-40 bg-slate-950 border-r border-slate-800">
+                                    Aciertos Totales:
+                                </th>
+                                <th class="p-2.5 sm:px-3 text-center sticky left-[174px] sm:left-[204px] z-40 bg-purple-950 border-r-2 border-purple-500/60 text-[11px] text-purple-300 font-semibold">
+                                    16 Ap.
+                                </th>
+                                ${bets.map(b => {
+                                    const isWin = b.hits >= 10;
+                                    return `
+                                        <th class="p-1 sm:p-2 text-center font-mono ${isWin ? 'bg-amber-500/20' : ''}">
+                                            <span class="px-1.5 py-0.5 rounded text-xs font-black inline-flex items-center gap-0.5 ${isWin ? 'bg-amber-400 text-slate-950 shadow-md font-bold' : 'text-slate-400'}">
+                                                ${b.hits}${isWin ? '🏆' : ''}
+                                            </span>
+                                        </th>
+                                    `;
+                                }).join('')}
+                                <th class="p-2 sm:px-3 text-center bg-slate-900 text-slate-400 text-[10px] font-semibold border-l border-slate-700">
+                                    LAE
+                                </th>
+                            </tr>
+                        </tfoot>
                     </table>
-                </div>
-            </div>
-
-            <!-- Resultados Oficiales de los 15 Partidos -->
-            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
-                <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>⚽</span> Resultados Oficiales de la Jornada ${targetData.jornadaNum}
-                </h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                    ${matches.slice(0, 15).map((m, idx) => `
-                        <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
-                            <span class="text-slate-300 truncate max-w-[160px]">
-                                <strong class="text-slate-500 font-mono mr-1">${idx === 14 ? 'P15' : (idx + 1)}.</strong>
-                                ${m.home} - ${m.away}
-                            </span>
-                            <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 font-black font-mono">
-                                ${m.result || '-'}
-                            </span>
-                        </div>
-                    `).join('')}
                 </div>
             </div>
         `;
