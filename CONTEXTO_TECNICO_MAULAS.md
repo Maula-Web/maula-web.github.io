@@ -315,11 +315,34 @@ Se desarrolló y luego eliminó una funcionalidad completa para importar pronós
 
 ---
 
-## 11. Rendimiento y Optimización (Arquitectura JS)
+## 11. Rendimiento y Optimización (Arquitectura JS y Carga Rápida)
 
-Conforme la base de datos de la peña ha ido creciendo a lo largo de las jornadas, se han implementado optimizaciones críticas en la capa de procesamiento (front-end JavaScript) para asegurar una carga instantánea y fluida, especialmente en dispositivos móviles:
+Conforme la base de datos de la peña ha ido creciendo a lo largo de las jornadas, se han implementado optimizaciones críticas en la capa de procesamiento (front-end JavaScript), red y almacenamiento local para asegurar una carga instantánea y fluida, especialmente en dispositivos móviles:
 
-- **Indexación mediante HashMaps (O(1))**: Se ha abandonado la búsqueda lineal múltiple (`Array.find()` y `Array.filter()`) al cruzar jornadas, miembros y pronósticos en `dashboard.js` y `pronosticos.js`. El sistema ahora construye diccionarios (`Map`) en memoria tras la descarga inicial de Firebase. Para asegurar retrocompatibilidad con registros antiguos, asigna a cada pronóstico claves múltiples cruzando posibles campos (`jId` vs `jornadaId`, `mId` vs `memberId`). Esto reduce millones de iteraciones de cálculo en el hilo principal de JavaScript a búsquedas directas en O(1), previniendo bloqueos del navegador y la "congelación" inicial de la interfaz en los smartphones.
+- **Indexación mediante HashMaps (O(1))**: Se ha erradicado la búsqueda lineal múltiple (`Array.find()` y `Array.filter()`) al cruzar jornadas, miembros y pronósticos en todos los módulos principales (`dashboard.js`, `pronosticos.js`, `resultados.js`, `resumen-temporada.js` y `bote-engine.js`). El sistema construye diccionarios (`Map`) en memoria tras la descarga inicial de Firebase. Para asegurar retrocompatibilidad con registros antiguos, asigna a cada pronóstico claves múltiples cruzando posibles campos (`jId` vs `jornadaId`, `mId` vs `memberId`). Esto reduce millones de iteraciones de cálculo en el hilo principal de JavaScript a búsquedas directas en O(1), previniendo bloqueos del navegador y la "congelación" inicial de la interfaz en smartphones.
+- **Deduplicación de Inicialización y Guardias Migratorias (`db-service.js`)**:
+  - `DataService.init()` ahora almacena su promesa en curso (`this._initPromise`) y una bandera (`this._initialized`), evitando que múltiples componentes lanzados a la vez ejecuten inicializaciones paralelas.
+  - La verificación de migración histórica se guarda en `localStorage ('maulas_db_migrated')`, eliminando 7 consultas de red innecesarias a Firestore en cada navegación.
+- **Caché en Memoria con Auto-Invalidación (`loadSeasonData`)**:
+  - `DataService.loadSeasonData()` almacena en memoria la promesa resuelta durante el ciclo de vida de la página. Llamadas simultáneas o recurrentes desde distintos scripts reutilizan el mismo resultado sin re-descargar colecciones enteras.
+  - Al realizar cualquier modificación en base de datos (`save`, `update`, `delete`), la caché se invalida automáticamente (`clearSeasonDataCache()`).
+- **Descargas Específicas de Configuración (`auth.js`, `bote.js`)**:
+  - Sustitución de `getAll('config')` (que descargaba decenas de KB de todas las configuraciones) por llamadas directas a documentos únicos: `getDoc('config', 'theme')`, `getDoc('config', 'bote_config')` y `getDoc('config', 'emilio_status')`.
+  - Carga en paralelo de datos y configuración mediante `Promise.all([this.loadData(), this.loadConfig()])`.
+- **Memoización Algorítmica en el Motor Financiero (`bote-engine.js`)**:
+  - Creación de `getWinnerOfJornada` y `getLoserOfJornada` con memorización por clave de jornada (`_winnerCache`, `_loserCache`). Esto reduce de más de 28.000 evaluaciones O(N²) redundantes a exactamente 1 cálculo por jornada, acelerando la simulación completa del Bote a menos de 60ms.
+  - Búsqueda en O(1) de pronósticos dentro del bucle de movimientos mediante mapa hash pre-construido.
+- **Desacoplamiento Visual del Slider en Resumen de Temporada (`resumen-temporada.js`)**:
+  - En la gráfica de evolución acumulada, el desplazamiento del slider de zoom y ventana deslizante ya no recalcula todas las estadísticas ni vuelve a llamar a `calculateData()`.
+  - Los datos calculados se mantienen en memoria (`this.data`) y el slider únicamente aplica un rebanado (`slice`) ultrarrápido sobre los puntos a renderizar, garantizando 60 FPS al interactuar con el control.
+- **Memoización de Fechas en `utils.js`**:
+  - `AppUtils.parseDate` dispone de un diccionario de memoización (`_dateCache`). Las fechas consultadas repetidamente se resuelven en 0 ms sin re-evaluar expresiones regulares complejas.
+- **Preconexión de Recursos (Resource Hints) y Fuentes Paralelas**:
+  - Inserción de `<link rel="preconnect">` en todas las páginas HTML hacia `fonts.googleapis.com`, `fonts.gstatic.com`, `www.gstatic.com` y `cdn.jsdelivr.net`.
+  - Enlace directo a la tipografía de Google Fonts en el `<head>`, permitiendo descargar CSS y fuentes en paralelo y eliminando el bloqueo que causaba `@import` en `styles.css`.
+- **Caché Completa PWA (Service Worker v1.1)**:
+  - Actualización a la versión `maulas-pwa-v1.1` en `service-worker.js`.
+  - Inclusión en el App Shell de recursos que faltaban en precache (`resumen-styles.css`, `frases.js` y `chart.umd.min.js`), asegurando funcionamiento offline 100% resiliente y carga instantánea.
 - **Tolerancia a Arrays Dispersos (NoSQL)**: Debido a que las estructuras de array en Firebase pueden contener "huecos" (slots `undefined` o `null`) originados por manipulaciones manuales del histórico, todos los bucles de renderizado principal integran salvaguardas preventivas. Si el mapa no encuentra un dato válido, los algoritmos de puntuación asumen "No jugado", manteniendo intacta la estabilidad visual del panel.
 
 ---

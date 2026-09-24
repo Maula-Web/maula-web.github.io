@@ -57,6 +57,19 @@ class ResultsManager {
             };
         });
 
+        // Fast O(1) index for pronosticos
+        const pronosticosMap = new Map();
+        (this.pronosticos || []).forEach(p => {
+            if (!p) return;
+            const jIds = [p.jId, p.jornadaId].filter(x => x !== undefined && x !== null).map(String);
+            const mIds = [p.mId, p.memberId].filter(x => x !== undefined && x !== null).map(String);
+            jIds.forEach(jId => {
+                mIds.forEach(mId => {
+                    pronosticosMap.set(`${jId}_${mId}`, p);
+                });
+            });
+        });
+
         finishedJornadas.forEach(j => {
             const officialResults = j.matches.map(m => m.result);
             const jDate = AppUtils.parseDate(j.date);
@@ -67,11 +80,8 @@ class ResultsManager {
 
             // First pass: Calculate scores for all members
             this.members.forEach(m => {
-                // Find pronostico - Use loose comparison for IDs (mix of strings and numbers)
-                const p = this.pronosticos.find(pred =>
-                    String(pred.jId) === String(j.id) &&
-                    String(pred.mId) === String(m.id)
-                );
+                // Find pronostico in O(1)
+                const p = pronosticosMap.get(`${j.id}_${m.id}`);
 
                 let hits = -1;
                 let points = 0;

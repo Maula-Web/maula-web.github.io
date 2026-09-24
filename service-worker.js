@@ -3,7 +3,7 @@
  * Versión de caché: maulas-pwa-v1.0
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.0';
+const CACHE_NAME = 'maulas-pwa-v1.1';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -22,6 +22,7 @@ const CORE_ASSETS = [
     'manual.html',
     'MANUAL_COMPLETO_2026.html',
     'css/styles.css',
+    'css/resumen-styles.css',
     'manifest.json',
     'apple-touch-icon.png',
     'apple-touch-icon-precomposed.png',
@@ -39,6 +40,7 @@ const CORE_ASSETS = [
     'js/firebase-init.js',
     'js/scoring.js',
     'js/utils.js',
+    'js/frases.js',
     'js/pronosticos.js',
     'js/jornadas.js',
     'js/dashboard.js',
@@ -52,7 +54,8 @@ const CORE_ASSETS = [
     'js/theme-editor.js',
     'js/telegram-service.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
-    'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js'
+    'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
+    'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
 ];
 
 // 1. Instalación: Precachear recursos del App Shell de manera resiliente

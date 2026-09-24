@@ -21,6 +21,8 @@ var AppUtils = window.AppUtils || {
         return this.months.some(m => low.includes(m));
     },
 
+    _dateCache: new Map(),
+
     /**
      * Parsing flexible date strings to Date object
      * Supports: "dd/mm/yyyy", "dd de mes de yyyy", "dd mes yyyy"
@@ -34,6 +36,12 @@ var AppUtils = window.AppUtils || {
         const trimmed = dateStr.trim();
         if (trimmed.toLowerCase() === 'por definir') return null;
 
+        if (this._dateCache && this._dateCache.has(trimmed)) {
+            const cached = this._dateCache.get(trimmed);
+            return cached ? new Date(cached.getTime()) : null;
+        }
+
+        let parsed = null;
         try {
             // 1. Try standard YYYY-MM-DD or YYYY/MM/DD (e.g. 2026-08-01, 2026-09-22)
             const isoMatch = trimmed.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
@@ -41,7 +49,7 @@ var AppUtils = window.AppUtils || {
                 const year = parseInt(isoMatch[1], 10);
                 const month = parseInt(isoMatch[2], 10) - 1;
                 const day = parseInt(isoMatch[3], 10);
-                return new Date(year, month, day);
+                return this._cacheDate(trimmed, new Date(year, month, day));
             }
 
             // 2. Try standard DD/MM/YYYY or DD-MM-YYYY (e.g. 16-08-2026, 23/08/2026)
@@ -50,7 +58,7 @@ var AppUtils = window.AppUtils || {
                 const day = parseInt(dmyMatch[1], 10);
                 const month = parseInt(dmyMatch[2], 10) - 1;
                 const year = parseInt(dmyMatch[3], 10);
-                return new Date(year, month, day);
+                return this._cacheDate(trimmed, new Date(year, month, day));
             }
 
             // 3. Flexible 3-part separator fallback
@@ -58,9 +66,9 @@ var AppUtils = window.AppUtils || {
                 const parts = trimmed.split(/[\/-]/);
                 if (parts.length === 3) {
                     if (parts[0].length === 4) {
-                        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                        return this._cacheDate(trimmed, new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)));
                     } else {
-                        return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+                        return this._cacheDate(trimmed, new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)));
                     }
                 }
             }
@@ -83,17 +91,24 @@ var AppUtils = window.AppUtils || {
                 const monthIdx = (this.months || ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']).findIndex(m => clean.includes(m));
 
                 if (!isNaN(day) && monthIdx !== -1) {
-                    return new Date(year, monthIdx, day);
+                    return this._cacheDate(trimmed, new Date(year, monthIdx, day));
                 }
             }
 
             // 5. Native Date parse fallback (e.g. ISO string with time)
             const fallback = new Date(trimmed);
             if (!isNaN(fallback.getTime())) {
-                return fallback;
+                return this._cacheDate(trimmed, fallback);
             }
         } catch (e) { console.warn('Date parse error', e); }
-        return null; // Failed
+        return this._cacheDate(trimmed, null);
+    },
+
+    _cacheDate(key, d) {
+        if (!this._dateCache) this._dateCache = new Map();
+        if (this._dateCache.size > 500) this._dateCache.clear();
+        this._dateCache.set(key, d);
+        return d ? new Date(d.getTime()) : null;
     },
 
     /**

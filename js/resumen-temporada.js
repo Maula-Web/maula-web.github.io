@@ -145,7 +145,7 @@ class ResumenManager {
         const firstJ = this.viewOffset + 1;
         const lastJ = this.viewOffset + this.viewJornadasCount;
         
-        const { jornadas } = this.calculateData();
+        const jornadas = (this.data && this.data.jornadas) ? this.data.jornadas : [];
         const startNum = jornadas[this.viewOffset] ? jornadas[this.viewOffset].number : firstJ;
         const endNum = jornadas[this.viewOffset + this.viewJornadasCount - 1] ? jornadas[this.viewOffset + this.viewJornadasCount - 1].number : lastJ;
 
@@ -195,7 +195,20 @@ class ResumenManager {
             return seasonMatch && hasResult && isValidDate;
         });
 
-        console.log(`ResumenManager: Found ${activeJornadas.length} jornadas for season ${this.currentSeason} (Total checked: ${this.jornadas.length})`);
+        // Fast O(1) lookup Map
+        const pronosticosMap = new Map();
+        if (this.pronosticos && Array.isArray(this.pronosticos)) {
+            this.pronosticos.forEach(p => {
+                if (!p) return;
+                const jIds = [p.jId, p.jornadaId].filter(x => x !== undefined && x !== null).map(String);
+                const mIds = [p.mId, p.memberId].filter(x => x !== undefined && x !== null).map(String);
+                jIds.forEach(j => {
+                    mIds.forEach(m => {
+                        pronosticosMap.set(`${j}_${m}`, p);
+                    });
+                });
+            });
+        }
 
         activeJornadas.forEach(j => {
             const officialResults = j.matches.map(m => m.result);
@@ -207,11 +220,7 @@ class ResumenManager {
             const isPig15 = match15 && AppUtils.isPigMatch(match15.home, match15.away);
 
             this.members.forEach(m => {
-                // Usar comparación laxa (==) igual que el Dashboard para tolerar string/number
-                const p = this.pronosticos.find(pred =>
-                    (pred.jId == j.id || pred.jornadaId == j.id) &&
-                    (pred.mId == m.id || pred.memberId == m.id)
-                );
+                const p = pronosticosMap.get(`${j.id}_${m.id}`);
                 let points = 0;
                 let hits = -1;
                 let potentialHits = null;
@@ -333,7 +342,7 @@ class ResumenManager {
         const ctx = document.getElementById('evolutionChart');
         if (!ctx) return;
 
-        const { stats, jornadas } = this.calculateData();
+        const { stats, jornadas } = (this.data && this.data.stats) ? this.data : (this.data = this.calculateData());
         
         // --- ZOOM & SLIDING WINDOW LOGIC ---
         this.totalJornadasInSeason = jornadas.length;
@@ -364,7 +373,7 @@ class ResumenManager {
                 const color = fixedColors[i % 4];
 
                 // Filter history data to match jornadas
-                const filteredHistory = s.history.slice(startIndex);
+                const filteredHistory = s.history.slice(startIndex, startIndex + this.viewJornadasCount);
 
                 datasets.push({
                     label: s.name,

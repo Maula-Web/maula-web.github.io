@@ -14,6 +14,23 @@ class BoteEngine {
      */
     calculateAllMovements(members, jornadas, pronosticos, pronosticosExtra, repartos, cierresVuelta, ingresos, cashPayments) {
         const movements = [];
+        this._winnerCache = new Map();
+        this._loserCache = new Map();
+
+        // Index pronosticos for O(1) fast lookup
+        this._pMap = new Map();
+        if (pronosticos && Array.isArray(pronosticos)) {
+            pronosticos.forEach(p => {
+                if (!p) return;
+                const jIds = [p.jId, p.jornadaId].filter(x => x !== undefined && x !== null).map(String);
+                const mIds = [p.mId, p.memberId].filter(x => x !== undefined && x !== null).map(String);
+                jIds.forEach(j => {
+                    mIds.forEach(m => {
+                        this._pMap.set(`${j}_${m}`, p);
+                    });
+                });
+            });
+        }
 
         // Saldos iniciales heredados
         const initialBalances = {
@@ -85,7 +102,7 @@ class BoteEngine {
                     if (matchesWithResult.length === 0) return;
 
                     const infoRedist = jornadaExemptions[jornadaIndex];
-                    const pronostico = pronosticos.find(p =>
+                    const pronostico = this._pMap ? (this._pMap.get(`${jornada.id}_${mIdStr}`) || this._pMap.get(`${jornada.number}_${mIdStr}`)) : pronosticos.find(p =>
                         (p.jId == jornada.id || p.jornadaId == jornada.id) &&
                         (String(p.mId || p.memberId) === mIdStr)
                     );
@@ -279,8 +296,7 @@ class BoteEngine {
             }
         } else if (jornadaIndex > 0) {
             const prevJornada = jornadas[jornadaIndex - 1];
-            const prevWinner = members.find(m => this.wasWinnerOfJornada(m.id, prevJornada, members, jornadas, pronosticos));
-            const prevWinnerId = prevWinner ? String(prevWinner.id) : null;
+            const prevWinnerId = this.getWinnerOfJornada(prevJornada, members, jornadas, pronosticos);
 
             const matchesExtra = pronosticosExtra ? pronosticosExtra.filter(p =>
                 (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number) || parseInt(p.jId || p.jornadaId) === jornada.number) &&
@@ -545,9 +561,13 @@ class BoteEngine {
         return totalExtraPrize;
     }
 
-    wasWinnerOfJornada(memberId, prevJornada, members, jornadas, pronosticos) {
-        if (!prevJornada.matches || prevJornada.matches.length < 15 || prevJornada.matches.some(m => !m.result || m.result === '' || m.result === 'por definir')) {
-            return false;
+    getWinnerOfJornada(prevJornada, members, jornadas, pronosticos) {
+        if (!prevJornada || !prevJornada.matches || prevJornada.matches.length < 15 || prevJornada.matches.some(m => !m.result || m.result === '' || m.result === 'por definir')) {
+            return null;
+        }
+        const cacheKey = String(prevJornada.id || prevJornada.number);
+        if (this._winnerCache && this._winnerCache.has(cacheKey)) {
+            return this._winnerCache.get(cacheKey);
         }
 
         const prizeThreshold = prevJornada.minHitsToWin || 10;
@@ -555,10 +575,10 @@ class BoteEngine {
         // Build member results for prevJornada
         const memberResults = (members || []).map(m => {
             const mIdStr = String(m.id);
-            const p = pronosticos ? pronosticos.find(pr =>
+            const p = pronosticos ? (this._pMap ? (this._pMap.get(`${prevJornada.id}_${mIdStr}`) || this._pMap.get(`${prevJornada.number}_${mIdStr}`)) : pronosticos.find(pr =>
                 (String(pr.jId || pr.jornadaId) === String(prevJornada.id) || parseInt(pr.jId || pr.jornadaId) === prevJornada.number) &&
                 String(pr.mId || pr.memberId) === mIdStr
-            ) : null;
+            )) : null;
 
             let hasPronostico = false;
             let isLate = false;
@@ -598,7 +618,7 @@ class BoteEngine {
             };
         });
 
-        if (memberResults.length === 0) return false;
+        if (memberResults.length === 0) return null;
 
         // Eligible for winner: must have valid forecast, or if late must be pardoned or hits >= prizeThreshold
         const eligibleForWinner = memberResults.filter(r => {
@@ -609,22 +629,34 @@ class BoteEngine {
             return false;
         });
 
-        if (eligibleForWinner.length === 0) return false;
+        if (eligibleForWinner.length === 0) return null;
 
         const maxPoints = Math.max(...eligibleForWinner.map(r => r.points));
         const winners = eligibleForWinner.filter(r => r.points === maxPoints);
 
+        let finalWinnerId = null;
         if (winners.length === 1) {
-            return String(winners[0].memberId) === String(memberId);
+            finalWinnerId = String(winners[0].memberId);
+        } else {
+            finalWinnerId = String(this.resolveTie(winners.map(w => w.memberId), prevJornada.number - 1, 'max', jornadas, pronosticos));
         }
 
-        const finalWinnerId = this.resolveTie(winners.map(w => w.memberId), prevJornada.number - 1, 'max', jornadas, pronosticos);
-        return String(finalWinnerId) === String(memberId);
+        if (this._winnerCache) this._winnerCache.set(cacheKey, finalWinnerId);
+        return finalWinnerId;
     }
 
-    wasLoserOfJornada(memberId, prevJornada, members, jornadas, pronosticos) {
-        if (!prevJornada.matches || prevJornada.matches.length < 15 || prevJornada.matches.some(m => !m.result || m.result === '' || m.result === 'por definir')) {
-            return false;
+    wasWinnerOfJornada(memberId, prevJornada, members, jornadas, pronosticos) {
+        const winnerId = this.getWinnerOfJornada(prevJornada, members, jornadas, pronosticos);
+        return winnerId !== null && String(winnerId) === String(memberId);
+    }
+
+    getLoserOfJornada(prevJornada, members, jornadas, pronosticos) {
+        if (!prevJornada || !prevJornada.matches || prevJornada.matches.length < 15 || prevJornada.matches.some(m => !m.result || m.result === '' || m.result === 'por definir')) {
+            return null;
+        }
+        const cacheKey = String(prevJornada.id || prevJornada.number);
+        if (this._loserCache && this._loserCache.has(cacheKey)) {
+            return this._loserCache.get(cacheKey);
         }
 
         const prizeThreshold = prevJornada.minHitsToWin || 10;
@@ -633,10 +665,10 @@ class BoteEngine {
         // Build results for ALL members
         const memberResults = (members || []).map(m => {
             const mIdStr = String(m.id);
-            const p = pronosticos ? pronosticos.find(pr =>
+            const p = pronosticos ? (this._pMap ? (this._pMap.get(`${prevJornada.id}_${mIdStr}`) || this._pMap.get(`${prevJornada.number}_${mIdStr}`)) : pronosticos.find(pr =>
                 (String(pr.jId || pr.jornadaId) === String(prevJornada.id) || parseInt(pr.jId || pr.jornadaId) === prevJornada.number) &&
                 String(pr.mId || pr.memberId) === mIdStr
-            ) : null;
+            )) : null;
 
             let hasPronostico = false;
             let isLate = false;
@@ -676,7 +708,7 @@ class BoteEngine {
             };
         });
 
-        if (memberResults.length === 0) return false;
+        if (memberResults.length === 0) return null;
 
         // Condition A: Offenders (Missing pronostico or unpardoned late with hits < prizeThreshold)
         const offenders = memberResults.filter(r =>
@@ -692,13 +724,20 @@ class BoteEngine {
             maulaCandidates = memberResults.filter(r => r.points === minPoints);
         }
 
+        let finalLoserId = null;
         if (maulaCandidates.length === 1) {
-            return String(maulaCandidates[0].memberId) === String(memberId);
+            finalLoserId = String(maulaCandidates[0].memberId);
+        } else {
+            finalLoserId = String(this.resolveTie(maulaCandidates.map(c => c.memberId), prevJornada.number - 1, 'min', jornadas, pronosticos));
         }
 
-        // Tie-break: Recursive check & deterministic fallback (higher memberId)
-        const finalLoserId = this.resolveTie(maulaCandidates.map(c => c.memberId), prevJornada.number - 1, 'min', jornadas, pronosticos);
-        return String(finalLoserId) === String(memberId);
+        if (this._loserCache) this._loserCache.set(cacheKey, finalLoserId);
+        return finalLoserId;
+    }
+
+    wasLoserOfJornada(memberId, prevJornada, members, jornadas, pronosticos) {
+        const loserId = this.getLoserOfJornada(prevJornada, members, jornadas, pronosticos);
+        return loserId !== null && String(loserId) === String(memberId);
     }
 
     resolveTie(memberIds, jornadaNum, type, jornadas, pronosticos) {

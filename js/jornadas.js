@@ -11,12 +11,11 @@ class JornadaManager {
 
         if (window.DataService) {
             await window.DataService.init();
-            await this.loadData();
+            const data = await window.DataService.loadSeasonData();
+            this.jornadas = data.jornadas;
             if (window.DiceService) {
                 try {
-                    const members = await window.DataService.getAll('members');
-                    const pronosticos = await window.DataService.getAll('pronosticos');
-                    await window.DiceService.checkAndApplyDice(members, this.jornadas, pronosticos);
+                    await window.DiceService.checkAndApplyDice(data.members, this.jornadas, data.pronosticos);
                 } catch (errDice) {
                     console.error("Error aplicando dado en jornadas:", errDice);
                 }
@@ -29,8 +28,10 @@ class JornadaManager {
     }
 
     async loadData() {
-        const allJ = await window.DataService.getAll('jornadas');
-        this.jornadas = allJ.filter(j => j.season === AppUtils.activeSeason);
+        if (!this.jornadas || this.jornadas.length === 0) {
+            const data = await window.DataService.loadSeasonData();
+            this.jornadas = data.jornadas;
+        }
     }
 
     startClock() {

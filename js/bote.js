@@ -52,9 +52,8 @@ class BoteManager {
             console.log('BoteManager: Starting initialization...');
             if (!window.DataService.db) await window.DataService.init();
 
-            // Load data
-            await this.loadData();
-            await this.loadConfig();
+            // Load data and config concurrently
+            await Promise.all([this.loadData(), this.loadConfig()]);
 
             // Check dependencies
             if (!window.ScoringSystem) {
@@ -137,8 +136,7 @@ class BoteManager {
     }
 
     async loadConfig() {
-        const configDocs = await window.DataService.getAll('config');
-        const boteConfig = configDocs.find(c => c.id === 'bote_config');
+        const boteConfig = await window.DataService.getDoc('config', 'bote_config');
 
         if (boteConfig) {
             this.config = { ...this.config, ...boteConfig };

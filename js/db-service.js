@@ -11,17 +11,32 @@ class DataService {
             bote: 'bote',
             ingresos: 'ingresos'
         };
+        this._initialized = false;
+        this._initPromise = null;
+        this._seasonDataPromise = null;
     }
 
     async init() {
-        console.log("DataService: Checking connection...");
-        try {
-            await this.migrateIfNeeded();
-            console.log("DataService: Ready.");
-        } catch (e) {
-            console.error("DataService Error:", e);
-            alert("Error conectando con la base de datos.");
-        }
+        if (this._initialized) return;
+        if (this._initPromise) return this._initPromise;
+
+        this._initPromise = (async () => {
+            try {
+                // If migration check was already done in this browser/session, avoid redundant Firestore queries
+                const isMigrated = localStorage.getItem('maulas_db_migrated');
+                if (!isMigrated) {
+                    await this.migrateIfNeeded();
+                    localStorage.setItem('maulas_db_migrated', 'true');
+                }
+                this._initialized = true;
+            } catch (e) {
+                console.error("DataService Error:", e);
+                this._initPromise = null;
+                alert("Error conectando con la base de datos.");
+            }
+        })();
+
+        return this._initPromise;
     }
 
     // --- MIGRATION UTILS ---
@@ -174,16 +189,19 @@ class DataService {
     async save(collectionName, item) {
         if (!item.id) item.id = Date.now();
         await this.db.collection(collectionName).doc(String(item.id)).set(item);
+        this.clearSeasonDataCache();
     }
 
     // Generic Partial Update
     async update(collectionName, id, data) {
         await this.db.collection(collectionName).doc(String(id)).update(data);
+        this.clearSeasonDataCache();
     }
 
     // Generic Delete
     async delete(collectionName, id) {
         await this.db.collection(collectionName).doc(String(id)).delete();
+        this.clearSeasonDataCache();
     }
 
     // Config Specific
@@ -243,38 +261,50 @@ class DataService {
     }
 
     // Unified data loader for the active season to prevent redundant Firestore calls across components
-    async loadSeasonData() {
-        const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
-
-        const [members, allJornadas, pronosticos, pronosticosExtra, scoringRulesDoc] = await Promise.all([
-            this.getAll('members'),
-            this.getAll('jornadas'),
-            this.getAll('pronosticos'),
-            this.getAll('pronosticos_extra').catch(() => []),
-            this.getDoc('config', 'scoring_rules').catch(() => null)
-        ]);
-
-        // Integrate scoring rules history globally
-        if (scoringRulesDoc && scoringRulesDoc.history && window.ScoringSystem) {
-            window.ScoringSystem.historyCache = scoringRulesDoc.history;
-            console.log("DataService: Loaded scoring rules from Firestore");
-            
-            // Sync to local storage for offline fallback and early loads
-            localStorage.setItem('maulas_rules_history', JSON.stringify(scoringRulesDoc.history));
+    async loadSeasonData(forceRefresh = false) {
+        if (!forceRefresh && this._seasonDataPromise) {
+            return this._seasonDataPromise;
         }
 
-        // Clean & sort members
-        const sortedMembers = (members || []).sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        this._seasonDataPromise = (async () => {
+            const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
 
-        // Filter jornadas by active season
-        const seasonJornadas = (allJornadas || []).filter(j => j.season === activeSeason);
+            const [members, allJornadas, pronosticos, pronosticosExtra, scoringRulesDoc] = await Promise.all([
+                this.getAll('members'),
+                this.getAll('jornadas'),
+                this.getAll('pronosticos'),
+                this.getAll('pronosticos_extra').catch(() => []),
+                this.getDoc('config', 'scoring_rules').catch(() => null)
+            ]);
 
-        return {
-            members: sortedMembers,
-            jornadas: seasonJornadas,
-            pronosticos: pronosticos || [],
-            pronosticosExtra: pronosticosExtra || []
-        };
+            // Integrate scoring rules history globally
+            if (scoringRulesDoc && scoringRulesDoc.history && window.ScoringSystem) {
+                window.ScoringSystem.historyCache = scoringRulesDoc.history;
+                console.log("DataService: Loaded scoring rules from Firestore");
+                
+                // Sync to local storage for offline fallback and early loads
+                localStorage.setItem('maulas_rules_history', JSON.stringify(scoringRulesDoc.history));
+            }
+
+            // Clean & sort members
+            const sortedMembers = (members || []).sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
+            // Filter jornadas by active season
+            const seasonJornadas = (allJornadas || []).filter(j => j.season === activeSeason);
+
+            return {
+                members: sortedMembers,
+                jornadas: seasonJornadas,
+                pronosticos: pronosticos || [],
+                pronosticosExtra: pronosticosExtra || []
+            };
+        })();
+
+        return this._seasonDataPromise;
+    }
+
+    clearSeasonDataCache() {
+        this._seasonDataPromise = null;
     }
 }
 

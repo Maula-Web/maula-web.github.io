@@ -74,8 +74,7 @@ const Auth = {
                 }
 
                 // 2. Standard Lockout Check
-                const config = await window.DataService.getAll('config');
-                const status = config.find(c => c.id === 'emilio_status');
+                const status = await window.DataService.getDoc('config', 'emilio_status');
 
                 if (status && status.expelledUntil) {
                     const until = new Date(status.expelledUntil);
@@ -178,8 +177,7 @@ const Auth = {
         if (window.DataService) {
             try {
                 if (!window.DataService.db) await window.DataService.init();
-                const config = await window.DataService.getAll('config');
-                const themeDoc = config.find(c => c.id === 'theme');
+                const themeDoc = await window.DataService.getDoc('config', 'theme');
                 if (themeDoc) {
                     // Update cache if different
                     localStorage.setItem('maulas_theme_cache', JSON.stringify(themeDoc));
