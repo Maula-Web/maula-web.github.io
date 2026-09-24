@@ -1,0 +1,3855 @@
+[
+  {
+    "_id": "1",
+    "_createTime": "2025-12-16T15:55:23.776207Z",
+    "_updateTime": "2026-02-09T18:35:26.639416Z",
+    "number": 1,
+    "date": "17 de agosto de 2025",
+    "id": 1,
+    "matches": [
+      {
+        "result": "2",
+        "away": "Rayo Vallecano",
+        "home": "Girona"
+      },
+      {
+        "home": "Villarreal",
+        "away": "R. Oviedo",
+        "result": "1"
+      },
+      {
+        "away": "Levante",
+        "result": "1",
+        "home": "Alavés"
+      },
+      {
+        "result": "2",
+        "away": "Barcelona",
+        "home": "Mallorca"
+      },
+      {
+        "home": "Valencia",
+        "away": "Real Sociedad",
+        "result": "X"
+      },
+      {
+        "result": "2",
+        "home": "Celta",
+        "away": "Getafe"
+      },
+      {
+        "away": "Sevilla",
+        "home": "Athletic Club",
+        "result": "1"
+      },
+      {
+        "home": "Espanyol",
+        "away": "At. Madrid",
+        "result": "1"
+      },
+      {
+        "home": "Racing Santander",
+        "away": "Castellón",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "home": "Málaga",
+        "away": "Eibar"
+      },
+      {
+        "away": "Deportivo",
+        "home": "Granada",
+        "result": "2"
+      },
+      {
+        "home": "Cádiz",
+        "result": "1",
+        "away": "Mirandés"
+      },
+      {
+        "home": "Huesca",
+        "away": "Leganés",
+        "result": "X"
+      },
+      {
+        "away": "Andorra",
+        "result": "X",
+        "home": "Las Palmas"
+      },
+      {
+        "away": "Betis",
+        "home": "Elche",
+        "result": "1-1"
+      }
+    ],
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 8.55,
+      "11": 48.37,
+      "12": 474.83,
+      "13": 7920.99,
+      "14": 0,
+      "15": 0
+    }
+  },
+  {
+    "_id": "11",
+    "_createTime": "2025-12-16T16:56:50.380806Z",
+    "_updateTime": "2026-02-09T18:35:29.128367Z",
+    "date": "5 de octubre de 2025",
+    "id": 11,
+    "number": 11,
+    "matches": [
+      {
+        "home": "R. Oviedo",
+        "away": "Levante",
+        "result": "2"
+      },
+      {
+        "result": "1",
+        "away": "Valencia",
+        "home": "Girona"
+      },
+      {
+        "away": "Mallorca",
+        "home": "Athletic Club",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Villarreal",
+        "home": "Real Madrid"
+      },
+      {
+        "result": "1",
+        "home": "Sevilla",
+        "away": "Barcelona"
+      },
+      {
+        "result": "1",
+        "home": "Alavés",
+        "away": "Elche"
+      },
+      {
+        "away": "Betis",
+        "home": "Espanyol",
+        "result": "2"
+      },
+      {
+        "away": "Rayo Vallecano",
+        "home": "Real Sociedad",
+        "result": "2"
+      },
+      {
+        "result": "X",
+        "away": "Almería",
+        "home": "Deportivo"
+      },
+      {
+        "away": "Leganés",
+        "home": "Andorra",
+        "result": "2"
+      },
+      {
+        "away": "Burgos",
+        "home": "Huesca",
+        "result": "1"
+      },
+      {
+        "home": "R. Zaragoza",
+        "result": "2",
+        "away": "Córdoba"
+      },
+      {
+        "away": "Málaga",
+        "result": "1",
+        "home": "Racing Santander"
+      },
+      {
+        "result": "1",
+        "home": "Las Palmas",
+        "away": "Cádiz"
+      },
+      {
+        "result": "1-1",
+        "away": "At. Madrid",
+        "home": "Celta"
+      }
+    ],
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 9.81,
+      "11": 37.37,
+      "12": 258.65,
+      "13": 3514.41,
+      "14": 299896.2,
+      "15": 2161292.55
+    }
+  },
+  {
+    "_id": "14",
+    "_createTime": "2025-12-16T15:55:24.295281Z",
+    "_updateTime": "2026-02-09T18:35:31.661368Z",
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 11.67,
+      "11": 64.39,
+      "12": 627.91,
+      "13": 9441.95,
+      "14": 0,
+      "15": 0
+    },
+    "id": 14,
+    "date": "19 de octubre de 2025",
+    "number": 14,
+    "matches": [
+      {
+        "result": "2",
+        "home": "Sevilla",
+        "away": "Mallorca"
+      },
+      {
+        "home": "Barcelona",
+        "away": "Girona",
+        "result": "1"
+      },
+      {
+        "away": "Betis",
+        "home": "Villarreal",
+        "result": "X"
+      },
+      {
+        "away": "Osasuna",
+        "home": "At. Madrid",
+        "result": "1"
+      },
+      {
+        "home": "Elche",
+        "away": "Athletic Club",
+        "result": "X"
+      },
+      {
+        "away": "Real Sociedad",
+        "home": "Celta",
+        "result": "X"
+      },
+      {
+        "result": "2",
+        "home": "Levante",
+        "away": "Rayo Vallecano"
+      },
+      {
+        "result": "2",
+        "home": "Getafe",
+        "away": "Real Madrid"
+      },
+      {
+        "home": "R. Zaragoza",
+        "away": "Cultural Leonesa",
+        "result": "2"
+      },
+      {
+        "away": "Málaga",
+        "home": "Leganés",
+        "result": "1"
+      },
+      {
+        "away": "Albacete",
+        "result": "2",
+        "home": "Castellón"
+      },
+      {
+        "home": "Valladolid",
+        "away": "Sporting",
+        "result": "2"
+      },
+      {
+        "home": "Racing Santander",
+        "away": "Deportivo",
+        "result": "1"
+      },
+      {
+        "home": "Córdoba",
+        "away": "Almería",
+        "result": "X"
+      },
+      {
+        "result": "0-0",
+        "home": "Alavés",
+        "away": "Valencia"
+      }
+    ]
+  },
+  {
+    "_id": "16",
+    "_createTime": "2025-12-14T21:26:37.162246Z",
+    "_updateTime": "2026-02-17T17:18:53.476078Z",
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {},
+    "id": 16,
+    "date": "26-10-2025",
+    "matches": [
+      {
+        "result": "X",
+        "home": "Girona",
+        "away": "Oviedo"
+      },
+      {
+        "home": "Espanyol",
+        "away": "Elche",
+        "result": "1"
+      },
+      {
+        "away": "Getafe",
+        "home": "Athletic Club",
+        "result": "2"
+      },
+      {
+        "result": "2",
+        "home": "Valencia",
+        "away": "Villarreal"
+      },
+      {
+        "home": "Mallorca",
+        "result": "X",
+        "away": "Levante"
+      },
+      {
+        "home": "Osasuna",
+        "result": "2",
+        "away": "Celta"
+      },
+      {
+        "home": "Rayo Vallecano",
+        "away": "Alavés",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "home": "Betis",
+        "away": "At. Madrid"
+      },
+      {
+        "home": "Granada",
+        "result": "X",
+        "away": "Cádiz"
+      },
+      {
+        "home": "Mirandés",
+        "away": "Racing",
+        "result": "2"
+      },
+      {
+        "home": "Málaga",
+        "result": "1",
+        "away": "Andorra"
+      },
+      {
+        "home": "Sporting",
+        "away": "Zaragoza",
+        "result": "1"
+      },
+      {
+        "home": "Almería",
+        "away": "Castellón",
+        "result": "1"
+      },
+      {
+        "away": "Valladolid",
+        "home": "Deportivo",
+        "result": "X"
+      },
+      {
+        "home": "Real Madrid",
+        "result": "2-1",
+        "away": "Barcelona"
+      }
+    ],
+    "number": 16
+  },
+  {
+    "_id": "17",
+    "_createTime": "2025-12-14T21:26:37.235354Z",
+    "_updateTime": "2026-02-17T17:18:52.916694Z",
+    "id": 17,
+    "matches": [
+      {
+        "away": "Rayo Vallecano",
+        "home": "Villarreal",
+        "result": "1"
+      },
+      {
+        "away": "Sevilla",
+        "result": "1",
+        "home": "At. Madrid"
+      },
+      {
+        "away": "Valencia",
+        "home": "Real Madrid",
+        "result": "1"
+      },
+      {
+        "away": "Celta",
+        "home": "Levante",
+        "result": "2"
+      },
+      {
+        "away": "Espanyol",
+        "home": "Alavés",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "home": "Barcelona",
+        "away": "Elche"
+      },
+      {
+        "home": "Betis",
+        "away": "Mallorca",
+        "result": "1"
+      },
+      {
+        "home": "Oviedo",
+        "result": "X",
+        "away": "Osasuna"
+      },
+      {
+        "away": "Burgos",
+        "home": "Leganés",
+        "result": "2"
+      },
+      {
+        "away": "Eibar",
+        "home": "Almería",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "home": "Andorra",
+        "away": "Cádiz"
+      },
+      {
+        "result": "X",
+        "home": "Sporting",
+        "away": "Las Palmas"
+      },
+      {
+        "home": "Castellón",
+        "result": "1",
+        "away": "Málaga"
+      },
+      {
+        "away": "Deportivo",
+        "result": "2",
+        "home": "Zaragoza"
+      },
+      {
+        "result": "M-2",
+        "away": "Athletic Club",
+        "home": "Real Sociedad"
+      }
+    ],
+    "active": true,
+    "prizes": {
+      "11": 1.95,
+      "12": 9.71,
+      "13": 87.25,
+      "14": 3536.44
+    },
+    "season": "2025-2026",
+    "date": "02-11-2025",
+    "number": 17
+  },
+  {
+    "_id": "1765746692447",
+    "_createTime": "2025-12-14T21:11:32.347899Z",
+    "_updateTime": "2026-02-17T17:18:53.757644Z",
+    "date": "14-12-2025",
+    "number": 28,
+    "id": 1765746692447,
+    "season": "2025-2026",
+    "prizes": {
+      "10": 11.06,
+      "11": 68.45,
+      "12": 798.05,
+      "13": 13597.55,
+      "14": 754210.56
+    },
+    "active": true,
+    "matches": [
+      {
+        "result": "1",
+        "away": "Valencia",
+        "home": "At. Madrid"
+      },
+      {
+        "result": "1",
+        "home": "Mallorca",
+        "away": "Elche"
+      },
+      {
+        "result": "1",
+        "home": "Barcelona",
+        "away": "Osasuna"
+      },
+      {
+        "result": "2",
+        "away": "Espanyol",
+        "home": "Getafe"
+      },
+      {
+        "away": "Oviedo",
+        "result": "1",
+        "home": "Sevilla"
+      },
+      {
+        "result": "1",
+        "away": "Athletic Club",
+        "home": "Celta"
+      },
+      {
+        "away": "Villarreal",
+        "home": "Levante",
+        "result": "1"
+      },
+      {
+        "home": "Alavés",
+        "away": "Real Madrid",
+        "result": "2"
+      },
+      {
+        "away": "Granada",
+        "home": "Sporting",
+        "result": "1"
+      },
+      {
+        "home": "Valladolid",
+        "result": "2",
+        "away": "Andorra"
+      },
+      {
+        "away": "Leganés",
+        "home": "Racing",
+        "result": "X"
+      },
+      {
+        "result": "2",
+        "away": "Cádiz",
+        "home": "Zaragoza"
+      },
+      {
+        "home": "Almería",
+        "result": "2",
+        "away": "Burgos"
+      },
+      {
+        "result": "X",
+        "home": "Ceuta",
+        "away": "Las Palmas"
+      },
+      {
+        "away": "Betis",
+        "home": "Rayo V",
+        "result": "0-0"
+      }
+    ]
+  },
+  {
+    "_id": "1765746736650",
+    "_createTime": "2025-12-14T21:11:32.943962Z",
+    "_updateTime": "2026-02-17T17:18:53.247771Z",
+    "date": "25-01-2026",
+    "matches": [
+      {
+        "home": "Rayo V",
+        "result": "2",
+        "away": "Osasuna"
+      },
+      {
+        "away": "Espanyol",
+        "home": "Valencia",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "home": "Sevilla",
+        "away": "Athletic Club"
+      },
+      {
+        "home": "Villarreal",
+        "result": "2",
+        "away": "Real Madrid"
+      },
+      {
+        "home": "At. Madrid",
+        "away": "Mallorca",
+        "result": "1"
+      },
+      {
+        "home": "Barcelona",
+        "away": "Oviedo",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "home": "Real Sociedad",
+        "away": "Celta"
+      },
+      {
+        "result": "1",
+        "home": "Alavés",
+        "away": "Betis"
+      },
+      {
+        "away": "Albacete",
+        "home": "Valladolid",
+        "result": "2"
+      },
+      {
+        "away": "Córdoba",
+        "result": "2",
+        "home": "Las Palmas"
+      },
+      {
+        "home": "Andorra",
+        "away": "Huesca",
+        "result": "X"
+      },
+      {
+        "away": "Almería",
+        "home": "Eibar",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "away": "Castellón",
+        "home": "Zaragoza"
+      },
+      {
+        "away": "Racing",
+        "result": "2",
+        "home": "Deportivo"
+      },
+      {
+        "home": "Girona",
+        "result": "1-1",
+        "away": "Getafe"
+      }
+    ],
+    "number": 37,
+    "id": 1765746736650,
+    "prizes": {
+      "10": 8.75,
+      "11": 36.49,
+      "12": 272.63,
+      "13": 4077.77,
+      "14": 809029.56
+    },
+    "active": true,
+    "season": "2025-2026"
+  },
+  {
+    "_id": "1765746752006",
+    "_createTime": "2025-12-14T21:11:32.644976Z",
+    "_updateTime": "2026-02-17T17:18:53.915788Z",
+    "season": "2025-2026",
+    "prizes": {
+      "10": 7.16,
+      "11": 35.4,
+      "12": 329.72,
+      "13": 4830.18,
+      "14": 793436.76
+    },
+    "active": true,
+    "matches": [
+      {
+        "result": "1",
+        "away": "Valencia",
+        "home": "Celta"
+      },
+      {
+        "home": "Osasuna",
+        "away": "Athletic Club",
+        "result": "X"
+      },
+      {
+        "away": "Villarreal",
+        "home": "Elche",
+        "result": "2"
+      },
+      {
+        "away": "Barcelona",
+        "result": "2",
+        "home": "Espanyol"
+      },
+      {
+        "away": "Levante",
+        "result": "2",
+        "home": "Sevilla"
+      },
+      {
+        "away": "Betis",
+        "result": "1",
+        "home": "Real Madrid"
+      },
+      {
+        "home": "Alavés",
+        "result": "X",
+        "away": "Oviedo"
+      },
+      {
+        "result": "2",
+        "away": "Girona",
+        "home": "Mallorca"
+      },
+      {
+        "result": "1",
+        "home": "Castellón",
+        "away": "Huesca"
+      },
+      {
+        "away": "Racing",
+        "result": "X",
+        "home": "Valladolid"
+      },
+      {
+        "home": "Córdoba",
+        "result": "1",
+        "away": "Burgos"
+      },
+      {
+        "result": "2",
+        "away": "Málaga",
+        "home": "Sporting"
+      },
+      {
+        "result": "2",
+        "home": "Zaragoza",
+        "away": "Las Palmas"
+      },
+      {
+        "result": "X",
+        "away": "Cádiz",
+        "home": "Deportivo"
+      },
+      {
+        "home": "Real Sociedad",
+        "away": "At. Madrid",
+        "result": "1-1"
+      }
+    ],
+    "date": "04-01-2026",
+    "number": 32,
+    "id": 1765746752006
+  },
+  {
+    "_id": "1768941156367",
+    "_createTime": "2026-01-20T20:33:16.613687Z",
+    "_updateTime": "2026-02-17T17:18:53.314941Z",
+    "number": 39,
+    "id": 1768941156367,
+    "matches": [
+      {
+        "away": "Girona",
+        "home": "Oviedo",
+        "result": "1"
+      },
+      {
+        "home": "Osasuna",
+        "away": "Villarreal",
+        "result": "X"
+      },
+      {
+        "result": "X",
+        "away": "At. Madrid",
+        "home": "Levante"
+      },
+      {
+        "away": "Barcelona",
+        "result": "2",
+        "home": "Elche"
+      },
+      {
+        "away": "Rayo V",
+        "result": "1",
+        "home": "Real Madrid"
+      },
+      {
+        "result": "1",
+        "away": "Valencia",
+        "home": "Betis"
+      },
+      {
+        "away": "Celta",
+        "home": "Getafe",
+        "result": "X"
+      },
+      {
+        "away": "Sevilla",
+        "home": "Mallorca",
+        "result": "1"
+      },
+      {
+        "away": "Deportivo",
+        "home": "Cultural Leonesa",
+        "result": "2"
+      },
+      {
+        "result": "1",
+        "home": "Almería",
+        "away": "Ceuta"
+      },
+      {
+        "away": "Sporting",
+        "result": "1",
+        "home": "Eibar"
+      },
+      {
+        "home": "Huesca",
+        "result": "1",
+        "away": "Cádiz"
+      },
+      {
+        "away": "Racing",
+        "result": "1",
+        "home": "Granada"
+      },
+      {
+        "home": "Mirandés",
+        "away": "Málaga",
+        "result": "1"
+      },
+      {
+        "home": "Athletic Club",
+        "away": "Real Sociedad",
+        "result": "1-1"
+      }
+    ],
+    "date": "01-02-2026",
+    "prizes": {
+      "10": 2.5,
+      "11": 8.17,
+      "12": 50.17,
+      "13": 487.69,
+      "14": 21154.8,
+      "15": 680462.07
+    },
+    "season": "2025-2026",
+    "active": true
+  },
+  {
+    "_id": "1770238059311",
+    "_createTime": "2026-02-04T20:47:38.942734Z",
+    "_updateTime": "2026-02-17T17:18:54.073810Z",
+    "matches": [
+      {
+        "result": "X",
+        "away": "Osasuna",
+        "home": "Elche"
+      },
+      {
+        "result": "1",
+        "away": "Villarreal",
+        "home": "Getafe"
+      },
+      {
+        "result": "2",
+        "away": "Valencia",
+        "home": "Levante"
+      },
+      {
+        "home": "Real Madrid",
+        "away": "Real Sociedad",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "away": "Alavés",
+        "home": "Sevilla"
+      },
+      {
+        "away": "Athletic Club",
+        "home": "Oviedo",
+        "result": "2"
+      },
+      {
+        "away": "Barcelona",
+        "home": "Girona",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "away": "Betis",
+        "home": "Mallorca"
+      },
+      {
+        "away": "Celta",
+        "home": "RCD Espanyol",
+        "result": "X"
+      },
+      {
+        "result": "X",
+        "away": "Sporting",
+        "home": "Albacete"
+      },
+      {
+        "away": "Cádiz",
+        "home": "Burgos",
+        "result": "X"
+      },
+      {
+        "home": "Castellón",
+        "result": "1",
+        "away": "Deportivo"
+      },
+      {
+        "result": "1",
+        "home": "Eibar",
+        "away": "Racing"
+      },
+      {
+        "away": "Las Palmas",
+        "home": "Mirandés",
+        "result": "X"
+      },
+      {
+        "home": "Rayo Vallecano",
+        "away": "Atlético De Madrid",
+        "result": "M-0"
+      }
+    ],
+    "number": 42,
+    "prizes": {
+      "10": 33.57,
+      "11": 201.33,
+      "12": 2439.23,
+      "13": 38621.19,
+      "14": 494351.16
+    },
+    "season": "2025-2026",
+    "active": true,
+    "id": 1770238059311,
+    "date": "15-02-2026"
+  },
+  {
+    "_id": "1770238099442",
+    "_createTime": "2026-02-04T20:48:19.074045Z",
+    "_updateTime": "2026-02-17T17:18:53.998155Z",
+    "number": 40,
+    "matches": [
+      {
+        "away": "Oviedo",
+        "home": "Rayo Vallecano",
+        "result": "1"
+      },
+      {
+        "home": "Barcelona",
+        "away": "Mallorca",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "away": "Girona",
+        "home": "Sevilla"
+      },
+      {
+        "home": "Real Sociedad",
+        "away": "Elche",
+        "result": "1"
+      },
+      {
+        "home": "Alavés",
+        "result": "2",
+        "away": "Getafe"
+      },
+      {
+        "home": "Athletic Club",
+        "away": "Levante",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "away": "Betis",
+        "home": "Atlético"
+      },
+      {
+        "home": "Villarreal",
+        "result": "1",
+        "away": "RCD Espanyol"
+      },
+      {
+        "away": "Almería",
+        "result": "2",
+        "home": "Cádiz"
+      },
+      {
+        "result": "2",
+        "home": "Valladolid",
+        "away": "Castellón"
+      },
+      {
+        "home": "Ceuta",
+        "away": "Córdoba",
+        "result": "X"
+      },
+      {
+        "home": "Deportivo",
+        "result": "1",
+        "away": "Albacete"
+      },
+      {
+        "home": "Sporting",
+        "away": "Huesca",
+        "result": "1"
+      },
+      {
+        "away": "Cultural Leonesa",
+        "home": "Málaga",
+        "result": "1"
+      },
+      {
+        "result": "0-2",
+        "away": "Real Madrid",
+        "home": "Valencia"
+      }
+    ],
+    "date": "08-02-2026",
+    "active": true,
+    "season": "2025-2026",
+    "prizes": {
+      "11": 1.58,
+      "12": 7.68,
+      "13": 87.67,
+      "14": 5590.28,
+      "15": 149895.13
+    },
+    "id": 1770238099442
+  },
+  {
+    "_id": "1770658284230",
+    "_createTime": "2026-02-09T17:31:23.180199Z",
+    "_updateTime": "2026-02-23T06:58:29.673440Z",
+    "number": 44,
+    "matches": [
+      {
+        "away": "Oviedo",
+        "home": "Real Sociedad",
+        "result": "X"
+      },
+      {
+        "away": "Rayo Vallecano",
+        "home": "Betis",
+        "result": "X"
+      },
+      {
+        "away": "Real Madrid",
+        "home": "Osasuna",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "RCD Espanyol",
+        "home": "Atlético"
+      },
+      {
+        "result": "2",
+        "away": "Sevilla",
+        "home": "Getafe"
+      },
+      {
+        "result": "1",
+        "away": "Levante",
+        "home": "Barcelona"
+      },
+      {
+        "result": "1",
+        "home": "Celta",
+        "away": "Mallorca"
+      },
+      {
+        "result": "1",
+        "home": "Villarreal",
+        "away": "Valencia"
+      },
+      {
+        "result": "1",
+        "home": "Almería",
+        "away": "Córdoba"
+      },
+      {
+        "result": "X",
+        "away": "Castellón",
+        "home": "Las Palmas"
+      },
+      {
+        "home": "Sporting",
+        "result": "X",
+        "away": "Valladolid"
+      },
+      {
+        "home": "Andorra",
+        "away": "Zaragoza",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Burgos",
+        "home": "Racing"
+      },
+      {
+        "result": "1",
+        "away": "Albacete",
+        "home": "Málaga"
+      },
+      {
+        "away": "Girona",
+        "result": "0-0",
+        "home": "Alavés"
+      }
+    ],
+    "date": "22-02-2026",
+    "id": 1770658284230,
+    "season": "2025-2026",
+    "prizes": {},
+    "active": true
+  },
+  {
+    "_id": "1771348732461",
+    "_createTime": "2026-02-17T17:18:53.405979Z",
+    "_updateTime": "2026-03-02T22:50:19.721262Z",
+    "id": 1771348732461,
+    "number": 45,
+    "date": "01-03-2026",
+    "matches": [
+      {
+        "home": "Rayo Vallecano",
+        "result": "X",
+        "away": "Athletic Club"
+      },
+      {
+        "home": "Barcelona",
+        "result": "1",
+        "away": "Villarreal"
+      },
+      {
+        "result": "2",
+        "away": "Real Sociedad",
+        "home": "Mallorca"
+      },
+      {
+        "away": "Atlético",
+        "home": "Oviedo",
+        "result": "2"
+      },
+      {
+        "home": "Elche",
+        "away": "RCD Espanyol",
+        "result": "X"
+      },
+      {
+        "result": "1",
+        "home": "Valencia",
+        "away": "Osasuna"
+      },
+      {
+        "result": "2",
+        "home": "Girona",
+        "away": "Celta"
+      },
+      {
+        "home": "Real Madrid",
+        "result": "2",
+        "away": "Getafe"
+      },
+      {
+        "away": "Burgos",
+        "result": "2",
+        "home": "Zaragoza"
+      },
+      {
+        "away": "Málaga",
+        "home": "Granada",
+        "result": "2"
+      },
+      {
+        "home": "Castellón",
+        "away": "Racing",
+        "result": "2"
+      },
+      {
+        "home": "Sporting",
+        "away": "Leganés",
+        "result": "X"
+      },
+      {
+        "result": "2",
+        "away": "Las Palmas",
+        "home": "Cultural Leonesa"
+      },
+      {
+        "away": "Cádiz",
+        "home": "Eibar",
+        "result": "1"
+      },
+      {
+        "home": "Betis",
+        "away": "Sevilla",
+        "result": "2-2"
+      }
+    ],
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 8.37,
+      "11": 43.16,
+      "12": 476.47,
+      "13": 8848.71
+    }
+  },
+  {
+    "_id": "1771862403436",
+    "_createTime": "2026-02-23T16:00:03.551385Z",
+    "_updateTime": "2026-03-09T22:13:14.682367Z",
+    "season": "2025-2026",
+    "prizes": {},
+    "active": true,
+    "id": 1771862403436,
+    "matches": [
+      {
+        "result": "1",
+        "away": "Betis",
+        "home": "Getafe"
+      },
+      {
+        "result": "X",
+        "away": "Girona",
+        "home": "Levante"
+      },
+      {
+        "away": "Real Sociedad",
+        "home": "Atlético",
+        "result": "1"
+      },
+      {
+        "home": "Celta",
+        "result": "2",
+        "away": "Real Madrid"
+      },
+      {
+        "away": "Elche",
+        "home": "Villarreal",
+        "result": "1"
+      },
+      {
+        "home": "Sevilla",
+        "result": "X",
+        "away": "Rayo Vallecano"
+      },
+      {
+        "away": "Alavés",
+        "home": "Valencia",
+        "result": "1"
+      },
+      {
+        "away": "Oviedo",
+        "home": "RCD Espanyol",
+        "result": "X"
+      },
+      {
+        "home": "Huesca",
+        "away": "Albacete",
+        "result": "X"
+      },
+      {
+        "home": "Málaga",
+        "result": "X",
+        "away": "Valladolid"
+      },
+      {
+        "away": "Sporting",
+        "result": "1",
+        "home": "Andorra"
+      },
+      {
+        "result": "1",
+        "away": "Córdoba",
+        "home": "Racing"
+      },
+      {
+        "result": "2",
+        "home": "Leganés",
+        "away": "Eibar"
+      },
+      {
+        "result": "2",
+        "home": "Deportivo",
+        "away": "Granada"
+      },
+      {
+        "away": "Barcelona",
+        "home": "Athletic Club",
+        "result": "0-1"
+      }
+    ],
+    "number": 46,
+    "date": "08-03-2026"
+  },
+  {
+    "_id": "1772549787942",
+    "_createTime": "2026-03-03T14:56:27.350923Z",
+    "_updateTime": "2026-03-17T05:08:22.217891Z",
+    "number": 48,
+    "date": "15-03-2026",
+    "matches": [
+      {
+        "home": "Girona",
+        "away": "Athletic Club",
+        "result": "1"
+      },
+      {
+        "away": "Getafe",
+        "result": "1",
+        "home": "Atlético"
+      },
+      {
+        "result": "1",
+        "away": "Valencia",
+        "home": "Oviedo"
+      },
+      {
+        "home": "Real Madrid",
+        "away": "Elche",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "home": "Mallorca",
+        "away": "RCD Espanyol"
+      },
+      {
+        "away": "Sevilla",
+        "home": "Barcelona",
+        "result": "1"
+      },
+      {
+        "away": "Celta",
+        "result": "X",
+        "home": "Betis"
+      },
+      {
+        "result": "X",
+        "away": "Levante",
+        "home": "Rayo Vallecano"
+      },
+      {
+        "home": "Valladolid",
+        "result": "1",
+        "away": "Leganés"
+      },
+      {
+        "result": "1",
+        "away": "Almería",
+        "home": "Zaragoza"
+      },
+      {
+        "away": "Deportivo",
+        "home": "Ceuta",
+        "result": "2"
+      },
+      {
+        "away": "Burgos",
+        "home": "Eibar",
+        "result": "X"
+      },
+      {
+        "home": "Sporting",
+        "result": "1",
+        "away": "Castellón"
+      },
+      {
+        "result": "1",
+        "away": "Las Palmas",
+        "home": "Albacete"
+      },
+      {
+        "home": "Real Sociedad",
+        "away": "Osasuna",
+        "result": "M-1"
+      }
+    ],
+    "id": 1772549787942,
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 3.39,
+      "11": 12.52,
+      "12": 82.01,
+      "13": 868.65,
+      "14": 51114.95,
+      "15": 0
+    }
+  },
+  {
+    "_id": "1773251937503",
+    "_createTime": "2026-03-11T17:58:55.557494Z",
+    "_updateTime": "2026-03-23T17:17:47.284903Z",
+    "number": 50,
+    "date": "22-03-2026",
+    "id": 1773251937503,
+    "matches": [
+      {
+        "home": "Elche",
+        "result": "1",
+        "away": "Mallorca"
+      },
+      {
+        "away": "Getafe",
+        "result": "2",
+        "home": "RCD Espanyol"
+      },
+      {
+        "home": "Levante",
+        "away": "Oviedo",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Girona",
+        "home": "Osasuna"
+      },
+      {
+        "result": "2",
+        "home": "Sevilla",
+        "away": "Valencia"
+      },
+      {
+        "result": "1",
+        "away": "Rayo Vallecano",
+        "home": "Barcelona"
+      },
+      {
+        "home": "Celta",
+        "away": "Alavés",
+        "result": "2"
+      },
+      {
+        "result": "1",
+        "home": "Athletic Club",
+        "away": "Betis"
+      },
+      {
+        "result": "1",
+        "away": "Ceuta",
+        "home": "Leganés"
+      },
+      {
+        "away": "Eibar",
+        "home": "Andorra",
+        "result": "2"
+      },
+      {
+        "home": "Cádiz",
+        "result": "2",
+        "away": "Málaga"
+      },
+      {
+        "home": "Burgos",
+        "away": "Córdoba",
+        "result": "1"
+      },
+      {
+        "home": "Mirandés",
+        "result": "1",
+        "away": "Valladolid"
+      },
+      {
+        "home": "Las Palmas",
+        "result": "1",
+        "away": "Sporting"
+      },
+      {
+        "result": "M-2",
+        "home": "Real Madrid",
+        "away": "Atlético De Madrid"
+      }
+    ],
+    "prizes": {
+      "10": 3.49,
+      "11": 13.79,
+      "12": 93.31,
+      "13": 1076.57,
+      "14": 65582.96
+    },
+    "active": true,
+    "season": "2025-2026"
+  },
+  {
+    "_id": "1774371213758",
+    "_createTime": "2026-03-24T16:53:34.807755Z",
+    "_updateTime": "2026-04-08T14:55:50.466154Z",
+    "date": "05-04-2026",
+    "matches": [
+      {
+        "away": "Levante",
+        "home": "Real Sociedad",
+        "result": "1"
+      },
+      {
+        "away": "Real Madrid",
+        "home": "Mallorca",
+        "result": "1"
+      },
+      {
+        "home": "Alavés",
+        "result": "X",
+        "away": "Osasuna"
+      },
+      {
+        "home": "Getafe",
+        "away": "Athletic Club",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "home": "Valencia",
+        "away": "Celta"
+      },
+      {
+        "home": "Oviedo",
+        "result": "1",
+        "away": "Sevilla"
+      },
+      {
+        "away": "RCD Espanyol",
+        "home": "Betis",
+        "result": "X"
+      },
+      {
+        "away": "Villarreal",
+        "home": "Girona",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "home": "Cádiz",
+        "away": "Córdoba"
+      },
+      {
+        "result": "2",
+        "home": "Albacete",
+        "away": "Burgos"
+      },
+      {
+        "away": "Málaga",
+        "home": "Deportivo",
+        "result": "X"
+      },
+      {
+        "away": "Racing",
+        "home": "Andorra",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Leganés",
+        "home": "Almería"
+      },
+      {
+        "home": "Las Palmas",
+        "away": "Huesca",
+        "result": "1"
+      },
+      {
+        "away": "Barcelona",
+        "result": "1-2",
+        "home": "Atlético"
+      }
+    ],
+    "id": 1774371213758,
+    "number": 53,
+    "season": "2025-2026",
+    "prizes": {
+      "10": 18.75,
+      "11": 91.92,
+      "12": 839.25,
+      "13": 5304.04
+    },
+    "active": true
+  },
+  {
+    "_id": "1775136378466",
+    "_createTime": "2026-04-02T13:26:18.487179Z",
+    "_updateTime": "2026-04-14T03:53:07.583345Z",
+    "id": 1775136378466,
+    "active": true,
+    "date": "12-04-2026",
+    "prizes": {
+      "10": 26.01,
+      "11": 153.74,
+      "12": 1599.39,
+      "13": 26317.29,
+      "14": 617579.04,
+      "15": 0
+    },
+    "season": "2025-2026",
+    "thursdayReminderSent": true,
+    "number": 55,
+    "matches": [
+      {
+        "result": "X",
+        "home": "Real Madrid",
+        "position": 1,
+        "away": "Girona"
+      },
+      {
+        "away": "Alavés",
+        "home": "Real Sociedad",
+        "position": 2,
+        "result": "X"
+      },
+      {
+        "away": "Valencia",
+        "result": "1",
+        "position": 3,
+        "home": "Elche"
+      },
+      {
+        "position": 4,
+        "result": "1",
+        "home": "Barcelona",
+        "away": "RCD Espanyol"
+      },
+      {
+        "away": "Atlético",
+        "position": 5,
+        "home": "Sevilla",
+        "result": "1"
+      },
+      {
+        "home": "Osasuna",
+        "away": "Betis",
+        "position": 6,
+        "result": "X"
+      },
+      {
+        "position": 7,
+        "home": "Mallorca",
+        "result": "1",
+        "away": "Rayo Vallecano"
+      },
+      {
+        "result": "2",
+        "away": "Oviedo",
+        "position": 8,
+        "home": "Celta"
+      },
+      {
+        "away": "Villarreal",
+        "position": 9,
+        "home": "Athletic Club",
+        "result": "2"
+      },
+      {
+        "result": "1",
+        "position": 10,
+        "away": "Las Palmas",
+        "home": "Málaga"
+      },
+      {
+        "home": "Córdoba",
+        "result": "1",
+        "away": "Zaragoza",
+        "position": 11
+      },
+      {
+        "result": "X",
+        "position": 12,
+        "home": "Huesca",
+        "away": "Deportivo"
+      },
+      {
+        "result": "X",
+        "position": 13,
+        "home": "Mirandés",
+        "away": "Castellón"
+      },
+      {
+        "position": 14,
+        "home": "Racing",
+        "away": "Almería",
+        "result": "1"
+      },
+      {
+        "result": "1-0",
+        "position": 15,
+        "away": "Getafe",
+        "home": "Levante"
+      }
+    ]
+  },
+  {
+    "_id": "1776438706194",
+    "_createTime": "2026-04-17T15:11:44.961812Z",
+    "_updateTime": "2026-04-28T13:55:21.118002Z",
+    "id": 1776438706194,
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 3.68,
+      "11": 14.75,
+      "12": 111.5,
+      "13": 1464.81,
+      "14": 74551.71,
+      "15": 4370845.19
+    },
+    "date": "26-04-2026",
+    "number": 59,
+    "matches": [
+      {
+        "result": "X",
+        "home": "Betis",
+        "away": "Real Madrid"
+      },
+      {
+        "home": "Alavés",
+        "result": "1",
+        "away": "Mallorca"
+      },
+      {
+        "home": "Getafe",
+        "away": "Barcelona",
+        "result": "2"
+      },
+      {
+        "home": "Valencia",
+        "result": "1",
+        "away": "Girona"
+      },
+      {
+        "result": "1",
+        "home": "Atlético",
+        "away": "Athletic Club"
+      },
+      {
+        "away": "Real Sociedad",
+        "home": "Rayo Vallecano",
+        "result": "X"
+      },
+      {
+        "result": "2",
+        "away": "Elche",
+        "home": "Oviedo"
+      },
+      {
+        "away": "Sevilla",
+        "result": "1",
+        "home": "Osasuna"
+      },
+      {
+        "result": "1",
+        "away": "Celta",
+        "home": "Villarreal"
+      },
+      {
+        "away": "Deportivo",
+        "home": "Burgos",
+        "result": "X"
+      },
+      {
+        "home": "Málaga",
+        "away": "Castellón",
+        "result": "2"
+      },
+      {
+        "home": "Granada",
+        "result": "2",
+        "away": "Almería"
+      },
+      {
+        "home": "Huesca",
+        "away": "Zaragoza",
+        "result": "1"
+      },
+      {
+        "away": "Racing",
+        "home": "Ceuta",
+        "result": "X"
+      },
+      {
+        "away": "Levante",
+        "home": "RCD Espanyol",
+        "result": "0-0"
+      }
+    ]
+  },
+  {
+    "_id": "1777384698770",
+    "_createTime": "2026-04-28T13:58:18.840292Z",
+    "_updateTime": "2026-05-12T15:23:39.831241Z",
+    "date": "10-05-2026",
+    "id": 1777384698770,
+    "prizes": {
+      "10": 19.13,
+      "11": 107.94,
+      "12": 1244.24,
+      "13": 21247.81,
+      "14": 0,
+      "15": 0
+    },
+    "season": "2025-2026",
+    "active": true,
+    "matches": [
+      {
+        "away": "Alavés",
+        "result": "X",
+        "home": "Elche"
+      },
+      {
+        "home": "Sevilla",
+        "away": "RCD Espanyol",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "home": "Atlético",
+        "away": "Celta"
+      },
+      {
+        "result": "X",
+        "away": "Betis",
+        "home": "Real Sociedad"
+      },
+      {
+        "away": "Villarreal",
+        "home": "Mallorca",
+        "result": "X"
+      },
+      {
+        "home": "Athletic Club",
+        "result": "2",
+        "away": "Valencia"
+      },
+      {
+        "away": "Getafe",
+        "home": "Oviedo",
+        "result": "X"
+      },
+      {
+        "result": "X",
+        "away": "Girona",
+        "home": "Rayo Vallecano"
+      },
+      {
+        "result": "X",
+        "away": "Castellón",
+        "home": "Ceuta"
+      },
+      {
+        "result": "X",
+        "away": "Almería",
+        "home": "Burgos"
+      },
+      {
+        "result": "1",
+        "home": "Málaga",
+        "away": "Sporting"
+      },
+      {
+        "away": "Las Palmas",
+        "result": "1",
+        "home": "Andorra"
+      },
+      {
+        "result": "2",
+        "away": "Racing",
+        "home": "Leganés"
+      },
+      {
+        "home": "Córdoba",
+        "away": "Granada",
+        "result": "1"
+      },
+      {
+        "result": "2-0",
+        "home": "Barcelona",
+        "away": "Real Madrid"
+      }
+    ],
+    "number": 61
+  },
+  {
+    "_id": "1777384699865",
+    "_createTime": "2026-04-28T13:58:19.915734Z",
+    "_updateTime": "2026-05-09T09:48:57.430268Z",
+    "number": 60,
+    "id": 1777384699865,
+    "date": "03-05-2026",
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 2.11,
+      "11": 7.44,
+      "12": 47.34,
+      "13": 530.4,
+      "14": 44651.61
+    },
+    "matches": [
+      {
+        "result": "1",
+        "away": "Levante",
+        "home": "Villarreal"
+      },
+      {
+        "result": "2",
+        "away": "Atlético",
+        "home": "Valencia"
+      },
+      {
+        "result": "2",
+        "home": "Alavés",
+        "away": "Athletic Club"
+      },
+      {
+        "home": "Osasuna",
+        "result": "2",
+        "away": "Barcelona"
+      },
+      {
+        "result": "1",
+        "away": "Elche",
+        "home": "Celta"
+      },
+      {
+        "result": "2",
+        "away": "Rayo Vallecano",
+        "home": "Getafe"
+      },
+      {
+        "away": "Oviedo",
+        "home": "Betis",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "home": "RCD Espanyol",
+        "away": "Real Madrid"
+      },
+      {
+        "home": "Cultural Leonesa",
+        "away": "Cádiz",
+        "result": "X"
+      },
+      {
+        "home": "Castellón",
+        "away": "Córdoba",
+        "result": "2"
+      },
+      {
+        "result": "2",
+        "away": "Málaga",
+        "home": "Eibar"
+      },
+      {
+        "result": "1",
+        "home": "Racing",
+        "away": "Huesca"
+      },
+      {
+        "result": "2",
+        "home": "Sporting",
+        "away": "Ceuta"
+      },
+      {
+        "away": "Valladolid",
+        "home": "Las Palmas",
+        "result": "1"
+      },
+      {
+        "result": "0-0",
+        "away": "Real Sociedad",
+        "home": "Sevilla"
+      }
+    ]
+  },
+  {
+    "_id": "1778320287786",
+    "_createTime": "2026-05-09T09:51:28.658578Z",
+    "_updateTime": "2026-05-18T21:45:33.411085Z",
+    "prizes": {
+      "10": 5.72,
+      "11": 24.94,
+      "12": 195.3,
+      "13": 2649.8,
+      "14": 228942.6
+    },
+    "active": true,
+    "season": "2025-2026",
+    "date": "17-05-2026",
+    "id": 1778320287786,
+    "number": 63,
+    "matches": [
+      {
+        "away": "Celta",
+        "home": "Athletic Club",
+        "result": "X"
+      },
+      {
+        "away": "Girona",
+        "home": "Atlético",
+        "result": "1"
+      },
+      {
+        "away": "Betis",
+        "home": "Barcelona",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Getafe",
+        "home": "Elche"
+      },
+      {
+        "away": "Mallorca",
+        "home": "Levante",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "home": "Rayo Vallecano",
+        "away": "Villarreal"
+      },
+      {
+        "away": "Valencia",
+        "home": "Real Sociedad",
+        "result": "2"
+      },
+      {
+        "result": "2",
+        "away": "Alavés",
+        "home": "Oviedo"
+      },
+      {
+        "home": "Osasuna",
+        "away": "RCD Espanyol",
+        "result": "2"
+      },
+      {
+        "home": "Ceuta",
+        "result": "2",
+        "away": "Málaga"
+      },
+      {
+        "home": "Racing",
+        "result": "1",
+        "away": "Valladolid"
+      },
+      {
+        "home": "Almería",
+        "result": "2",
+        "away": "Las Palmas"
+      },
+      {
+        "result": "X",
+        "home": "Castellón",
+        "away": "Cádiz"
+      },
+      {
+        "result": "X",
+        "home": "Leganés",
+        "away": "Huesca"
+      },
+      {
+        "result": "0-1",
+        "away": "Real Madrid",
+        "home": "Sevilla"
+      }
+    ]
+  },
+  {
+    "_id": "1779109786290",
+    "_createTime": "2026-05-18T13:09:46.290734Z",
+    "_updateTime": "2026-08-20T14:12:50.668858Z",
+    "number": 64,
+    "date": "24-05-2026",
+    "prizes": {
+      "10": 11.73,
+      "11": 65.46,
+      "12": 709.03,
+      "13": 10293.12
+    },
+    "season": "2025-2026",
+    "active": true,
+    "matches": [
+      {
+        "home": "Alavés",
+        "away": "Rayo Vallecano",
+        "result": "2"
+      },
+      {
+        "home": "Betis",
+        "away": "Levante",
+        "result": "1"
+      },
+      {
+        "home": "Celta",
+        "away": "Sevilla",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "away": "Real Sociedad",
+        "home": "RCD Espanyol"
+      },
+      {
+        "away": "Osasuna",
+        "home": "Getafe",
+        "result": "1"
+      },
+      {
+        "home": "Mallorca",
+        "away": "Oviedo",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Atlético",
+        "home": "Villarreal"
+      },
+      {
+        "home": "Valencia",
+        "away": "Barcelona",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "home": "Girona",
+        "away": "Elche"
+      },
+      {
+        "result": "X",
+        "home": "Málaga",
+        "away": "Racing"
+      },
+      {
+        "home": "Andorra",
+        "away": "Ceuta",
+        "result": "2"
+      },
+      {
+        "home": "Huesca",
+        "away": "Castellón",
+        "result": "2"
+      },
+      {
+        "away": "Córdoba",
+        "result": "1",
+        "home": "Eibar"
+      },
+      {
+        "away": "Almería",
+        "home": "Sporting",
+        "result": "1"
+      },
+      {
+        "home": "Real Madrid",
+        "away": "Athletic Club",
+        "result": "M-2"
+      }
+    ],
+    "id": 1779109786290,
+    "habemusSent": true
+  },
+  {
+    "_id": "1785869755970",
+    "_createTime": "2026-08-04T18:56:59.395640Z",
+    "_updateTime": "2026-08-25T16:36:54.297237Z",
+    "number": 1,
+    "noSellado": false,
+    "season": "2026-2027",
+    "prizes": {
+      "10": 11.26,
+      "11": 54.78,
+      "12": 446.23,
+      "13": 8537.95,
+      "14": 273214.44
+    },
+    "active": true,
+    "matches": [
+      {
+        "result": "1",
+        "home": "Alavés",
+        "away": "Getafe"
+      },
+      {
+        "home": "Sevilla",
+        "result": "1",
+        "away": "Rayo Vallecano"
+      },
+      {
+        "home": "Racing",
+        "away": "Villarreal",
+        "result": "X"
+      },
+      {
+        "away": "Levante",
+        "result": "1",
+        "home": "Espanyol"
+      },
+      {
+        "home": "Celta",
+        "result": "X",
+        "away": "Osasuna"
+      },
+      {
+        "away": "Ceuta",
+        "home": "Andorra",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "away": "Celta B",
+        "home": "Cádiz Cf"
+      },
+      {
+        "away": "Granada Cf",
+        "result": "X",
+        "home": "Oviedo"
+      },
+      {
+        "result": "1",
+        "away": "Valladolid",
+        "home": "Mallorca"
+      },
+      {
+        "home": "Eibar",
+        "away": "Tenerife",
+        "result": "2"
+      },
+      {
+        "result": "1",
+        "home": "Burgos",
+        "away": "Córdoba Cf"
+      },
+      {
+        "result": "X",
+        "home": "Girona Fc",
+        "away": "Leganes"
+      },
+      {
+        "home": "Las Palmas",
+        "away": "Albacete Balompié",
+        "result": "1"
+      },
+      {
+        "away": "Sabadell",
+        "result": "X",
+        "home": "Sporting De Gijón"
+      },
+      {
+        "away": "Elche",
+        "result": "1-1",
+        "home": "Deportivo De La Coruña"
+      }
+    ],
+    "id": 1785869755970,
+    "date": "16-08-2026",
+    "sustitutoSellado": null
+  },
+  {
+    "_id": "1786879897736",
+    "_createTime": "2026-08-16T11:36:27.047156Z",
+    "_updateTime": "2026-09-20T06:47:34.106756Z",
+    "matches": [
+      {
+        "home": "Athletic Club",
+        "away": "Sevilla",
+        "result": "2"
+      },
+      {
+        "away": "Celta",
+        "result": "X",
+        "home": "Valencia"
+      },
+      {
+        "away": "Real Madrid",
+        "home": "Espanyol",
+        "result": "2"
+      },
+      {
+        "home": "Getafe",
+        "away": "Racing",
+        "result": "1"
+      },
+      {
+        "home": "Elche",
+        "result": "2",
+        "away": "Barcelona"
+      },
+      {
+        "away": "Levante",
+        "result": "X",
+        "home": "Osasuna"
+      },
+      {
+        "away": "Deportivo De La Coruña",
+        "home": "Mala",
+        "result": "X"
+      },
+      {
+        "away": "Leganes",
+        "home": "Oviedo",
+        "result": "2"
+      },
+      {
+        "home": "Ceuta",
+        "result": "2",
+        "away": "Las Palmas"
+      },
+      {
+        "result": "X",
+        "away": "Cádiz Cf",
+        "home": "Eldense"
+      },
+      {
+        "away": "Valladolid",
+        "home": "Eibar",
+        "result": "1"
+      },
+      {
+        "away": "Sabadell",
+        "result": "X",
+        "home": "Castellón"
+      },
+      {
+        "result": "1",
+        "away": "Burgos",
+        "home": "Sporting De Gijón"
+      },
+      {
+        "result": "1",
+        "home": "Tenerife",
+        "away": "Almería"
+      },
+      {
+        "home": "Atlético De Madrid",
+        "away": "Villarreal",
+        "result": "2-2"
+      }
+    ],
+    "number": 2,
+    "active": true,
+    "prizes": {
+      "10": 3,
+      "11": 28.84
+    },
+    "season": "2026-2027",
+    "id": 1786879897736,
+    "date": "23/08/2026"
+  },
+  {
+    "_id": "1787065938995",
+    "_createTime": "2026-08-18T15:15:41.342193Z",
+    "_updateTime": "2026-09-24T15:27:19.879437Z",
+    "matches": [
+      {
+        "home": "Levante",
+        "away": "Betis",
+        "result": "1"
+      },
+      {
+        "away": "Espanyol",
+        "home": "Real Sociedad",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "away": "Atlético De Madrid",
+        "home": "Sevilla"
+      },
+      {
+        "home": "Real Madrid",
+        "result": "1",
+        "away": "Málaga"
+      },
+      {
+        "away": "Valencia",
+        "home": "Deportivo De La Coruña",
+        "result": "1"
+      },
+      {
+        "away": "Athletic Club",
+        "home": "Celta",
+        "result": "2"
+      },
+      {
+        "home": "Osasuna",
+        "away": "Getafe",
+        "result": "1"
+      },
+      {
+        "home": "Albacete Balompié",
+        "away": "Oviedo",
+        "result": "2"
+      },
+      {
+        "home": "Cádiz Cf",
+        "result": "X",
+        "away": "Valladolid"
+      },
+      {
+        "away": "Granada Cf",
+        "result": "2",
+        "home": "Córdoba Cf"
+      },
+      {
+        "result": "1",
+        "away": "Badalona (f)",
+        "home": "Athletic Club (f)"
+      },
+      {
+        "away": "Espanyol (F)",
+        "result": "1",
+        "home": "Eibar (f)"
+      },
+      {
+        "away": "Valencia (f)",
+        "home": "Alavés (f)",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Atlético De Madrid (F)",
+        "home": "Real Madrid (F)"
+      },
+      {
+        "away": "Rayo Vallecano",
+        "result": "M-2",
+        "home": "Barcelona"
+      }
+    ],
+    "number": 3,
+    "id": 1787065938995,
+    "date": "30/08/2026",
+    "prizes": {
+      "10": 2.32,
+      "11": 8.2,
+      "12": 53.87,
+      "13": 572.09,
+      "14": 41373.66
+    },
+    "active": true,
+    "season": "2026-2027"
+  },
+  {
+    "_id": "1787906956305",
+    "_createTime": "2026-08-28T08:51:31.450763Z",
+    "_updateTime": "2026-09-10T16:26:49.434622Z",
+    "prizes": {
+      "10": 3.4,
+      "11": 16.94,
+      "12": 173.25,
+      "13": 3981.76,
+      "14": 242091,
+      "15": 1126075.47
+    },
+    "active": true,
+    "season": "2026-2027",
+    "date": "06/09/2026",
+    "matches": [
+      {
+        "result": "1",
+        "away": "Atlético De Madrid",
+        "home": "Athletic Club"
+      },
+      {
+        "home": "Rayo Vallecano",
+        "result": "1",
+        "away": "Racing Santander"
+      },
+      {
+        "home": "Villarreal",
+        "away": "Deportivo De La Coruña",
+        "result": "2"
+      },
+      {
+        "away": "Barcelona",
+        "home": "Valencia",
+        "result": "2"
+      },
+      {
+        "result": "1",
+        "home": "Alavés",
+        "away": "Osasuna"
+      },
+      {
+        "away": "Levante",
+        "home": "Málaga",
+        "result": "X"
+      },
+      {
+        "home": "Espanyol",
+        "away": "Sevilla",
+        "result": "X"
+      },
+      {
+        "result": "X",
+        "away": "Tenerife",
+        "home": "Real Sociedad B."
+      },
+      {
+        "away": "Girona Fc",
+        "result": "2",
+        "home": "Sporting De Gijón"
+      },
+      {
+        "away": "Cádiz Cf",
+        "home": "Almería",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "away": "Barcelona (F)",
+        "home": "Sevilla (f)"
+      },
+      {
+        "away": "Athletic (F)",
+        "result": "2",
+        "home": "Logroño (f)"
+      },
+      {
+        "result": "1",
+        "home": "Atlético De Madrid (f)",
+        "away": "Alavés (f)"
+      },
+      {
+        "home": "Real Madrid (f)",
+        "away": "Eibar (f)",
+        "result": "X"
+      },
+      {
+        "away": "Celta",
+        "home": "Getafe",
+        "result": "1-1"
+      }
+    ],
+    "id": 1787906956305,
+    "number": 4
+  },
+  {
+    "_id": "1788451078976",
+    "_createTime": "2026-09-03T15:59:33.675185Z",
+    "_updateTime": "2026-09-14T20:59:56.127013Z",
+    "date": "13/09/2026",
+    "season": "2026-2027",
+    "active": true,
+    "prizes": {},
+    "id": 1788451078976,
+    "number": 6,
+    "matches": [
+      {
+        "away": "Elche",
+        "result": "X",
+        "home": "Athletic Club"
+      },
+      {
+        "away": "Barcelona",
+        "home": "Levante",
+        "result": "2"
+      },
+      {
+        "away": "Espanyol",
+        "result": "2",
+        "home": "Osasuna"
+      },
+      {
+        "home": "Racing",
+        "away": "Alavés",
+        "result": "1"
+      },
+      {
+        "home": "Real Madrid",
+        "away": "Rayo Vallecano",
+        "result": "1"
+      },
+      {
+        "home": "Sevilla",
+        "result": "1",
+        "away": "Valencia"
+      },
+      {
+        "home": "Villarreal",
+        "away": "Betis",
+        "result": "2"
+      },
+      {
+        "away": "Las Palmas",
+        "result": "2",
+        "home": "Cádiz Cf"
+      },
+      {
+        "away": "Leganés",
+        "home": "Tenerife",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "home": "Valladolid",
+        "away": "Oviedo"
+      },
+      {
+        "result": "1",
+        "away": "Granada (F)",
+        "home": "Alavés (F)"
+      },
+      {
+        "home": "Logroño (f)",
+        "result": "1",
+        "away": "Valencia (F)"
+      },
+      {
+        "away": "Badalona (F)",
+        "home": "Eibar (F)",
+        "result": "2"
+      },
+      {
+        "home": "Madrid CFF (F)",
+        "away": "Sevilla (F)",
+        "result": "1"
+      },
+      {
+        "away": "Atlético de Madrid",
+        "home": "Real Sociedad",
+        "result": "0-M"
+      }
+    ]
+  },
+  {
+    "_id": "1789054862274",
+    "_createTime": "2026-09-10T15:41:24.343040Z",
+    "_updateTime": "2026-09-20T21:21:10.008375Z",
+    "matches": [
+      {
+        "away": "Rayo Vallecano",
+        "result": "X",
+        "home": "Osasuna",
+        "score": ""
+      },
+      {
+        "away": "Alavés",
+        "score": "",
+        "home": "Athletic Club",
+        "result": "X"
+      },
+      {
+        "away": "Barcelona",
+        "score": "",
+        "home": "Sevilla",
+        "result": "2"
+      },
+      {
+        "home": "Getafe",
+        "away": "Málaga",
+        "result": "1",
+        "score": ""
+      },
+      {
+        "away": "Betis",
+        "score": "",
+        "result": "X",
+        "home": "Deportivo De La Coruña"
+      },
+      {
+        "result": "1",
+        "away": "Levante",
+        "home": "Villarreal",
+        "score": ""
+      },
+      {
+        "result": "2",
+        "score": "",
+        "home": "Valencia",
+        "away": "Real Sociedad"
+      },
+      {
+        "result": "2",
+        "score": "",
+        "home": "Andorra",
+        "away": "Sporting De Gijón"
+      },
+      {
+        "result": "1",
+        "home": "Castellón",
+        "score": "",
+        "away": "Tenerife"
+      },
+      {
+        "result": "1",
+        "home": "Leganés",
+        "score": "",
+        "away": "Granada"
+      },
+      {
+        "result": "1",
+        "away": "Logroño (f)",
+        "home": "Atlético De Madrid (f)",
+        "score": ""
+      },
+      {
+        "result": "1",
+        "away": "Athletic Club (F)",
+        "home": "Eibar (f)",
+        "score": ""
+      },
+      {
+        "score": "",
+        "result": "1",
+        "away": "Valencia (f)",
+        "home": "Real Madrid (f)"
+      },
+      {
+        "result": "2",
+        "home": "Tenerife (F)",
+        "away": "Sevilla (f)",
+        "score": ""
+      },
+      {
+        "home": "Atlético de Madrid",
+        "score": "2-1",
+        "away": "Real Madrid",
+        "result": "2-1"
+      }
+    ],
+    "number": 8,
+    "id": 1789054862274,
+    "season": "2026-2027",
+    "prizes": {
+      "10": 0,
+      "11": 4.92,
+      "12": 32.39,
+      "13": 392.32,
+      "14": 27505.25,
+      "15": 3442752.89
+    },
+    "active": true,
+    "date": "20/09/2026"
+  },
+  {
+    "_id": "19",
+    "_createTime": "2025-12-16T16:56:50.602455Z",
+    "_updateTime": "2026-02-17T17:18:53.010535Z",
+    "date": "09-11-2025",
+    "number": 19,
+    "season": "2025-2026",
+    "prizes": {
+      "11": 3.54,
+      "12": 17.1,
+      "13": 136.36,
+      "14": 5616.43
+    },
+    "active": true,
+    "matches": [
+      {
+        "home": "Girona",
+        "away": "Alavés",
+        "result": "1"
+      },
+      {
+        "home": "Sevilla",
+        "away": "Osasuna",
+        "result": "1"
+      },
+      {
+        "away": "Levante",
+        "home": "At. Madrid",
+        "result": "1"
+      },
+      {
+        "home": "Espanyol",
+        "result": "2",
+        "away": "Villarreal"
+      },
+      {
+        "home": "Athletic Club",
+        "result": "1",
+        "away": "Oviedo"
+      },
+      {
+        "result": "X",
+        "away": "Betis",
+        "home": "Valencia"
+      },
+      {
+        "away": "Getafe",
+        "result": "1",
+        "home": "Mallorca"
+      },
+      {
+        "home": "Celta",
+        "result": "2",
+        "away": "Barcelona"
+      },
+      {
+        "home": "Huesca",
+        "away": "Andorra",
+        "result": "X"
+      },
+      {
+        "away": "Córdoba",
+        "home": "Málaga",
+        "result": "X"
+      },
+      {
+        "result": "1",
+        "away": "Racing",
+        "home": "Las Palmas"
+      },
+      {
+        "result": "X",
+        "away": "Almería",
+        "home": "Ceuta"
+      },
+      {
+        "away": "Zaragoza",
+        "result": "1",
+        "home": "Granada"
+      },
+      {
+        "away": "Valladolid",
+        "result": "X",
+        "home": "Cádiz"
+      },
+      {
+        "home": "Rayo V",
+        "away": "Real Madrid",
+        "result": "0-0"
+      }
+    ],
+    "id": 19
+  },
+  {
+    "_id": "2",
+    "_createTime": "2025-12-16T16:56:50.041486Z",
+    "_updateTime": "2026-02-09T20:55:43.279783Z",
+    "season": "2025-2026",
+    "prizes": {
+      "10": 3,
+      "11": 28.84
+    },
+    "active": true,
+    "id": 2,
+    "date": "24 de agosto de 2025",
+    "number": 2,
+    "matches": [
+      {
+        "away": "Celta",
+        "home": "Mallorca",
+        "result": "X"
+      },
+      {
+        "result": "X",
+        "home": "At. Madrid",
+        "away": "Elche"
+      },
+      {
+        "result": "2",
+        "away": "Barcelona",
+        "home": "Levante"
+      },
+      {
+        "home": "Osasuna",
+        "result": "1",
+        "away": "Valencia"
+      },
+      {
+        "result": "X",
+        "home": "Real Sociedad",
+        "away": "Espanyol"
+      },
+      {
+        "result": "1",
+        "away": "Girona",
+        "home": "Villarreal"
+      },
+      {
+        "result": "2",
+        "away": "Real Madrid",
+        "home": "R. Oviedo"
+      },
+      {
+        "result": "1",
+        "away": "Rayo Vallecano",
+        "home": "Athletic Club"
+      },
+      {
+        "away": "Huesca",
+        "result": "2",
+        "home": "Mirandés"
+      },
+      {
+        "away": "Sporting",
+        "result": "2",
+        "home": "Ceuta"
+      },
+      {
+        "away": "Andorra",
+        "home": "R. Zaragoza",
+        "result": "2"
+      },
+      {
+        "home": "Deportivo",
+        "away": "Burgos",
+        "result": "X"
+      },
+      {
+        "home": "Cultural Leonesa",
+        "away": "Almería",
+        "result": "2"
+      },
+      {
+        "result": "2",
+        "away": "Racing Santander",
+        "home": "Albacete"
+      },
+      {
+        "result": "1-2",
+        "home": "Sevilla",
+        "away": "Getafe"
+      }
+    ]
+  },
+  {
+    "_id": "22",
+    "_createTime": "2025-12-16T15:55:24.572282Z",
+    "_updateTime": "2026-02-17T17:18:53.561647Z",
+    "number": 22,
+    "id": 22,
+    "date": "23-11-2025",
+    "matches": [
+      {
+        "away": "Celta",
+        "home": "Alavés",
+        "result": "2"
+      },
+      {
+        "away": "Athletic Club",
+        "home": "Barcelona",
+        "result": "1"
+      },
+      {
+        "home": "Osasuna",
+        "result": "2",
+        "away": "Real Sociedad"
+      },
+      {
+        "result": "1",
+        "away": "Mallorca",
+        "home": "Villarreal"
+      },
+      {
+        "away": "Rayo V",
+        "home": "Oviedo",
+        "result": "X"
+      },
+      {
+        "away": "Girona",
+        "home": "Betis",
+        "result": "X"
+      },
+      {
+        "away": "At. Madrid",
+        "home": "Getafe",
+        "result": "2"
+      },
+      {
+        "home": "Elche",
+        "result": "X",
+        "away": "Real Madrid"
+      },
+      {
+        "away": "Almería",
+        "home": "Leganés",
+        "result": "2"
+      },
+      {
+        "result": "X",
+        "home": "Granada",
+        "away": "Córdoba"
+      },
+      {
+        "home": "Deportivo",
+        "away": "Ceuta",
+        "result": "1"
+      },
+      {
+        "home": "Huesca",
+        "result": "1",
+        "away": "Sporting"
+      },
+      {
+        "result": "2",
+        "away": "Racing",
+        "home": "Burgos"
+      },
+      {
+        "away": "Mirandés",
+        "home": "Málaga",
+        "result": "1"
+      },
+      {
+        "home": "Espanyol",
+        "away": "Sevilla",
+        "result": "2-1"
+      }
+    ],
+    "prizes": {
+      "10": 3.96,
+      "11": 19.11,
+      "12": 191.01,
+      "13": 3071.97,
+      "14": 158923.07
+    },
+    "season": "2025-2026",
+    "active": true
+  },
+  {
+    "_id": "24",
+    "_createTime": "2025-12-14T21:26:37.428418Z",
+    "_updateTime": "2026-02-17T17:18:53.637827Z",
+    "id": 24,
+    "number": 24,
+    "date": "30-11-2025",
+    "matches": [
+      {
+        "result": "X",
+        "away": "Osasuna",
+        "home": "Mallorca"
+      },
+      {
+        "away": "Alavés",
+        "home": "Barcelona",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "away": "Athletic Club",
+        "home": "Levante"
+      },
+      {
+        "away": "Oviedo",
+        "result": "1",
+        "home": "At. Madrid"
+      },
+      {
+        "result": "2",
+        "home": "Real Sociedad",
+        "away": "Villarreal"
+      },
+      {
+        "away": "Betis",
+        "home": "Sevilla",
+        "result": "2"
+      },
+      {
+        "home": "Celta",
+        "result": "2",
+        "away": "Espanyol"
+      },
+      {
+        "home": "Girona",
+        "result": "X",
+        "away": "Real Madrid"
+      },
+      {
+        "home": "Ceuta",
+        "result": "1",
+        "away": "Burgos"
+      },
+      {
+        "home": "Albacete",
+        "away": "Deportivo",
+        "result": "2"
+      },
+      {
+        "result": "X",
+        "away": "Málaga",
+        "home": "Valladolid"
+      },
+      {
+        "home": "Zaragoza",
+        "away": "Leganes",
+        "result": "1"
+      },
+      {
+        "home": "Córdoba",
+        "away": "Cádiz",
+        "result": "2"
+      },
+      {
+        "home": "Castellón",
+        "result": "1",
+        "away": "Las Palmas"
+      },
+      {
+        "away": "Valencia",
+        "home": "Rayo V",
+        "result": "1-1"
+      }
+    ],
+    "prizes": {
+      "10": 8.1,
+      "11": 38.31,
+      "12": 341.96,
+      "13": 6220.95,
+      "14": 690111.12
+    },
+    "active": true,
+    "season": "2025-2026"
+  },
+  {
+    "_id": "26",
+    "_createTime": "2025-12-14T21:26:37.501496Z",
+    "_updateTime": "2026-02-17T17:18:53.699351Z",
+    "matches": [
+      {
+        "away": "Getafe",
+        "home": "Villarreal",
+        "result": "1"
+      },
+      {
+        "home": "Alavés",
+        "away": "Real Sociedad",
+        "result": "1"
+      },
+      {
+        "result": "2",
+        "home": "Betis",
+        "away": "Barcelona"
+      },
+      {
+        "result": "1",
+        "home": "Elche",
+        "away": "Girona"
+      },
+      {
+        "result": "X",
+        "away": "Sevilla",
+        "home": "Valencia"
+      },
+      {
+        "home": "Espanyol",
+        "result": "1",
+        "away": "Rayo V"
+      },
+      {
+        "result": "2",
+        "away": "Celta",
+        "home": "Real Madrid"
+      },
+      {
+        "result": "1",
+        "home": "Osasuna",
+        "away": "Levante"
+      },
+      {
+        "result": "2",
+        "away": "Almería",
+        "home": "Andorra"
+      },
+      {
+        "home": "Huesca",
+        "result": "2",
+        "away": "Valladolid"
+      },
+      {
+        "away": "Racing",
+        "result": "2",
+        "home": "Cádiz"
+      },
+      {
+        "home": "Leganés",
+        "result": "X",
+        "away": "Córdoba"
+      },
+      {
+        "result": "2",
+        "away": "Castellón",
+        "home": "Deportivo"
+      },
+      {
+        "away": "Ceuta",
+        "home": "Granada",
+        "result": "X"
+      },
+      {
+        "away": "At. Madrid",
+        "result": "1-0",
+        "home": "Athletic Club"
+      }
+    ],
+    "active": true,
+    "season": "2025-2026",
+    "prizes": {
+      "10": 6.3
+    },
+    "date": "07-12-2025",
+    "number": 26,
+    "id": 26
+  },
+  {
+    "_id": "3",
+    "_createTime": "2025-12-16T15:55:23.911330Z",
+    "_updateTime": "2026-02-09T20:55:43.360388Z",
+    "number": 3,
+    "matches": [
+      {
+        "result": "X",
+        "home": "Alavés",
+        "away": "At. Madrid"
+      },
+      {
+        "result": "1",
+        "away": "Real Sociedad",
+        "home": "R. Oviedo"
+      },
+      {
+        "result": "2",
+        "home": "Girona",
+        "away": "Sevilla"
+      },
+      {
+        "home": "Real Madrid",
+        "result": "1",
+        "away": "Mallorca"
+      },
+      {
+        "result": "X",
+        "away": "Villarreal",
+        "home": "Celta"
+      },
+      {
+        "result": "2",
+        "home": "Betis",
+        "away": "Athletic Club"
+      },
+      {
+        "away": "Osasuna",
+        "home": "Espanyol",
+        "result": "1"
+      },
+      {
+        "away": "Ceuta",
+        "result": "1",
+        "home": "Racing Santander"
+      },
+      {
+        "result": "X",
+        "home": "Valladolid",
+        "away": "Córdoba"
+      },
+      {
+        "result": "X",
+        "away": "Zaragoza",
+        "home": "Castellón"
+      },
+      {
+        "away": "Burgos",
+        "home": "Andorra",
+        "result": "1"
+      },
+      {
+        "away": "Albacete",
+        "home": "Cádiz",
+        "result": "1"
+      },
+      {
+        "away": "Málaga",
+        "home": "Las Palmas",
+        "result": "2"
+      },
+      {
+        "result": "2",
+        "home": "Granada",
+        "away": "Mirandés"
+      },
+      {
+        "home": "Rayo Vallecano",
+        "away": "Barcelona",
+        "result": "1-1"
+      }
+    ],
+    "active": true,
+    "prizes": {
+      "11": 48.37
+    },
+    "season": "2025-2026",
+    "date": "31 de agosto de 2025",
+    "id": 3
+  },
+  {
+    "_id": "30",
+    "_createTime": "2025-12-16T15:55:25.068255Z",
+    "_updateTime": "2026-02-17T17:18:53.838787Z",
+    "number": 30,
+    "date": "21-12-2025",
+    "matches": [
+      {
+        "result": "X",
+        "away": "Celta",
+        "home": "Oviedo"
+      },
+      {
+        "away": "Real Sociedad",
+        "home": "Levante",
+        "result": "X"
+      },
+      {
+        "away": "Alavés",
+        "home": "Osasuna",
+        "result": "1"
+      },
+      {
+        "home": "Real Madrid",
+        "result": "1",
+        "away": "Sevilla"
+      },
+      {
+        "home": "Girona",
+        "result": "2",
+        "away": "At. Madrid"
+      },
+      {
+        "away": "Barcelona",
+        "result": "2",
+        "home": "Villarreal"
+      },
+      {
+        "result": "1",
+        "home": "Elche",
+        "away": "Rayo Vallecano"
+      },
+      {
+        "home": "Betis",
+        "result": "1",
+        "away": "Getafe"
+      },
+      {
+        "home": "Andorra",
+        "away": "Deportivo",
+        "result": "1"
+      },
+      {
+        "home": "Huesca",
+        "away": "Racing",
+        "result": "X"
+      },
+      {
+        "result": "1",
+        "home": "Málaga",
+        "away": "Almería"
+      },
+      {
+        "result": "X",
+        "away": "Zaragoza",
+        "home": "Burgos"
+      },
+      {
+        "away": "Albacete",
+        "home": "Granada",
+        "result": "X"
+      },
+      {
+        "away": "Castellón",
+        "home": "Cádiz",
+        "result": "1"
+      },
+      {
+        "home": "Athletic Club",
+        "away": "Espanyol",
+        "result": "1-2"
+      }
+    ],
+    "id": 30,
+    "season": "2025-2026",
+    "prizes": {
+      "10": 3.34,
+      "11": 12.24,
+      "12": 81.71,
+      "13": 878.06,
+      "14": 41561.55
+    },
+    "active": true
+  },
+  {
+    "_id": "33",
+    "_createTime": "2025-12-14T21:26:37.973558Z",
+    "_updateTime": "2026-02-17T17:18:53.085869Z",
+    "sustitutoSellado": null,
+    "noSellado": true,
+    "number": 33,
+    "matches": [
+      {
+        "result": "2",
+        "away": "Real Sociedad",
+        "home": "Getafe"
+      },
+      {
+        "home": "Girona",
+        "result": "1",
+        "away": "Osasuna"
+      },
+      {
+        "result": "1",
+        "away": "Alavés",
+        "home": "Villarreal"
+      },
+      {
+        "home": "Oviedo",
+        "result": "X",
+        "away": "Betis"
+      },
+      {
+        "home": "Sevilla",
+        "result": "2",
+        "away": "Celta"
+      },
+      {
+        "home": "Valencia",
+        "away": "Elche",
+        "result": "X"
+      },
+      {
+        "result": "X",
+        "home": "Levante",
+        "away": "Espanyol"
+      },
+      {
+        "home": "Cádiz",
+        "away": "Sporting",
+        "result": "1"
+      },
+      {
+        "away": "Valladolid",
+        "home": "Leganés",
+        "result": "1"
+      },
+      {
+        "away": "Castellón",
+        "result": "X",
+        "home": "Granada"
+      },
+      {
+        "away": "Ceuta",
+        "result": "1",
+        "home": "Málaga"
+      },
+      {
+        "away": "Córdoba",
+        "result": "2",
+        "home": "Huesca"
+      },
+      {
+        "result": "X",
+        "away": "Deportivo",
+        "home": "Las Palmas"
+      },
+      {
+        "result": "X",
+        "away": "Almería",
+        "home": "Mirandés"
+      },
+      {
+        "result": "2-1",
+        "away": "Mallorca",
+        "home": "Rayo V"
+      }
+    ],
+    "active": true,
+    "prizes": {
+      "10": 8.43,
+      "11": 35.93,
+      "12": 269.75,
+      "13": 3629.41,
+      "14": 227120.64
+    },
+    "season": "2025-2026",
+    "date": "11-01-2026",
+    "id": 33
+  },
+  {
+    "_id": "35",
+    "_createTime": "2025-12-14T21:26:38.121043Z",
+    "_updateTime": "2026-02-17T17:18:53.164505Z",
+    "date": "18-01-2026",
+    "number": 35,
+    "id": 35,
+    "matches": [
+      {
+        "home": "Betis",
+        "away": "Villarreal",
+        "result": "1"
+      },
+      {
+        "away": "Rayo V",
+        "home": "Celta",
+        "result": "1"
+      },
+      {
+        "home": "Elche",
+        "result": "X",
+        "away": "Sevilla"
+      },
+      {
+        "home": "Getafe",
+        "result": "2",
+        "away": "Valencia"
+      },
+      {
+        "away": "Oviedo",
+        "result": "1",
+        "home": "Osasuna"
+      },
+      {
+        "home": "At. Madrid",
+        "result": "1",
+        "away": "Alavés"
+      },
+      {
+        "home": "Mallorca",
+        "away": "Athletic Club",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Levante",
+        "home": "Real Madrid"
+      },
+      {
+        "result": "1",
+        "away": "Cádiz",
+        "home": "Albacete"
+      },
+      {
+        "away": "Huesca",
+        "home": "Burgos",
+        "result": "1"
+      },
+      {
+        "away": "Sporting",
+        "result": "2",
+        "home": "Cultural Leonesa"
+      },
+      {
+        "result": "2",
+        "away": "Deportivo",
+        "home": "Almería"
+      },
+      {
+        "away": "Eibar",
+        "home": "Granada",
+        "result": "X"
+      },
+      {
+        "away": "Las Palmas",
+        "home": "Racing",
+        "result": "1"
+      },
+      {
+        "result": "2-1",
+        "away": "Barcelona",
+        "home": "Real Sociedad"
+      }
+    ],
+    "prizes": {
+      "10": 2.65,
+      "11": 10,
+      "12": 70.94,
+      "13": 877.72,
+      "14": 37360.05
+    },
+    "active": true,
+    "season": "2025-2026"
+  },
+  {
+    "_id": "5",
+    "_createTime": "2025-12-16T15:55:23.996115Z",
+    "_updateTime": "2026-02-09T20:55:43.434828Z",
+    "matches": [
+      {
+        "away": "Oviedo",
+        "home": "Getafe",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "away": "Betis",
+        "home": "Levante"
+      },
+      {
+        "away": "Villarreal",
+        "result": "1",
+        "home": "At. Madrid"
+      },
+      {
+        "result": "1",
+        "away": "Valencia",
+        "home": "Barcelona"
+      },
+      {
+        "result": "2",
+        "home": "Athletic Club",
+        "away": "Alavés"
+      },
+      {
+        "away": "Real Madrid",
+        "result": "2",
+        "home": "Real Sociedad"
+      },
+      {
+        "home": "Celta",
+        "away": "Girona",
+        "result": "X"
+      },
+      {
+        "result": "1",
+        "home": "Osasuna",
+        "away": "Rayo Vallecano"
+      },
+      {
+        "away": "Eibar",
+        "result": "1",
+        "home": "Cádiz"
+      },
+      {
+        "result": "2",
+        "home": "Mirandés",
+        "away": "Deportivo"
+      },
+      {
+        "home": "Huesca",
+        "away": "Málaga",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "home": "Valladolid",
+        "away": "Almería"
+      },
+      {
+        "result": "2",
+        "away": "Burgos",
+        "home": "Sporting"
+      },
+      {
+        "result": "2",
+        "away": "Leganés",
+        "home": "Granada"
+      },
+      {
+        "away": "Valencia",
+        "result": "M-2",
+        "home": "Espanyol"
+      }
+    ],
+    "active": true,
+    "season": "2025-2026",
+    "prizes": {
+      "10": 13.08
+    },
+    "date": "14 de septiembre de 2025",
+    "id": 5,
+    "number": 5
+  },
+  {
+    "_id": "7",
+    "_createTime": "2025-12-14T21:26:36.883198Z",
+    "_updateTime": "2026-02-11T16:24:12.695027Z",
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 1,
+      "11": 1.83,
+      "12": 16.16,
+      "13": 920.09
+    },
+    "matches": [
+      {
+        "away": "Sevilla",
+        "home": "Alavés",
+        "result": "2"
+      },
+      {
+        "home": "Barcelona",
+        "away": "Getafe",
+        "result": "1"
+      },
+      {
+        "home": "Betis",
+        "result": "1",
+        "away": "Real Sociedad"
+      },
+      {
+        "away": "R. Oviedo",
+        "home": "Elche",
+        "result": "1"
+      },
+      {
+        "away": "Levante",
+        "home": "Girona",
+        "result": "2"
+      },
+      {
+        "home": "Mallorca",
+        "away": "At. Madrid",
+        "result": "X"
+      },
+      {
+        "home": "Rayo Vallecano",
+        "result": "X",
+        "away": "Celta"
+      },
+      {
+        "result": "1",
+        "away": "Espanyol",
+        "home": "Real Madrid"
+      },
+      {
+        "away": "Osasuna",
+        "result": "1",
+        "home": "Villarreal"
+      },
+      {
+        "home": "Albacete",
+        "away": "Valladolid",
+        "result": "1"
+      },
+      {
+        "result": "X",
+        "away": "Racing",
+        "home": "Córdoba"
+      },
+      {
+        "home": "Deportivo",
+        "away": "Huesca",
+        "result": "1"
+      },
+      {
+        "away": "Sporting",
+        "result": "1",
+        "home": "Almería"
+      },
+      {
+        "home": "Málaga",
+        "away": "Cádiz",
+        "result": "2"
+      },
+      {
+        "result": "2-0",
+        "away": "Athletic Club",
+        "home": "Valencia"
+      }
+    ],
+    "number": 7,
+    "date": "21 de septiembre de 2025",
+    "id": 7
+  },
+  {
+    "_id": "9",
+    "_createTime": "2025-12-14T21:26:36.957533Z",
+    "_updateTime": "2026-02-09T18:37:57.708801Z",
+    "id": 9,
+    "season": "2025-2026",
+    "active": true,
+    "prizes": {
+      "10": 10.49,
+      "11": 53.87,
+      "12": 461.23,
+      "13": 6658.31,
+      "14": 553971.48,
+      "15": 0
+    },
+    "date": "28 de septiembre de 2025",
+    "number": 9,
+    "matches": [
+      {
+        "home": "Getafe",
+        "result": "X",
+        "away": "Levante"
+      },
+      {
+        "away": "Alavés",
+        "home": "Mallorca",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Athletic Club",
+        "home": "Villarreal"
+      },
+      {
+        "away": "Sevilla",
+        "home": "Rayo Vallecano",
+        "result": "2"
+      },
+      {
+        "result": "1",
+        "away": "Celta",
+        "home": "Elche"
+      },
+      {
+        "home": "Betis",
+        "away": "Osasuna",
+        "result": "1"
+      },
+      {
+        "result": "1",
+        "away": "Real Sociedad",
+        "home": "Barcelona"
+      },
+      {
+        "away": "R. Oviedo",
+        "result": "1",
+        "home": "Valencia"
+      },
+      {
+        "away": "Deportivo",
+        "home": "Eibar",
+        "result": "X"
+      },
+      {
+        "result": "2",
+        "home": "Racing Santander",
+        "away": "Andorra"
+      },
+      {
+        "away": "Almería",
+        "home": "Las Palmas",
+        "result": "2"
+      },
+      {
+        "home": "Burgos",
+        "result": "1",
+        "away": "Málaga"
+      },
+      {
+        "result": "X",
+        "home": "Cádiz",
+        "away": "Ceuta"
+      },
+      {
+        "away": "Albacete",
+        "result": "2",
+        "home": "Sporting"
+      },
+      {
+        "home": "At. Madrid",
+        "away": "Real Madrid",
+        "result": "M-2"
+      }
+    ]
+  }
+]

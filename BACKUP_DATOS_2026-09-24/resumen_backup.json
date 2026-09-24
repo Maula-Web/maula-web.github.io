@@ -1,0 +1,67 @@
+{
+  "projectId": "maulasweb",
+  "backupDate": "2026-09-24T15:32:40.271Z",
+  "backupDir": "D:\\PROYECTO_MAULAS\\BACKUP_DATOS_2026-09-24",
+  "collections": {
+    "members": {
+      "count": 19,
+      "file": "members.json"
+    },
+    "jornadas": {
+      "count": 41,
+      "file": "jornadas.json"
+    },
+    "pronosticos": {
+      "count": 1050,
+      "file": "pronosticos.json"
+    },
+    "bote": {
+      "count": 0
+    },
+    "ingresos": {
+      "count": 23,
+      "file": "ingresos.json"
+    },
+    "cierres_vuelta": {
+      "count": 0
+    },
+    "repartos": {
+      "count": 0
+    },
+    "votaciones": {
+      "count": 2,
+      "file": "votaciones.json"
+    },
+    "logs": {
+      "count": 1262,
+      "file": "logs.json"
+    },
+    "config": {
+      "count": 12,
+      "file": "config.json"
+    },
+    "documents": {
+      "count": 0
+    },
+    "docs": {
+      "count": 2,
+      "file": "docs.json"
+    },
+    "maulas_members": {
+      "count": 0
+    },
+    "maulas_jornadas": {
+      "count": 0
+    },
+    "maulas_pronosticos": {
+      "count": 0
+    },
+    "maulas_logs": {
+      "count": 0
+    },
+    "maulas_docs": {
+      "count": 0
+    }
+  },
+  "totalDocuments": 2411
+}

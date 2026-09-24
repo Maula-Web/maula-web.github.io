@@ -389,9 +389,9 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 - En cuanto la conexión a Internet se restablece, las operaciones pendientes se sincronizan de forma transparente con la nube.
 
 ### 13.5. Copias de Seguridad del Proyecto
-- **Script de Respaldo de Firestore**: `scripts/backup_firestore.js`, que descarga todas las colecciones activas mediante la API REST de Firestore a archivos JSON individuales dentro de `BACKUP_DATOS_YYYY-MM-DD/`.
-- **Copia Comprimida de Seguridad**: Archivo ZIP íntegro en `D:\PROYECTO_MAULAS_BACKUP_YYYY-MM-DD.zip` conteniendo todo el código fuente, base de datos exportada, recursos multimedia e historial.
-- **Control de Versiones Local**: Tag de Git `v1.0-pre-pwa` y rama de seguridad `backup-pre-pwa` antes de aplicar cambios arquitecturales.
+- **Script de Respaldo de Firestore**: `scripts/backup_firestore.js`, que descarga todas las colecciones activas mediante la API REST de Firestore a archivos JSON individuales dentro de `BACKUP_DATOS_YYYY-MM-DD/`. (Último respaldo completo generado: `BACKUP_DATOS_2026-09-24/` con 2.411 documentos respaldados de todas las colecciones activas).
+- **Copia Comprimida de Seguridad**: Archivo ZIP íntegro en `D:\PROYECTO_MAULAS_BACKUP_2026-09-24.zip` y archivo local actualizado en `D:\PROYECTO_MAULAS\proyecto maula web.zip`, conteniendo todo el código fuente optimizado, base de datos exportada, recursos multimedia e historial.
+- **Control de Versiones Local**: Tags de Git `v1.0-pre-pwa` y `v1.1-pwa-optimized` (versión consolidada con Service Worker v1.1 y optimizaciones de cálculo y carga).
 
 ### 13.6. Automatización Externa con GitHub Actions y Sincronización
 - **Actualización Desatendida de Datos Externos**: Las fuentes externas (`datos_auxiliares/rss_cache.xml` y `datos_auxiliares/external_data_metadata.json`) se sincronizan de manera autónoma mediante un workflow de GitHub Actions que realiza commits directos con el prefijo `Auto-update: Datos externos (RSS/PDF) [skip ci]`.
