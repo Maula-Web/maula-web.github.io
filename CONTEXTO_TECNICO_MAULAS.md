@@ -433,23 +433,31 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 ## 15. Notificación Automática «Habemus Quinielam» en Telegram (v1.3)
 
 ### 15.1. Diagnóstico y Causa Raíz
-- **Fallo Histórico**: La notificación automática nunca se disparaba cuando los socios completaban sus pronósticos en la web de producción, a pesar de que el botón de prueba en Administración (`admin.html`) sí funcionaba correctamente.
-- **Causa**: `pronosticos.html` carecía por completo de la inclusión del script `js/telegram-service.js` en su estructura HTML. En `js/pronosticos.js`, la condición `if (window.TelegramService)` siempre evaluaba a `false` en tiempo de ejecución. Por el contrario, en `admin.html` el script sí estaba cargado, por lo que el botón de test manual (`testHabemus()`) funcionaba.
+- **Fallo Histórico**: La notificación automática nunca se disparaba cuando los socios completaban sus pronósticos en la web de producción, a pesar de que el botón de prueba en Administración (`admin.html`) sí funcionaba.
+- **Causa 1 (Script ausente)**: `pronosticos.html` carecía por completo de la inclusión del script `js/telegram-service.js` en su estructura HTML. En `js/pronosticos.js`, la condición `if (window.TelegramService)` siempre evaluaba a `false` en tiempo de ejecución.
+- **Causa 2 (Interferencia de temporadas / Jornada 64)**: En Firestore coexisten jornadas de temporadas pasadas (ej. Temporada 2025-2026 finalizó en la Jornada 64). Tanto en `admin.html` como en los fallbacks de `TelegramService`, al buscar la "última jornada activa" mediante `sort((a,b) => b.number - a.number)[0]`, el sistema seleccionaba la **Jornada 64** de la temporada anterior en lugar de la jornada en curso de la temporada actual (`2026-2027`), debido a que 64 > 11/8. Como la Jornada 64 ya tenía `habemusSent = true`, el envío se abortaba de inmediato.
+- **Causa 3 (Bloqueo en Modo Corrección)**: En `performFinalSave` de `js/pronosticos.js`, existía la condición `if (window.TelegramService && !isCorrection)`. Al rellenar o modificar pronósticos mediante el Modo Corrección (imprescindible cuando las jornadas ya han entrado en juego o han cerrado plazo), la función no se invocaba nunca.
+- **Causa 4 (Colisión de identificadores)**: Las quinielas de la temporada actual almacenan `jId` como identificador de marca temporal (`j.id`), mientras que en temporadas anteriores se usaba el número ordinal (`11`, `8`, etc.). Al comparar por número ordinal en lugar de `currentJ.id`, se producían colisiones con pronósticos históricos de 2025-2026.
 
 ### 15.2. Corrección e Integraciones Implementadas
 - **Carga de Script en `pronosticos.html`**: Se ha incluido `<script src="js/telegram-service.js"></script>` en el `<head>` de la página.
+- **Aislamiento Estricto por Temporada (`activeSeason`)**:
+  - Tanto `TelegramService.checkHabemusQuinielam` como `admin.html` filtran explícitamente las jornadas por la temporada activa (`(j.season || '2026-2027') === activeSeason`).
+  - La resolución de la jornada prioriza el ID exacto y el número ordinal dentro de la temporada activa. Si no se especifica jornada, selecciona la jornada activa más reciente de la temporada actual (ej. J11 o J8), haciendo físicamente imposible que seleccione la Jornada 64 de la temporada anterior.
+- **Selector y Estado en Vivo en el Panel de Administración (`admin.html`)**:
+  - La tarjeta de **Habemus Quinielam** incluye ahora un desplegable interactivo (`#habemus-jornada-select`) que muestra todas las jornadas de la temporada en curso con su fecha y estado de envío.
+  - Indicador dinámico (`#habemus-jornada-status`) que detalla en tiempo real cuántos socios han completado su pronóstico (ej. `19/19 (Completo)` o `0/19`) y si el aviso de Telegram figura como `✅ Enviado` o `⏳ No enviado`.
+  - Los botones **📤 Probar Envío** y **🔄 Reset** operan directamente sobre la jornada seleccionada en el desplegable, impidiendo cualquier operación sobre jornadas de temporadas previas.
+- **Habilitación en Modo Corrección**:
+  - En `performFinalSave` de [pronosticos.js](file:///d:/PROYECTO_MAULAS/js/pronosticos.js) se eliminó la restricción `&& !isCorrection`, de modo que si el último socio cumplimenta su quiniela bajo corrección, se verifica y despacha el aviso inmediatamente.
 - **Detección Instantánea con Pronósticos en Memoria**:
-  - `TelegramService.checkHabemusQuinielam(jId, forceResend = false, inMemoryPronosticos = null)` ahora acepta el array en memoria de pronósticos.
-  - En `js/pronosticos.js` (`performFinalSave`), se pasa `this.pronosticos` directamente a la función, eliminando esperas y vulnerabilidades frente a la latencia de propagación de Firestore.
-- **Robustez en la Comparación y Socios Activos**:
-  - Compara `jId` tanto con `jor.id` como con `jor.number` (soporta identificadores numéricos y de cadena).
-  - Si no se especifica `jId`, selecciona automáticamente la jornada activa más reciente.
-  - Filtra estrictamente socios activos (`m.active !== false`), evitando que usuarios archivados o inactivos bloqueen indefinidamente el envío de la notificación.
-  - Soporta el comodín `{jornada}` en la plantilla de mensaje configurada en Firebase (`config/habemus`).
+  - Se pasa `this.pronosticos` directamente a `checkHabemusQuinielam`, eliminando esperas y dependencias de la latencia de red de Firestore.
+- **Filtro de Socios Activos y Coincidencia de IDs**:
+  - Comprobación estricta de socios activos (`m.active !== false`) y validación de pronósticos por `pJId === String(currentJ.id) && pMId === String(m.id)`.
 - **Integración con «El Dado de Quinielas» (`DiceService`)**:
-  - Si un socio ausente tiene activado el Dado de Quinielas y sus pronósticos son rellenados de forma automática al iniciar la página (`DiceService.checkAndApplyDice`), el sistema invoca de inmediato `checkHabemusQuinielam` si dicho pronóstico completa el pleno de socios para la jornada en curso.
-- **Prevención de Envíos Duplicados**:
-  - Tras el envío exitoso a Telegram vía `TelegramService.sendRaw`, se marca `habemusSent = true` en el documento de la jornada en Firestore. El panel de administración (`admin.html`) mantiene el botón para resetear este flag en caso de desear un reenvío voluntario.
+  - Al iniciar `pronosticos.html`, si el Dado cumplimenta automáticamente los pronósticos de socios ausentes para la jornada activa, se dispara la comprobación automática de Habemus Quinielam.
+- **Prevención de Duplicados**:
+  - Tras el envío a Telegram, se persiste `habemusSent = true` en la jornada de Firestore, pudiendo ser reseteado en cualquier momento desde la tarjeta de administración.
 
 ---
 

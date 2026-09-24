@@ -434,7 +434,7 @@ window.TelegramService = {
         }
     },
     async checkHabemusQuinielam(jId, forceResend = false, inMemoryPronosticos = null) {
-        if (!window.DataService) return;
+        if (!window.DataService) return { ok: false, reason: 'no_dataservice' };
 
         try {
             // 1. Get Config
@@ -443,14 +443,15 @@ window.TelegramService = {
 
             if (!tg || !tg.token || !tg.chatId) {
                 console.log("Habemus: No Telegram config found. Skipping.");
-                return;
+                return { ok: false, reason: 'no_telegram_config' };
             }
             if (!hab || hab.enabled === false) {
                 console.log("Habemus: Disabled in config. Skipping.");
-                return;
+                return { ok: false, reason: 'habemus_disabled' };
             }
 
             // 2. Fetch Data
+            const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
             const members = await window.DataService.getAll('members');
             const jornadas = await window.DataService.getAll('jornadas');
             let pronosticos = inMemoryPronosticos;
@@ -458,36 +459,54 @@ window.TelegramService = {
                 pronosticos = await window.DataService.getAll('pronosticos');
             }
 
+            // Strict season scoping: Never pick or compare previous season jornadas (e.g. J64 from 2025-2026)
+            const seasonJornadas = (jornadas || []).filter(j => (j.season || '2026-2027') === activeSeason);
+
             let currentJ = null;
             if (jId) {
-                currentJ = jornadas.find(jor => String(jor.id) === String(jId) || String(jor.number) === String(jId));
+                // 1. Try exact ID match in current season
+                currentJ = seasonJornadas.find(jor => String(jor.id) === String(jId));
+                // 2. Try number match in current season
+                if (!currentJ) {
+                    currentJ = seasonJornadas.find(jor => String(jor.number) === String(jId));
+                }
+                // 3. Fallback to any jornada by exact ID
+                if (!currentJ) {
+                    currentJ = (jornadas || []).find(jor => String(jor.id) === String(jId));
+                }
             }
+
+            // 4. Fallback if still not found: latest active jornada of the CURRENT SEASON
             if (!currentJ) {
-                const active = jornadas.filter(j => j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
-                if (active.length > 0) currentJ = active[0];
+                const activeInSeason = seasonJornadas.filter(j => j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+                if (activeInSeason.length > 0) {
+                    currentJ = activeInSeason[0];
+                } else if (seasonJornadas.length > 0) {
+                    currentJ = seasonJornadas.sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0))[0];
+                }
             }
 
             if (!currentJ) {
                 console.log("Habemus: Jornada not found:", jId);
-                return;
+                return { ok: false, reason: 'jornada_not_found' };
             }
 
             if (!forceResend && currentJ.habemusSent) {
-                console.log(`Habemus: Already sent for J${currentJ.number}. Use forceResend=true to override.`);
-                return;
+                console.log(`Habemus: Already sent for J${currentJ.number} (Season: ${currentJ.season || activeSeason}). Use forceResend=true to override.`);
+                return { ok: false, reason: 'already_sent' };
             }
 
             // 3. Verify all active members have played
             const activeMembers = (members || []).filter(m => m && m.active !== false);
-            console.log(`Habemus: Checking J${currentJ.number}... Active Members: ${activeMembers.length}`);
+            console.log(`Habemus: Checking J${currentJ.number} (Season: ${currentJ.season || activeSeason})... Active Members: ${activeMembers.length}`);
 
             const pending = [];
             const allPlayed = activeMembers.length > 0 && activeMembers.every(m => {
-                const p = pronosticos.find(pred =>
-                    (String(pred.jId) === String(currentJ.id) || String(pred.jornadaId) === String(currentJ.id) ||
-                     String(pred.jId) === String(currentJ.number) || String(pred.jornadaId) === String(currentJ.number)) &&
-                    (String(pred.mId) === String(m.id) || String(pred.memberId) === String(m.id))
-                );
+                const p = pronosticos.find(pred => {
+                    const pJId = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId || '');
+                    const pMId = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId || '');
+                    return pJId === String(currentJ.id) && pMId === String(m.id);
+                });
                 const played = p && p.selection && Array.isArray(p.selection) &&
                     p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                 if (!played) pending.push(m.name || m.phone || `ID:${m.id}`);
@@ -510,12 +529,15 @@ window.TelegramService = {
                 } else {
                     console.error("Habemus: Telegram API error", res);
                 }
+                return res;
             } else {
                 console.log(`Habemus: ${pending.length} member(s) still pending for J${currentJ.number}: ${pending.join(', ')}`);
+                return { ok: false, reason: 'pending_members', pending };
             }
 
         } catch (e) {
             console.error("TelegramService (Habemus) Error:", e);
+            return { ok: false, error: e };
         }
     },
     async sendPardonNotification(forgiverName, forgivenName, jornadaNumber) {

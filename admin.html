@@ -281,10 +281,19 @@
                         <label for="habemus-enabled" style="font-weight:bold;">🔔 Notificar cuando todos hayan
                             jugado</label>
                     </div>
+
+                    <div style="margin-top:0.5rem; margin-bottom:0.5rem; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 6px; border: 1px solid #e0e0e0;">
+                        <label for="habemus-jornada-select" style="display:block; margin-bottom:0.2rem; font-weight:bold;">Jornada en curso (<span id="habemus-season-label">2026-2027</span>):</label>
+                        <select id="habemus-jornada-select" style="width:100%; padding:6px; font-size:0.85rem; border-radius:4px; border:1px solid #ccc;" onchange="updateHabemusStatus()">
+                            <option value="">Cargando jornadas...</option>
+                        </select>
+                        <div id="habemus-jornada-status" style="margin-top:5px; font-size:0.75rem; color:#444; font-weight:500;"></div>
+                    </div>
+
                     <div style="margin-top:0.5rem;">
                         <label style="display:block; margin-bottom:0.2rem;">Mensaje:</label>
                         <textarea id="habemus-msg"
-                            style="width:100%; height:80px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
+                            style="width:100%; height:70px; padding:5px; font-size:0.8rem; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
                     </div>
                     <div style="display:flex; gap:5px; margin-top:0.5rem;">
                         <button type="submit" class="btn-action"
@@ -299,8 +308,7 @@
                     <div id="habemus-save-msg"
                         style="text-align:center; color:green; margin-top:0.2rem; font-size:0.8rem; display:none;">
                         ¡Guardado!</div>
-                    <small style="color:#888; font-size:0.7rem;">📤 Probar: envia el mensaje ahora. 🔄 Reset: permite
-                        enviar de nuevo si ya se envió.</small>
+                    <small style="color:#888; font-size:0.7rem; display:block; margin-top:4px;">📤 Probar: envía el aviso de la jornada seleccionada ahora. 🔄 Reset: permite volver a enviar el aviso cuando todos completen.</small>
                 </form>
             </div>
 
@@ -730,7 +738,6 @@
 
         async function loadHabemusConfig() {
             if (!window.DataService) return;
-            // Use getDoc instead of getAll to be more direct and robust
             const hab = await window.DataService.getDoc('config', 'habemus');
             if (hab) {
                 document.getElementById('habemus-enabled').checked = hab.enabled !== false;
@@ -739,6 +746,78 @@
                 document.getElementById('habemus-enabled').checked = true;
                 document.getElementById('habemus-msg').value = '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
             }
+
+            await populateHabemusJornadas();
+        }
+
+        async function populateHabemusJornadas() {
+            if (!window.DataService) return;
+            const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
+            const seasonLabel = document.getElementById('habemus-season-label');
+            if (seasonLabel) seasonLabel.textContent = activeSeason;
+
+            const sel = document.getElementById('habemus-jornada-select');
+            if (!sel) return;
+
+            const jornadas = await window.DataService.getAll('jornadas');
+            const seasonJornadas = (jornadas || [])
+                .filter(j => (j.season || '2026-2027') === activeSeason && j.active)
+                .sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+
+            sel.innerHTML = '';
+            if (!seasonJornadas.length) {
+                sel.innerHTML = '<option value="">No hay jornadas activas esta temporada</option>';
+                return;
+            }
+
+            seasonJornadas.forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j.id;
+                opt.textContent = `Jornada ${j.number} (${j.date || 'Sin fecha'})${j.habemusSent ? ' [Ya enviado]' : ' [Pendiente]'}`;
+                sel.appendChild(opt);
+            });
+
+            await updateHabemusStatus();
+        }
+
+        async function updateHabemusStatus() {
+            const sel = document.getElementById('habemus-jornada-select');
+            const statusDiv = document.getElementById('habemus-jornada-status');
+            if (!sel || !statusDiv) return;
+
+            const jId = sel.value;
+            if (!jId) {
+                statusDiv.innerHTML = '<span style="color:#888;">Sin jornada seleccionada</span>';
+                return;
+            }
+
+            const [jornadas, members, pronosticos] = await Promise.all([
+                window.DataService.getAll('jornadas'),
+                window.DataService.getAll('members'),
+                window.DataService.getAll('pronosticos')
+            ]);
+
+            const j = (jornadas || []).find(x => String(x.id) === String(jId));
+            if (!j) {
+                statusDiv.innerHTML = '<span style="color:#d32f2f;">Jornada no encontrada</span>';
+                return;
+            }
+
+            const activeMembers = (members || []).filter(m => m && m.active !== false);
+            const playedCount = activeMembers.filter(m => {
+                const p = pronosticos.find(pred => {
+                    const pJId = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId || '');
+                    const pMId = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId || '');
+                    return pJId === String(j.id) && pMId === String(m.id);
+                });
+                return p && p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+            }).length;
+
+            const isAll = activeMembers.length > 0 && playedCount >= activeMembers.length;
+            const sentBadge = j.habemusSent ? '<span style="color:#2e7d32; font-weight:bold;">✅ Enviado</span>' : '<span style="color:#e65100; font-weight:bold;">⏳ No enviado</span>';
+            const countBadge = isAll ? `<span style="color:#2e7d32; font-weight:bold;">${playedCount}/${activeMembers.length} (Completo)</span>` : `<span style="color:#c62828; font-weight:bold;">${playedCount}/${activeMembers.length}</span>`;
+
+            statusDiv.innerHTML = `📊 Jugados: ${countBadge} | Habemus: ${sentBadge}`;
         }
 
         async function saveHabemusConfig() {
@@ -759,25 +838,40 @@
 
         async function testHabemus() {
             if (!window.TelegramService) { alert('TelegramService no cargado.'); return; }
-            // Get most recent active jornada
+            const sel = document.getElementById('habemus-jornada-select');
+            const jId = sel ? sel.value : null;
+            if (!jId) { alert('Selecciona una jornada de la lista.'); return; }
+
             const jornadas = await window.DataService.getAll('jornadas');
-            const active = jornadas.filter(j => j.active).sort((a, b) => b.number - a.number);
-            if (!active.length) { alert('No hay jornadas activas.'); return; }
-            const jId = active[0].id;
-            console.log('Habemus TEST: forcing send for jornada', jId);
-            await window.TelegramService.checkHabemusQuinielam(jId, true);
-            alert('Prueba ejecutada. Revisa la consola (F12) y el grupo de Telegram.');
+            const j = (jornadas || []).find(x => String(x.id) === String(jId));
+            const jNum = j ? j.number : jId;
+
+            console.log('Habemus TEST: forcing send for jornada', jId, `(J${jNum})`);
+            const res = await window.TelegramService.checkHabemusQuinielam(jId, true);
+            await updateHabemusStatus();
+            if (res && res.ok) {
+                alert(`¡Prueba enviada con éxito para la Jornada ${jNum} al canal de Telegram!`);
+            } else {
+                alert(`Prueba ejecutada para Jornada ${jNum}. Revisa la consola y el grupo de Telegram.`);
+            }
         }
 
         async function resetHabemusSent() {
+            const sel = document.getElementById('habemus-jornada-select');
+            const jId = sel ? sel.value : null;
+            if (!jId) { alert('Selecciona una jornada de la lista.'); return; }
+
             const jornadas = await window.DataService.getAll('jornadas');
-            const active = jornadas.filter(j => j.active).sort((a, b) => b.number - a.number);
-            if (!active.length) { alert('No hay jornadas activas.'); return; }
-            const j = active[0];
-            if (!confirm(`¿Reset "habemusSent" en Jornada ${j.number}? Permitirá enviar el mensaje de nuevo cuando todos completen.`)) return;
+            const j = (jornadas || []).find(x => String(x.id) === String(jId));
+            if (!j) { alert('Jornada no encontrada.'); return; }
+
+            const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
+            if (!confirm(`¿Reset "habemusSent" en Jornada ${j.number} (Temporada ${j.season || activeSeason})?\n\nEsto permitirá que se vuelva a enviar el aviso cuando todos completen sus quinielas.`)) return;
+
             j.habemusSent = false;
             await window.DataService.save('jornadas', j);
-            alert(`¡Reset hecho! La J${j.number} volverá a enviar el aviso cuando todos hayan jugado.`);
+            await populateHabemusJornadas();
+            alert(`¡Reset realizado con éxito! La Jornada ${j.number} (${j.season || activeSeason}) volverá a enviar el aviso cuando todos los socios activos completen sus pronósticos.`);
         }
 
         async function loadTelegramConfig() {

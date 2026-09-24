@@ -1172,7 +1172,7 @@ class PronosticoManager {
         this.renderSummaryTable(); // Refresh summary
 
         // Check for Habemus Quinielam (Telegram)
-        if (window.TelegramService && !isCorrection) {
+        if (window.TelegramService) {
             setTimeout(() => {
                 window.TelegramService.checkHabemusQuinielam(this.currentJornadaId, false, this.pronosticos);
             }, 500);
