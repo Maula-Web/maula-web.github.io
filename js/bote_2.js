@@ -1346,7 +1346,7 @@ class BoteAppController {
         } else if (type === 'acumulado') {
             const crecimiento = parseFloat(extra) || 0;
             const totalCaja = BOTE_INICIAL + crecimiento;
-            title.textContent = `🏦 Bote Acumulado tras J${jornadaNum}`;
+            title.textContent = `💰 Bote Acumulado tras J${jornadaNum}`;
             body.innerHTML = `
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-amber-300 font-semibold">🌱 Bote Inicial (Agosto 2026):</span>
