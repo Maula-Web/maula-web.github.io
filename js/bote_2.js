@@ -57,7 +57,7 @@ class BoteAppController {
             }
 
             const popover = document.getElementById('matrix-popover');
-            if (popover && !popover.classList.contains('hidden') && !popover.contains(e.target) && !e.target.closest('#matriz-tbody td')) {
+            if (popover && !popover.classList.contains('hidden') && !popover.contains(e.target) && !e.target.closest('#matriz-tbody td') && !e.target.closest('#flujo-table-body td')) {
                 popover.classList.add('hidden');
             }
         });
@@ -876,14 +876,15 @@ class BoteAppController {
         `;
 
         pop.classList.remove('hidden');
+        this.positionPopover(pop, e.currentTarget);
+    }
 
-        // Posicionar popover inteligentemente dentro del viewport (el elemento tiene posición 'fixed')
-        const rect = e.currentTarget.getBoundingClientRect();
-        const popW = pop.offsetWidth || 288;
-        const popH = pop.offsetHeight || 260;
+    positionPopover(pop, targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        const popW = pop.offsetWidth || 300;
+        const popH = pop.offsetHeight || 280;
         const margin = 12;
 
-        // Cálculo horizontal centrado respecto a la celda clicada y acotado por los márgenes de la pantalla
         let left = rect.left + (rect.width / 2) - (popW / 2);
         if (left + popW > window.innerWidth - margin) {
             left = window.innerWidth - popW - margin;
@@ -892,22 +893,265 @@ class BoteAppController {
             left = margin;
         }
 
-        // Cálculo vertical inteligente:
-        // Si colocarlo debajo de la celda se sale de la pantalla por abajo, colocarlo arriba de la celda
         let top = rect.bottom + 8;
         if (top + popH > window.innerHeight - margin) {
             const topAbove = rect.top - popH - 8;
             if (topAbove >= margin) {
-                // Cabe cómodamente encima de la celda
                 top = topAbove;
             } else {
-                // En pantallas muy bajas, ajustar para que el popover quede completamente dentro del área visible
                 top = Math.max(margin, window.innerHeight - popH - margin);
             }
         }
 
         pop.style.left = `${Math.round(left)}px`;
         pop.style.top = `${Math.round(top)}px`;
+    }
+
+    showFlujoPopover(e, type, jornadaNum, extra) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const pop = document.getElementById('matrix-popover');
+        const title = document.getElementById('pop-title');
+        const body = document.getElementById('pop-body');
+        if (!pop || !title || !body) return;
+
+        const data = this.getSeasonData();
+        const BOTE_INICIAL = 738.68;
+
+        if (type === 'inicial') {
+            title.textContent = '🌱 Bote Inicial Temporada';
+            body.innerHTML = `
+                <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-2 text-amber-200">
+                    <div class="text-[11px] font-semibold text-amber-300">Fondo de Apertura (Agosto 2026)</div>
+                    <div class="text-base font-black font-mono mt-0.5 text-amber-400">+738,68 €</div>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Socios aportantes:</span>
+                    <strong class="text-slate-200">18 socios</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Media aportada:</span>
+                    <strong class="text-slate-200">~41,04 € / socio</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Origen:</span>
+                    <strong class="text-slate-300 text-right">Remanente anterior + Cuotas reapertura</strong>
+                </div>
+                <div class="pt-1.5 text-[11px] text-slate-400 leading-relaxed">
+                    💡 Fondo inicial que garantiza el sellado de las quinielas antes de recaudar cuotas semanales.
+                </div>
+            `;
+            pop.classList.remove('hidden');
+            this.positionPopover(pop, e.currentTarget);
+            return;
+        }
+
+        const jSummary = data.jornadaSummaries.find(j => j.number === jornadaNum);
+        if (!jSummary) return;
+
+        const jMovements = data.movements.filter(m => m.jornadaNum === jornadaNum);
+
+        // Desglose de penalizaciones
+        const totUnos = jMovements.reduce((sum, m) => sum + (m.penalizacionUnos || 0), 0);
+        const totBajos = jMovements.reduce((sum, m) => sum + (m.penalizacionBajosAciertos || 0), 0);
+        const totPig = jMovements.reduce((sum, m) => sum + (m.penalizacionPIG || 0), 0);
+        const totMaula = jMovements.reduce((sum, m) => sum + (m.penalizacionMaula || 0), 0);
+        const totPenalties = totUnos + totBajos + totPig + totMaula;
+
+        // Desglose de cuotas
+        const numSocios = jSummary.numSocios || 19;
+        const cuotaBase = jSummary.costeColumna || 0.75;
+        const totCuotas = numSocios * cuotaBase;
+
+        // Desglose de premios
+        const doblesPrize = (jornadaNum === 3 ? 2.32 : (jornadaNum === 4 ? 3.40 : 0));
+        const indivPrizes = jMovements.filter(m => m.premios > 0);
+
+        if (type === 'cuotas') {
+            title.textContent = `📊 Cuotas Base - Jornada ${jornadaNum}`;
+            body.innerHTML = `
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Socios activos:</span>
+                    <strong class="text-white">${numSocios} socios</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Precio por columna:</span>
+                    <strong class="text-slate-300 font-mono">${cuotaBase.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Cálculo:</span>
+                    <strong class="text-slate-300 font-mono">${numSocios} × ${cuotaBase.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between pt-1.5 text-xs">
+                    <span class="text-emerald-400 font-bold">Total Cuotas Base:</span>
+                    <strong class="text-emerald-400 font-mono text-sm">+${totCuotas.toFixed(2)} €</strong>
+                </div>
+                <div class="pt-2 text-[11px] text-slate-400">
+                    Aportación estándar de los socios para pagar sus columnas individuales semanales.
+                </div>
+            `;
+        } else if (type === 'penalizaciones') {
+            title.textContent = `⚠️ Penalizaciones - Jornada ${jornadaNum}`;
+            body.innerHTML = `
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">1️⃣ Multa de Unos (≥10):</span>
+                    <strong class="text-amber-400 font-mono">+${totUnos.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">📉 Bajos Aciertos (0-3 ac):</span>
+                    <strong class="text-rose-400 font-mono">+${totBajos.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">🐷 Fallo en PIG:</span>
+                    <strong class="text-pink-400 font-mono">+${totPig.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">💀 Maula de la jornada:</span>
+                    <strong class="text-purple-400 font-mono">+${totMaula.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between pt-1.5 text-xs">
+                    <span class="text-amber-300 font-bold">Total Penalizaciones:</span>
+                    <strong class="text-amber-400 font-mono text-sm">+${totPenalties.toFixed(2)} €</strong>
+                </div>
+                <div class="pt-2 text-[11px] text-slate-400">
+                    Las penalizaciones ingresan íntegramente en la caja de la Peña aumentando el superávit semanal.
+                </div>
+            `;
+        } else if (type === 'premios') {
+            title.textContent = `🏆 Premios LAE - Jornada ${jornadaNum}`;
+            if (jSummary.premios > 0 || doblesPrize > 0) {
+                let premiosHtml = '';
+                if (doblesPrize > 0) {
+                    premiosHtml += `
+                        <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                            <span class="text-purple-300 font-semibold flex items-center gap-1">🟣 Quiniela Dobles:</span>
+                            <strong class="text-emerald-400 font-mono">+${doblesPrize.toFixed(2)} €</strong>
+                        </div>
+                    `;
+                }
+                indivPrizes.forEach(ip => {
+                    premiosHtml += `
+                        <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                            <span class="text-blue-300 font-medium truncate max-w-[170px]">🔵 ${ip.memberName} (${ip.aciertos || 10} ac):</span>
+                            <strong class="text-emerald-400 font-mono">+${ip.premios.toFixed(2)} €</strong>
+                        </div>
+                    `;
+                });
+                body.innerHTML = `
+                    ${premiosHtml}
+                    <div class="flex justify-between pt-1.5 text-xs">
+                        <span class="text-emerald-400 font-bold">Total Premios Oficiales:</span>
+                        <strong class="text-emerald-400 font-mono text-sm">+${jSummary.premios.toFixed(2)} €</strong>
+                    </div>
+                    <div class="pt-2 text-[11px] text-slate-400">
+                        Premios oficiales de Loterías y Apuestas del Estado en esta jornada.
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <div class="py-3 text-center text-slate-400 text-xs">
+                        Sin premios oficiales en esta jornada (ninguna quiniela alcanzó 10 aciertos).
+                    </div>
+                `;
+            }
+        } else if (type === 'sellado') {
+            title.textContent = `🎟️ Coste Sellado - Jornada ${jornadaNum}`;
+            body.innerHTML = `
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">19 Quinielas Sencillas:</span>
+                    <strong class="text-slate-200 font-mono">19 × 0,75 € = 14,25 €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">1 Reducida (7 Dobles):</span>
+                    <strong class="text-purple-300 font-mono">16 × 0,75 € = 10,50 €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Socio encargado:</span>
+                    <strong class="text-rose-300">${jSummary.loserName || 'Designado'}</strong>
+                </div>
+                <div class="flex justify-between pt-1.5 text-xs">
+                    <span class="text-rose-400 font-bold">Total Sellado Lotería:</span>
+                    <strong class="text-rose-400 font-mono text-sm">-${jSummary.gastoSellado.toFixed(2)} €</strong>
+                </div>
+                <div class="pt-2 text-[11px] text-slate-400">
+                    Importe real abonado físicamente en la administración de lotería.
+                </div>
+            `;
+        } else if (type === 'neto') {
+            title.textContent = `📈 Margen Neto Peña - Jornada ${jornadaNum}`;
+            body.innerHTML = `
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-emerald-400 font-medium">+ Recaudado (Cuotas + Multas):</span>
+                    <strong class="text-emerald-400 font-mono">+${jSummary.recaudacion.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-rose-400 font-medium">- Coste Sellado Lotería:</span>
+                    <strong class="text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-amber-400 font-medium">+ Premios Oficiales:</span>
+                    <strong class="text-amber-400 font-mono">+${jSummary.premios.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between pt-1.5 text-xs border-t border-slate-700">
+                    <span class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-black">Superávit Neto Semanal:</span>
+                    <strong class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono text-base font-extrabold">
+                        ${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2)} €
+                    </strong>
+                </div>
+                <div class="pt-2 text-[11px] text-slate-400">
+                    Beneficio neto generado en la jornada que incrementa directamente el bote común de la peña.
+                </div>
+            `;
+        } else if (type === 'acumulado') {
+            const crecimiento = parseFloat(extra) || 0;
+            const totalCaja = BOTE_INICIAL + crecimiento;
+            title.textContent = `🏦 Bote Acumulado tras J${jornadaNum}`;
+            body.innerHTML = `
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-amber-300 font-semibold">🌱 Bote Inicial (Agosto 2026):</span>
+                    <strong class="text-amber-400 font-mono">+${BOTE_INICIAL.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="${crecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-medium">Margen Neto Acumulado (J1-J${jornadaNum}):</span>
+                    <strong class="${crecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono">
+                        ${crecimiento >= 0 ? '+' : ''}${crecimiento.toFixed(2)} €
+                    </strong>
+                </div>
+                <div class="flex justify-between pt-1.5 text-xs border-t border-slate-700">
+                    <span class="text-white font-black text-sm">Bote Total en Caja:</span>
+                    <strong class="text-amber-400 font-mono text-base font-extrabold">${totalCaja.toFixed(2)} €</strong>
+                </div>
+                <div class="pt-2 text-[11px] text-slate-400">
+                    Saldo total real de la peña acumulado en cuenta bancaria y caja física.
+                </div>
+            `;
+        } else if (type === 'jornada') {
+            title.textContent = `⚽ Resumen Jornada ${jornadaNum}`;
+            body.innerHTML = `
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Fecha oficial:</span>
+                    <strong class="text-white">${jSummary.date}</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-emerald-400 font-semibold">👑 Ganador (juega dobles):</span>
+                    <strong class="text-white">${jSummary.winnerName || 'N/A'}</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-rose-400 font-semibold">💀 Sellador (reembolso):</span>
+                    <strong class="text-white">${jSummary.loserName || 'N/A'}</strong>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
+                    <span class="text-slate-400">Recaudado / Sellado:</span>
+                    <strong class="text-slate-300 font-mono">+${jSummary.recaudacion.toFixed(2)} € / -${jSummary.gastoSellado.toFixed(2)} €</strong>
+                </div>
+                <div class="flex justify-between pt-1.5 text-xs">
+                    <span class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">Neto Semanal Peña:</span>
+                    <strong class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono text-sm">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2)} €</strong>
+                </div>
+            `;
+        }
+
+        pop.classList.remove('hidden');
+        this.positionPopover(pop, e.currentTarget);
     }
 
     // =========================================================================
@@ -927,17 +1171,18 @@ class BoteAppController {
 
         // Fila 0: Bote Inicial de la Temporada
         const tr0 = document.createElement('tr');
-        tr0.className = 'bg-amber-500/10 border-b border-amber-500/20 text-xs sm:text-sm font-semibold hover:bg-amber-500/15 transition-colors';
+        tr0.className = 'bg-amber-500/10 border-b border-amber-500/20 text-xs sm:text-sm font-semibold hover:bg-amber-500/15 transition-colors cursor-pointer';
+        tr0.title = 'Clic en cualquier celda para ver el desglose del Bote Inicial';
         tr0.innerHTML = `
-            <td class="p-3 font-bold text-amber-300 flex items-center gap-1.5">
+            <td class="p-3 font-bold text-amber-300 flex items-center gap-1.5 cursor-pointer hover:underline" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">
                 <span>🌱</span> Inicio Temporada
             </td>
-            <td class="p-3 text-slate-400 font-mono">Agosto 2026</td>
-            <td class="p-3 text-right font-mono text-emerald-400 font-bold" colspan="2">Aportaciones Iniciales Socios (Bote Inicial)</td>
-            <td class="p-3 text-right font-mono text-slate-500">-</td>
-            <td class="p-3 text-right font-mono text-slate-500">-</td>
-            <td class="p-3 text-right font-mono font-bold text-amber-300">+${BOTE_INICIAL.toFixed(2)} €</td>
-            <td class="p-3 text-right font-mono font-black text-amber-400 bg-amber-500/15">${BOTE_INICIAL.toFixed(2)} €</td>
+            <td class="p-3 text-slate-400 font-mono cursor-pointer" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Agosto 2026</td>
+            <td class="p-3 text-right font-mono text-emerald-400 font-bold cursor-pointer" colspan="2" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Aportaciones Iniciales Socios (Bote Inicial)</td>
+            <td class="p-3 text-right font-mono text-slate-500 cursor-pointer" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
+            <td class="p-3 text-right font-mono text-slate-500 cursor-pointer" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
+            <td class="p-3 text-right font-mono font-bold text-amber-300 cursor-pointer hover:underline" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">+${BOTE_INICIAL.toFixed(2)} €</td>
+            <td class="p-3 text-right font-mono font-black text-amber-400 bg-amber-500/15 cursor-pointer hover:underline" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">${BOTE_INICIAL.toFixed(2)} €</td>
         `;
         tbody.appendChild(tr0);
 
@@ -948,18 +1193,33 @@ class BoteAppController {
             totalCrecimiento += j.neto;
 
             const boteTotalJornada = BOTE_INICIAL + saldoAcumuladoPeña;
+            const currentCrecimiento = saldoAcumuladoPeña;
 
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 text-xs sm:text-sm transition-colors border-b border-slate-800/40';
             tr.innerHTML = `
-                <td class="p-3 font-bold text-white">Jornada ${j.number}</td>
-                <td class="p-3 text-slate-400">${j.date}</td>
-                <td class="p-3 text-right font-mono text-emerald-400">+${cuotasBase.toFixed(2)} €</td>
-                <td class="p-3 text-right font-mono text-amber-400">+${penalties.toFixed(2)} €</td>
-                <td class="p-3 text-right font-mono ${j.premios > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600'}">${j.premios > 0 ? '+' + j.premios.toFixed(2) + ' €' : '-'}</td>
-                <td class="p-3 text-right font-mono text-rose-400">-${j.gastoSellado.toFixed(2)} €</td>
-                <td class="p-3 text-right font-mono font-bold ${j.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${j.neto >= 0 ? '+' : ''}${j.neto.toFixed(2)} €</td>
-                <td class="p-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40">
+                <td class="p-3 font-bold text-white cursor-pointer hover:text-orange-400 transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'jornada', ${j.number})" title="Clic para ver resumen de la Jornada ${j.number}">
+                    Jornada ${j.number}
+                </td>
+                <td class="p-3 text-slate-400 cursor-pointer hover:text-slate-200 transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'jornada', ${j.number})" title="Clic para ver resumen">
+                    ${j.date}
+                </td>
+                <td class="p-3 text-right font-mono text-emerald-400 cursor-pointer hover:bg-emerald-500/15 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'cuotas', ${j.number})" title="Clic para ver desglose de cuotas base">
+                    +${cuotasBase.toFixed(2)} €
+                </td>
+                <td class="p-3 text-right font-mono text-amber-400 cursor-pointer hover:bg-amber-500/15 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'penalizaciones', ${j.number})" title="Clic para ver desglose de penalizaciones">
+                    +${penalties.toFixed(2)} €
+                </td>
+                <td class="p-3 text-right font-mono cursor-pointer hover:bg-emerald-500/15 rounded transition-colors ${j.premios > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600'}" onclick="window.BoteApp.showFlujoPopover(event, 'premios', ${j.number})" title="Clic para ver desglose de premios">
+                    ${j.premios > 0 ? '+' + j.premios.toFixed(2) + ' €' : '-'}
+                </td>
+                <td class="p-3 text-right font-mono text-rose-400 cursor-pointer hover:bg-rose-500/15 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'sellado', ${j.number})" title="Clic para ver desglose del ticket de sellado">
+                    -${j.gastoSellado.toFixed(2)} €
+                </td>
+                <td class="p-3 text-right font-mono font-bold cursor-pointer hover:bg-slate-800 rounded transition-colors ${j.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}" onclick="window.BoteApp.showFlujoPopover(event, 'neto', ${j.number})" title="Clic para ver la fórmula del superávit neto">
+                    ${j.neto >= 0 ? '+' : ''}${j.neto.toFixed(2)} €
+                </td>
+                <td class="p-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40 cursor-pointer hover:bg-amber-500/20 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'acumulado', ${j.number}, ${currentCrecimiento})" title="Clic para ver el desglose del bote acumulado">
                     <div>${boteTotalJornada.toFixed(2)} €</div>
                     <div class="text-[10px] ${saldoAcumuladoPeña >= 0 ? 'text-emerald-400/80' : 'text-rose-400/80'} font-normal">
                         (Crec: ${saldoAcumuladoPeña >= 0 ? '+' : ''}${saldoAcumuladoPeña.toFixed(2)} €)
