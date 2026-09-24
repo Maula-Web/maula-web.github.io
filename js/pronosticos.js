@@ -1476,6 +1476,8 @@ class PronosticoManager {
                 }
 
                 const cellLed = this.getMemberStatusLed(m.id, j);
+                const showInCell = (cellLed.status === 'red' || cellLed.status === 'yellow');
+                const cellLedHtml = showInCell ? `<span class="led-status-indicator led-${cellLed.status}" style="margin-right: 4px;" title="${cellLed.title}"></span>` : '';
 
                 if (isPlayed) {
                     const selection14 = p.selection.slice(0, 14);
@@ -1497,7 +1499,7 @@ class PronosticoManager {
 
                     cellContent = `
                         <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}${p.isDice ? ' (Relleno con Dado 🎲)' : ''} - ${cellLed.title}">
-                            <span class="led-status-indicator led-${cellLed.status}" style="margin-right: 4px;" title="${cellLed.title}"></span>
+                            ${cellLedHtml}
                             ${diceBadge}
                             <span class="sf-block">${b1}</span>
                             <span class="sf-sep">|</span>
@@ -1510,7 +1512,7 @@ class PronosticoManager {
                         </div>
                     `;
                 } else {
-                    cellContent = `<span class="summary-no-data" title="${cellLed.title}"><span class="led-status-indicator led-${cellLed.status}" style="margin-right: 4px;" title="${cellLed.title}"></span>-</span>`;
+                    cellContent = `<span class="summary-no-data" title="${cellLed.title}">${cellLedHtml}-</span>`;
                 }
 
                 rowHtml += `<td class="${cellClass}" data-jid="${j.id}" data-mid="${m.id}">${cellContent}</td>`;

@@ -507,8 +507,8 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ### 17.3. Integración en la Interfaz
 1. **Tabla Resumen de Pronósticos (`#forecast-summary-table`)**:
-   - **Cabeceras (`<th>`)**: Cada socio muestra el LED de su estado correspondiente a la jornada activa o seleccionada (`updateSummaryHeaderLeds()`), con tooltip descriptivo.
-   - **Celdas (`<td>`)**: Cada celda `(Jornada, Socio)` incluye su propio LED miniaturizado para conocer el estado exacto en cada jornada individual.
+   - **Cabeceras (`<th>`)**: Cada socio muestra el LED de su estado (verde, amarillo o rojo) correspondiente a la jornada activa o seleccionada (`updateSummaryHeaderLeds()`), con tooltip descriptivo.
+   - **Celdas (`<td>`)**: Para evitar saturación visual, las quinielas completas **no** muestran el LED verde dentro de cada celda; sin embargo, los avisos en **rojo** (incompletos/pendientes) y en **amarillo** (falta rellenar dobles) sí se muestran en cada pronóstico además de junto al nombre.
    - **Leyenda**: Situada encima de la tabla con los 3 colores y sus significados.
 2. **Modal de Pronósticos Colectivos (`#view-jornada-modal`)**:
    - Cabeceras de columnas de socios con el LED orientado correctamente junto a su nombre.
