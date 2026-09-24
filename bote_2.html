@@ -1101,15 +1101,15 @@
         </div>
     </div>
 
-    <!-- MODAL 4: 🛠️ GESTIONAR SELLADO DE JORNADA (Reembolso Bote vs Bizum) -->
+    <!-- MODAL 4: 🛠️ GESTIONAR SELLADO DE JORNADA (Reembolso Bote vs Bizum y Sustituto) -->
     <div id="modal-gestion-jornada" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-jornada')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-3xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
+        <div class="glass-panel w-full max-w-4xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                         <span>🛠️</span> Gestión de Sellado y Reembolsos
                     </h3>
-                    <p class="text-xs text-slate-400">Configura si el reembolso de cada sellado se añade al Bote del socio o se paga por Bizum</p>
+                    <p class="text-xs text-slate-400">Asigna quién selló realmente la quiniela si hubo sustituto y elige el método de reembolso (Bote o Bizum)</p>
                 </div>
                 <button onclick="window.BoteApp.closeModal('modal-gestion-jornada')" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">✕</button>
             </div>
@@ -1119,9 +1119,10 @@
                         <tr class="bg-slate-900/90 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
                             <th class="p-2.5 sm:p-3">Jornada</th>
                             <th class="p-2.5 sm:p-3">Fecha</th>
-                            <th class="p-2.5 sm:p-3">Sellador</th>
+                            <th class="p-2.5 sm:p-3">Maula Oficial</th>
+                            <th class="p-2.5 sm:p-3">Socio que Selló Realmente</th>
                             <th class="p-2.5 sm:p-3 text-right">Coste</th>
-                            <th class="p-2.5 sm:p-3 text-center">Método de Reembolso</th>
+                            <th class="p-2.5 sm:p-3 text-center">Reembolso Sellador</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60" id="gestion-jornada-table-body">

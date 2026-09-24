@@ -345,6 +345,7 @@ class BoteAppController {
             // 2. Socio que juega los dobles en esta jornada (ganador de la jornada anterior)
             const doblesPlayerMov = jMovements.find(m => m.jugaDobles);
             const sealerMov = jMovements.find(m => m.isSealer || m.sellado < 0);
+            const maulaMov = jMovements.find(m => (m.penalizacionMaula && m.penalizacionMaula > 0) || m.isLoser);
 
             const neto = recaudacion - gastoSellado + premios;
 
@@ -364,10 +365,14 @@ class BoteAppController {
                 winnerName: winnerName,
                 doblesPlayerId: doblesPlayerMov ? String(doblesPlayerMov.memberId) : null,
                 doblesPlayerName: doblesPlayerMov ? doblesPlayerMov.memberName : null,
-                loserId: sealerMov ? String(sealerMov.memberId) : null,
-                loserName: sealerMov ? sealerMov.memberName : null,
-                noSellado: false,
-                sustitutoSellado: null
+                maulaId: maulaMov ? String(maulaMov.memberId) : (sealerMov ? String(sealerMov.memberId) : null),
+                maulaName: maulaMov ? maulaMov.memberName : (sealerMov ? sealerMov.memberName : null),
+                loserId: maulaMov ? String(maulaMov.memberId) : (sealerMov ? String(sealerMov.memberId) : null),
+                loserName: maulaMov ? maulaMov.memberName : (sealerMov ? sealerMov.memberName : null),
+                sealerId: sealerMov ? String(sealerMov.memberId) : null,
+                sealerName: sealerMov ? sealerMov.memberName : null,
+                noSellado: !!j.noSellado,
+                sustitutoSellado: j.sustitutoSellado || null
             };
         });
 
@@ -826,7 +831,7 @@ class BoteAppController {
                 icons += ' <span title="Juega gratis esta jornada (premio o ganador jornada previa)">🎁</span>';
             }
             if (m.isSealer || m.sellado < 0) {
-                icons += ' <span title="Encargado del sellado">💀</span>';
+                icons += m.isSustituto ? ' <span title="Sustituto: este socio selló la quiniela en lugar del Maula oficial" class="text-amber-400 font-bold">🔄💀</span>' : ' <span title="Encargado del sellado (Maula)">💀</span>';
             }
 
             tr.innerHTML = `
@@ -958,6 +963,95 @@ class BoteAppController {
         } catch (e) {
             console.error("Error toggling sellado cash:", e);
             alert("No se pudo actualizar el tipo de reembolso en la base de datos.");
+        }
+    }
+
+    /**
+     * Asigna o modifica el socio sustituto que realmente selló la quiniela
+     */
+    async changeSustitutoSellado(jornadaId, sustitutoId) {
+        const data = this.getSeasonData();
+        const jSummary = data.jornadaSummaries.find(j => String(j.id) === String(jornadaId) || String(j.number) === String(jornadaId));
+        if (!jSummary) return;
+
+        const officialMaulaId = jSummary.maulaId || jSummary.loserId;
+        const newSustitutoId = (sustitutoId && sustitutoId !== '' && String(sustitutoId) !== String(officialMaulaId)) ? String(sustitutoId) : null;
+
+        try {
+            // 1. Guardar en base de datos Firestore si está disponible
+            if (window.DataService) {
+                let jornadaDoc = null;
+                if (this.rawSeasonData && this.rawSeasonData.jornadas) {
+                    jornadaDoc = this.rawSeasonData.jornadas.find(j => String(j.id) === String(jornadaId) || String(j.number) === String(jornadaId));
+                }
+                if (!jornadaDoc) {
+                    jornadaDoc = await window.DataService.getDoc('jornadas', String(jornadaId));
+                }
+                if (jornadaDoc) {
+                    jornadaDoc.sustitutoSellado = newSustitutoId;
+                    await window.DataService.save('jornadas', {
+                        ...jornadaDoc,
+                        sustitutoSellado: newSustitutoId
+                    });
+                }
+            }
+
+            // 2. Actualizar en rawSeasonData local
+            if (this.rawSeasonData && this.rawSeasonData.jornadas) {
+                const jDoc = this.rawSeasonData.jornadas.find(j => String(j.id) === String(jornadaId) || String(j.number) === String(jornadaId));
+                if (jDoc) jDoc.sustitutoSellado = newSustitutoId;
+            }
+
+            // 3. Actualizar en jSummary local
+            jSummary.sustitutoSellado = newSustitutoId;
+
+            // 4. Recalcular todo el modelo contable
+            if (this.isLive) {
+                await this.loadLiveFirebaseData();
+            } else {
+                // En modo snapshot local: transferir el sellado entre los movimientos
+                const jMovements = data.movements.filter(m => String(m.jornadaId) === String(jSummary.id) || m.jornadaNum === jSummary.number);
+                const prevSealerMov = jMovements.find(m => m.sellado < 0 || m.isSealer);
+                const targetMemberId = newSustitutoId || officialMaulaId;
+                const newSealerMov = jMovements.find(m => String(m.memberId) === String(targetMemberId));
+
+                if (prevSealerMov && newSealerMov && prevSealerMov !== newSealerMov) {
+                    const sellVal = prevSealerMov.sellado; // -24.75
+                    const isCash = prevSealerMov.isSelladoInCash;
+
+                    prevSealerMov.sellado = 0;
+                    prevSealerMov.isSealer = false;
+                    prevSealerMov.isSustituto = false;
+
+                    newSealerMov.sellado = sellVal;
+                    newSealerMov.isSealer = true;
+                    newSealerMov.isSustituto = !!newSustitutoId;
+                    newSealerMov.isSelladoInCash = isCash;
+
+                    // Ajustar saldos acumulados de los miembros en snapshot local
+                    const prevMem = data.memberSummaries.find(m => String(m.id) === String(prevSealerMov.memberId));
+                    const newMem = data.memberSummaries.find(m => String(m.id) === String(newSealerMov.memberId));
+                    if (prevMem && newMem) {
+                        prevMem.breakdown.sellado = (prevMem.breakdown.sellado || 0) + Math.abs(sellVal);
+                        newMem.breakdown.sellado = (newMem.breakdown.sellado || 0) - Math.abs(sellVal);
+                    }
+                }
+                this.recalculateCurrentModel();
+            }
+
+            // 5. Re-renderizar todas las vistas y el modal
+            this.renderAll();
+            this.renderModalGestionJornada();
+
+            const mem = newSustitutoId ? data.memberSummaries.find(m => String(m.id) === String(newSustitutoId)) : null;
+            if (mem) {
+                alert(`✅ Sustituto guardado: ${mem.name} selló la Jornada ${jSummary.number}. El gasto del sellado (-24,75 €) y su reembolso (+24,75 €) se han asignado a su cuenta.`);
+            } else {
+                alert(`✅ Sellado restaurado: La Jornada ${jSummary.number} vuelve a tener como sellador a su Maula oficial (${jSummary.maulaName || jSummary.loserName}).`);
+            }
+        } catch (err) {
+            console.error('Error al cambiar sustituto sellado:', err);
+            alert('Hubo un error al guardar el cambio de sellador.');
         }
     }
 
@@ -2055,30 +2149,64 @@ class BoteAppController {
         if (!tbody) return;
         tbody.innerHTML = '';
 
+        const allMembersSorted = [...data.memberSummaries].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
         data.jornadaSummaries.forEach(j => {
-            const sealer = data.memberSummaries.find(m => String(m.id) === String(j.loserId));
+            const officialMaulaId = j.maulaId || j.loserId;
+            const officialMaula = data.memberSummaries.find(m => String(m.id) === String(officialMaulaId));
+            const currentSustitutoId = j.sustitutoSellado ? String(j.sustitutoSellado) : null;
+            const actualSealerId = currentSustitutoId || officialMaulaId;
+            const actualSealer = data.memberSummaries.find(m => String(m.id) === String(actualSealerId));
+
             const jMovements = data.movements.filter(m => m.jornadaNum === j.number);
-            const sealerMov = jMovements.find(m => String(m.memberId) === String(j.loserId));
-            const isCash = sealerMov ? sealerMov.isSelladoInCash : false;
+            const actualSealerMov = jMovements.find(m => String(m.memberId) === String(actualSealerId));
+            const isCash = actualSealerMov ? actualSealerMov.isSelladoInCash : false;
+
+            const hasSustituto = !!currentSustitutoId && String(currentSustitutoId) !== String(officialMaulaId);
+
+            // Generar opciones del selector
+            const optionsHtml = allMembersSorted.map(m => {
+                const isSelected = hasSustituto && String(m.id) === String(currentSustitutoId);
+                const isOfficial = String(m.id) === String(officialMaulaId);
+                return `<option value="${m.id}" ${isSelected ? 'selected' : ''}>
+                    ${isOfficial ? `👤 ${m.name} (Maula oficial)` : `🔄 Sustituto: ${m.name}`}
+                </option>`;
+            }).join('');
 
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-900/60 text-xs';
+            tr.className = `hover:bg-slate-900/60 text-xs ${hasSustituto ? 'bg-amber-500/5' : ''}`;
             tr.innerHTML = `
-                <td class="p-3 font-bold text-white">Jornada ${j.number}</td>
-                <td class="p-3 text-slate-400">${j.date}</td>
-                <td class="p-3 font-semibold text-rose-300">${sealer ? sealer.name : 'N/A'}</td>
-                <td class="p-3 text-right font-mono font-bold text-white">${j.gastoSellado.toFixed(2)} €</td>
-                <td class="p-3 text-center">
-                    <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1">
-                        <label class="cursor-pointer flex items-center gap-1 ${!isCash ? 'text-amber-400 font-bold' : 'text-slate-400'}">
-                            <input type="radio" name="modal_reemb_${j.number}" ${!isCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${j.loserId}', '${j.id || j.number}', false)">
-                            <span>Bote</span>
-                        </label>
-                        <span class="text-slate-600">|</span>
-                        <label class="cursor-pointer flex items-center gap-1 ${isCash ? 'text-emerald-400 font-bold' : 'text-slate-400'}">
-                            <input type="radio" name="modal_reemb_${j.number}" ${isCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${j.loserId}', '${j.id || j.number}', true)">
-                            <span>Bizum</span>
-                        </label>
+                <td class="p-3 font-bold text-white whitespace-nowrap">Jornada ${j.number}</td>
+                <td class="p-3 text-slate-400 whitespace-nowrap font-mono">${j.date}</td>
+                <td class="p-3 font-semibold text-rose-300">
+                    <span class="inline-flex items-center gap-1">
+                        <span>💀</span> ${officialMaula ? officialMaula.name : 'N/A'}
+                    </span>
+                </td>
+                <td class="p-3">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <select onchange="window.BoteApp.changeSustitutoSellado('${j.id || j.number}', this.value)" class="bg-slate-900 border ${hasSustituto ? 'border-amber-500/60 text-amber-300 font-semibold' : 'border-slate-700 text-slate-300'} rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-amber-500 max-w-[210px] cursor-pointer">
+                            <option value="">👤 ${officialMaula ? officialMaula.name : 'Maula Oficial'} (Maula oficial)</option>
+                            ${optionsHtml}
+                        </select>
+                        ${hasSustituto ? '<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold border border-amber-500/30 whitespace-nowrap">🔄 Sustituto</span>' : ''}
+                    </div>
+                </td>
+                <td class="p-3 text-right font-mono font-bold text-white whitespace-nowrap">${j.gastoSellado.toFixed(2)} €</td>
+                <td class="p-3 text-center whitespace-nowrap">
+                    <div class="inline-flex flex-col items-center gap-0.5">
+                        <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1">
+                            <label class="cursor-pointer flex items-center gap-1 ${!isCash ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-white'}">
+                                <input type="radio" name="modal_reemb_${j.number}" ${!isCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${actualSealerId}', '${j.id || j.number}', false)">
+                                <span>Bote</span>
+                            </label>
+                            <span class="text-slate-600">|</span>
+                            <label class="cursor-pointer flex items-center gap-1 ${isCash ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'}">
+                                <input type="radio" name="modal_reemb_${j.number}" ${isCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${actualSealerId}', '${j.id || j.number}', true)">
+                                <span>Bizum</span>
+                            </label>
+                        </div>
+                        <span class="text-[10px] text-slate-400">${actualSealer ? actualSealer.name : ''}</span>
                     </div>
                 </td>
             `;
