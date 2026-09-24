@@ -595,6 +595,20 @@ class BoteAppController {
             </button>
         ` : '';
 
+        const exemptMovements = jMovements.filter(m => m.exento);
+        const exemptNames = exemptMovements.map(m => m.memberName).join(', ');
+        const exemptHtml = exemptMovements.length > 0 ? `
+            <span class="text-slate-600">•</span>
+            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50">
+                <span class="text-amber-400 font-bold">🎁 Gratis:</span> 
+                <span class="underline decoration-dotted decoration-slate-500">${exemptNames}</span>
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
+                    <strong class="text-amber-400 block mb-1 font-bold">🎁 Socio Exento de Cuota</strong>
+                    Juega gratis esta jornada al haber obtenido premio o ganado en la jornada anterior.
+                </div>
+            </div>
+        ` : '';
+
         if (headerCard) {
             headerCard.innerHTML = `
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -610,10 +624,11 @@ class BoteAppController {
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || 'N/A'}</span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto">
                                     <strong class="text-emerald-400 block mb-1 font-bold">👑 Ganador de la Jornada</strong>
-                                    Socio con más aciertos. Obtiene el derecho a pronosticar la quiniela de 7 dobles de la siguiente jornada (coste de 10,50 € pagado al 100% por la peña).
+                                    Socio con más aciertos en esta jornada. Jugará gratis (🎁) y pronosticará la quiniela de 7 dobles en la siguiente jornada (coste de 10,50 € pagado al 100% por la peña).
                                 </div>
                             </div>
                             ${doblesBtn}
+                            ${exemptHtml}
                             <span class="text-slate-600">•</span>
                             <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50">
                                 <span class="text-rose-400 font-bold">💀 Sellador:</span> 
@@ -707,13 +722,15 @@ class BoteAppController {
             }
 
             let icons = '';
-            if (m.exento) icons += ' <span title="Juega gratis esta jornada">🎁</span>';
             if (m.isWinner || (jSummary.winnerId && String(m.memberId) === String(jSummary.winnerId))) {
                 icons += ' <span title="Ganador de esta jornada">👑</span>';
-            } else if (m.jugaDobles) {
-                icons += ' <span title="Ganador jornada previa (juega dobles esta jornada)">🎲</span>';
             }
-            if (m.isSealer || m.sellado < 0) icons += ' <span title="Encargado del sellado">💀</span>';
+            if (m.exento) {
+                icons += ' <span title="Juega gratis esta jornada (premio o ganador jornada previa)">🎁</span>';
+            }
+            if (m.isSealer || m.sellado < 0) {
+                icons += ' <span title="Encargado del sellado">💀</span>';
+            }
 
             tr.innerHTML = `
                 <td class="p-2.5 sm:px-4">
