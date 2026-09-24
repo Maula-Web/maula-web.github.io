@@ -149,7 +149,8 @@ class BoteEngine {
                         exento: costs.exento,
                         jugaDobles: costs.jugaDobles,
                         isSelladoInCash: isSelladoInCash,
-                        isLoser: costs.isLoser,
+                        isWinner: costs.isWinner || false,
+                        isLoser: costs.isLoser || false,
                         isSealer: costs.isSealer || (costs.sellado < 0),
                         pennaIn: costs.aportacion + penalties + prizes + extraPrizes,
                         pennaOut: (isSelladoInCash && costs.sellado < 0) ? Math.abs(costs.sellado) : 0
@@ -239,6 +240,8 @@ class BoteEngine {
             aciertos: 0,
             exento: false,
             jugaDobles: false,
+            isWinner: false,
+            isLoser: false,
             isSustituto: false
         };
 
@@ -416,6 +419,9 @@ class BoteEngine {
 
         let isCurrentLoser = false;
         if (jornadaPlayed) {
+            if (this.wasWinnerOfJornada(memberId, jornada, members, jornadas, pronosticos)) {
+                costs.isWinner = true;
+            }
             if (this.wasLoserOfJornada(memberId, jornada, members, jornadas, pronosticos)) {
                 isCurrentLoser = true;
                 costs.isLoser = true;

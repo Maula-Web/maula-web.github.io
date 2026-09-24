@@ -215,7 +215,8 @@ class BoteAppController {
                         jornadas,
                         movements,
                         ingresos,
-                        cashPayments
+                        cashPayments,
+                        pronosticos
                     );
                     this.isLive = true;
                     console.log("✅ Bote 2: Datos en vivo calculados al céntimo con Firestore");
@@ -230,7 +231,7 @@ class BoteAppController {
     /**
      * Transforma los movimientos del BoteEngine en el modelo enriquecido para las 5 vistas
      */
-    buildSeasonModelFromMovements(season, config, members, jornadas, movements, ingresos, cashPayments) {
+    buildSeasonModelFromMovements(season, config, members, jornadas, movements, ingresos, cashPayments, pronosticos) {
         // Resumen por socio
         const memberSummaries = members.map(m => {
             const mMovements = movements.filter(mov => String(mov.memberId) === String(m.id));
@@ -286,7 +287,34 @@ class BoteAppController {
                 premios += ((m.premios || 0) + (m.extraPrizes || 0));
             });
 
-            const winnerMov = jMovements.find(m => m.jugaDobles);
+            // 1. Ganador real de ESTA jornada (el socio con más aciertos que ha ganado la jornada)
+            let winnerId = null;
+            let winnerName = null;
+            if (this.engine && typeof this.engine.getWinnerOfJornada === 'function') {
+                winnerId = this.engine.getWinnerOfJornada(j, members, jornadas, pronosticos);
+            }
+            const winnerMov = jMovements.find(m => m.isWinner || (winnerId && String(m.memberId) === String(winnerId)));
+            if (winnerMov) {
+                winnerId = String(winnerMov.memberId);
+                winnerName = winnerMov.memberName;
+            } else if (winnerId) {
+                const wMem = members.find(m => String(m.id) === String(winnerId));
+                winnerName = wMem ? wMem.name : null;
+            } else if (jMovements.length > 0) {
+                // Fallback por aciertos si no hay motor disponible
+                const validMovs = jMovements.filter(m => typeof m.aciertos === 'number' && !isNaN(m.aciertos));
+                if (validMovs.length > 0) {
+                    const maxAc = Math.max(...validMovs.map(m => m.aciertos));
+                    const best = validMovs.filter(m => m.aciertos === maxAc);
+                    if (best.length === 1) {
+                        winnerId = String(best[0].memberId);
+                        winnerName = best[0].memberName;
+                    }
+                }
+            }
+
+            // 2. Socio que juega los dobles en esta jornada (ganador de la jornada anterior)
+            const doblesPlayerMov = jMovements.find(m => m.jugaDobles);
             const sealerMov = jMovements.find(m => m.isSealer || m.sellado < 0);
 
             const neto = recaudacion - gastoSellado + premios;
@@ -303,8 +331,10 @@ class BoteAppController {
                 premios,
                 totalIn: recaudacion,
                 neto,
-                winnerId: winnerMov ? String(winnerMov.memberId) : null,
-                winnerName: winnerMov ? winnerMov.memberName : null,
+                winnerId: winnerId,
+                winnerName: winnerName,
+                doblesPlayerId: doblesPlayerMov ? String(doblesPlayerMov.memberId) : null,
+                doblesPlayerName: doblesPlayerMov ? doblesPlayerMov.memberName : null,
                 loserId: sealerMov ? String(sealerMov.memberId) : null,
                 loserName: sealerMov ? sealerMov.memberName : null,
                 noSellado: false,
@@ -560,7 +590,7 @@ class BoteAppController {
         const jMovements = data.movements.filter(m => m.jornadaNum === jSummary.number);
         const doblesPrize = jMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
         const doblesBtn = (doblesPrize > 0) ? `
-            <button onclick="window.BoteApp.showReducedBreakdown('${jSummary.winnerId || ''}', ${jSummary.number})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold transition-all shadow-sm" title="Ver desglose oficial de las 16 apuestas reducidas premiadas">
+            <button onclick="window.BoteApp.showReducedBreakdown('${jSummary.doblesPlayerId || jSummary.winnerId || ''}', ${jSummary.number})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold transition-all shadow-sm" title="Ver desglose oficial de las 16 apuestas reducidas premiadas">
                 <span>📋</span> Ver Reducción Premiada (+${doblesPrize.toFixed(2)} €)
             </button>
         ` : '';
@@ -678,7 +708,11 @@ class BoteAppController {
 
             let icons = '';
             if (m.exento) icons += ' <span title="Juega gratis esta jornada">🎁</span>';
-            if (m.jugaDobles) icons += ' <span title="Ganador jornada previa (juega dobles)">👑</span>';
+            if (m.isWinner || (jSummary.winnerId && String(m.memberId) === String(jSummary.winnerId))) {
+                icons += ' <span title="Ganador de esta jornada">👑</span>';
+            } else if (m.jugaDobles) {
+                icons += ' <span title="Ganador jornada previa (juega dobles esta jornada)">🎲</span>';
+            }
             if (m.isSealer || m.sellado < 0) icons += ' <span title="Encargado del sellado">💀</span>';
 
             tr.innerHTML = `
@@ -849,8 +883,8 @@ class BoteAppController {
                     return;
                 }
 
-                const isWin = j.winnerId && String(m.id) === String(j.winnerId);
-                const isLoss = j.loserId && String(m.id) === String(j.loserId);
+                const isWin = (mov && mov.isWinner) || (j.winnerId && String(m.id) === String(j.winnerId));
+                const isLoss = (mov && mov.isLoser) || (j.loserId && String(m.id) === String(j.loserId));
                 const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0);
 
                 let cellClass = 'border-r border-slate-800/50 cursor-pointer p-1.5 sm:p-2 transition-all hover:brightness-125';
@@ -919,6 +953,10 @@ class BoteAppController {
         const body = document.getElementById('pop-body');
         if (!pop || !title || !body) return;
 
+        const jSum = data.jornadaSummaries.find(j => j.number === jornadaNum);
+        const isWin = (mov && mov.isWinner) || (jSum && String(member.id) === String(jSum.winnerId));
+        const isLoss = (mov && mov.isLoser) || (jSum && String(member.id) === String(jSum.loserId));
+
         title.textContent = `${member.name} - Jornada ${jornadaNum}`;
 
         const selladoText = mov.sellado < 0 ? `+${Math.abs(mov.sellado).toFixed(2)} € (${mov.isSelladoInCash ? 'Bizum' : 'Bote'})` : '-';
@@ -926,7 +964,7 @@ class BoteAppController {
         body.innerHTML = `
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Aciertos:</span>
-                <strong class="text-white">${mov.aciertos !== undefined ? mov.aciertos : '-'}</strong>
+                <strong class="text-white">${mov.aciertos !== undefined ? mov.aciertos : '-'}${isWin ? ' <span class="text-emerald-400 font-bold text-xs ml-1">👑 (Ganador)</span>' : ''}${isLoss ? ' <span class="text-rose-400 font-bold text-xs ml-1">💀 (Sellador)</span>' : ''}</strong>
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Cuota Base:</span>
@@ -1964,7 +2002,8 @@ class BoteAppController {
 
             let acText = m.aciertos !== undefined ? m.aciertos : '-';
             if (m.exento) acText += ' 🎁';
-            if (m.jugaDobles) acText += ' 👑';
+            if (m.isWinner) acText += ' 👑';
+            else if (m.jugaDobles) acText += ' 🎲';
             if (m.isSealer || m.sellado < 0) acText += ' 💀';
 
             let inBreakdown = [];
