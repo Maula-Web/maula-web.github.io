@@ -828,18 +828,37 @@ class BoteAppController {
 
         pop.classList.remove('hidden');
 
-        // Posicionar popover
+        // Posicionar popover inteligentemente dentro del viewport (el elemento tiene posición 'fixed')
         const rect = e.currentTarget.getBoundingClientRect();
-        const popW = 280;
-        let left = rect.left + window.scrollX;
-        let top = rect.bottom + window.scrollY + 8;
+        const popW = pop.offsetWidth || 288;
+        const popH = pop.offsetHeight || 260;
+        const margin = 12;
 
-        if (left + popW > window.innerWidth - 10) {
-            left = window.innerWidth - popW - 10;
+        // Cálculo horizontal centrado respecto a la celda clicada y acotado por los márgenes de la pantalla
+        let left = rect.left + (rect.width / 2) - (popW / 2);
+        if (left + popW > window.innerWidth - margin) {
+            left = window.innerWidth - popW - margin;
+        }
+        if (left < margin) {
+            left = margin;
         }
 
-        pop.style.left = Math.max(10, left) + 'px';
-        pop.style.top = top + 'px';
+        // Cálculo vertical inteligente:
+        // Si colocarlo debajo de la celda se sale de la pantalla por abajo, colocarlo arriba de la celda
+        let top = rect.bottom + 8;
+        if (top + popH > window.innerHeight - margin) {
+            const topAbove = rect.top - popH - 8;
+            if (topAbove >= margin) {
+                // Cabe cómodamente encima de la celda
+                top = topAbove;
+            } else {
+                // En pantallas muy bajas, ajustar para que el popover quede completamente dentro del área visible
+                top = Math.max(margin, window.innerHeight - popH - margin);
+            }
+        }
+
+        pop.style.left = `${Math.round(left)}px`;
+        pop.style.top = `${Math.round(top)}px`;
     }
 
     // =========================================================================

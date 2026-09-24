@@ -869,7 +869,7 @@
     </div>
 
     <!-- Popover flotante para celdas de la matriz -->
-    <div id="matrix-popover" class="fixed hidden z-50 p-4 rounded-2xl bg-slate-900 border border-orange-500/50 shadow-2xl text-xs w-72 backdrop-blur-xl">
+    <div id="matrix-popover" class="fixed hidden z-50 p-4 rounded-2xl bg-slate-900 border border-orange-500/50 shadow-2xl text-xs w-72 max-w-[calc(100vw-24px)] max-h-[calc(100vh-24px)] overflow-y-auto backdrop-blur-xl">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
             <strong class="text-white text-sm" id="pop-title">Socio - JX</strong>
             <button onclick="document.getElementById('matrix-popover').classList.add('hidden')" class="text-slate-400 hover:text-white">✕</button>
