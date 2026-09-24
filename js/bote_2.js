@@ -82,6 +82,10 @@ class BoteAppController {
             if (trigger) {
                 const panel = trigger.closest('.glass-panel, [id="jornada-header-card"], .grid, section');
                 if (panel) panel.style.zIndex = '100';
+                const tr = trigger.closest('tr');
+                if (tr) tr.style.zIndex = '60';
+                const td = trigger.closest('td, th');
+                if (td) td.style.zIndex = '70';
                 trigger.style.zIndex = '110';
             }
         });
@@ -91,6 +95,10 @@ class BoteAppController {
             if (trigger) {
                 const panel = trigger.closest('.glass-panel, [id="jornada-header-card"], .grid, section');
                 if (panel) panel.style.zIndex = '';
+                const tr = trigger.closest('tr');
+                if (tr) tr.style.zIndex = '';
+                const td = trigger.closest('td, th');
+                if (td) td.style.zIndex = '';
                 trigger.style.zIndex = '';
             }
         });
@@ -685,16 +693,84 @@ class BoteAppController {
         tbody.innerHTML = '';
 
         // Mantener orden por ID de socio
-        jMovements.sort((a, b) => parseInt(a.memberId) - parseInt(b.memberId)).forEach(m => {
+        jMovements.sort((a, b) => parseInt(a.memberId) - parseInt(b.memberId)).forEach((m, rowIdx) => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 transition-colors text-xs sm:text-sm';
 
-            // Chips de penalizaciones
+            // Posicionamiento dinámico: mitad superior hacia abajo, mitad inferior hacia arriba
+            const posClass = rowIdx < 10 ? 'left-1/2 -translate-x-1/2 top-full mt-1.5' : 'left-1/2 -translate-x-1/2 bottom-full mb-1.5';
+            const prizePosClass = rowIdx < 10 ? 'right-0 top-full mt-1.5' : 'right-0 bottom-full mb-1.5';
+
+            // Chips de penalizaciones con tarjetas explicativas formato Superávit Peña
             const penaltyChips = [];
-            if (m.penalizacionUnos > 0) penaltyChips.push(`<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[11px] font-semibold" title="Multa por 10 o más signos '1'">+1️⃣ ${m.penalizacionUnos.toFixed(2)}€</span>`);
-            if (m.penalizacionBajosAciertos > 0) penaltyChips.push(`<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[11px] font-semibold" title="Multa por 0 a 3 aciertos">📉 ${m.penalizacionBajosAciertos.toFixed(2)}€</span>`);
-            if (m.penalizacionPIG > 0) penaltyChips.push(`<span class="px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400 text-[11px] font-semibold" title="Fallo en partido de interés general (PIG)">🐷 ${m.penalizacionPIG.toFixed(2)}€</span>`);
-            if (m.penalizacionMaula > 0) penaltyChips.push(`<span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[11px] font-semibold" title="Penalización por quedar último (Maula)">💀 ${m.penalizacionMaula.toFixed(2)}€</span>`);
+            if (m.penalizacionUnos > 0) {
+                penaltyChips.push(`
+                    <div class="group relative cursor-help inline-block">
+                        <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[11px] font-semibold border border-amber-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                            +1️⃣ ${m.penalizacionUnos.toFixed(2)}€
+                        </span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>1️⃣</span> Multa por Exceso de Unos (+1)
+                            </strong>
+                            <p class="leading-relaxed">
+                                Penalización de <strong>+${m.penalizacionUnos.toFixed(2)} €</strong> aplicada por pronosticar 10 o más signos "1" en la quiniela semanal. Se abona íntegramente al fondo común de la peña.
+                            </p>
+                        </div>
+                    </div>
+                `);
+            }
+            if (m.penalizacionBajosAciertos > 0) {
+                penaltyChips.push(`
+                    <div class="group relative cursor-help inline-block">
+                        <span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[11px] font-semibold border border-rose-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                            📉 ${m.penalizacionBajosAciertos.toFixed(2)}€
+                        </span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>📉</span> Multa por Bajos Aciertos
+                            </strong>
+                            <p class="leading-relaxed">
+                                Penalización de <strong>+${m.penalizacionBajosAciertos.toFixed(2)} €</strong> aplicada por obtener entre 0 y 3 aciertos en los 14 primeros partidos del boleto semanal.
+                            </p>
+                        </div>
+                    </div>
+                `);
+            }
+            if (m.penalizacionPIG > 0) {
+                penaltyChips.push(`
+                    <div class="group relative cursor-help inline-block">
+                        <span class="px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400 text-[11px] font-semibold border border-pink-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                            🐷 ${m.penalizacionPIG.toFixed(2)}€
+                        </span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-pink-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-pink-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>🐷</span> Fallo en Partido de Interés General (PIG)
+                            </strong>
+                            <p class="leading-relaxed">
+                                Multa de <strong>+${m.penalizacionPIG.toFixed(2)} €</strong> por no acertar el resultado en el partido fijado como Partido de Interés General de la jornada.
+                            </p>
+                        </div>
+                    </div>
+                `);
+            }
+            if (m.penalizacionMaula > 0) {
+                penaltyChips.push(`
+                    <div class="group relative cursor-help inline-block">
+                        <span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[11px] font-semibold border border-purple-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                            💀 ${m.penalizacionMaula.toFixed(2)}€
+                        </span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>💀</span> Penalización Maula de la Jornada
+                            </strong>
+                            <p class="leading-relaxed">
+                                Multa de <strong>+${m.penalizacionMaula.toFixed(2)} €</strong> aplicada al socio que ha quedado en última posición de aciertos en la jornada.
+                            </p>
+                        </div>
+                    </div>
+                `);
+            }
 
             const penaltiesHtml = penaltyChips.length > 0 ? penaltyChips.join(' ') : '<span class="text-slate-600">-</span>';
 
@@ -740,7 +816,19 @@ class BoteAppController {
                     ${m.aciertos !== undefined ? m.aciertos : '-'}
                 </td>
                 <td class="p-2.5 sm:px-4 text-right font-mono text-slate-300">
-                    ${m.exento ? '<span class="text-amber-400 font-bold" title="Exento por premio en jornada previa">GRATIS</span>' : m.aportacion.toFixed(2) + ' €'}
+                    ${m.exento ? `
+                        <div class="group relative cursor-help inline-block">
+                            <span class="text-amber-400 font-bold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 hover:brightness-125 transition-all">GRATIS</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                    <span>🎁</span> Cuota Gratis (Exento)
+                                </strong>
+                                <p class="leading-relaxed">
+                                    El socio no paga cuota semanal (0,00 €) al haber obtenido premio oficial o ganado en la jornada anterior.
+                                </p>
+                            </div>
+                        </div>
+                    ` : m.aportacion.toFixed(2) + ' €'}
                 </td>
                 <td class="p-2.5 sm:px-4 text-center">
                     ${penaltiesHtml}
@@ -750,9 +838,19 @@ class BoteAppController {
                 </td>
                 <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.premios > 0 ? 'text-emerald-400' : 'text-slate-600'}">
                     ${m.premios > 0 ? `
-                        <div class="inline-flex flex-col items-end">
+                        <div class="group relative cursor-help inline-flex flex-col items-end">
                             <span>+${m.premios.toFixed(2)} €</span>
-                            <span class="text-[9px] font-sans font-semibold text-blue-300 bg-blue-500/20 px-1 py-0.5 rounded border border-blue-500/30" title="Premio oficial ganado por el pronóstico individual del socio">🔵 Individual</span>
+                            <span class="text-[9px] font-sans font-semibold text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all">
+                                🔵 Individual ℹ️
+                            </span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${prizePosClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-blue-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                                <strong class="text-blue-400 block mb-1 font-bold flex items-center gap-1.5">
+                                    <span>🔵</span> Premio Oficial Individual (+${m.premios.toFixed(2)} €)
+                                </strong>
+                                <p class="leading-relaxed">
+                                    Premio oficial de Loterías del Estado conseguido por el boleto individual del socio (${m.aciertos} aciertos). El socio disfruta de cuota gratis la jornada siguiente.
+                                </p>
+                            </div>
                         </div>
                     ` : '-'}
                 </td>
@@ -786,9 +884,19 @@ class BoteAppController {
                 <td class="p-2.5 sm:px-4 text-center text-slate-500">-</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono text-slate-500">-</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono font-black text-emerald-400">
-                    <div class="inline-flex flex-col items-end">
+                    <div class="group relative cursor-help inline-flex flex-col items-end">
                         <span>+${doblesPrize.toFixed(2)} €</span>
-                        <span class="text-[9px] font-sans font-semibold text-purple-300 bg-purple-500/20 px-1 py-0.5 rounded border border-purple-500/30">🟣 Bote Peña</span>
+                        <span class="text-[9px] font-sans font-semibold text-purple-300 bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all">
+                            🟣 Bote Peña ℹ️
+                        </span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-1.5 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-purple-300 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>🟣</span> Premio Reducción de Dobles (+${doblesPrize.toFixed(2)} €)
+                            </strong>
+                            <p class="leading-relaxed">
+                                Premio oficial conseguido por las 16 apuestas reducidas (7 dobles) financiadas por la peña. Este importe entra directamente al fondo de la caja común.
+                            </p>
+                        </div>
                     </div>
                 </td>
                 <td class="p-2.5 sm:px-4 text-center text-slate-500">-</td>
