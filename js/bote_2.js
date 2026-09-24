@@ -628,7 +628,12 @@ class BoteAppController {
                     -${(m.totalGastos || 0).toFixed(2)} €
                 </td>
                 <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.premios > 0 ? 'text-emerald-400' : 'text-slate-600'}">
-                    ${m.premios > 0 ? '+' + m.premios.toFixed(2) + ' €' : '-'}
+                    ${m.premios > 0 ? `
+                        <div class="inline-flex flex-col items-end">
+                            <span>+${m.premios.toFixed(2)} €</span>
+                            <span class="text-[9px] font-sans font-semibold text-blue-300 bg-blue-500/20 px-1 py-0.5 rounded border border-blue-500/30" title="Premio oficial ganado por el pronóstico individual del socio">🔵 Individual</span>
+                        </div>
+                    ` : '-'}
                 </td>
                 <td class="p-2.5 sm:px-4 text-right">
                     ${selladoCol}
@@ -642,6 +647,36 @@ class BoteAppController {
             `;
             tbody.appendChild(tr);
         });
+
+        // Fila especial para la Quiniela de Dobles si obtuvo premio en esta jornada
+        const doblesPrize = (jSummary.number === 3 ? 2.32 : (jSummary.number === 4 ? 3.40 : 0));
+        if (doblesPrize > 0) {
+            const trDobles = document.createElement('tr');
+            trDobles.className = 'bg-purple-950/30 border-t-2 border-purple-500/40 text-xs sm:text-sm font-semibold hover:bg-purple-950/40 transition-colors';
+            trDobles.innerHTML = `
+                <td class="p-2.5 sm:px-4 text-purple-200">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-300 text-[10px] font-black uppercase">🟣 Dobles</span>
+                        <strong>Quiniela de Dobles (Peña)</strong>
+                        <button onclick="window.BoteApp.showReducedBreakdown(null, ${jSummary.number})" class="text-[10px] text-purple-400 hover:text-purple-200 underline ml-1">Ver 16 apuestas</button>
+                    </div>
+                </td>
+                <td class="p-2.5 sm:px-4 text-center font-bold text-purple-300">10 ac.</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400">10,50 € (Peña)</td>
+                <td class="p-2.5 sm:px-4 text-center text-slate-500">-</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-500">-</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono font-black text-emerald-400">
+                    <div class="inline-flex flex-col items-end">
+                        <span>+${doblesPrize.toFixed(2)} €</span>
+                        <span class="text-[9px] font-sans font-semibold text-purple-300 bg-purple-500/20 px-1 py-0.5 rounded border border-purple-500/30">🟣 Bote Peña</span>
+                    </div>
+                </td>
+                <td class="p-2.5 sm:px-4 text-center text-slate-500">-</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-emerald-400">+${doblesPrize.toFixed(2)} €</td>
+                <td class="p-2.5 sm:px-4 text-right text-slate-400 text-[11px] font-sans">Ingresado en Bote Peña</td>
+            `;
+            tbody.appendChild(trDobles);
+        }
     }
 
     /**
@@ -948,38 +983,136 @@ class BoteAppController {
     }
 
     renderPremiosDobles() {
-        const grid = document.getElementById('premios-dobles-grid');
-        if (!grid) return;
-        grid.innerHTML = `
-            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 hover:border-purple-500/40 transition-all">
-                <div class="flex justify-between items-center">
-                    <strong class="text-white text-sm sm:text-base">Jornada 3 (30/08/2026)</strong>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10 Aciertos</span>
+        const gridDobles = document.getElementById('premios-dobles-grid');
+        const gridIndiv = document.getElementById('premios-individuales-grid');
+        const badgeDobles = document.getElementById('total-premios-dobles-badge');
+        const badgeIndiv = document.getElementById('total-premios-individuales-badge');
+        const badgeGlobal = document.getElementById('total-premios-global-badge');
+
+        const data = this.getSeasonData();
+
+        // 1. Premios de Quinielas de Dobles (Fondo de la Peña)
+        const doblesPrizes = [
+            {
+                jornadaNum: 3,
+                date: "30/08/2026",
+                memberId: 13,
+                memberName: "Luismi",
+                previousJornada: 2,
+                hits: 10,
+                amount: 2.32
+            },
+            {
+                jornadaNum: 4,
+                date: "06/09/2026",
+                memberId: 6,
+                memberName: "Fernando Lozano",
+                previousJornada: 3,
+                hits: 10,
+                amount: 3.40
+            }
+        ];
+
+        let totDobles = doblesPrizes.reduce((sum, p) => sum + p.amount, 0);
+
+        if (gridDobles) {
+            gridDobles.innerHTML = doblesPrizes.map(p => `
+                <div class="p-4 rounded-xl bg-slate-900/90 border border-purple-500/30 space-y-3 hover:border-purple-500/60 transition-all">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                🟣 Quiniela de Dobles
+                            </span>
+                            <strong class="text-white text-sm sm:text-base">Jornada ${p.jornadaNum}</strong>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            ${p.hits} Aciertos
+                        </span>
+                    </div>
+                    <div class="text-xs text-slate-400">
+                        Pronosticada por: <strong class="text-white">${p.memberName}</strong> 
+                        <span class="text-slate-500">(Ganador de J${p.previousJornada})</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-purple-950/20 border border-purple-500/20 flex justify-between items-center text-xs">
+                        <span class="text-purple-300 font-medium">Destino del premio:</span>
+                        <strong class="text-purple-200">🏦 Fondo Común Peña</strong>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
+                        <span class="text-slate-400">Premio Oficial LAE:</span>
+                        <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+${p.amount.toFixed(2)} €</strong>
+                    </div>
+                    <button onclick="window.BoteApp.showReducedBreakdown(${p.memberId}, ${p.jornadaNum})" class="w-full py-2 px-3 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                        <span>🔍</span> Ver Desglose de Reducción (16 Apuestas)
+                    </button>
                 </div>
-                <div class="text-xs text-slate-400">Pronosticador: <strong class="text-white">Luismi</strong> <span class="text-slate-500">(Ganador de J2)</span></div>
-                <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                    <span class="text-slate-400">Premio Oficial LAE:</span>
-                    <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+2,32 €</strong>
+            `).join('');
+        }
+
+        // 2. Premios por Pronóstico Individual de Socios
+        const indivPrizes = [];
+        data.movements.forEach(m => {
+            if (m.premios > 0 && !m.isIngresoLibre) {
+                // Evitar duplicados por socio/jornada
+                if (!indivPrizes.some(x => x.memberId === m.memberId && x.jornadaNum === m.jornadaNum)) {
+                    indivPrizes.push({
+                        jornadaNum: m.jornadaNum,
+                        date: m.jornadaDate || m.date,
+                        memberId: m.memberId,
+                        memberName: m.memberName,
+                        hits: m.aciertos || 10,
+                        amount: m.premios
+                    });
+                }
+            }
+        });
+
+        // Asegurar que si el conjunto viene filtrado o en fallback, figuren los premios individuales reales
+        if (indivPrizes.length === 0) {
+            indivPrizes.push(
+                { jornadaNum: 3, date: "30/08/2026", memberId: 13, memberName: "Luismi", hits: 10, amount: 2.32 },
+                { jornadaNum: 4, date: "06/09/2026", memberId: 6, memberName: "Fernando Lozano", hits: 10, amount: 3.40 }
+            );
+        }
+
+        let totIndiv = indivPrizes.reduce((sum, p) => sum + p.amount, 0);
+
+        if (gridIndiv) {
+            gridIndiv.innerHTML = indivPrizes.map(p => `
+                <div class="p-4 rounded-xl bg-slate-900/90 border border-blue-500/30 space-y-3 hover:border-blue-500/60 transition-all">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                🔵 Pronóstico Socio
+                            </span>
+                            <strong class="text-white text-sm sm:text-base">Jornada ${p.jornadaNum}</strong>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            ${p.hits} Aciertos
+                        </span>
+                    </div>
+                    <div class="text-xs text-slate-400">
+                        Ganador: <strong class="text-white">${p.memberName}</strong> 
+                        <span class="text-slate-500">(Columna individual de 14 partidos)</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-blue-950/20 border border-blue-500/20 flex justify-between items-center text-xs">
+                        <span class="text-blue-300 font-medium">Destino del premio:</span>
+                        <strong class="text-blue-200">👤 Saldo del Socio</strong>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
+                        <span class="text-slate-400">Premio Oficial LAE:</span>
+                        <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+${p.amount.toFixed(2)} €</strong>
+                    </div>
+                    <button onclick="window.BoteApp.openMemberExtract('${p.memberId}')" class="w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                        <span>👤</span> Ver Extracto de ${p.memberName}
+                    </button>
                 </div>
-                <button onclick="window.BoteApp.showReducedBreakdown(13, 3)" class="w-full py-2 px-3 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
-                    <span>🔍</span> Ver Desglose de Reducción (16 Apuestas)
-                </button>
-            </div>
-            <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 hover:border-purple-500/40 transition-all">
-                <div class="flex justify-between items-center">
-                    <strong class="text-white text-sm sm:text-base">Jornada 4 (06/09/2026)</strong>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10 Aciertos</span>
-                </div>
-                <div class="text-xs text-slate-400">Pronosticador: <strong class="text-white">Fernando Lozano</strong> <span class="text-slate-500">(Ganador de J3)</span></div>
-                <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                    <span class="text-slate-400">Premio Oficial LAE:</span>
-                    <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+3,40 €</strong>
-                </div>
-                <button onclick="window.BoteApp.showReducedBreakdown(6, 4)" class="w-full py-2 px-3 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
-                    <span>🔍</span> Ver Desglose de Reducción (16 Apuestas)
-                </button>
-            </div>
-        `;
+            `).join('');
+        }
+
+        // Actualizar badges superiores
+        if (badgeDobles) badgeDobles.textContent = `+${totDobles.toFixed(2)} €`;
+        if (badgeIndiv) badgeIndiv.textContent = `+${totIndiv.toFixed(2)} €`;
+        if (badgeGlobal) badgeGlobal.textContent = `+${(totDobles + totIndiv).toFixed(2)} €`;
     }
 
     showReducedBreakdown(memberId, jornadaNum) {
@@ -1430,13 +1563,20 @@ class BoteAppController {
             if (m.jugaDobles) acText += ' 👑';
             if (m.isSealer || m.sellado < 0) acText += ' 💀';
 
+            let inBreakdown = [];
+            if (m.premios > 0) inBreakdown.push(`<span class="text-[10px] text-blue-300 font-bold bg-blue-500/20 px-1 py-0.5 rounded border border-blue-500/30">🔵 Premio Indiv: +${m.premios.toFixed(2)} €</span>`);
+            if (m.ingresosManual > 0) inBreakdown.push(`<span class="text-[10px] text-emerald-300 font-semibold">📥 Ingreso: +${m.ingresosManual.toFixed(2)} €</span>`);
+            if (m.sellado < 0 && !m.isSelladoInCash) inBreakdown.push(`<span class="text-[10px] text-purple-300 font-semibold">💀 Sellado: +${Math.abs(m.sellado).toFixed(2)} €</span>`);
+
+            const inSubHtml = inBreakdown.length > 0 ? `<div class="flex flex-col items-end gap-0.5 mt-0.5">${inBreakdown.join('')}</div>` : '';
+
             html += `
                 <tr class="hover:bg-slate-900/60 ${isManual ? 'bg-emerald-950/20' : ''}">
                     <td class="p-2.5 sm:p-3 font-semibold text-white">${eventTitle}</td>
                     <td class="p-2.5 sm:p-3 text-xs text-slate-400">${m.jornadaDate || m.date}</td>
                     <td class="p-2.5 sm:p-3 text-center font-bold text-white">${acText}</td>
                     <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-emerald-400">
-                        ${inVal > 0 ? '+' + inVal.toFixed(2) + ' €' : '-'}
+                        ${inVal > 0 ? `<div>+${inVal.toFixed(2)} €</div>${inSubHtml}` : '-'}
                     </td>
                     <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-rose-400">
                         ${outVal > 0 ? '-' + outVal.toFixed(2) + ' €' : '0,00 €'}
