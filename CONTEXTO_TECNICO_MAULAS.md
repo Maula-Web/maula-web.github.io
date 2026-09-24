@@ -430,6 +430,29 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 
 ---
 
+## 15. Notificación Automática «Habemus Quinielam» en Telegram (v1.3)
+
+### 15.1. Diagnóstico y Causa Raíz
+- **Fallo Histórico**: La notificación automática nunca se disparaba cuando los socios completaban sus pronósticos en la web de producción, a pesar de que el botón de prueba en Administración (`admin.html`) sí funcionaba correctamente.
+- **Causa**: `pronosticos.html` carecía por completo de la inclusión del script `js/telegram-service.js` en su estructura HTML. En `js/pronosticos.js`, la condición `if (window.TelegramService)` siempre evaluaba a `false` en tiempo de ejecución. Por el contrario, en `admin.html` el script sí estaba cargado, por lo que el botón de test manual (`testHabemus()`) funcionaba.
+
+### 15.2. Corrección e Integraciones Implementadas
+- **Carga de Script en `pronosticos.html`**: Se ha incluido `<script src="js/telegram-service.js"></script>` en el `<head>` de la página.
+- **Detección Instantánea con Pronósticos en Memoria**:
+  - `TelegramService.checkHabemusQuinielam(jId, forceResend = false, inMemoryPronosticos = null)` ahora acepta el array en memoria de pronósticos.
+  - En `js/pronosticos.js` (`performFinalSave`), se pasa `this.pronosticos` directamente a la función, eliminando esperas y vulnerabilidades frente a la latencia de propagación de Firestore.
+- **Robustez en la Comparación y Socios Activos**:
+  - Compara `jId` tanto con `jor.id` como con `jor.number` (soporta identificadores numéricos y de cadena).
+  - Si no se especifica `jId`, selecciona automáticamente la jornada activa más reciente.
+  - Filtra estrictamente socios activos (`m.active !== false`), evitando que usuarios archivados o inactivos bloqueen indefinidamente el envío de la notificación.
+  - Soporta el comodín `{jornada}` en la plantilla de mensaje configurada en Firebase (`config/habemus`).
+- **Integración con «El Dado de Quinielas» (`DiceService`)**:
+  - Si un socio ausente tiene activado el Dado de Quinielas y sus pronósticos son rellenados de forma automática al iniciar la página (`DiceService.checkAndApplyDice`), el sistema invoca de inmediato `checkHabemusQuinielam` si dicho pronóstico completa el pleno de socios para la jornada en curso.
+- **Prevención de Envíos Duplicados**:
+  - Tras el envío exitoso a Telegram vía `TelegramService.sendRaw`, se marca `habemusSent = true` en el documento de la jornada en Firestore. El panel de administración (`admin.html`) mantiene el botón para resetear este flag en caso de desear un reenvío voluntario.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
@@ -439,3 +462,4 @@ Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
 3. Indícale en qué vista de la web o qué archivo quieres que se enfoque y qué error concreto ocurre.
 
 *(Nota: Este archivo debe editarse y actualizarse cada vez que implementemos una regla de negocio nueva que sea compleja de entender para alguien externo).*
+

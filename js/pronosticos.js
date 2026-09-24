@@ -199,7 +199,14 @@ class PronosticoManager {
 
         if (window.DiceService) {
             try {
-                await window.DiceService.checkAndApplyDice(this.members, this.jornadas, this.pronosticos);
+                const diceApplied = await window.DiceService.checkAndApplyDice(this.members, this.jornadas, this.pronosticos);
+                if (diceApplied && diceApplied.length > 0 && window.TelegramService) {
+                    const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+                    const targetJornada = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
+                    if (targetJornada) {
+                        window.TelegramService.checkHabemusQuinielam(targetJornada.id, false, this.pronosticos);
+                    }
+                }
             } catch (errDice) {
                 console.error("Error ejecutando DiceService:", errDice);
             }
@@ -1167,8 +1174,8 @@ class PronosticoManager {
         // Check for Habemus Quinielam (Telegram)
         if (window.TelegramService && !isCorrection) {
             setTimeout(() => {
-                window.TelegramService.checkHabemusQuinielam(this.currentJornadaId);
-            }, 1000); // Small delay to ensure DB propagation
+                window.TelegramService.checkHabemusQuinielam(this.currentJornadaId, false, this.pronosticos);
+            }, 500);
         }
     }
 

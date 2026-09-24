@@ -433,7 +433,7 @@ window.TelegramService = {
             console.error("TelegramService (Reminder) Error:", e);
         }
     },
-    async checkHabemusQuinielam(jId, forceResend = false) {
+    async checkHabemusQuinielam(jId, forceResend = false, inMemoryPronosticos = null) {
         if (!window.DataService) return;
 
         try {
@@ -453,9 +453,20 @@ window.TelegramService = {
             // 2. Fetch Data
             const members = await window.DataService.getAll('members');
             const jornadas = await window.DataService.getAll('jornadas');
-            const pronosticos = await window.DataService.getAll('pronosticos');
+            let pronosticos = inMemoryPronosticos;
+            if (!pronosticos || !Array.isArray(pronosticos)) {
+                pronosticos = await window.DataService.getAll('pronosticos');
+            }
 
-            const currentJ = jornadas.find(jor => String(jor.id) === String(jId));
+            let currentJ = null;
+            if (jId) {
+                currentJ = jornadas.find(jor => String(jor.id) === String(jId) || String(jor.number) === String(jId));
+            }
+            if (!currentJ) {
+                const active = jornadas.filter(j => j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+                if (active.length > 0) currentJ = active[0];
+            }
+
             if (!currentJ) {
                 console.log("Habemus: Jornada not found:", jId);
                 return;
@@ -466,18 +477,20 @@ window.TelegramService = {
                 return;
             }
 
-            // 3. Verify all members have played
-            console.log(`Habemus: Checking J${currentJ.number}... Members: ${members.length}`);
+            // 3. Verify all active members have played
+            const activeMembers = (members || []).filter(m => m && m.active !== false);
+            console.log(`Habemus: Checking J${currentJ.number}... Active Members: ${activeMembers.length}`);
 
             const pending = [];
-            const allPlayed = members.every(m => {
+            const allPlayed = activeMembers.length > 0 && activeMembers.every(m => {
                 const p = pronosticos.find(pred =>
-                    (String(pred.jId) === String(currentJ.id) || String(pred.jornadaId) === String(currentJ.id)) &&
+                    (String(pred.jId) === String(currentJ.id) || String(pred.jornadaId) === String(currentJ.id) ||
+                     String(pred.jId) === String(currentJ.number) || String(pred.jornadaId) === String(currentJ.number)) &&
                     (String(pred.mId) === String(m.id) || String(pred.memberId) === String(m.id))
                 );
                 const played = p && p.selection && Array.isArray(p.selection) &&
                     p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                if (!played) pending.push(m.phone || m.name || `ID:${m.id}`);
+                if (!played) pending.push(m.name || m.phone || `ID:${m.id}`);
                 return played;
             });
 
@@ -486,18 +499,19 @@ window.TelegramService = {
                     console.log(`Habemus: FORCE SEND (${pending.length} members pending: ${pending.join(', ')})`);
                 }
                 console.log(`Habemus: Sending message for J${currentJ.number}...`);
-                const msg = (hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻').trim();
+                const rawMsg = (hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻').trim();
+                const msg = rawMsg.replace(/{jornada}/gi, currentJ.number);
                 const res = await this.sendRaw(tg.token, tg.chatId, msg);
 
                 if (res && res.ok) {
                     currentJ.habemusSent = true;
                     await window.DataService.save('jornadas', currentJ);
-                    console.log("Habemus: Message sent and jornada flagged ✅");
+                    console.log(`Habemus: Message sent for J${currentJ.number} and flagged in DB ✅`);
                 } else {
                     console.error("Habemus: Telegram API error", res);
                 }
             } else {
-                console.log(`Habemus: ${pending.length} member(s) still pending: ${pending.join(', ')}`);
+                console.log(`Habemus: ${pending.length} member(s) still pending for J${currentJ.number}: ${pending.join(', ')}`);
             }
 
         } catch (e) {
