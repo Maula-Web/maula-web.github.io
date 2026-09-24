@@ -608,8 +608,8 @@
          ===================================================================== -->
 
     <!-- MODAL 1: 📄 EXTRACTO BANCARIO DEL SOCIO -->
-    <div id="modal-extracto-socio" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-3xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden">
+    <div id="modal-extracto-socio" onclick="if(event.target === this) window.BoteApp.closeModal('modal-extracto-socio')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-3xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center font-bold text-lg sm:text-xl" id="extracto-avatar">
@@ -634,8 +634,8 @@
     </div>
 
     <!-- MODAL 2: ➕ REGISTRAR INGRESO / APORTACIÓN -->
-    <div id="modal-ingreso" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-lg border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden">
+    <div id="modal-ingreso" onclick="if(event.target === this) window.BoteApp.closeModal('modal-ingreso')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-lg border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
                 <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                     <span>➕</span> Registrar Aportación / Ingreso
@@ -680,8 +680,8 @@
     </div>
 
     <!-- MODAL 3: 📋 GESTIONAR INGRESOS REGISTRADOS -->
-    <div id="modal-gestion-ingresos" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-4xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden">
+    <div id="modal-gestion-ingresos" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-ingresos')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-4xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -711,8 +711,8 @@
     </div>
 
     <!-- MODAL 4: 🛠️ GESTIONAR SELLADO DE JORNADA (Reembolso Bote vs Bizum) -->
-    <div id="modal-gestion-jornada" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-3xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden">
+    <div id="modal-gestion-jornada" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-jornada')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-3xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -742,8 +742,8 @@
     </div>
 
     <!-- MODAL 5: ⚙️ CONFIGURACIÓN DE TARIFAS -->
-    <div id="modal-config" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-2xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden">
+    <div id="modal-config" onclick="if(event.target === this) window.BoteApp.closeModal('modal-config')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-2xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -818,8 +818,8 @@
     </div>
 
     <!-- MODAL 6: 💰 NUEVO REPARTO DE GANANCIAS -->
-    <div id="modal-reparto" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-md border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden">
+    <div id="modal-reparto" onclick="if(event.target === this) window.BoteApp.closeModal('modal-reparto')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-md border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900">
                 <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                     <span>💰</span> Reparto de Ganancias
@@ -843,8 +843,8 @@
     </div>
 
     <!-- MODAL 7: 🔑 ACCESO EVALUADOR (Fernando o Marcelo) -->
-    <div id="modal-auth-evaluador" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-sm border-amber-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden p-6 text-center space-y-4">
+    <div id="modal-auth-evaluador" onclick="if(event.target === this) window.BoteApp.closeModal('modal-auth-evaluador')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="glass-panel w-full max-w-sm border-amber-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden p-6 text-center space-y-4 m-auto">
             <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-2xl font-bold">
                 🔑
             </div>
@@ -869,7 +869,7 @@
     </div>
 
     <!-- Popover flotante para celdas de la matriz -->
-    <div id="matrix-popover" class="fixed hidden z-50 p-4 rounded-2xl bg-slate-900 border border-orange-500/50 shadow-2xl text-xs w-72 max-w-[calc(100vw-24px)] max-h-[calc(100vh-24px)] overflow-y-auto backdrop-blur-xl">
+    <div id="matrix-popover" class="fixed hidden z-[10005] p-4 rounded-2xl bg-slate-900 border border-orange-500/50 shadow-2xl text-xs w-72 max-w-[calc(100vw-24px)] max-h-[calc(100vh-24px)] overflow-y-auto backdrop-blur-xl">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
             <strong class="text-white text-sm" id="pop-title">Socio - JX</strong>
             <button onclick="document.getElementById('matrix-popover').classList.add('hidden')" class="text-slate-400 hover:text-white">✕</button>

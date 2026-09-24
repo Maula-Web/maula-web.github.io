@@ -61,6 +61,16 @@ class BoteAppController {
                 popover.classList.add('hidden');
             }
         });
+
+        // Cerrar modales y popover con tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const openModals = document.querySelectorAll('[id^="modal-"]:not(.hidden)');
+                openModals.forEach(m => this.closeModal(m.id));
+                const popover = document.getElementById('matrix-popover');
+                if (popover) popover.classList.add('hidden');
+            }
+        });
     }
 
     /**
@@ -1165,14 +1175,23 @@ class BoteAppController {
 
     openModal(modalId) {
         const el = document.getElementById(modalId);
-        if (el) el.classList.remove('hidden');
+        if (el) {
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            el.scrollTop = 0;
+            const scrollable = el.querySelector('.overflow-y-auto');
+            if (scrollable) scrollable.scrollTop = 0;
+        }
         const dd = document.getElementById('tools-dropdown');
         if (dd) dd.classList.add('hidden');
     }
 
     closeModal(modalId) {
         const el = document.getElementById(modalId);
-        if (el) el.classList.add('hidden');
+        if (el) {
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
     }
 
     exportCSV() {
