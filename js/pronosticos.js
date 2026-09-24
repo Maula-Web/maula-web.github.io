@@ -264,6 +264,8 @@ class PronosticoManager {
         this.currentJornadaId = parsedJId;
         this.currentMemberId = parsedMId;
 
+        this.updateSummaryHeaderLeds();
+
         // Try to sync Dropdowns if present
         if (this.selJornada) {
             const opt = this.selJornada.querySelector(`option[value="${parsedJId}"]`);
@@ -320,6 +322,11 @@ class PronosticoManager {
 
         const memberName = member ? AppUtils.getMemberName(member) : `Socio #${this.currentMemberId}`;
         const jornadaText = jornada ? `Jornada ${jornada.number} (${jornada.date})` : `Jornada #${this.currentJornadaId}`;
+        const memberLed = (member && jornada) ? this.getMemberStatusLed(member.id, jornada) : null;
+        const ledBadgeHtml = memberLed ? `
+            <span class="led-status-indicator led-${memberLed.status}" style="margin-right: 4px;" title="${memberLed.title}"></span>
+        ` : '';
+
         const diceBadgeHtml = (existing && existing.isDice) ? `
             <span style="background: rgba(103, 58, 183, 0.12); color: #673ab7; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(103, 58, 183, 0.3); display: inline-flex; align-items: center; gap: 6px;" title="Rellenado automáticamente por El Dado de Quinielas">
                 🎲 <span>Relleno con Dado</span>
@@ -329,7 +336,7 @@ class PronosticoManager {
         this.activeSelectionInfo.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <span style="background: var(--primary-color, #1976d2); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    👤 <span>${memberName}</span>
+                    👤 ${ledBadgeHtml}<span>${memberName}</span>
                 </span>
                 <span style="background: rgba(25, 118, 210, 0.1); color: var(--primary-color, #1976d2); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(25, 118, 210, 0.25); display: inline-flex; align-items: center; gap: 6px;">
                     📅 <span>${jornadaText}</span>
@@ -362,6 +369,7 @@ class PronosticoManager {
         if (this.summaryTable) {
             this.summaryTable.querySelectorAll('.summary-cell.active-cell').forEach(c => c.classList.remove('active-cell'));
         }
+        this.updateSummaryHeaderLeds();
         this.updateActiveSelectionUI();
     }
 
@@ -1217,6 +1225,113 @@ class PronosticoManager {
         return window.AppUtils ? window.AppUtils.calculateDeadline(dateStr) : null;
     }
 
+    /**
+     * Devuelve el estado del indicador luminoso tipo LED para un socio y una jornada dada:
+     * - 'green': Pronóstico completo (14 signos + P15 si es PIG), y dobles si le correspondían.
+     * - 'yellow': Pronóstico completo, pero falta rellenar la Quiniela de Dobles (solo para el socio responsable de dobles).
+     * - 'red': Falta algún signo del pronóstico o está pendiente.
+     */
+    getMemberStatusLed(memberId, targetJornada) {
+        if (!targetJornada) return { status: 'red', title: 'Sin jornada' };
+        const jIdStr = String(targetJornada.id);
+        const mIdStr = String(memberId);
+
+        // 1. Verificar pronóstico base del socio
+        const p = (this.pronosticos || []).find(pred => {
+            const pj = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId);
+            const pm = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId);
+            return pj === jIdStr && pm === mIdStr;
+        });
+
+        if (!p || !p.selection || !Array.isArray(p.selection)) {
+            return { status: 'red', title: 'Pronóstico pendiente / sin rellenar' };
+        }
+
+        // Comprobar los primeros 14 partidos
+        let normalComplete = true;
+        for (let i = 0; i < 14; i++) {
+            const val = p.selection[i];
+            if (!val || String(val).trim() === '' || String(val).trim() === '-') {
+                normalComplete = false;
+                break;
+            }
+        }
+
+        // Comprobar Pleno al 15 si es partido PIG
+        if (normalComplete && targetJornada.matches && targetJornada.matches[14]) {
+            const m15 = targetJornada.matches[14];
+            const isPig = typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m15.home, m15.away);
+            if (isPig) {
+                const val15 = p.selection[14];
+                if (!val15 || String(val15).trim() === '' || String(val15).trim() === '-') {
+                    normalComplete = false;
+                }
+            }
+        }
+
+        if (!normalComplete) {
+            return { status: 'red', title: 'Pronóstico incompleto (faltan signos)' };
+        }
+
+        // 2. El pronóstico normal está completo.
+        // Comprobar si este socio es el responsable/elegible para la Quiniela de Dobles en esta jornada.
+        let isEligibleDoubles = false;
+        try {
+            if (typeof this.checkEligibility === 'function') {
+                const elig = this.checkEligibility(targetJornada.number, memberId, true);
+                if (elig && elig.eligible) {
+                    isEligibleDoubles = true;
+                }
+            }
+        } catch (e) {
+            console.error("Error al comprobar elegibilidad de dobles para LED:", e);
+        }
+
+        if (isEligibleDoubles) {
+            // Comprobar si la quiniela de dobles de esta jornada está ya rellenada
+            const pExtra = (this.pronosticosExtra || []).find(pe => {
+                const pj = String(pe.jId !== undefined && pe.jId !== null ? pe.jId : pe.jornadaId);
+                return pj === jIdStr;
+            });
+
+            const hasDoublesFilled = pExtra && pExtra.selection && Array.isArray(pExtra.selection) &&
+                pExtra.selection.filter(s => s && String(s).trim() !== '' && String(s) !== '-').length >= 14;
+
+            if (!hasDoublesFilled) {
+                return { status: 'yellow', title: 'Pronóstico completo, pero falta rellenar la Quiniela de Dobles' };
+            }
+        }
+
+        return {
+            status: 'green',
+            title: isEligibleDoubles ? 'Pronóstico y Quiniela de Dobles completos' : 'Pronóstico completo'
+        };
+    }
+
+    updateSummaryHeaderLeds() {
+        if (!this.summaryTable) return;
+        const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+        let targetJornada = null;
+        if (this.currentJornadaId) {
+            targetJornada = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
+        }
+        if (!targetJornada) {
+            targetJornada = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
+        }
+        if (!targetJornada) return;
+
+        const ths = this.summaryTable.querySelectorAll('thead th[data-mid]');
+        ths.forEach(th => {
+            const mId = th.getAttribute('data-mid');
+            const ledSpan = th.querySelector('.led-status-indicator');
+            if (ledSpan && mId) {
+                const led = this.getMemberStatusLed(mId, targetJornada);
+                ledSpan.className = `led-status-indicator led-${led.status}`;
+                ledSpan.title = `J${targetJornada.number}: ${led.title}`;
+            }
+        });
+    }
+
     renderSummaryTable() {
         if (!this.summaryTable) return;
 
@@ -1228,6 +1343,16 @@ class PronosticoManager {
         // 1. Sort Members alphabetically
         const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
+        // Determine reference jornada for column headers
+        const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+        let targetJornadaForHeader = null;
+        if (this.currentJornadaId) {
+            targetJornadaForHeader = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
+        }
+        if (!targetJornadaForHeader) {
+            targetJornadaForHeader = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
+        }
+
         // 2. Build Header
         const headerRow = document.createElement('tr');
         const stickyTh = document.createElement('th');
@@ -1238,7 +1363,15 @@ class PronosticoManager {
         sortedMembers.forEach((m, index) => {
             const th = document.createElement('th');
             th.className = 'summary-header-cell';
-            th.textContent = AppUtils.getMemberName(m);
+            th.setAttribute('data-mid', m.id);
+            const led = this.getMemberStatusLed(m.id, targetJornadaForHeader);
+            const jNumText = targetJornadaForHeader ? `J${targetJornadaForHeader.number}: ` : '';
+            th.innerHTML = `
+                <div style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                    <span class="led-status-indicator led-${led.status}" title="${jNumText}${led.title}"></span>
+                    <span>${AppUtils.getMemberName(m)}</span>
+                </div>
+            `;
             headerRow.appendChild(th);
         });
 
@@ -1342,6 +1475,8 @@ class PronosticoManager {
                     isPlayed = p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                 }
 
+                const cellLed = this.getMemberStatusLed(m.id, j);
+
                 if (isPlayed) {
                     const selection14 = p.selection.slice(0, 14);
                     const b1 = selection14.slice(0, 4).map(s => s || '-').join('');
@@ -1361,7 +1496,8 @@ class PronosticoManager {
                     const p15Badge = p15Val ? `<span class="sf-p15-badge" title="Pleno al 15: ${p15Val}">P15: ${p15Val}</span>` : '';
 
                     cellContent = `
-                        <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}${p.isDice ? ' (Relleno con Dado 🎲)' : ''}">
+                        <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}${p.isDice ? ' (Relleno con Dado 🎲)' : ''} - ${cellLed.title}">
+                            <span class="led-status-indicator led-${cellLed.status}" style="margin-right: 4px;" title="${cellLed.title}"></span>
                             ${diceBadge}
                             <span class="sf-block">${b1}</span>
                             <span class="sf-sep">|</span>
@@ -1374,7 +1510,7 @@ class PronosticoManager {
                         </div>
                     `;
                 } else {
-                    cellContent = `<span class="summary-no-data">-</span>`;
+                    cellContent = `<span class="summary-no-data" title="${cellLed.title}"><span class="led-status-indicator led-${cellLed.status}" style="margin-right: 4px;" title="${cellLed.title}"></span>-</span>`;
                 }
 
                 rowHtml += `<td class="${cellClass}" data-jid="${j.id}" data-mid="${m.id}">${cellContent}</td>`;
@@ -1634,7 +1770,13 @@ class PronosticoManager {
             sortedMembers.forEach(m => {
                 const f = allForecasts.find(p => String(p.mId || p.memberId) === String(m.id));
                 const diceIcon = (f && f.isDice) ? ' 🎲' : '';
-                html += `<th title="${m.name}${diceIcon ? ' (Relleno con Dado)' : ''}" style="border: 1px solid #ccc; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${fSizeMember}; color: #333; font-weight: 600; white-space: nowrap; overflow:hidden;">${m.name}${diceIcon}</th>`;
+                const led = this.getMemberStatusLed(m.id, jornada);
+                html += `<th title="${m.name}${diceIcon ? ' (Relleno con Dado)' : ''} - ${led.title}" style="border: 1px solid #ccc; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${fSizeMember}; color: #333; font-weight: 600; white-space: nowrap; overflow:hidden;">
+                    <div style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                        <span class="led-status-indicator led-${led.status}" style="transform: rotate(180deg);" title="${led.title}"></span>
+                        <span>${m.name}${diceIcon}</span>
+                    </div>
+                </th>`;
             });
 
             // Doubles Columns at the end
@@ -1879,9 +2021,9 @@ class PronosticoManager {
      * REESCRITURA TOTAL: Lógica de elegibilidad para dobles.
      * Incluye sistema de DESEMPATE para garantizar un único ganador.
      */
-    checkEligibility(currentJornadaNum, memberId) {
-        // CORRECTION MODE BYPASS: If we are in correction mode, always allow managing doubles
-        if (this.correctionMode) return { eligible: true };
+    checkEligibility(currentJornadaNum, memberId, forceReal = false) {
+        // CORRECTION MODE BYPASS: If we are in correction mode, always allow managing doubles (unless calculating real eligibility)
+        if (this.correctionMode && !forceReal) return { eligible: true };
 
         if (currentJornadaNum <= 1) {
             if (currentJornadaNum === 1) {

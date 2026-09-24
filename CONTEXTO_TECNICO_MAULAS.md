@@ -488,6 +488,36 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 
 ---
 
+## 17. Indicadores Luminosos LED de Estado de Pronósticos y Dobles (v1.5)
+
+### 17.1. Finalidad y Comportamiento Visual
+En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/pronosticos.html)) se incorporan indicadores luminosos tipo LED con brillo y sombra radial (`box-shadow`), diseñados para ofrecer retroalimentación visual inmediata sobre el estado de cumplimentación de las quinielas sin recargar ni descolocar la maquetación.
+
+### 17.2. Estados del LED y Reglas de Negocio
+- 🟢 **Verde (`.led-green`)**:
+  - Indica que el pronóstico normal del socio está **completo al 100%**:
+    - Los 14 partidos principales cuentan con un signo válido (1, X o 2).
+    - El Pleno al 15 está relleno obligatoriamente si el partido está catalogado como PIG (`AppUtils.isPigMatch`). Si no es PIG, no se exige.
+    - Si el socio es el responsable/elegible para la **Quiniela de Dobles** en dicha jornada, también se exige que los dobles estén ya guardados.
+- 🟡 **Amarillo (`.led-yellow`) con pulsación suave (`led-pulse-yellow`)**:
+  - Indica que el socio **ha completado su pronóstico individual**, pero **es el socio responsable de la Quiniela de Dobles** de esa jornada (por haber ganado o sido elegible en la jornada anterior vía `checkEligibility(jNum, mId, true)`) y **aún no ha rellenado la Quiniela de Dobles**.
+  - Este estado es exclusivo del socio encargado de los dobles, permitiéndole identificar de inmediato que le falta esa tarea grupal.
+- 🔴 **Rojo (`.led-red`)**:
+  - Indica que el socio aún no ha rellenado su pronóstico en esa jornada o le falta algún signo por marcar.
+
+### 17.3. Integración en la Interfaz
+1. **Tabla Resumen de Pronósticos (`#forecast-summary-table`)**:
+   - **Cabeceras (`<th>`)**: Cada socio muestra el LED de su estado correspondiente a la jornada activa o seleccionada (`updateSummaryHeaderLeds()`), con tooltip descriptivo.
+   - **Celdas (`<td>`)**: Cada celda `(Jornada, Socio)` incluye su propio LED miniaturizado para conocer el estado exacto en cada jornada individual.
+   - **Leyenda**: Situada encima de la tabla con los 3 colores y sus significados.
+2. **Modal de Pronósticos Colectivos (`#view-jornada-modal`)**:
+   - Cabeceras de columnas de socios con el LED orientado correctamente junto a su nombre.
+   - Mini-leyenda responsive en la barra superior del modal.
+3. **Barra de Selección Activa (`#active-selection-info`)**:
+   - La pastilla del socio seleccionado muestra su LED correspondiente a la jornada en curso.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

@@ -3975,4 +3975,52 @@ body.mobile-mode .p-divider {
     background: #1e1e1e !important;
 }
 
+/* ==========================================================================
+   LED Status Indicators for Forecasts
+   ========================================================================== */
+.led-status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    vertical-align: middle;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    cursor: help;
+}
+
+.led-status-indicator.led-green {
+    background-color: #00e676;
+    border: 1px solid #00c853;
+    box-shadow: 0 0 8px #00e676, 0 0 2px #fff, inset 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.led-status-indicator.led-red {
+    background-color: #ff1744;
+    border: 1px solid #d50000;
+    box-shadow: 0 0 8px #ff1744, 0 0 2px #fff, inset 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.led-status-indicator.led-yellow {
+    background-color: #ffd600;
+    border: 1px solid #ffab00;
+    box-shadow: 0 0 8px #ffd600, 0 0 2px #fff, inset 0 0 2px rgba(255, 255, 255, 0.8);
+    animation: led-pulse-yellow 2s infinite ease-in-out;
+}
+
+@keyframes led-pulse-yellow {
+    0%, 100% {
+        box-shadow: 0 0 6px #ffd600, 0 0 2px #fff;
+    }
+    50% {
+        box-shadow: 0 0 14px #ffea00, 0 0 4px #ffd600;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-led-legend {
+        display: none !important;
+    }
+}
+
 
