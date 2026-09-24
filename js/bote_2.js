@@ -75,6 +75,25 @@ class BoteAppController {
                 if (popover) popover.classList.add('hidden');
             }
         });
+
+        // Asegurar que cualquier tarjeta o panel con tooltip explicativo activo quede siempre en primer plano
+        document.addEventListener('mouseover', (e) => {
+            const trigger = e.target.closest('.group.cursor-help, .cursor-help');
+            if (trigger) {
+                const panel = trigger.closest('.glass-panel, [id="jornada-header-card"], .grid, section');
+                if (panel) panel.style.zIndex = '100';
+                trigger.style.zIndex = '110';
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            const trigger = e.target.closest('.group.cursor-help, .cursor-help');
+            if (trigger) {
+                const panel = trigger.closest('.glass-panel, [id="jornada-header-card"], .grid, section');
+                if (panel) panel.style.zIndex = '';
+                trigger.style.zIndex = '';
+            }
+        });
     }
 
     /**
@@ -556,20 +575,20 @@ class BoteAppController {
                             ${jSummary.premios > 0 ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">🏆 Jornada Premiada</span>' : ''}
                         </div>
                         <div class="flex flex-wrap items-center gap-3 mt-2 text-xs sm:text-sm">
-                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300">
+                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50">
                                 <span class="text-emerald-400 font-bold">👑 Ganador:</span> 
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || 'N/A'}</span>
-                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto">
                                     <strong class="text-emerald-400 block mb-1 font-bold">👑 Ganador de la Jornada</strong>
                                     Socio con más aciertos. Obtiene el derecho a pronosticar la quiniela de 7 dobles de la siguiente jornada (coste de 10,50 € pagado al 100% por la peña).
                                 </div>
                             </div>
                             ${doblesBtn}
                             <span class="text-slate-600">•</span>
-                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300">
+                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50">
                                 <span class="text-rose-400 font-bold">💀 Sellador:</span> 
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.loserName || 'N/A'}</span>
-                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
+                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto">
                                     <strong class="text-rose-400 block mb-1 font-bold">💀 Sellador Oficial</strong>
                                     Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de 24,75 € en su hucha personal o por Bizum.
                                 </div>
@@ -577,35 +596,35 @@ class BoteAppController {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center">
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-colors">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center relative z-20">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Recaudado ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold text-emerald-400 font-mono">+${jSummary.recaudacion.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
                                 <strong class="text-emerald-400 block mb-1 font-bold">📥 Recaudación de la Jornada</strong>
                                 Suma de cuotas semanales de los 19 socios más las penalizaciones aplicadas por exceso de unos, bajos aciertos o fallos en PIG.
                             </div>
                         </div>
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/40 transition-colors">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/40 hover:z-50 transition-colors">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Coste Sellado ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
                                 <strong class="text-rose-400 block mb-1 font-bold">🎟️ Gasto Oficial de Sellado</strong>
                                 Coste total pagado en la administración de loterías: 19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 €.
                             </div>
                         </div>
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 transition-colors">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 hover:z-50 transition-colors">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Premios ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold text-amber-400 font-mono">+${jSummary.premios.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
                                 <strong class="text-amber-400 block mb-1 font-bold">🏆 Premios Oficiales LAE</strong>
                                 Importe oficial de premios de Loterías del Estado en esta jornada (por pronósticos individuales o por la quiniela de dobles).
                             </div>
                         </div>
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-colors">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Neto Peña ℹ️</span>
                             <span class="text-xs sm:text-sm font-extrabold ${netoColor} font-mono">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none text-left font-normal">
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
                                 <strong class="text-emerald-400 block mb-1 font-bold">📈 Superávit Neto Semanal</strong>
                                 Margen neto semanal que se incorpora a la hucha colectiva de la peña tras descontar los 24,75 € de sellado oficial.
                             </div>

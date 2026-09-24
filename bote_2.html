@@ -69,6 +69,52 @@
             border: 1px solid var(--color-card-border);
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* REGLAS DE SUPERPOSICIÓN: TARJETAS EXPLICATIVAS SIEMPRE EN PRIMER PLANO */
+        .glass-panel:hover,
+        .glass-panel:focus-within,
+        .glass-panel:has(.group:hover) {
+            z-index: 50 !important;
+        }
+
+        .grid:has(.group:hover),
+        section:has(.group:hover) {
+            z-index: 60 !important;
+            position: relative;
+        }
+
+        .group:hover,
+        .group:focus-within {
+            z-index: 70 !important;
+            position: relative;
+        }
+
+        /* Asegurar que las tarjetas explicativas queden siempre en primer plano absoluto sin recortes */
+        .group > div[class*="group-hover:visible"],
+        .group:hover > div[class*="absolute"],
+        div[class*="group-hover:visible"] {
+            z-index: 99999 !important;
+            pointer-events: auto !important;
+        }
+
+        #jornada-header-card {
+            position: relative;
+            z-index: 25;
+        }
+        #jornada-header-card:hover,
+        #jornada-header-card:has(.group:hover) {
+            z-index: 100 !important;
+        }
+
+        thead {
+            position: relative;
+            z-index: 10;
+        }
+        thead tr th.group:hover {
+            z-index: 40 !important;
         }
 
         .primary-glow {
@@ -263,7 +309,7 @@
         </header>
 
         <!-- Bento Grid Financiero (5 Tarjetas con explicaciones enriquecidas sin cortes) -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 relative z-20">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 relative z-30">
             
             <!-- Hero Card: Bote Total en Caja (2 columnas en pantallas grandes) -->
             <div class="lg:col-span-2 glass-panel p-4 sm:p-5 relative flex flex-col justify-between border-amber-500/40 bg-gradient-to-br from-amber-950/20 via-slate-900/60 to-slate-900/80">
@@ -502,12 +548,12 @@
             </div>
 
             <!-- Tarjeta de cabecera financiera de la jornada -->
-            <div class="glass-panel p-4 sm:p-5 border-orange-500/30 bg-gradient-to-r from-orange-950/20 via-slate-900/80 to-slate-900/80" id="jornada-header-card">
+            <div class="glass-panel p-4 sm:p-5 border-orange-500/30 bg-gradient-to-r from-orange-950/20 via-slate-900/80 to-slate-900/80 relative z-30" id="jornada-header-card">
                 <!-- Inyectado por JS -->
             </div>
 
             <!-- Gráfico Comparativo: Recaudación vs Sellado por Jornada (Plegable) -->
-            <div class="glass-panel p-4 sm:p-5 space-y-3 border-orange-500/30">
+            <div class="glass-panel p-4 sm:p-5 space-y-3 border-orange-500/30 relative z-10">
                 <div class="flex items-center justify-between cursor-pointer select-none" onclick="window.BoteApp.toggleJornadasChart()">
                     <div class="flex items-center gap-2.5">
                         <span class="text-base sm:text-lg">📊</span>
@@ -630,7 +676,7 @@
             </div>
 
             <!-- Tarjetas de Resumen de Flujo de Caja con Bote Inicial claramente expuesto -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-20">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-30">
                 <div class="glass-panel p-4 sm:p-5 relative">
                     <div class="group relative cursor-help flex items-start justify-between">
                         <span class="text-xs font-bold uppercase text-amber-400 flex items-center gap-1">🌱 Bote Inicial Temporada <span class="text-xs">ℹ️</span></span>
@@ -685,7 +731,7 @@
             </div>
 
             <!-- Gráfico de Evolución del Fondo Común (Bote de la Peña) -->
-            <div class="glass-panel p-4 sm:p-5 space-y-3 border-amber-500/30">
+            <div class="glass-panel p-4 sm:p-5 space-y-3 border-amber-500/30 relative z-10">
                 <div class="flex items-center justify-between cursor-pointer select-none" onclick="window.BoteApp.toggleFlujoChart()">
                     <div class="flex items-center gap-2.5">
                         <span class="text-base sm:text-lg">📈</span>
