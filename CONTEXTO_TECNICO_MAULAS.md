@@ -70,6 +70,24 @@ Para optimizar el rendimiento y la mantenibilidad, todo el núcleo matemático d
 - **Cómputo de Premios por Categoría (`jornada.prizes`)**: Los premios individuales se calculan cruzando los aciertos del socio con el objeto oficial de premios de la jornada (`'15'`, `'14'`, `'13'`, `'12'`, `'11'`, `'10'`). Este desglose se importa de forma exacta desde la web oficial de Loterías y Apuestas del Estado mediante el nuevo importador de resultados.
 - **Columna de Dobles y Reducciones Comunitarias**: `getExtraPrizesForJornada` escruta las apuestas múltiples comunitarias cruzando combinaciones y premios para computar los ingresos comunales de la peña.
 
+### 3.6. Extracto Individual y Detalle de Movimientos de Socio (`bote.js`, `bote-engine.js`, `utils.js`)
+
+Para garantizar la máxima transparencia en la contabilidad comunal, el modal de detalle de socio (`#member-detail-modal`) ofrece una vista desglosada y auditable de cada movimiento:
+
+- **Orden Cronológico Estricto**: Los movimientos se presentan en secuencia temporal natural con un selector que permite conmutar entre orden cronológico ascendente (`ASC`, por defecto para ver la evolución del saldo) y descendente (`DESC`).
+- **Normalización y Parseo Robusto de Fechas (`utils.js`)**: Tratamiento exhaustivo en la función de parseo de fechas (`formatDateForInput` y parseo de cadenas ISO `YYYY-MM-DD`, `DD/MM/YYYY`, Firestore Timestamps y objetos Date nativos). Se elimina cualquier ambigüedad de zona horaria UTC vs. local que provocaba que fechas grabadas como `2026-09-20` se mostraran desfasadas un día antes o se ordenaran incorrectamente.
+- **Estructura de Columnas del Extracto**:
+  - `JORNADA`: Insignia identificativa (ej. `J8`, `J9`) o etiqueta informativa para movimientos extraordinarios (`Bizum`, `Cierre 1ª Vuelta`, `Reparto`).
+  - `CONCEPTO / FECHA`: Detalle descriptivo de la operación (ej. "Apuesta J8 + Dobles", "Ingreso Bizum", "Premio 12 aciertos", "Penalización retraso") junto a la fecha exacta.
+  - `APORTA / INGRESO (+€)`: Entradas dinerarias netas del socio al bote común.
+  - `GASTA / CARGO (-€)`: Salidas y costes imputados al socio (coste de quiniela ordinaria 0,75€ + cuota proporcional comunal de dobles + multas).
+  - `PREMIOS (+€)`: Ingresos procedentes de aciertos individuales o comunales.
+  - `SALDO RESULTANTE (€)`: Balance acumulado y consolidado tras la ejecución de la fila.
+- **Optimización de UI del Bote (`bote.html`)**:
+  - Selector de socio con icono de flecha blanca vectorial adaptada para el tema oscuro.
+  - Reubicación del selector directamente bajo la barra de botones principales para mejorar la ergonomía.
+  - Contenedor con scroll horizontal (`.table-responsive`) en la tabla resumen para garantizar visualización íntegra en pantallas estrechas sin romper el maquetado.
+
 ## 4. Lógica de Puntuación — Reglas Críticas
 
 ### 4.1. Fórmula General (`scoring.js`)
@@ -252,6 +270,19 @@ Ideado a propuesta del socio **Buzón** para situaciones en las que un socio se 
 - **Limpieza de Enlaces**: Se retiró el texto/enlace redundante "Ir a la tabla" en el encabezado de pronósticos.
 - **Escudos Femeninos y Normalización**: Incorporación de escudos oficiales de la Liga Femenina en `escudos/Femeninos/` (`Badalona (f)`, `Logroño (f)`, `Madrid CFF (f)`) y enriquecimiento del mapa de alias en `utils.js` para admitir variantes abreviadas habituales de la prensa (`Rayo V.`, `R. Madrid`, `R. Sociedad`, `R. Valladolid`, etc.).
 
+### 7.4. Optimizaciones Móviles y de Interfaz (Responsive UI)
+
+A raíz de las pruebas de uso intensivo en smartphones y tablets, se implementaron adaptaciones críticas en componentes clave:
+
+- **Columna Fija de Temporada en Clasificación (`resultados.html`, `js/resultados.js`)**:
+  - En la tabla de clasificación por jornadas, la columna de cabecera "TEMPORADA" se amplió a un ancho mínimo de seguridad de 100px y su rótulo se estructuró en dos líneas (`TEMP.` / `25-26`). Esto previene el solapamiento visual con los números de las primeras jornadas en pantallas de smartphones con ancho reducido.
+- **Botonera Adaptativa en Modal de Jornadas (`jornadas.html`)**:
+  - Los botones de acción del modal de edición de jornadas y resultados partidos se configuraron con envoltorio flexible (`flex-wrap: wrap`), asegurando que en pantallas estrechas no desborden horizontalmente y manteniendo un área táctil mínima (touch target) de 44px de altura para máxima ergonomía.
+- **Separadores de Bloque Corporativos (`css/styles.css`, `js/pronosticos.js`)**:
+  - Estandarización de líneas divisorias finas en color rojo corporativo (`#ff3600`) entre bloques de información en pronósticos, resultados, bote y administración.
+- **Identificador de Temporada en Cabecera**:
+  - Incorporación de la etiqueta de temporada activa junto al logotipo de la Peña en la barra de navegación superior.
+
 ## 8. Comunicaciones y Notificaciones: Telegram
 
 - Existe un servicio (`telegram-service.js`) que ejerce como "Bot", conectado a la API de Telegram.
@@ -266,6 +297,7 @@ Ideado a propuesta del socio **Buzón** para situaciones en las que un socio se 
 ## 9. Identidad Visual y Estilo
 
 - **Colores de Acción**: Los botones críticos de previsualización de cierres y cobros en el Bote utilizan un azul oscuro profundo (`#0d47a1`) para diferenciarse de acciones secundarias.
+- **Separadores Corporativos**: Se utiliza una línea fina en color rojo corporativo (`#ff3600`) para delimitar bloques y secciones, reforzando la identidad gráfica de Las Maulas.
 - **Tipografía**: Basada en 'Inter', 'Montserrat' y 'Outfit' para máxima legibilidad en tablas densas de datos y paneles de control.
 - **Feedback Visual**: Las notificaciones de éxito y errores utilizan la paleta semántica estándar de la web (verde para éxitos, naranja para advertencias/retrasos, rojo para errores críticos).
 
@@ -337,6 +369,10 @@ Para ofrecer una experiencia nativa en teléfonos móviles (Android e iOS) e ind
 - **Script de Respaldo de Firestore**: `scripts/backup_firestore.js`, que descarga todas las colecciones activas mediante la API REST de Firestore a archivos JSON individuales dentro de `BACKUP_DATOS_YYYY-MM-DD/`.
 - **Copia Comprimida de Seguridad**: Archivo ZIP íntegro en `D:\PROYECTO_MAULAS_BACKUP_YYYY-MM-DD.zip` conteniendo todo el código fuente, base de datos exportada, recursos multimedia e historial.
 - **Control de Versiones Local**: Tag de Git `v1.0-pre-pwa` y rama de seguridad `backup-pre-pwa` antes de aplicar cambios arquitecturales.
+
+### 13.6. Automatización Externa con GitHub Actions y Sincronización
+- **Actualización Desatendida de Datos Externos**: Las fuentes externas (`datos_auxiliares/rss_cache.xml` y `datos_auxiliares/external_data_metadata.json`) se sincronizan de manera autónoma mediante un workflow de GitHub Actions que realiza commits directos con el prefijo `Auto-update: Datos externos (RSS/PDF) [skip ci]`.
+- **Protocolo de Sincronización en la Carpeta de Trabajo**: Al iniciar sesiones de trabajo o antes de desplegar cambios, se debe ejecutar `git pull` en la máquina local para incorporar sin conflictos las actualizaciones automáticas generadas por GitHub Actions.
 
 ---
 
