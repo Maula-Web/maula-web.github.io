@@ -518,6 +518,34 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ---
 
+## 18. Nueva Sección: Bote 2 (Tesorería & Auditoría Financiera)
+
+### 18.1. Propósito y Convivencia
+- Se crea la nueva sección **Bote_2** (`bote_2.html`, `js/bote_2.js`, `js/bote_2_data.js`) como una evolución moderna, ultra-rápida y detallada de la gestión del Bote y Tesorería.
+- **Convivencia activa**: El Bote original (`bote.html`) se mantiene 100% operativo e intacto mientras se completan las pruebas de esta nueva versión.
+
+### 18.2. Control de Acceso Exclusivo (Gatekeeper)
+- **Acceso Autorizado**: Reservado exclusivamente para los socios evaluadores:
+  - **Fernando Lozano** (ID: 6, `lozano@maulas.com`, alias `Lozano`)
+  - **Marcelo Pérez** (ID: 14, `marcelo@maulas.com`, alias `Marcelo`)
+- **Resto de Socios y Visitantes**: Si un usuario no autorizado o no identificado intenta acceder a `bote_2.html`, el sistema oculta el contenido principal y despliega un panel estilizado de **"En obras (Fase de Pruebas Exclusiva)"** con accesos directos al Bote actual y al Inicio.
+- **Acceso Rápido para Evaluadores**: Incluye modal de identificación rápida (`modal-auth-evaluador`) y soporte para parámetro URL (`?evaluador=6` o `?evaluador=14`) para facilitar la auditoría en navegación privada.
+
+### 18.3. Arquitectura y Rendimiento
+- **Desacoplamiento Ligero**: Los datos históricos y snapshots locales se extrajeron a `js/bote_2_data.js`, reduciendo el HTML principal de más de 50.000 líneas a solo 888 líneas limpias, garantizando carga instantánea tanto en redes móviles como en escritorio.
+- **Adaptabilidad al Viewport**: Contenedor optimizado (`max-width: 1380px`, sin desbordamientos innecesarios ni barras de scroll vertical redundantes en escritorio), con sticky-headers en tablas y columna fija lateral en pantallas pequeñas.
+- **Orden de Socios**: En todas las vistas (Cuentas de Socios, Matriz Cuadrante, Auditor de Jornadas y Desplegable de Ingresos) se aplica estrictamente el orden numérico oficial por ID (1 al 19), idéntico al resto de la aplicación.
+- **Tooltips y Explicaciones**: Todos los elementos estáticos y no desplegables (tarjetas Bento, métricas de recaudación, badges de multas y conceptos) incorporan tooltips explicativos (`title` y chips con `ℹ️`) para clarificar su cálculo contable.
+
+### 18.4. Reembolso de Sellado: Bote vs Bizum
+- En la quiniela de cada jornada, el socio perdedor o sellador adelanta el coste del boleto físico.
+- Se implementó la posibilidad de elegir de forma individual para cada jornada si el importe del sellado:
+  - **Va al Bote del socio (`isSelladoInCash: false`)**: Se acredita en su saldo virtual acumulado.
+  - **Se paga por Bizum / Efectivo (`isSelladoInCash: true`)**: El dinero se reembolsa externamente y no incrementa su hucha del bote.
+- Se gestiona interactivamente desde la tabla de detalle de la jornada y desde el modal de Tesorería (`modal-gestion-jornada`), persistiendo en la colección Firestore `reembolsos_efectivo` (`${memberId}_${jornadaId}`).
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
@@ -527,4 +555,5 @@ Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
 3. Indícale en qué vista de la web o qué archivo quieres que se enfoque y qué error concreto ocurre.
 
 *(Nota: Este archivo debe editarse y actualizarse cada vez que implementemos una regla de negocio nueva que sea compleja de entender para alguien externo).*
+
 

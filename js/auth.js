@@ -301,6 +301,7 @@ const Auth = {
                 <a href="pronosticos.html" class="btn-primary btn-pronosticos ${page === 'pronosticos.html' ? 'active' : ''}">RELLENAR QUINIELA</a>
                 <a href="resultados.html" class="btn-primary btn-resultados ${page === 'resultados.html' ? 'active' : ''}">CLASIFICACIÓN</a>
                 <a href="bote.html" class="btn-primary btn-bote ${page === 'bote.html' ? 'active' : ''}">BOTE</a>
+                <a href="bote_2.html" class="btn-primary btn-bote-2 ${page === 'bote_2.html' ? 'active' : ''}" style="border: 1px dashed #ff9100; color: #ff9100;" title="Nueva versión de Tesorería (en pruebas)">BOTE 2</a>
                 <a href="resumen-temporada.html" class="btn-primary btn-resumen ${page === 'resumen-temporada.html' ? 'active' : ''}">RESUMEN TEMPORADA</a>
                 <a href="votaciones.html" class="btn-primary btn-votaciones ${page === 'votaciones.html' ? 'active' : ''}" style="background:white; color:black; font-weight:900;">VOTACIONES</a>
                 <a href="admin.html" class="btn-primary btn-admin ${page === 'admin.html' ? 'active' : ''}">ADMINISTRACIÓN</a>
@@ -336,6 +337,23 @@ const Auth = {
                     resultadosBtn.insertAdjacentElement('afterend', boteBtn);
                 } else {
                     sidebar.appendChild(boteBtn);
+                }
+            }
+
+            // 2b-2. Ensure Bote 2 button exists
+            if (!sidebar.querySelector('a[href="bote_2.html"]')) {
+                const bote2Btn = document.createElement('a');
+                bote2Btn.href = "bote_2.html";
+                bote2Btn.className = `btn-primary btn-bote-2 ${page === 'bote_2.html' ? 'active' : ''}`;
+                bote2Btn.style.border = "1px dashed #ff9100";
+                bote2Btn.style.color = "#ff9100";
+                bote2Btn.title = "Nueva versión de Tesorería (en pruebas)";
+                bote2Btn.textContent = "BOTE 2";
+                const boteBtn = sidebar.querySelector('a[href="bote.html"]');
+                if (boteBtn) {
+                    boteBtn.insertAdjacentElement('afterend', bote2Btn);
+                } else {
+                    sidebar.appendChild(bote2Btn);
                 }
             }
 
