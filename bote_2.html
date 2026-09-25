@@ -1147,6 +1147,53 @@
             </div>
             <form id="form-config" onsubmit="window.BoteApp.submitConfig(event)" class="flex flex-col flex-1 overflow-hidden">
                 <div class="p-4 sm:p-6 overflow-y-auto space-y-6 text-xs sm:text-sm flex-1">
+                    <!-- Sección Destacada: Fecha de Entrada en Vigor / Vigencia -->
+                    <div class="p-4 rounded-xl bg-gradient-to-r from-orange-950/60 via-slate-900 to-slate-900 border border-orange-500/40 shadow-lg shadow-orange-950/20 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <label for="config-fecha-vigencia" class="text-xs sm:text-sm font-bold text-orange-400 flex items-center gap-1.5">
+                                <span>📅</span> Fecha de Vigencia de los Nuevos Parámetros
+                            </label>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="window.BoteApp.setConfigDate('today')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 hover:bg-orange-500/20 hover:text-orange-300 text-slate-300 border border-slate-700 transition-colors">
+                                    ⚡ Hoy
+                                </button>
+                                <button type="button" onclick="window.BoteApp.setConfigDate('season_start')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 hover:bg-orange-500/20 hover:text-orange-300 text-slate-300 border border-slate-700 transition-colors">
+                                    🏁 Inicio Temporada (16/08/2026)
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                            <div>
+                                <input type="date" id="config-fecha-vigencia" required class="w-full bg-slate-950 border border-orange-500/60 rounded-lg px-3 py-2 text-white font-mono font-bold text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400">
+                            </div>
+                            <p class="text-[11px] text-slate-400 leading-tight">
+                                Cualquier cambio se aplicará a partir de las jornadas cuya fecha sea igual o posterior a esta fecha. Al hacer clic en Guardar, se te preguntará para confirmar la fecha de vigencia.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Botón para ver Historial de Vigencias -->
+                    <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                        <span class="text-xs text-slate-400 flex items-center gap-1.5">
+                            <span>📜</span> Registro de cambios históricos con fecha de efecto
+                        </span>
+                        <button type="button" onclick="window.BoteApp.toggleConfigHistory()" id="btn-toggle-config-history" class="text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1 rounded-lg transition-colors flex items-center gap-1.5">
+                            <span>Ver Historial de Vigencias</span>
+                            <span id="config-history-badge" class="px-1.5 py-0.2 bg-amber-500/20 rounded-full text-[10px]">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Panel desplegable con el historial de vigencias -->
+                    <div id="config-history-panel" class="hidden p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-300 pb-1 border-b border-slate-800">
+                            <span>Historial Cronológico de Tarifas y Penalizaciones</span>
+                            <span class="text-[11px] text-slate-500">Ordenado por fecha de vigencia</span>
+                        </div>
+                        <div id="config-history-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+                    </div>
+
                     <!-- Sección 1: Precios Base y Cuotas -->
                     <div>
                         <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-1.5">

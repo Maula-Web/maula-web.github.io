@@ -20,9 +20,16 @@ class BoteManager {
             costeColumna: 0.75,
             costeDobles: 10.50,
             aportacionSemanal: 1.50,
+            costeExtraExento: 0.20,
             penalizacionMaula: 1.00,
             boteInicial: 0.00,
-            temporadaActual: '2026-2027'
+            temporadaActual: '2026-2027',
+            history: {
+                costeColumna: [{ date: '2026-08-01', value: 0.75 }],
+                costeDobles: [{ date: '2026-08-01', value: 10.50 }],
+                aportacionSemanal: [{ date: '2026-08-01', value: 1.50 }],
+                costeExtraExento: [{ date: '2026-08-01', value: 0.20 }]
+            }
         };
         this.cashPayments = []; // New - Tracks sellados paid in cash
         this.repartos = []; // New - Tracks profit distributions
@@ -140,19 +147,29 @@ class BoteManager {
 
         if (boteConfig) {
             this.config = { ...this.config, ...boteConfig };
-            if (this.config.penalizacionMaula === undefined) {
-                this.config.penalizacionMaula = 1.00;
+            if (boteConfig.history) {
+                this.config.history = { ...this.config.history, ...boteConfig.history };
             }
-            // FIX: Enforce 10.50 for costeDobles so sellado is 26.25 (15.75 singles + 10.50 double)
-            this.config.costeDobles = 10.50;
-            if (this.config.history && this.config.history['costeDobles']) {
-                this.config.history['costeDobles'].forEach(h => h.value = 10.50);
+            if (boteConfig.penalties_history) {
+                this.config.penalties_history = { ...this.config.penalties_history, ...boteConfig.penalties_history };
             }
-        } else {
-            this.config.costeDobles = 10.50;
-            this.config.penalizacionMaula = 1.00;
         }
-        
+
+        // Asegurar estructura de histórico base si no existe
+        if (!this.config.history) this.config.history = {};
+        const basePrices = {
+            costeColumna: 0.75,
+            costeDobles: 10.50,
+            aportacionSemanal: 1.50,
+            costeExtraExento: 0.20
+        };
+        for (const [k, defVal] of Object.entries(basePrices)) {
+            if (!this.config.history[k] || !Array.isArray(this.config.history[k]) || this.config.history[k].length === 0) {
+                const initialVal = this.config[k] !== undefined ? parseFloat(this.config[k]) : defVal;
+                this.config.history[k] = [{ date: '2026-08-01', value: initialVal }];
+            }
+        }
+
         if (this.engine) this.engine.config = this.config;
     }
 
@@ -822,6 +839,9 @@ class BoteManager {
      */
     openConfigModal() {
         // Populate current values
+        const elFecha = document.getElementById('config-fecha-vigencia');
+        if (elFecha && !elFecha.value) elFecha.value = new Date().toISOString().split('T')[0];
+
         document.getElementById('config-coste-columna').value = this.config.costeColumna;
         document.getElementById('config-coste-dobles').value = this.config.costeDobles;
         document.getElementById('config-aportacion').value = this.config.aportacionSemanal;
@@ -1001,74 +1021,165 @@ class BoteManager {
         }
     }
 
+    normalizeDateStr(d) {
+        if (!d) return '';
+        if (typeof d === 'string') {
+            const trimmed = d.trim();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+            const dmy = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+            if (dmy) {
+                const day = dmy[1].padStart(2, '0');
+                const month = dmy[2].padStart(2, '0');
+                const year = dmy[3];
+                return `${year}-${month}-${day}`;
+            }
+        }
+        const parseD = (window.AppUtils && window.AppUtils.parseDate) ? window.AppUtils.parseDate(d) : new Date(d);
+        if (!parseD || isNaN(parseD.getTime())) return '';
+        const y = parseD.getFullYear();
+        const m = String(parseD.getMonth() + 1).padStart(2, '0');
+        const day = String(parseD.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    addPriceToHistory(key, date, value) {
+        if (!this.config.history) this.config.history = {};
+        if (!this.config.history[key]) this.config.history[key] = [];
+        const normDate = this.normalizeDateStr(date);
+        const numVal = parseFloat(value);
+        const existing = this.config.history[key].find(e => this.normalizeDateStr(e.date) === normDate);
+        if (existing) {
+            existing.value = numVal;
+            existing.date = normDate;
+        } else {
+            this.config.history[key].push({ date: normDate, value: numVal });
+        }
+        this.config.history[key].sort((a, b) => this.normalizeDateStr(b.date).localeCompare(this.normalizeDateStr(a.date)));
+    }
+
+    addPenaltyToHistory(type, entry) {
+        if (!this.config.penalties_history) this.config.penalties_history = {};
+        if (!this.config.penalties_history[type]) this.config.penalties_history[type] = [];
+        const normDate = this.normalizeDateStr(entry.date);
+        entry.date = normDate;
+        const existing = this.config.penalties_history[type].find(e => this.normalizeDateStr(e.date) === normDate);
+        if (existing) {
+            Object.assign(existing, entry);
+        } else {
+            this.config.penalties_history[type].push(entry);
+        }
+        this.config.penalties_history[type].sort((a, b) => this.normalizeDateStr(b.date).localeCompare(this.normalizeDateStr(a.date)));
+    }
+
     /**
      * Submit config form
      */
     async submitConfig(event) {
         event.preventDefault();
 
-        const today = new Date().toISOString().split('T')[0];
+        const inputFechaEl = document.getElementById('config-fecha-vigencia');
+        let fechaVigencia = inputFechaEl && inputFechaEl.value ? inputFechaEl.value.trim() : new Date().toISOString().split('T')[0];
 
         // Basic costs
-        this.config.costeColumna = parseFloat(document.getElementById('config-coste-columna').value);
-        this.config.costeDobles = parseFloat(document.getElementById('config-coste-dobles').value);
-        this.config.aportacionSemanal = parseFloat(document.getElementById('config-aportacion').value);
-        this.config.costeExtraExento = parseFloat(document.getElementById('config-extra-exento').value);
-        this.config.boteInicial = parseFloat(document.getElementById('config-bote-inicial').value);
+        const newCosteColumna = parseFloat(document.getElementById('config-coste-columna').value);
+        const newCosteDobles = parseFloat(document.getElementById('config-coste-dobles').value);
+        const newAportacion = parseFloat(document.getElementById('config-aportacion').value);
+        const newExtraExento = parseFloat(document.getElementById('config-extra-exento').value);
+        const newBoteInicial = parseFloat(document.getElementById('config-bote-inicial').value);
 
-        // Advanced Penalties History
-        if (!this.config.penalties_history) this.config.penalties_history = {};
-
-        // Perdedor / Sellar
         const elMaulaVal = document.getElementById('config-penalizacion-maula');
-        if (elMaulaVal) {
-            const maulaValue = parseFloat(elMaulaVal.value);
-            this.config.penalizacionMaula = maulaValue;
-            this.addPenaltyToHistory('maula', { date: today, value: maulaValue });
-        }
+        const newMaula = elMaulaVal ? parseFloat(elMaulaVal.value) : 1.00;
+        const newPIG = parseFloat(document.getElementById('config-penalizacion-pig').value);
 
-        // PIG
-        const pigValue = parseFloat(document.getElementById('config-penalizacion-pig').value);
-        this.addPenaltyToHistory('pig', { date: today, value: pigValue });
-
-        // Low Hits
-        const lowValues = {
+        const newLowValues = {
             0: parseFloat(document.getElementById('config-pen-0').value),
             1: parseFloat(document.getElementById('config-pen-1').value),
             2: parseFloat(document.getElementById('config-pen-2').value),
             3: parseFloat(document.getElementById('config-pen-3').value)
         };
-        this.addPenaltyToHistory('bajos_aciertos', { date: today, values: lowValues });
 
-        // Unos Grid
-        const unosValues = {};
+        const newUnosValues = {};
         for (let i = 10; i <= 15; i++) {
             const el = document.getElementById(`config-unos-${i}`);
-            if (el) unosValues[i] = parseFloat(el.value);
+            if (el) newUnosValues[i] = parseFloat(el.value);
         }
-        this.addPenaltyToHistory('unos', { date: today, values: unosValues });
+
+        const changes = [];
+        const diff = (a, b) => Math.abs((parseFloat(a) || 0) - (parseFloat(b) || 0)) > 0.001;
+
+        const curAportacion = this.engine ? this.engine.getHistoricalPrice('aportacionSemanal', fechaVigencia) : (this.config.aportacionSemanal || 1.50);
+        const curCosteColumna = this.engine ? this.engine.getHistoricalPrice('costeColumna', fechaVigencia) : (this.config.costeColumna || 0.75);
+        const curCosteDobles = this.engine ? this.engine.getHistoricalPrice('costeDobles', fechaVigencia) : (this.config.costeDobles || 10.50);
+        const curExtraExento = this.engine ? this.engine.getHistoricalPrice('costeExtraExento', fechaVigencia) : (this.config.costeExtraExento || 0.20);
+        const curMaula = this.engine ? this.engine.calculateHistoricalPenalty('maula', null, fechaVigencia) : (this.config.penalizacionMaula || 1.00);
+        const curPIG = this.engine ? this.engine.calculateHistoricalPenalty('pig', null, fechaVigencia) : (this.config.penalizacionPIG || 1.00);
+
+        if (diff(newAportacion, curAportacion)) changes.push(`• Aportación semanal: ${curAportacion.toFixed(2)} € ➔ ${newAportacion.toFixed(2)} €`);
+        if (diff(newCosteColumna, curCosteColumna)) changes.push(`• Coste columna normal: ${curCosteColumna.toFixed(2)} € ➔ ${newCosteColumna.toFixed(2)} €`);
+        if (diff(newCosteDobles, curCosteDobles)) changes.push(`• Coste dobles reducida: ${curCosteDobles.toFixed(2)} € ➔ ${newCosteDobles.toFixed(2)} €`);
+        if (diff(newExtraExento, curExtraExento)) changes.push(`• Extra socio exento: ${curExtraExento.toFixed(2)} € ➔ ${newExtraExento.toFixed(2)} €`);
+        if (diff(newBoteInicial, this.config.boteInicial)) changes.push(`• Bote Inicial temporada: ${(this.config.boteInicial || 0).toFixed(2)} € ➔ ${newBoteInicial.toFixed(2)} €`);
+        if (diff(newMaula, curMaula)) changes.push(`• Penalización Maula: ${curMaula.toFixed(2)} € ➔ ${newMaula.toFixed(2)} €`);
+        if (diff(newPIG, curPIG)) changes.push(`• Penalización PIG: ${curPIG.toFixed(2)} € ➔ ${newPIG.toFixed(2)} €`);
+
+        for (let i = 0; i <= 3; i++) {
+            const curLow = this.engine ? this.engine.calculateHistoricalPenalty('bajos_aciertos', i, fechaVigencia) : 0;
+            if (diff(newLowValues[i], curLow)) {
+                changes.push(`• Penalización ${i} aciertos: ${curLow.toFixed(2)} € ➔ ${newLowValues[i].toFixed(2)} €`);
+            }
+        }
+
+        for (let i = 10; i <= 15; i++) {
+            const curUnos = this.engine ? this.engine.calculateHistoricalPenalty('unos', i, fechaVigencia) : 0;
+            if (diff(newUnosValues[i], curUnos)) {
+                changes.push(`• Penalización ${i} unos: ${curUnos.toFixed(2)} € ➔ ${newUnosValues[i].toFixed(2)} €`);
+            }
+        }
+
+        const promptIntro = changes.length > 0
+            ? `Se aplicarán los siguientes cambios en los parámetros:\n\n${changes.join('\n')}\n\n`
+            : `Confirmación de configuración de parámetros.\n\n`;
+
+        const confirmedDateInput = prompt(`${promptIntro}¿Desde qué fecha debe estar vigente este cambio? (Formato: AAAA-MM-DD):`, fechaVigencia);
+
+        if (confirmedDateInput === null) return;
+
+        const confirmedDate = this.normalizeDateStr(confirmedDateInput);
+        if (!confirmedDate || !/^\d{4}-\d{2}-\d{2}$/.test(confirmedDate)) {
+            alert('⚠️ La fecha introducida no es válida. Por favor, introduce una fecha con formato AAAA-MM-DD (ejemplo: 2026-09-25).');
+            return;
+        }
+
+        if (inputFechaEl) inputFechaEl.value = confirmedDate;
+
+        this.addPriceToHistory('costeColumna', confirmedDate, newCosteColumna);
+        this.addPriceToHistory('costeDobles', confirmedDate, newCosteDobles);
+        this.addPriceToHistory('aportacionSemanal', confirmedDate, newAportacion);
+        this.addPriceToHistory('costeExtraExento', confirmedDate, newExtraExento);
+
+        this.addPenaltyToHistory('maula', { date: confirmedDate, value: newMaula });
+        this.addPenaltyToHistory('pig', { date: confirmedDate, value: newPIG });
+        this.addPenaltyToHistory('bajos_aciertos', { date: confirmedDate, values: newLowValues });
+        this.addPenaltyToHistory('unos', { date: confirmedDate, values: newUnosValues });
+
+        this.config.costeColumna = newCosteColumna;
+        this.config.costeDobles = newCosteDobles;
+        this.config.aportacionSemanal = newAportacion;
+        this.config.costeExtraExento = newExtraExento;
+        this.config.boteInicial = newBoteInicial;
+        this.config.penalizacionMaula = newMaula;
+        this.config.penalizacionPIG = newPIG;
 
         try {
             await this.saveConfig();
-            alert('Configuración guardada correctamente. Los cambios se aplicarán a movimientos futuros y basados en la fecha de la jornada.');
             this.closeModal('modal-config');
+            if (this.engine) this.engine.config = this.config;
             this.render();
+            alert(`✅ Configuración guardada y vigente desde el ${confirmedDate}.\n\nSe han recalculado todos los saldos y movimientos del Bote.`);
         } catch (error) {
             console.error('Error saving config:', error);
             alert('Error al guardar la configuración');
         }
-    }
-
-    addPenaltyToHistory(type, entry) {
-        if (!this.config.penalties_history[type]) this.config.penalties_history[type] = [];
-        const existing = this.config.penalties_history[type].find(e => e.date === entry.date);
-        if (existing) {
-            Object.assign(existing, entry);
-        } else {
-            this.config.penalties_history[type].push(entry);
-        }
-        // Keep sorted by date
-        this.config.penalties_history[type].sort((a, b) => new Date(b.date) - new Date(a.date));
     }
 
     /**

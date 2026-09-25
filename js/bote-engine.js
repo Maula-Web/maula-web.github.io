@@ -435,49 +435,84 @@ class BoteEngine {
         return costs;
     }
 
+    normalizeDateStr(d) {
+        if (!d) return '';
+        if (typeof d === 'string') {
+            const trimmed = d.trim();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+            const dmy = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+            if (dmy) {
+                const day = dmy[1].padStart(2, '0');
+                const month = dmy[2].padStart(2, '0');
+                const year = dmy[3];
+                return `${year}-${month}-${day}`;
+            }
+        }
+        const parseD = (window.AppUtils && window.AppUtils.parseDate) ? window.AppUtils.parseDate(d) : new Date(d);
+        if (!parseD || isNaN(parseD.getTime())) return '';
+        const y = parseD.getFullYear();
+        const m = String(parseD.getMonth() + 1).padStart(2, '0');
+        const day = String(parseD.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
     getHistoricalPrice(key, date) {
-        if (!date || isNaN(date.getTime())) return this.config[key] || 0;
-        if (!this.config.history || !this.config.history[key]) return this.config[key] || 0;
-        const settings = this.config.history[key].filter(h => new Date(h.date) <= date).sort((a, b) => new Date(b.date) - new Date(a.date));
-        return settings.length > 0 ? settings[0].value : (this.config[key] || 0);
+        const targetStr = this.normalizeDateStr(date);
+        const fallback = this.config[key] !== undefined ? parseFloat(this.config[key]) : 0;
+        if (!targetStr) return fallback;
+
+        if (!this.config.history || !this.config.history[key] || !Array.isArray(this.config.history[key]) || this.config.history[key].length === 0) {
+            return fallback;
+        }
+
+        const settings = this.config.history[key];
+        const valid = settings.filter(h => this.normalizeDateStr(h.date) <= targetStr)
+            .sort((a, b) => this.normalizeDateStr(b.date).localeCompare(this.normalizeDateStr(a.date)));
+
+        if (valid.length > 0) return parseFloat(valid[0].value);
+
+        // Si la fecha evaluada es anterior al primer registro de vigencia, tomar el más antiguo (baseline)
+        const earliest = [...settings].sort((a, b) => this.normalizeDateStr(a.date).localeCompare(this.normalizeDateStr(b.date)))[0];
+        return earliest ? parseFloat(earliest.value) : fallback;
     }
 
     calculateHistoricalPenalty(type, value, date) {
+        const targetStr = this.normalizeDateStr(date);
         const defaultMaulaVal = this.config.penalizacionMaula !== undefined ? parseFloat(this.config.penalizacionMaula) : 1.00;
-        if (!date || isNaN(date.getTime())) {
+        const defaultPIGVal = this.config.penalizacionPIG !== undefined ? parseFloat(this.config.penalizacionPIG) : 1.00;
+
+        const fallback = () => {
             if (type === 'unos' && value >= 10) return this.calculatePenalizacionUnos(value);
-            if (type === 'pig') return this.config.penalizacionPIG || 1.00;
+            if (type === 'pig') return defaultPIGVal;
             if (type === 'maula' || type === 'perdedor') return defaultMaulaVal;
-            if (type === 'bajos_aciertos') return { 0: 1.0, 1: 0.8, 2: 0.6, 3: 0.4 }[value] || 0;
+            if (type === 'bajos_aciertos') return { 0: 3.0, 1: 2.0, 2: 1.0, 3: 0.5 }[value] || 0;
             return 0;
-        }
+        };
+
+        if (!targetStr) return fallback();
+
         const history = this.config.penalties_history || {};
         const settings = history[type] || [];
+        if (!Array.isArray(settings) || settings.length === 0) {
+            return fallback();
+        }
 
-        let setting = settings.filter(s => new Date(s.date) <= date)
-            .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        let setting = settings.filter(s => this.normalizeDateStr(s.date) <= targetStr)
+            .sort((a, b) => this.normalizeDateStr(b.date).localeCompare(this.normalizeDateStr(a.date)))[0];
 
         if (!setting) {
-            setting = settings.sort((a, b) => new Date(a.date) - new Date(b.date))[0];
-            if (!setting) {
-                if (type === 'unos' && value >= 10) return this.calculatePenalizacionUnos(value);
-                if (type === 'pig') return this.config.penalizacionPIG || 1.00;
-                if (type === 'maula' || type === 'perdedor') return defaultMaulaVal;
-                if (type === 'bajos_aciertos') {
-                    return { 0: 1.0, 1: 0.8, 2: 0.6, 3: 0.4 }[value] || 0;
-                }
-                return 0;
-            }
+            setting = [...settings].sort((a, b) => this.normalizeDateStr(a.date).localeCompare(this.normalizeDateStr(b.date)))[0];
+            if (!setting) return fallback();
         }
 
         if (type === 'unos' || type === 'bajos_aciertos') {
             if (setting.values && setting.values[value] !== undefined) {
                 return parseFloat(setting.values[value]);
             }
-            return 0;
+            return fallback();
         }
         if (type === 'pig') {
-            return setting.value !== undefined ? parseFloat(setting.value) : 1.00;
+            return setting.value !== undefined ? parseFloat(setting.value) : defaultPIGVal;
         }
         if (type === 'maula' || type === 'perdedor') {
             return setting.value !== undefined ? parseFloat(setting.value) : defaultMaulaVal;

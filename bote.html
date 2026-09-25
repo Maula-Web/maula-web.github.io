@@ -734,6 +734,13 @@
             </div>
             <div class="modal-body">
                 <form id="form-config" onsubmit="window.Bote.submitConfig(event)">
+                    <div class="form-group" style="background: rgba(255, 145, 0, 0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 145, 0, 0.3); margin-bottom: 1.2rem;">
+                        <label style="color: #ff9100; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                            <span>📅</span> Fecha de Vigencia de los Cambios
+                        </label>
+                        <input type="date" id="config-fecha-vigencia" required style="width: 100%; margin-top: 6px; padding: 6px 10px; background: #111; border: 1px solid #ff9100; color: #fff; border-radius: 6px; font-weight: bold;">
+                        <small style="color: #bbb; font-size: 0.8rem; display: block; margin-top: 4px;">Los cambios serán aplicados a las jornadas celebradas a partir de esta fecha. Al guardar se te preguntará para confirmar.</small>
+                    </div>
                     <div class="form-group">
                         <label>Coste Columna Normal (€)</label>
                         <input type="number" id="config-coste-columna" step="0.01" min="0" value="0.75" required>
