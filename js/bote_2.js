@@ -2428,6 +2428,8 @@ class BoteAppController {
 
             this.closeModal('modal-ingreso');
             this.renderAll();
+            // Refrescar explícitamente el modal de gestión de ingresos si estaba abierto
+            this.renderGestionIngresos();
             alert(`¡Ingreso de ${cant.toFixed(2)} € registrado con éxito!`);
         } catch (err) {
             console.error("Error guardando ingreso:", err);

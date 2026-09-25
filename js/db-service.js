@@ -185,8 +185,15 @@ class DataService {
         return doc.exists ? doc.data() : null;
     }
 
-    // Generic Add/Update (Upsert)
+    // Generic Add/Update (Upsert with MERGE - preserva campos existentes en Firestore)
     async save(collectionName, item) {
+        if (!item.id) item.id = Date.now();
+        await this.db.collection(collectionName).doc(String(item.id)).set(item, { merge: true });
+        this.clearSeasonDataCache();
+    }
+
+    // Generic Add/Update (Overwrites FULL document - usar solo cuando se quiere reemplazar todo)
+    async saveExact(collectionName, item) {
         if (!item.id) item.id = Date.now();
         await this.db.collection(collectionName).doc(String(item.id)).set(item);
         this.clearSeasonDataCache();

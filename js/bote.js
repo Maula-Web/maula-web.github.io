@@ -952,7 +952,7 @@ class BoteManager {
      * Delete an ingreso
      */
     async deleteIngreso(ingresoId) {
-        const ingreso = this.ingresos.find(i => i.id === ingresoId);
+        const ingreso = this.ingresos.find(i => String(i.id) === String(ingresoId));
         if (!ingreso) return;
 
         const member = this.members.find(m => String(m.id) === String(ingreso.memberId));
@@ -965,7 +965,7 @@ class BoteManager {
 
         try {
             await window.DataService.delete('ingresos', ingresoId);
-            this.ingresos = this.ingresos.filter(i => i.id !== ingresoId);
+            this.ingresos = this.ingresos.filter(i => String(i.id) !== String(ingresoId));
 
             alert('Ingreso eliminado correctamente');
             this.renderIngresosLista();
@@ -1832,6 +1832,50 @@ class BoteManager {
                     this.render();
                 }
             } catch (e) { console.error('Migration v25 failed:', e); }
+        }
+
+        // Migration v30: Re-apply all known prizes to ensure data wasn't lost by overwrite bug
+        const migV30Done = localStorage.getItem('bote_maintenance_v30');
+        if (!migV30Done) {
+            try {
+                console.log('Running migration v30 (Re-apply known prizes to restore any lost data)...');
+                const allJ = await window.DataService.getAll('jornadas');
+
+                const knownPrizes = [
+                    { num: 2, hits: 11, val: 28.84 },
+                    { num: 2, hits: 10, val: 3.00 },
+                    { num: 3, hits: 11, val: 48.37 },
+                    { num: 5, hits: 10, val: 13.08 },
+                    { num: 7, hits: 13, val: 920.09 },
+                    { num: 7, hits: 12, val: 16.16 },
+                    { num: 7, hits: 11, val: 1.83 },
+                    { num: 7, hits: 10, val: 1.00 },
+                    { num: 26, hits: 10, val: 6.30 }
+                ];
+
+                const prizesByNum = {};
+                knownPrizes.forEach(u => {
+                    if (!prizesByNum[u.num]) prizesByNum[u.num] = {};
+                    prizesByNum[u.num][String(u.hits)] = u.val;
+                });
+
+                for (const num of Object.keys(prizesByNum)) {
+                    const jDocs = allJ.filter(j => j.number === parseInt(num));
+                    const newPrizes = prizesByNum[num];
+                    for (const d of jDocs) {
+                        // Merge prizes con update (parcial) para no perder otros campos
+                        const existingPrizes = d.prizes || {};
+                        const mergedPrizes = { ...existingPrizes, ...newPrizes };
+                        await window.DataService.update('jornadas', d.id, { prizes: mergedPrizes });
+                        console.log(`v30: Restored prizes for jornada ${num} (id: ${d.id})`);
+                    }
+                }
+
+                localStorage.setItem('bote_maintenance_v30', 'true');
+                console.log('Migration v30 complete! Prizes restored.');
+                await this.loadData();
+                this.render();
+            } catch (e) { console.error('Migration v30 failed:', e); }
         }
     }
 
