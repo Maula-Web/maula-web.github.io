@@ -326,6 +326,8 @@ class BoteAppController {
                 gastoSellado = Math.abs(sealerMov.sellado);
             }
 
+            let recaudacion = 0;
+            let premios = 0;
             jMovements.forEach(m => {
                 recaudacion += (m.pennaIn || 0);
                 premios += ((m.premios || 0) + (m.extraPrizes || 0));
@@ -452,9 +454,9 @@ class BoteAppController {
         // Actualizar pestañas activas
         document.querySelectorAll('.nav-tab').forEach(tab => {
             if (tab.dataset.view === viewName) {
-                tab.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20';
+                tab.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap bg-orange-500 text-slate-950 border border-orange-400 shadow-md shadow-orange-500/20';
             } else {
-                tab.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60';
+                tab.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap text-slate-300 bg-slate-900/90 border border-slate-600/70 hover:border-orange-500/70 hover:text-white hover:bg-slate-800/80';
             }
         });
 
@@ -572,7 +574,7 @@ class BoteAppController {
                     ${statusBadge}
                 </td>
                 <td class="p-3 sm:px-4 text-center">
-                    <button onclick="window.BoteApp.openMemberExtract('${m.id}')" class="px-2.5 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-slate-950 font-bold text-xs border border-orange-500/30 transition-all flex items-center gap-1 mx-auto" title="Ver extracto detallado jornada a jornada">
+                    <button onclick="window.BoteApp.openMemberExtract('${m.id}')" class="btn-extracto px-2.5 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-slate-950 font-bold text-xs border border-orange-500/40 hover:border-orange-400 shadow-sm transition-all flex items-center gap-1 mx-auto" title="Ver extracto detallado jornada a jornada">
                         <span>📄</span> Extracto
                     </button>
                 </td>
@@ -585,9 +587,9 @@ class BoteAppController {
         this.memberFilter = type;
         document.querySelectorAll('#member-filters button').forEach(b => {
             if (b.dataset.filter === type) {
-                b.className = 'px-3 py-1 rounded-lg font-bold bg-orange-500 text-slate-950';
+                b.className = 'px-3 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 border border-orange-400 shadow-sm';
             } else {
-                b.className = 'px-3 py-1 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700';
+                b.className = 'px-3 py-1 rounded-lg font-semibold bg-slate-900/90 text-slate-300 border border-slate-600/70 hover:border-orange-500/60 hover:text-white hover:bg-slate-800';
             }
         });
         this.renderMembersTable();
@@ -617,9 +619,9 @@ class BoteAppController {
             };
 
             if (isSelected) {
-                btn.className = 'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-orange-500 text-slate-950 shadow-md shadow-orange-500/20 whitespace-nowrap flex items-center gap-2 transition-all';
+                btn.className = 'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-orange-500 text-slate-950 border border-orange-400 shadow-md shadow-orange-500/20 whitespace-nowrap flex items-center gap-2 transition-all';
             } else {
-                btn.className = 'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 whitespace-nowrap flex items-center gap-2 transition-all';
+                btn.className = 'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-600/70 hover:border-orange-500/70 whitespace-nowrap flex items-center gap-2 transition-all';
             }
 
             btn.innerHTML = `
@@ -819,14 +821,15 @@ class BoteAppController {
             const penaltiesHtml = penaltyChips.length > 0 ? penaltyChips.join(' ') : '<span class="text-slate-600">-</span>';
 
             // REGLA CLAVE SOLICITADA POR EL USUARIO:
-            // Reembolso sellado con opción de elegir entre Bote del socio o por Bizum
+            // Reembolso sellado con opción de elegir entre Bote del socio o por Bizum con tarjeta explicativa
             let selladoCol = '<span class="text-slate-600">-</span>';
             if (m.sellado < 0) {
                 const sellVal = Math.abs(m.sellado).toFixed(2);
+                const selladoPosClass = rowIdx < 10 ? 'right-0 top-full mt-1.5' : 'right-0 bottom-full mb-1.5';
                 selladoCol = `
-                    <div class="inline-flex flex-col gap-1 items-end">
-                        <span class="font-bold font-mono text-xs text-purple-300" title="Importe adelantado por sellar">+${sellVal} €</span>
-                        <div class="flex items-center gap-1.5 text-[11px] bg-slate-900 border border-slate-700/80 rounded-lg px-1.5 py-0.5 shadow-inner" title="Elige si se abona en su bote o se reembolsa por Bizum">
+                    <div class="group relative cursor-help inline-flex flex-col gap-1 items-end">
+                        <span class="font-bold font-mono text-xs text-purple-300">+${sellVal} €</span>
+                        <div class="flex items-center gap-1.5 text-[11px] bg-slate-900 border border-purple-500/40 hover:border-purple-400 rounded-lg px-2 py-1 shadow-inner transition-colors">
                             <label class="cursor-pointer flex items-center gap-1 ${!m.isSelladoInCash ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-white'}">
                                 <input type="radio" name="reemb_${m.memberId}_${m.jornadaId || jSummary.number}" ${!m.isSelladoInCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${m.memberId}', '${m.jornadaId || jSummary.number}', false)">
                                 <span>Bote</span>
@@ -836,6 +839,16 @@ class BoteAppController {
                                 <input type="radio" name="reemb_${m.memberId}_${m.jornadaId || jSummary.number}" ${m.isSelladoInCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${m.memberId}', '${m.jornadaId || jSummary.number}', true)">
                                 <span>Bizum</span>
                             </label>
+                        </div>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${selladoPosClass} w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>🔄</span> Reembolso Sellado: Bote vs Bizum
+                            </strong>
+                            <p class="leading-relaxed">
+                                El socio adelantó <strong>+${sellVal} €</strong> al sellar la quiniela. Puedes elegir cómo compensárselo:<br><br>
+                                • <strong class="text-amber-400">Bote:</strong> Se suman a su hucha personal, aumentando su saldo del bote.<br>
+                                • <strong class="text-emerald-400">Bizum:</strong> El tesorero le reembolsa el dinero externamente por Bizum/efectivo. No incrementa su saldo del bote.
+                            </p>
                         </div>
                     </div>
                 `;
@@ -1080,8 +1093,8 @@ class BoteAppController {
         this.matrizMode = mode;
         const btnV = document.getElementById('btn-matriz-visual');
         const btnF = document.getElementById('btn-matriz-financiero');
-        if (btnV) btnV.className = mode === 'visual' ? 'px-3 py-1.5 rounded-lg font-bold bg-orange-500 text-slate-950 transition-all flex items-center gap-1.5' : 'px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all flex items-center gap-1.5';
-        if (btnF) btnF.className = mode === 'financiero' ? 'px-3 py-1.5 rounded-lg font-bold bg-orange-500 text-slate-950 transition-all flex items-center gap-1.5' : 'px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all flex items-center gap-1.5';
+        if (btnV) btnV.className = mode === 'visual' ? 'px-3 py-1.5 rounded-lg font-bold bg-orange-500 text-slate-950 transition-all flex items-center gap-1.5 border border-orange-400 shadow-sm' : 'px-3 py-1.5 rounded-lg font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60';
+        if (btnF) btnF.className = mode === 'financiero' ? 'px-3 py-1.5 rounded-lg font-bold bg-orange-500 text-slate-950 transition-all flex items-center gap-1.5 border border-orange-400 shadow-sm' : 'px-3 py-1.5 rounded-lg font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60';
         this.renderMatriz();
     }
 
@@ -1093,8 +1106,8 @@ class BoteAppController {
         if (!theadRow || !tbody) return;
 
         theadRow.innerHTML = `
-            <th class="p-2.5 sm:p-3 text-left sticky-left-col bg-slate-950 min-w-[140px] border-r border-slate-800 text-xs">Socio</th>
-            <th class="p-2.5 sm:p-3 text-right bg-slate-900 min-w-[110px] border-r border-slate-800 text-amber-400 text-xs group relative cursor-help select-none">
+            <th class="p-2.5 sm:p-3 text-left sticky-left-col bg-slate-950 min-w-[140px] border-r border-slate-800 text-xs sm:text-sm">Socio</th>
+            <th class="p-2.5 sm:p-3 text-right bg-slate-900 min-w-[110px] border-r border-slate-800 text-amber-400 text-xs sm:text-sm group relative cursor-help select-none">
                 <span class="inline-flex items-center gap-1">Saldo Actual <span class="text-[11px] text-amber-400">ℹ️</span></span>
                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
                     <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
@@ -1109,9 +1122,9 @@ class BoteAppController {
 
         data.jornadaSummaries.forEach(j => {
             theadRow.innerHTML += `
-                <th class="p-2 text-center min-w-[65px] border-r border-slate-800/80 bg-slate-900/80 text-xs">
+                <th class="p-2 text-center min-w-[65px] border-r border-slate-800/80 bg-slate-900/80 text-xs sm:text-sm">
                     <div>J${j.number}</div>
-                    <div class="text-[10px] font-normal text-slate-500">${j.date}</div>
+                    <div class="text-[10px] sm:text-[11px] font-normal text-slate-400">${j.date}</div>
                 </th>
             `;
         });
@@ -1123,13 +1136,13 @@ class BoteAppController {
 
         sortedMembers.forEach(m => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-900/80 transition-colors text-xs';
+            tr.className = 'hover:bg-slate-900/80 transition-colors text-xs sm:text-sm';
 
             let rowHtml = `
-                <td class="p-2 sm:p-2.5 text-left font-bold text-white sticky-left-col border-r border-slate-800 bg-slate-950">
+                <td class="p-2 sm:p-2.5 text-left font-bold text-white sticky-left-col border-r border-slate-800 bg-slate-950 text-xs sm:text-sm">
                     ${m.name}
                 </td>
-                <td class="p-2 sm:p-2.5 text-right font-mono font-extrabold text-amber-400 border-r border-slate-800 bg-slate-950/40">
+                <td class="p-2 sm:p-2.5 text-right font-mono font-black text-amber-400 border-r border-slate-800 bg-slate-950/40 text-sm sm:text-base">
                     ${m.saldo.toFixed(2)} €
                 </td>
             `;
@@ -1150,13 +1163,13 @@ class BoteAppController {
 
                 if (this.matrizMode === 'visual') {
                     // Modo Visual: Iconos, aciertos y chips de estado
-                    let bgBadge = 'bg-slate-800/60 text-slate-300';
-                    if (isWin) bgBadge = 'bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30';
-                    else if (isLoss) bgBadge = 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30';
-                    else if (penalties > 0) bgBadge = 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                    let bgBadge = 'bg-slate-800/80 text-slate-300 border border-slate-700/60';
+                    if (isWin) bgBadge = 'bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 shadow-sm';
+                    else if (isLoss) bgBadge = 'bg-rose-500/25 text-rose-300 font-extrabold border border-rose-500/50 shadow-sm';
+                    else if (penalties > 0) bgBadge = 'bg-rose-950/70 text-rose-300 border border-rose-500/50 font-bold shadow-sm';
 
                     cellContent = `
-                        <div class="inline-flex items-center justify-center px-1.5 py-0.5 rounded ${bgBadge} text-xs font-mono">
+                        <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg ${bgBadge} text-sm sm:text-base font-bold font-mono">
                             ${mov.aciertos !== undefined ? mov.aciertos : '-'}
                             ${isWin ? '👑' : ''}${isLoss ? '💀' : ''}
                         </div>
@@ -1165,7 +1178,7 @@ class BoteAppController {
                     // Modo Financiero: Neto en euros de la jornada
                     const isPos = mov.neto >= 0;
                     cellContent = `
-                        <span class="font-mono font-bold ${isPos ? 'text-emerald-400' : 'text-rose-400'} text-[11px]">
+                        <span class="font-mono font-extrabold ${isPos ? 'text-emerald-400' : 'text-rose-400'} text-xs sm:text-sm">
                             ${isPos ? '+' : ''}${mov.neto.toFixed(2)}€
                         </span>
                     `;
@@ -1180,16 +1193,16 @@ class BoteAppController {
 
         if (tfoot) {
             let footHtml = `
-                <tr class="text-xs">
+                <tr class="text-xs sm:text-sm">
                     <td class="p-2 sm:p-2.5 text-left sticky-left-col bg-slate-950 font-bold text-orange-400 border-r border-slate-800">Totales Jornada</td>
-                    <td class="p-2 sm:p-2.5 text-right font-mono font-extrabold text-white border-r border-slate-800 bg-slate-950">
+                    <td class="p-2 sm:p-2.5 text-right font-mono font-extrabold text-white border-r border-slate-800 bg-slate-950 text-xs sm:text-sm">
                         ${data.summary.totalSaldosVirtuales.toFixed(2)} €
                     </td>
             `;
 
             data.jornadaSummaries.forEach(j => {
                 footHtml += `
-                    <td class="p-2 font-mono font-bold text-center border-r border-slate-800/80 text-orange-300">
+                    <td class="p-2 font-mono font-extrabold text-center border-r border-slate-800/80 text-orange-300 text-xs sm:text-sm">
                         ${j.neto >= 0 ? '+' : ''}${j.neto.toFixed(1)}€
                     </td>
                 `;
@@ -2212,8 +2225,8 @@ class BoteAppController {
                 </td>
                 <td class="p-3 text-right font-mono font-bold text-white whitespace-nowrap">${j.gastoSellado.toFixed(2)} €</td>
                 <td class="p-3 text-center whitespace-nowrap">
-                    <div class="inline-flex flex-col items-center gap-0.5">
-                        <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1">
+                    <div class="group relative cursor-help inline-flex flex-col items-center gap-0.5">
+                        <div class="inline-flex items-center gap-2 bg-slate-900 border border-purple-500/40 hover:border-purple-400 rounded-lg px-2.5 py-1 transition-colors">
                             <label class="cursor-pointer flex items-center gap-1 ${!isCash ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-white'}">
                                 <input type="radio" name="modal_reemb_${j.number}" ${!isCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${actualSealerId}', '${j.id || j.number}', false)">
                                 <span>Bote</span>
@@ -2225,6 +2238,15 @@ class BoteAppController {
                             </label>
                         </div>
                         <span class="text-[10px] text-slate-400">${actualSealer ? actualSealer.name : ''}</span>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-1.5 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>🔄</span> Reembolso de Sellado: Bote vs Bizum
+                            </strong>
+                            <p class="leading-relaxed">
+                                • <strong class="text-amber-400">Bote:</strong> Se ingresan los <strong>+${j.gastoSellado.toFixed(2)} €</strong> en la hucha virtual de ${actualSealer ? actualSealer.name : 'este socio'} (aumenta su saldo del bote).<br>
+                                • <strong class="text-emerald-400">Bizum:</strong> Reembolso externo liquidado por Bizum/efectivo. No se modifica su saldo del bote.
+                            </p>
+                        </div>
                     </div>
                 </td>
             `;
@@ -2630,11 +2652,16 @@ class BoteAppController {
                             ${penaltyBadges.map(b => `<span class="px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 font-mono">${b}</span>`).join('')}
                         </div>
                     </div>
-                    ${!isBaseline ? `
-                        <button type="button" onclick="window.BoteApp.deleteConfigHistoryDate('${d}')" class="text-slate-500 hover:text-rose-400 p-1 transition-colors text-xs" title="Eliminar vigencia de esta fecha">
-                            🗑️
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="window.BoteApp.loadConfigHistoryDate('${d}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-700 hover:border-amber-500/40 text-xs font-semibold transition-all flex items-center gap-1" title="Cargar estos valores en el formulario para editarlos">
+                            <span>✏️</span> Cargar
                         </button>
-                    ` : ''}
+                        ${!isBaseline ? `
+                            <button type="button" onclick="window.BoteApp.deleteConfigHistoryDate('${d}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700 hover:border-rose-500/40 text-xs transition-all" title="Eliminar vigencia de esta fecha">
+                                🗑️
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
             `;
         });
@@ -2642,45 +2669,91 @@ class BoteAppController {
         listEl.innerHTML = html;
     }
 
+    loadConfigHistoryDate(targetDate) {
+        const norm = this.normalizeDateStr(targetDate);
+        if (!norm) return;
+
+        const setValue = (id, val) => {
+            const el = document.getElementById(id);
+            if (el && val !== undefined) el.value = val;
+        };
+
+        const fechaInput = document.getElementById('config-fecha-vigencia');
+        if (fechaInput) fechaInput.value = norm;
+
+        if (this.engine) {
+            setValue('config-aportacion', this.engine.getHistoricalPrice('aportacionSemanal', norm));
+            setValue('config-coste-columna', this.engine.getHistoricalPrice('costeColumna', norm));
+            setValue('config-coste-dobles', this.engine.getHistoricalPrice('costeDobles', norm));
+            setValue('config-extra-exento', this.engine.getHistoricalPrice('costeExtraExento', norm));
+            setValue('config-penalizacion-maula', this.engine.calculateHistoricalPenalty('maula', null, norm));
+            setValue('config-penalizacion-pig', this.engine.calculateHistoricalPenalty('pig', null, norm));
+
+            for (let i = 0; i <= 3; i++) {
+                setValue(`config-pen-${i}`, this.engine.calculateHistoricalPenalty('bajos_aciertos', i, norm));
+            }
+            for (let i = 10; i <= 15; i++) {
+                setValue(`config-unos-${i}`, this.engine.calculateHistoricalPenalty('unos', i, norm));
+            }
+        }
+
+        const formConfig = document.getElementById('form-config');
+        if (formConfig) {
+            const scrollable = formConfig.querySelector('.overflow-y-auto');
+            if (scrollable) scrollable.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
     async deleteConfigHistoryDate(targetDate) {
+        const normTarget = this.normalizeDateStr(targetDate);
+        if (normTarget === '2026-08-01') {
+            alert('ℹ️ No se puede eliminar la vigencia inicial de apertura de temporada (01/08/2026).');
+            return;
+        }
+
         if (!confirm(`¿Estás seguro de eliminar todas las tarifas y penalizaciones configuradas con fecha de vigencia ${targetDate}?\n\nLos cálculos del Bote se actualizarán inmediatamente.`)) {
             return;
         }
 
-        const normTarget = this.normalizeDateStr(targetDate);
         if (this.config.history) {
             for (const key of Object.keys(this.config.history)) {
-                this.config.history[key] = (this.config.history[key] || []).filter(e => this.normalizeDateStr(e.date) !== normTarget);
+                if (Array.isArray(this.config.history[key])) {
+                    this.config.history[key] = this.config.history[key].filter(e => this.normalizeDateStr(e.date) !== normTarget);
+                }
             }
         }
         if (this.config.penalties_history) {
             for (const key of Object.keys(this.config.penalties_history)) {
-                this.config.penalties_history[key] = (this.config.penalties_history[key] || []).filter(e => this.normalizeDateStr(e.date) !== normTarget);
+                if (Array.isArray(this.config.penalties_history[key])) {
+                    this.config.penalties_history[key] = this.config.penalties_history[key].filter(e => this.normalizeDateStr(e.date) !== normTarget);
+                }
             }
         }
 
         // Actualizar valores actuales de fallback al más reciente
-        if (this.config.history && this.config.history.costeColumna && this.config.history.costeColumna.length > 0) {
+        if (this.config.history?.costeColumna?.length > 0) {
             this.config.costeColumna = this.config.history.costeColumna[0].value;
         }
-        if (this.config.history && this.config.history.costeDobles && this.config.history.costeDobles.length > 0) {
+        if (this.config.history?.costeDobles?.length > 0) {
             this.config.costeDobles = this.config.history.costeDobles[0].value;
         }
-        if (this.config.history && this.config.history.aportacionSemanal && this.config.history.aportacionSemanal.length > 0) {
+        if (this.config.history?.aportacionSemanal?.length > 0) {
             this.config.aportacionSemanal = this.config.history.aportacionSemanal[0].value;
         }
-        if (this.config.history && this.config.history.costeExtraExento && this.config.history.costeExtraExento.length > 0) {
+        if (this.config.history?.costeExtraExento?.length > 0) {
             this.config.costeExtraExento = this.config.history.costeExtraExento[0].value;
         }
-        if (this.config.penalties_history && this.config.penalties_history.maula && this.config.penalties_history.maula.length > 0) {
+        if (this.config.penalties_history?.maula?.length > 0) {
             this.config.penalizacionMaula = this.config.penalties_history.maula[0].value;
         }
-        if (this.config.penalties_history && this.config.penalties_history.pig && this.config.penalties_history.pig.length > 0) {
+        if (this.config.penalties_history?.pig?.length > 0) {
             this.config.penalizacionPIG = this.config.penalties_history.pig[0].value;
         }
 
         try {
+            if (this.engine) this.engine.config = this.config;
             await this.saveConfig();
+
             if (this.isLive) {
                 await this.loadLiveFirebaseData();
             } else {
@@ -3067,20 +3140,20 @@ class BoteAppController {
 
         if (mode === 'chart') {
             if (btnChart) {
-                btnChart.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all';
+                btnChart.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm';
             }
             if (btnTable) {
-                btnTable.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white text-xs flex items-center gap-1.5 transition-all';
+                btnTable.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60';
             }
             if (tableCont) tableCont.classList.add('hidden');
             if (chartCont) chartCont.classList.remove('hidden');
             setTimeout(() => this.renderSociosChart(), 50);
         } else {
             if (btnTable) {
-                btnTable.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all';
+                btnTable.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm';
             }
             if (btnChart) {
-                btnChart.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white text-xs flex items-center gap-1.5 transition-all';
+                btnChart.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60';
             }
             if (chartCont) chartCont.classList.add('hidden');
             if (tableCont) tableCont.classList.remove('hidden');
