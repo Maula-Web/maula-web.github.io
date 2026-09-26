@@ -3,12 +3,13 @@
  * Versión de caché: maulas-pwa-v1.0
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.11';
+const CACHE_NAME = 'maulas-pwa-v1.12';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
     './',
     'index.html',
+    'dashboard_2.html',
     'pronosticos.html',
     'jornadas.html',
     'socios.html',
@@ -46,6 +47,7 @@ const CORE_ASSETS = [
     'js/pronosticos.js',
     'js/jornadas.js',
     'js/dashboard.js',
+    'js/dashboard_2.js',
     'js/bote.js',
     'js/bote_2.js',
     'js/socios_2.js',

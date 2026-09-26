@@ -332,7 +332,8 @@ const Auth = {
     injectLogout: function () {
         if (window.location.pathname.includes('login.html') || 
             window.location.pathname.includes('bote_2.html') || 
-            window.location.pathname.includes('socios_2.html')) return;
+            window.location.pathname.includes('socios_2.html') ||
+            window.location.pathname.includes('dashboard_2.html')) return;
 
         // Path current
         const path = window.location.pathname;
@@ -378,6 +379,7 @@ const Auth = {
                     <span></span>
                     <span></span>
                 </div>
+                ${isFernandoLozano ? `<a href="dashboard_2.html" class="btn-primary btn-dashboard-2 ${page === 'dashboard_2.html' ? 'active' : ''}" style="border: 1px dashed #ff9100; color: #ff9100;" title="Nueva versión de Inicio 2.0 (en pruebas)">INICIO 2</a>` : ''}
                 <a href="socios.html" class="btn-primary btn-socios ${page === 'socios.html' ? 'active' : ''}">SOCIOS</a>
                 ${isFernandoLozano ? `<a href="socios_2.html" class="btn-primary btn-socios-2 ${page === 'socios_2.html' ? 'active' : ''}" style="border: 1px dashed #ff9100; color: #ff9100;" title="Nueva versión de Socios 2.0 (en pruebas)">SOCIOS 2</a>` : ''}
                 <a href="jornadas.html" class="btn-primary btn-jornadas ${page === 'jornadas.html' ? 'active' : ''}">RESULTADOS PARTIDOS</a>
@@ -406,6 +408,28 @@ const Auth = {
                     logo.style.cursor = 'pointer';
                     logo.onclick = () => window.location.href = 'index.html';
                 }
+            }
+
+            // 2a-0. Ensure Inicio 2 button exists ONLY for Fernando Lozano
+            if (isFernandoLozano) {
+                if (!sidebar.querySelector('a[href="dashboard_2.html"]')) {
+                    const dash2Btn = document.createElement('a');
+                    dash2Btn.href = "dashboard_2.html";
+                    dash2Btn.className = `btn-primary btn-dashboard-2 ${page === 'dashboard_2.html' ? 'active' : ''}`;
+                    dash2Btn.style.border = "1px dashed #ff9100";
+                    dash2Btn.style.color = "#ff9100";
+                    dash2Btn.title = "Nueva versión de Inicio / Dashboard 2.0 (en pruebas)";
+                    dash2Btn.textContent = "INICIO 2";
+                    const menuToggle = sidebar.querySelector('#mobile-menu-toggle');
+                    if (menuToggle) {
+                        menuToggle.insertAdjacentElement('afterend', dash2Btn);
+                    } else {
+                        sidebar.prepend(dash2Btn);
+                    }
+                }
+            } else {
+                const existingD2 = sidebar.querySelector('a[href="dashboard_2.html"]');
+                if (existingD2) existingD2.remove();
             }
 
             // 2a. Ensure Socios 2 button exists ONLY for Fernando Lozano

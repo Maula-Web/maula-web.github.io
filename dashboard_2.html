@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard 2.0 - PEÑA MAULAS</title>
+    <!-- Favicon & Mobile App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Peña Maulas">
+    <meta name="theme-color" content="#090d16">
+
+    <!-- Fonts & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+
+    <style>
+        :root {
+            --color-primary: #ff9100;
+            --color-primary-dark: #e65100;
+            --color-primary-light: #ffa726;
+            --color-bg: #090d16;
+            --color-card: rgba(18, 24, 38, 0.85);
+            --color-card-border: rgba(255, 145, 0, 0.2);
+            --color-emerald: #10b981;
+            --color-rose: #f43f5e;
+            --color-amber: #f59e0b;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 145, 0, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(255, 145, 0, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass-panel {
+            background: var(--color-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--color-card-border);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+        }
+
+        /* REGLAS DE SUPERPOSICIÓN: TARJETAS EXPLICATIVAS SIEMPRE EN PRIMER PLANO */
+        .glass-panel:hover,
+        .glass-panel:focus-within,
+        .glass-panel:has(.group:hover) {
+            z-index: 50 !important;
+        }
+
+        .grid:has(.group:hover),
+        section:has(.group:hover) {
+            z-index: 100040 !important;
+            position: relative;
+        }
+
+        .group:hover,
+        .group:focus-within,
+        .group:active {
+            z-index: 100050 !important;
+            position: relative;
+        }
+
+        /* FONDO TOTALMENTE OPACO SÓLIDO (#0b0f19) SIN NINGUNA TRANSPARENCIA */
+        .tooltip-card,
+        .group > div[class*="group-hover:visible"],
+        .group:hover > div[class*="absolute"],
+        div[class*="group-hover:visible"] {
+            background-color: #0b0f19 !important;
+            background: #0b0f19 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            opacity: 1 !important;
+            border: 1.5px solid rgba(255, 145, 0, 0.7) !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.98), 0 0 25px rgba(255, 145, 0, 0.25) !important;
+            color: #f8fafc !important;
+            z-index: 100060 !important;
+            pointer-events: auto !important;
+        }
+
+        /* Animación suave para widgets y modales */
+        @keyframes modalScaleIn {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-widget {
+            animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Glow dinámico */
+        .primary-glow {
+            background: linear-gradient(135deg, #ff9100 0%, #ff6d00 100%);
+            box-shadow: 0 4px 20px rgba(255, 145, 0, 0.35);
+        }
+
+        /* Pulse suave para alertas activas */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.02); }
+        }
+        .pulse-soft {
+            animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Feedback táctil */
+        .btn-clickable {
+            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.18s ease;
+        }
+        .btn-clickable:active {
+            transform: scale(0.96) !important;
+        }
+    </style>
+</head>
+
+<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
+    <!-- Scripts base del sistema -->
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/telegram-service.js"></script>
+    <script src="js/dice-service.js"></script>
+    <script src="js/bote-engine.js"></script>
+
+    <!-- =====================================================================
+         PANTALLA: ACCESO RESTRINGIDO (Visible para cualquier socio excepto Fernando Lozano)
+         ===================================================================== -->
+    <div id="restricted-screen" class="hidden min-h-[85vh] flex items-center justify-center p-4">
+        <div class="glass-panel max-w-xl w-full p-8 text-center space-y-6 border-amber-500/40 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-12 -top-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-4xl pulse-soft">
+                🚧
+            </div>
+
+            <div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    Fase de Pruebas Exclusiva
+                </span>
+                <h1 class="text-3xl font-extrabold text-white mt-3">Dashboard 2.0 en Obras</h1>
+                <p class="text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
+                    Esta nueva versión del centro de mando (<strong>Dashboard 2.0</strong>) está actualmente en fase de diseño y pruebas exclusiva para <strong>Fernando Lozano</strong>.
+                </p>
+                <p class="text-slate-500 text-xs mt-2">
+                    Estará disponible para toda la peña en cuanto se concluyan las pruebas de interfaz y tiempo real.
+                </p>
+            </div>
+
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="index.html" class="w-full sm:w-auto primary-glow text-slate-950 font-bold px-6 py-2.5 rounded-xl text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                    <span>🏠</span> Ir al Inicio Clásico
+                </a>
+                <a href="login.html" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-sm border border-slate-700 transition-all flex items-center justify-center gap-2">
+                    <span>🔑</span> Iniciar Sesión
+                </a>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 text-xs text-slate-500">
+                ¿Eres Fernando Lozano? 
+                <button onclick="window.DashboardApp && window.DashboardApp.promptLoginEvaluador()" class="text-amber-400 hover:underline font-semibold ml-1">
+                    Identifícate con tu PIN o Apodo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         CONTENIDO PRINCIPAL: DASHBOARD 2.0 (Visible para Fernando Lozano)
+         ===================================================================== -->
+    <div id="main-content" class="max-w-[1500px] mx-auto space-y-4 sm:space-y-6">
+
+        <!-- NAVBAR SUPERIOR MAULAS 2.0 (NAVEGACIÓN UNIVERSAL Y SELECTOR DE SECCIÓN) -->
+        <nav class="glass-panel p-2.5 sm:p-3.5 border-amber-500/40 flex items-center justify-between gap-3 relative z-[100] shadow-xl">
+            <!-- Brand / Logo & Temporada -->
+            <div class="flex items-center gap-3">
+                <a href="dashboard_2.html" class="flex items-center gap-2.5 group">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow group-hover:scale-105 transition-transform">
+                    <div class="leading-tight">
+                        <span class="font-black text-white text-sm sm:text-base tracking-wide block group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
+                        <span class="text-[10px] text-amber-400 font-mono hidden sm:block">Temporada 2026-2027</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Menú Horizontal en Pantallas Grandes (Desktop) -->
+            <div class="hidden xl:flex items-center gap-1 text-xs font-bold text-slate-300">
+                <a href="dashboard_2.html" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold transition">🏠 Inicio 2.0</a>
+                <a href="socios_2.html" class="px-2.5 py-1.5 rounded-lg hover:bg-amber-500/20 hover:text-amber-400 border border-transparent hover:border-amber-500/30 transition">👥 Socios 2.0</a>
+                <a href="bote_2.html" class="px-2.5 py-1.5 rounded-lg hover:bg-amber-500/20 hover:text-amber-400 border border-transparent hover:border-amber-500/30 transition">💰 Bote 2.0</a>
+                <a href="jornadas.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">⚽ Resultados</a>
+                <a href="pronosticos.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">📝 Quiniela</a>
+                <a href="resultados.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">🏆 Clasificación</a>
+                <a href="resumen-temporada.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">📊 Resumen</a>
+                <a href="votaciones.html" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition font-black">🗳️ Votaciones</a>
+                <a href="admin.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">⚙️ Admin</a>
+            </div>
+
+            <!-- Selector Rápido de Sección & Acciones -->
+            <div class="flex items-center gap-2">
+                <!-- Dropdown Selector de Sección (Accesible en móvil, tablet y escritorio) -->
+                <div class="relative inline-block" id="nav-section-dropdown-wrap">
+                    <button type="button" onclick="document.getElementById('nav-section-dropdown').classList.toggle('hidden')" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-amber-500/50 hover:border-amber-400 text-amber-400 font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+                        <span>🧭 Cambiar Sección</span>
+                        <span class="text-[10px]">▼</span>
+                    </button>
+                    <div id="nav-section-dropdown" class="hidden absolute right-0 mt-2 w-60 rounded-2xl bg-[#0b0f19] border border-amber-500/60 shadow-2xl p-2 z-[100080] text-xs font-semibold space-y-1">
+                        <a href="dashboard_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-amber-300 bg-amber-500/20 border border-amber-500/40 font-bold">
+                            <span class="flex items-center gap-2"><span>🏠</span> Inicio / Dashboard 2.0</span>
+                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300">Activo</span>
+                        </a>
+                        <a href="socios_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                            <span class="flex items-center gap-2"><span>👥</span> Socios 2.0</span>
+                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Nuevo</span>
+                        </a>
+                        <a href="bote_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                            <span class="flex items-center gap-2"><span>💰</span> Bote & Tesorería 2.0</span>
+                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Nuevo</span>
+                        </a>
+                        <a href="jornadas.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚽</span> Resultados Partidos</a>
+                        <a href="pronosticos.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📝</span> Rellenar Quiniela</a>
+                        <a href="resultados.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🏆</span> Clasificación General</a>
+                        <a href="resumen-temporada.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📊</span> Resumen Temporada</a>
+                        <a href="votaciones.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition font-bold"><span>🗳️</span> Votaciones</a>
+                        <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚙️</span> Administración</a>
+                        <a href="theme-editor.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🎨</span> Identidad Visual</a>
+                        <div class="border-t border-slate-800 my-1 pt-1">
+                            <a href="index.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-[11px]"><span>←</span> Inicio 1.0 (Clásica)</a>
+                            <a href="socios.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-[11px]"><span>←</span> Socios 1.0 (Clásica)</a>
+                            <a href="bote.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-[11px]"><span>←</span> Bote 1.0 (Clásica)</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Actualizar App -->
+                <button onclick="if(window.Auth && window.Auth.forceAppUpdate){window.Auth.forceAppUpdate();}else{location.reload(true);}" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1" title="Forzar descarga de última versión y limpiar caché">
+                    <span>🔄</span>
+                    <span class="hidden md:inline">Actualizar</span>
+                </button>
+
+                <!-- Botón Salir / Logout -->
+                <button onclick="if(window.Auth && window.Auth.logout){window.Auth.logout();}else{sessionStorage.clear();localStorage.clear();location.href='login.html';}" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/20 text-rose-400 border border-slate-700 hover:border-rose-500/40 text-xs font-bold transition flex items-center gap-1" title="Cerrar sesión">
+                    <span>🚪</span>
+                    <span class="hidden md:inline">Salir</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Top Announcement Bar (Coherencia Total con Bote 2 y Socios 2) -->
+        <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+            <div class="flex items-center gap-3">
+                <span class="p-2 rounded-lg bg-amber-500/20 text-amber-400 text-base sm:text-lg">⚡</span>
+                <div>
+                    <strong class="text-amber-400 font-semibold">Dashboard 2.0 - Centro de Mando & Operaciones</strong>
+                    <p class="text-slate-400 text-xs">Panel integral en tiempo real exclusivo en fase de pruebas para Fernando Lozano.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs flex-wrap justify-center">
+                <a href="index.html" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition-colors flex items-center gap-1.5" title="Volver al panel tradicional">
+                    <span>← Inicio Clásico</span>
+                </a>
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    Sincronizado en Vivo
+                </span>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             BANNER DE ESTADO DE LA JORNADA (EN CURSO / PRÓXIMO CIERRE / BOTE OFICIAL)
+             ===================================================================== -->
+        <div id="live-jornada-banner" class="hidden glass-panel p-4 border-amber-500/50 bg-gradient-to-r from-slate-900/90 via-amber-950/20 to-slate-900/90 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div id="live-banner-icon" class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
+                    ⚽
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span id="live-banner-tag" class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono">
+                            Próxima Cita
+                        </span>
+                        <h2 id="live-banner-title" class="text-base sm:text-lg font-extrabold text-white">
+                            Jornada 5 - Domingo 04/10/2026
+                        </h2>
+                    </div>
+                    <p id="live-banner-subtitle" class="text-xs text-slate-400 mt-0.5">
+                        Plazo para rellenar la quiniela abierto hasta el jueves a las 17:00h.
+                    </p>
+                </div>
+            </div>
+            <div id="live-banner-actions" class="flex items-center gap-2 shrink-0 w-full md:w-auto justify-end">
+                <a href="pronosticos.html" class="primary-glow text-slate-950 font-black px-4 py-2 rounded-xl text-xs sm:text-sm hover:brightness-110 active:scale-95 transition flex items-center gap-2">
+                    <span>✍️</span> Rellenar Mi Quiniela
+                </a>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             ALERTA DE BOTE OFICIAL (SI EXISTE)
+             ===================================================================== -->
+        <div id="official-bote-alert" class="hidden p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-orange-500/25 to-amber-500/20 border-2 border-amber-500/60 shadow-xl flex items-center justify-between gap-3 pulse-soft">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl sm:text-3xl">💰</span>
+                <div>
+                    <strong class="text-amber-300 font-extrabold text-sm sm:text-base tracking-wide flex items-center gap-2">
+                        <span>¡HAY BOTE OFICIAL EN LA JORNADA!</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500 text-slate-950 font-black">Loterías y Apuestas</span>
+                    </strong>
+                    <p class="text-slate-300 text-xs mt-0.5">La quiniela de esta semana cuenta con un bote millonario especial acumulado en la categoría especial (15 aciertos).</p>
+                </div>
+            </div>
+            <a href="pronosticos.html" class="hidden sm:inline-flex px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow">
+                ¡A por el Bote! →
+            </a>
+        </div>
+
+        <!-- =====================================================================
+             BENTO GRID: CUADRO DE MANDOS MAULAS (9 WIDGETS DE ALTO RENDIMIENTO)
+             ===================================================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+
+            <!-- WIDGET 1: CUENTA ATRÁS DIGITAL ÉPICA (Colspan 2 en desktop) -->
+            <div class="lg:col-span-2 glass-panel p-5 border-amber-500/40 relative overflow-hidden flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">⏳</span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Cierre de Admisión de Quinielas</h3>
+                    </div>
+
+                    <!-- Botón explicativo con tooltip 100% opaco -->
+                    <div class="relative group cursor-pointer">
+                        <span class="w-6 h-6 rounded-full bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 flex items-center justify-center text-xs font-bold border border-slate-700 transition">
+                            ℹ️
+                        </span>
+                        <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-80 p-4 rounded-2xl text-xs space-y-2 select-none">
+                            <div class="font-bold text-amber-400 flex items-center gap-1.5">
+                                <span>⏰</span> ¿Por qué cerramos los jueves a las 17:00h?
+                            </div>
+                            <p class="text-slate-300 leading-relaxed">
+                                El socio designado como <strong>Sellador (El Maula)</strong> debe desplazarse físicamente a la administración de loterías oficial para validar y pagar la combinación de la peña antes de que cierren las terminales oficiales.
+                            </p>
+                            <p class="text-slate-400 text-[11px] pt-1 border-t border-slate-800">
+                                ⚠️ Los pronósticos enviados tras las 17:00h conllevan penalización económica salvo que se tenga activado el <strong>Dado de Viajes</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cajas Digitales Countdown -->
+                <div class="py-2">
+                    <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center">
+                        <div class="p-2.5 sm:p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-inner">
+                            <span id="cd-days" class="block font-mono text-2xl sm:text-4xl font-extrabold text-amber-400">--</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Días</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-inner">
+                            <span id="cd-hours" class="block font-mono text-2xl sm:text-4xl font-extrabold text-white">--</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Horas</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-inner">
+                            <span id="cd-mins" class="block font-mono text-2xl sm:text-4xl font-extrabold text-white">--</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Min</span>
+                        </div>
+                        <div class="p-2.5 sm:p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-inner">
+                            <span id="cd-secs" class="block font-mono text-2xl sm:text-4xl font-extrabold text-emerald-400">--</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Seg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pie de Cuenta Atrás -->
+                <div class="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                        <span class="text-amber-400">📅</span>
+                        <span>Límite oficial: <strong id="cd-deadline-label" class="text-white font-bold">Jueves 17:00h</strong></span>
+                    </div>
+                    <div id="cd-status-badge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span>Plazo Abierto</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WIDGET 2: ESTADO DE PARTICIPACIÓN DE LA PEÑA (Colspan 2 en desktop) -->
+            <div class="lg:col-span-2 glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📨</span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Participación en la Jornada</h3>
+                    </div>
+
+                    <!-- Botón explicativo -->
+                    <div class="relative group cursor-pointer">
+                        <span class="w-6 h-6 rounded-full bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 flex items-center justify-center text-xs font-bold border border-slate-700 transition">
+                            ℹ️
+                        </span>
+                        <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-80 p-4 rounded-2xl text-xs space-y-2 select-none">
+                            <div class="font-bold text-amber-400 flex items-center gap-1.5">
+                                <span>📊</span> Control de Envíos en Tiempo Real
+                            </div>
+                            <p class="text-slate-300 leading-relaxed">
+                                Supervisa cuántos socios han registrado ya su combinación de 15 partidos para la jornada actual.
+                            </p>
+                            <p class="text-slate-400 text-[11px] pt-1 border-t border-slate-800">
+                                Los socios ausentes con <strong>Dado activo</strong> se rellenan automáticamente de forma aleatoria al llegar la hora de cierre.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="py-2 space-y-2">
+                    <div class="flex items-baseline justify-between">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono flex items-center gap-2">
+                            <span id="submitted-count">0</span>
+                            <span class="text-sm text-slate-400 font-sans font-normal">de <span id="total-members-count">19</span> socios</span>
+                        </div>
+                        <span id="submitted-percentage" class="text-sm font-bold font-mono text-emerald-400">0%</span>
+                    </div>
+
+                    <!-- Barra de Progreso -->
+                    <div class="w-full bg-slate-950 rounded-full h-3 p-0.5 border border-slate-800 overflow-hidden">
+                        <div id="submitted-progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: 0%;"></div>
+                    </div>
+
+                    <div id="my-forecast-status" class="pt-1 text-xs flex items-center justify-between text-slate-300">
+                        <span class="text-slate-400">Tu estado: <strong id="my-forecast-badge" class="text-amber-400 font-bold">Comprobando...</strong></span>
+                        <a href="pronosticos.html" class="text-amber-400 hover:text-amber-300 font-bold hover:underline flex items-center gap-1">
+                            <span>Ver Pronósticos</span> <span>→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                    <span>Sincronización instantánea</span>
+                    <button onclick="window.DashboardApp && window.DashboardApp.openSubmittedListModal()" class="text-slate-300 hover:text-amber-400 font-semibold underline">
+                        ¿Quién falta por enviar?
+                    </button>
+                </div>
+            </div>
+
+            <!-- WIDGET 3: 👑 GANADOR SEMANAL (RELLENA DOBLES) -->
+            <div class="glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between group hover:border-amber-400 transition">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                            <span>👑</span> Rellena Dobles
+                        </span>
+
+                        <!-- Tooltip explicativo -->
+                        <div class="relative cursor-pointer">
+                            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-bold border border-slate-700">
+                                ℹ️
+                            </span>
+                            <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-72 p-3.5 rounded-2xl text-xs space-y-1.5 select-none">
+                                <div class="font-bold text-amber-400">👑 Premio del Ganador Semanal</div>
+                                <p class="text-slate-300 leading-relaxed">
+                                    El socio que obtuvo la mayor puntuación en la última jornada tiene el privilegio de elegir los <strong>7 dobles reducidos al 13</strong> de la quiniela colectiva.
+                                </p>
+                                <p class="text-slate-400 text-[11px] pt-1 border-t border-slate-800">
+                                    El coste del boleto lo asume íntegramente el bote de la peña.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-xs text-slate-400 block font-medium">Ganador Jornada Anterior:</span>
+                        <h4 id="role-winner-name" class="text-xl sm:text-2xl font-black text-amber-400 tracking-tight truncate">
+                            Cargando...
+                        </h4>
+                        <p id="role-winner-detail" class="text-xs text-slate-400">
+                            Pendiente de validación
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between">
+                    <span class="text-slate-500">Premio Colectivo</span>
+                    <a href="pronosticos.html" class="text-amber-400 font-bold hover:underline">Ver Dobles →</a>
+                </div>
+            </div>
+
+            <!-- WIDGET 4: 💀 EL MAULA SEMANAL (SELLA LA QUINIELA) -->
+            <div class="glass-panel p-5 border-rose-500/30 relative flex flex-col justify-between group hover:border-rose-400 transition">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
+                            <span>💀</span> El Maula (Sella)
+                        </span>
+
+                        <!-- Tooltip explicativo -->
+                        <div class="relative cursor-pointer">
+                            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-bold border border-slate-700">
+                                ℹ️
+                            </span>
+                            <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-72 p-3.5 rounded-2xl text-xs space-y-1.5 select-none">
+                                <div class="font-bold text-rose-400">💀 Deber del Sellador</div>
+                                <p class="text-slate-300 leading-relaxed">
+                                    El socio con menor puntuación (o que no envió la quiniela a tiempo) es el <strong>Maula de la semana</strong>.
+                                </p>
+                                <p class="text-slate-400 text-[11px] pt-1 border-t border-slate-800">
+                                    Su obligación es acudir a la administración de loterías a sellar el boleto colectivo de la peña antes del jueves a las 17:00h. Se le reembolsa el coste íntegro.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-xs text-slate-400 block font-medium">Sellador Designado:</span>
+                        <h4 id="role-loser-name" class="text-xl sm:text-2xl font-black text-rose-400 tracking-tight truncate">
+                            Cargando...
+                        </h4>
+                        <p id="role-loser-detail" class="text-xs text-slate-400">
+                            Responsable del sellado oficial
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between">
+                    <span class="text-slate-500">Reembolso 100% Bote</span>
+                    <a href="bote_2.html" class="text-rose-400 font-bold hover:underline">Ver Reembolso →</a>
+                </div>
+            </div>
+
+            <!-- WIDGET 5: 🐷 PARTIDO PIG (PLENO AL 15) -->
+            <div class="glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between group hover:border-amber-400 transition">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/40 flex items-center gap-1">
+                            <span>🐷</span> Alerta P15 (PIG)
+                        </span>
+
+                        <!-- Tooltip explicativo -->
+                        <div class="relative cursor-pointer">
+                            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-bold border border-slate-700">
+                                ℹ️
+                            </span>
+                            <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-72 p-3.5 rounded-2xl text-xs space-y-1.5 select-none">
+                                <div class="font-bold text-pink-400">🐷 Regla Especial PIG (Pleno al 15)</div>
+                                <p class="text-slate-300 leading-relaxed">
+                                    Cuando el <strong>Atlético de Madrid</strong> juega en el Pleno al 15, acertar el resultado exacto otorga inmunidad absoluta frente a ser el Maula de la semana.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span id="pig-status-label" class="text-xs text-slate-400 block font-medium">Estado PIG:</span>
+                        <div id="pig-content" class="text-sm font-semibold text-slate-200">
+                            Sin partido PIG activo
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between text-slate-500">
+                    <span>Reglamento Peña</span>
+                    <span id="pig-badge-foot" class="text-slate-400 font-bold">Inmunidad Maula</span>
+                </div>
+            </div>
+
+            <!-- WIDGET 6: 🏆 LÍDER DE LA CLASIFICACIÓN GENERAL -->
+            <div class="glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between group hover:border-amber-400 transition">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                            <span>🏆</span> Líder Temporada
+                        </span>
+
+                        <!-- Tooltip explicativo -->
+                        <div class="relative cursor-pointer">
+                            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-bold border border-slate-700">
+                                ℹ️
+                            </span>
+                            <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-72 p-3.5 rounded-2xl text-xs space-y-1.5 select-none">
+                                <div class="font-bold text-amber-400">🏆 Clasificación General</div>
+                                <p class="text-slate-300 leading-relaxed">
+                                    Suma total de puntos acumulados jornada a jornada. En caso de empate a puntos, se aplican los criterios de desempate histórico de la peña.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-xs text-slate-400 block font-medium">1º Clasificado:</span>
+                        <h4 id="leader-name" class="text-xl sm:text-2xl font-black text-white tracking-tight truncate">
+                            Cargando...
+                        </h4>
+                        <div class="flex items-baseline gap-2 pt-0.5">
+                            <span id="leader-points" class="font-mono text-base font-extrabold text-amber-400">0 pts</span>
+                            <span id="leader-diff" class="text-xs text-slate-400 font-medium">(Ventaja: +0 pts)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between">
+                    <span class="text-slate-500">38 Jornadas</span>
+                    <a href="resultados.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>
+                </div>
+            </div>
+
+            <!-- WIDGET 7: 💰 BOTE ACUMULADO EN CAJA (Colspan 2 en desktop) -->
+            <div class="lg:col-span-2 glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between group hover:border-amber-400 transition">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">💰</span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Caja Real de la Peña (Bote Común)</h3>
+                    </div>
+
+                    <!-- Tooltip explicativo -->
+                    <div class="relative cursor-pointer">
+                        <span class="w-6 h-6 rounded-full bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 flex items-center justify-center text-xs font-bold border border-slate-700 transition">
+                            ℹ️
+                        </span>
+                        <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-80 p-4 rounded-2xl text-xs space-y-2 select-none">
+                            <div class="font-bold text-amber-400">💰 Dinero Real en Caja</div>
+                            <p class="text-slate-300 leading-relaxed">
+                                Refleja el saldo financiero total de la peña (cuenta bancaria y efectivo). Incluye el bote inicial, aportaciones por Bizum, margen neto de cuotas semanales y premios cobrados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs text-slate-400">Saldo Total Disponible:</span>
+                        <div id="dashboard-bote-total" class="text-3xl sm:text-4xl font-black font-mono text-emerald-400 tracking-tight mt-0.5">
+                            0.00 €
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="p-2 rounded-xl bg-slate-950/70 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">Margen Neto Semanal:</span>
+                            <strong id="dashboard-bote-neto" class="text-white font-mono font-bold">+0.00 €</strong>
+                        </div>
+                        <div class="p-2 rounded-xl bg-slate-950/70 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">Premios Cobrados:</span>
+                            <strong id="dashboard-bote-premios" class="text-amber-400 font-mono font-bold">0.00 €</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                    <span class="text-slate-400">Contabilidad sincronizada al céntimo</span>
+                    <a href="bote_2.html" class="text-amber-400 font-bold hover:underline flex items-center gap-1">
+                        <span>Ir a Bote 2.0</span> <span>→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- WIDGET 8: 🎁 PREMIOS SEMANALES & RESUMEN DE TEMPORADA (Colspan 2 en desktop) -->
+            <div class="lg:col-span-2 glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🏆</span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Premios & Rendimiento Económico</h3>
+                    </div>
+
+                    <!-- Tooltip explicativo -->
+                    <div class="relative group cursor-pointer">
+                        <span class="w-6 h-6 rounded-full bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 flex items-center justify-center text-xs font-bold border border-slate-700 transition">
+                            ℹ️
+                        </span>
+                        <div class="invisible group-hover:visible absolute right-0 top-full mt-2 w-80 p-4 rounded-2xl text-xs space-y-2 select-none">
+                            <div class="font-bold text-amber-400">🎁 Sistema de Premios</div>
+                            <p class="text-slate-300 leading-relaxed">
+                                Pronósticos con premio económico oficial (a partir de 10 aciertos según el escrutinio de Loterías). Distingue entre premios individuales y el premio de la quiniela de dobles de la peña.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="py-2 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <!-- Columna 1: Semana -->
+                    <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1.5">
+                        <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-between">
+                            <span>Última Jornada</span>
+                            <span id="weekly-prize-total" class="font-mono text-white text-sm font-extrabold">0.00 €</span>
+                        </div>
+                        <div id="weekly-prizes-list" class="space-y-1 text-slate-300 text-[11px] max-h-24 overflow-y-auto pr-1">
+                            Sin premios registrados en la jornada anterior.
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Acumulado Temporada -->
+                    <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1.5 flex flex-col justify-between">
+                        <div>
+                            <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
+                                Total Temporada 2026-27
+                            </div>
+                            <div id="season-prize-total" class="text-2xl font-black font-mono text-white tracking-tight mt-1">
+                                0.00 €
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800">
+                            <span>Individuales: <strong id="season-indiv-count" class="text-emerald-400 font-mono">0</strong></span>
+                            <span>Dobles: <strong id="season-dobles-count" class="text-purple-400 font-mono">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                    <span>Escrutinio oficial de Loterías</span>
+                    <a href="resumen-temporada.html" class="text-amber-400 font-bold hover:underline">Ver Histórico →</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =====================================================================
+             ZONA LÚDICA: BROMA OFICIAL "ECHAR A EMILIO"
+             ===================================================================== -->
+        <div id="prank-container" class="glass-panel p-4 sm:p-5 border-rose-500/40 bg-gradient-to-r from-rose-950/20 via-slate-900 to-rose-950/20 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-2xl shrink-0">
+                    🚩
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                        <span>Botón de Expulsión Temporal de Emilio</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase">Tradición Maula</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Expulsa a Emilio de la web durante 15 minutos con notificación automática al canal de Telegram.
+                    </p>
+                    <div id="prank-cooldown-msg" class="hidden text-xs text-rose-400 font-bold mt-1">
+                        ⚠️ Queda menos de 1 hora para el cierre de quinielas. La expulsión está deshabilitada reglamentariamente.
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-expulsar-emilio" onclick="window.DashboardApp && window.DashboardApp.executePrank()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-black text-xs sm:text-sm shadow-lg shadow-rose-900/40 active:scale-95 transition flex items-center justify-center gap-2 whitespace-nowrap">
+                <span>🚩</span> ECHAR A EMILIO
+            </button>
+        </div>
+
+    </div>
+
+    <!-- =====================================================================
+         MODAL: LISTA DE QUIÉNES FALTAN POR ENVIAR
+         ===================================================================== -->
+    <div id="modal-pending-members" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100090] flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full p-6 border-amber-500/60 shadow-2xl space-y-4 animate-widget">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📋</span>
+                    <h3 class="text-base font-extrabold text-white">Estado de Envíos de la Peña</h3>
+                </div>
+                <button onclick="document.getElementById('modal-pending-members').classList.add('hidden')" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-emerald-400 mb-2 flex items-center gap-1.5">
+                        <span>✅</span> Han enviado (<span id="modal-sent-count">0</span>):
+                    </h4>
+                    <div id="modal-sent-list" class="flex flex-wrap gap-1.5 text-xs">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-800">
+                    <h4 class="text-xs font-bold uppercase text-rose-400 mb-2 flex items-center gap-1.5">
+                        <span>⏳</span> Pendientes de enviar (<span id="modal-pending-count">0</span>):
+                    </h4>
+                    <div id="modal-pending-list" class="flex flex-wrap gap-1.5 text-xs">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex justify-end">
+                <button onclick="document.getElementById('modal-pending-members').classList.add('hidden')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONTROLADOR DASHBOARD 2.0 -->
+    <script src="js/dashboard_2.js"></script>
+</body>
+
+</html>
