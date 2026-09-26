@@ -3,7 +3,7 @@
  * Versión de caché: maulas-pwa-v1.0
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.1';
+const CACHE_NAME = 'maulas-pwa-v1.3';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -14,6 +14,7 @@ const CORE_ASSETS = [
     'socios.html',
     'resultados.html',
     'bote.html',
+    'bote_2.html',
     'resumen-temporada.html',
     'votaciones.html',
     'admin.html',
@@ -45,6 +46,7 @@ const CORE_ASSETS = [
     'js/jornadas.js',
     'js/dashboard.js',
     'js/bote.js',
+    'js/bote_2.js',
     'js/bote-engine.js',
     'js/dice-service.js',
     'js/text-importer.js',
@@ -53,6 +55,7 @@ const CORE_ASSETS = [
     'js/resumen-temporada.js',
     'js/theme-editor.js',
     'js/telegram-service.js',
+    'js/push-service.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
@@ -154,4 +157,101 @@ self.addEventListener('fetch', (event) => {
             return cachedResp || fetchPromise;
         })
     );
+});
+
+// =========================================================================
+// 4. NOTIFICACIONES PUSH PWA (Web Push API de fondo y pantalla de bloqueo)
+// =========================================================================
+
+self.addEventListener('push', (event) => {
+    console.log('[Service Worker] Evento Push recibido:', event);
+    let payload = {
+        title: 'Peña Maulas ⚽',
+        body: 'Nueva notificación oficial de la Peña Maulas.',
+        icon: 'icons/icon-192x192.png',
+        badge: 'icons/favicon-32x32.png',
+        tag: 'maulas-push-' + Date.now(),
+        url: './'
+    };
+
+    if (event.data) {
+        try {
+            const json = event.data.json();
+            payload = { ...payload, ...json };
+        } catch (e) {
+            payload.body = event.data.text();
+        }
+    }
+
+    const options = {
+        body: payload.body,
+        icon: payload.icon || 'icons/icon-192x192.png',
+        badge: payload.badge || 'icons/favicon-32x32.png',
+        vibrate: [250, 100, 250, 100, 250],
+        tag: payload.tag || 'maulas-notification',
+        renotify: true,
+        data: {
+            url: payload.url || './',
+            receivedAt: Date.now()
+        }
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(payload.title, options)
+    );
+});
+
+self.addEventListener('notificationclick', (event) => {
+    console.log('[Service Worker] Clic en notificación:', event.notification.tag);
+    event.notification.close();
+    const targetUrl = (event.notification.data && event.notification.data.url) ? event.notification.data.url : './';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            for (let client of windowClients) {
+                if (client.url.includes(targetUrl) && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
+    );
+});
+
+// Mensajería desde la aplicación para programar pruebas retardadas (móvil bloqueado o app cerrada)
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
+        const delay = event.data.delay || 5000;
+        const payload = event.data.payload || {
+            title: '⚽ Peña Maulas (Prueba Móvil)',
+            body: '¡Hola Fernando Lozano! Las notificaciones funcionan con el terminal bloqueado.',
+            icon: 'icons/icon-192x192.png',
+            badge: 'icons/favicon-32x32.png',
+            tag: 'test-delayed'
+        };
+
+        const showPromise = new Promise((resolve) => {
+            setTimeout(async () => {
+                try {
+                    await self.registration.showNotification(payload.title, {
+                        body: payload.body,
+                        icon: payload.icon || 'icons/icon-192x192.png',
+                        badge: payload.badge || 'icons/favicon-32x32.png',
+                        vibrate: [250, 100, 250, 100, 250],
+                        tag: payload.tag || 'test-scheduled-' + Date.now(),
+                        renotify: true,
+                        data: { url: './' }
+                    });
+                } catch (err) {
+                    console.error('[Service Worker] Error al mostrar notificación programada:', err);
+                } finally {
+                    resolve();
+                }
+            }, delay);
+        });
+
+        event.waitUntil(showPromise);
+    }
 });

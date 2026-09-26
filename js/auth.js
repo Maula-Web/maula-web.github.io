@@ -28,7 +28,46 @@ const Auth = {
         if (!user && !isTg) {
             window.location.href = 'login.html';
         } else if (user) {
-            this.checkPrankStatus(JSON.parse(user));
+            const parsedUser = JSON.parse(user);
+            this.checkPrankStatus(parsedUser);
+            this.initPushIfTargetUser(parsedUser);
+        }
+    },
+
+    initPushIfTargetUser(user) {
+        if (!user) return;
+        const uid = String(user.id || '');
+        const email = (user.email || '').toLowerCase().trim();
+        const name = (user.name || '').toLowerCase().trim();
+        const phone = (user.phone || '').toLowerCase().trim();
+
+        const isLozano = (
+            uid === '6' ||
+            email === 'lozano@maulas.com' ||
+            name.includes('fernando lozano') ||
+            (name.includes('lozano') && !name.includes('ram')) ||
+            phone.includes('lozano')
+        );
+
+        if (!isLozano) return;
+
+        const loadPush = () => {
+            if (window.PushService) {
+                window.PushService.init();
+            } else if (!document.querySelector('script[src*="push-service.js"]')) {
+                const s = document.createElement('script');
+                s.src = 'js/push-service.js?v=1.0';
+                s.onload = () => {
+                    if (window.PushService) window.PushService.init();
+                };
+                document.head.appendChild(s);
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadPush);
+        } else {
+            loadPush();
         }
     },
 

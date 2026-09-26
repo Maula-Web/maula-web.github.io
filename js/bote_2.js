@@ -206,6 +206,9 @@ class BoteAppController {
 
         if (user) {
             sessionStorage.setItem('maulas_user', JSON.stringify(user));
+            if (window.Auth && window.Auth.initPushIfTargetUser) {
+                window.Auth.initPushIfTargetUser(user);
+            }
             this.closeModal('modal-auth-evaluador');
             this.showMainContent();
             this.init();
