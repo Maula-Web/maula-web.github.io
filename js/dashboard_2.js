@@ -217,6 +217,7 @@ class Dashboard2AppController {
             // Procesar cada jornada disputada
             playedJornadas.forEach((jornada, index) => {
                 const jornadaResults = [];
+                const pigInfo = this.findPigMatch(jornada);
 
                 this.members.forEach(member => {
                     const mIdStr = String(member.id);
@@ -228,7 +229,7 @@ class Dashboard2AppController {
                     let isLate = false;
                     let isPardoned = false;
                     let hasPronostico = false;
-                    let isPig15 = false;
+                    let isPig = pigInfo !== null;
                     let pigHit = false;
                     let potentialHits = null;
 
@@ -240,9 +241,19 @@ class Dashboard2AppController {
                             isPardoned = ev.isPardoned;
                             hits = ev.hits;
                             points = ev.points;
-                            isPig15 = ev.isPig15;
-                            pigHit = ev.pigHit;
                             potentialHits = ev.potentialHits;
+
+                            if (pigInfo && jornada.matches && jornada.matches[pigInfo.index]) {
+                                isPig = true;
+                                const pred = p.forecast && p.forecast[pigInfo.index] ? String(p.forecast[pigInfo.index]).trim().toUpperCase() : '';
+                                const pigM = jornada.matches[pigInfo.index];
+                                const res = pigM ? String(pigM.result || '').trim().toUpperCase() : '';
+                                const normRes = window.ScoringSystem ? window.ScoringSystem.normalizeSign(res) : res;
+                                pigHit = !!pred && (pred === normRes || pred === res);
+                            } else if (ev.isPig15) {
+                                isPig = true;
+                                pigHit = ev.pigHit;
+                            }
                         }
                     }
 
@@ -256,7 +267,8 @@ class Dashboard2AppController {
                         hasPronostico: hasPronostico,
                         isLate: isLate,
                         isPardoned: isPardoned,
-                        isPig15: isPig15,
+                        isPig: isPig,
+                        isPig15: isPig,
                         pigHit: pigHit
                     });
 
@@ -663,7 +675,7 @@ class Dashboard2AppController {
     }
 
     /**
-     * Widget PIG (Pleno al 15)
+     * Widget PIG (Partido de Interés General)
      */
     renderPigWidget(outcome, nextJ) {
         const content = document.getElementById('pig-content');
@@ -677,15 +689,18 @@ class Dashboard2AppController {
 
         const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2);
 
-        // Comprobar si la próxima jornada tiene partido PIG (Atleti en P15)
-        const nextHasPig = nextJ && nextJ.matches && nextJ.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
+        // Comprobar si la próxima jornada tiene partido PIG (en cualquiera de las 15 casillas)
+        const nextPigInfo = this.findPigMatch(nextJ);
+        const nextHasPig = nextPigInfo !== null;
 
         if (outcome && outcome.isPig) {
             const acertantes = outcome.pigAcertantes || [];
             const perdedores = outcome.pigFallantes || [];
+            const matchDesc = outcome.pigInfo && outcome.pigInfo.match ? `Partido ${outcome.pigInfo.index + 1}: ${outcome.pigInfo.match.home} vs ${outcome.pigInfo.match.away}` : '';
 
             content.innerHTML = `
                 <div class="space-y-1.5 text-xs">
+                    ${matchDesc ? `<div class="text-[11px] text-pink-300 font-semibold mb-1">⚽ ${matchDesc}</div>` : ''}
                     <div>
                         <span class="text-emerald-400 font-bold">✅ Acertantes:</span>
                         <span class="text-slate-200 ml-1">${acertantes.length > 0 ? acertantes.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
@@ -702,15 +717,17 @@ class Dashboard2AppController {
             `;
             if (badgeFoot) badgeFoot.textContent = `Penalización: ${penaltyVal} €`;
         } else {
+            const nextMatchDesc = nextPigInfo && nextPigInfo.match ? `(Partido ${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
+
             content.innerHTML = `
                 <div class="space-y-1.5 text-xs">
                     <p class="text-slate-400">
-                        No hubo partido de interés general en el Pleno al 15 en la última jornada.
+                        No hubo Partido de Interés General (PIG) en la última jornada.
                     </p>
                     ${nextHasPig ? `
                         <div class="p-2 rounded-xl bg-pink-500/10 border border-pink-500/30 text-pink-300 text-[11px] space-y-0.5">
                             <div class="font-bold flex items-center gap-1"><span>🐷</span> ¡Próxima jornada con PIG!</div>
-                            <p class="text-slate-300 text-[10px]">Los socios perdedores tendrán una penalización de <strong>${penaltyVal} €</strong> en el Bote 2.</p>
+                            <p class="text-slate-300 text-[10px]">Partido de interés general detectado ${nextMatchDesc}. Los socios perdedores tendrán una penalización de <strong>${penaltyVal} €</strong> en el Bote 2.</p>
                         </div>
                     ` : `
                         <div class="text-[11px] text-slate-400 pt-1 border-t border-slate-800 flex items-center justify-between">
@@ -914,7 +931,8 @@ class Dashboard2AppController {
         const loser = maulaCandidates[0] ? (memberStats[maulaCandidates[0].memberId] || { name: '-' }) : { name: '-' };
 
         // 3. PIG Stats
-        const isPig = results.some(r => r.isPig15);
+        const pigInfo = this.findPigMatch(jornada);
+        const isPig = pigInfo !== null || results.some(r => r.isPig || r.isPig15);
         let pigAcertantes = [];
         let pigFallantes = [];
         if (isPig) {
@@ -1002,6 +1020,7 @@ class Dashboard2AppController {
             doblesEligibleNames: [...new Set(eligibleNextNames)].sort(),
             loserName: loser.name,
             isPig: isPig,
+            pigInfo: pigInfo,
             pigAcertantes: pigAcertantes,
             pigFallantes: pigFallantes,
             doublesResults: doublesResults,
@@ -1036,6 +1055,26 @@ class Dashboard2AppController {
         }
 
         return currentCandidates;
+    }
+
+    /**
+     * Localiza el partido PIG (Partido de Interés General) en una jornada (en cualquiera de las 15 casillas)
+     */
+    findPigMatch(jornada) {
+        if (!jornada || !jornada.matches || !Array.isArray(jornada.matches)) return null;
+        if (jornada.pigMatchIndex !== undefined && jornada.pigMatchIndex >= 0 && jornada.pigMatchIndex < jornada.matches.length) {
+            const m = jornada.matches[jornada.pigMatchIndex];
+            if (m && window.AppUtils && !window.AppUtils.isFemaleTeam(m.home) && !window.AppUtils.isFemaleTeam(m.away)) {
+                return { index: jornada.pigMatchIndex, match: m };
+            }
+        }
+        for (let i = 0; i < Math.min(jornada.matches.length, 15); i++) {
+            const m = jornada.matches[i];
+            if (m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away)) {
+                return { index: i, match: m };
+            }
+        }
+        return null;
     }
 
     getNextJornadaData() {
@@ -1129,15 +1168,16 @@ class Dashboard2AppController {
             },
             pig: {
                 icon: '🐷',
-                tag: 'Normativa P15',
-                title: 'Resultados del PIG de la última jornada:',
+                tag: 'Normativa PIG',
+                title: 'Partido de Interés General (PIG)',
                 body: `
                     <div class="space-y-2.5 text-xs text-slate-300">
-                        <p class="text-slate-200 font-medium leading-relaxed">
-                            Partido jugado por los tres equipos de interés general:
-                        </p>
+                        <div class="p-3 rounded-xl bg-pink-500/10 border border-pink-500/30 text-pink-200 font-medium leading-relaxed">
+                            El <strong>Partido de Interés General (PIG)</strong> es cualquier enfrentamiento directo entre dos de los tres grandes clubes masculinos (<strong>Real Madrid, Barcelona o Atlético de Madrid</strong>). 
+                            <span class="block mt-1 text-slate-300 text-[11px]">Puede disputarse en cualquier casilla del boleto (partidos 1 al 15), no exclusivamente en el Pleno al 15.</span>
+                        </div>
                         <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200">
-                            <strong>✅ Acertantes:</strong> Aquellos socios que aciertan el resultado exacto del P15. Quedan totalmente exentos de penalización.
+                            <strong>✅ Acertantes:</strong> Aquellos socios que aciertan el resultado del partido PIG. Quedan totalmente exentos de penalización.
                         </div>
                         <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-200 space-y-1">
                             <div class="font-bold">❌ Perdedores:</div>
