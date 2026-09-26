@@ -282,7 +282,10 @@ class Dashboard2AppController {
                 });
 
                 // Contabilizar premios de dobles de esta jornada
-                const doublesForecasts = this.pronosticosExtra.filter(df => df.jId === jornada.id || df.jornadaId === jornada.id);
+                const doublesForecasts = this.pronosticosExtra.filter(p => {
+                    const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+                    return pJ === String(jornada.id) || pJ === String(jornada.number);
+                });
                 if (doublesForecasts.length > 0 && jornada.matches) {
                     const officialResults = jornada.matches.map(m => m.result);
                     doublesForecasts.forEach(df => {
@@ -308,6 +311,22 @@ class Dashboard2AppController {
                                     hasPrize = true;
                                 }
                             });
+                        } else if (ev) {
+                            const cat = ev.officialHits !== undefined ? ev.officialHits : ev.hits;
+                            let actualMinHits = jornada.minHitsToWin || 10;
+                            if (prizesMap && Object.keys(prizesMap).length > 0) {
+                                actualMinHits = Math.min(...Object.keys(prizesMap).map(Number));
+                            }
+                            if (cat >= actualMinHits) {
+                                let pVal = prizesMap[cat] || prizesMap[String(cat)] || 0;
+                                if (typeof pVal === 'string') {
+                                    pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                                }
+                                if (pVal > 0) {
+                                    extraPrizeAmount += parseFloat(pVal);
+                                    hasPrize = true;
+                                }
+                            }
                         }
 
                         if (hasPrize && extraPrizeAmount > 0) {
@@ -387,7 +406,7 @@ class Dashboard2AppController {
             if (elWinnerName) elWinnerName.textContent = lastJornadaOutcome.winnerName || 'Pendiente';
             if (elWinnerDetail) {
                 const eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
-                elWinnerDetail.textContent = eligibles.length > 1 ? `Dobles: ${eligibles.join(', ')}` : 'Rellena los 7 dobles reducidos';
+                elWinnerDetail.textContent = eligibles.length > 1 ? `Dobles: ${eligibles.join(', ')}` : 'Rellena la columna de signos dobles';
             }
 
             // E. Widget 4: ✍️ SELLA: (Sellador Designado)
@@ -403,11 +422,15 @@ class Dashboard2AppController {
             const elLeaderName = document.getElementById('leader-name');
             const elLeaderPoints = document.getElementById('leader-points');
             const elLeaderDiff = document.getElementById('leader-diff');
+            const elLeaderJornadas = document.getElementById('leader-jornadas-count');
             if (elLeaderName) elLeaderName.textContent = leader.name || '-';
             if (elLeaderPoints) elLeaderPoints.textContent = `${leader.totalPoints || 0} pts`;
             if (elLeaderDiff) {
                 const diff = (leader.totalPoints || 0) - secondLeaderPoints;
                 elLeaderDiff.textContent = `(Ventaja: +${diff} pts)`;
+            }
+            if (elLeaderJornadas) {
+                elLeaderJornadas.textContent = `${playedCount} jornadas disputadas`;
             }
 
             // H. Widget 7: 💰 Bote Acumulado en Caja
@@ -748,14 +771,14 @@ class Dashboard2AppController {
             const indivs = (outcome.prizeWinners || []).map(pw => `
                 <div class="flex items-center justify-between py-0.5 border-b border-slate-900">
                     <span class="text-slate-200 font-semibold">${pw.name}</span>
-                    <span class="text-emerald-400 font-mono font-bold">${pw.hits} aciertos</span>
+                    <span class="text-emerald-400 font-mono font-bold">${pw.hits} aciertos ${pw.prize ? `(+${pw.prize.toFixed(2)} €)` : ''}</span>
                 </div>
             `);
 
             const dobles = (outcome.doublesResults || []).filter(dr => dr.prize > 0).map(dw => `
-                <div class="flex items-center justify-between py-0.5 border-b border-slate-900 text-purple-300">
-                    <span>👑 Dobles (${dw.name})</span>
-                    <span class="font-mono font-bold">${dw.hits} ac. (${dw.prize.toFixed(2)}€)</span>
+                <div class="flex items-center justify-between py-0.5 border-b border-slate-900 text-amber-300">
+                    <span class="font-semibold">👑 Dobles (${dw.name})</span>
+                    <span class="font-mono font-bold text-emerald-400">${dw.hits} ac. (+${dw.prize.toFixed(2)} €)</span>
                 </div>
             `);
 
@@ -901,13 +924,16 @@ class Dashboard2AppController {
 
         // 4. Doubles
         const doublesResults = [];
-        const doublesForecasts = this.pronosticosExtra.filter(p => p.jId === jornada.id || p.jornadaId === jornada.id);
+        const doublesForecasts = this.pronosticosExtra.filter(p => {
+            const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+            return pJ === String(jornada.id) || pJ === String(jornada.number);
+        });
         if (doublesForecasts.length > 0 && jornada.matches) {
             const officialResults = jornada.matches.map(m => m.result);
             doublesForecasts.forEach(df => {
-                const mId = df.mId || df.memberId;
-                const member = memberStats[mId];
-                if (!member) return;
+                const mId = df.mId !== undefined && df.mId !== null ? df.mId : df.memberId;
+                const member = memberStats[mId] || memberStats[Number(mId)] || (this.members || []).find(m => String(m.id) === String(mId));
+                const memberName = member ? (member.name || member.fullName || (window.AppUtils ? window.AppUtils.getMemberName(member) : 'Socio')) : 'Socio';
 
                 const selection = df.selection || df.forecast || [];
                 const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
@@ -927,8 +953,20 @@ class Dashboard2AppController {
                         if (typeof pVal === 'string') pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
                         if (count > 0 && pVal > 0) prizeVal += count * parseFloat(pVal);
                     });
+                } else if (ev) {
+                    actualHits = ev.hits || 0;
+                    const cat = ev.officialHits !== undefined ? ev.officialHits : ev.hits;
+                    let actualMinHits = jornada.minHitsToWin || 10;
+                    if (prizesMap && Object.keys(prizesMap).length > 0) {
+                        actualMinHits = Math.min(...Object.keys(prizesMap).map(Number));
+                    }
+                    if (cat >= actualMinHits) {
+                        let pVal = prizesMap[cat] || prizesMap[String(cat)] || 0;
+                        if (typeof pVal === 'string') pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                        if (pVal > 0) prizeVal += parseFloat(pVal);
+                    }
                 }
-                doublesResults.push({ name: member.name, hits: actualHits, prize: prizeVal });
+                doublesResults.push({ name: memberName, hits: actualHits, prize: prizeVal });
             });
         }
 
@@ -940,7 +978,12 @@ class Dashboard2AppController {
             let val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
             if (typeof val === 'string') val = parseFloat(val.replace(',', '.').replace('€', '').trim());
             return val > 0;
-        }).sort((a, b) => b.hits - a.hits).map(r => ({ name: r.name, hits: r.hits }));
+        }).sort((a, b) => b.hits - a.hits).map(r => {
+            const prizesMap = jornada.prizes || jornada.prizeRates || {};
+            let val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
+            if (typeof val === 'string') val = parseFloat(val.replace(',', '.').replace('€', '').trim());
+            return { name: r.name, hits: r.hits, prize: val || 0 };
+        });
 
         // 6. Elegibles para siguientes dobles (Ganador + cualquiera con premio > 0)
         const eligibleNextNames = results.filter(r => {
@@ -951,12 +994,7 @@ class Dashboard2AppController {
             return isWinner || (val > 0 && r.hasPronostico);
         }).map(r => r.name);
 
-        const prizeMoney = prizeWinners.reduce((sum, pw) => {
-            const prizesMap = jornada.prizes || jornada.prizeRates || {};
-            let val = prizesMap[pw.hits] || prizesMap[String(pw.hits)] || 0;
-            if (typeof val === 'string') val = parseFloat(val.replace(',', '.').replace('€', '').trim());
-            return sum + (val || 0);
-        }, 0);
+        const prizeMoney = prizeWinners.reduce((sum, pw) => sum + (pw.prize || 0), 0);
         const doublesMoney = doublesResults.reduce((sum, dr) => sum + (dr.prize || 0), 0);
 
         return {
@@ -1039,7 +1077,7 @@ class Dashboard2AppController {
                     </div>
                     <div class="space-y-2 text-xs text-slate-300 pt-1">
                         <p>
-                            • El ganador selecciona los <strong>7 dobles reducidos al 13</strong> de la combinación oficial de la peña para la siguiente jornada.
+                            • El ganador selecciona los <strong>signos dobles</strong> de la combinación oficial de la peña para la siguiente jornada.
                         </p>
                         <p>
                             • El coste íntegro del boleto es financiado por el bote común de la peña, y cualquier premio que obtenga la combinación se reparte según las normas oficiales.
@@ -1081,7 +1119,7 @@ class Dashboard2AppController {
                             El jueves a las 17:00h es la hora límite para que todas las quinielas de los socios estén rellenas en la web.
                         </p>
                         <p class="text-slate-300 text-xs leading-relaxed">
-                            No es necesario que el sellador selle físicamente a las 17:00h en loterías; esa hora marca el cierre de admisión de pronósticos en la plataforma para poder calcular la combinación de la peña y asignar los 7 dobles.
+                            No es necesario que el sellador selle físicamente a las 17:00h en loterías; esa hora marca el cierre de admisión de pronósticos en la plataforma para poder calcular la combinación de la peña y asignar los signos dobles.
                         </p>
                         <p class="text-slate-400 text-[11px] pt-1.5 border-t border-slate-800">
                             ⚠️ Los socios que no hayan rellenado sus 15 pronósticos a las 17:00h incurren en penalización económica reglamentaria (salvo que tengan activado el Dado de Viajes).
