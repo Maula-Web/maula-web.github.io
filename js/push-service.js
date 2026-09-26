@@ -126,9 +126,14 @@ const PushService = {
                 body: '¡Hola Fernando Lozano! Las notificaciones nativas en tu móvil funcionan correctamente.',
                 icon: 'icons/icon-192x192.png',
                 badge: 'icons/favicon-32x32.png',
-                vibrate: [250, 100, 250, 100, 250],
+                vibrate: [300, 100, 300, 100, 300],
                 tag: 'maulas-direct-' + Date.now(),
                 renotify: true,
+                requireInteraction: true,
+                silent: false,
+                actions: [
+                    { action: 'open_app', title: '📲 Ver Peña Maulas' }
+                ],
                 data: {
                     url: './',
                     timestamp: Date.now()
@@ -176,6 +181,11 @@ const PushService = {
             icon: 'icons/icon-192x192.png',
             badge: 'icons/favicon-32x32.png',
             tag: 'maulas-scheduled-' + Date.now(),
+            requireInteraction: true,
+            silent: false,
+            actions: [
+                { action: 'open_app', title: '📲 Ver Peña Maulas' }
+            ],
             url: './'
         };
 
@@ -652,6 +662,19 @@ const PushService = {
                     <div style="background:rgba(15, 23, 42, 0.5); border-left:3px solid #ff9100; padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.78rem; color:#94a3b8; line-height:1.45;">
                         <strong style="color:#f8fafc;">💡 ¿Cómo probar con la web cerrada?</strong><br>
                         Pulsa el botón de <strong>5 o 10 segundos</strong>, apaga la pantalla de tu teléfono inmediatamente con el botón lateral o sal al inicio. Tu móvil vibrará y te mostrará la notificación en la pantalla de bloqueo.
+                    </div>
+
+                    <!-- Ayuda: Despertar pantalla en móvil -->
+                    <div style="background:rgba(30, 41, 59, 0.4); border:1px solid rgba(255, 255, 255, 0.08); padding:12px; border-radius:10px; font-size:0.78rem; color:#cbd5e1; line-height:1.45;">
+                        <div style="font-weight:700; color:#ffd700; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                            <span>💡</span> ¿Por qué no se enciende la pantalla sola al llegar?
+                        </div>
+                        Tu móvil <strong>sí recibe la notificación</strong> y la coloca en la bandeja de notificaciones. Que la pantalla física se encienda ("despierte") depende del ajuste de privacidad de tu sistema operativo:
+                        <ul style="margin:6px 0 0 16px; padding:0; color:#94a3b8;">
+                            <li><strong>Ajuste Pantalla de Bloqueo:</strong> En <em>Ajustes &gt; Pantalla de bloqueo</em>, activa <strong>"Despertar pantalla al recibir notificaciones"</strong> o "Pantalla ambiente".</li>
+                            <li><strong>Prioridad de Notificación:</strong> Mantén pulsada la notificación de Peña Maulas cuando llegue &gt; pulsa el icono de engranaje ⚙️ &gt; cámbiala de "Silencioso" a <strong>"Prioridad / Sonido y emergente en pantalla"</strong>.</li>
+                            <li><strong>Instalar PWA:</strong> Si añades la web a la pantalla de inicio ("Instalar app"), el sistema la dota de un canal de notificaciones propio independiente del navegador.</li>
+                        </ul>
                     </div>
                 </div>
             </div>

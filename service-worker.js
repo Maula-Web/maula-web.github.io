@@ -3,7 +3,7 @@
  * Versión de caché: maulas-pwa-v1.0
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.3';
+const CACHE_NAME = 'maulas-pwa-v1.4';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -187,9 +187,14 @@ self.addEventListener('push', (event) => {
         body: payload.body,
         icon: payload.icon || 'icons/icon-192x192.png',
         badge: payload.badge || 'icons/favicon-32x32.png',
-        vibrate: [250, 100, 250, 100, 250],
+        vibrate: [300, 100, 300, 100, 300],
         tag: payload.tag || 'maulas-notification',
         renotify: true,
+        requireInteraction: true,
+        silent: false,
+        actions: [
+            { action: 'open_app', title: '📲 Ver Peña Maulas' }
+        ],
         data: {
             url: payload.url || './',
             receivedAt: Date.now()
@@ -202,7 +207,7 @@ self.addEventListener('push', (event) => {
 });
 
 self.addEventListener('notificationclick', (event) => {
-    console.log('[Service Worker] Clic en notificación:', event.notification.tag);
+    console.log('[Service Worker] Clic en notificación:', event.notification.tag, 'Acción:', event.action);
     event.notification.close();
     const targetUrl = (event.notification.data && event.notification.data.url) ? event.notification.data.url : './';
 
@@ -225,7 +230,7 @@ self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
         const delay = event.data.delay || 5000;
         const payload = event.data.payload || {
-            title: '⚽ Peña Maulas (Prueba Móvil)',
+            title: '⚽ Peña Maulas (Móvil Bloqueado)',
             body: '¡Hola Fernando Lozano! Las notificaciones funcionan con el terminal bloqueado.',
             icon: 'icons/icon-192x192.png',
             badge: 'icons/favicon-32x32.png',
@@ -239,9 +244,14 @@ self.addEventListener('message', (event) => {
                         body: payload.body,
                         icon: payload.icon || 'icons/icon-192x192.png',
                         badge: payload.badge || 'icons/favicon-32x32.png',
-                        vibrate: [250, 100, 250, 100, 250],
+                        vibrate: [300, 100, 300, 100, 300],
                         tag: payload.tag || 'test-scheduled-' + Date.now(),
                         renotify: true,
+                        requireInteraction: true,
+                        silent: false,
+                        actions: [
+                            { action: 'open_app', title: '📲 Ver Peña Maulas' }
+                        ],
                         data: { url: './' }
                     });
                 } catch (err) {
