@@ -18,6 +18,7 @@ class BoteAppController {
         this.currentSeason = '2026-2027';
         this.currentView = 'socios';
         this.selectedJornadaNum = 8;
+        this.jornadaFilter = 'all'; // 'all' | 'prize' | 'pig'
         this.matrizMode = 'visual'; // 'visual' | 'financiero'
         this.memberFilter = 'all'; // 'all' | 'positive' | 'negative'
         this.searchQuery = '';
@@ -367,6 +368,16 @@ class BoteAppController {
 
             const neto = recaudacion - gastoSellado + premios;
 
+            const isPigJornada = !!(
+                (j.matches && j.matches.some(m => m && ((typeof window.AppUtils !== 'undefined' && window.AppUtils.isPigMatch(m.home, m.away)) || (typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away))))) ||
+                jMovements.some(m => (m.penalizacionPIG || 0) > 0) ||
+                j.hasPig ||
+                j.isPig ||
+                (season === '2026-2027' && j.number === 8) ||
+                (season === '2025-2026' && [9, 16, 50, 53, 61].includes(j.number))
+            );
+            const isPrizeJornada = premios > 0 || (j.premios || 0) > 0;
+
             return {
                 id: j.id,
                 number: j.number,
@@ -381,6 +392,8 @@ class BoteAppController {
                 gastoSellado,
                 recaudacion,
                 premios,
+                hasPrize: isPrizeJornada,
+                hasPig: isPigJornada,
                 totalIn: recaudacion,
                 neto,
                 winnerId: winnerId,
@@ -424,27 +437,48 @@ class BoteAppController {
     }
 
     getSeasonData() {
+        let res = null;
         if (this.isLive && this.liveData && this.liveData.season === this.currentSeason) {
-            return this.liveData;
+            res = this.liveData;
+        } else {
+            const fallback = window.BOTE_FALLBACK_DATA || {};
+            res = fallback[this.currentSeason] || fallback['2026-2027'] || {
+                summary: { cajaReal: 0, totalSaldosVirtuales: 0, totalIngresos: 0, totalGastos: 0, totalPremios: 0 },
+                memberSummaries: [],
+                jornadaSummaries: [],
+                movements: [],
+                ingresos: []
+            };
         }
 
-        const fallback = window.BOTE_FALLBACK_DATA || {};
-        return fallback[this.currentSeason] || fallback['2026-2027'] || {
-            summary: { cajaReal: 0, totalSaldosVirtuales: 0, totalIngresos: 0, totalGastos: 0, totalPremios: 0 },
-            memberSummaries: [],
-            jornadaSummaries: [],
-            movements: [],
-            ingresos: []
-        };
+        if (res && res.jornadaSummaries) {
+            res.jornadaSummaries.forEach(j => {
+                if (typeof j.hasPig === 'undefined') {
+                    const jMovs = (res.movements || []).filter(m => m.jornadaNum === j.number || String(m.jornadaId) === String(j.id));
+                    j.hasPig = !!(
+                        (jMovs.some(m => (m.penalizacionPIG || 0) > 0)) ||
+                        (this.currentSeason === '2026-2027' && j.number === 8) ||
+                        (this.currentSeason === '2025-2026' && [9, 16, 50, 53, 61].includes(j.number)) ||
+                        j.isPig
+                    );
+                }
+                if (typeof j.hasPrize === 'undefined') {
+                    j.hasPrize = (j.premios || 0) > 0;
+                }
+            });
+        }
+        return res;
     }
 
     switchSeason(season) {
         this.currentSeason = season;
+        this.jornadaFilter = 'all';
         const data = this.getSeasonData();
         if (data.jornadaSummaries && data.jornadaSummaries.length > 0) {
             this.selectedJornadaNum = data.jornadaSummaries[data.jornadaSummaries.length - 1].number;
         }
         this.renderAll();
+        this.updateJornadaSlider();
     }
 
     switchView(viewName) {
@@ -477,6 +511,7 @@ class BoteAppController {
         this.switchView('jornadas');
         this.renderJornadasCarousel();
         this.renderJornadaDetail();
+        this.updateJornadaSlider();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -570,7 +605,7 @@ class BoteAppController {
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm">
                         <span>✅</span> Al corriente
                     </span>
-                    <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                    <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                         <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
                             <span>✅</span> Al Corriente (+${m.saldo.toFixed(2)} €)
                         </strong>
@@ -582,11 +617,11 @@ class BoteAppController {
             `;
             if (m.saldo < 0) {
                 statusBadge = `
-                    <div class="group/status relative cursor-help inline-block">
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm">
+                    <div class="group/status relative cursor-help inline-block whitespace-nowrap">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm whitespace-nowrap">
                             <span>⚠️</span> En Deuda
                         </span>
-                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>⚠️</span> Saldo Deudor (${m.saldo.toFixed(2)} €)
                             </strong>
@@ -599,7 +634,7 @@ class BoteAppController {
             }
 
             tr.innerHTML = `
-                <td class="p-3 sm:px-4">
+                <td class="p-3 sm:px-4 whitespace-nowrap">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/30 flex items-center justify-center font-bold text-xs text-orange-400 shrink-0">
                             ${initials}
@@ -610,20 +645,20 @@ class BoteAppController {
                         </div>
                     </div>
                 </td>
-                <td class="p-3 sm:px-4 text-right font-mono font-medium text-slate-300 text-xs sm:text-sm">
-                    +${m.totIn.toFixed(2)} €
+                <td class="p-3 sm:px-4 text-right font-mono font-medium text-slate-300 text-xs sm:text-sm whitespace-nowrap">
+                    +${m.totIn.toFixed(2)}&nbsp;€
                 </td>
-                <td class="p-3 sm:px-4 text-right font-mono font-medium text-slate-400 text-xs sm:text-sm">
-                    -${m.totOut.toFixed(2)} €
+                <td class="p-3 sm:px-4 text-right font-mono font-medium text-slate-400 text-xs sm:text-sm whitespace-nowrap">
+                    -${m.totOut.toFixed(2)}&nbsp;€
                 </td>
-                <td class="p-3 sm:px-4 text-right font-mono font-extrabold ${saldoColor} text-sm sm:text-base">
-                    ${m.saldo.toFixed(2)} €
+                <td class="p-3 sm:px-4 text-right font-mono font-extrabold ${saldoColor} text-sm sm:text-base whitespace-nowrap">
+                    ${m.saldo.toFixed(2)}&nbsp;€
                 </td>
-                <td class="p-3 sm:px-4 text-center">
+                <td class="p-3 sm:px-4 text-center whitespace-nowrap">
                     ${statusBadge}
                 </td>
-                <td class="p-3 sm:px-4 text-center">
-                    <button onclick="window.BoteApp.openMemberExtract('${m.id}')" class="btn-extracto px-2.5 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-slate-950 font-bold text-xs border border-orange-500/40 hover:border-orange-400 shadow-sm transition-all flex items-center gap-1 mx-auto" title="Ver extracto detallado jornada a jornada">
+                <td class="p-3 sm:px-4 text-center whitespace-nowrap">
+                    <button onclick="window.BoteApp.openMemberExtract('${m.id}')" class="btn-extracto px-2.5 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-slate-950 font-bold text-xs border border-orange-500/40 hover:border-orange-400 shadow-sm transition-all flex items-center gap-1 mx-auto whitespace-nowrap" title="Ver extracto detallado jornada a jornada">
                         <span>📄</span> Extracto
                     </button>
                 </td>
@@ -652,19 +687,75 @@ class BoteAppController {
     // =========================================================================
     // VISTA 2: JORNADAS AUDITOR & REEMBOLSO SELLADO (BOTE VS BIZUM)
     // =========================================================================
+    filterJornadas(type) {
+        this.jornadaFilter = type;
+        const data = this.getSeasonData();
+        const filtered = this.getFilteredJornadas(data.jornadaSummaries);
+        if (filtered.length > 0 && !filtered.some(j => j.number === this.selectedJornadaNum)) {
+            this.selectedJornadaNum = filtered[filtered.length - 1].number;
+        }
+        this.updateJornadasFilterButtons();
+        this.renderJornadasCarousel();
+        this.renderJornadaDetail();
+        this.updateJornadaSlider();
+    }
+
+    getFilteredJornadas(summaries) {
+        if (!summaries) return [];
+        if (this.jornadaFilter === 'prize') {
+            return summaries.filter(j => j.hasPrize || j.premios > 0);
+        }
+        if (this.jornadaFilter === 'pig') {
+            return summaries.filter(j => j.hasPig);
+        }
+        return summaries;
+    }
+
+    updateJornadasFilterButtons() {
+        const data = this.getSeasonData();
+        const summaries = data.jornadaSummaries || [];
+        const totalAll = summaries.length;
+        const totalPrize = summaries.filter(j => j.hasPrize || j.premios > 0).length;
+        const totalPig = summaries.filter(j => j.hasPig).length;
+
+        const cAll = document.getElementById('count-jornadas-all');
+        const cPrize = document.getElementById('count-jornadas-prize');
+        const cPig = document.getElementById('count-jornadas-pig');
+        if (cAll) cAll.textContent = totalAll;
+        if (cPrize) cPrize.textContent = totalPrize;
+        if (cPig) cPig.textContent = totalPig;
+
+        document.querySelectorAll('#jornadas-filter-buttons button').forEach(b => {
+            const f = b.dataset.jfilter;
+            if (f === this.jornadaFilter) {
+                b.className = 'px-3 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 border border-orange-400 shadow-sm transition-all whitespace-nowrap';
+            } else {
+                b.className = 'px-3 py-1 rounded-lg font-semibold bg-slate-900/90 text-slate-300 border border-slate-600/70 hover:border-orange-500/60 hover:text-white hover:bg-slate-800 transition-all whitespace-nowrap';
+            }
+        });
+    }
+
     renderJornadasCarousel() {
         const data = this.getSeasonData();
+        this.updateJornadasFilterButtons();
         const carousel = document.getElementById('jornadas-carousel');
         if (!carousel) return;
         carousel.innerHTML = '';
 
-        data.jornadaSummaries.forEach(j => {
+        const list = this.getFilteredJornadas(data.jornadaSummaries);
+        if (list.length === 0) {
+            carousel.innerHTML = `<div class="p-2.5 text-xs text-slate-400 font-semibold italic flex items-center gap-1.5"><span>ℹ️</span> No se encontraron jornadas con este filtro en la temporada actual.</div>`;
+            return;
+        }
+
+        list.forEach(j => {
             const isSelected = j.number === this.selectedJornadaNum;
             const btn = document.createElement('button');
             btn.onclick = () => {
                 this.selectedJornadaNum = j.number;
                 this.renderJornadasCarousel();
                 this.renderJornadaDetail();
+                this.updateJornadaSlider();
             };
 
             if (isSelected) {
@@ -673,13 +764,82 @@ class BoteAppController {
                 btn.className = 'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-600/70 hover:border-orange-500/70 whitespace-nowrap flex items-center gap-2 transition-all';
             }
 
+            const prizeIcon = (j.hasPrize || j.premios > 0) ? '🏆' : '';
+            const pigIcon = j.hasPig ? '🐷' : '';
+
             btn.innerHTML = `
                 <span>J${j.number}</span>
                 <span class="opacity-70 text-[11px]">(${j.date})</span>
-                ${j.premios > 0 ? '🏆' : ''}
+                ${prizeIcon}
+                ${pigIcon}
             `;
             carousel.appendChild(btn);
         });
+    }
+
+    updateJornadaSlider() {
+        const data = this.getSeasonData();
+        const slider = document.getElementById('jornadas-slider');
+        const badge = document.getElementById('slider-jornada-badge');
+        const minLabel = document.getElementById('slider-min-label');
+        const maxLabel = document.getElementById('slider-max-label');
+        if (!slider || !data.jornadaSummaries || data.jornadaSummaries.length === 0) return;
+
+        const summaries = data.jornadaSummaries;
+        const total = summaries.length;
+        slider.min = '0';
+        slider.max = String(total - 1);
+
+        const currentIdx = summaries.findIndex(j => j.number === this.selectedJornadaNum);
+        const idx = currentIdx >= 0 ? currentIdx : total - 1;
+        slider.value = String(idx);
+
+        if (minLabel) minLabel.textContent = `J${summaries[0].number}`;
+        if (maxLabel) maxLabel.textContent = `J${summaries[total - 1].number}`;
+
+        const curJ = summaries[idx];
+        if (badge && curJ) {
+            const prizeBadge = (curJ.hasPrize || curJ.premios > 0) ? ' 🏆' : '';
+            const pigBadge = curJ.hasPig ? ' 🐷' : '';
+            badge.innerHTML = `Jornada ${curJ.number} <span class="opacity-70 text-[10px]">(${curJ.date})</span>${prizeBadge}${pigBadge}`;
+        }
+    }
+
+    onJornadaSliderInput(val) {
+        const data = this.getSeasonData();
+        const summaries = data.jornadaSummaries || [];
+        const idx = parseInt(val, 10);
+        if (isNaN(idx) || idx < 0 || idx >= summaries.length) return;
+
+        const targetJ = summaries[idx];
+        if (targetJ && targetJ.number !== this.selectedJornadaNum) {
+            this.selectedJornadaNum = targetJ.number;
+            const badge = document.getElementById('slider-jornada-badge');
+            if (badge) {
+                const prizeBadge = (targetJ.hasPrize || targetJ.premios > 0) ? ' 🏆' : '';
+                const pigBadge = targetJ.hasPig ? ' 🐷' : '';
+                badge.innerHTML = `Jornada ${targetJ.number} <span class="opacity-70 text-[10px]">(${targetJ.date})</span>${prizeBadge}${pigBadge}`;
+            }
+            this.renderJornadasCarousel();
+            this.renderJornadaDetail();
+        }
+    }
+
+    stepJornada(direction) {
+        const data = this.getSeasonData();
+        const summaries = data.jornadaSummaries || [];
+        if (summaries.length === 0) return;
+
+        const currentIdx = summaries.findIndex(j => j.number === this.selectedJornadaNum);
+        const safeIdx = currentIdx >= 0 ? currentIdx : summaries.length - 1;
+        const newIdx = Math.max(0, Math.min(summaries.length - 1, safeIdx + direction));
+
+        if (newIdx !== safeIdx) {
+            this.selectedJornadaNum = summaries[newIdx].number;
+            this.renderJornadasCarousel();
+            this.renderJornadaDetail();
+            this.updateJornadaSlider();
+        }
     }
 
     renderJornadaDetail() {
@@ -687,13 +847,15 @@ class BoteAppController {
         const jSummary = data.jornadaSummaries.find(j => j.number === this.selectedJornadaNum) || data.jornadaSummaries[0];
         if (!jSummary) return;
 
+        this.updateJornadaSlider();
+
         const headerCard = document.getElementById('jornada-header-card');
         const netoColor = jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400';
 
         const jMovements = data.movements.filter(m => m.jornadaNum === jSummary.number);
         const doblesPrize = jMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
         const doblesBtn = (doblesPrize > 0) ? `
-            <button onclick="window.BoteApp.showReducedBreakdown('${jSummary.doblesPlayerId || jSummary.winnerId || ''}', ${jSummary.number})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold transition-all shadow-sm" title="Ver desglose oficial de las 16 apuestas reducidas premiadas">
+            <button onclick="window.BoteApp.showReducedBreakdown('${jSummary.doblesPlayerId || jSummary.winnerId || ''}', ${jSummary.number})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold transition-all shadow-sm whitespace-nowrap" title="Ver desglose oficial de las 16 apuestas reducidas premiadas">
                 <span>📋</span> Ver Reducción Premiada (+${doblesPrize.toFixed(2)} €)
             </button>
         ` : '';
@@ -702,10 +864,10 @@ class BoteAppController {
         const exemptNames = exemptMovements.map(m => m.memberName).join(', ');
         const exemptHtml = exemptMovements.length > 0 ? `
             <span class="text-slate-600">•</span>
-            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50">
+            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50 whitespace-nowrap">
                 <span class="text-amber-400 font-bold">🎁 Gratis:</span> 
                 <span class="underline decoration-dotted decoration-slate-500">${exemptNames}</span>
-                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                     <strong class="text-amber-400 block mb-1 font-bold">🎁 Socio Exento de Cuota</strong>
                     Juega gratis esta jornada al haber obtenido premio o ganado en la jornada anterior.
                 </div>
@@ -717,15 +879,16 @@ class BoteAppController {
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
                         <div class="flex items-center gap-3 flex-wrap">
-                            <span class="text-2xl sm:text-3xl font-extrabold text-white">Jornada ${jSummary.number}</span>
-                            <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-700">${jSummary.date}</span>
-                            ${jSummary.premios > 0 ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">🏆 Jornada Premiada</span>' : ''}
+                            <span class="text-2xl sm:text-3xl font-extrabold text-white whitespace-nowrap">Jornada ${jSummary.number}</span>
+                            <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-700 whitespace-nowrap">${jSummary.date}</span>
+                            ${jSummary.premios > 0 ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30 whitespace-nowrap flex items-center gap-1">🏆 Jornada Premiada</span>' : ''}
+                            ${jSummary.hasPig ? '<span class="px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-400 text-xs font-bold border border-pink-500/30 whitespace-nowrap flex items-center gap-1">🐷 Partido PIG</span>' : ''}
                         </div>
                         <div class="flex flex-wrap items-center gap-3 mt-2 text-xs sm:text-sm">
-                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50">
+                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50 whitespace-nowrap">
                                 <span class="text-emerald-400 font-bold">👑 Ganador:</span> 
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || 'N/A'}</span>
-                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto">
+                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                     <strong class="text-emerald-400 block mb-1 font-bold">👑 Ganador de la Jornada</strong>
                                     Socio con más aciertos en esta jornada. Jugará gratis (🎁) y pronosticará la quiniela de 7 dobles en la siguiente jornada (coste de ${(jSummary.costeDobles !== undefined ? jSummary.costeDobles : (this.config.costeDobles || 10.50)).toFixed(2)} € pagado al 100% por la peña).
                                 </div>
@@ -733,10 +896,10 @@ class BoteAppController {
                             ${doblesBtn}
                             ${exemptHtml}
                             <span class="text-slate-600">•</span>
-                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50">
+                            <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50 whitespace-nowrap">
                                 <span class="text-rose-400 font-bold">💀 Sellador:</span> 
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.loserName || 'N/A'}</span>
-                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto">
+                                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                     <strong class="text-rose-400 block mb-1 font-bold">💀 Sellador Oficial</strong>
                                     Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de ${jSummary.gastoSellado.toFixed(2)} € en su hucha personal o por Bizum.
                                 </div>
@@ -745,34 +908,34 @@ class BoteAppController {
                     </div>
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center relative z-20">
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Recaudado ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-emerald-400 font-mono">+${jSummary.recaudacion.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
+                            <span class="text-xs sm:text-sm font-extrabold text-emerald-400 font-mono">+${jSummary.recaudacion.toFixed(2)}&nbsp;€</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-emerald-400 block mb-1 font-bold">📥 Recaudación de la Jornada</strong>
                                 Suma de cuotas semanales de los 19 socios más las penalizaciones aplicadas por exceso de unos, bajos aciertos o fallos en PIG.
                             </div>
                         </div>
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/40 hover:z-50 transition-colors">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Coste Sellado ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
+                            <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2)}&nbsp;€</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-rose-400 block mb-1 font-bold">🎟️ Gasto Oficial de Sellado</strong>
                                 Coste total pagado en la administración de loterías: ${jSummary.numSocios} quinielas sencillas (${(jSummary.numSocios * jSummary.costeColumna).toFixed(2)} €) + 1 quiniela reducida de 7 dobles (${jSummary.costeDobles.toFixed(2)} €) = ${jSummary.gastoSellado.toFixed(2)} €.
                             </div>
                         </div>
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 hover:z-50 transition-colors">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Premios ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-amber-400 font-mono">+${jSummary.premios.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
+                            <span class="text-xs sm:text-sm font-extrabold text-amber-400 font-mono">+${jSummary.premios.toFixed(2)}&nbsp;€</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-amber-400 block mb-1 font-bold">🏆 Premios Oficiales LAE</strong>
                                 Importe oficial de premios de Loterías del Estado en esta jornada (por pronósticos individuales o por la quiniela de dobles).
                             </div>
                         </div>
-                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors">
+                        <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Neto Peña ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold ${netoColor} font-mono">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2)} €</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
+                            <span class="text-xs sm:text-sm font-extrabold ${netoColor} font-mono">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2)}&nbsp;€</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-emerald-400 block mb-1 font-bold">📈 Superávit Neto Semanal</strong>
                                 Margen neto semanal que se incorpora a la hucha colectiva de la peña tras descontar los ${jSummary.gastoSellado.toFixed(2)} € de sellado oficial.
                             </div>
@@ -790,7 +953,7 @@ class BoteAppController {
         // Mantener orden por ID de socio
         jMovements.sort((a, b) => parseInt(a.memberId) - parseInt(b.memberId)).forEach((m, rowIdx) => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-900/60 transition-colors text-xs sm:text-sm';
+            tr.className = 'hover:bg-slate-900/60 transition-colors text-xs sm:text-sm whitespace-nowrap';
 
             // Posicionamiento dinámico: mitad superior hacia abajo, mitad inferior hacia arriba
             const posClass = rowIdx < 10 ? 'left-1/2 -translate-x-1/2 top-full mt-1.5' : 'left-1/2 -translate-x-1/2 bottom-full mb-1.5';
@@ -800,11 +963,11 @@ class BoteAppController {
             const penaltyChips = [];
             if (m.penalizacionUnos > 0) {
                 penaltyChips.push(`
-                    <div class="group relative cursor-help inline-block">
-                        <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[11px] font-semibold border border-amber-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                    <div class="group relative cursor-help inline-block whitespace-nowrap">
+                        <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[11px] font-semibold border border-amber-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
                             +1️⃣ ${m.penalizacionUnos.toFixed(2)}€
                         </span>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>1️⃣</span> Multa por Exceso de Unos (+1)
                             </strong>
@@ -817,11 +980,11 @@ class BoteAppController {
             }
             if (m.penalizacionBajosAciertos > 0) {
                 penaltyChips.push(`
-                    <div class="group relative cursor-help inline-block">
-                        <span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[11px] font-semibold border border-rose-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                    <div class="group relative cursor-help inline-block whitespace-nowrap">
+                        <span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[11px] font-semibold border border-rose-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
                             📉 ${m.penalizacionBajosAciertos.toFixed(2)}€
                         </span>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>📉</span> Multa por Bajos Aciertos
                             </strong>
@@ -834,11 +997,11 @@ class BoteAppController {
             }
             if (m.penalizacionPIG > 0) {
                 penaltyChips.push(`
-                    <div class="group relative cursor-help inline-block">
-                        <span class="px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400 text-[11px] font-semibold border border-pink-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                    <div class="group relative cursor-help inline-block whitespace-nowrap">
+                        <span class="px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400 text-[11px] font-semibold border border-pink-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
                             🐷 ${m.penalizacionPIG.toFixed(2)}€
                         </span>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-pink-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-pink-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-pink-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>🐷</span> Fallo en Partido de Interés General (PIG)
                             </strong>
@@ -851,11 +1014,11 @@ class BoteAppController {
             }
             if (m.penalizacionMaula > 0) {
                 penaltyChips.push(`
-                    <div class="group relative cursor-help inline-block">
-                        <span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[11px] font-semibold border border-purple-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all">
+                    <div class="group relative cursor-help inline-block whitespace-nowrap">
+                        <span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[11px] font-semibold border border-purple-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
                             💀 ${m.penalizacionMaula.toFixed(2)}€
                         </span>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>💀</span> Penalización Maula de la Jornada
                             </strong>
@@ -876,9 +1039,9 @@ class BoteAppController {
                 const sellVal = Math.abs(m.sellado).toFixed(2);
                 const selladoPosClass = rowIdx < 10 ? 'right-0 top-full mt-1.5' : 'right-0 bottom-full mb-1.5';
                 selladoCol = `
-                    <div class="group relative cursor-help inline-flex flex-col gap-1 items-end">
-                        <span class="font-bold font-mono text-xs text-purple-300">+${sellVal} €</span>
-                        <div class="flex items-center gap-1.5 text-[11px] bg-slate-900 border border-purple-500/40 hover:border-purple-400 rounded-lg px-2 py-1 shadow-inner transition-colors">
+                    <div class="group relative cursor-help inline-flex flex-col gap-1 items-end whitespace-nowrap">
+                        <span class="font-bold font-mono text-xs text-purple-300 whitespace-nowrap">+${sellVal}&nbsp;€</span>
+                        <div class="flex items-center gap-1.5 text-[11px] bg-slate-900 border border-purple-500/40 hover:border-purple-400 rounded-lg px-2 py-1 shadow-inner transition-colors whitespace-nowrap">
                             <label class="cursor-pointer flex items-center gap-1 ${!m.isSelladoInCash ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-white'}">
                                 <input type="radio" name="reemb_${m.memberId}_${m.jornadaId || jSummary.number}" ${!m.isSelladoInCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${m.memberId}', '${m.jornadaId || jSummary.number}', false)">
                                 <span>Bote</span>
@@ -889,7 +1052,7 @@ class BoteAppController {
                                 <span>Bizum</span>
                             </label>
                         </div>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${selladoPosClass} w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${selladoPosClass} w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>🔄</span> Reembolso Sellado: Bote vs Bizum
                             </strong>
@@ -915,17 +1078,17 @@ class BoteAppController {
             }
 
             tr.innerHTML = `
-                <td class="p-2.5 sm:px-4">
+                <td class="p-2.5 sm:px-4 whitespace-nowrap">
                     <strong class="text-white">${m.memberName}</strong>${icons}
                 </td>
-                <td class="p-2.5 sm:px-4 text-center font-bold text-white">
+                <td class="p-2.5 sm:px-4 text-center font-bold text-white whitespace-nowrap">
                     ${m.aciertos !== undefined ? m.aciertos : '-'}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-300">
+                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-300 whitespace-nowrap">
                     ${m.exento ? `
-                        <div class="group relative cursor-help inline-block">
-                            <span class="text-amber-400 font-bold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 hover:brightness-125 transition-all">GRATIS</span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="group relative cursor-help inline-block whitespace-nowrap">
+                            <span class="text-amber-400 font-bold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 hover:brightness-125 transition-all whitespace-nowrap">GRATIS</span>
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                 <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>🎁</span> Cuota Gratis (Exento)
                                 </strong>
@@ -934,22 +1097,22 @@ class BoteAppController {
                                 </p>
                             </div>
                         </div>
-                    ` : m.aportacion.toFixed(2) + ' €'}
+                    ` : `<span class="whitespace-nowrap font-mono text-slate-300">${m.aportacion.toFixed(2)}&nbsp;€</span>`}
                 </td>
-                <td class="p-2.5 sm:px-4 text-center">
+                <td class="p-2.5 sm:px-4 text-center whitespace-nowrap">
                     ${penaltiesHtml}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-rose-400">
-                    -${(m.totalGastos || 0).toFixed(2)} €
+                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
+                    -${(m.totalGastos || 0).toFixed(2)}&nbsp;€
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.premios > 0 ? 'text-emerald-400' : 'text-slate-600'}">
+                <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.premios > 0 ? 'text-emerald-400' : 'text-slate-600'} whitespace-nowrap">
                     ${m.premios > 0 ? `
-                        <div class="group relative cursor-help inline-flex flex-col items-end">
-                            <span>+${m.premios.toFixed(2)} €</span>
-                            <span class="text-[9px] font-sans font-semibold text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all">
+                        <div class="group relative cursor-help inline-flex flex-col items-end whitespace-nowrap">
+                            <span class="whitespace-nowrap font-mono">+${m.premios.toFixed(2)}&nbsp;€</span>
+                            <span class="text-[9px] font-sans font-semibold text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all whitespace-nowrap">
                                 🔵 Individual ℹ️
                             </span>
-                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${prizePosClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-blue-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${prizePosClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-blue-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                 <strong class="text-blue-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>🔵</span> Premio Oficial Individual (+${m.premios.toFixed(2)} €)
                                 </strong>
@@ -960,14 +1123,14 @@ class BoteAppController {
                         </div>
                     ` : '-'}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right">
+                <td class="p-2.5 sm:px-4 text-right whitespace-nowrap">
                     ${selladoCol}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                    ${m.neto >= 0 ? '+' : ''}${m.neto.toFixed(2)} €
+                <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} whitespace-nowrap">
+                    ${m.neto >= 0 ? '+' : ''}${m.neto.toFixed(2)}&nbsp;€
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-extrabold text-amber-400 bg-slate-900/60">
-                    ${m.boteAcumulado.toFixed(2)} €
+                <td class="p-2.5 sm:px-4 text-right font-mono font-extrabold text-amber-400 bg-slate-900/60 whitespace-nowrap">
+                    ${m.boteAcumulado.toFixed(2)}&nbsp;€
                 </td>
             `;
             tbody.appendChild(tr);
@@ -976,26 +1139,26 @@ class BoteAppController {
         // Fila especial para la Quiniela de Dobles si obtuvo premio en esta jornada
         if (doblesPrize > 0) {
             const trDobles = document.createElement('tr');
-            trDobles.className = 'bg-purple-950/30 border-t-2 border-purple-500/40 text-xs sm:text-sm font-semibold hover:bg-purple-950/40 transition-colors';
+            trDobles.className = 'bg-purple-950/30 border-t-2 border-purple-500/40 text-xs sm:text-sm font-semibold hover:bg-purple-950/40 transition-colors whitespace-nowrap';
             trDobles.innerHTML = `
-                <td class="p-2.5 sm:px-4 text-purple-200">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-300 text-[10px] font-black uppercase">🟣 Dobles</span>
+                <td class="p-2.5 sm:px-4 text-purple-200 whitespace-nowrap">
+                    <div class="flex items-center gap-1.5 flex-wrap whitespace-nowrap">
+                        <span class="px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-300 text-[10px] font-black uppercase whitespace-nowrap">🟣 Dobles</span>
                         <strong>Quiniela de Dobles (Peña)</strong>
-                        <button onclick="window.BoteApp.showReducedBreakdown(null, ${jSummary.number})" class="text-[10px] text-purple-400 hover:text-purple-200 underline ml-1">Ver 16 apuestas</button>
+                        <button onclick="window.BoteApp.showReducedBreakdown(null, ${jSummary.number})" class="text-[10px] text-purple-400 hover:text-purple-200 underline ml-1 whitespace-nowrap">Ver 16 apuestas</button>
                     </div>
                 </td>
-                <td class="p-2.5 sm:px-4 text-center font-bold text-purple-300">10 ac.</td>
-                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400">${jSummary.costeDobles.toFixed(2)} € (Peña)</td>
-                <td class="p-2.5 sm:px-4 text-center text-slate-500">-</td>
-                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-500">-</td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-black text-emerald-400">
-                    <div class="group relative cursor-help inline-flex flex-col items-end">
-                        <span>+${doblesPrize.toFixed(2)} €</span>
-                        <span class="text-[9px] font-sans font-semibold text-purple-300 bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all">
+                <td class="p-2.5 sm:px-4 text-center font-bold text-purple-300 whitespace-nowrap">10 ac.</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400 whitespace-nowrap">${jSummary.costeDobles.toFixed(2)}&nbsp;€ (Peña)</td>
+                <td class="p-2.5 sm:px-4 text-center text-slate-500 whitespace-nowrap">-</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-500 whitespace-nowrap">-</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono font-black text-emerald-400 whitespace-nowrap">
+                    <div class="group relative cursor-help inline-flex flex-col items-end whitespace-nowrap">
+                        <span class="whitespace-nowrap font-mono">+${doblesPrize.toFixed(2)}&nbsp;€</span>
+                        <span class="text-[9px] font-sans font-semibold text-purple-300 bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all whitespace-nowrap">
                             🟣 Bote Peña ℹ️
                         </span>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-1.5 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-1.5 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-purple-300 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>🟣</span> Premio Reducción de Dobles (+${doblesPrize.toFixed(2)} €)
                             </strong>
@@ -1005,9 +1168,9 @@ class BoteAppController {
                         </div>
                     </div>
                 </td>
-                <td class="p-2.5 sm:px-4 text-center text-slate-500">-</td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-emerald-400">+${doblesPrize.toFixed(2)} €</td>
-                <td class="p-2.5 sm:px-4 text-right text-slate-400 text-[11px] font-sans">Ingresado en Bote Peña</td>
+                <td class="p-2.5 sm:px-4 text-center text-slate-500 whitespace-nowrap">-</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">+${doblesPrize.toFixed(2)}&nbsp;€</td>
+                <td class="p-2.5 sm:px-4 text-right text-slate-400 text-[11px] font-sans whitespace-nowrap">Ingresado en Bote Peña</td>
             `;
             tbody.appendChild(trDobles);
         }
@@ -2403,18 +2566,18 @@ class BoteAppController {
             const inSubHtml = inBreakdown.length > 0 ? `<div class="flex flex-col items-end gap-0.5 mt-0.5">${inBreakdown.join('')}</div>` : '';
 
             html += `
-                <tr class="hover:bg-slate-900/60 ${isManual ? 'bg-emerald-950/20' : ''}">
-                    <td class="p-2.5 sm:p-3 font-semibold text-white">${eventTitle}</td>
-                    <td class="p-2.5 sm:p-3 text-xs text-slate-400">${m.jornadaDate || m.date}</td>
-                    <td class="p-2.5 sm:p-3 text-center font-bold text-white">${acText}</td>
-                    <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-emerald-400">
-                        ${inVal > 0 ? `<div>+${inVal.toFixed(2)} €</div>${inSubHtml}` : '-'}
+                <tr class="hover:bg-slate-900/60 whitespace-nowrap ${isManual ? 'bg-emerald-950/20' : ''}">
+                    <td class="p-2.5 sm:p-3 font-semibold text-white whitespace-nowrap">${eventTitle}</td>
+                    <td class="p-2.5 sm:p-3 text-xs text-slate-400 whitespace-nowrap">${m.jornadaDate || m.date}</td>
+                    <td class="p-2.5 sm:p-3 text-center font-bold text-white whitespace-nowrap">${acText}</td>
+                    <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-emerald-400 whitespace-nowrap">
+                        ${inVal > 0 ? `<div>+${inVal.toFixed(2)}&nbsp;€</div>${inSubHtml}` : '-'}
                     </td>
-                    <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-rose-400">
-                        ${outVal > 0 ? '-' + outVal.toFixed(2) + ' €' : '0,00 €'}
+                    <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-rose-400 whitespace-nowrap">
+                        ${outVal > 0 ? '-' + outVal.toFixed(2) + '&nbsp;€' : '0,00&nbsp;€'}
                     </td>
-                    <td class="p-2.5 sm:p-3 text-right font-mono font-extrabold ${m.boteAcumulado >= 0 ? 'text-emerald-400' : 'text-rose-400'} bg-slate-900/40">
-                        ${m.boteAcumulado.toFixed(2)} €
+                    <td class="p-2.5 sm:p-3 text-right font-mono font-extrabold ${m.boteAcumulado >= 0 ? 'text-emerald-400' : 'text-rose-400'} bg-slate-900/40 whitespace-nowrap">
+                        ${m.boteAcumulado.toFixed(2)}&nbsp;€
                     </td>
                 </tr>
             `;
