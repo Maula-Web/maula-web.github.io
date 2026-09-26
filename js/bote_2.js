@@ -1745,9 +1745,9 @@ class BoteAppController {
                             Pronosticada por: <strong class="text-white">${p.memberName}</strong> 
                             <span class="text-slate-500">(Ganador de J${p.previousJornada})</span>
                         </div>
-                        <div class="p-2.5 rounded-lg bg-purple-950/20 border border-purple-500/20 flex justify-between items-center text-xs">
-                            <span class="text-purple-300 font-medium">Destino del premio:</span>
-                            <strong class="text-purple-200">🏦 Fondo Común Peña</strong>
+                        <div class="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 flex justify-between items-center text-xs">
+                            <span class="text-emerald-300 font-medium">Destino del premio:</span>
+                            <strong class="text-emerald-400 font-bold flex items-center gap-1">🏦 Bote de la Peña</strong>
                         </div>
                         <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
                             <span class="text-slate-400">Premio Oficial LAE:</span>
