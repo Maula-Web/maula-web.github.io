@@ -56,8 +56,10 @@ const CORE_ASSETS = [
     'js/theme-editor.js',
     'js/telegram-service.js',
     'js/push-service.js',
+    'firebase-messaging-sw.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
+    'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js',
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
 ];
 

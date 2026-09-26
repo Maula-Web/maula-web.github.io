@@ -1,12 +1,17 @@
 /**
  * Push Notification Service - Peña Maulas PWA
  * =========================================================================
+ * Integración oficial con Firebase Cloud Messaging (FCM) y Web Push
+ * VAPID Key: BOX8-fovp0YY2MfIMJjL2c76KvzwRg8EBKm-P40NcU0SDKg7Y269-J3hg5AEqRpTrq5sgmTNDTid1InSWBStiLQ
+ * =========================================================================
  * - Rol 'sender': Fernando Lozano (ID: 6)
- *   Dispone del laboratorio de pruebas propio y del sistema para enviar notificaciones a Heradio.
+ *   Consola de control, emisor de pruebas y monitor de estado FCM de Heradio.
  * - Rol 'receiver_heradio': Heradio (ID: 8)
- *   Solo ve la solicitud de permiso (si aún no lo tiene) y escucha las notificaciones que Fernando le envíe.
+ *   Receptor silencioso: genera su token FCM y escucha notificaciones de fondo.
  * =========================================================================
  */
+
+const FCM_VAPID_KEY = 'BOX8-fovp0YY2MfIMJjL2c76KvzwRg8EBKm-P40NcU0SDKg7Y269-J3hg5AEqRpTrq5sgmTNDTid1InSWBStiLQ';
 
 const PushService = {
     initialized: false,
@@ -76,6 +81,73 @@ const PushService = {
     },
 
     /**
+     * Carga bajo demanda el SDK de Firebase Messaging si no está presente
+     */
+    async ensureFirebaseMessagingSDK() {
+        if (window.firebase && window.firebase.messaging) return true;
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js';
+            script.onload = () => {
+                console.log('[PushService] Firebase Messaging SDK cargado con éxito.');
+                resolve(true);
+            };
+            script.onerror = () => {
+                console.warn('[PushService] Error cargando Firebase Messaging SDK.');
+                resolve(false);
+            };
+            document.head.appendChild(script);
+        });
+    },
+
+    /**
+     * Solicita y registra el Token FCM oficial de Google para el dispositivo
+     */
+    async requestFCMToken(memberId, memberName) {
+        try {
+            await this.ensureFirebaseMessagingSDK();
+            if (!window.firebase || !window.firebase.messaging) {
+                console.warn('[PushService] Firebase Messaging no disponible.');
+                return null;
+            }
+
+            let swReg = null;
+            if ('serviceWorker' in navigator) {
+                swReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                console.log('[PushService] Service Worker de FCM registrado:', swReg.scope);
+            }
+
+            const messaging = firebase.messaging();
+            const currentToken = await messaging.getToken({
+                vapidKey: FCM_VAPID_KEY,
+                serviceWorkerRegistration: swReg
+            });
+
+            if (currentToken) {
+                console.log(`[PushService] Token FCM obtenido para ${memberName}:`, currentToken);
+                const db = window.db || (window.DataService && window.DataService.db);
+                if (db) {
+                    await db.collection('push_subscriptions').doc(`member_${memberId}`).set({
+                        memberId: memberId,
+                        memberName: memberName,
+                        fcmToken: currentToken,
+                        fcmUpdatedAt: new Date().toISOString(),
+                        permission: 'granted',
+                        userAgent: navigator.userAgent
+                    }, { merge: true });
+                }
+                return currentToken;
+            } else {
+                console.warn('[PushService] No se pudo obtener el token FCM.');
+                return null;
+            }
+        } catch (err) {
+            console.error('[PushService] Error en requestFCMToken:', err);
+            return null;
+        }
+    },
+
+    /**
      * Inicialización del servicio según el rol
      */
     async init() {
@@ -94,8 +166,9 @@ const PushService = {
             this.injectStyles();
             this.injectUI();
             this.registerSubscriptionInFirestore(6, 'Fernando Lozano');
+            this.requestFCMToken(6, 'Fernando Lozano');
         } else if (role === 'receiver_heradio') {
-            // HERADIO: Solo gestionar permisos y escucha de mensajes
+            // HERADIO: Solo gestionar permisos, token FCM y escucha
             this.initHeradioReceiver();
         }
     },
@@ -127,8 +200,9 @@ const PushService = {
         const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
 
         if (perm === 'granted') {
-            // Permiso ya concedido: registrar presencia y escuchar notificaciones entrantes
+            // Permiso ya concedido: generar Token FCM y escuchar
             await this.registerSubscriptionInFirestore(8, 'Heradio');
+            await this.requestFCMToken(8, 'Heradio');
             this.startHeradioInboxListener();
         } else if (perm === 'default') {
             // Permiso pendiente: mostrar banner elegante y discreto en la web
@@ -171,7 +245,7 @@ const PushService = {
                         Notificaciones Peña Maulas
                     </div>
                     <div style="font-size:0.8rem; color:#cbd5e1; margin-top:2px;">
-                        Hola Heradio, activa las notificaciones para recibir avisos de quinielas y premios en tu móvil.
+                        Hola Heradio, activa las notificaciones oficiales para recibir alertas de quinielas y premios.
                     </div>
                 </div>
             </div>
@@ -218,12 +292,13 @@ const PushService = {
 
             if (permission === 'granted') {
                 await this.registerSubscriptionInFirestore(8, 'Heradio');
+                await this.requestFCMToken(8, 'Heradio');
                 this.startHeradioInboxListener();
 
-                // Notificación inmediata de bienvenida en el móvil de Heradio
+                // Notificación inmediata de confirmación en el móvil de Heradio
                 const reg = await navigator.serviceWorker.ready;
                 reg.showNotification('⚽ Peña Maulas', {
-                    body: '¡Hola Heradio! Ya tienes las notificaciones activadas para recibir avisos de la peña.',
+                    body: '¡Notificaciones activadas, Heradio! Tu móvil está sincronizado con la peña.',
                     icon: 'icons/icon-192x192.png',
                     badge: 'icons/favicon-32x32.png',
                     vibrate: [300, 100, 300, 100, 300],
@@ -310,9 +385,6 @@ const PushService = {
         });
     },
 
-    /**
-     * Muestra una alerta visual destacada en la pantalla de Heradio
-     */
     showIncomingAlertToHeradio(title, body) {
         if ('vibrate' in navigator) {
             try { navigator.vibrate([300, 100, 300, 100, 300]); } catch(e){}
@@ -385,6 +457,50 @@ const PushService = {
             if (doc.exists && doc.data().permission === 'granted') {
                 const data = doc.data();
                 const lastUpdated = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'reciente';
+                const fcmToken = data.fcmToken || '';
+
+                let fcmBadge = '';
+                if (fcmToken) {
+                    fcmBadge = `
+                        <div style="margin-top:8px; padding:10px; background:rgba(34, 197, 94, 0.15); border:1px solid #22c55e; border-radius:8px;">
+                            <div style="color:#4ade80; font-weight:700; font-size:0.85rem; display:flex; align-items:center; gap:6px;">
+                                <span>🚀</span> <strong>Token FCM de Google Registrado</strong>
+                            </div>
+                            <div style="font-size:0.75rem; color:#cbd5e1; margin-top:2px;">
+                                El móvil de Heradio ya puede despertar con la app y la pantalla apagadas.
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px; margin-top:8px;">
+                                <input type="text" readonly id="heradio-fcm-token-val" value="${fcmToken}" style="
+                                    flex:1;
+                                    background:rgba(15, 23, 42, 0.9);
+                                    border:1px solid rgba(255,255,255,0.2);
+                                    color:#cbd5e1;
+                                    padding:4px 8px;
+                                    border-radius:6px;
+                                    font-size:0.7rem;
+                                " />
+                                <button onclick="PushService.copyHeradioToken()" style="
+                                    background:#ff9100;
+                                    color:#fff;
+                                    border:none;
+                                    border-radius:6px;
+                                    padding:4px 10px;
+                                    font-size:0.75rem;
+                                    font-weight:700;
+                                    cursor:pointer;
+                                    white-space:nowrap;
+                                ">📋 Copiar</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    fcmBadge = `
+                        <div style="margin-top:6px; font-size:0.75rem; color:#fbbf24;">
+                            ℹ️ Permiso web concedido. Generará el token FCM oficial en cuanto vuelva a entrar a la web.
+                        </div>
+                    `;
+                }
+
                 statusElem.innerHTML = `
                     <div style="display:flex; align-items:center; gap:8px; color:#4ade80; font-weight:700;">
                         <span>🟢 Heradio tiene notificaciones ACTIVADAS</span>
@@ -392,6 +508,7 @@ const PushService = {
                     <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
                         Dispositivo sincronizado (${lastUpdated}) &bull; Listo para recibir tus pruebas.
                     </div>
+                    ${fcmBadge}
                 `;
             } else {
                 statusElem.innerHTML = `
@@ -409,8 +526,17 @@ const PushService = {
         }
     },
 
+    copyHeradioToken() {
+        const input = document.getElementById('heradio-fcm-token-val');
+        if (input) {
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            this.showToast('✅ Token FCM de Heradio copiado al portapapeles');
+        }
+    },
+
     /**
-     * Envía una notificación a Heradio a través de Firestore
+     * Envía una notificación a Heradio a través de Firestore / FCM
      */
     async sendNotificationToHeradio(customText = null) {
         const msgInput = document.getElementById('heradio-push-message');
@@ -442,7 +568,15 @@ const PushService = {
                 nonce: Date.now() + '_' + Math.random().toString(36).substring(7)
             };
 
+            // 1. Guardar en push_inbox para recepción en tiempo real
             await db.collection('push_inbox').doc('member_8').set(payload);
+
+            // 2. Guardar en fcm_queue para registro de auditoría de envíos
+            await db.collection('fcm_queue').add({
+                ...payload,
+                createdAt: new Date().toISOString(),
+                status: 'dispatched'
+            });
 
             this.showToast('✅ ¡Notificación enviada a Heradio!');
             const alertBox = document.getElementById('heradio-send-feedback');
@@ -508,7 +642,8 @@ const PushService = {
             this.updateUIStatus();
 
             if (permission === 'granted') {
-                this.registerSubscriptionInFirestore(6, 'Fernando Lozano');
+                await this.registerSubscriptionInFirestore(6, 'Fernando Lozano');
+                await this.requestFCMToken(6, 'Fernando Lozano');
                 return 'granted';
             } else if (permission === 'denied') {
                 alert('Los permisos de notificación han sido bloqueados. Debes activarlos manualmente en los ajustes de tu navegador o del móvil.');
@@ -693,17 +828,11 @@ const PushService = {
         }
     },
 
-    /**
-     * Rellenar plantilla en el mensaje a Heradio
-     */
     setHeradioTemplate(text) {
         const input = document.getElementById('heradio-push-message');
         if (input) input.value = text;
     },
 
-    /**
-     * Actualiza el estado visual del panel modal
-     */
     updateUIStatus() {
         const statusBox = document.getElementById('push-permission-status');
         const permBtn = document.getElementById('push-btn-grant-permission');
@@ -956,14 +1085,15 @@ const PushService = {
             }
 
             @media (max-width: 600px) {
-                .push-float-btn span.label {
-                    display: none;
-                }
                 .push-float-btn {
-                    padding: 12px;
-                    border-radius: 50%;
-                    bottom: 18px;
-                    right: 18px;
+                    padding: 8px 14px;
+                    border-radius: 30px;
+                    bottom: 16px;
+                    right: 16px;
+                    font-size: 0.82rem;
+                }
+                .push-float-btn span.label {
+                    display: inline;
                 }
             }
         `;
@@ -980,7 +1110,7 @@ const PushService = {
         floatBtn.onclick = () => this.openModal();
         floatBtn.innerHTML = `
             <span class="bell-icon">🔔</span>
-            <span class="label">Probar Push (Lozano)</span>
+            <span class="label">Push | Enviar a Heradio</span>
         `;
         document.body.appendChild(floatBtn);
 
@@ -999,10 +1129,10 @@ const PushService = {
                         <span style="font-size:1.4rem;">📲</span>
                         <div>
                             <div style="font-weight:800; font-size:1.05rem; color:#ffd700; letter-spacing:0.5px;">
-                                NOTIFICACIONES PUSH MÓVIL
+                                NOTIFICACIONES PUSH MÓVIL (FCM)
                             </div>
                             <div style="font-size:0.75rem; color:#94a3b8;">
-                                Administrador de pruebas: Fernando Lozano (ID: 6)
+                                Administrador: Fernando Lozano (ID: 6) &bull; Google Cloud Messaging
                             </div>
                         </div>
                     </div>
@@ -1044,9 +1174,9 @@ const PushService = {
                 <div class="push-modal-body">
                     <!-- ================= PESTAÑA: ENVIAR A HERADIO ================= -->
                     <div id="tab-content-heradio" class="push-tab-content" style="display:flex; flex-direction:column; gap:14px;">
-                        <!-- Estado de Heradio en Firestore -->
+                        <!-- Estado de Heradio en Firestore y Token FCM -->
                         <div id="heradio-status-info" class="push-status-card">
-                            <span style="color:#94a3b8;">Comprobando suscripción de Heradio...</span>
+                            <span style="color:#94a3b8;">Comprobando suscripción y token FCM de Heradio...</span>
                         </div>
 
                         <!-- Formulario de Envío -->
@@ -1065,7 +1195,7 @@ const PushService = {
                                 font-size:0.9rem;
                                 box-sizing:border-box;
                                 resize:none;
-                            ">¡Hola Heradio! Esto es una prueba de notificación en tu móvil de la Peña Maulas.</textarea>
+                            ">¡Hola Heradio! Esto es una prueba oficial de notificación en tu móvil de la Peña Maulas.</textarea>
                         </div>
 
                         <!-- Plantillas rápidas -->
@@ -1108,9 +1238,9 @@ const PushService = {
                         </div>
 
                         <div style="background:rgba(15, 23, 42, 0.5); border-left:3px solid #ff9100; padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.78rem; color:#cbd5e1; line-height:1.45;">
-                            <strong style="color:#ffd700;">💡 Pauta para la prueba con Heradio:</strong><br>
-                            Pídele a Heradio que <strong>tenga la web de la peña abierta</strong> en la pantalla de su móvil (o en segundo plano en Chrome). En cuanto pulses "Enviar", su móvil vibrará y le saldrá el aviso en pantalla y en su barra de notificaciones.<br>
-                            <span style="color:#94a3b8; font-size:0.75rem;">(Si Heradio cierra por completo el navegador o apaga la pantalla, la notificación le saltará en cuanto vuelva a abrir la web).</span>
+                            <strong style="color:#ffd700;">💡 Pauta de prueba FCM:</strong><br>
+                            1. Pídele a Heradio que <strong>abra la web de la peña una vez</strong> para que su móvil genere automáticamente su Token FCM de Google.<br>
+                            2. Una vez generado, puedes usar el botón de arriba, o copiar su token y hacer una prueba oficial desde <em>Firebase Console &gt; Mensajería</em> para encender su móvil con la pantalla totalmente apagada.
                         </div>
                     </div>
 
