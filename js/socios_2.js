@@ -564,7 +564,7 @@ class SociosAppController {
                 locale: 'es',
                 dateFormat: 'Y-m-d',
                 altInput: true,
-                altInputClass: 'w-full pl-9 pr-9 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-xs sm:text-sm font-bold text-white text-center focus:outline-none cursor-pointer transition shadow-inner select-none',
+                altInputClass: 'w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-xs sm:text-sm font-bold text-white text-center focus:outline-none cursor-pointer transition shadow-inner select-none',
                 altFormat: 'd/m/Y',
                 conjunction: ' al ',
                 minDate: '2026-01-01',

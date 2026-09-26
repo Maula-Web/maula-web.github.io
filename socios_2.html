@@ -529,12 +529,12 @@
         <!-- BARRA DE BÚSQUEDA, FILTROS Y CONMUTADOR DE VISTAS -->
         <div class="glass-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <!-- Buscador en tiempo real -->
-            <div class="w-full md:w-80 relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <div class="w-full md:w-80 relative flex items-center">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm select-none">
                     🔍
                 </span>
-                <input type="text" id="search-input" oninput="window.SociosApp.applyFilters()" placeholder="Buscar socio, apodo, email, @nick..." class="w-full pl-9 pr-8 py-2 bg-slate-900/80 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
-                <button id="search-clear-btn" onclick="window.SociosApp.clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
+                <input type="text" id="search-input" oninput="window.SociosApp.applyFilters()" placeholder="Buscar socio, apodo, email, @nick..." class="w-full pl-11 pr-9 py-2.5 bg-slate-900/80 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition shadow-inner">
+                <button id="search-clear-btn" onclick="window.SociosApp.clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white text-xs font-bold transition p-1" title="Borrar búsqueda">
                     ✕
                 </button>
             </div>
@@ -632,8 +632,8 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Nick Telegram (Sin @)</label>
                             <div class="relative flex items-center">
-                                <span class="absolute left-3.5 text-slate-400 font-bold text-sm pointer-events-none">@</span>
-                                <input type="text" id="form-inp-tgnick" placeholder="lozano_maula" class="w-full pl-8 pr-3.5 py-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
+                                <span class="absolute left-3.5 text-slate-400 font-bold text-sm pointer-events-none select-none">@</span>
+                                <input type="text" id="form-inp-tgnick" placeholder="lozano_maula" class="w-full pl-9 pr-3.5 py-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
                             </div>
                         </div>
                     </div>
@@ -678,8 +678,8 @@
                                 </span>
                             </div>
                             <div class="relative flex items-center">
-                                <span class="absolute left-3 text-slate-400 pointer-events-none text-base">📅</span>
-                                <input type="text" id="form-inp-dice-range" placeholder="Toca aquí para elegir fechas..." readonly class="w-full pl-9 pr-9 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-xs sm:text-sm font-bold text-white text-center focus:outline-none cursor-pointer transition shadow-inner select-none">
+                                <span class="absolute left-3.5 text-slate-400 pointer-events-none text-base select-none">📅</span>
+                                <input type="text" id="form-inp-dice-range" placeholder="Toca aquí para elegir fechas..." readonly class="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-xs sm:text-sm font-bold text-white text-center focus:outline-none cursor-pointer transition shadow-inner select-none">
                                 <button type="button" id="btn-clear-dice-range" onclick="window.SociosApp.clearDiceDates()" class="absolute right-2 px-2 py-1 text-xs text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 transition" title="Limpiar rango seleccionado">✕</button>
                             </div>
                             <p class="text-[11px] text-slate-400 mt-1">
