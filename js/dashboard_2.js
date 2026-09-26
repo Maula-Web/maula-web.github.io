@@ -705,7 +705,7 @@ class Dashboard2AppController {
             content.innerHTML = `
                 <div class="space-y-1.5 text-xs">
                     <p class="text-slate-400">
-                        No hubo partido del Atleti en el Pleno al 15 en la última jornada.
+                        No hubo partido de interés general en el Pleno al 15 en la última jornada.
                     </p>
                     ${nextHasPig ? `
                         <div class="p-2 rounded-xl bg-pink-500/10 border border-pink-500/30 text-pink-300 text-[11px] space-y-0.5">
@@ -1134,7 +1134,7 @@ class Dashboard2AppController {
                 body: `
                     <div class="space-y-2.5 text-xs text-slate-300">
                         <p class="text-slate-200 font-medium leading-relaxed">
-                            En las jornadas en las que el <strong>Atlético de Madrid</strong> disputa el partido del <strong>Pleno al 15 (partido PIG)</strong>:
+                            Partido jugado por los tres equipos de interés general:
                         </p>
                         <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200">
                             <strong>✅ Acertantes:</strong> Aquellos socios que aciertan el resultado exacto del P15. Quedan totalmente exentos de penalización.
