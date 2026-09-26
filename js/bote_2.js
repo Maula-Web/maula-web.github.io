@@ -111,29 +111,31 @@ class BoteAppController {
             }
         });
 
-        // Asegurar que cualquier tarjeta o panel con tooltip explicativo activo quede siempre en primer plano
+        // Asegurar que cualquier tarjeta o panel con tooltip explicativo activo quede siempre en primer plano absoluto
         document.addEventListener('mouseover', (e) => {
-            const trigger = e.target.closest('.group.cursor-help, .cursor-help');
+            const trigger = e.target.closest('.group.cursor-help, .cursor-help, [class*="cursor-help"]');
             if (trigger) {
-                const panel = trigger.closest('.glass-panel, [id="jornada-header-card"], .grid, section');
-                if (panel) panel.style.zIndex = '100';
-                const tr = trigger.closest('tr');
-                if (tr) tr.style.zIndex = '60';
-                const td = trigger.closest('td, th');
-                if (td) td.style.zIndex = '70';
-                trigger.style.zIndex = '110';
+                let el = trigger;
+                while (el && el !== document.body) {
+                    if (el.classList.contains('glass-panel') || el.classList.contains('group') || el.id === 'jornada-header-card' || el.tagName === 'TR' || el.tagName === 'TH' || el.tagName === 'TD' || el.classList.contains('relative')) {
+                        el.style.zIndex = '99999';
+                    }
+                    el = el.parentElement;
+                }
+                trigger.style.zIndex = '99999';
             }
         });
 
         document.addEventListener('mouseout', (e) => {
-            const trigger = e.target.closest('.group.cursor-help, .cursor-help');
+            const trigger = e.target.closest('.group.cursor-help, .cursor-help, [class*="cursor-help"]');
             if (trigger) {
-                const panel = trigger.closest('.glass-panel, [id="jornada-header-card"], .grid, section');
-                if (panel) panel.style.zIndex = '';
-                const tr = trigger.closest('tr');
-                if (tr) tr.style.zIndex = '';
-                const td = trigger.closest('td, th');
-                if (td) td.style.zIndex = '';
+                let el = trigger;
+                while (el && el !== document.body) {
+                    if (el.classList.contains('glass-panel') || el.classList.contains('group') || el.id === 'jornada-header-card' || el.tagName === 'TR' || el.tagName === 'TH' || el.tagName === 'TD' || el.classList.contains('relative')) {
+                        el.style.zIndex = '';
+                    }
+                    el = el.parentElement;
+                }
                 trigger.style.zIndex = '';
             }
         });
@@ -470,6 +472,14 @@ class BoteAppController {
         }
     }
 
+    goToJornada(jNum) {
+        this.selectedJornadaNum = parseInt(jNum);
+        this.switchView('jornadas');
+        this.renderJornadasCarousel();
+        this.renderJornadaDetail();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     renderAll() {
         this.renderSummaryCards();
         this.renderMembersTable();
@@ -555,9 +565,37 @@ class BoteAppController {
 
             const initials = m.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
-            let statusBadge = '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Saldo positivo o al día">Al corriente</span>';
+            let statusBadge = `
+                <div class="group/status relative cursor-help inline-block">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm">
+                        <span>✅</span> Al corriente
+                    </span>
+                    <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                            <span>✅</span> Al Corriente (+${m.saldo.toFixed(2)} €)
+                        </strong>
+                        <p class="leading-relaxed">
+                            El socio dispone de saldo positivo en su hucha virtual para cubrir las cuotas semanales de las próximas jornadas.
+                        </p>
+                    </div>
+                </div>
+            `;
             if (m.saldo < 0) {
-                statusBadge = '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20" title="El socio tiene saldo negativo en la hucha">En Deuda</span>';
+                statusBadge = `
+                    <div class="group/status relative cursor-help inline-block">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm">
+                            <span>⚠️</span> En Deuda
+                        </span>
+                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                            <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>⚠️</span> Saldo Deudor (${m.saldo.toFixed(2)} €)
+                            </strong>
+                            <p class="leading-relaxed">
+                                El socio tiene saldo negativo en su hucha. Se requiere una recarga mediante Bizum o transferencia bancaria para regularizar su cuenta.
+                            </p>
+                        </div>
+                    </div>
+                `;
             }
 
             tr.innerHTML = `
@@ -916,7 +954,7 @@ class BoteAppController {
                                     <span>🔵</span> Premio Oficial Individual (+${m.premios.toFixed(2)} €)
                                 </strong>
                                 <p class="leading-relaxed">
-                                    Premio oficial de Loterías del Estado conseguido por el boleto individual del socio (${m.aciertos} aciertos). El socio disfruta de cuota gratis la jornada siguiente.
+                                    Premio oficial de Loterías del Estado conseguido por el boleto individual del socio (${m.aciertos} aciertos). El importe ingresa íntegramente en el Bote de la Peña y el socio disfruta de cuota gratis la jornada siguiente.
                                 </p>
                             </div>
                         </div>
@@ -1779,16 +1817,16 @@ class BoteAppController {
                         Ganador: <strong class="text-white">${p.memberName}</strong> 
                         <span class="text-slate-500">(Columna individual de 14 partidos)</span>
                     </div>
-                    <div class="p-2.5 rounded-lg bg-blue-950/20 border border-blue-500/20 flex justify-between items-center text-xs">
-                        <span class="text-blue-300 font-medium">Destino del premio:</span>
-                        <strong class="text-blue-200">👤 Saldo del Socio</strong>
+                    <div class="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 flex justify-between items-center text-xs">
+                        <span class="text-emerald-300 font-medium">Destino del premio:</span>
+                        <strong class="text-emerald-400 font-bold flex items-center gap-1">🏦 Bote de la Peña</strong>
                     </div>
                     <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
                         <span class="text-slate-400">Premio Oficial LAE:</span>
                         <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+${p.amount.toFixed(2)} €</strong>
                     </div>
-                    <button onclick="window.BoteApp.openMemberExtract('${p.memberId}')" class="w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
-                        <span>👤</span> Ver Extracto de ${p.memberName}
+                    <button onclick="window.BoteApp.goToJornada(${p.jornadaNum})" class="w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                        <span>📋</span> Ver Jornada ${p.jornadaNum} (${p.hits} aciertos)
                     </button>
                 </div>
             `).join('');
