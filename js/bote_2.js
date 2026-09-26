@@ -3726,3 +3726,12 @@ class BoteAppController {
 document.addEventListener('DOMContentLoaded', () => {
     window.BoteApp = new BoteAppController();
 });
+
+// Cerrar dropdown de navegación al hacer clic fuera
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('nav-section-dropdown');
+    const wrap = document.getElementById('nav-section-dropdown-wrap');
+    if (dropdown && wrap && !wrap.contains(e.target)) {
+        dropdown.classList.add('hidden');
+    }
+});

@@ -75,7 +75,7 @@
             position: relative;
         }
 
-        /* REGLA CRÍTICA: Asegurar que las tarjetas explicativas queden SIEMPRE en primer plano absoluto sin recortes */
+        /* REGLA CRÍTICA: Asegurar que las tarjetas explicativas queden SIEMPRE en primer plano absoluto sin recortes y 100% OPACAS */
         #kpi-section {
             position: relative;
             z-index: 50;
@@ -97,10 +97,19 @@
             position: relative;
         }
 
+        /* FONDO TOTALMENTE OPACO SÓLIDO (#0b0f19) SIN NINGUNA TRANSPARENCIA (ESTILO BOTE 2) */
         .tooltip-card,
         .group > div[class*="group-hover:visible"],
         .group:hover > div[class*="absolute"],
         div[class*="group-hover:visible"] {
+            background-color: #0b0f19 !important;
+            background: #0b0f19 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            opacity: 1 !important;
+            border: 1.5px solid rgba(255, 145, 0, 0.7) !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.98), 0 0 25px rgba(255, 145, 0, 0.25) !important;
+            color: #f8fafc !important;
             z-index: 100060 !important;
             pointer-events: auto !important;
         }
@@ -132,16 +141,20 @@
 
         /* =========================================================================
            ESTILOS PERSONALIZADOS FLATPICKR - PEÑA MAULAS THEME (DARK + AMBER)
+           Ajuste dimensional para que los 7 días (Lun a Dom) quepan con holgura
            ========================================================================= */
         .flatpickr-calendar {
             background: #0d1322 !important;
-            border: 1px solid rgba(255, 145, 0, 0.5) !important;
+            border: 1.5px solid rgba(255, 145, 0, 0.6) !important;
             border-radius: 18px !important;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 145, 0, 0.2) !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 145, 0, 0.25) !important;
             font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
             z-index: 100070 !important;
-            padding: 8px !important;
-            backdrop-filter: blur(16px) !important;
+            padding: 12px 10px !important;
+            width: 326px !important;
+            max-width: calc(100vw - 24px) !important;
+            box-sizing: border-box !important;
+            backdrop-filter: blur(20px) !important;
         }
         .flatpickr-calendar .flatpickr-months {
             background: transparent !important;
@@ -151,29 +164,61 @@
         .flatpickr-calendar .flatpickr-months .flatpickr-month {
             color: #ffffff !important;
             fill: #ffffff !important;
+            height: 34px !important;
         }
         .flatpickr-calendar .flatpickr-current-month {
             font-weight: 700 !important;
             color: #ffffff !important;
             font-size: 0.95rem !important;
+            padding: 4px 0 0 0 !important;
         }
         .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
         .flatpickr-calendar .flatpickr-current-month input.cur-year {
             color: #ff9100 !important;
             font-weight: 800 !important;
         }
+        .flatpickr-weekdays {
+            width: 100% !important;
+            max-width: 300px !important;
+            margin: 0 auto 4px auto !important;
+            display: flex !important;
+            justify-content: space-between !important;
+        }
         span.flatpickr-weekday {
             color: #94a3b8 !important;
             font-weight: 700 !important;
             font-size: 0.75rem !important;
+            max-width: 42px !important;
+            flex: 1 !important;
+            text-align: center !important;
+        }
+        .flatpickr-days {
+            width: 100% !important;
+            display: flex !important;
+            justify-content: center !important;
+        }
+        .dayContainer {
+            width: 300px !important;
+            min-width: 300px !important;
+            max-width: 300px !important;
+            box-sizing: border-box !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: flex-start !important;
         }
         .flatpickr-day {
-            color: #cbd5e1 !important;
+            max-width: 40px !important;
+            height: 38px !important;
+            line-height: 38px !important;
             border-radius: 10px !important;
             font-weight: 600 !important;
             font-size: 0.82rem !important;
             transition: all 0.15s ease !important;
             border: 1px solid transparent !important;
+            margin: 1px 1px !important;
+            color: #cbd5e1 !important;
         }
         .flatpickr-day:hover {
             background: rgba(255, 145, 0, 0.25) !important;
@@ -241,7 +286,79 @@
     </div>
 
     <!-- CONTENIDO PRINCIPAL DE SOCIOS 2.0 -->
-    <div id="main-content" class="max-w-[1700px] mx-auto space-y-6">
+    <div id="main-content" class="max-w-[1700px] mx-auto space-y-5 sm:space-y-6">
+
+        <!-- NAVBAR SUPERIOR MAULAS 2.0 (NAVEGACIÓN UNIVERSAL Y SELECTOR DE SECCIÓN) -->
+        <nav class="glass-panel p-2.5 sm:p-3.5 border-amber-500/40 flex items-center justify-between gap-3 relative z-[100] shadow-xl">
+            <!-- Brand / Logo & Temporada -->
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-2.5 group">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow group-hover:scale-105 transition-transform">
+                    <div class="leading-tight">
+                        <span class="font-black text-white text-sm sm:text-base tracking-wide block group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
+                        <span class="text-[10px] text-amber-400 font-mono hidden sm:block">Temporada 2026-2027</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Menú Horizontal en Pantallas Grandes (Desktop) -->
+            <div class="hidden xl:flex items-center gap-1 text-xs font-bold text-slate-300">
+                <a href="index.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">🏠 Inicio</a>
+                <a href="socios_2.html" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold transition">👥 Socios 2.0</a>
+                <a href="jornadas.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">⚽ Resultados</a>
+                <a href="pronosticos.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">📝 Quiniela</a>
+                <a href="resultados.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">🏆 Clasificación</a>
+                <a href="bote_2.html" class="px-2.5 py-1.5 rounded-lg hover:bg-amber-500/20 hover:text-amber-400 border border-transparent hover:border-amber-500/30 transition">💰 Bote 2.0</a>
+                <a href="resumen-temporada.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">📊 Resumen</a>
+                <a href="votaciones.html" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition font-black">🗳️ Votaciones</a>
+                <a href="admin.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">⚙️ Admin</a>
+            </div>
+
+            <!-- Selector Rápido de Sección & Acciones -->
+            <div class="flex items-center gap-2">
+                <!-- Dropdown Selector de Sección (Accesible en móvil, tablet y escritorio) -->
+                <div class="relative inline-block" id="nav-section-dropdown-wrap">
+                    <button type="button" onclick="document.getElementById('nav-section-dropdown').classList.toggle('hidden')" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-amber-500/50 hover:border-amber-400 text-amber-400 font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+                        <span>🧭 Cambiar Sección</span>
+                        <span class="text-[10px]">▼</span>
+                    </button>
+                    <div id="nav-section-dropdown" class="hidden absolute right-0 mt-2 w-60 rounded-2xl bg-[#0b0f19] border border-amber-500/60 shadow-2xl p-2 z-[100080] text-xs font-semibold space-y-1">
+                        <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🏠</span> Inicio</a>
+                        <a href="socios_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-amber-300 bg-amber-500/20 border border-amber-500/40 font-bold">
+                            <span class="flex items-center gap-2"><span>👥</span> Socios 2.0</span>
+                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300">Activo</span>
+                        </a>
+                        <a href="bote_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                            <span class="flex items-center gap-2"><span>💰</span> Bote & Tesorería 2.0</span>
+                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Nuevo</span>
+                        </a>
+                        <a href="jornadas.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚽</span> Resultados Partidos</a>
+                        <a href="pronosticos.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📝</span> Rellenar Quiniela</a>
+                        <a href="resultados.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🏆</span> Clasificación General</a>
+                        <a href="resumen-temporada.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📊</span> Resumen Temporada</a>
+                        <a href="votaciones.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition font-bold"><span>🗳️</span> Votaciones</a>
+                        <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚙️</span> Administración</a>
+                        <a href="theme-editor.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🎨</span> Identidad Visual</a>
+                        <div class="border-t border-slate-800 my-1 pt-1">
+                            <a href="socios.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-[11px]"><span>←</span> Socios 1.0 (Clásica)</a>
+                            <a href="bote.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-[11px]"><span>←</span> Bote 1.0 (Clásica)</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Actualizar App -->
+                <button onclick="if(window.Auth && window.Auth.forceAppUpdate){window.Auth.forceAppUpdate();}else{location.reload(true);}" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1" title="Forzar descarga de última versión y limpiar caché">
+                    <span>🔄</span>
+                    <span class="hidden md:inline">Actualizar</span>
+                </button>
+
+                <!-- Botón Salir / Logout -->
+                <button onclick="if(window.Auth && window.Auth.logout){window.Auth.logout();}else{sessionStorage.clear();localStorage.clear();location.href='login.html';}" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/20 text-rose-400 border border-slate-700 hover:border-rose-500/40 text-xs font-bold transition flex items-center gap-1" title="Cerrar sesión">
+                    <span>🚪</span>
+                    <span class="hidden md:inline">Salir</span>
+                </button>
+            </div>
+        </nav>
 
         <!-- Top Announcement Bar (Coherencia Total con Bote 2) -->
         <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
@@ -323,13 +440,13 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Socios registrados en la peña</div>
 
-                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
                     <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
                         <span>🏛️</span>
                         <span>Censo Oficial de Socios</span>
                     </div>
-                    <p class="leading-relaxed text-slate-300">Total de miembros con plaza activa en la temporada 2026-2027 con derecho a pronóstico semanal y participación en el bote común.</p>
+                    <p class="leading-relaxed text-slate-200">Total de miembros con plaza activa en la temporada 2026-2027 con derecho a pronóstico semanal y participación en el bote común.</p>
                 </div>
             </div>
 
@@ -348,13 +465,13 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Comodín activado para hoy</div>
 
-                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
                     <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
                         <span>🎲</span>
                         <span>Dado de Quinielas Activo</span>
                     </div>
-                    <p class="leading-relaxed text-slate-300">Indica qué socios tienen activado el rango de fechas de ausencia. El sistema rellenará al azar sus pronósticos sin penalización por retraso.</p>
+                    <p class="leading-relaxed text-slate-200">Indica qué socios tienen activado el rango de fechas de ausencia. El sistema rellenará al azar sus pronósticos sin penalización por retraso.</p>
                 </div>
             </div>
 
@@ -373,13 +490,13 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Máx. 3 por socio en toda la temporada</div>
 
-                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
                     <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
                         <span>🎯</span>
                         <span>Límite Anual de Dados</span>
                     </div>
-                    <p class="leading-relaxed text-slate-300">Conforme al reglamento de la peña, cada socio puede beneficiarse del dado un máximo de 3 jornadas por temporada. Una vez alcanzado, el dado se bloquea.</p>
+                    <p class="leading-relaxed text-slate-200">Conforme al reglamento de la peña, cada socio puede beneficiarse del dado un máximo de 3 jornadas por temporada. Una vez alcanzado, el dado se bloquea.</p>
                 </div>
             </div>
 
@@ -398,13 +515,13 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Sincronizados con el bot de la peña</div>
 
-                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
                     <div class="flex items-center gap-1.5 font-bold text-sky-400 mb-1.5">
                         <span>💬</span>
                         <span>Integración con Telegram</span>
                     </div>
-                    <p class="leading-relaxed text-slate-300">Socios con su alias @usuario registrado. Les permite recibir recordatorios, avisos de premios y votar encuestas directamente desde la aplicación de Telegram.</p>
+                    <p class="leading-relaxed text-slate-200">Socios con su alias @usuario registrado. Les permite recibir recordatorios, avisos de premios y votar encuestas directamente desde la aplicación de Telegram.</p>
                 </div>
             </div>
         </section>
@@ -504,23 +621,26 @@
                     
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Nombre Completo *</label>
-                        <input type="text" id="form-inp-name" required placeholder="Ej: Fernando Lozano" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                        <input type="text" id="form-inp-name" required placeholder="Ej: Fernando Lozano" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Apodo (Se usará en toda la web)</label>
-                            <input type="text" id="form-inp-phone" placeholder="Ej: Lozano" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                            <input type="text" id="form-inp-phone" placeholder="Ej: Lozano" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Nick Telegram (Sin @)</label>
-                            <input type="text" id="form-inp-tgnick" placeholder="Ej: lozano_maula" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                            <div class="relative flex items-center">
+                                <span class="absolute left-3.5 text-slate-400 font-bold text-sm pointer-events-none">@</span>
+                                <input type="text" id="form-inp-tgnick" placeholder="lozano_maula" class="w-full pl-8 pr-3.5 py-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Correo Electrónico *</label>
-                        <input type="email" id="form-inp-email" required placeholder="ejemplo@maulas.com" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                        <input type="email" id="form-inp-email" required placeholder="ejemplo@maulas.com" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
                     </div>
                 </div>
 
@@ -540,7 +660,7 @@
                         Permite que el sistema rellene automáticamente al azar las quinielas del socio en el rango de fechas indicado sin penalización por retraso (máximo 3 jornadas por temporada).
                     </p>
 
-                    <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-950 rounded-lg border border-slate-800 hover:border-slate-700 transition">
+                    <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-950 rounded-xl border border-slate-800 hover:border-slate-700 transition">
                         <input type="checkbox" id="form-inp-dice-enabled" onchange="window.SociosApp.toggleDiceFields()" class="w-4 h-4 rounded text-amber-500 focus:ring-amber-500 focus:ring-offset-slate-950 bg-slate-900 border-slate-700 cursor-pointer">
                         <span class="text-sm font-bold text-slate-200">Activar Dado para este socio</span>
                     </label>
@@ -558,9 +678,9 @@
                                 </span>
                             </div>
                             <div class="relative flex items-center">
-                                <input type="text" id="form-inp-dice-range" placeholder="Toca aquí para abrir el calendario interactivo..." readonly class="w-full pl-10 pr-12 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-sm font-semibold text-white focus:outline-none cursor-pointer transition shadow-inner font-mono">
                                 <span class="absolute left-3 text-slate-400 pointer-events-none text-base">📅</span>
-                                <button type="button" id="btn-clear-dice-range" onclick="window.SociosApp.clearDiceDates()" class="absolute right-2.5 px-2 py-1 text-xs text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 transition" title="Limpiar rango seleccionado">✕</button>
+                                <input type="text" id="form-inp-dice-range" placeholder="Toca aquí para elegir fechas..." readonly class="w-full pl-9 pr-9 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-xs sm:text-sm font-bold text-white text-center focus:outline-none cursor-pointer transition shadow-inner select-none">
+                                <button type="button" id="btn-clear-dice-range" onclick="window.SociosApp.clearDiceDates()" class="absolute right-2 px-2 py-1 text-xs text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 transition" title="Limpiar rango seleccionado">✕</button>
                             </div>
                             <p class="text-[11px] text-slate-400 mt-1">
                                 Toca para abrir el calendario y pulsa sobre el <strong>primer día</strong> y el <strong>último día</strong> de tu ausencia.

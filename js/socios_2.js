@@ -564,6 +564,7 @@ class SociosAppController {
                 locale: 'es',
                 dateFormat: 'Y-m-d',
                 altInput: true,
+                altInputClass: 'w-full pl-9 pr-9 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-xs sm:text-sm font-bold text-white text-center focus:outline-none cursor-pointer transition shadow-inner select-none',
                 altFormat: 'd/m/Y',
                 conjunction: ' al ',
                 minDate: '2026-01-01',
@@ -941,3 +942,12 @@ class SociosAppController {
 
 // Exponer globalmente e instanciar
 window.SociosApp = new SociosAppController();
+
+// Cerrar dropdown de navegación al hacer clic fuera
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('nav-section-dropdown');
+    const wrap = document.getElementById('nav-section-dropdown-wrap');
+    if (dropdown && wrap && !wrap.contains(e.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
