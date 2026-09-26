@@ -3,7 +3,7 @@
  * Versión de caché: maulas-pwa-v1.0
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.4';
+const CACHE_NAME = 'maulas-pwa-v1.6';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [

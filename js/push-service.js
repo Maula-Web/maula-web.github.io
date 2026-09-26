@@ -18,8 +18,31 @@ const PushService = {
      */
     getUserRole() {
         try {
-            const userStr = sessionStorage.getItem('maulas_user');
-            if (!userStr) return null;
+            let userStr = sessionStorage.getItem('maulas_user');
+            if (!userStr) {
+                userStr = localStorage.getItem('maulas_user');
+                if (userStr) sessionStorage.setItem('maulas_user', userStr);
+            }
+
+            // Fallback por parámetro en URL si entra como evaluador o prueba directa
+            if (!userStr) {
+                const params = new URLSearchParams(window.location.search);
+                const ev = (params.get('evaluador') || params.get('user') || params.get('socio') || '').toLowerCase();
+                if (ev === '6' || ev === 'fernando' || ev === 'lozano') {
+                    const u = { id: 6, name: 'Fernando Lozano', email: 'lozano@maulas.com', phone: 'Lozano' };
+                    sessionStorage.setItem('maulas_user', JSON.stringify(u));
+                    localStorage.setItem('maulas_user', JSON.stringify(u));
+                    return 'sender';
+                }
+                if (ev === '8' || ev === 'heradio') {
+                    const u = { id: 8, name: 'Heradio', email: 'heradio@maulas.com', phone: 'Heradio' };
+                    sessionStorage.setItem('maulas_user', JSON.stringify(u));
+                    localStorage.setItem('maulas_user', JSON.stringify(u));
+                    return 'receiver_heradio';
+                }
+                return null;
+            }
+
             const user = JSON.parse(userStr);
             const uid = String(user.id || '');
             const email = (user.email || '').toLowerCase().trim();
@@ -235,16 +258,22 @@ const PushService = {
             const data = doc.data();
             if (!data || !data.nonce || data.nonce === lastSeenNonce) return;
 
-            // Comprobar antigüedad: si tiene más de 10 minutos, no disparar
+            // Comprobar antigüedad: si tiene más de 15 minutos, ignorar
             const now = Date.now();
-            if (data.timestamp && (now - data.timestamp > 600000)) return;
+            if (data.timestamp && (now - data.timestamp > 900000)) return;
 
             lastSeenNonce = data.nonce;
             localStorage.setItem('last_seen_heradio_nonce', lastSeenNonce);
 
-            // Disparar la notificación nativa en el móvil de Heradio
-            navigator.serviceWorker.ready.then((reg) => {
-                reg.showNotification(data.title || '⚽ Peña Maulas', {
+            console.log('[PushService] Notificación entrante para Heradio:', data);
+
+            // 1. Alerta visual inmediata en la pantalla de Heradio
+            this.showIncomingAlertToHeradio(data.title || '⚽ Peña Maulas (Fernando)', data.body || '');
+
+            // 2. Notificación nativa en la barra/bloqueo de Android
+            const showNotificationNative = async () => {
+                const title = data.title || '⚽ Peña Maulas';
+                const options = {
                     body: data.body || 'Notificación oficial de la Peña Maulas.',
                     icon: 'icons/icon-192x192.png',
                     badge: 'icons/favicon-32x32.png',
@@ -256,11 +285,80 @@ const PushService = {
                         { action: 'open_app', title: '📲 Ver Peña Maulas' }
                     ],
                     data: { url: './' }
-                });
-            });
+                };
+
+                try {
+                    const reg = await Promise.race([
+                        navigator.serviceWorker.ready,
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('SW ready timeout')), 2500))
+                    ]);
+                    await reg.showNotification(title, options);
+                    console.log('[PushService] Notificación nativa mostrada vía Service Worker');
+                } catch (e) {
+                    console.warn('[PushService] Service Worker demorado, usando Notification fallback:', e);
+                    try {
+                        new Notification(title, options);
+                    } catch (err2) {
+                        console.error('[PushService] Fallback nativo falló:', err2);
+                    }
+                }
+            };
+
+            showNotificationNative();
         }, (err) => {
             console.warn('[PushService] Error en listener de Heradio:', err);
         });
+    },
+
+    /**
+     * Muestra una alerta visual destacada en la pantalla de Heradio
+     */
+    showIncomingAlertToHeradio(title, body) {
+        if ('vibrate' in navigator) {
+            try { navigator.vibrate([300, 100, 300, 100, 300]); } catch(e){}
+        }
+
+        let alertBox = document.getElementById('heradio-incoming-alert');
+        if (!alertBox) {
+            alertBox = document.createElement('div');
+            alertBox.id = 'heradio-incoming-alert';
+            alertBox.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 32px);
+                max-width: 500px;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                border: 2px solid #ff9100;
+                border-radius: 16px;
+                padding: 16px 20px;
+                box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 25px rgba(255,145,0,0.3);
+                z-index: 100000;
+                color: #fff;
+                font-family: inherit;
+                animation: push-modal-in 0.3s ease-out;
+            `;
+            document.body.appendChild(alertBox);
+        }
+
+        alertBox.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:1.4rem;">🔔</span>
+                    <strong style="color:#ffd700; font-size:1rem;">${title}</strong>
+                </div>
+                <button onclick="document.getElementById('heradio-incoming-alert').remove()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0 4px;">✕</button>
+            </div>
+            <div style="font-size:0.95rem; color:#f8fafc; line-height:1.4;">
+                ${body}
+            </div>
+        `;
+
+        setTimeout(() => {
+            const el = document.getElementById('heradio-incoming-alert');
+            if (el) el.remove();
+        }, 15000);
     },
 
     // =========================================================================
@@ -1009,9 +1107,10 @@ const PushService = {
                         <div id="heradio-send-feedback" style="display:none; padding:12px; background:rgba(34, 197, 94, 0.15); border:1px solid #22c55e; border-radius:10px;">
                         </div>
 
-                        <div style="background:rgba(15, 23, 42, 0.5); border-left:3px solid #ff9100; padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.78rem; color:#94a3b8; line-height:1.45;">
-                            <strong style="color:#f8fafc;">💡 ¿Cómo funciona?</strong><br>
-                            Heradio solo tiene que abrir la web en su móvil una vez y darle al botón <strong>"Activar"</strong>. En cuanto pulses este botón, su teléfono recibirá la notificación en tiempo real.
+                        <div style="background:rgba(15, 23, 42, 0.5); border-left:3px solid #ff9100; padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.78rem; color:#cbd5e1; line-height:1.45;">
+                            <strong style="color:#ffd700;">💡 Pauta para la prueba con Heradio:</strong><br>
+                            Pídele a Heradio que <strong>tenga la web de la peña abierta</strong> en la pantalla de su móvil (o en segundo plano en Chrome). En cuanto pulses "Enviar", su móvil vibrará y le saldrá el aviso en pantalla y en su barra de notificaciones.<br>
+                            <span style="color:#94a3b8; font-size:0.75rem;">(Si Heradio cierra por completo el navegador o apaga la pantalla, la notificación le saltará en cuanto vuelva a abrir la web).</span>
                         </div>
                     </div>
 

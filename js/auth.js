@@ -22,7 +22,13 @@ const Auth = {
 
         if (window.location.pathname.includes('login.html')) return;
 
-        const user = sessionStorage.getItem('maulas_user');
+        let user = sessionStorage.getItem('maulas_user');
+        if (!user) {
+            user = localStorage.getItem('maulas_user');
+            if (user) {
+                sessionStorage.setItem('maulas_user', user);
+            }
+        }
         const isTg = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData;
 
         if (!user && !isTg) {
@@ -278,6 +284,7 @@ const Auth = {
                 loginTime: new Date().toISOString()
             };
             sessionStorage.setItem('maulas_user', JSON.stringify(userData));
+            localStorage.setItem('maulas_user', JSON.stringify(userData));
 
             await this.logAction(member.phone || member.name, 'Inicio de Sesión');
             return true;
@@ -295,10 +302,16 @@ const Auth = {
     },
 
     logout: function () {
-        const user = JSON.parse(sessionStorage.getItem('maulas_user'));
-        if (user) this.logAction(user.name, 'Cierre de Sesión');
+        const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user && user.name) this.logAction(user.name, 'Cierre de Sesión');
+            } catch (e) {}
+        }
 
         sessionStorage.removeItem('maulas_user');
+        localStorage.removeItem('maulas_user');
         window.location.href = 'login.html';
     },
 
@@ -436,7 +449,23 @@ const Auth = {
             document.body.insertBefore(separator, sidebar.nextSibling);
         }
 
-        // 3. Inject Logout Button
+        // 3. Inject Refresh & Logout Buttons
+        if (!document.getElementById('btn-refresh-sidebar')) {
+            const refreshBtn = document.createElement('a');
+            refreshBtn.href = "#";
+            refreshBtn.id = "btn-refresh-sidebar";
+            refreshBtn.textContent = "🔄 ACTUALIZAR APP";
+            refreshBtn.className = "btn-primary";
+            refreshBtn.style.border = "1px solid #4ade80";
+            refreshBtn.style.color = "#4ade80";
+            refreshBtn.title = "Fuerza la descarga de la última versión y limpia la caché";
+            refreshBtn.onclick = (e) => {
+                e.preventDefault();
+                this.forceAppUpdate();
+            };
+            sidebar.appendChild(refreshBtn);
+        }
+
         if (!document.getElementById('btn-logout-sidebar')) {
             const btn = document.createElement('a');
             btn.href = "#";
@@ -546,6 +575,29 @@ const Auth = {
                 window.addEventListener('load', register);
             }
         }
+    },
+
+    async forceAppUpdate() {
+        const confirmUpdate = confirm('¿Deseas actualizar la aplicación y descargar la última versión? (Limpiará la caché)');
+        if (!confirmUpdate) return;
+
+        try {
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let r of registrations) {
+                    await r.unregister();
+                }
+            }
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                for (let k of keys) {
+                    await caches.delete(k);
+                }
+            }
+        } catch (e) {
+            console.warn('Error al limpiar caché:', e);
+        }
+        window.location.reload(true);
     }
 };
 
