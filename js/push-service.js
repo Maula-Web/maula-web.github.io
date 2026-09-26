@@ -1,61 +1,80 @@
 /**
  * Push Notification Service - Peña Maulas PWA
  * =========================================================================
- * Módulo exclusivo de pruebas de notificaciones Push para Fernando Lozano (ID: 6)
- * Permite validar notificaciones nativas en directo y con pantalla bloqueada / web cerrada.
+ * - Rol 'sender': Fernando Lozano (ID: 6)
+ *   Dispone del laboratorio de pruebas propio y del sistema para enviar notificaciones a Heradio.
+ * - Rol 'receiver_heradio': Heradio (ID: 8)
+ *   Solo ve la solicitud de permiso (si aún no lo tiene) y escucha las notificaciones que Fernando le envíe.
  * =========================================================================
  */
 
 const PushService = {
     initialized: false,
     timerInterval: null,
+    heradioUnsubscribe: null,
 
     /**
-     * Comprueba si el usuario autenticado es Fernando Lozano
+     * Determina el rol del usuario conectado
      */
-    isTargetUser() {
+    getUserRole() {
         try {
             const userStr = sessionStorage.getItem('maulas_user');
-            if (!userStr) return false;
+            if (!userStr) return null;
             const user = JSON.parse(userStr);
             const uid = String(user.id || '');
             const email = (user.email || '').toLowerCase().trim();
             const name = (user.name || '').toLowerCase().trim();
             const phone = (user.phone || '').toLowerCase().trim();
 
-            return (
+            // 1. Fernando Lozano (Emisor / Administrador de pruebas)
+            if (
                 uid === '6' ||
                 email === 'lozano@maulas.com' ||
                 name.includes('fernando lozano') ||
                 (name.includes('lozano') && !name.includes('ram')) ||
                 phone.includes('lozano')
-            );
+            ) {
+                return 'sender';
+            }
+
+            // 2. Heradio (Receptor de pruebas)
+            if (
+                uid === '8' ||
+                email === 'heradio@maulas.com' ||
+                name.includes('heradio')
+            ) {
+                return 'receiver_heradio';
+            }
+
+            return null;
         } catch (e) {
-            return false;
+            return null;
         }
     },
 
     /**
-     * Inicialización del servicio
+     * Inicialización del servicio según el rol
      */
     async init() {
-        if (!this.isTargetUser()) {
-            return;
-        }
+        const role = this.getUserRole();
+        if (!role) return;
 
         if (this.initialized) return;
         this.initialized = true;
 
-        console.log('[PushService] Inicializando laboratorio de notificaciones para Fernando Lozano (ID 6)...');
+        console.log(`[PushService] Inicializando servicio con rol: ${role}`);
 
-        // Inyectar estilos específicos
-        this.injectStyles();
-
-        // Inyectar botón flotante y modal en el DOM
-        this.injectUI();
-
-        // Registrar o verificar Service Worker
         await this.ensureServiceWorker();
+
+        if (role === 'sender') {
+            // FERNANDO LOZANO: Inyectar interfaz completa
+            this.injectStyles();
+            this.injectUI();
+            this.registerSubscriptionInFirestore(6, 'Fernando Lozano');
+        } else if (role === 'receiver_heradio') {
+            // HERADIO: Solo gestionar permisos y escucha de mensajes
+            this.initHeradioReceiver();
+        }
     },
 
     /**
@@ -69,7 +88,7 @@ const PushService = {
 
         try {
             const reg = await navigator.serviceWorker.ready;
-            console.log('[PushService] Service Worker activo y listo:', reg.scope);
+            console.log('[PushService] Service Worker activo:', reg.scope);
             return reg;
         } catch (e) {
             console.warn('[PushService] Error esperando Service Worker ready:', e);
@@ -77,8 +96,308 @@ const PushService = {
         }
     },
 
+    // =========================================================================
+    // FLUJO PARA HERADIO (ID 8) - SIMPLE Y DISCRETO
+    // =========================================================================
+
+    async initHeradioReceiver() {
+        const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+
+        if (perm === 'granted') {
+            // Permiso ya concedido: registrar presencia y escuchar notificaciones entrantes
+            await this.registerSubscriptionInFirestore(8, 'Heradio');
+            this.startHeradioInboxListener();
+        } else if (perm === 'default') {
+            // Permiso pendiente: mostrar banner elegante y discreto en la web
+            this.injectHeradioPermissionBanner();
+        }
+    },
+
+    injectHeradioPermissionBanner() {
+        if (document.getElementById('heradio-push-banner')) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'heradio-push-banner';
+        banner.style.cssText = `
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 30px);
+            max-width: 520px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1.5px solid #ff9100;
+            border-radius: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: #f8fafc;
+            font-family: inherit;
+            animation: push-modal-in 0.3s ease-out;
+        `;
+
+        banner.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:1.6rem;">⚽</span>
+                <div>
+                    <div style="font-weight:700; font-size:0.95rem; color:#ffd700;">
+                        Notificaciones Peña Maulas
+                    </div>
+                    <div style="font-size:0.8rem; color:#cbd5e1; margin-top:2px;">
+                        Hola Heradio, activa las notificaciones para recibir avisos de quinielas y premios en tu móvil.
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button id="heradio-btn-permit" style="
+                    background: linear-gradient(135deg, #ff9100 0%, #ea580c 100%);
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 8px 14px;
+                    font-weight: 700;
+                    font-size: 0.82rem;
+                    cursor: pointer;
+                    white-space: nowrap;
+                ">Activar</button>
+                <button onclick="document.getElementById('heradio-push-banner').remove()" style="
+                    background: none;
+                    border: none;
+                    color: #94a3b8;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 4px;
+                ">✕</button>
+            </div>
+        `;
+
+        document.body.appendChild(banner);
+
+        document.getElementById('heradio-btn-permit').onclick = async () => {
+            await this.requestPermissionForHeradio();
+        };
+    },
+
+    async requestPermissionForHeradio() {
+        if (!('Notification' in window)) {
+            alert('Este navegador no soporta notificaciones nativas.');
+            return;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            const banner = document.getElementById('heradio-push-banner');
+            if (banner) banner.remove();
+
+            if (permission === 'granted') {
+                await this.registerSubscriptionInFirestore(8, 'Heradio');
+                this.startHeradioInboxListener();
+
+                // Notificación inmediata de bienvenida en el móvil de Heradio
+                const reg = await navigator.serviceWorker.ready;
+                reg.showNotification('⚽ Peña Maulas', {
+                    body: '¡Hola Heradio! Ya tienes las notificaciones activadas para recibir avisos de la peña.',
+                    icon: 'icons/icon-192x192.png',
+                    badge: 'icons/favicon-32x32.png',
+                    vibrate: [300, 100, 300, 100, 300],
+                    requireInteraction: true,
+                    silent: false,
+                    tag: 'heradio-welcome',
+                    data: { url: './' }
+                });
+            } else if (permission === 'denied') {
+                alert('Has bloqueado los permisos de notificación. Si deseas activarlos, hazlo en los ajustes del navegador.');
+            }
+        } catch (e) {
+            console.error('[PushService] Error pidiendo permisos a Heradio:', e);
+        }
+    },
+
+    startHeradioInboxListener() {
+        const db = window.db || (window.DataService && window.DataService.db);
+        if (!db) {
+            console.warn('[PushService] Firestore no disponible para el listener de Heradio.');
+            return;
+        }
+
+        console.log('[PushService] Heradio escuchando notificaciones en push_inbox/member_8...');
+
+        let lastSeenNonce = localStorage.getItem('last_seen_heradio_nonce') || '';
+
+        if (this.heradioUnsubscribe) this.heradioUnsubscribe();
+
+        this.heradioUnsubscribe = db.collection('push_inbox').doc('member_8').onSnapshot((doc) => {
+            if (!doc.exists) return;
+            const data = doc.data();
+            if (!data || !data.nonce || data.nonce === lastSeenNonce) return;
+
+            // Comprobar antigüedad: si tiene más de 10 minutos, no disparar
+            const now = Date.now();
+            if (data.timestamp && (now - data.timestamp > 600000)) return;
+
+            lastSeenNonce = data.nonce;
+            localStorage.setItem('last_seen_heradio_nonce', lastSeenNonce);
+
+            // Disparar la notificación nativa en el móvil de Heradio
+            navigator.serviceWorker.ready.then((reg) => {
+                reg.showNotification(data.title || '⚽ Peña Maulas', {
+                    body: data.body || 'Notificación oficial de la Peña Maulas.',
+                    icon: 'icons/icon-192x192.png',
+                    badge: 'icons/favicon-32x32.png',
+                    vibrate: [300, 100, 300, 100, 300],
+                    tag: 'inbox-' + data.nonce,
+                    requireInteraction: true,
+                    silent: false,
+                    actions: [
+                        { action: 'open_app', title: '📲 Ver Peña Maulas' }
+                    ],
+                    data: { url: './' }
+                });
+            });
+        }, (err) => {
+            console.warn('[PushService] Error en listener de Heradio:', err);
+        });
+    },
+
+    // =========================================================================
+    // FLUJO PARA FERNANDO LOZANO (ID 6) - PANEL COMPLETO DE EMISIÓN
+    // =========================================================================
+
     /**
-     * Solicita permisos de notificación al sistema operativo / navegador
+     * Comprueba en Firestore el estado de permisos y conexión de Heradio
+     */
+    async checkHeradioStatus() {
+        const statusElem = document.getElementById('heradio-status-info');
+        if (!statusElem) return;
+
+        statusElem.innerHTML = `<span style="color:#94a3b8;">Verificando estado de Heradio...</span>`;
+
+        try {
+            const db = window.db || (window.DataService && window.DataService.db);
+            if (!db) {
+                statusElem.innerHTML = `<span style="color:#f87171;">Base de datos no conectada.</span>`;
+                return;
+            }
+
+            const doc = await db.collection('push_subscriptions').doc('member_8').get();
+            if (doc.exists && doc.data().permission === 'granted') {
+                const data = doc.data();
+                const lastUpdated = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'reciente';
+                statusElem.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px; color:#4ade80; font-weight:700;">
+                        <span>🟢 Heradio tiene notificaciones ACTIVADAS</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
+                        Dispositivo sincronizado (${lastUpdated}) &bull; Listo para recibir tus pruebas.
+                    </div>
+                `;
+            } else {
+                statusElem.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px; color:#fbbf24; font-weight:700;">
+                        <span>🟡 Heradio aún no ha aceptado permisos</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
+                        En cuanto Heradio entre a la web desde su móvil, le aparecerá el botón para activarlas.
+                    </div>
+                `;
+            }
+        } catch (e) {
+            console.error('[PushService] Error consultando estado de Heradio:', e);
+            statusElem.innerHTML = `<span style="color:#f87171;">Error al consultar estado de Heradio.</span>`;
+        }
+    },
+
+    /**
+     * Envía una notificación a Heradio a través de Firestore
+     */
+    async sendNotificationToHeradio(customText = null) {
+        const msgInput = document.getElementById('heradio-push-message');
+        const sendBtn = document.getElementById('heradio-btn-send');
+        const message = (customText || (msgInput ? msgInput.value : '')).trim();
+
+        if (!message) {
+            alert('Por favor escribe un mensaje para Heradio.');
+            return;
+        }
+
+        if (sendBtn) {
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = `⏳ Enviando a Heradio...`;
+        }
+
+        try {
+            const db = window.db || (window.DataService && window.DataService.db);
+            if (!db) throw new Error('Firestore no está disponible');
+
+            const payload = {
+                title: '⚽ Peña Maulas (Fernando Lozano)',
+                body: message,
+                senderId: 6,
+                senderName: 'Fernando Lozano',
+                targetMemberId: 8,
+                targetName: 'Heradio',
+                timestamp: Date.now(),
+                nonce: Date.now() + '_' + Math.random().toString(36).substring(7)
+            };
+
+            await db.collection('push_inbox').doc('member_8').set(payload);
+
+            this.showToast('✅ ¡Notificación enviada a Heradio!');
+            const alertBox = document.getElementById('heradio-send-feedback');
+            if (alertBox) {
+                alertBox.style.display = 'block';
+                alertBox.innerHTML = `
+                    <div style="color:#4ade80; font-weight:bold; font-size:0.85rem;">
+                        ✅ Notificación enviada al móvil de Heradio con éxito.
+                    </div>
+                    <div style="color:#cbd5e1; font-size:0.75rem; margin-top:2px;">
+                        Mensaje: "${message}"
+                    </div>
+                `;
+                setTimeout(() => { alertBox.style.display = 'none'; }, 6000);
+            }
+        } catch (e) {
+            console.error('[PushService] Error enviando notificación a Heradio:', e);
+            alert('Error al enviar notificación a Heradio: ' + e.message);
+        } finally {
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = `🚀 Enviar Notificación a Heradio Ahora`;
+            }
+        }
+    },
+
+    /**
+     * Guarda la suscripción Web Push en Firestore
+     */
+    async registerSubscriptionInFirestore(memberId, memberName) {
+        try {
+            const db = window.db || (window.DataService && window.DataService.db);
+            if (!db) return;
+
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
+            const subData = {
+                memberId: memberId,
+                memberName: memberName,
+                permission: ('Notification' in window) ? Notification.permission : 'unsupported',
+                updatedAt: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                isStandalone: isStandalone
+            };
+
+            await db.collection('push_subscriptions').doc(`member_${memberId}`).set(subData, { merge: true });
+            console.log(`[PushService] Estado de suscripción registrado para ${memberName} (ID: ${memberId})`);
+        } catch (err) {
+            console.warn('[PushService] Aviso guardando suscripción:', err);
+        }
+    },
+
+    /**
+     * Solicita permisos de notificación al sistema operativo / navegador (para Fernando)
      */
     async requestPermission() {
         if (!('Notification' in window)) {
@@ -91,8 +410,7 @@ const PushService = {
             this.updateUIStatus();
 
             if (permission === 'granted') {
-                // Registrar suscripción en Firestore si es posible
-                this.registerSubscriptionInFirestore();
+                this.registerSubscriptionInFirestore(6, 'Fernando Lozano');
                 return 'granted';
             } else if (permission === 'denied') {
                 alert('Los permisos de notificación han sido bloqueados. Debes activarlos manualmente en los ajustes de tu navegador o del móvil.');
@@ -106,7 +424,7 @@ const PushService = {
     },
 
     /**
-     * Lanza una notificación inmediata en directo
+     * Lanza una notificación inmediata en directo (Fernando)
      */
     async sendImmediateTest() {
         if (!('Notification' in window)) {
@@ -144,7 +462,6 @@ const PushService = {
             this.showToast('✅ Notificación enviada a tu barra de avisos');
         } catch (e) {
             console.error('[PushService] Error en notificación inmediata:', e);
-            // Fallback a constructor Notification si Service Worker falla
             try {
                 new Notification('⚽ Peña Maulas (Directo)', {
                     body: '¡Hola Fernando Lozano! Notificación de prueba recibida.',
@@ -158,7 +475,7 @@ const PushService = {
     },
 
     /**
-     * Programa una notificación con retardo (para probar con móvil bloqueado o web cerrada)
+     * Programa una notificación con retardo (móvil bloqueado o web cerrada)
      */
     async scheduleDelayedTest(seconds = 5) {
         if (!('Notification' in window)) {
@@ -189,7 +506,6 @@ const PushService = {
             url: './'
         };
 
-        // 1. Enviar orden al Service Worker para que despierte el móvil
         try {
             if (navigator.serviceWorker.controller) {
                 navigator.serviceWorker.controller.postMessage({
@@ -211,7 +527,6 @@ const PushService = {
             console.warn('[PushService] Error enviando mensaje a SW:', e);
         }
 
-        // 2. Feedback visual interactivo para que Fernando bloquee el móvil
         let remaining = seconds;
         if (countdownElem) {
             countdownElem.style.display = 'block';
@@ -255,33 +570,37 @@ const PushService = {
     },
 
     /**
-     * Guarda la suscripción Web Push en Firestore (para envíos remotos futuros)
+     * Cambiar de pestaña en el modal de Fernando
      */
-    async registerSubscriptionInFirestore() {
-        try {
-            if (!('serviceWorker' in navigator)) return;
-            const reg = await navigator.serviceWorker.ready;
-            if (!reg.pushManager) return;
+    switchTab(tabId) {
+        document.querySelectorAll('.push-tab-content').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.push-tab-btn').forEach(btn => {
+            btn.style.borderColor = 'transparent';
+            btn.style.color = '#94a3b8';
+            btn.style.background = 'rgba(30, 41, 59, 0.4)';
+        });
 
-            let sub = await reg.pushManager.getSubscription();
-            
-            // Si Firestore está disponible
-            const db = window.db || (window.DataService && window.DataService.db);
-            if (db) {
-                const subData = {
-                    memberId: 6,
-                    memberName: 'Fernando Lozano',
-                    updatedAt: new Date().toISOString(),
-                    userAgent: navigator.userAgent,
-                    isStandalone: window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone,
-                    subscription: sub ? JSON.parse(JSON.stringify(sub)) : null
-                };
-                await db.collection('push_subscriptions').doc('member_6').set(subData, { merge: true });
-                console.log('[PushService] Suscripción registrada en Firestore con éxito.');
-            }
-        } catch (err) {
-            console.warn('[PushService] Aviso guardando suscripción:', err);
+        const targetContent = document.getElementById(`tab-content-${tabId}`);
+        const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+
+        if (targetContent) targetContent.style.display = 'flex';
+        if (targetBtn) {
+            targetBtn.style.borderColor = '#ff9100';
+            targetBtn.style.color = '#ffd700';
+            targetBtn.style.background = 'rgba(255, 145, 0, 0.15)';
         }
+
+        if (tabId === 'heradio') {
+            this.checkHeradioStatus();
+        }
+    },
+
+    /**
+     * Rellenar plantilla en el mensaje a Heradio
+     */
+    setHeradioTemplate(text) {
+        const input = document.getElementById('heradio-push-message');
+        if (input) input.value = text;
     },
 
     /**
@@ -301,7 +620,7 @@ const PushService = {
             statusBox.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; color:#4ade80; font-weight:bold;">
                     <span style="font-size:1.3rem;">✅</span>
-                    <span>Permisos de notificación concedidos</span>
+                    <span>Permisos de notificación concedidos en tu móvil</span>
                 </div>
                 <div style="font-size:0.8rem; color:#94a3b8; margin-top:4px;">
                     ${isStandalone ? '📱 Modo PWA / App instalada detectado' : '🌐 Ejecutándose en navegador web'}
@@ -316,7 +635,7 @@ const PushService = {
                     <span>Permiso bloqueado en este dispositivo</span>
                 </div>
                 <div style="font-size:0.8rem; color:#cbd5e1; margin-top:4px; line-height:1.4;">
-                    Para probar, pulsa en el candado 🔒 de la barra de navegación del móvil y activa "Notificaciones".
+                    Para probar, pulsa en el candado 🔒 de la barra del navegador y activa "Notificaciones".
                 </div>
             `;
             if (permBtn) permBtn.style.display = 'none';
@@ -328,7 +647,7 @@ const PushService = {
                     <span>Permiso pendiente de autorización</span>
                 </div>
                 <div style="font-size:0.8rem; color:#94a3b8; margin-top:4px;">
-                    Debes conceder permiso para que tu móvil reciba alertas.
+                    Debes conceder permiso para que tu propio móvil reciba alertas.
                 </div>
             `;
             if (permBtn) permBtn.style.display = 'block';
@@ -336,20 +655,15 @@ const PushService = {
         }
     },
 
-    /**
-     * Muestra el modal de pruebas
-     */
     openModal() {
         const modal = document.getElementById('modal-push-lab');
         if (modal) {
             modal.style.display = 'flex';
             this.updateUIStatus();
+            this.checkHeradioStatus();
         }
     },
 
-    /**
-     * Cierra el modal de pruebas
-     */
     closeModal() {
         const modal = document.getElementById('modal-push-lab');
         if (modal) {
@@ -365,9 +679,6 @@ const PushService = {
         triggerBtns.forEach(b => b.disabled = false);
     },
 
-    /**
-     * Mensaje flotante tipo Toast
-     */
     showToast(message) {
         let toast = document.getElementById('push-toast');
         if (!toast) {
@@ -399,16 +710,12 @@ const PushService = {
         }, 3500);
     },
 
-    /**
-     * Inyecta estilos CSS aislados
-     */
     injectStyles() {
         if (document.getElementById('push-service-styles')) return;
 
         const style = document.createElement('style');
         style.id = 'push-service-styles';
         style.textContent = `
-            /* Botón Flotante Push (Fernando Lozano) */
             .push-float-btn {
                 position: fixed;
                 bottom: 24px;
@@ -448,7 +755,6 @@ const PushService = {
                 98% { transform: rotate(0); }
             }
 
-            /* Modal Push Lab */
             .push-modal-backdrop {
                 display: none;
                 position: fixed;
@@ -470,7 +776,7 @@ const PushService = {
                 border: 1px solid rgba(255, 145, 0, 0.35);
                 border-radius: 18px;
                 width: 100%;
-                max-width: 480px;
+                max-width: 520px;
                 box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(255, 145, 0, 0.15);
                 color: #f8fafc;
                 font-family: inherit;
@@ -492,11 +798,11 @@ const PushService = {
                 justify-content: space-between;
             }
             .push-modal-body {
-                padding: 22px;
+                padding: 20px 22px;
                 display: flex;
                 flex-direction: column;
                 gap: 16px;
-                max-height: 80vh;
+                max-height: 82vh;
                 overflow-y: auto;
             }
             .push-status-card {
@@ -566,13 +872,10 @@ const PushService = {
         document.head.appendChild(style);
     },
 
-    /**
-     * Inyecta la UI en el DOM
-     */
     injectUI() {
         if (document.getElementById('modal-push-lab')) return;
 
-        // 1. Botón Flotante
+        // 1. Botón Flotante para Fernando
         const floatBtn = document.createElement('div');
         floatBtn.className = 'push-float-btn';
         floatBtn.title = 'Laboratorio de Notificaciones Push (Fernando Lozano)';
@@ -601,80 +904,167 @@ const PushService = {
                                 NOTIFICACIONES PUSH MÓVIL
                             </div>
                             <div style="font-size:0.75rem; color:#94a3b8;">
-                                Socio: Fernando Lozano (ID: 6) &bull; Peña Maulas
+                                Administrador de pruebas: Fernando Lozano (ID: 6)
                             </div>
                         </div>
                     </div>
                     <button onclick="PushService.closeModal()" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; padding:4px 8px;">✕</button>
                 </div>
 
-                <div class="push-modal-body">
-                    <!-- Estado de Permisos -->
-                    <div id="push-permission-status" class="push-status-card">
-                        <!-- Populated by JS -->
-                    </div>
-
-                    <!-- Botón Solicitar Permiso (si está en 'default') -->
-                    <button id="push-btn-grant-permission" class="push-btn-primary" onclick="PushService.requestPermission()" style="display:none;">
-                        🔔 Activar Permiso de Notificaciones
+                <!-- Barra de pestañas -->
+                <div style="display:flex; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(15,23,42,0.8); padding:6px 12px 0 12px; gap:8px;">
+                    <button id="tab-btn-heradio" class="push-tab-btn" onclick="PushService.switchTab('heradio')" style="
+                        flex:1;
+                        padding:10px 8px;
+                        background:rgba(255, 145, 0, 0.15);
+                        border:none;
+                        border-bottom:2px solid #ff9100;
+                        color:#ffd700;
+                        font-weight:700;
+                        font-size:0.85rem;
+                        cursor:pointer;
+                        border-radius:8px 8px 0 0;
+                    ">
+                        👤 Enviar a Heradio
                     </button>
+                    <button id="tab-btn-self" class="push-tab-btn" onclick="PushService.switchTab('self')" style="
+                        flex:1;
+                        padding:10px 8px;
+                        background:rgba(30, 41, 59, 0.4);
+                        border:none;
+                        border-bottom:2px solid transparent;
+                        color:#94a3b8;
+                        font-weight:700;
+                        font-size:0.85rem;
+                        cursor:pointer;
+                        border-radius:8px 8px 0 0;
+                    ">
+                        📱 Mi Dispositivo
+                    </button>
+                </div>
 
-                    <!-- Zona de Pruebas -->
-                    <div id="push-action-buttons" style="display:none; flex-direction:column; gap:12px;">
-                        <div style="font-size:0.85rem; color:#cbd5e1; font-weight:600; margin-bottom:-4px;">
-                            Selecciona una prueba:
+                <div class="push-modal-body">
+                    <!-- ================= PESTAÑA: ENVIAR A HERADIO ================= -->
+                    <div id="tab-content-heradio" class="push-tab-content" style="display:flex; flex-direction:column; gap:14px;">
+                        <!-- Estado de Heradio en Firestore -->
+                        <div id="heradio-status-info" class="push-status-card">
+                            <span style="color:#94a3b8;">Comprobando suscripción de Heradio...</span>
                         </div>
 
-                        <!-- Prueba 1: Inmediata -->
-                        <button class="push-btn-secondary push-btn-trigger" onclick="PushService.sendImmediateTest()">
-                            <span style="font-size:1.2rem;">⚡</span>
-                            <div style="text-align:left;">
-                                <div style="font-size:0.92rem; font-weight:bold;">1. Probar Notificación Inmediata</div>
-                                <div style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">Suena y vibra ahora mismo en tu teléfono</div>
-                            </div>
-                        </button>
-
-                        <!-- Prueba 2: Retardo 5 segundos (Móvil bloqueado / app cerrada) -->
-                        <button class="push-btn-primary push-btn-trigger" onclick="PushService.scheduleDelayedTest(5)">
-                            <span style="font-size:1.2rem;">⏱️</span>
-                            <div style="text-align:left;">
-                                <div style="font-size:0.92rem; font-weight:bold;">2. Probar en 5 segundos (Móvil Bloqueado)</div>
-                                <div style="font-size:0.75rem; color:#ffedd5; font-weight:normal;">Pulsa y bloquea la pantalla o sal al escritorio</div>
-                            </div>
-                        </button>
-
-                        <!-- Prueba 3: Retardo 10 segundos -->
-                        <button class="push-btn-secondary push-btn-trigger" onclick="PushService.scheduleDelayedTest(10)" style="opacity:0.9;">
-                            <span style="font-size:1.2rem;">⏳</span>
-                            <div style="text-align:left;">
-                                <div style="font-size:0.92rem; font-weight:bold;">3. Probar en 10 segundos (Con más tiempo)</div>
-                                <div style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">Para bloquear el móvil con total calma</div>
-                            </div>
-                        </button>
-                    </div>
-
-                    <!-- Caja de cuenta atrás interactiva -->
-                    <div id="push-countdown-display" style="display:none; text-align:center; padding:16px; background:rgba(255, 145, 0, 0.08); border:1px dashed #ff9100; border-radius:12px;">
-                        <!-- Dinámico -->
-                    </div>
-
-                    <!-- Instrucciones breves -->
-                    <div style="background:rgba(15, 23, 42, 0.5); border-left:3px solid #ff9100; padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.78rem; color:#94a3b8; line-height:1.45;">
-                        <strong style="color:#f8fafc;">💡 ¿Cómo probar con la web cerrada?</strong><br>
-                        Pulsa el botón de <strong>5 o 10 segundos</strong>, apaga la pantalla de tu teléfono inmediatamente con el botón lateral o sal al inicio. Tu móvil vibrará y te mostrará la notificación en la pantalla de bloqueo.
-                    </div>
-
-                    <!-- Ayuda: Despertar pantalla en móvil -->
-                    <div style="background:rgba(30, 41, 59, 0.4); border:1px solid rgba(255, 255, 255, 0.08); padding:12px; border-radius:10px; font-size:0.78rem; color:#cbd5e1; line-height:1.45;">
-                        <div style="font-weight:700; color:#ffd700; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-                            <span>💡</span> ¿Por qué no se enciende la pantalla sola al llegar?
+                        <!-- Formulario de Envío -->
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label style="font-size:0.85rem; color:#cbd5e1; font-weight:700;">
+                                Mensaje a enviar a Heradio:
+                            </label>
+                            <textarea id="heradio-push-message" rows="3" style="
+                                width:100%;
+                                background:rgba(30, 41, 59, 0.7);
+                                border:1px solid rgba(255, 255, 255, 0.15);
+                                border-radius:10px;
+                                color:#fff;
+                                padding:10px;
+                                font-family:inherit;
+                                font-size:0.9rem;
+                                box-sizing:border-box;
+                                resize:none;
+                            ">¡Hola Heradio! Esto es una prueba de notificación en tu móvil de la Peña Maulas.</textarea>
                         </div>
-                        Tu móvil <strong>sí recibe la notificación</strong> y la coloca en la bandeja de notificaciones. Que la pantalla física se encienda ("despierte") depende del ajuste de privacidad de tu sistema operativo:
-                        <ul style="margin:6px 0 0 16px; padding:0; color:#94a3b8;">
-                            <li><strong>Ajuste Pantalla de Bloqueo:</strong> En <em>Ajustes &gt; Pantalla de bloqueo</em>, activa <strong>"Despertar pantalla al recibir notificaciones"</strong> o "Pantalla ambiente".</li>
-                            <li><strong>Prioridad de Notificación:</strong> Mantén pulsada la notificación de Peña Maulas cuando llegue &gt; pulsa el icono de engranaje ⚙️ &gt; cámbiala de "Silencioso" a <strong>"Prioridad / Sonido y emergente en pantalla"</strong>.</li>
-                            <li><strong>Instalar PWA:</strong> Si añades la web a la pantalla de inicio ("Instalar app"), el sistema la dota de un canal de notificaciones propio independiente del navegador.</li>
-                        </ul>
+
+                        <!-- Plantillas rápidas -->
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                            <button onclick="PushService.setHeradioTemplate('¡Hola Heradio! Prueba de notificación recibida en tu móvil.')" style="
+                                background:rgba(51, 65, 85, 0.6);
+                                border:1px solid rgba(255,255,255,0.1);
+                                border-radius:16px;
+                                color:#cbd5e1;
+                                font-size:0.75rem;
+                                padding:4px 10px;
+                                cursor:pointer;
+                            ">👋 Saludo de prueba</button>
+                            <button onclick="PushService.setHeradioTemplate('¡Heradio! Se ha sellado la quiniela de esta jornada en la peña.')" style="
+                                background:rgba(51, 65, 85, 0.6);
+                                border:1px solid rgba(255,255,255,0.1);
+                                border-radius:16px;
+                                color:#cbd5e1;
+                                font-size:0.75rem;
+                                padding:4px 10px;
+                                cursor:pointer;
+                            ">⚽ Quiniela sellada</button>
+                            <button onclick="PushService.setHeradioTemplate('¡Heradio, hay premio en la jornada! Revisa la clasificación.')" style="
+                                background:rgba(51, 65, 85, 0.6);
+                                border:1px solid rgba(255,255,255,0.1);
+                                border-radius:16px;
+                                color:#cbd5e1;
+                                font-size:0.75rem;
+                                padding:4px 10px;
+                                cursor:pointer;
+                            ">💰 ¡Hay premio!</button>
+                        </div>
+
+                        <!-- Botón de Envío -->
+                        <button id="heradio-btn-send" class="push-btn-primary" onclick="PushService.sendNotificationToHeradio()">
+                            🚀 Enviar Notificación a Heradio Ahora
+                        </button>
+
+                        <div id="heradio-send-feedback" style="display:none; padding:12px; background:rgba(34, 197, 94, 0.15); border:1px solid #22c55e; border-radius:10px;">
+                        </div>
+
+                        <div style="background:rgba(15, 23, 42, 0.5); border-left:3px solid #ff9100; padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.78rem; color:#94a3b8; line-height:1.45;">
+                            <strong style="color:#f8fafc;">💡 ¿Cómo funciona?</strong><br>
+                            Heradio solo tiene que abrir la web en su móvil una vez y darle al botón <strong>"Activar"</strong>. En cuanto pulses este botón, su teléfono recibirá la notificación en tiempo real.
+                        </div>
+                    </div>
+
+                    <!-- ================= PESTAÑA: MI DISPOSITIVO (FERNANDO) ================= -->
+                    <div id="tab-content-self" class="push-tab-content" style="display:none; flex-direction:column; gap:14px;">
+                        <!-- Estado de Permisos -->
+                        <div id="push-permission-status" class="push-status-card">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <!-- Botón Solicitar Permiso (si está en 'default') -->
+                        <button id="push-btn-grant-permission" class="push-btn-primary" onclick="PushService.requestPermission()" style="display:none;">
+                            🔔 Activar Permiso de Notificaciones en este dispositivo
+                        </button>
+
+                        <!-- Zona de Pruebas Propias -->
+                        <div id="push-action-buttons" style="display:none; flex-direction:column; gap:10px;">
+                            <button class="push-btn-secondary push-btn-trigger" onclick="PushService.sendImmediateTest()">
+                                <span style="font-size:1.2rem;">⚡</span>
+                                <div style="text-align:left;">
+                                    <div style="font-size:0.92rem; font-weight:bold;">1. Notificación Inmediata</div>
+                                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">Suena y vibra ahora mismo en tu teléfono</div>
+                                </div>
+                            </button>
+
+                            <button class="push-btn-primary push-btn-trigger" onclick="PushService.scheduleDelayedTest(5)">
+                                <span style="font-size:1.2rem;">⏱️</span>
+                                <div style="text-align:left;">
+                                    <div style="font-size:0.92rem; font-weight:bold;">2. Probar en 5 segundos (Móvil Bloqueado)</div>
+                                    <div style="font-size:0.75rem; color:#ffedd5; font-weight:normal;">Pulsa y apaga la pantalla o sal al escritorio</div>
+                                </div>
+                            </button>
+
+                            <button class="push-btn-secondary push-btn-trigger" onclick="PushService.scheduleDelayedTest(10)" style="opacity:0.9;">
+                                <span style="font-size:1.2rem;">⏳</span>
+                                <div style="text-align:left;">
+                                    <div style="font-size:0.92rem; font-weight:bold;">3. Probar en 10 segundos</div>
+                                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">Para bloquear el móvil con más calma</div>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Cuenta atrás interactiva -->
+                        <div id="push-countdown-display" style="display:none; text-align:center; padding:16px; background:rgba(255, 145, 0, 0.08); border:1px dashed #ff9100; border-radius:12px;">
+                        </div>
+
+                        <!-- Ayuda despertar pantalla -->
+                        <div style="background:rgba(30, 41, 59, 0.4); border:1px solid rgba(255, 255, 255, 0.08); padding:12px; border-radius:10px; font-size:0.78rem; color:#cbd5e1; line-height:1.45;">
+                            <div style="font-weight:700; color:#ffd700; margin-bottom:4px;">
+                                💡 Para que tu pantalla se encienda sola al llegar:
+                            </div>
+                            En <em>Ajustes del móvil &gt; Pantalla de bloqueo</em>, activa <strong>"Despertar pantalla al recibir notificaciones"</strong>. Y en la notificación, cámbiala a modo <strong>"Prioridad / Ventana emergente"</strong>.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -686,7 +1076,7 @@ const PushService = {
 // Exponer en window para acceso global
 window.PushService = PushService;
 
-// Auto-inicialización cuando el DOM esté listo si es Fernando Lozano
+// Auto-inicialización cuando el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => PushService.init());
 } else {

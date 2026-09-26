@@ -49,14 +49,20 @@ const Auth = {
             phone.includes('lozano')
         );
 
-        if (!isLozano) return;
+        const isHeradio = (
+            uid === '8' ||
+            email === 'heradio@maulas.com' ||
+            name.includes('heradio')
+        );
+
+        if (!isLozano && !isHeradio) return;
 
         const loadPush = () => {
             if (window.PushService) {
                 window.PushService.init();
             } else if (!document.querySelector('script[src*="push-service.js"]')) {
                 const s = document.createElement('script');
-                s.src = 'js/push-service.js?v=1.0';
+                s.src = 'js/push-service.js?v=1.5';
                 s.onload = () => {
                     if (window.PushService) window.PushService.init();
                 };
