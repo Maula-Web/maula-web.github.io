@@ -507,6 +507,17 @@ class BoteAppController {
         if (cardPrem) cardPrem.textContent = (s.totalPremios || 0).toFixed(2) + ' €';
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
         if (bJornadas) bJornadas.textContent = data.jornadaSummaries.length;
+
+        const gastosTooltip = document.getElementById('card-gastos-tooltip-text');
+        if (gastosTooltip) {
+            const numSocios = (data.memberSummaries || []).length || 19;
+            const latestJ = data.jornadaSummaries && data.jornadaSummaries.length > 0 ? data.jornadaSummaries[data.jornadaSummaries.length - 1] : null;
+            const cCol = latestJ ? latestJ.costeColumna : (this.config.costeColumna !== undefined ? this.config.costeColumna : 0.75);
+            const cDob = latestJ ? latestJ.costeDobles : (this.config.costeDobles !== undefined ? this.config.costeDobles : 10.50);
+            const sencillasTotal = numSocios * cCol;
+            const totalSellado = sencillasTotal + cDob;
+            gastosTooltip.textContent = `Gasto real pagado en la administración de lotería en cada jornada: ${numSocios} quinielas sencillas (${sencillasTotal.toFixed(2)} €) + 1 quiniela reducida de 7 dobles (${cDob.toFixed(2)} €) = ${totalSellado.toFixed(2)} € por jornada.`;
+        }
     }
 
     // =========================================================================
@@ -678,7 +689,7 @@ class BoteAppController {
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || 'N/A'}</span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto">
                                     <strong class="text-emerald-400 block mb-1 font-bold">👑 Ganador de la Jornada</strong>
-                                    Socio con más aciertos en esta jornada. Jugará gratis (🎁) y pronosticará la quiniela de 7 dobles en la siguiente jornada (coste de 10,50 € pagado al 100% por la peña).
+                                    Socio con más aciertos en esta jornada. Jugará gratis (🎁) y pronosticará la quiniela de 7 dobles en la siguiente jornada (coste de ${(jSummary.costeDobles !== undefined ? jSummary.costeDobles : (this.config.costeDobles || 10.50)).toFixed(2)} € pagado al 100% por la peña).
                                 </div>
                             </div>
                             ${doblesBtn}
@@ -689,7 +700,7 @@ class BoteAppController {
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.loserName || 'N/A'}</span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto">
                                     <strong class="text-rose-400 block mb-1 font-bold">💀 Sellador Oficial</strong>
-                                    Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de 24,75 € en su hucha personal o por Bizum.
+                                    Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de ${jSummary.gastoSellado.toFixed(2)} € en su hucha personal o por Bizum.
                                 </div>
                             </div>
                         </div>
@@ -709,7 +720,7 @@ class BoteAppController {
                             <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2)} €</span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
                                 <strong class="text-rose-400 block mb-1 font-bold">🎟️ Gasto Oficial de Sellado</strong>
-                                Coste total pagado en la administración de loterías: 19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 €.
+                                Coste total pagado en la administración de loterías: ${jSummary.numSocios} quinielas sencillas (${(jSummary.numSocios * jSummary.costeColumna).toFixed(2)} €) + 1 quiniela reducida de 7 dobles (${jSummary.costeDobles.toFixed(2)} €) = ${jSummary.gastoSellado.toFixed(2)} €.
                             </div>
                         </div>
                         <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 hover:z-50 transition-colors">
@@ -725,7 +736,7 @@ class BoteAppController {
                             <span class="text-xs sm:text-sm font-extrabold ${netoColor} font-mono">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2)} €</span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal">
                                 <strong class="text-emerald-400 block mb-1 font-bold">📈 Superávit Neto Semanal</strong>
-                                Margen neto semanal que se incorpora a la hucha colectiva de la peña tras descontar los 24,75 € de sellado oficial.
+                                Margen neto semanal que se incorpora a la hucha colectiva de la peña tras descontar los ${jSummary.gastoSellado.toFixed(2)} € de sellado oficial.
                             </div>
                         </div>
                     </div>
@@ -937,7 +948,7 @@ class BoteAppController {
                     </div>
                 </td>
                 <td class="p-2.5 sm:px-4 text-center font-bold text-purple-300">10 ac.</td>
-                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400">10,50 € (Peña)</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400">${jSummary.costeDobles.toFixed(2)} € (Peña)</td>
                 <td class="p-2.5 sm:px-4 text-center text-slate-500">-</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono text-slate-500">-</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono font-black text-emerald-400">
@@ -1076,7 +1087,7 @@ class BoteAppController {
 
             const mem = newSustitutoId ? data.memberSummaries.find(m => String(m.id) === String(newSustitutoId)) : null;
             if (mem) {
-                alert(`✅ Sustituto guardado: ${mem.name} selló la Jornada ${jSummary.number}. El gasto del sellado (-24,75 €) y su reembolso (+24,75 €) se han asignado a su cuenta.`);
+                alert(`✅ Sustituto guardado: ${mem.name} selló la Jornada ${jSummary.number}. El gasto del sellado (-${jSummary.gastoSellado.toFixed(2)} €) y su reembolso (+${jSummary.gastoSellado.toFixed(2)} €) se han asignado a su cuenta.`);
             } else {
                 alert(`✅ Sellado restaurado: La Jornada ${jSummary.number} vuelve a tener como sellador a su Maula oficial (${jSummary.maulaName || jSummary.loserName}).`);
             }
@@ -1443,14 +1454,15 @@ class BoteAppController {
             }
         } else if (type === 'sellado') {
             title.textContent = `🎟️ Coste Sellado - Jornada ${jornadaNum}`;
+            const cDob = jSummary.costeDobles !== undefined ? jSummary.costeDobles : (this.config.costeDobles || 10.50);
             body.innerHTML = `
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
-                    <span class="text-slate-400">19 Quinielas Sencillas:</span>
-                    <strong class="text-slate-200 font-mono">19 × 0,75 € = 14,25 €</strong>
+                    <span class="text-slate-400">${numSocios} Quinielas Sencillas:</span>
+                    <strong class="text-slate-200 font-mono">${numSocios} × ${cuotaBase.toFixed(2)} € = ${totCuotas.toFixed(2)} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">1 Reducida (7 Dobles):</span>
-                    <strong class="text-purple-300 font-mono">16 × 0,75 € = 10,50 €</strong>
+                    <strong class="text-purple-300 font-mono">${cDob.toFixed(2)} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Socio encargado:</span>
@@ -1628,6 +1640,22 @@ class BoteAppController {
             cardCrecimiento.className = `text-lg sm:text-xl font-extrabold ${totalCrecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono`;
         }
         if (cardBoteTotal) cardBoteTotal.textContent = (BOTE_INICIAL + totalCrecimiento).toFixed(2) + ' €';
+
+        // Tarjeta de Coste Sellado Semanal (dinámica según parámetros)
+        const numSocios = (data.memberSummaries || []).length || 19;
+        const latestJ = data.jornadaSummaries && data.jornadaSummaries.length > 0 ? data.jornadaSummaries[data.jornadaSummaries.length - 1] : null;
+        const cCol = latestJ ? latestJ.costeColumna : (this.config.costeColumna !== undefined ? this.config.costeColumna : 0.75);
+        const cDob = latestJ ? latestJ.costeDobles : (this.config.costeDobles !== undefined ? this.config.costeDobles : 10.50);
+        const sencillasTotal = numSocios * cCol;
+        const totalSellado = sencillasTotal + cDob;
+
+        const cardSellado = document.getElementById('flujo-coste-sellado');
+        const cardSelladoSub = document.getElementById('flujo-coste-sellado-sub');
+        const cardSelladoTooltip = document.getElementById('flujo-sellado-tooltip-text');
+
+        if (cardSellado) cardSellado.textContent = `${totalSellado.toFixed(2)} € / jor`;
+        if (cardSelladoSub) cardSelladoSub.textContent = `${numSocios} sencillas + 1 dobles`;
+        if (cardSelladoTooltip) cardSelladoTooltip.textContent = `${numSocios} quinielas sencillas (${sencillasTotal.toFixed(2)} €) + 1 quiniela reducida de 7 dobles (${cDob.toFixed(2)} €) = ${totalSellado.toFixed(2)} € por jornada.`;
     }
 
     renderPremiosDobles() {
@@ -1856,6 +1884,10 @@ class BoteAppController {
             }
         }
 
+        const seasonData = this.getSeasonData();
+        const jSum = (seasonData && seasonData.jornadaSummaries) ? seasonData.jornadaSummaries.find(j => j.number === targetData.jornadaNum) : null;
+        const cDob = jSum ? jSum.costeDobles : (this.engine ? this.engine.getHistoricalPrice('costeDobles', targetData.date) : (this.config.costeDobles || 10.50));
+
         const selection = targetData.selection;
         const matches = targetData.matches;
         const prizes = targetData.prizes || {};
@@ -1987,7 +2019,7 @@ class BoteAppController {
                     <span>🟣</span> ¿Cómo funciona la Reducción Autorizada R2 (7 dobles - 16 apuestas)?
                 </strong>
                 <p class="leading-relaxed">
-                    La quiniela base pronosticada por <strong>${targetData.memberName}</strong> contiene 7 dobles (que al directo serían 128 apuestas = 96,00 €). El método oficial de reducción autorizada de LAE optimiza la jugada en exactamente <strong>16 apuestas estratégicas (coste 10,50 € pagado al 100% por la peña)</strong> asegurando el 100% al 13 si se aciertan los 14 signos y altas garantías de 14. En la tabla se compara el <strong>pronóstico base</strong> junto a las <strong>16 apuestas</strong> generadas y el <strong>resultado oficial</strong> de cada partido.
+                    La quiniela base pronosticada por <strong>${targetData.memberName}</strong> contiene 7 dobles (que al directo serían 128 apuestas = 96,00 €). El método oficial de reducción autorizada de LAE optimiza la jugada en exactamente <strong>16 apuestas estratégicas (coste ${cDob.toFixed(2)} € pagado al 100% por la peña)</strong> asegurando el 100% al 13 si se aciertan los 14 signos y altas garantías de 14. En la tabla se compara el <strong>pronóstico base</strong> junto a las <strong>16 apuestas</strong> generadas y el <strong>resultado oficial</strong> de cada partido.
                 </p>
             </div>
 
@@ -2122,7 +2154,7 @@ class BoteAppController {
         const content = document.getElementById('reducida-modal-content');
 
         if (title) title.textContent = `Desglose Reducción - Jornada ${targetData.jornadaNum} - ${targetData.memberName}`;
-        if (subtitle) subtitle.textContent = `16 apuestas combinadas (7 dobles) - Coste 10,50 € asumido íntegramente por la Peña`;
+        if (subtitle) subtitle.textContent = `16 apuestas combinadas (7 dobles) - Coste ${cDob.toFixed(2)} € asumido íntegramente por la Peña`;
         if (content) content.innerHTML = html;
 
         this.openModal('modal-reducida-detalle');
@@ -3307,7 +3339,7 @@ class BoteAppController {
                     },
                     {
                         type: 'bar',
-                        label: 'Coste Sellado LAE (24,75 €)',
+                        label: 'Coste Sellado LAE',
                         data: sellado,
                         backgroundColor: 'rgba(244, 63, 94, 0.75)',
                         borderColor: '#f43f5e',

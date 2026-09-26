@@ -474,7 +474,7 @@
                         <!-- Tooltip explicativo de superávit corregido (sin corte) -->
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-80 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
                             <strong class="text-emerald-400 block mb-1">📈 ¿Por qué hay superávit en caja?</strong>
-                            Es el margen acumulado en la hucha común: en cada jornada se recaudan cuotas superiores al coste de sellado (28,50 € vs 24,75 €) más las penalizaciones pagadas por socios que alimentan el fondo colectivo de la peña.
+                            Es el margen acumulado en la hucha común: en cada jornada se recaudan cuotas superiores al coste de sellado más las penalizaciones pagadas por socios que alimentan el fondo colectivo de la peña.
                         </div>
                     </div>
                 </div>
@@ -511,7 +511,7 @@
                     <!-- Tooltip gastos -->
                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
                         <strong class="text-rose-400 block mb-1">📤 Coste Oficial de Sellado</strong>
-                        Gasto real pagado en la administración de lotería en cada jornada: 19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 € por jornada.
+                        <span id="card-gastos-tooltip-text">Gasto real pagado en la administración de lotería en cada jornada (quinielas sencillas de los socios más la quiniela reducida de 7 dobles).</span>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -709,7 +709,7 @@
                             <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
                                 Comparativa Semanal: Recaudación vs Coste de Sellado
                             </h3>
-                            <p class="text-[11px] text-slate-400">Verde: Recaudación total • Rojo: Sellado oficial (24,75 €) • Amarillo: Margen neto</p>
+                            <p class="text-[11px] text-slate-400">Verde: Recaudación total • Rojo: Sellado oficial • Amarillo: Margen neto</p>
                         </div>
                     </div>
                     <button class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 flex items-center gap-1 transition-all" id="btn-toggle-jornadas-chart">
@@ -799,7 +799,7 @@
                                     <span class="inline-flex items-center gap-1">Reembolso Sellado <span class="text-[11px] text-purple-400">ℹ️</span></span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
                                         <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
-                                            <span>🔄</span> Reembolso de Sellado (24,75 €)
+                                            <span>🔄</span> Reembolso de Sellado
                                         </strong>
                                         <p class="leading-relaxed">
                                             Devolución del coste oficial de sellado abonado en loterías por el sellador oficial (💀). Puedes elegir si se abona a su Bote virtual o se liquida por Bizum.
@@ -950,11 +950,11 @@
                         <span class="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 text-base">🎟️</span>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-50 pointer-events-none">
                             <strong class="text-rose-400 block mb-1">🎟️ Coste Fijo de Sellado</strong>
-                            19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 € por jornada.
+                            <span id="flujo-sellado-tooltip-text">19 quinielas sencillas (14,25 €) + 1 quiniela reducida de 7 dobles (10,50 €) = 24,75 € por jornada.</span>
                         </div>
                     </div>
-                    <div class="text-2xl font-extrabold text-rose-400 mt-1 font-mono">24,75 € / jor</div>
-                    <p class="text-[11px] text-slate-400 mt-1">19 sencillas + 1 dobles</p>
+                    <div class="text-2xl font-extrabold text-rose-400 mt-1 font-mono" id="flujo-coste-sellado">24,75 € / jor</div>
+                    <p class="text-[11px] text-slate-400 mt-1" id="flujo-coste-sellado-sub">19 sencillas + 1 dobles</p>
                 </div>
             </div>
 
@@ -1001,7 +1001,7 @@
                                     <!-- Tooltip estilo enriquecido en cabecera -->
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 text-left normal-case font-normal pointer-events-none">
                                         <strong class="text-amber-400 block mb-1">💰 ¿Cómo se calcula el Bote Acumulado?</strong>
-                                        Arranca con el Bote Inicial de temporada (738,68 € procedentes de las aportaciones iniciales de socios). En cada jornada se le suma el margen neto generado: (Cuotas + Penalizaciones + Premios) - (Sellado de 24,75 €). Así se refleja el dinero físico real que tiene la peña tras cada jornada.
+                                        Arranca con el Bote Inicial de temporada (738,68 € procedentes de las aportaciones iniciales de socios). En cada jornada se le suma el margen neto generado: (Cuotas + Penalizaciones + Premios) - (Gasto de Sellado Oficial). Así se refleja el dinero físico real que tiene la peña tras cada jornada.
                                     </div>
                                 </th>
                             </tr>
@@ -1051,7 +1051,7 @@
                         <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                             <span>🟣</span> Historial de Premios en Quinielas de Dobles (Bote Peña)
                         </h3>
-                        <p class="text-xs text-slate-400">Quinielas reducidas de 7 dobles (16 apuestas) sufragadas al 100% por la Peña (10,50 €/jornada). Los premios ingresan íntegramente en la caja común.</p>
+                        <p class="text-xs text-slate-400">Quinielas reducidas de 7 dobles (16 apuestas) sufragadas al 100% por la Peña. Los premios ingresan íntegramente en la caja común.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold self-start sm:self-center">
                         🟣 Fondo Común de la Peña
@@ -1519,7 +1519,7 @@
                     </div>
                     <div>
                         <h2 class="text-lg sm:text-xl font-extrabold text-white" id="reducida-modal-titulo">Desglose de Quiniela Reducida</h2>
-                        <p class="text-xs text-slate-400" id="reducida-modal-subtitulo">16 apuestas combinadas (7 dobles) - Coste 10,50 € asumido por la Peña</p>
+                        <p class="text-xs text-slate-400" id="reducida-modal-subtitulo">16 apuestas combinadas (7 dobles) - Coste asumido por la Peña</p>
                     </div>
                 </div>
                 <button onclick="window.BoteApp.closeModal('modal-reducida-detalle')" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-base font-bold transition-all">
