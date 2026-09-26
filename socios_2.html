@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Socios 2.0 - PEÑA MAULAS</title>
+    <!-- Favicon & Mobile App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Peña Maulas">
+    <meta name="theme-color" content="#090d16">
+
+    <!-- Fonts & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+
+    <style>
+        :root {
+            --color-primary: #ff9100;
+            --color-primary-dark: #e65100;
+            --color-primary-light: #ffa726;
+            --color-bg: #090d16;
+            --color-card: rgba(18, 24, 38, 0.85);
+            --color-card-border: rgba(255, 145, 0, 0.2);
+            --color-emerald: #10b981;
+            --color-rose: #f43f5e;
+            --color-amber: #f59e0b;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 145, 0, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(255, 145, 0, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass-panel {
+            background: var(--color-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--color-card-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+        }
+
+        /* Tooltips en primer plano absoluto */
+        .group:hover > div[class*="absolute"],
+        div[class*="group-hover:visible"] {
+            z-index: 99999 !important;
+            pointer-events: auto !important;
+        }
+
+        /* Estilo de tabla en una sola línea */
+        .table-nowrap th,
+        .table-nowrap td {
+            white-space: nowrap !important;
+        }
+
+        /* Animación suave para modales */
+        @keyframes modalScaleIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal {
+            animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Tarjeta de socio con hover sutil */
+        .member-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .member-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 145, 0, 0.5);
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 145, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body class="p-3 md:p-6 lg:p-8">
+    <script src="js/auth.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/dice-service.js"></script>
+
+    <!-- PANTALLA DE ACCESO RESTRINGIDO (SOLO FERNANDO LOZANO) -->
+    <div id="restricted-access-screen" class="hidden min-h-[70vh] flex flex-col items-center justify-center text-center p-6">
+        <div class="glass-panel p-8 max-w-md w-full border-amber-500/40">
+            <div class="text-6xl mb-4">🚧</div>
+            <h1 class="text-2xl font-black text-amber-400 mb-2">SECCIÓN EN OBRAS</h1>
+            <p class="text-sm text-slate-300 mb-6 leading-relaxed">
+                Esta nueva versión <strong>Socios 2.0</strong> se encuentra en fase exclusiva de diseño para el evaluador oficial <strong>Fernando Lozano</strong>.
+            </p>
+            <div class="flex flex-col gap-3">
+                <button onclick="window.SociosApp.quickAuth(6)" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold rounded-xl shadow-lg transition">
+                    🔑 Acceder como Fernando Lozano
+                </button>
+                <a href="socios.html" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm transition">
+                    ← Volver a Socios 1.0 (Versión Clásica)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL DE SOCIOS 2.0 -->
+    <div id="main-content" class="max-w-[1700px] mx-auto space-y-6">
+
+        <!-- Top Announcement Bar (Coherencia Total con Bote 2) -->
+        <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+            <div class="flex items-center gap-3">
+                <span class="p-2 rounded-lg bg-amber-500/20 text-amber-400 text-base sm:text-lg">👥</span>
+                <div>
+                    <strong class="text-amber-400 font-semibold">Socios 2.0 - Gestión Deportiva y Censo Avanzado</strong>
+                    <p class="text-slate-400 text-xs">Vista exclusiva en fase de pruebas para Fernando Lozano. Sincronizada en tiempo real con Firestore.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs flex-wrap justify-center">
+                <a href="index.html" class="px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition-colors flex items-center gap-1.5" title="Ir al Inicio">
+                    <span>🏠 Inicio</span>
+                </a>
+                <a href="bote_2.html" class="px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 font-medium transition-colors flex items-center gap-1.5" title="Ir a la nueva versión de Tesorería">
+                    <span>💰 Bote 2</span>
+                </a>
+                <a href="socios.html" class="px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition-colors flex items-center gap-1.5" title="Volver a la vista tradicional de Socios">
+                    <span>← Socios 1.0</span>
+                </a>
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    Sincronizado en Vivo
+                </span>
+            </div>
+        </div>
+
+        <!-- CABECERA PRINCIPAL -->
+        <header class="glass-panel p-5 md:p-6 border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 text-3xl">
+                    👥
+                </div>
+                <div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <h1 class="text-2xl md:text-3xl font-black tracking-tight text-white flex items-center gap-2">
+                            SOCIOS <span class="text-amber-400">2.0</span>
+                        </h1>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            Temporada 2026-2027
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Pruebas Fernando Lozano
+                        </span>
+                    </div>
+                    <p class="text-xs md:text-sm text-slate-400 mt-1">
+                        Censo oficial de la Peña Maulas, fichas deportivas de socios y control del Dado de Quinielas.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botones de Acción de Cabecera -->
+            <div class="flex items-center gap-3 flex-wrap">
+                <button id="btn-add-socio" onclick="window.SociosApp.openModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-amber-500/25 flex items-center gap-2 text-sm transition">
+                    <span class="text-lg leading-none">➕</span>
+                    <span>Alta de Nuevo Socio</span>
+                </button>
+                <button id="btn-toggle-delete" onclick="window.SociosApp.toggleDeleteMode()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold rounded-xl text-sm transition flex items-center gap-2">
+                    <span id="delete-mode-icon">➖</span>
+                    <span id="delete-mode-text">Modo Bajas</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- TARJETAS RESUMEN / KPIS -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- KPI 1: Total Socios -->
+            <div class="glass-panel p-5 relative group cursor-help">
+                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    <span>Censo Activo</span>
+                    <span class="text-lg">🏛️</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpi-total-socios" class="text-3xl font-black text-white font-mono">--</span>
+                    <span class="text-xs text-emerald-400 font-semibold">100% activos</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-1">Socios registrados en la peña</div>
+
+                <!-- Tooltip Explicativo -->
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
+                    <p class="font-bold text-amber-400 mb-1">Censo Oficial de Socios</p>
+                    <p>Total de miembros con plaza activa en la temporada 2026-2027 con derecho a pronóstico semanal y participación en el bote común.</p>
+                </div>
+            </div>
+
+            <!-- KPI 2: Dados Activos Esta Jornada -->
+            <div class="glass-panel p-5 relative group cursor-help">
+                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    <span>Dados en Curso</span>
+                    <span class="text-lg">🎲</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpi-dados-activos" class="text-3xl font-black text-amber-400 font-mono">--</span>
+                    <span class="text-xs text-amber-300 font-semibold">viajes / ausencias</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-1">Comodín activado para hoy</div>
+
+                <!-- Tooltip Explicativo -->
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
+                    <p class="font-bold text-amber-400 mb-1">Dado de Quinielas Activo</p>
+                    <p>Indica qué socios tienen activado el rango de fechas de ausencia. El sistema rellenará al azar sus pronósticos sin penalización por retraso.</p>
+                </div>
+            </div>
+
+            <!-- KPI 3: Comodines Disponibles -->
+            <div class="glass-panel p-5 relative group cursor-help">
+                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    <span>Comodines de Temporada</span>
+                    <span class="text-lg">🎯</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpi-dados-usados" class="text-3xl font-black text-emerald-400 font-mono">--</span>
+                    <span class="text-xs text-slate-400 font-semibold">usadas en total</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-1">Máx. 3 por socio en toda la temporada</div>
+
+                <!-- Tooltip Explicativo -->
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
+                    <p class="font-bold text-amber-400 mb-1">Límite Anual de Dados</p>
+                    <p>Conforme al reglamento de la peña, cada socio puede beneficiarse del dado un máximo de 3 jornadas por temporada. Una vez alcanzado, el dado se bloquea.</p>
+                </div>
+            </div>
+
+            <!-- KPI 4: Conectados a Telegram -->
+            <div class="glass-panel p-5 relative group cursor-help">
+                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    <span>Comunidad Telegram</span>
+                    <span class="text-lg">💬</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span id="kpi-telegram-vinculados" class="text-3xl font-black text-sky-400 font-mono">--</span>
+                    <span class="text-xs text-sky-300 font-semibold">con nick oficial</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-1">Sincronizados con el bot de la peña</div>
+
+                <!-- Tooltip Explicativo -->
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
+                    <p class="font-bold text-sky-400 mb-1">Integración con Telegram</p>
+                    <p>Socios con su alias @usuario registrado. Les permite recibir recordatorios, avisos de premios y votar encuestas directamente desde la aplicación de Telegram.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BARRA DE BÚSQUEDA, FILTROS Y CONMUTADOR DE VISTAS -->
+        <div class="glass-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Buscador en tiempo real -->
+            <div class="w-full md:w-80 relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    🔍
+                </span>
+                <input type="text" id="search-input" oninput="window.SociosApp.applyFilters()" placeholder="Buscar socio, apodo, email, @nick..." class="w-full pl-9 pr-8 py-2 bg-slate-900/80 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition">
+                <button id="search-clear-btn" onclick="window.SociosApp.clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Filtros por Categoría (Píldoras) -->
+            <div class="flex items-center gap-1.5 flex-wrap overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+                <button onclick="window.SociosApp.setCategoryFilter('all')" data-cat="all" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow-md">
+                    Todos (<span id="count-all">0</span>)
+                </button>
+                <button onclick="window.SociosApp.setCategoryFilter('dice_active')" data-cat="dice_active" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+                    🎲 Dado Activo (<span id="count-dice-active">0</span>)
+                </button>
+                <button onclick="window.SociosApp.setCategoryFilter('dice_exhausted')" data-cat="dice_exhausted" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+                    ⚠️ Dado Agotado (<span id="count-dice-exhausted">0</span>)
+                </button>
+                <button onclick="window.SociosApp.setCategoryFilter('telegram')" data-cat="telegram" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+                    💬 Con Telegram (<span id="count-telegram">0</span>)
+                </button>
+            </div>
+
+            <!-- Selector de Vista: Fichas vs Tabla -->
+            <div class="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-800 self-end md:self-auto">
+                <button id="view-mode-grid" onclick="window.SociosApp.setViewMode('grid')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow flex items-center gap-1.5">
+                    <span>🎴</span>
+                    <span class="hidden sm:inline">Fichas</span>
+                </button>
+                <button id="view-mode-table" onclick="window.SociosApp.setViewMode('table')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center gap-1.5">
+                    <span>📑</span>
+                    <span class="hidden sm:inline">Tabla</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- VISTA A: FICHAS DEPORTIVAS (GRID) -->
+        <section id="members-grid-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <!-- Populated dynamically by JS -->
+        </section>
+
+        <!-- VISTA B: TABLA COMPACTA EN UNA SOLA LÍNEA (ESTILO BOTE 2) -->
+        <section id="members-table-container" class="hidden glass-panel overflow-hidden border-slate-800">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs table-nowrap">
+                    <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800 tracking-wider">
+                        <tr>
+                            <th class="py-3.5 px-4 cursor-pointer hover:text-white" onclick="window.SociosApp.sortBy('id')">Nº Socio ↕</th>
+                            <th class="py-3.5 px-4 cursor-pointer hover:text-white" onclick="window.SociosApp.sortBy('name')">Nombre Completo ↕</th>
+                            <th class="py-3.5 px-4 cursor-pointer hover:text-white" onclick="window.SociosApp.sortBy('phone')">Apodo Oficial ↕</th>
+                            <th class="py-3.5 px-4">Correo Electrónico</th>
+                            <th class="py-3.5 px-4">Nick Telegram</th>
+                            <th class="py-3.5 px-4">Dado 🎲 (Estado & Fechas)</th>
+                            <th class="py-3.5 px-4 text-center cursor-pointer hover:text-white" onclick="window.SociosApp.sortBy('diceUses')">Usadas / 3 ↕</th>
+                            <th class="py-3.5 px-4 text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="members-table-body" class="divide-y divide-slate-800/60 font-mono text-xs">
+                        <!-- Populated dynamically by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL DE GESTIÓN DE SOCIO (ALTA / EDICIÓN) -->
+    <div id="modal-member-form" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-[99999]">
+        <div class="glass-panel w-full max-w-xl border-amber-500/40 p-6 md:p-8 animate-modal max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">👤</span>
+                    <div>
+                        <h2 id="modal-form-title" class="text-xl font-black text-white">Editar Socio</h2>
+                        <p class="text-xs text-slate-400">Datos personales y configuración de dados de quiniela</p>
+                    </div>
+                </div>
+                <button onclick="window.SociosApp.closeModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">✕</button>
+            </div>
+
+            <form id="member-edit-form" onsubmit="window.SociosApp.handleFormSubmit(event)" class="space-y-5">
+                <input type="hidden" id="form-inp-id">
+
+                <!-- DATOS PERSONALES -->
+                <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Identidad del Socio</div>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Nombre Completo *</label>
+                        <input type="text" id="form-inp-name" required placeholder="Ej: Fernando Lozano" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Apodo (Se usará en toda la web)</label>
+                            <input type="text" id="form-inp-phone" placeholder="Ej: Lozano" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Nick Telegram (Sin @)</label>
+                            <input type="text" id="form-inp-tgnick" placeholder="Ej: lozano_maula" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Correo Electrónico *</label>
+                        <input type="email" id="form-inp-email" required placeholder="ejemplo@maulas.com" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-sm text-white focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- CONFIGURACIÓN DEL DADO DE QUINIELAS -->
+                <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span>🎲</span>
+                            <span>Dado de Quinielas (Viajes / Ausencias)</span>
+                        </div>
+                        <span id="form-lbl-dice-counter" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            0 / 3 usadas
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Permite que el sistema rellene automáticamente al azar las quinielas del socio en el rango de fechas indicado sin penalización por retraso (máximo 3 jornadas por temporada).
+                    </p>
+
+                    <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-950 rounded-lg border border-slate-800 hover:border-slate-700 transition">
+                        <input type="checkbox" id="form-inp-dice-enabled" onchange="window.SociosApp.toggleDiceFields()" class="w-4 h-4 rounded text-amber-500 focus:ring-amber-500 focus:ring-offset-slate-950 bg-slate-900 border-slate-700 cursor-pointer">
+                        <span class="text-sm font-bold text-slate-200">Activar Dado para este socio</span>
+                    </label>
+
+                    <div id="form-dice-dates" class="grid grid-cols-1 sm:grid-cols-2 gap-3 opacity-50 pointer-events-none transition-opacity">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Fecha de Inicio</label>
+                            <input type="date" id="form-inp-dice-start" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-xs text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Fecha de Fin</label>
+                            <input type="date" id="form-inp-dice-end" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-xs text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div id="form-dice-exhausted-alert" class="hidden p-3 bg-rose-500/15 border border-rose-500/30 rounded-lg text-xs text-rose-300 font-semibold flex items-center gap-2">
+                        <span>⚠️</span>
+                        <span>Este socio ya ha alcanzado el límite reglamentario de 3 jornadas con dado en la temporada.</span>
+                    </div>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="window.SociosApp.closeModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-sm transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-sm shadow-lg transition">
+                        Guardar Socio
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONTROLADOR SOCIOS 2.0 -->
+    <script src="js/socios_2.js"></script>
+</body>
+
+</html>

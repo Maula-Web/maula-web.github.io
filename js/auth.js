@@ -330,11 +330,35 @@ const Auth = {
     },
 
     injectLogout: function () {
-        if (window.location.pathname.includes('login.html')) return;
+        if (window.location.pathname.includes('login.html') || 
+            window.location.pathname.includes('bote_2.html') || 
+            window.location.pathname.includes('socios_2.html')) return;
 
         // Path current
         const path = window.location.pathname;
         const page = path.split('/').pop() || 'index.html';
+
+        // Check if current user is Fernando Lozano (ID: 6)
+        let isFernandoLozano = false;
+        try {
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            if (userStr) {
+                const u = JSON.parse(userStr);
+                const uid = String(u.id || '');
+                const umail = (u.email || '').toLowerCase().trim();
+                const uname = (u.name || '').toLowerCase().trim();
+                const uphone = (u.phone || '').toLowerCase().trim();
+                if (
+                    uid === '6' ||
+                    umail === 'lozano@maulas.com' ||
+                    uname.includes('fernando lozano') ||
+                    (uname.includes('lozano') && !uname.includes('ram')) ||
+                    uphone.includes('lozano')
+                ) {
+                    isFernandoLozano = true;
+                }
+            }
+        } catch (e) {}
 
         // 1. Ensure Header (sidebar-menu) exists on all pages
         let sidebar = document.querySelector('.sidebar-menu');
@@ -355,6 +379,7 @@ const Auth = {
                     <span></span>
                 </div>
                 <a href="socios.html" class="btn-primary btn-socios ${page === 'socios.html' ? 'active' : ''}">SOCIOS</a>
+                ${isFernandoLozano ? `<a href="socios_2.html" class="btn-primary btn-socios-2 ${page === 'socios_2.html' ? 'active' : ''}" style="border: 1px dashed #ff9100; color: #ff9100;" title="Nueva versión de Socios 2.0 (en pruebas)">SOCIOS 2</a>` : ''}
                 <a href="jornadas.html" class="btn-primary btn-jornadas ${page === 'jornadas.html' ? 'active' : ''}">RESULTADOS PARTIDOS</a>
                 <a href="pronosticos.html" class="btn-primary btn-pronosticos ${page === 'pronosticos.html' ? 'active' : ''}">RELLENAR QUINIELA</a>
                 <a href="resultados.html" class="btn-primary btn-resultados ${page === 'resultados.html' ? 'active' : ''}">CLASIFICACIÓN</a>
@@ -381,6 +406,28 @@ const Auth = {
                     logo.style.cursor = 'pointer';
                     logo.onclick = () => window.location.href = 'index.html';
                 }
+            }
+
+            // 2a. Ensure Socios 2 button exists ONLY for Fernando Lozano
+            if (isFernandoLozano) {
+                if (!sidebar.querySelector('a[href="socios_2.html"]')) {
+                    const socios2Btn = document.createElement('a');
+                    socios2Btn.href = "socios_2.html";
+                    socios2Btn.className = `btn-primary btn-socios-2 ${page === 'socios_2.html' ? 'active' : ''}`;
+                    socios2Btn.style.border = "1px dashed #ff9100";
+                    socios2Btn.style.color = "#ff9100";
+                    socios2Btn.title = "Nueva versión de Socios 2.0 (en pruebas)";
+                    socios2Btn.textContent = "SOCIOS 2";
+                    const sociosBtn = sidebar.querySelector('a[href="socios.html"]');
+                    if (sociosBtn) {
+                        sociosBtn.insertAdjacentElement('afterend', socios2Btn);
+                    } else {
+                        sidebar.appendChild(socios2Btn);
+                    }
+                }
+            } else {
+                const existingS2 = sidebar.querySelector('a[href="socios_2.html"]');
+                if (existingS2) existingS2.remove();
             }
 
             // 2b. Ensure Bote button exists
