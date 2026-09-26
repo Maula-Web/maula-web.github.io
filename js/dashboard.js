@@ -74,6 +74,7 @@ class DashboardManager {
 
             let lastJornadaInfo = null;
             let totalSeasonPrizes = 0;
+            let totalSeasonDoblesPrizes = 0;
             let totalSeasonMoney = 0;
 
             // Process all played jornadas
@@ -185,14 +186,43 @@ class DashboardManager {
                     const extras = extrasMap.get(String(jornada.id)) || extrasMap.get(String(jornada.number)) || [];
 
                     extras.forEach(p => {
-                        const sel = p.selection || p.forecasts || [];
+                        const sel = p.selection || p.forecasts || p.forecast || [];
                         const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
-                        const evaluation = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(sel, officialResults, jornada.date) : { hits: 0, points: 0, bonus: 0 };
+                        const doubleCount = (sel || []).filter((s, i) => i < 14 && s && s.length > 1).length;
+                        const isReduced = p.isReduced || (doubleCount === 7);
+                        const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
+                        const evaluation = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(sel, officialResults, jDate, { isReduced }) : { hits: 0, points: 0, bonus: 0 };
 
                         const prizesMap = jornada.prizes || jornada.prizeRates || {};
-                        const prizeVal = prizesMap[evaluation.hits] || prizesMap[String(evaluation.hits)] || 0;
-                        if (prizeVal > 0) {
-                            totalSeasonMoney += parseFloat(prizeVal);
+                        let extraPrizeAmount = 0;
+                        let hasPrize = false;
+
+                        if (evaluation && evaluation.breakdown) {
+                            Object.keys(evaluation.breakdown).forEach(h => {
+                                const count = evaluation.breakdown[h];
+                                let pVal = prizesMap[h] || prizesMap[String(h)] || 0;
+                                if (typeof pVal === 'string') {
+                                    pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                                }
+                                if (count > 0 && pVal > 0) {
+                                    extraPrizeAmount += count * parseFloat(pVal);
+                                    hasPrize = true;
+                                }
+                            });
+                        } else if (evaluation && evaluation.hits) {
+                            let pVal = prizesMap[evaluation.hits] || prizesMap[String(evaluation.hits)] || 0;
+                            if (typeof pVal === 'string') {
+                                pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                            }
+                            if (pVal > 0) {
+                                extraPrizeAmount += parseFloat(pVal);
+                                hasPrize = true;
+                            }
+                        }
+
+                        if (hasPrize && extraPrizeAmount > 0) {
+                            totalSeasonDoblesPrizes++;
+                            totalSeasonMoney += extraPrizeAmount;
                         }
                     });
                 }
@@ -307,15 +337,29 @@ class DashboardManager {
                 const lastJDate = playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].date : '';
 
                 let prizesList = "";
-                if (lastJornadaInfo.prizeWinners && lastJornadaInfo.prizeWinners.length > 0) {
-                    prizesList = lastJornadaInfo.prizeWinners.map(pw => `
-                    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f5f5f5;">
-                        <span style="font-weight:500;">${pw.name}</span>
-                        <span style="background:var(--primary-green); color:white; padding:0 8px; border-radius:10px; font-weight:bold; font-size:0.85rem;">${pw.hits} aciertos</span>
-                    </div>
-                `).join('');
+                const weeklyIndiv = (lastJornadaInfo.prizeWinners && lastJornadaInfo.prizeWinners.length > 0)
+                    ? lastJornadaInfo.prizeWinners.map(pw => `
+                        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f5f5f5;">
+                            <span style="font-weight:500;">${pw.name}</span>
+                            <span style="background:var(--primary-green); color:white; padding:0 8px; border-radius:10px; font-weight:bold; font-size:0.85rem;">${pw.hits} aciertos</span>
+                        </div>
+                    `)
+                    : [];
+
+                const weeklyDobles = (lastJornadaInfo.doublesResults && lastJornadaInfo.doublesResults.length > 0)
+                    ? lastJornadaInfo.doublesResults.filter(dr => dr.prize > 0).map(dw => `
+                        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f5f5f5;">
+                            <span style="font-weight:500; color:#7b1fa2;">🟣 Quiniela Dobles (${dw.name})</span>
+                            <span style="background:#9c27b0; color:white; padding:0 8px; border-radius:10px; font-weight:bold; font-size:0.85rem;">${dw.hits} ac. (${dw.prize.toFixed(2)}€)</span>
+                        </div>
+                    `)
+                    : [];
+
+                const allWeekly = [...weeklyIndiv, ...weeklyDobles];
+                if (allWeekly.length > 0) {
+                    prizesList = allWeekly.join('');
                 } else {
-                    prizesList = `<div style="color:#888; font-style:italic;">No hubo socios con premio (${lastJornadaInfo.minHitsToWin} aciertos)</div>`;
+                    prizesList = `<div style="color:#888; font-style:italic;">No hubo pronósticos con premio (${lastJornadaInfo.minHitsToWin} aciertos)</div>`;
                 }
 
                 lastJornadaPrizesHtml = `
@@ -324,7 +368,7 @@ class DashboardManager {
                         <!-- Column 1: Weekly -->
                         <div style="text-align: left; border-right: 1px solid #eee; padding-right: 1.5rem;">
                             <h3 style="color:var(--primary-green); font-weight:bold; font-size:1rem; margin-bottom:0.8rem; margin-top:0;">🏆 PREMIOS SEMANALES (J. ${lastJNum})</h3>
-                            <div style="font-size:0.85rem; color:#666; margin-bottom:0.8rem;">Socios con ${lastJornadaInfo.minHitsToWin}+ aciertos:</div>
+                            <div style="font-size:0.85rem; color:#666; margin-bottom:0.8rem;">Pronósticos con ${lastJornadaInfo.minHitsToWin}+ aciertos:</div>
                             ${prizesList}
                             <div style="margin-top: 1rem; font-weight: bold; color: var(--primary-green); font-size: 1.1rem;">
                                 Total Semana: ${lastJornadaInfo.totalMoney.toFixed(2)}€
@@ -336,8 +380,18 @@ class DashboardManager {
                             <h3 style="color:var(--primary-blue); font-weight:bold; font-size:1rem; margin-bottom:0.8rem; margin-top:0;">📊 RESUMEN TEMPORADA</h3>
                             <div style="display: flex; flex-direction: column; gap: 0.8rem;">
                                 <div>
-                                    <div style="font-size: 0.85rem; color: #666;">Total Pronósticos con Premio:</div>
-                                    <div style="font-size: 1.4rem; font-weight: bold; color: var(--primary-green);">${totalSeasonPrizes}</div>
+                                    <div style="font-size: 0.85rem; color: #666; margin-bottom:0.25rem;">Total Pronósticos con Premio:</div>
+                                    <div style="display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap;">
+                                        <div title="Pronósticos individuales de socios con premio">
+                                            <span style="font-size: 1.35rem; font-weight: bold; color: var(--primary-green);">${totalSeasonPrizes}</span>
+                                            <span style="font-size: 0.8rem; color: #555; font-weight: 500;">individuales</span>
+                                        </div>
+                                        <div style="color: #ccc;">•</div>
+                                        <div title="Columnas reducidas de dobles con premio">
+                                            <span style="font-size: 1.35rem; font-weight: bold; color: #9c27b0;">${totalSeasonDoblesPrizes}</span>
+                                            <span style="font-size: 0.8rem; color: #555; font-weight: 500;">dobles</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
                                     <div style="font-size: 0.85rem; color: #666;">Total Recaudado en Premios:</div>
@@ -641,23 +695,44 @@ class DashboardManager {
                 const member = memberStats[mId];
                 if (!member) return;
 
-                const selection = df.selection || [];
-                let hits = 0;
-                selection.forEach((sel, idx) => {
-                    if (idx >= 14) return; // Exclude Pleno al 15
-                    const res = officialResults[idx];
-                    if (res && sel && sel.includes(res)) {
-                        hits++;
-                    }
-                });
+                const selection = df.selection || df.forecast || [];
+                const doubleCount = (selection || []).filter((s, i) => i < 14 && s && s.length > 1).length;
+                const isReduced = df.isReduced || (doubleCount === 7);
+                const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
+                const ev = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced }) : null;
 
-                const minHits = jornada.minHitsToWin || 10;
+                const prizesMap = jornada.prizes || jornada.prizeRates || {};
                 let prizeVal = 0;
-                if (hits >= minHits && jornada.prizeRates && jornada.prizeRates[hits]) {
-                    prizeVal = jornada.prizeRates[hits];
+                let actualHits = 0;
+
+                if (ev && ev.breakdown) {
+                    actualHits = ev.hits || 0;
+                    Object.keys(ev.breakdown).forEach(h => {
+                        const count = ev.breakdown[h];
+                        let pVal = prizesMap[h] || prizesMap[String(h)] || 0;
+                        if (typeof pVal === 'string') {
+                            pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                        }
+                        if (count > 0 && pVal > 0) {
+                            prizeVal += count * parseFloat(pVal);
+                        }
+                    });
+                } else {
+                    selection.forEach((sel, idx) => {
+                        if (idx >= 14) return;
+                        const res = officialResults[idx];
+                        if (res && sel && sel.includes(res)) {
+                            actualHits++;
+                        }
+                    });
+                    let pVal = prizesMap[actualHits] || prizesMap[String(actualHits)] || 0;
+                    if (typeof pVal === 'string') {
+                        pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                    }
+                    if (pVal > 0) prizeVal = parseFloat(pVal);
                 }
 
-                doublesResults.push({ name: member.name, hits: hits, prize: prizeVal });
+                doublesResults.push({ name: member.name, hits: actualHits, prize: prizeVal });
             });
         }
 
@@ -743,6 +818,7 @@ class DashboardManager {
             pigAcertantes: pigAcertantes,
             pigFallantes: pigFallantes,
             doublesHtml: doublesHtml,
+            doublesResults: doublesResults,
             prizeWinners: prizeWinners,
             minHitsToWin: minHitsToWin,
             totalMoney: prizeMoney + doublesMoney
