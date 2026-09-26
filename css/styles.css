@@ -2263,7 +2263,7 @@ tbody tr:hover {
     font-size: 0.9rem;
 }
 
-input[type="text"],
+input[type="text"]:not(#search-input):not(#form-inp-tgnick):not(#form-inp-dice-range),
 input[type="number"],
 input[type="email"],
 input[type="tel"],
