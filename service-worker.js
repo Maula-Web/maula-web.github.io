@@ -3,7 +3,7 @@
  * Versión de caché: maulas-pwa-v1.0
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.7';
+const CACHE_NAME = 'maulas-pwa-v1.8';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -62,7 +62,11 @@ const CORE_ASSETS = [
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js',
-    'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
+    'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
+    'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+    'https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css',
+    'https://cdn.jsdelivr.net/npm/flatpickr',
+    'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js'
 ];
 
 // 1. Instalación: Precachear recursos del App Shell de manera resiliente

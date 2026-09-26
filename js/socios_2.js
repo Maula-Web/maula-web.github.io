@@ -43,6 +43,7 @@ class SociosAppController {
 
         // 3. Configurar interfaz inicial
         this.setViewMode(this.viewMode, false);
+        this.initDatePicker();
         this.applyFilters();
     }
 
@@ -549,6 +550,165 @@ class SociosAppController {
     }
 
     /**
+     * INICIALIZACIÓN DEL CALENDARIO FLATPICKR PARA EL DADO
+     */
+    initDatePicker() {
+        if (typeof flatpickr === 'undefined') return;
+
+        const rangeInput = document.getElementById('form-inp-dice-range');
+        if (!rangeInput) return;
+
+        try {
+            this.fpInstance = flatpickr(rangeInput, {
+                mode: 'range',
+                locale: 'es',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'd/m/Y',
+                conjunction: ' al ',
+                minDate: '2026-01-01',
+                theme: 'dark',
+                static: false,
+                onReady: (selectedDates, dateStr, instance) => {
+                    if (instance.calendarContainer) {
+                        instance.calendarContainer.style.zIndex = '100070';
+                    }
+                },
+                onOpen: (selectedDates, dateStr, instance) => {
+                    if (instance.calendarContainer) {
+                        instance.calendarContainer.style.zIndex = '100070';
+                    }
+                },
+                onChange: (selectedDates) => {
+                    this.handleDatePickerChange(selectedDates);
+                }
+            });
+        } catch (e) {
+            console.warn('[Socios 2.0] Error inicializando Flatpickr:', e);
+        }
+    }
+
+    handleDatePickerChange(selectedDates) {
+        const inpStart = document.getElementById('form-inp-dice-start');
+        const inpEnd = document.getElementById('form-inp-dice-end');
+        const badge = document.getElementById('form-dice-duration-badge');
+
+        if (!selectedDates || selectedDates.length === 0) {
+            if (inpStart) inpStart.value = '';
+            if (inpEnd) inpEnd.value = '';
+            if (badge) {
+                badge.classList.add('hidden');
+                badge.textContent = '';
+            }
+            return;
+        }
+
+        const formatIso = (d) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const sStr = formatIso(selectedDates[0]);
+        if (inpStart) inpStart.value = sStr;
+
+        if (selectedDates.length === 2) {
+            const eStr = formatIso(selectedDates[1]);
+            if (inpEnd) inpEnd.value = eStr;
+
+            // Calcular diferencia de días
+            const diffTime = Math.abs(selectedDates[1] - selectedDates[0]);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            if (badge) {
+                badge.classList.remove('hidden');
+                badge.textContent = `📅 ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+            }
+        } else {
+            if (inpEnd) inpEnd.value = sStr;
+            if (badge) {
+                badge.classList.remove('hidden');
+                badge.textContent = '📅 1 día';
+            }
+        }
+    }
+
+    applyDatePreset(preset) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let startDate = new Date(today);
+        let endDate = new Date(today);
+
+        if (preset === 'weekend') {
+            const dayOfWeek = today.getDay(); // 0: Dom, 1: Lun, ..., 5: Vie, 6: Sab
+            if (dayOfWeek === 5) {
+                // Viernes
+                startDate = new Date(today);
+                endDate = new Date(today);
+                endDate.setDate(today.getDate() + 2);
+            } else if (dayOfWeek === 6) {
+                // Sábado
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 1);
+                endDate = new Date(today);
+                endDate.setDate(today.getDate() + 1);
+            } else if (dayOfWeek === 0) {
+                // Domingo
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 2);
+                endDate = new Date(today);
+            } else {
+                // Lunes a Jueves -> Próximo viernes
+                const daysUntilFriday = 5 - dayOfWeek;
+                startDate.setDate(today.getDate() + daysUntilFriday);
+                endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 2);
+            }
+        } else if (preset === 'week') {
+            startDate = new Date(today);
+            endDate = new Date(today);
+            endDate.setDate(today.getDate() + 7);
+        } else if (preset === 'fortnight') {
+            startDate = new Date(today);
+            endDate = new Date(today);
+            endDate.setDate(today.getDate() + 14);
+        } else if (preset === 'month') {
+            startDate = new Date(today);
+            endDate = new Date(today);
+            endDate.setDate(today.getDate() + 30);
+        }
+
+        if (this.fpInstance) {
+            this.fpInstance.setDate([startDate, endDate], true);
+        } else {
+            this.handleDatePickerChange([startDate, endDate]);
+        }
+    }
+
+    clearDiceDates() {
+        if (this.fpInstance) {
+            this.fpInstance.clear();
+        }
+        const inpStart = document.getElementById('form-inp-dice-start');
+        const inpEnd = document.getElementById('form-inp-dice-end');
+        const badge = document.getElementById('form-dice-duration-badge');
+        if (inpStart) inpStart.value = '';
+        if (inpEnd) inpEnd.value = '';
+        if (badge) {
+            badge.classList.add('hidden');
+            badge.textContent = '';
+        }
+    }
+
+    openDatePicker() {
+        if (this.fpInstance) {
+            this.fpInstance.open();
+        }
+    }
+
+    /**
      * MODAL DE ALTA / EDICIÓN
      */
     openModal(member = null) {
@@ -589,11 +749,20 @@ class SociosAppController {
 
             if (inpDiceStart) {
                 inpDiceStart.value = member.diceStartDate || '';
-                inpDiceStart.disabled = isExhausted;
             }
             if (inpDiceEnd) {
                 inpDiceEnd.value = member.diceEndDate || '';
-                inpDiceEnd.disabled = isExhausted;
+            }
+
+            // Sincronizar con calendario Flatpickr
+            if (member.diceStartDate && member.diceEndDate && this.fpInstance) {
+                try {
+                    this.fpInstance.setDate([member.diceStartDate, member.diceEndDate], true);
+                } catch (e) {
+                    console.warn('[Socios 2.0] Error estableciendo fechas en picker:', e);
+                }
+            } else {
+                this.clearDiceDates();
             }
         } else {
             if (title) title.textContent = 'Alta de Nuevo Socio';
@@ -605,8 +774,9 @@ class SociosAppController {
                 inpDiceEnabled.checked = false;
                 inpDiceEnabled.disabled = false;
             }
-            if (inpDiceStart) inpDiceStart.disabled = false;
-            if (inpDiceEnd) inpDiceEnd.disabled = false;
+            if (inpDiceStart) inpDiceStart.value = '';
+            if (inpDiceEnd) inpDiceEnd.value = '';
+            this.clearDiceDates();
         }
 
         this.toggleDiceFields();
@@ -623,6 +793,9 @@ class SociosAppController {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
+        if (this.fpInstance) {
+            this.fpInstance.close();
+        }
     }
 
     toggleDiceFields() {
@@ -632,6 +805,14 @@ class SociosAppController {
             const active = chk.checked && !chk.disabled;
             container.style.opacity = active ? '1' : '0.4';
             container.style.pointerEvents = active ? 'auto' : 'none';
+
+            if (this.fpInstance && this.fpInstance.altInput) {
+                if (active) {
+                    this.fpInstance.altInput.removeAttribute('disabled');
+                } else {
+                    this.fpInstance.altInput.setAttribute('disabled', 'disabled');
+                }
+            }
         }
     }
 

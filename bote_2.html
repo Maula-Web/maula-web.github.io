@@ -82,13 +82,14 @@
 
         .grid:has(.group:hover),
         section:has(.group:hover) {
-            z-index: 60 !important;
+            z-index: 100040 !important;
             position: relative;
         }
 
         .group:hover,
-        .group:focus-within {
-            z-index: 70 !important;
+        .group:focus-within,
+        .group:active {
+            z-index: 100050 !important;
             position: relative;
         }
 
@@ -96,7 +97,7 @@
         .group > div[class*="group-hover:visible"],
         .group:hover > div[class*="absolute"],
         div[class*="group-hover:visible"] {
-            z-index: 99999 !important;
+            z-index: 100060 !important;
             pointer-events: auto !important;
         }
 

@@ -29,6 +29,12 @@
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
 
+    <!-- Flatpickr (Selector de Fechas y Rangos de Calendario) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
     <style>
         :root {
             --color-primary: #ff9100;
@@ -69,14 +75,37 @@
             position: relative;
         }
 
-        /* Tooltips en primer plano absoluto */
+        /* REGLA CRÍTICA: Asegurar que las tarjetas explicativas queden SIEMPRE en primer plano absoluto sin recortes */
+        #kpi-section {
+            position: relative;
+            z-index: 50;
+            overflow: visible !important;
+        }
+
+        .kpi-card {
+            position: relative;
+            overflow: visible !important;
+        }
+
+        .kpi-card:hover,
+        .kpi-card:focus-within,
+        .kpi-card:active,
+        .group:hover,
+        .group:focus-within,
+        .group:active {
+            z-index: 100050 !important;
+            position: relative;
+        }
+
+        .tooltip-card,
+        .group > div[class*="group-hover:visible"],
         .group:hover > div[class*="absolute"],
         div[class*="group-hover:visible"] {
-            z-index: 99999 !important;
+            z-index: 100060 !important;
             pointer-events: auto !important;
         }
 
-        /* Estilo de tabla en una sola línea */
+        /* Estilos de tabla en una sola línea */
         .table-nowrap th,
         .table-nowrap td {
             white-space: nowrap !important;
@@ -99,6 +128,90 @@
             transform: translateY(-4px);
             border-color: rgba(255, 145, 0, 0.5);
             box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 145, 0, 0.15);
+        }
+
+        /* =========================================================================
+           ESTILOS PERSONALIZADOS FLATPICKR - PEÑA MAULAS THEME (DARK + AMBER)
+           ========================================================================= */
+        .flatpickr-calendar {
+            background: #0d1322 !important;
+            border: 1px solid rgba(255, 145, 0, 0.5) !important;
+            border-radius: 18px !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 145, 0, 0.2) !important;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+            z-index: 100070 !important;
+            padding: 8px !important;
+            backdrop-filter: blur(16px) !important;
+        }
+        .flatpickr-calendar .flatpickr-months {
+            background: transparent !important;
+            border-radius: 12px !important;
+            padding: 4px 0 8px 0 !important;
+        }
+        .flatpickr-calendar .flatpickr-months .flatpickr-month {
+            color: #ffffff !important;
+            fill: #ffffff !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month {
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            font-size: 0.95rem !important;
+        }
+        .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-calendar .flatpickr-current-month input.cur-year {
+            color: #ff9100 !important;
+            font-weight: 800 !important;
+        }
+        span.flatpickr-weekday {
+            color: #94a3b8 !important;
+            font-weight: 700 !important;
+            font-size: 0.75rem !important;
+        }
+        .flatpickr-day {
+            color: #cbd5e1 !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            font-size: 0.82rem !important;
+            transition: all 0.15s ease !important;
+            border: 1px solid transparent !important;
+        }
+        .flatpickr-day:hover {
+            background: rgba(255, 145, 0, 0.25) !important;
+            border-color: rgba(255, 145, 0, 0.5) !important;
+            color: #ffffff !important;
+        }
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange {
+            background: linear-gradient(135deg, #ff9100 0%, #e65100 100%) !important;
+            border-color: #ff9100 !important;
+            color: #090d16 !important;
+            font-weight: 900 !important;
+            box-shadow: 0 4px 14px rgba(255, 145, 0, 0.5) !important;
+        }
+        .flatpickr-day.inRange {
+            background: rgba(255, 145, 0, 0.2) !important;
+            border-color: rgba(255, 145, 0, 0.3) !important;
+            color: #ffa726 !important;
+            box-shadow: -5px 0 0 rgba(255, 145, 0, 0.2), 5px 0 0 rgba(255, 145, 0, 0.2) !important;
+        }
+        .flatpickr-day.today {
+            border-color: #ff9100 !important;
+            color: #ff9100 !important;
+        }
+        .flatpickr-day.disabled,
+        .flatpickr-day.disabled:hover {
+            color: #475569 !important;
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+        .flatpickr-calendar.arrowTop:before,
+        .flatpickr-calendar.arrowTop:after {
+            border-bottom-color: #0d1322 !important;
+        }
+        .flatpickr-calendar.arrowBottom:before,
+        .flatpickr-calendar.arrowBottom:after {
+            border-top-color: #0d1322 !important;
         }
     </style>
 </head>
@@ -193,12 +306,15 @@
             </div>
         </header>
 
-        <!-- TARJETAS RESUMEN / KPIS -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- TARJETAS RESUMEN / KPIS (SIEMPRE EN PRIMER PLANO ABSOLUTO) -->
+        <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-50 overflow-visible">
             <!-- KPI 1: Total Socios -->
-            <div class="glass-panel p-5 relative group cursor-help">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span>Censo Activo</span>
+                    <span class="flex items-center gap-1.5">
+                        <span>Censo Activo</span>
+                        <span class="text-[11px] text-amber-400">ℹ️</span>
+                    </span>
                     <span class="text-lg">🏛️</span>
                 </div>
                 <div class="flex items-baseline gap-2">
@@ -207,17 +323,23 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Socios registrados en la peña</div>
 
-                <!-- Tooltip Explicativo -->
-                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
-                    <p class="font-bold text-amber-400 mb-1">Censo Oficial de Socios</p>
-                    <p>Total de miembros con plaza activa en la temporada 2026-2027 con derecho a pronóstico semanal y participación en el bote común.</p>
+                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                    <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
+                        <span>🏛️</span>
+                        <span>Censo Oficial de Socios</span>
+                    </div>
+                    <p class="leading-relaxed text-slate-300">Total de miembros con plaza activa en la temporada 2026-2027 con derecho a pronóstico semanal y participación en el bote común.</p>
                 </div>
             </div>
 
             <!-- KPI 2: Dados Activos Esta Jornada -->
-            <div class="glass-panel p-5 relative group cursor-help">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span>Dados en Curso</span>
+                    <span class="flex items-center gap-1.5">
+                        <span>Dados en Curso</span>
+                        <span class="text-[11px] text-amber-400">ℹ️</span>
+                    </span>
                     <span class="text-lg">🎲</span>
                 </div>
                 <div class="flex items-baseline gap-2">
@@ -226,17 +348,23 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Comodín activado para hoy</div>
 
-                <!-- Tooltip Explicativo -->
-                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
-                    <p class="font-bold text-amber-400 mb-1">Dado de Quinielas Activo</p>
-                    <p>Indica qué socios tienen activado el rango de fechas de ausencia. El sistema rellenará al azar sus pronósticos sin penalización por retraso.</p>
+                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                    <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
+                        <span>🎲</span>
+                        <span>Dado de Quinielas Activo</span>
+                    </div>
+                    <p class="leading-relaxed text-slate-300">Indica qué socios tienen activado el rango de fechas de ausencia. El sistema rellenará al azar sus pronósticos sin penalización por retraso.</p>
                 </div>
             </div>
 
             <!-- KPI 3: Comodines Disponibles -->
-            <div class="glass-panel p-5 relative group cursor-help">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span>Comodines de Temporada</span>
+                    <span class="flex items-center gap-1.5">
+                        <span>Comodines de Temporada</span>
+                        <span class="text-[11px] text-amber-400">ℹ️</span>
+                    </span>
                     <span class="text-lg">🎯</span>
                 </div>
                 <div class="flex items-baseline gap-2">
@@ -245,17 +373,23 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Máx. 3 por socio en toda la temporada</div>
 
-                <!-- Tooltip Explicativo -->
-                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
-                    <p class="font-bold text-amber-400 mb-1">Límite Anual de Dados</p>
-                    <p>Conforme al reglamento de la peña, cada socio puede beneficiarse del dado un máximo de 3 jornadas por temporada. Una vez alcanzado, el dado se bloquea.</p>
+                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                    <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
+                        <span>🎯</span>
+                        <span>Límite Anual de Dados</span>
+                    </div>
+                    <p class="leading-relaxed text-slate-300">Conforme al reglamento de la peña, cada socio puede beneficiarse del dado un máximo de 3 jornadas por temporada. Una vez alcanzado, el dado se bloquea.</p>
                 </div>
             </div>
 
             <!-- KPI 4: Conectados a Telegram -->
-            <div class="glass-panel p-5 relative group cursor-help">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span>Comunidad Telegram</span>
+                    <span class="flex items-center gap-1.5">
+                        <span>Comunidad Telegram</span>
+                        <span class="text-[11px] text-amber-400">ℹ️</span>
+                    </span>
                     <span class="text-lg">💬</span>
                 </div>
                 <div class="flex items-baseline gap-2">
@@ -264,10 +398,13 @@
                 </div>
                 <div class="text-xs text-slate-400 mt-1">Sincronizados con el bot de la peña</div>
 
-                <!-- Tooltip Explicativo -->
-                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl text-xs text-slate-200 z-[99999] pointer-events-none">
-                    <p class="font-bold text-sky-400 mb-1">Integración con Telegram</p>
-                    <p>Socios con su alias @usuario registrado. Les permite recibir recordatorios, avisos de premios y votar encuestas directamente desde la aplicación de Telegram.</p>
+                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
+                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-slate-900/98 border border-amber-500/60 rounded-xl shadow-2xl text-xs text-slate-200 z-[100060] pointer-events-auto backdrop-blur-xl drop-shadow-2xl">
+                    <div class="flex items-center gap-1.5 font-bold text-sky-400 mb-1.5">
+                        <span>💬</span>
+                        <span>Integración con Telegram</span>
+                    </div>
+                    <p class="leading-relaxed text-slate-300">Socios con su alias @usuario registrado. Les permite recibir recordatorios, avisos de premios y votar encuestas directamente desde la aplicación de Telegram.</p>
                 </div>
             </div>
         </section>
@@ -408,14 +545,60 @@
                         <span class="text-sm font-bold text-slate-200">Activar Dado para este socio</span>
                     </label>
 
-                    <div id="form-dice-dates" class="grid grid-cols-1 sm:grid-cols-2 gap-3 opacity-50 pointer-events-none transition-opacity">
+                    <div id="form-dice-dates" class="space-y-3.5 opacity-50 pointer-events-none transition-opacity">
+                        <!-- SELECTOR PRINCIPAL EN CALENDARIO INTERACTIVO -->
                         <div>
-                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Fecha de Inicio</label>
-                            <input type="date" id="form-inp-dice-start" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-xs text-white focus:outline-none">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                                    <span>🗓️</span>
+                                    <span>Seleccionar Rango en Calendario</span>
+                                </label>
+                                <span id="form-dice-duration-badge" class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 hidden">
+                                    0 días
+                                </span>
+                            </div>
+                            <div class="relative flex items-center">
+                                <input type="text" id="form-inp-dice-range" placeholder="Toca aquí para abrir el calendario interactivo..." readonly class="w-full pl-10 pr-12 py-2.5 bg-slate-950 border border-slate-700 hover:border-amber-500 focus:border-amber-500 rounded-xl text-sm font-semibold text-white focus:outline-none cursor-pointer transition shadow-inner font-mono">
+                                <span class="absolute left-3 text-slate-400 pointer-events-none text-base">📅</span>
+                                <button type="button" id="btn-clear-dice-range" onclick="window.SociosApp.clearDiceDates()" class="absolute right-2.5 px-2 py-1 text-xs text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 transition" title="Limpiar rango seleccionado">✕</button>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">
+                                Toca para abrir el calendario y pulsa sobre el <strong>primer día</strong> y el <strong>último día</strong> de tu ausencia.
+                            </p>
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Fecha de Fin</label>
-                            <input type="date" id="form-inp-dice-end" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-xs text-white focus:outline-none">
+
+                        <!-- BOTONES DE SELECCIÓN RÁPIDA (PRESETS DE QUINIELA) -->
+                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                                <span>⚡</span>
+                                <span>Ayuda rápida (relleno en 1 toque):</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" onclick="window.SociosApp.applyDatePreset('weekend')" class="px-2.5 py-1 bg-slate-900 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-800 hover:border-amber-500/40 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                                    <span>⚡</span> Este finde (Vie-Dom)
+                                </button>
+                                <button type="button" onclick="window.SociosApp.applyDatePreset('week')" class="px-2.5 py-1 bg-slate-900 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-800 hover:border-amber-500/40 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                                    <span>✈️</span> 7 días (1 semana)
+                                </button>
+                                <button type="button" onclick="window.SociosApp.applyDatePreset('fortnight')" class="px-2.5 py-1 bg-slate-900 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-800 hover:border-amber-500/40 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                                    <span>🏖️</span> 15 días (2 semanas)
+                                </button>
+                                <button type="button" onclick="window.SociosApp.applyDatePreset('month')" class="px-2.5 py-1 bg-slate-900 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-800 hover:border-amber-500/40 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                                    <span>🗓️</span> 30 días (1 mes)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- FECHAS SINCRONIZADAS Y FORMATO BD -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Fecha de Inicio</label>
+                                <input type="text" id="form-inp-dice-start" readonly onclick="window.SociosApp.openDatePicker()" placeholder="YYYY-MM-DD" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-xs font-mono text-white focus:outline-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Fecha de Fin</label>
+                                <input type="text" id="form-inp-dice-end" readonly onclick="window.SociosApp.openDatePicker()" placeholder="YYYY-MM-DD" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg text-xs font-mono text-white focus:outline-none cursor-pointer">
+                            </div>
                         </div>
                     </div>
 
