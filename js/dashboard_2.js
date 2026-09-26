@@ -16,6 +16,7 @@ class Dashboard2AppController {
         this.nextJornada = null;
         this.submittedMembers = [];
         this.pendingMembers = [];
+        this.pigPenalty = 1.00;
 
         this.init();
     }
@@ -133,6 +134,25 @@ class Dashboard2AppController {
             // Asegurar que la configuración del sistema de puntuación está cargada
             if (window.ScoringSystem && window.ScoringSystem.getConfig) {
                 window.ScoringSystem.getConfig();
+            }
+
+            // Cargar configuración de Bote para obtener penalización PIG codificada
+            try {
+                let boteConfig = null;
+                if (window.DataService) {
+                    boteConfig = await window.DataService.getDoc('config', 'bote_config');
+                }
+                if (!boteConfig) {
+                    const local = localStorage.getItem('bote_config');
+                    if (local) {
+                        try { boteConfig = JSON.parse(local); } catch (e) { }
+                    }
+                }
+                if (boteConfig && boteConfig.penalizacionPIG !== undefined) {
+                    this.pigPenalty = parseFloat(boteConfig.penalizacionPIG) || 1.00;
+                }
+            } catch (errCfg) {
+                this.pigPenalty = 1.00;
             }
         } catch (e) {
             console.error('[Dashboard 2.0] Error cargando datos de Firestore:', e);
@@ -319,6 +339,8 @@ class Dashboard2AppController {
                     loserName: "Edu",
                     doblesEligibleNames: ["Álvaro"],
                     isPig: false,
+                    pigAcertantes: [],
+                    pigFallantes: [],
                     prizeWinners: [],
                     totalMoney: 0,
                     minHitsToWin: 10
@@ -368,11 +390,11 @@ class Dashboard2AppController {
                 elWinnerDetail.textContent = eligibles.length > 1 ? `Dobles: ${eligibles.join(', ')}` : 'Rellena los 7 dobles reducidos';
             }
 
-            // E. Widget 4: 💀 El Maula Semanal (Sellador)
+            // E. Widget 4: ✍️ SELLA: (Sellador Designado)
             const elLoserName = document.getElementById('role-loser-name');
             const elLoserDetail = document.getElementById('role-loser-detail');
             if (elLoserName) elLoserName.textContent = lastJornadaOutcome.loserName || 'Pendiente';
-            if (elLoserDetail) elLoserDetail.textContent = `Sella el boleto antes del jueves 17:00h`;
+            if (elLoserDetail) elLoserDetail.textContent = 'Responsable de validar y sellar el boleto colectivo';
 
             // F. Widget 5: 🐷 Partido PIG (Pleno al 15)
             this.renderPigWidget(lastJornadaOutcome, this.nextJornada);
@@ -439,7 +461,7 @@ class Dashboard2AppController {
                 tag.className = 'px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono';
             }
             if (title) title.textContent = `Jornada ${nextJ.number} - ${nextJ.date}`;
-            if (sub) sub.textContent = 'Plazo para rellenar la quiniela abierto hasta el jueves a las 17:00h.';
+            if (sub) sub.textContent = 'Plazo para tener todas las quinielas rellenas en la web: Jueves a las 17:00h.';
         } else {
             if (title) title.textContent = 'Temporada 2026-2027';
             if (sub) sub.textContent = 'Todas las jornadas oficiales disputadas hasta la fecha.';
@@ -623,36 +645,59 @@ class Dashboard2AppController {
     renderPigWidget(outcome, nextJ) {
         const content = document.getElementById('pig-content');
         const badgeFoot = document.getElementById('pig-badge-foot');
+        const statusLabel = document.getElementById('pig-status-label');
         if (!content) return;
+
+        if (statusLabel) {
+            statusLabel.textContent = 'Resultados del PIG de la última jornada:';
+        }
+
+        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2);
 
         // Comprobar si la próxima jornada tiene partido PIG (Atleti en P15)
         const nextHasPig = nextJ && nextJ.matches && nextJ.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
 
-        if (nextHasPig) {
-            content.innerHTML = `
-                <div class="text-pink-400 font-bold text-xs flex items-center gap-1.5">
-                    <span>🐷</span> ¡Próxima jornada con PIG!
-                </div>
-                <div class="text-[11px] text-slate-300 mt-0.5">
-                    El Atleti juega en el Pleno al 15. Acertar el resultado exacto libra del rol de Maula.
-                </div>
-            `;
-            if (badgeFoot) badgeFoot.textContent = 'PIG Activo Próxima J.';
-        } else if (outcome.isPig) {
+        if (outcome && outcome.isPig) {
             const acertantes = outcome.pigAcertantes || [];
+            const perdedores = outcome.pigFallantes || [];
+
             content.innerHTML = `
-                <div class="text-xs">
-                    <span class="text-emerald-400 font-bold">✅ Acertaron:</span> ${acertantes.length > 0 ? acertantes.join(', ') : 'Ninguno'}
+                <div class="space-y-1.5 text-xs">
+                    <div>
+                        <span class="text-emerald-400 font-bold">✅ Acertantes:</span>
+                        <span class="text-slate-200 ml-1">${acertantes.length > 0 ? acertantes.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
+                    </div>
+                    <div>
+                        <span class="text-rose-400 font-bold">❌ Perdedores:</span>
+                        <span class="text-slate-300 ml-1">${perdedores.length > 0 ? perdedores.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
+                    </div>
+                    <div class="text-[11px] text-amber-300/90 pt-1.5 border-t border-slate-800 flex items-center justify-between">
+                        <span>Penalización Bote 2:</span>
+                        <span class="font-mono font-bold text-rose-400">-${penaltyVal} € / socio</span>
+                    </div>
                 </div>
             `;
-            if (badgeFoot) badgeFoot.textContent = 'Jornada anterior con PIG';
+            if (badgeFoot) badgeFoot.textContent = `Penalización: ${penaltyVal} €`;
         } else {
             content.innerHTML = `
-                <div class="text-xs text-slate-400">
-                    No hubo partido del Atleti en el P15 en la última jornada.
+                <div class="space-y-1.5 text-xs">
+                    <p class="text-slate-400">
+                        No hubo partido del Atleti en el Pleno al 15 en la última jornada.
+                    </p>
+                    ${nextHasPig ? `
+                        <div class="p-2 rounded-xl bg-pink-500/10 border border-pink-500/30 text-pink-300 text-[11px] space-y-0.5">
+                            <div class="font-bold flex items-center gap-1"><span>🐷</span> ¡Próxima jornada con PIG!</div>
+                            <p class="text-slate-300 text-[10px]">Los socios perdedores tendrán una penalización de <strong>${penaltyVal} €</strong> en el Bote 2.</p>
+                        </div>
+                    ` : `
+                        <div class="text-[11px] text-slate-400 pt-1 border-t border-slate-800 flex items-center justify-between">
+                            <span>Penalización Bote 2:</span>
+                            <span class="font-mono font-bold text-amber-400">${penaltyVal} €</span>
+                        </div>
+                    `}
                 </div>
             `;
-            if (badgeFoot) badgeFoot.textContent = 'Inmunidad Maula';
+            if (badgeFoot) badgeFoot.textContent = nextHasPig ? 'PIG Próxima J.' : `Penalización: ${penaltyVal} €`;
         }
     }
 
@@ -851,7 +896,7 @@ class Dashboard2AppController {
         let pigFallantes = [];
         if (isPig) {
             pigAcertantes = results.filter(r => r.pigHit).map(r => r.name);
-            pigFallantes = results.filter(r => !r.pigHit && r.hasPronostico).map(r => r.name);
+            pigFallantes = results.filter(r => !r.pigHit).map(r => r.name);
         }
 
         // 4. Doubles
@@ -970,15 +1015,208 @@ class Dashboard2AppController {
     }
 
     /**
+     * Modal explicativo en primer plano para tarjetas del Dashboard
+     */
+    showInfo(type) {
+        const modal = document.getElementById('modal-info-card');
+        const iconEl = document.getElementById('modal-info-icon');
+        const titleEl = document.getElementById('modal-info-title');
+        const tagEl = document.getElementById('modal-info-tag');
+        const bodyEl = document.getElementById('modal-info-body');
+
+        if (!modal || !bodyEl) return;
+
+        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2);
+
+        const infoMap = {
+            dobles: {
+                icon: '👑',
+                tag: 'Reglamento de Dobles',
+                title: 'Rellena Dobles',
+                body: `
+                    <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-200 text-sm font-semibold leading-relaxed">
+                        El socio que consiguió la mayor puntuación en la última jornada, tiene el privilegio de rellenar la columna de dobles.
+                    </div>
+                    <div class="space-y-2 text-xs text-slate-300 pt-1">
+                        <p>
+                            • El ganador selecciona los <strong>7 dobles reducidos al 13</strong> de la combinación oficial de la peña para la siguiente jornada.
+                        </p>
+                        <p>
+                            • El coste íntegro del boleto es financiado por el bote común de la peña, y cualquier premio que obtenga la combinación se reparte según las normas oficiales.
+                        </p>
+                    </div>
+                `
+            },
+            sella: {
+                icon: '✍️',
+                tag: 'Operaciones de Sellado',
+                title: 'SELLA: (Sellador Designado)',
+                body: `
+                    <p class="text-slate-100 font-medium text-sm leading-relaxed">
+                        El socio designado para sellar es el encargado de acudir a la administración de loterías a validar el boleto colectivo de la peña con los pronósticos y dobles generados.
+                    </p>
+                    <div class="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs space-y-1.5 mt-2">
+                        <div class="font-bold flex items-center gap-1.5 text-amber-300">
+                            <span>📌</span> Aclaración sobre el horario:
+                        </div>
+                        <p>
+                            <strong>No es necesario sellar realmente en loterías el jueves a las 17:00h.</strong>
+                        </p>
+                        <p class="text-slate-300">
+                            Lo que es estrictamente necesario es que <strong>todas las quinielas individuales de los socios estén rellenas en la web antes del jueves a las 17:00h</strong> para que el sistema y el ganador de dobles puedan preparar la combinación con margen suficiente.
+                        </p>
+                    </div>
+                    <p class="text-slate-400 text-xs mt-2 pt-2 border-t border-slate-800">
+                        💰 El coste total de sellar el boleto se le reembolsa al socio sellador al 100% desde el bote de la peña.
+                    </p>
+                `
+            },
+            countdown: {
+                icon: '⏰',
+                tag: 'Plazo Límite de Relleno',
+                title: 'Límite para Rellenar Quinielas',
+                body: `
+                    <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="font-bold text-amber-400">
+                            El jueves a las 17:00h es la hora límite para que todas las quinielas de los socios estén rellenas en la web.
+                        </p>
+                        <p class="text-slate-300 text-xs leading-relaxed">
+                            No es necesario que el sellador selle físicamente a las 17:00h en loterías; esa hora marca el cierre de admisión de pronósticos en la plataforma para poder calcular la combinación de la peña y asignar los 7 dobles.
+                        </p>
+                        <p class="text-slate-400 text-[11px] pt-1.5 border-t border-slate-800">
+                            ⚠️ Los socios que no hayan rellenado sus 15 pronósticos a las 17:00h incurren en penalización económica reglamentaria (salvo que tengan activado el Dado de Viajes).
+                        </p>
+                    </div>
+                `
+            },
+            pig: {
+                icon: '🐷',
+                tag: 'Normativa P15',
+                title: 'Resultados del PIG de la última jornada:',
+                body: `
+                    <div class="space-y-2.5 text-xs text-slate-300">
+                        <p class="text-slate-200 font-medium leading-relaxed">
+                            En las jornadas en las que el <strong>Atlético de Madrid</strong> disputa el partido del <strong>Pleno al 15 (partido PIG)</strong>:
+                        </p>
+                        <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200">
+                            <strong>✅ Acertantes:</strong> Aquellos socios que aciertan el resultado exacto del P15. Quedan totalmente exentos de penalización.
+                        </div>
+                        <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-200 space-y-1">
+                            <div class="font-bold">❌ Perdedores:</div>
+                            <p>
+                                Aquellos socios que fallaron el pronóstico (o no rellenaron la quiniela). <strong>Tienen una penalización económica de ${penaltyVal} €</strong> (codificada en los parámetros del Bote 2), importe que se ingresa íntegramente en la caja de la peña.
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            participation: {
+                icon: '📊',
+                tag: 'Control de Envíos',
+                title: 'Participación en la Jornada',
+                body: `
+                    <p class="text-slate-200 text-sm leading-relaxed">
+                        Supervisa en tiempo real cuántos socios han rellenado y enviado su combinación de 15 partidos en la plataforma para la jornada actual.
+                    </p>
+                    <p class="text-slate-300 text-xs mt-2">
+                        Puedes pulsar en <strong>"¿Quién falta por enviar?"</strong> para consultar la lista nominal con los socios que ya han completado su pronóstico y quiénes aún están pendientes antes del jueves a las 17:00h.
+                    </p>
+                `
+            },
+            lider: {
+                icon: '🏆',
+                tag: 'Clasificación Oficial',
+                title: 'Líder de la Clasificación General',
+                body: `
+                    <p class="text-slate-200 text-sm leading-relaxed">
+                        Indica qué socio encabeza la clasificación general tras las jornadas disputadas hasta la fecha.
+                    </p>
+                    <p class="text-slate-300 text-xs mt-2">
+                        La clasificación suma todos los puntos obtenidos jornada a jornada con el baremo oficial de la peña. En caso de empate se aplican los criterios de desempate histórico de jornadas anteriores.
+                    </p>
+                `
+            },
+            bote: {
+                icon: '💰',
+                tag: 'Tesorería en Vivo',
+                title: 'Caja Real de la Peña (Bote Común)',
+                body: `
+                    <p class="text-slate-200 text-sm leading-relaxed">
+                        Refleja el saldo financiero total disponible en la peña (cuenta bancaria y efectivo en mano).
+                    </p>
+                    <p class="text-slate-300 text-xs mt-2">
+                        Se calcula al céntimo a partir del bote inicial, aportaciones periódicas, el margen neto semanal de cuotas descontando el gasto del sellador en la administración, penalizaciones y premios oficiales cobrados.
+                    </p>
+                `
+            },
+            premios: {
+                icon: '🎁',
+                tag: 'Escrutinio Oficial',
+                title: 'Premios & Rendimiento Económico',
+                body: `
+                    <p class="text-slate-200 text-sm leading-relaxed">
+                        Resumen de los importes ganados oficialmente en las jornadas según el escrutinio de Loterías y Apuestas del Estado a partir de 10 aciertos.
+                    </p>
+                    <p class="text-slate-300 text-xs mt-2">
+                        Distingue entre premios ganados por los socios a nivel individual y los premios obtenidos por la quiniela colectiva de dobles de la peña.
+                    </p>
+                `
+            }
+        };
+
+        const info = infoMap[type] || {
+            icon: 'ℹ️',
+            tag: 'Información',
+            title: 'Detalle de la Sección',
+            body: '<p class="text-slate-300">Información del panel Maulas 2.0.</p>'
+        };
+
+        if (iconEl) iconEl.textContent = info.icon;
+        if (tagEl) tagEl.textContent = info.tag;
+        if (titleEl) titleEl.textContent = info.title;
+        bodyEl.innerHTML = info.body;
+
+        modal.classList.remove('hidden');
+    }
+
+    closeInfoModal() {
+        const modal = document.getElementById('modal-info-card');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    /**
      * Listeners de interfaz
      */
     initUiListeners() {
-        // Cierre de dropdown al hacer clic fuera
+        // Cierre de dropdown al hacer clic fuera y cierre de modales al pulsar backdrop
         document.addEventListener('click', (e) => {
             const dropdown = document.getElementById('nav-section-dropdown');
             const wrap = document.getElementById('nav-section-dropdown-wrap');
             if (dropdown && wrap && !wrap.contains(e.target)) {
                 dropdown.classList.add('hidden');
+            }
+
+            // Cerrar modal explicativo al pulsar sobre el fondo oscuro
+            const infoModal = document.getElementById('modal-info-card');
+            if (infoModal && e.target === infoModal) {
+                this.closeInfoModal();
+            }
+
+            // Cerrar modal de envíos pendientes al pulsar sobre el fondo oscuro
+            const memModal = document.getElementById('modal-pending-members');
+            if (memModal && e.target === memModal) {
+                memModal.classList.add('hidden');
+            }
+        });
+
+        // Cerrar modales al presionar la tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeInfoModal();
+                const memModal = document.getElementById('modal-pending-members');
+                if (memModal) memModal.classList.add('hidden');
+                const dropdown = document.getElementById('nav-section-dropdown');
+                if (dropdown) dropdown.classList.add('hidden');
             }
         });
     }
