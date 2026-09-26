@@ -515,47 +515,7 @@
                 </div>
             </div>
 
-            <!-- WIDGET 5: 🐷 PARTIDO DE INTERÉS GENERAL (PIG) -->
-            <div class="glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/40 flex items-center gap-1">
-                            <span>🐷</span> Alerta PIG
-                        </span>
-
-                        <!-- Cuadro azul explicativo con hover instantáneo -->
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div onclick="window.DashboardApp && window.DashboardApp.showInfo('pig')" class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 hover:text-sky-300 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
-                                ℹ️
-                            </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
-                                <strong class="text-pink-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>🐷</span> Partido de Interés General (PIG)
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p class="text-amber-200">Enfrentamiento entre dos de los tres grandes clubes (Real Madrid, Barcelona o Atlético de Madrid), en cualquier casilla del boleto (partidos 1 al 15).</p>
-                                    <p><strong class="text-emerald-400">✅ Acertantes:</strong> exentos de penalización.</p>
-                                    <p><strong class="text-rose-400">❌ Perdedores:</strong> penalización codificada en los parámetros del Bote 2 (1.00 €) que ingresa en la caja común.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1">
-                        <span id="pig-status-label" class="text-xs text-amber-400 block font-bold">Resultados del PIG de la última jornada:</span>
-                        <div id="pig-content" class="text-sm font-semibold text-slate-200">
-                            Cargando resultados...
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between text-slate-500">
-                    <span>Normativa Bote 2</span>
-                    <span id="pig-badge-foot" class="text-amber-400 font-bold font-mono">Penalización: 1.00 €</span>
-                </div>
-            </div>
-
-            <!-- WIDGET 6: 🏆 LÍDER DE LA CLASIFICACIÓN GENERAL -->
+            <!-- WIDGET 5: 🏆 LÍDER DE LA CLASIFICACIÓN GENERAL -->
             <div class="glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-3">
@@ -595,6 +555,47 @@
                 <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between">
                     <span class="text-slate-400 font-semibold" id="leader-jornadas-count">6 jornadas disputadas</span>
                     <a href="resultados.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>
+                </div>
+            </div>
+
+            <!-- WIDGET 6: 🐸 ÚLTIMO CLASIFICADO (RANA) / 🐷 PARTIDO PIG (TARJETA HÍBRIDA ROTATIVA) -->
+            <div id="pig-hybrid-widget" class="glass-panel p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span id="pig-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                            <span id="pig-badge-icon">🐸</span> <span id="pig-badge-text">Último Clasificado</span>
+                        </span>
+
+                        <!-- Cuadro azul explicativo con hover instantáneo -->
+                        <div class="group/tip relative inline-flex cursor-help shrink-0">
+                            <div onclick="window.DashboardApp && window.DashboardApp.showPigOrRanaInfo()" class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 hover:text-sky-300 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                ℹ️
+                            </div>
+                            <div id="pig-tooltip-box" class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                <strong id="pig-tip-title" class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                                    <span>🐸</span> Último Clasificado (Rana)
+                                </strong>
+                                <div id="pig-tip-content" class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                    <p>Socio en la última posición de la clasificación general acumulada.</p>
+                                    <p class="text-slate-400">Esta tarjeta rota automáticamente: muestra el Partido PIG si hubo enfrentamiento directo en la jornada anterior, o la Rana si no lo hubo.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span id="pig-status-label" class="text-xs text-slate-400 block font-medium">Farolillo Rojo de la General:</span>
+                        <div id="pig-content" class="text-sm font-semibold text-slate-200">
+                            Cargando...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between text-slate-500">
+                    <span id="pig-foot-left" class="text-slate-400 font-semibold">6 jornadas disputadas</span>
+                    <span id="pig-foot-right">
+                        <a href="resultados.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>
+                    </span>
                 </div>
             </div>
 

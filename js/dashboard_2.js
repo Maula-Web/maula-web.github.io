@@ -378,14 +378,21 @@ class Dashboard2AppController {
                 };
             }
 
-            // 4. Determinar Líder de la General
+            // 4. Determinar Líder de la General y Último Clasificado (Rana)
             let leader = { name: '-', totalPoints: 0, totalHits: 0 };
             let secondLeaderPoints = 0;
+            let lastMember = { name: '-', totalPoints: 0, totalHits: 0 };
+            let penultimateDiff = 0;
             const sortedMembers = Object.values(memberStats).sort((a, b) => b.totalPoints - a.totalPoints || b.totalHits - a.totalHits);
             if (sortedMembers.length > 0) {
                 leader = sortedMembers[0];
                 if (sortedMembers.length > 1) {
                     secondLeaderPoints = sortedMembers[1].totalPoints;
+                }
+                lastMember = sortedMembers[sortedMembers.length - 1];
+                if (sortedMembers.length > 1) {
+                    const penultimate = sortedMembers[sortedMembers.length - 2];
+                    penultimateDiff = Math.max(0, penultimate.totalPoints - lastMember.totalPoints);
                 }
             }
 
@@ -427,10 +434,7 @@ class Dashboard2AppController {
             if (elLoserName) elLoserName.textContent = lastJornadaOutcome.loserName || 'Pendiente';
             if (elLoserDetail) elLoserDetail.textContent = 'Responsable de validar y sellar el boleto colectivo';
 
-            // F. Widget 5: 🐷 Partido PIG (Pleno al 15)
-            this.renderPigWidget(lastJornadaOutcome, this.nextJornada);
-
-            // G. Widget 6: 🏆 Líder de la General
+            // F. Widget 5: 🏆 Líder de la General
             const elLeaderName = document.getElementById('leader-name');
             const elLeaderPoints = document.getElementById('leader-points');
             const elLeaderDiff = document.getElementById('leader-diff');
@@ -444,6 +448,9 @@ class Dashboard2AppController {
             if (elLeaderJornadas) {
                 elLeaderJornadas.textContent = `${playedCount} jornadas disputadas`;
             }
+
+            // G. Widget 6: 🐸 Último Clasificado (Rana) / 🐷 Partido PIG (Tarjeta Híbrida)
+            this.renderPigWidget(lastJornadaOutcome, this.nextJornada, lastMember, penultimateDiff, playedCount, sortedMembers.length);
 
             // H. Widget 7: 💰 Bote Acumulado en Caja
             this.renderBoteWidget(playedJornadas);
@@ -675,25 +682,54 @@ class Dashboard2AppController {
     }
 
     /**
-     * Widget PIG (Partido de Interés General)
+     * Widget Híbrido Rotativo: 🐸 Último Clasificado (Rana) / 🐷 Partido PIG
      */
-    renderPigWidget(outcome, nextJ) {
+    renderPigWidget(outcome, nextJ, lastMember, penultimateDiff, playedCount, totalMembers) {
         const content = document.getElementById('pig-content');
-        const badgeFoot = document.getElementById('pig-badge-foot');
         const statusLabel = document.getElementById('pig-status-label');
+        const elBadge = document.getElementById('pig-badge');
+        const elBadgeIcon = document.getElementById('pig-badge-icon');
+        const elBadgeText = document.getElementById('pig-badge-text');
+        const elTipTitle = document.getElementById('pig-tip-title');
+        const elTipContent = document.getElementById('pig-tip-content');
+        const footLeft = document.getElementById('pig-foot-left');
+        const footRight = document.getElementById('pig-foot-right');
         if (!content) return;
 
-        if (statusLabel) {
-            statusLabel.textContent = 'Resultados del PIG de la última jornada:';
-        }
-
         const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2);
-
-        // Comprobar si la próxima jornada tiene partido PIG (en cualquiera de las 15 casillas)
         const nextPigInfo = this.findPigMatch(nextJ);
         const nextHasPig = nextPigInfo !== null;
+        const nextMatchDesc = (nextPigInfo && nextPigInfo.match) ? `(P.${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
 
-        if (outcome && outcome.isPig) {
+        // Determinar si en la última jornada disputada hubo PIG
+        const isPigMode = !!(outcome && outcome.isPig);
+        this.currentPigOrRanaMode = isPigMode ? 'pig' : 'rana';
+
+        if (isPigMode) {
+            // =================================================================
+            // MODO PIG: Hubo enfrentamiento entre los tres grandes en la última J.
+            // =================================================================
+            if (elBadge) elBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/40 flex items-center gap-1';
+            if (elBadgeIcon) elBadgeIcon.textContent = '🐷';
+            if (elBadgeText) elBadgeText.textContent = 'Alerta PIG';
+
+            if (elTipTitle) {
+                elTipTitle.className = 'text-pink-400 block mb-1 font-bold flex items-center gap-1.5';
+                elTipTitle.innerHTML = '<span>🐷</span> Partido de Interés General (PIG)';
+            }
+            if (elTipContent) {
+                elTipContent.innerHTML = `
+                    <p class="text-amber-200">Enfrentamiento entre dos de los tres grandes clubes (Real Madrid, Barcelona o Atlético de Madrid), en cualquier casilla del boleto (partidos 1 al 15).</p>
+                    <p><strong class="text-emerald-400">✅ Acertantes:</strong> exentos de penalización.</p>
+                    <p><strong class="text-rose-400">❌ Perdedores:</strong> penalización codificada en los parámetros del Bote 2 (${penaltyVal} €) que ingresa en la caja común.</p>
+                `;
+            }
+
+            if (statusLabel) {
+                statusLabel.className = 'text-xs text-amber-400 block font-bold';
+                statusLabel.textContent = 'Resultados del PIG de la última jornada:';
+            }
+
             const acertantes = outcome.pigAcertantes || [];
             const perdedores = outcome.pigFallantes || [];
             const matchDesc = outcome.pigInfo && outcome.pigInfo.match ? `Partido ${outcome.pigInfo.index + 1}: ${outcome.pigInfo.match.home} vs ${outcome.pigInfo.match.away}` : '';
@@ -715,29 +751,68 @@ class Dashboard2AppController {
                     </div>
                 </div>
             `;
-            if (badgeFoot) badgeFoot.textContent = `Penalización: ${penaltyVal} €`;
+
+            if (footLeft) {
+                footLeft.className = 'text-slate-500';
+                footLeft.textContent = 'Normativa Bote 2';
+            }
+            if (footRight) {
+                footRight.innerHTML = `<span class="text-amber-400 font-bold font-mono">Penalización: ${penaltyVal} €</span>`;
+            }
         } else {
-            const nextMatchDesc = nextPigInfo && nextPigInfo.match ? `(Partido ${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
+            // =================================================================
+            // MODO RANA: No hubo PIG en la última jornada -> Mostrar Último Clasificado
+            // =================================================================
+            if (elBadge) elBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1';
+            if (elBadgeIcon) elBadgeIcon.textContent = '🐸';
+            if (elBadgeText) elBadgeText.textContent = 'Último Clasificado';
+
+            if (elTipTitle) {
+                elTipTitle.className = 'text-emerald-400 block mb-1 font-bold flex items-center gap-1.5';
+                elTipTitle.innerHTML = '<span>🐸</span> Último Clasificado (Rana)';
+            }
+            if (elTipContent) {
+                elTipContent.innerHTML = `
+                    <p>Socio en la última posición de la clasificación general acumulada (Farolillo Rojo).</p>
+                    <p class="text-slate-400">Esta tarjeta rota automáticamente: en semanas con PIG muestra los resultados y penalizaciones, y en semanas sin PIG muestra al colista con la Rana 🐸.</p>
+                `;
+            }
+
+            if (statusLabel) {
+                statusLabel.className = 'text-xs text-slate-400 block font-medium';
+                statusLabel.textContent = totalMembers ? `${totalMembers}º Clasificado (Farolillo Rojo):` : 'Último Clasificado:';
+            }
+
+            const memberName = lastMember ? lastMember.name : 'Pendiente';
+            const memberPts = lastMember ? lastMember.totalPoints : 0;
+            const diffText = penultimateDiff !== undefined ? `(A -${penultimateDiff} pts del penúltimo)` : '';
 
             content.innerHTML = `
-                <div class="space-y-1.5 text-xs">
-                    <p class="text-slate-400">
-                        No hubo Partido de Interés General (PIG) en la última jornada.
-                    </p>
+                <div class="space-y-1">
+                    <h4 class="text-xl sm:text-2xl font-black text-rose-400 tracking-tight truncate flex items-center gap-2">
+                        <span>${memberName}</span>
+                        <span class="text-lg" title="Rana de la Peña">🐸</span>
+                    </h4>
+                    <div class="flex items-baseline gap-2 pt-0.5">
+                        <span class="font-mono text-base font-extrabold text-amber-400">${memberPts} pts</span>
+                        <span class="text-xs text-slate-400 font-medium">${diffText}</span>
+                    </div>
                     ${nextHasPig ? `
-                        <div class="p-2 rounded-xl bg-pink-500/10 border border-pink-500/30 text-pink-300 text-[11px] space-y-0.5">
-                            <div class="font-bold flex items-center gap-1"><span>🐷</span> ¡Próxima jornada con PIG!</div>
-                            <p class="text-slate-300 text-[10px]">Partido de interés general detectado ${nextMatchDesc}. Los socios perdedores tendrán una penalización de <strong>${penaltyVal} €</strong> en el Bote 2.</p>
+                        <div class="mt-2 p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/30 text-pink-300 text-[10px] flex items-center gap-1.5 font-medium">
+                            <span class="shrink-0">🐷</span>
+                            <span class="truncate">¡Próxima J. con PIG! ${nextMatchDesc}</span>
                         </div>
-                    ` : `
-                        <div class="text-[11px] text-slate-400 pt-1 border-t border-slate-800 flex items-center justify-between">
-                            <span>Penalización Bote 2:</span>
-                            <span class="font-mono font-bold text-amber-400">${penaltyVal} €</span>
-                        </div>
-                    `}
+                    ` : ''}
                 </div>
             `;
-            if (badgeFoot) badgeFoot.textContent = nextHasPig ? 'PIG Próxima J.' : `Penalización: ${penaltyVal} €`;
+
+            if (footLeft) {
+                footLeft.className = 'text-slate-400 font-semibold';
+                footLeft.textContent = `${playedCount || 0} jornadas disputadas`;
+            }
+            if (footRight) {
+                footRight.innerHTML = `<a href="resultados.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>`;
+            }
         }
     }
 
@@ -1092,6 +1167,14 @@ class Dashboard2AppController {
     }
 
     /**
+     * Manejador de información para la tarjeta híbrida rotativa (PIG vs Rana)
+     */
+    showPigOrRanaInfo() {
+        const mode = this.currentPigOrRanaMode || 'rana';
+        this.showInfo(mode);
+    }
+
+    /**
      * Modal explicativo en primer plano para tarjetas del Dashboard
      */
     showInfo(type) {
@@ -1106,6 +1189,27 @@ class Dashboard2AppController {
         const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2);
 
         const infoMap = {
+            rana: {
+                icon: '🐸',
+                tag: 'Clasificación General',
+                title: 'Último Clasificado (La Rana 🐸)',
+                body: `
+                    <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 text-sm font-semibold leading-relaxed flex items-start gap-2.5">
+                        <span class="text-2xl shrink-0">🐸</span>
+                        <div>
+                            El socio que ocupa la última posición de la clasificación general acumulada recibe el distintivo de la Rana (Farolillo Rojo).
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-xs text-slate-300 pt-2">
+                        <p>
+                            • <strong>Tarjeta Híbrida Rotativa:</strong> Esta tarjeta rota inteligentemente según la actualidad de la peña. Las semanas donde la jornada anterior hubo un Partido de Interés General (PIG), se muestran los resultados del PIG, los acertantes y quiénes deben pagar la penalización. En las semanas sin PIG, se muestra al último clasificado de la general con la Rana 🐸.
+                        </p>
+                        <p>
+                            • La clasificación general se actualiza automáticamente tras cada jornada sumando los puntos oficiales de todos los socios.
+                        </p>
+                    </div>
+                `
+            },
             dobles: {
                 icon: '👑',
                 tag: 'Reglamento de Dobles',
