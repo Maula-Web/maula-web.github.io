@@ -10,19 +10,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Peña Maulas">
-    <meta name="application-name" content="Peña Maulas">
     <meta name="theme-color" content="#f59e0b">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS v3 -->
     <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
@@ -34,11 +28,7 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                        outfit: ['"Outfit"', 'sans-serif']
-                    },
-                    colors: {
-                        slate: { 850: '#151e2e', 950: '#0b0f19' },
+                        mono: ['"JetBrains Mono"', 'monospace']
                     }
                 }
             }
@@ -47,51 +37,86 @@
 
     <!-- Custom CSS for V2 & overriding legacy JS classes -->
     <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --bg-panel: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --row-bg: rgba(241, 245, 249, 0.6);
+            --row-hover: rgba(226, 232, 240, 0.8);
+            --btn-bg: rgba(241, 245, 249, 1);
+            --btn-text: #475569;
+            --btn-border: #cbd5e1;
+            --primary-orange: #f59e0b;
+            --primary-green: #10b981;
+        }
+
+        .dark {
+            --bg-primary: #0b0f19;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --bg-panel: rgba(15, 23, 42, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --row-bg: rgba(30, 41, 59, 0.4);
+            --row-hover: rgba(30, 41, 59, 0.8);
+            --btn-bg: rgba(15, 23, 42, 0.8);
+            --btn-text: #94a3b8;
+            --btn-border: rgba(255, 255, 255, 0.1);
+        }
+
         body {
-            background-color: #0b0f19;
-            color: #f1f5f9;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .dark body {
             background-image: 
-                radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
             background-attachment: fixed;
         }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
+            background: var(--bg-panel);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
             border-radius: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         
         /* Overrides for pronosticos.js classes */
-        .pronostico-row {
+        .pronostico-row, .doubles-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0.75rem 1rem;
-            background: rgba(30, 41, 59, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--row-bg);
+            border: 1px solid var(--border-color);
             border-radius: 0.75rem;
             margin-bottom: 0.5rem;
             transition: all 0.2s ease;
+            gap: 1rem;
         }
-        .pronostico-row:hover {
-            background: rgba(30, 41, 59, 0.8);
+        .pronostico-row:hover, .doubles-row:hover {
+            background: var(--row-hover);
             border-color: rgba(245, 158, 11, 0.3);
             transform: translateX(2px);
         }
+        
         .p-match-info {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             flex: 1;
+            min-width: 0;
         }
         .p-match-num, .match-display-idx {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.8rem;
-            color: #f59e0b;
+            color: var(--primary-orange);
             font-weight: 700;
             min-width: 1.5rem;
         }
@@ -99,45 +124,80 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            overflow: hidden;
         }
+        .team-info-stacked { display: flex; flex-direction: column; gap: 4px; }
+        .team-line { display: flex; align-items: center; gap: 6px; }
         .team-name {
             font-weight: 600;
             font-size: 0.85rem;
-            color: #e2e8f0;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .team-logo {
             width: 20px;
             height: 20px;
             object-fit: contain;
         }
-        .p-signs-container {
+
+        /* 1X2 Checkboxes Options */
+        .p-options {
             display: flex;
             gap: 0.5rem;
+            align-items: center;
+            justify-content: flex-end;
         }
-        .sign-btn {
-            background: rgba(15, 23, 42, 0.8);
-            color: #94a3b8;
-            border: 1px solid rgba(255,255,255,0.1);
+        .chk-option, .p15-option {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--btn-border);
             border-radius: 0.5rem;
             padding: 0.5rem 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
-            min-width: 3rem;
+            min-width: 2.5rem;
+            height: auto;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
         }
-        .sign-btn:hover {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
+        .chk-option:hover, .p15-option:hover {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--primary-orange);
             border-color: rgba(245, 158, 11, 0.4);
         }
-        .sign-btn.active {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #0f172a;
-            border-color: #f59e0b;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        
+        .chk-option.selected, .p15-option.selected {
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
             transform: scale(1.05);
+            font-weight: 800;
         }
+
+        /* Percentages */
+        .p-percentages {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            min-width: 65px;
+            text-align: right;
+        }
+        .perc-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            color: var(--text-muted);
+        }
+        .perc-1 b { color: var(--primary-orange); }
+        .perc-X b { color: var(--primary-green); }
+        .perc-2 b { color: #3b82f6; }
+
         .p-divider-block {
             height: 1px;
             background: rgba(245, 158, 11, 0.2);
@@ -159,42 +219,67 @@
             padding: 0 1rem;
             font-size: 0.7rem;
             font-weight: 800;
-            color: #f59e0b;
+            color: var(--primary-orange);
             letter-spacing: 0.05em;
         }
 
-        /* Summary Table V2 */
-        .summary-cell, .summary-header-cell {
-            padding: 0.75rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.8rem;
+        /* Summary Table V2 (Data Grid Style) */
+        #forecast-summary-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            text-align: center;
         }
         .summary-header-cell {
-            background: rgba(15, 23, 42, 0.9);
-            color: #94a3b8;
-            font-weight: 600;
+            background: var(--bg-panel);
+            color: var(--text-muted);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 2px solid var(--border-color);
             white-space: nowrap;
+        }
+        .summary-cell {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+        #forecast-summary-table tbody tr {
+            background: transparent;
+            transition: background-color 0.2s;
+        }
+        #forecast-summary-table tbody tr:hover {
+            background: var(--row-hover);
         }
         .summary-sticky-col {
             position: sticky;
             left: 0;
-            background: rgba(15, 23, 42, 0.95);
+            background: var(--bg-panel);
             z-index: 10;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid var(--border-color);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
         }
+        .dark .summary-sticky-col {
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+        }
+        
         .led-status-indicator {
             display: inline-block;
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            box-shadow: 0 0 8px currentColor;
         }
-        .led-green { color: #10b981; background: #10b981; }
-        .led-yellow { color: #f59e0b; background: #f59e0b; }
-        .led-red { color: #f43f5e; background: #f43f5e; }
+        .led-green { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .led-yellow { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .led-red { background: #f43f5e; box-shadow: 0 0 8px #f43f5e; }
 
         /* Modal States */
-        #audit-modal-overlay.active, #help-doubles-modal.active { display: flex !important; }
+        #audit-modal-overlay.active, #help-doubles-modal.active, #view-jornada-modal.active { display: flex !important; }
 
         /* Legacy Overrides */
         .desktop-only-flex { display: none !important; }
@@ -211,88 +296,115 @@
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(245, 158, 11, 0.5); }
+        ::-webkit-scrollbar-track { background: var(--bg-panel); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-orange); }
+        
+        /* Status Badges */
+        .badge-locked, .badge-dice, .badge-late {
+            font-size: 0.8rem;
+            font-weight: 800;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 
 <body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="js/firebase-init.js"></script>
-    <script src="js/db-service.js"></script>
-    <script src="js/telegram-service.js"></script>
+    <!-- Auth Check Inline Script to prevent flash -->
+    <script>
+        function checkAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
+            if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') return true;
+            
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            if (!userStr) return false;
+            try {
+                const user = JSON.parse(userStr);
+                if (user.id == 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) return true;
+                if (user.role === 'admin') return true;
+            } catch(e) {}
+            return false;
+        }
+        
+        // Apply theme immediately
+        const theme = localStorage.getItem('maulas_theme') || 'dark';
+        if (theme === 'light') document.documentElement.classList.remove('dark');
+        else document.documentElement.classList.add('dark');
+    </script>
 
     <!-- FASE DE PRUEBAS EXCLUSIVA (Restricted Screen) -->
-    <div id="restricted-screen" class="fixed inset-0 bg-slate-950 z-[999999] flex flex-col items-center justify-center p-6 text-center">
-        <div class="glass-panel p-8 md:p-12 max-w-lg w-full flex flex-col items-center border-rose-500/30">
+    <div id="restricted-screen" class="fixed inset-0 bg-slate-100 dark:bg-slate-950 z-[999999] flex-col items-center justify-center p-6 text-center" style="display: flex;">
+        <div class="glass-panel p-8 md:p-12 max-w-lg w-full flex flex-col items-center border-rose-500/30 shadow-xl">
             <div class="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mb-6 border border-rose-500/50">
                 <span class="text-4xl">🛑</span>
             </div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Acceso Restringido</h1>
-            <p class="text-slate-400 mb-8 leading-relaxed">Pronósticos 2.0 está en fase de pruebas exclusiva. Solo el administrador <strong class="text-rose-400">Fernando Lozano</strong> tiene acceso a la Quiniela.</p>
-            <button onclick="window.Auth && window.Auth.logout ? window.Auth.logout() : (sessionStorage.clear(), localStorage.clear(), location.href='login.html')" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition flex items-center gap-2">
+            <h1 class="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Acceso Restringido</h1>
+            <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">Pronósticos 2.0 está en fase de pruebas exclusiva. Solo el administrador <strong class="text-rose-500 dark:text-rose-400">Fernando Lozano</strong> tiene acceso a la Quiniela.</p>
+            <button onclick="window.Auth && window.Auth.logout ? window.Auth.logout() : (sessionStorage.clear(), localStorage.clear(), location.href='login.html')" class="px-6 py-3 bg-slate-800 dark:bg-slate-800 hover:bg-slate-700 dark:hover:bg-slate-700 text-white rounded-xl font-bold transition flex items-center gap-2">
                 <span>🚪</span> Salir de la cuenta
             </button>
         </div>
     </div>
 
-    <div id="main-content" class="hidden max-w-[1500px] mx-auto space-y-4 sm:space-y-6">
+    <div id="main-content" class="max-w-[1500px] mx-auto space-y-4 sm:space-y-6" style="display: none;">
 
         <!-- NAVBAR -->
-        <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 border-amber-500/40 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl">
+        <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100]">
             <!-- Left Side -->
             <div class="flex items-center justify-between gap-2 w-full md:w-auto flex-shrink-0">
                 <a href="dashboard_2.html" class="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
                     <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow group-hover:scale-105 transition-transform flex-shrink-0">
                     <div class="leading-tight flex flex-col justify-center">
-                        <span class="font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
-                        <span class="text-[9px] sm:text-[10px] text-amber-400 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
+                        <span class="font-black text-slate-800 dark:text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-500 transition-colors">PEÑA MAULAS</span>
+                        <span class="text-[9px] sm:text-[10px] text-amber-500 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
                     </div>
                 </a>
                 <div class="flex md:hidden items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                     <button onclick="location.reload(true);" class="w-7 h-7 rounded-lg bg-slate-900 text-emerald-400 border border-emerald-500/40 text-xs flex items-center justify-center font-bold">🔄</button>
+                     <button onclick="location.reload(true);" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-emerald-500 border border-emerald-500/40 text-xs flex items-center justify-center font-bold shadow-sm">🔄</button>
                 </div>
             </div>
 
             <!-- Center Nav -->
-            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-300 overflow-x-auto md:overflow-visible flex-nowrap md:flex-wrap no-scrollbar py-0.5 w-full md:w-auto md:flex-1 justify-start md:justify-center border-t border-slate-800/60 md:border-t-0 pt-1.5 md:pt-0">
-                <a href="dashboard_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-600 dark:text-slate-300 overflow-x-auto md:overflow-visible flex-nowrap md:flex-wrap no-scrollbar py-0.5 w-full md:w-auto md:flex-1 justify-start md:justify-center border-t border-slate-200 dark:border-slate-800/60 md:border-t-0 pt-1.5 md:pt-0">
+                <a href="dashboard_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏠</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Inicio</span>
                 </a>
-                <a href="socios_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="socios_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">👥</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Socios</span>
                 </a>
-                <a href="bote_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="bote_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">💰</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Bote</span>
                 </a>
-                <a href="jornadas_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="jornadas_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">⚽</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Resultados</span>
                 </a>
-                <a href="pronosticos_2.html" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold transition shadow-sm flex-shrink-0">
+                <a href="pronosticos_2.html" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/50 font-bold transition shadow-sm flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none scale-105">📝</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Quiniela</span>
                 </a>
-                <a href="resultados.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="resultados.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏆</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Clasificación</span>
                 </a>
-                <a href="resumen-temporada.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="resumen-temporada.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">📊</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Resumen</span>
                 </a>
-                <a href="votaciones.html" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="votaciones.html" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🗳️</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Votaciones</span>
                 </a>
-                <a href="admin.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="admin.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">⚙️</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Admin</span>
                 </a>
@@ -300,47 +412,55 @@
 
             <!-- Right Controls -->
             <div class="desktop-only-flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-                <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner">
-                    <button class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400">1.0 Clásica</button>
-                    <button class="px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow">📝 2.0 Pro</button>
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="version-switcher-container">
+                    <button type="button" id="btn-version-v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">1.0 Clásica</button>
+                    <button type="button" id="btn-version-v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow">📝 2.0 Pro</button>
                 </div>
-                <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner">
-                    <button class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400"><span>☀️</span> Claro</button>
-                    <button class="px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow"><span>🌙</span> Oscuro</button>
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="theme-switcher-container">
+                    <button type="button" id="btn-theme-light" onclick="if(window.AppTheme) { window.AppTheme.setTheme('light'); document.documentElement.classList.remove('dark'); localStorage.setItem('maulas_theme', 'light'); }" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition"><span>☀️</span> Claro</button>
+                    <button type="button" id="btn-theme-dark" onclick="if(window.AppTheme) { window.AppTheme.setTheme('dark'); document.documentElement.classList.add('dark'); localStorage.setItem('maulas_theme', 'dark'); }" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 dark:text-slate-950 dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:font-bold shadow dark:shadow-md transition"><span>🌙</span> Oscuro</button>
                 </div>
-                <button onclick="location.reload(true);" class="px-2 py-1.5 rounded-xl bg-slate-900 text-emerald-400 border border-emerald-500/40 text-xs font-bold"><span>🔄</span> Actualizar</button>
-                <button onclick="sessionStorage.clear();localStorage.clear();location.href='login.html';" class="px-2 py-1.5 rounded-xl bg-slate-900 text-rose-400 border border-slate-700 text-xs font-bold"><span>🚪</span> Salir</button>
+                <button onclick="location.reload(true);" class="px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-slate-300 dark:border-emerald-500/40 text-xs font-bold hover:bg-emerald-50 dark:hover:bg-slate-800 transition"><span>🔄</span> Actualizar</button>
+                <button onclick="sessionStorage.clear();localStorage.clear();location.href='login.html';" class="px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-rose-600 dark:text-rose-400 border border-slate-300 dark:border-slate-700 text-xs font-bold hover:bg-rose-50 dark:hover:bg-slate-800 transition"><span>🚪</span> Salir</button>
             </div>
         </nav>
+
+        <!-- Script to actually apply access -->
+        <script>
+            if (checkAccess()) {
+                document.getElementById('restricted-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+        </script>
 
         <!-- PRONOSTICOS HEADER CONTROLS -->
         <div class="glass-panel p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                 <div class="flex flex-col">
-                    <label class="text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Jornada Activa</label>
-                    <select id="sel-jornada" class="bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-2 font-bold focus:outline-none focus:border-amber-500 min-w-[200px]">
+                    <label class="text-xs text-slate-500 dark:text-slate-400 font-bold mb-1 uppercase tracking-wider">Jornada Activa</label>
+                    <select id="sel-jornada" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg px-4 py-2 font-bold focus:outline-none focus:border-amber-500 min-w-[200px] shadow-sm">
                         <!-- Populated by JS -->
                     </select>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Socio</label>
-                    <select id="sel-member" class="bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-2 font-bold focus:outline-none focus:border-amber-500 min-w-[200px]">
+                    <label class="text-xs text-slate-500 dark:text-slate-400 font-bold mb-1 uppercase tracking-wider">Socio</label>
+                    <select id="sel-member" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg px-4 py-2 font-bold focus:outline-none focus:border-amber-500 min-w-[200px] shadow-sm">
                         <!-- Populated by JS -->
                     </select>
                 </div>
             </div>
 
             <div class="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
-                <label class="flex items-center gap-2 cursor-pointer bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-700/50 hover:bg-slate-800 transition">
+                <label class="flex items-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-800 transition">
                     <div class="relative inline-block w-10 h-5">
                         <input type="checkbox" id="chk-correction-mode" class="peer sr-only">
-                        <div class="w-10 h-5 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500 shadow-inner"></div>
+                        <div class="w-10 h-5 bg-slate-300 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500 shadow-inner"></div>
                     </div>
-                    <span id="lbl-correction" class="text-sm font-bold text-slate-300">Modo Corrección</span>
+                    <span id="lbl-correction" class="text-sm font-bold text-slate-700 dark:text-slate-300">Modo Corrección</span>
                 </label>
                 <div class="flex gap-2">
-                    <button id="btn-help-doubles" class="p-2 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded-lg transition" title="Ayuda Sellado">❓</button>
-                    <button id="btn-view-jornada" class="p-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg transition" title="Ver Pronósticos Colectivos">👁️</button>
+                    <button id="btn-help-doubles" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-blue-500 dark:text-blue-400 rounded-lg transition" title="Ayuda Sellado">❓</button>
+                    <button id="btn-view-jornada" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-emerald-500 dark:text-emerald-400 rounded-lg transition" title="Ver Pronósticos Colectivos">👁️</button>
                 </div>
             </div>
         </div>
@@ -350,25 +470,25 @@
             
             <!-- LEFT COLUMN: Pronóstico Base -->
             <div class="glass-panel p-4 lg:p-6 relative flex flex-col">
-                <div class="flex justify-between items-end mb-4 border-b border-slate-800/60 pb-3">
-                    <h2 class="text-xl font-black text-white flex items-center gap-2"><span>📝</span> Quiniela Base</h2>
-                    <div id="deadline-info" class="text-xs font-mono text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20"></div>
+                <div class="flex justify-between items-end mb-4 border-b border-slate-200 dark:border-slate-800/60 pb-3">
+                    <h2 class="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2"><span>📝</span> Quiniela Base</h2>
+                    <div id="deadline-info" class="text-xs font-mono text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-500/10 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-500/20 shadow-sm"></div>
                 </div>
 
-                <div id="active-selection-info" class="mb-4 text-sm font-bold text-slate-300 bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                <div id="active-selection-info" class="mb-4 text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800 shadow-inner">
                     <!-- Populated by JS -->
                 </div>
 
                 <div id="status-message" class="text-center mb-4 min-h-[30px]"></div>
-                <div id="cost-info" class="text-center mb-4 font-mono text-amber-400"></div>
+                <div id="cost-info" class="text-center mb-4 font-mono text-amber-600 dark:text-amber-400"></div>
 
-                <div id="forecast-container" class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-1">
+                <div id="forecast-container" class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                     <!-- 15 Rows Populated by JS -->
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center">
-                    <button id="btn-clear-forecast" class="hidden px-4 py-2 bg-rose-500/10 text-rose-500 border border-rose-500/30 rounded-lg hover:bg-rose-500/20 transition font-bold text-sm">🗑️ Limpiar</button>
-                    <button id="btn-save" class="hidden px-6 py-2 bg-emerald-500 text-slate-950 font-black rounded-lg hover:bg-emerald-400 transition ml-auto shadow-[0_0_15px_rgba(16,185,129,0.3)]">💾 Guardar Pronóstico</button>
+                <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                    <button id="btn-clear-forecast" class="hidden px-4 py-2 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-200 dark:border-rose-500/30 rounded-lg hover:bg-rose-200 dark:hover:bg-rose-500/20 transition font-bold text-sm shadow-sm">🗑️ Limpiar</button>
+                    <button id="btn-save" class="hidden px-6 py-2 bg-emerald-500 text-white font-black rounded-lg hover:bg-emerald-400 transition ml-auto shadow-[0_0_15px_rgba(16,185,129,0.4)]">💾 Guardar Pronóstico</button>
                 </div>
             </div>
 
@@ -376,23 +496,23 @@
             <div id="doubles-section" class="hidden flex-col gap-4">
                 
                 <!-- Info & Method Card -->
-                <div class="glass-panel p-4 border-purple-500/30 bg-gradient-to-br from-slate-900 to-purple-950/30">
-                    <div id="doubles-status-card" class="flex justify-between items-start mb-4 border-b border-purple-500/20 pb-3">
+                <div class="glass-panel p-4 border-purple-200 dark:border-purple-500/30 bg-purple-50 dark:bg-gradient-to-br dark:from-slate-900 dark:to-purple-950/30">
+                    <div id="doubles-status-card" class="flex justify-between items-start mb-4 border-b border-purple-200 dark:border-purple-500/20 pb-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-2xl">🎲</span>
+                            <span class="text-2xl drop-shadow-md">🎲</span>
                             <div>
-                                <h3 class="font-black text-white text-lg leading-tight">Gestión de Dobles</h3>
-                                <span class="text-xs text-purple-300">Selecciona el método de sellado</span>
+                                <h3 class="font-black text-slate-800 dark:text-white text-lg leading-tight">Gestión de Dobles</h3>
+                                <span class="text-xs text-purple-600 dark:text-purple-300">Selecciona el método de sellado</span>
                             </div>
                         </div>
-                        <div class="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-purple-500/40 text-right shadow-inner">
-                            <div id="doubles-counter" class="font-mono text-amber-400 font-bold text-sm">0 Dobles, 0 Triples</div>
+                        <div class="bg-white dark:bg-slate-950/80 px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-500/40 text-right shadow-sm dark:shadow-inner">
+                            <div id="doubles-counter" class="font-mono text-amber-600 dark:text-amber-400 font-bold text-sm">0 Dobles, 0 Triples</div>
                         </div>
                     </div>
 
                     <div class="flex flex-col gap-3">
-                        <label class="text-xs text-slate-400 font-bold uppercase tracking-wider">Método de Sellado:</label>
-                        <select id="sel-method" class="bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-2.5 font-bold focus:outline-none focus:border-purple-500 w-full text-sm">
+                        <label class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Método de Sellado:</label>
+                        <select id="sel-method" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg px-4 py-2.5 font-bold focus:outline-none focus:border-purple-500 w-full text-sm shadow-sm">
                             <option value="directo">Apuestas Directas</option>
                             <option value="reducida-1">Reducida 1: 4 Triples (9 apuestas)</option>
                             <option value="reducida-2">Reducida 2: 7 Dobles (16 apuestas)</option>
@@ -402,7 +522,7 @@
                             <option value="reducida-6">Reducida 6: 11 Dobles (132 apuestas)</option>
                         </select>
                         
-                        <button id="btn-copy-forecast" class="w-full mt-2 px-4 py-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 rounded-lg hover:bg-indigo-500/30 transition font-bold text-sm flex items-center justify-center gap-2">
+                        <button id="btn-copy-forecast" class="w-full mt-2 px-4 py-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-500/30 transition font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
                             📋 <span>Copiar Quiniela Base</span>
                         </button>
                     </div>
@@ -411,11 +531,11 @@
                 <!-- Doubles Grid -->
                 <div class="glass-panel p-4 flex-1 flex flex-col relative overflow-hidden">
                     <div id="doubles-status" class="text-center font-bold text-sm mb-3"></div>
-                    <div id="doubles-container" class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-1">
+                    <div id="doubles-container" class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                         <!-- 15 Rows Populated by JS -->
                     </div>
-                    <div class="mt-4 pt-4 border-t border-slate-800">
-                        <button id="btn-save-doubles" class="w-full px-6 py-3 bg-purple-500 text-white font-black rounded-lg hover:bg-purple-400 transition shadow-[0_0_15px_rgba(168,85,247,0.4)]">💾 Guardar Dobles</button>
+                    <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <button id="btn-save-doubles" class="w-full px-6 py-3 bg-purple-600 dark:bg-purple-500 text-white font-black rounded-lg hover:bg-purple-500 dark:hover:bg-purple-400 transition shadow-[0_0_15px_rgba(168,85,247,0.4)]">💾 Guardar Dobles</button>
                     </div>
                 </div>
             </div>
@@ -423,22 +543,22 @@
         </div>
 
         <!-- SUMMARY TABLE SECTION -->
-        <div class="glass-panel p-4 lg:p-6">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-800/60 pb-4">
-                <h2 class="text-xl font-black text-white flex items-center gap-2"><span>📊</span> Panel General de Sellado</h2>
-                <div class="flex gap-4 text-xs font-bold">
+        <div class="glass-panel p-4 lg:p-6 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-200 dark:border-slate-800/60 pb-4">
+                <h2 class="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2"><span>📊</span> Panel General de Sellado</h2>
+                <div class="flex gap-4 text-xs font-bold text-slate-700 dark:text-slate-300">
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span> Completo</span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b]"></span> Faltan Dobles</span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_#f43f5e]"></span> Pendiente</span>
                 </div>
             </div>
 
-            <div id="summary-container" class="w-full overflow-x-auto custom-scrollbar rounded-xl border border-slate-800/80 bg-slate-900/50">
+            <div id="summary-container" class="w-full overflow-x-auto custom-scrollbar rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/50 shadow-inner">
                 <table id="forecast-summary-table" class="w-full text-center text-sm">
                     <thead>
                         <!-- JS generated -->
                     </thead>
-                    <tbody class="divide-y divide-slate-800/50">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
                         <!-- JS generated -->
                     </tbody>
                 </table>
@@ -449,49 +569,49 @@
 
     <!-- Hidden Modals Structure for JS -->
     <!-- Audit Modal -->
-    <div id="audit-modal-overlay" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg p-6 border-amber-500/30">
-            <h2 class="text-xl font-black text-white mb-4 border-b border-slate-700/50 pb-3 flex items-center gap-2"><span>📝</span> Auditoría de Corrección</h2>
-            <p class="text-slate-400 text-sm mb-4">Estás modificando una jornada <strong class="text-rose-400">CERRADA</strong>. Es obligatorio documentar este cambio.</p>
+    <div id="audit-modal-overlay" class="hidden fixed inset-0 bg-slate-900/90 dark:bg-slate-950/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-6 border-amber-500/30 shadow-2xl">
+            <h2 class="text-xl font-black text-slate-800 dark:text-white mb-4 border-b border-slate-200 dark:border-slate-700/50 pb-3 flex items-center gap-2"><span>📝</span> Auditoría de Corrección</h2>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">Estás modificando una jornada <strong class="text-rose-600 dark:text-rose-400">CERRADA</strong>. Es obligatorio documentar este cambio.</p>
             
             <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-300 mb-2 uppercase">Motivo del Cambio:</label>
-                <textarea id="audit-reason" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500" placeholder="Ej: Error de transcripción..."></textarea>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase">Motivo del Cambio:</label>
+                <textarea id="audit-reason" rows="3" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-3 text-slate-800 dark:text-white focus:outline-none focus:border-amber-500 shadow-sm" placeholder="Ej: Error de transcripción..."></textarea>
             </div>
             
-            <div class="mb-6 bg-slate-900/50 p-3 rounded-lg border border-slate-800 flex items-start gap-3">
+            <div class="mb-6 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex items-start gap-3 shadow-inner">
                 <input type="checkbox" id="audit-late-penalty" class="mt-1 w-5 h-5 accent-rose-500">
                 <div>
-                    <label for="audit-late-penalty" class="font-bold text-white text-sm cursor-pointer">Aplicar/Mantener penalización</label>
-                    <p class="text-xs text-slate-400 mt-1">Marca esto si el cambio se debe a una recepción tardía.</p>
+                    <label for="audit-late-penalty" class="font-bold text-slate-800 dark:text-white text-sm cursor-pointer">Aplicar/Mantener penalización</label>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Marca esto si el cambio se debe a una recepción tardía.</p>
                 </div>
             </div>
 
             <div class="flex justify-end gap-3">
-                <button id="btn-cancel-audit" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold transition">Cancelar</button>
+                <button id="btn-cancel-audit" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 font-bold transition shadow-sm">Cancelar</button>
                 <button id="btn-confirm-audit" class="px-6 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-black transition shadow-[0_0_15px_rgba(225,29,72,0.4)]">Confirmar Cambio</button>
             </div>
         </div>
     </div>
 
     <!-- View Collective Modal -->
-    <div id="view-jornada-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-2 sm:p-4">
-        <div class="glass-panel w-full h-[95vh] flex flex-col border-emerald-500/30 overflow-hidden">
-            <div class="bg-slate-900/80 p-3 sm:p-4 border-b border-emerald-500/20 flex flex-col sm:flex-row justify-between items-center gap-3">
+    <div id="view-jornada-modal" class="hidden fixed inset-0 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-2 sm:p-4">
+        <div class="glass-panel w-full h-[95vh] flex flex-col border-emerald-500/30 overflow-hidden shadow-2xl">
+            <div class="bg-slate-100 dark:bg-slate-900/80 p-3 sm:p-4 border-b border-slate-200 dark:border-emerald-500/20 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div class="flex flex-wrap items-center gap-3 sm:gap-6 w-full sm:w-auto">
-                    <h3 id="view-jornada-title" class="text-lg font-black text-white whitespace-nowrap">Ver Pronósticos</h3>
+                    <h3 id="view-jornada-title" class="text-lg font-black text-slate-800 dark:text-white whitespace-nowrap">Ver Pronósticos</h3>
                     <div class="flex items-center gap-2">
-                        <button id="btn-prev-jornada" class="w-8 h-8 rounded-lg bg-slate-800 text-emerald-400 hover:bg-slate-700 flex items-center justify-center font-bold transition">◀</button>
-                        <select id="sel-modal-jornada" class="bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-1 font-bold focus:outline-none focus:border-emerald-500 text-sm">
+                        <button id="btn-prev-jornada" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center font-bold transition shadow-sm border border-slate-200 dark:border-none">◀</button>
+                        <select id="sel-modal-jornada" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg px-3 py-1 font-bold focus:outline-none focus:border-emerald-500 text-sm shadow-sm">
                             <!-- Populated by JS -->
                         </select>
-                        <button id="btn-next-jornada" class="w-8 h-8 rounded-lg bg-slate-800 text-emerald-400 hover:bg-slate-700 flex items-center justify-center font-bold transition">▶</button>
+                        <button id="btn-next-jornada" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center font-bold transition shadow-sm border border-slate-200 dark:border-none">▶</button>
                     </div>
                 </div>
-                <button id="btnCloseViewJornada" class="text-slate-400 hover:text-white text-3xl leading-none absolute sm:relative top-2 right-2 sm:top-auto sm:right-auto">&times;</button>
+                <button id="btnCloseViewJornada" class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-3xl leading-none absolute sm:relative top-2 right-2 sm:top-auto sm:right-auto">&times;</button>
             </div>
             
-            <div id="view-jornada-content" class="flex-1 overflow-auto bg-slate-950/50 p-2 custom-scrollbar">
+            <div id="view-jornada-content" class="flex-1 overflow-auto bg-slate-50 dark:bg-slate-950/50 p-2 custom-scrollbar">
                 <!-- Table generated by JS -->
             </div>
             
@@ -502,28 +622,28 @@
     </div>
 
     <!-- Help Modal -->
-    <div id="help-doubles-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-2 sm:p-4">
-        <div class="glass-panel w-full h-[95vh] max-w-7xl flex flex-col border-blue-500/30 overflow-hidden">
-            <div class="bg-slate-900/80 p-4 border-b border-blue-500/20 flex justify-between items-center">
-                <h3 class="text-lg font-black text-white flex items-center gap-2"><span>📖</span> Ayuda: Sellado de Dobles</h3>
-                <button id="btnCloseHelpDoubles" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
+    <div id="help-doubles-modal" class="hidden fixed inset-0 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-2 sm:p-4">
+        <div class="glass-panel w-full h-[95vh] max-w-7xl flex flex-col border-blue-500/30 overflow-hidden shadow-2xl">
+            <div class="bg-slate-100 dark:bg-slate-900/80 p-4 border-b border-slate-200 dark:border-blue-500/20 flex justify-between items-center">
+                <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2"><span>📖</span> Ayuda: Sellado de Dobles</h3>
+                <button id="btnCloseHelpDoubles" class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-3xl leading-none">&times;</button>
             </div>
             
-            <div id="mobile-help-tabs" class="hidden p-2 bg-slate-900/50 flex gap-2">
-                <button id="btn-show-physical" class="flex-1 py-2 bg-blue-600 text-white font-bold rounded-lg">Físico</button>
-                <button id="btn-show-digital" class="flex-1 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg">Digital</button>
+            <div id="mobile-help-tabs" class="hidden p-2 bg-slate-200 dark:bg-slate-900/50 flex gap-2">
+                <button id="btn-show-physical" class="flex-1 py-2 bg-blue-600 text-white font-bold rounded-lg shadow-sm">Físico</button>
+                <button id="btn-show-digital" class="flex-1 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-lg shadow-sm border border-slate-300 dark:border-none">Digital</button>
             </div>
 
             <div id="help-container" class="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col lg:flex-row gap-6">
                 <!-- Físico -->
-                <div id="help-physical-section" class="flex-1 bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
-                    <h4 class="text-blue-400 font-black mb-4 border-b border-slate-700/50 pb-2">📌 Boleto Físico</h4>
-                    <div class="relative rounded-lg overflow-hidden border border-slate-700 shadow-xl mb-4">
+                <div id="help-physical-section" class="flex-1 bg-white dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <h4 class="text-blue-600 dark:text-blue-400 font-black mb-4 border-b border-slate-200 dark:border-slate-700/50 pb-2">📌 Boleto Físico</h4>
+                    <div class="relative rounded-lg overflow-hidden border border-slate-300 dark:border-slate-700 shadow-xl mb-4">
                         <img src="IMAGENES/reducidas.png" class="w-full h-auto">
                         <div id="marks-physical" class="absolute inset-0 pointer-events-none"></div>
                     </div>
-                    <div class="text-sm text-slate-300 space-y-2">
-                        <p class="text-amber-400 font-bold">7 Dobles REDUCIDOS:</p>
+                    <div class="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                        <p class="text-amber-600 dark:text-amber-400 font-bold">7 Dobles REDUCIDOS:</p>
                         <ul class="list-disc pl-5 space-y-1">
                             <li>Marca 14 signos (7 dobles).</li>
                             <li>Columna "DOBLES" → marca el 7.</li>
@@ -533,14 +653,14 @@
                     </div>
                 </div>
                 <!-- Digital -->
-                <div id="help-digital-section" class="flex-1 bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
-                    <h4 class="text-emerald-400 font-black mb-4 border-b border-slate-700/50 pb-2">💻 Interfaz Web</h4>
-                    <div class="relative rounded-lg overflow-hidden border border-slate-700 shadow-xl mb-4">
+                <div id="help-digital-section" class="flex-1 bg-white dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <h4 class="text-emerald-600 dark:text-emerald-400 font-black mb-4 border-b border-slate-200 dark:border-slate-700/50 pb-2">💻 Interfaz Web</h4>
+                    <div class="relative rounded-lg overflow-hidden border border-slate-300 dark:border-slate-700 shadow-xl mb-4">
                         <img src="IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg" class="w-full h-auto">
                         <div id="marks-digital" class="absolute inset-0 pointer-events-none"></div>
                     </div>
-                    <div class="text-sm text-slate-300 space-y-2">
-                        <p class="text-amber-400 font-bold">Proceso Digital:</p>
+                    <div class="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                        <p class="text-amber-600 dark:text-amber-400 font-bold">Proceso Digital:</p>
                         <ul class="list-decimal pl-5 space-y-1">
                             <li>Selecciona MÉTODO: Reducido.</li>
                             <li>Rellena 14 pronósticos.</li>
@@ -553,40 +673,14 @@
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script>
-        // Inline script to handle Restricted Access for V2 pages
-        document.addEventListener('DOMContentLoaded', () => {
-            const restr = document.getElementById('restricted-screen');
-            const main = document.getElementById('main-content');
-            
-            function checkAccess() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
-                if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') {
-                    return true;
-                }
-                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-                if (!userStr) return false;
-                try {
-                    const user = JSON.parse(userStr);
-                    if (user.id == 6 || user.id === 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) {
-                        return true;
-                    }
-                    if (user.role === 'admin') return true;
-                } catch(e) {}
-                return false;
-            }
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+    <script src="js/telegram-service.js"></script>
 
-            if (checkAccess()) {
-                if (restr) restr.style.display = 'none';
-                if (main) main.classList.remove('hidden');
-            } else {
-                if (restr) restr.style.display = 'flex';
-                if (main) main.classList.add('hidden');
-            }
-        });
-    </script>
+    <script src="js/auth.js"></script>
     <script src="js/scoring.js"></script>
     <script src="js/frases.js"></script>
     <script src="js/utils.js"></script>
