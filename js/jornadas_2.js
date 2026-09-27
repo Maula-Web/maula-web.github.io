@@ -421,6 +421,130 @@ class Jornadas2AppController {
             if (elPigPenalty) elPigPenalty.textContent = 'Exento';
         }
 
+        // 4b. Desplegable de Aciertos y Fallos PIG
+        const elPigDesgloseContainer = document.getElementById('kpi-pig-desglose-container');
+        const elPigDesgloseSummaryText = document.getElementById('kpi-pig-desglose-summary-text');
+        const elPigDesgloseContent = document.getElementById('kpi-pig-desglose-content');
+
+        if (pigInfo && pigInfo.match && elPigDesgloseContainer && elPigDesgloseContent) {
+            const m = pigInfo.match;
+            const res = (m.result || '').trim().toUpperCase();
+            // Comprobar si el partido PIG tiene resultado definido
+            const hasResult = res && res !== '-' && res !== 'POR DEFINIR';
+
+            if (hasResult) {
+                // Normalizar signo del resultado oficial
+                let officialSign = res;
+                if (officialSign.includes('-')) {
+                    const parts = officialSign.split('-');
+                    const val = (s) => (s === 'M' || s === 'M+' ? 3 : parseInt(s) || 0);
+                    const hG = val(parts[0]);
+                    const aG = val(parts[1]);
+                    if (hG > aG) officialSign = '1';
+                    else if (hG === aG) officialSign = 'X';
+                    else officialSign = '2';
+                }
+
+                const acertantes = [];
+                const fallantes = [];
+
+                this.members.forEach(member => {
+                    const p = this.pronosticos.find(pr => {
+                        if (!pr) return false;
+                        const mMatch = String(pr.memberId || pr.mId) === String(member.id);
+                        const jMatch = String(pr.jornadaId || pr.jId) === String(jornada.id) || String(pr.jornadaNumber || pr.jNum) === String(jornada.number);
+                        return mMatch && jMatch;
+                    });
+
+                    const sel = p ? (p.selection || p.forecast || p.forecasts || []) : [];
+                    const memberPred = sel[pigInfo.index] ? String(sel[pigInfo.index]).trim().toUpperCase() : '';
+
+                    let isHit = false;
+                    if (memberPred) {
+                        if (pigInfo.index === 14) {
+                            // Pleno al 15: puede ser exacto (res) o signo (officialSign)
+                            isHit = (memberPred === res || memberPred === officialSign);
+                        } else {
+                            // Casilla 1 a 14: puede contener el signo si jugó dobles (ej: '1X' contiene '1' o 'X')
+                            isHit = memberPred.includes(officialSign);
+                        }
+                    }
+
+                    if (isHit) {
+                        acertantes.push({ member, pred: memberPred });
+                    } else {
+                        fallantes.push({ member, pred: memberPred || 'No enviado' });
+                    }
+                });
+
+                // Ordenar por ID numérico ascendente
+                acertantes.sort((a, b) => (parseInt(a.member.id) || 0) - (parseInt(b.member.id) || 0));
+                fallantes.sort((a, b) => (parseInt(a.member.id) || 0) - (parseInt(b.member.id) || 0));
+
+                if (elPigDesgloseSummaryText) {
+                    elPigDesgloseSummaryText.textContent = `Aciertos (${acertantes.length}) · Fallos (${fallantes.length})`;
+                }
+
+                let pigDesgloseHtml = `
+                    <!-- 1. Acertantes PIG -->
+                    <div>
+                        <div class="flex items-center justify-between text-xs font-bold text-emerald-400 mb-1 pb-1 border-b border-emerald-500/20">
+                            <span class="flex items-center gap-1">
+                                <span>✅</span>
+                                <span>Acertaron el PIG (${acertantes.length})</span>
+                            </span>
+                            <span class="text-[10px] text-emerald-300/80 font-normal">Exentos de multa</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 pt-1 max-h-28 overflow-y-auto custom-scroll pr-1">
+                            ${acertantes.length > 0 ? acertantes.map(item => `
+                                <div class="flex items-center justify-between p-1 rounded bg-emerald-950/40 border border-emerald-500/20 text-slate-200">
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <span class="w-4 h-4 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold flex items-center justify-center shrink-0">#${item.member.id}</span>
+                                        <span class="truncate font-semibold">${item.member.name}</span>
+                                    </div>
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 shrink-0">${item.pred}</span>
+                                </div>
+                            `).join('') : '<div class="text-slate-500 italic py-1 text-center col-span-2">Ningún socio acertó</div>'}
+                        </div>
+                    </div>
+
+                    <!-- 2. Fallantes PIG (Penalizados 1,00 €) -->
+                    <div class="pt-2 border-t border-slate-800/80">
+                        <div class="flex items-center justify-between text-xs font-bold text-rose-400 mb-1 pb-1 border-b border-rose-500/20">
+                            <span class="flex items-center gap-1">
+                                <span>❌</span>
+                                <span>Fallaron / Penalizados (${fallantes.length})</span>
+                            </span>
+                            <span class="text-[10px] text-rose-300/80 font-mono font-bold">-1,00 € bote</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 pt-1 max-h-36 overflow-y-auto custom-scroll pr-1">
+                            ${fallantes.length > 0 ? fallantes.map(item => `
+                                <div class="flex items-center justify-between p-1 rounded bg-rose-950/40 border border-rose-500/20 text-slate-200">
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <span class="w-4 h-4 rounded bg-rose-500/20 text-rose-300 text-[9px] font-bold flex items-center justify-center shrink-0">#${item.member.id}</span>
+                                        <span class="truncate font-semibold">${item.member.name}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-900 text-slate-400 border border-slate-800">${item.pred}</span>
+                                        <span class="text-[10px] text-rose-400 font-mono font-bold">-1€</span>
+                                    </div>
+                                </div>
+                            `).join('') : '<div class="text-slate-500 italic py-1 text-center col-span-2">Pleno de aciertos</div>'}
+                        </div>
+                    </div>
+                `;
+
+                elPigDesgloseContent.innerHTML = pigDesgloseHtml;
+                elPigDesgloseContainer.classList.remove('hidden');
+            } else {
+                // Partido PIG aún no disputado
+                elPigDesgloseContainer.classList.add('hidden');
+            }
+        } else if (elPigDesgloseContainer) {
+            // Sin PIG en esta jornada
+            elPigDesgloseContainer.classList.add('hidden');
+        }
+
         // 5. KPI 4: Premios Oficiales & Rendimiento
         this.renderPrizesKPI(jornada);
 

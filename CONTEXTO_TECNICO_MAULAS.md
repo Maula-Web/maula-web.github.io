@@ -872,8 +872,39 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
   - Garantiza que en cualquier resolución (desde portátiles de 1024px hasta monitores 4K) los controles de la derecha permanezcan anclados, visibles y operativos.
 
 ### 28.3. Invalidación Inmediata de Caché PWA
-- Versión de caché de Service Worker incrementada a **`maulas-pwa-v1.26`** en `service-worker.js`.
+- Versión de caché de Service Worker incrementada a **`maulas-pwa-v1.27`** en `service-worker.js`.
 - Registro proactivo con `reg.update()` en `js/auth.js` para forzar la actualización del Service Worker en cuanto se abre la web, impidiendo la visualización de versiones cacheadas obsoletas.
+
+---
+
+## 29. MEJORAS DE CONTRASTE, DESPLEGABLES DE AUDITORÍA Y HOMOGENEIZACIÓN VISUAL (v1.27)
+
+### 29.1. Contraste en Modo Claro: Matriz Cuadrante y Resultados 2
+- **Matriz Cuadrante (Bote 2 - Vista 3 & 4)**:
+  - Fila de pie de tabla `Totales Jornada` (`#matriz-tfoot`): fondo crema suave `#fef8ee`, bordes `#e2d9cc`, etiqueta "Totales Jornada" en ámbar tostado `#9a3412` y cifras de totales por jornada oscurecidas a `#b45309` (fuente bold 800) para máxima legibilidad.
+  - Columna de Saldo Actual en `#matriz-tbody`: cifras en ámbar oscuro `#9a3412`.
+- **Resultados 2 (Jornadas 2)**:
+  - Botón **Importar Partidos**: texto oscurecido a `#9a3412` con borde `#ea580c` sobre fondo ámbar translúcido para alto contraste en modo claro.
+  - Signos de los partidos (`1`, `X`, `2`): oscurecimiento aplicado **exclusivamente al texto** sin alterar los fondos (.sign-pill-1: `#047857`, .sign-pill-X: `#0369a1`, .sign-pill-2: `#b45309`).
+  - Cifras de recuento en KPI 2: adaptadas a la misma paleta oscura de alto contraste.
+
+### 29.2. Unificación Exacta de Iniciales de Socios (Bote 2 vs Socios 2)
+- Se unificó el algoritmo de generación de iniciales/monogramas en `js/bote_2.js` (`renderMembers` y modal de extracto `openMemberExtract`) para que sea idéntico al de `js/socios_2.js`:
+  - Nombre compuesto o con apellido: primera letra del primer elemento + primera letra del segundo (ej: "Fernando Lozano" -> "FL", "JA Valdivieso" -> "JV").
+  - Nombre simple de una palabra: dos primeras letras en mayúsculas (ej: "Alvaro" -> "AL", "Dani" -> "DA", "Emilio" -> "EM", "Edu" -> "ED", "Jorge" -> "JO").
+
+### 29.3. Desplegable Interactivo de Conectividad (Socios 2)
+- En KPI 4 (**Conectividad**) se incorporó un desplegable interactivo `<details id="details-conectividad-desglose">` que muestra la relación nominal completa de los socios:
+  - **Comunidad Telegram**: desglose de socios con su número `#ID`, nombre y `@alias` registrado.
+  - **Notificaciones Push PWA**: desglose de socios con suscripción activa de avisos nativos en su terminal móvil.
+
+### 29.4. Desplegable Interactivo de Aciertos y Fallos PIG (Resultados 2)
+- En la tarjeta **Partido PIG (KPI 3)** de `jornadas_2.html`, cuando la jornada ha finalizado o el partido PIG se ha disputado, se muestra un desplegable interactivo `<details id="details-pig-desglose">`:
+  - **Acertaron el PIG**: socios que acertaron el pronóstico (exentos de penalización).
+  - **Fallaron / Penalizados (-1,00 €)**: relación nominal de socios que fallaron su pronóstico o no enviaron la quiniela, con indicación de la penalización de 1,00 € imputada al bote.
+
+### 29.5. Geometría Cuadrada del Icono de Socios 2 en Móviles
+- En `socios_2.html` (cabecera principal), se aplicaron las clases `shrink-0 flex-shrink-0 aspect-square min-w-[3rem] min-h-[3rem] sm:min-w-[3.5rem] sm:min-h-[3.5rem]` al contenedor del icono `👥` para evitar que el comportamiento flex en terminales móviles estrechos deforme o aplaste el contenedor, garantizando que se muestre siempre como un cuadrado perfecto.
 
 ---
 

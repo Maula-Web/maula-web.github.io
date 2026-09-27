@@ -428,7 +428,7 @@
         <!-- CABECERA PRINCIPAL -->
         <header class="glass-panel p-5 md:p-6 border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 text-3xl">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 min-w-[3rem] min-h-[3rem] sm:min-w-[3.5rem] sm:min-h-[3.5rem] shrink-0 flex-shrink-0 aspect-square rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 text-2xl sm:text-3xl">
                     👥
                 </div>
                 <div>
@@ -576,6 +576,20 @@
                     <span>Sincronización digital</span>
                     <span id="kpi-conectividad-badge" class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">🟢 En línea</span>
                 </div>
+
+                <!-- Desplegable interactivo: Desglose de socios por canal -->
+                <details id="details-conectividad-desglose" class="mt-2.5 group/conectividad border-t border-slate-800/80 pt-1.5 text-xs">
+                    <summary class="cursor-pointer select-none text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center justify-between py-1 transition-colors outline-none">
+                        <span class="flex items-center gap-1.5">
+                            <span>📋</span>
+                            <span>Ver desglose de socios</span>
+                        </span>
+                        <span class="transition-transform group-open/conectividad:rotate-180 text-slate-400 text-xs">▼</span>
+                    </summary>
+                    <div id="conectividad-desglose-content" class="mt-2 space-y-2.5 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-[11px] max-h-60 overflow-y-auto custom-scroll">
+                        <div class="text-slate-400 text-center py-2">Cargando desglose...</div>
+                    </div>
+                </details>
 
                 <!-- Tooltip Explicativo en Primer Plano Absoluto -->
                 <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-auto sm:right-0 sm:w-84 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">

@@ -635,7 +635,8 @@ class BoteAppController {
                 if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) this.openMemberExtract(m.id);
             };
 
-            const initials = m.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const names = (m.name || 'Socio').trim().split(/\s+/);
+            const initials = names.length > 1 ? (names[0][0] + names[1][0]).toUpperCase() : names[0].slice(0, 2).toUpperCase();
 
             let statusBadge = `
                 <div class="group/status relative cursor-help inline-block">
@@ -2538,7 +2539,10 @@ class BoteAppController {
         const content = document.getElementById('extracto-content');
 
         if (nameEl) nameEl.textContent = member.name;
-        if (avatarEl) avatarEl.textContent = member.name.substring(0, 2).toUpperCase();
+        if (avatarEl) {
+            const names = (member.name || 'Socio').trim().split(/\s+/);
+            avatarEl.textContent = names.length > 1 ? (names[0][0] + names[1][0]).toUpperCase() : names[0].slice(0, 2).toUpperCase();
+        }
         if (statusEl) {
             statusEl.className = member.saldo >= 0 ? 'text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-xs px-2.5 py-0.5 rounded-full font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
             statusEl.textContent = member.saldo >= 0 ? 'Al día (+)' : 'Saldo Deudor (-)';

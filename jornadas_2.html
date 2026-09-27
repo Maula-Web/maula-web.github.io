@@ -555,6 +555,22 @@
                             -
                         </div>
                     </div>
+
+                    <!-- Desplegable interactivo: Aciertos y Fallos PIG cuando la jornada ha finalizado -->
+                    <div id="kpi-pig-desglose-container" class="mt-2.5 pt-2 border-t border-slate-800/80 hidden">
+                        <details id="details-pig-desglose" class="group/pig-desglose text-xs">
+                            <summary class="cursor-pointer select-none text-[11px] font-bold text-pink-400 hover:text-pink-300 flex items-center justify-between py-1 transition-colors outline-none">
+                                <span class="flex items-center gap-1.5">
+                                    <span>📋</span>
+                                    <span id="kpi-pig-desglose-summary-text">Aciertos y Fallos PIG</span>
+                                </span>
+                                <span class="transition-transform group-open/pig-desglose:rotate-180 text-slate-400 text-xs">▼</span>
+                            </summary>
+                            <div id="kpi-pig-desglose-content" class="mt-2 space-y-2.5 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-[11px] max-h-56 overflow-y-auto custom-scroll">
+                                <!-- Renderizado dinámico desde jornadas_2.js -->
+                            </div>
+                        </details>
+                    </div>
                 </div>
 
                 <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between text-slate-500">

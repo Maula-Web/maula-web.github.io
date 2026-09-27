@@ -1065,3 +1065,132 @@ body.light-theme {
     color: #6b21a8 !important;
 }
 
+/* ==========================================================================
+   AJUSTES MODO CLARO SOLICITADOS POR EL USUARIO (BOTE 2, JORNADAS 2, SOCIOS 2)
+   ========================================================================== */
+
+/* 1. Matriz Cuadrante: Totales Jornada (tfoot) oscurecidos a tono ámbar/bronce tostado */
+.light-theme #matriz-tfoot {
+    background-color: #fef8ee !important;
+    border-top: 2px solid #b45309 !important;
+}
+
+.light-theme #matriz-tfoot tr,
+.light-theme #matriz-tfoot td {
+    background-color: #fef8ee !important;
+    border-color: #e2d9cc !important;
+}
+
+.light-theme #matriz-tfoot td:first-child {
+    color: #9a3412 !important; /* Ámbar oscuro nítido y legible */
+    font-weight: 800 !important;
+}
+
+.light-theme #matriz-tfoot td:nth-child(2) {
+    color: #0f172a !important; /* Total de saldos en carbón de alto contraste */
+    font-weight: 900 !important;
+}
+
+.light-theme #matriz-tfoot td.text-orange-300,
+.light-theme #matriz-tfoot td[class*="text-orange"],
+.light-theme #matriz-tfoot td[class*="text-amber"] {
+    color: #b45309 !important; /* Oscurecido a ámbar bronce tostado */
+    font-weight: 800 !important;
+}
+
+/* Columna Saldo Actual en cuerpo de Matriz Cuadrante */
+.light-theme #matriz-tbody td.text-amber-400,
+.light-theme #matriz-tbody td[class*="text-amber"] {
+    color: #9a3412 !important;
+    font-weight: 800 !important;
+}
+
+/* 2. Resultados 2 (Jornadas 2): Botón "Importar Partidos" con texto oscurecido */
+.light-theme button[onclick*="openImportMatchesModal"],
+.light-theme .btn-import-matches {
+    color: #9a3412 !important; /* Ámbar oscuro/teja de excelente contraste */
+    font-weight: 800 !important;
+    border-color: #ea580c !important;
+}
+
+.light-theme button[onclick*="openImportMatchesModal"]:hover {
+    color: #7c2d12 !important;
+    background-color: rgba(234, 88, 12, 0.15) !important;
+}
+
+/* 3. Resultados 2 (Jornadas 2): Signos de los partidos (1, X, 2) sólo texto oscurecido */
+.light-theme .sign-pill-1 {
+    color: #047857 !important; /* Verde esmeralda bosque oscuro */
+    font-weight: 900 !important;
+}
+
+.light-theme .sign-pill-X {
+    color: #0369a1 !important; /* Azul cerúleo oscuro */
+    font-weight: 900 !important;
+}
+
+.light-theme .sign-pill-2 {
+    color: #b45309 !important; /* Ámbar bronce tostado oscuro */
+    font-weight: 900 !important;
+}
+
+/* Recuento de signos en KPI 2 de Resultados */
+.light-theme #kpi-count-1 {
+    color: #047857 !important;
+}
+
+.light-theme #kpi-count-X {
+    color: #0369a1 !important;
+}
+
+.light-theme #kpi-count-2 {
+    color: #b45309 !important;
+}
+
+/* 4. Socios 2: Desplegable Conectividad en Modo Claro */
+.light-theme #conectividad-desglose-content {
+    background-color: #fdfbf7 !important;
+    border-color: #e2d9cc !important;
+    color: #1e293b !important;
+}
+
+.light-theme #conectividad-desglose-content .bg-sky-950\/40 {
+    background-color: #f0f9ff !important;
+    border-color: #bae6fd !important;
+    color: #0f172a !important;
+}
+
+.light-theme #conectividad-desglose-content .bg-amber-950\/40 {
+    background-color: #fffbeb !important;
+    border-color: #fde68a !important;
+    color: #0f172a !important;
+}
+
+.light-theme #conectividad-desglose-content .text-slate-200 {
+    color: #0f172a !important;
+}
+
+/* 5. Resultados 2: Desplegable PIG en Modo Claro */
+.light-theme #kpi-pig-desglose-content {
+    background-color: #fdfbf7 !important;
+    border-color: #e2d9cc !important;
+    color: #1e293b !important;
+}
+
+.light-theme #kpi-pig-desglose-content .bg-emerald-950\/40 {
+    background-color: #ecfdf5 !important;
+    border-color: #a7f3d0 !important;
+    color: #0f172a !important;
+}
+
+.light-theme #kpi-pig-desglose-content .bg-rose-950\/40 {
+    background-color: #fff1f2 !important;
+    border-color: #fecdd3 !important;
+    color: #0f172a !important;
+}
+
+.light-theme #kpi-pig-desglose-content .text-slate-200 {
+    color: #0f172a !important;
+}
+
+

@@ -166,6 +166,7 @@ class SociosAppController {
             if (sd && Array.isArray(sd.memberSummaries) && sd.memberSummaries.length > 0) {
                 memberSummaries = sd.memberSummaries;
             }
+        }
         if (memberSummaries.length === 0) {
             const cachedMembers = localStorage.getItem('maulas_bote2_members');
             if (cachedMembers) {
@@ -329,6 +330,8 @@ class SociosAppController {
         let totalDadosUsados = 0;
         let conTelegram = 0;
         let conPush = 0;
+        const tgMembers = [];
+        const pushMembers = [];
 
         const deudores = [];
         let tesorero = null;
@@ -346,10 +349,12 @@ class SociosAppController {
 
             if (m.tgNick && m.tgNick.trim() !== '') {
                 conTelegram++;
+                tgMembers.push(m);
             }
 
             if (this.hasPushActive(m.id)) {
                 conPush++;
+                pushMembers.push(m);
             }
 
             const debtInfo = this.getMemberDebtStatus(m);
@@ -472,6 +477,66 @@ class SociosAppController {
         if (elPush) elPush.textContent = `${conPush} / ${totalSocios}`;
         if (elBadgeConectividad) {
             elBadgeConectividad.innerHTML = `🟢 ${conPush} Push · ${conTelegram} TG`;
+        }
+
+        // Inyectar Desglose de Conectividad (Telegram + Push) en el desplegable
+        const elDesglose = document.getElementById('conectividad-desglose-content');
+        if (elDesglose) {
+            // Ordenar por ID numérico ascendente
+            tgMembers.sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+            pushMembers.sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+
+            let desgloseHtml = `
+                <!-- 1. Telegram -->
+                <div>
+                    <div class="flex items-center justify-between text-xs font-bold text-sky-400 mb-1.5 pb-1 border-b border-sky-500/20">
+                        <span class="flex items-center gap-1.5">
+                            <span>💬</span>
+                            <span>Comunidad Telegram (${tgMembers.length})</span>
+                        </span>
+                        <span class="text-[10px] text-sky-300/80 font-normal">Canal & Bot</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-1 max-h-36 overflow-y-auto pr-1 custom-scroll">
+                        ${tgMembers.length > 0 ? tgMembers.map(m => {
+                            const nick = m.tgNick.startsWith('@') ? m.tgNick : `@${m.tgNick}`;
+                            return `
+                                <div class="flex items-center justify-between p-1.5 rounded-lg bg-sky-950/40 border border-sky-500/20 text-slate-200">
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <span class="w-5 h-5 rounded-md bg-sky-500/20 text-sky-300 text-[10px] font-bold flex items-center justify-center shrink-0">#${m.id}</span>
+                                        <span class="font-semibold truncate">${m.name}</span>
+                                    </div>
+                                    <span class="text-[10px] text-sky-400 font-mono shrink-0">${nick}</span>
+                                </div>
+                            `;
+                        }).join('') : '<div class="text-slate-500 italic py-1 text-center">Sin socios en Telegram</div>'}
+                    </div>
+                </div>
+
+                <!-- 2. Push PWA -->
+                <div class="pt-2 border-t border-slate-800/80">
+                    <div class="flex items-center justify-between text-xs font-bold text-amber-400 mb-1.5 pb-1 border-b border-amber-500/20">
+                        <span class="flex items-center gap-1.5">
+                            <span>🔔</span>
+                            <span>Notificaciones Push PWA (${pushMembers.length})</span>
+                        </span>
+                        <span class="text-[10px] text-amber-300/80 font-normal">Móvil Activo</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-1 max-h-36 overflow-y-auto pr-1 custom-scroll">
+                        ${pushMembers.length > 0 ? pushMembers.map(m => {
+                            return `
+                                <div class="flex items-center justify-between p-1.5 rounded-lg bg-amber-950/40 border border-amber-500/20 text-slate-200">
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <span class="w-5 h-5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-bold flex items-center justify-center shrink-0">#${m.id}</span>
+                                        <span class="font-semibold truncate">${m.name}</span>
+                                    </div>
+                                    <span class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 shrink-0">✓ Activa</span>
+                                </div>
+                            `;
+                        }).join('') : '<div class="text-slate-500 italic py-1 text-center">Sin suscripciones push registradas</div>'}
+                    </div>
+                </div>
+            `;
+            elDesglose.innerHTML = desgloseHtml;
         }
 
         // Contadores en las píldoras de filtro
