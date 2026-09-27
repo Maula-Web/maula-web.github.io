@@ -629,17 +629,20 @@ window.AppVersion = {
     },
 
     updateButtons(mode) {
-        const btnV1 = document.getElementById('btn-version-v1');
-        const btnV2 = document.getElementById('btn-version-v2');
-        if (btnV1 && btnV2) {
-            if (mode === 'v2') {
-                btnV2.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
-                btnV1.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+        document.querySelectorAll('[data-version-btn="v1"], #btn-version-v1').forEach(btn => {
+            if (mode === 'v1') {
+                btn.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
             } else {
-                btnV1.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
-                btnV2.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+                btn.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
             }
-        }
+        });
+        document.querySelectorAll('[data-version-btn="v2"], #btn-version-v2').forEach(btn => {
+            if (mode === 'v2') {
+                btn.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+            } else {
+                btn.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+            }
+        });
     },
 
     updateLinks(mode) {
@@ -701,17 +704,20 @@ window.AppTheme = {
     },
 
     updateButtons(theme) {
-        const btnLight = document.getElementById('btn-theme-light');
-        const btnDark = document.getElementById('btn-theme-dark');
-        if (btnLight && btnDark) {
+        document.querySelectorAll('[data-theme-btn="light"], #btn-theme-light').forEach(btn => {
             if (theme === 'light') {
-                btnLight.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
-                btnDark.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+                btn.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
             } else {
-                btnDark.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
-                btnLight.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+                btn.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
             }
-        }
+        });
+        document.querySelectorAll('[data-theme-btn="dark"], #btn-theme-dark').forEach(btn => {
+            if (theme === 'dark') {
+                btn.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+            } else {
+                btn.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+            }
+        });
     },
 
     init() {

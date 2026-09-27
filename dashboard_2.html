@@ -176,20 +176,42 @@
     <div id="main-content" class="max-w-[1500px] mx-auto space-y-4 sm:space-y-6">
 
         <!-- NAVBAR SUPERIOR MAULAS 2.0 (NAVEGACIÓN UNIVERSAL Y SELECTOR DE SECCIÓN) -->
-        <nav class="glass-panel p-2.5 sm:p-3.5 border-amber-500/40 flex items-center justify-between gap-3 relative z-[100] shadow-xl">
-            <!-- Brand / Logo & Temporada -->
-            <div class="flex items-center gap-3 flex-shrink-0">
-                <a href="dashboard_2.html" class="flex items-center gap-2.5 group">
-                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow group-hover:scale-105 transition-transform flex-shrink-0">
+        <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 border-amber-500/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl">
+            <!-- Fila Superior en Móvil / Zona Izquierda en Escritorio -->
+            <div class="flex items-center justify-between gap-2 w-full lg:w-auto flex-shrink-0">
+                <!-- Brand / Logo & Temporada -->
+                <a href="dashboard_2.html" class="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow group-hover:scale-105 transition-transform flex-shrink-0">
                     <div class="leading-tight flex flex-col justify-center">
                         <span class="font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
-                        <span class="text-[10px] text-amber-400 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
+                        <span class="text-[9px] sm:text-[10px] text-amber-400 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
                     </div>
                 </a>
+
+                <!-- Controles Compactos para Móvil (< lg) -->
+                <div class="flex lg:hidden items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                    <!-- Selector Versión Móvil -->
+                    <div class="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-amber-500/40 text-[11px] font-bold shadow-inner" id="version-switcher-container-mobile">
+                        <button type="button" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-1.5 py-0.5 rounded text-[11px] font-semibold transition text-slate-400" title="1.0 Clásica">1.0</button>
+                        <button type="button" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-1.5 py-0.5 rounded text-[11px] font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="⚡ 2.0 Pro">⚡2.0</button>
+                    </div>
+
+                    <!-- Selector Tema Móvil -->
+                    <div class="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-amber-500/40 text-[11px] font-bold shadow-inner" id="theme-switcher-container-mobile">
+                        <button type="button" data-theme-btn="light" onclick="window.AppTheme && window.AppTheme.setTheme('light')" class="px-1.5 py-0.5 rounded text-xs transition text-slate-400" title="Modo Claro">☀️</button>
+                        <button type="button" data-theme-btn="dark" onclick="window.AppTheme && window.AppTheme.setTheme('dark')" class="px-1.5 py-0.5 rounded text-xs transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Modo Oscuro">🌙</button>
+                    </div>
+
+                    <!-- Botón Actualizar Móvil -->
+                    <button onclick="if(window.Auth && window.Auth.forceAppUpdate){window.Auth.forceAppUpdate();}else{location.reload(true);}" class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs flex items-center justify-center font-bold" title="Actualizar">🔄</button>
+
+                    <!-- Botón Salir Móvil -->
+                    <button onclick="if(window.Auth && window.Auth.logout){window.Auth.logout();}else{sessionStorage.clear();localStorage.clear();location.href='login.html';}" class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-rose-400 border border-slate-700 text-xs flex items-center justify-center font-bold" title="Cerrar sesión">🚪</button>
+                </div>
             </div>
 
-            <!-- Menú Horizontal con Enlaces Dinámicos (Visible en todas las pantallas) -->
-            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-300 overflow-x-auto lg:overflow-visible no-scrollbar py-0.5 max-w-full">
+            <!-- Menú Horizontal con los 9 selectores (En móvil fila deslizable; en escritorio centrado) -->
+            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-300 overflow-x-auto lg:overflow-visible no-scrollbar py-0.5 w-full lg:w-auto justify-start lg:justify-center border-t border-slate-800/60 lg:border-t-0 pt-1.5 lg:pt-0 max-w-full">
                 <a href="dashboard_2.html" data-version-link="inicio" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold transition shadow-sm flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none scale-105">🏠</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Inicio</span>
@@ -228,55 +250,28 @@
                 </a>
             </div>
 
-            <!-- Controles de Versión, Tema & Acciones de Cabecera -->
-            <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+            <!-- Controles en Escritorio (>= lg) -->
+            <div class="hidden lg:flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 <!-- INTERRUPTOR DE VERSIÓN (V1 Clásica <-> V2.0 Pro) -->
                 <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner" id="version-switcher-container">
-                    <button type="button" id="btn-version-v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white" title="Cambiar a Versión Clásica 1.0">
+                    <button type="button" id="btn-version-v1" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white" title="Cambiar a Versión Clásica 1.0">
                         1.0 Clásica
                     </button>
-                    <button type="button" id="btn-version-v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Versión 2.0 Activa">
+                    <button type="button" id="btn-version-v2" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Versión 2.0 Activa">
                         ⚡ 2.0 Pro
                     </button>
                 </div>
 
                 <!-- INTERRUPTOR DE TEMA (Modo Claro <-> Modo Oscuro) -->
                 <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner" id="theme-switcher-container">
-                    <button type="button" id="btn-theme-light" onclick="window.AppTheme && window.AppTheme.setTheme('light')" class="px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white" title="Activar Modo Claro">
+                    <button type="button" id="btn-theme-light" data-theme-btn="light" onclick="window.AppTheme && window.AppTheme.setTheme('light')" class="px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white" title="Activar Modo Claro">
                         <span>☀️</span>
                         <span class="hidden sm:inline">Claro</span>
                     </button>
-                    <button type="button" id="btn-theme-dark" onclick="window.AppTheme && window.AppTheme.setTheme('dark')" class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Activar Modo Oscuro">
+                    <button type="button" id="btn-theme-dark" data-theme-btn="dark" onclick="window.AppTheme && window.AppTheme.setTheme('dark')" class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Activar Modo Oscuro">
                         <span>🌙</span>
                         <span class="hidden sm:inline">Oscuro</span>
                     </button>
-                </div>
-
-                <!-- Dropdown Selector de Sección (Móvil / Pantallas reducidas) -->
-                <div class="relative inline-block lg:hidden" id="nav-section-dropdown-wrap">
-                    <button type="button" onclick="document.getElementById('nav-section-dropdown').classList.toggle('hidden')" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-amber-500/50 hover:border-amber-400 text-amber-400 font-bold text-xs flex items-center gap-1.5 transition shadow-sm whitespace-nowrap">
-                        <span>🧭</span>
-                        <span class="hidden sm:inline">Sección</span>
-                        <span class="text-[10px]">▼</span>
-                    </button>
-                    <div id="nav-section-dropdown" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-[#0b0f19] border border-amber-500/60 shadow-2xl p-2 z-[100080] text-xs font-semibold space-y-1">
-                        <div class="p-2 border-b border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                            <span>Navegación Peña Maulas</span>
-                            <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono text-[10px]">Modo 2.0</span>
-                        </div>
-                        <a href="dashboard_2.html" data-version-link="inicio" class="flex items-center justify-between px-3 py-2 rounded-xl text-amber-300 bg-amber-500/20 border border-amber-500/40 font-bold">
-                            <span class="flex items-center gap-2"><span>🏠</span> Inicio / Dashboard</span>
-                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300">Activo</span>
-                        </a>
-                        <a href="socios_2.html" data-version-link="socios" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>👥</span> Socios</a>
-                        <a href="bote_2.html" data-version-link="bote" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>💰</span> Bote & Tesorería</a>
-                        <a href="jornadas_2.html" data-version-link="jornadas" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚽</span> Resultados Partidos</a>
-                        <a href="pronosticos.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📝</span> Rellenar Quiniela</a>
-                        <a href="resultados.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🏆</span> Clasificación General</a>
-                        <a href="resumen-temporada.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📊</span> Resumen Temporada</a>
-                        <a href="votaciones.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition font-bold"><span>🗳️</span> Votaciones</a>
-                        <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚙️</span> Administración</a>
-                    </div>
                 </div>
 
                 <!-- Botón Actualizar App -->

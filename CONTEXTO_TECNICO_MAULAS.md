@@ -671,11 +671,12 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
   7. 📊 **Resumen** (`resumen-temporada.html`)
   8. 🗳️ **Votaciones** (`votaciones.html`)
   9. ⚙️ **Admin** (`admin.html`)
-- **Adaptabilidad y Responsividad**:
+- **Adaptabilidad y Responsividad Móvil**:
   - Se eliminó la restricción rígida `hidden xl:flex` que ocultaba los selectores en portátiles con escalado de pantalla al 125% o ventanas no maximizadas (<1280px).
-  - El menú se transformó en un dock flexible `overflow-x-auto lg:overflow-visible no-scrollbar` con elementos `flex-shrink-0`.
+  - **Arquitectura de Barra Adaptativa**:
+    - **En Móviles (< 1024px)**: La barra superior se organiza en dos filas perfectamente optimizadas. La fila 1 alberga la marca oficial (`PEÑA MAULAS` / `Temporada 2026-2027`) y los controles compactos (`1.0/2.0`, `☀️/🌙`, `🔄`, `🚪`), evitando cualquier desborde horizontal. La fila 2 despliega los **9 selectores oficiales** en un dock táctil deslizable (`overflow-x-auto no-scrollbar scroll-smooth`) con objetivos de pulsación confortables para el pulgar.
+    - **En Escritorio (>= 1024px)**: Se fusiona de manera fluida en una única fila horizontal con marca a la izquierda, los 9 selectores centrados y controles a la derecha.
   - El ancho del contenedor principal se amplió a `max-w-[1500px]` - `max-w-[1600px]`, asegurando que todos los botones respiren con comodidad y nunca se colapsen.
-  - Para pantallas móviles reducidas se mantiene el botón desplegable auxiliar `🧭 Sección` (`lg:hidden`).
 - **Identidad de Marca**: Rótulo unificado con `PEÑA MAULAS` en una sola línea y `Temporada 2026-2027` en la línea inferior.
 
 ---
@@ -691,12 +692,12 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 ### 23.2. Modo Oscuro (100% Intacto)
 - El modo oscuro por defecto de la aplicación se mantiene **completamente intacto, sin modificar ninguno de sus valores ni estilos originales**.
 
-### 23.3. Modo Claro de Alta Gama (Tendencias UI 2026: Frosted Porcelain & Obsidian)
-- **Lienzo Marfil Porcelana (`#f8fafc`)**: Fondo claro mate con gradientes radiales fijos en tonos sutiles de ámbar y esmeralda.
-- **Paneles Glass Cerámicos**: Las tarjetas `.glass-panel` adoptan fondo blanco traslúcido (`rgba(255, 255, 255, 0.88)`), desenfoque de fondo (`backdrop-filter: blur(20px)`) y bordes nítidos (`#e2e8f0`).
+### 23.3. Modo Claro de Alta Gama (Canvas Cáscara de Huevo & Tarjetas Blanco Puro)
+- **Lienzo Cáscara de Huevo (`#f8f5ed`)**: Fondo suave, cálido y mate con gradientes radiales fijos en tonos sutiles de ámbar y esmeralda. Reduce la fatiga visual y elimina el resplandor frío de los blancos artificiales.
+- **Paneles y Tarjetas Blanco Puro (`#ffffff`)**: Las tarjetas `.glass-panel`, `.bote2-card`, `.match-card-row` y modales se diseñan en blanco puro con ribete cálido lino/arena (`#e8dfcf`) y sombra difusa suave (`box-shadow: 0 6px 24px -4px rgba(120, 90, 40, 0.05)`). Sobre el fondo cáscara de huevo, las tarjetas destacan y flotan con nitidez natural sin requerir bloques oscuros.
 - **Jerarquía Tipográfica Obsidian**: Textos principales en negro grafito (`#0f172a`), secundarios en gris pizarra (`#1e293b`) y de lectura en pizarra suave (`#334155`), asegurando un contraste óptimo bajo luz natural.
 - **Acentos Cromáticos Cálidos**: Tonos ámbar dorado (`#d97706`/`#b45309`) y verde esmeralda (`#059669`).
-- **Regla de Oro en Tarjetas Explicativas (`ℹ️`)**: En Modo Claro, las tarjetas explicativas conservan su **fondo negro medianoche sólido (`#0b0f19`) con texto blanco nítido y ribete dorado**, garantizando máximo contraste y evitando que se fundan con el lienzo claro.
+- **Tarjetas Explicativas (`ℹ️`)**: En Modo Claro se transforman en **tarjetas flotantes luminosas en blanco puro** con ribete fino en oro cálido (`1.5px solid #d97706`), sombra profunda difuminada y tipografía en negro obsidiana (`#1e293b`) y ámbar tostado (`#92400e`). Se erradicaron completamente los bloques negros sobre fondo claro, manteniendo una legibilidad y contraste insuperables. El botón informativo `ℹ️` luce en amarillo ámbar dorado (`#fef3c7`, borde `#f59e0b`, icono `#b45309`).
 
 ### 23.4. Integración en Service Worker y Caché
 - Archivo `css/light-theme.css` incorporado a los recursos críticos (`CORE_ASSETS`) de `service-worker.js`.
