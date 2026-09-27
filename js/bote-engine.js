@@ -6,7 +6,38 @@
  */
 class BoteEngine {
     constructor(config = {}) {
-        this.config = config;
+        this.config = {
+            costeColumna: 0.75,
+            costeDobles: 10.50,
+            aportacionSemanal: 1.50,
+            costeExtraExento: 0.20,
+            boteInicial: 738.68,
+            penalizacionMaula: 1.00,
+            penalizacionPIG: 1.00,
+            temporadaActual: '2026-2027',
+            ...config
+        };
+    }
+
+    /**
+     * Identifica si un socio es el Tesorero oficial de la Peña Maulas (Marcelo Pérez).
+     * Cuenta con régimen especial de regularización mediante los repartos de la temporada.
+     */
+    static isTesorero(memberOrId) {
+        if (!memberOrId) return false;
+        if (typeof memberOrId === 'number' || typeof memberOrId === 'string') {
+            if (String(memberOrId).trim() === '14') return true;
+        }
+        if (typeof memberOrId === 'object') {
+            if (String(memberOrId.id).trim() === '14') return true;
+            const name = (memberOrId.name || '').toLowerCase();
+            if (name.includes('marcelo')) return true;
+        }
+        return false;
+    }
+
+    isTesorero(memberOrId) {
+        return BoteEngine.isTesorero(memberOrId);
     }
 
     /**
