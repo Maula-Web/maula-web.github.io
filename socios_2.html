@@ -75,6 +75,14 @@
             position: relative;
         }
 
+        /* Ocultar elementos legados o sidebars antiguos */
+        .sidebar-menu, .header-separator, .header-logo-wrap, #btn-refresh-sidebar, #btn-logout-sidebar {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
         /* REGLA CRÍTICA: Asegurar que las tarjetas explicativas queden SIEMPRE en primer plano absoluto sin recortes y 100% OPACAS */
         #kpi-section {
             position: relative;

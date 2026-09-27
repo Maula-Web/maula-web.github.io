@@ -7,9 +7,14 @@ const Auth = {
         this.applySavedTheme();
 
         const onReady = () => {
-            this.applyLayoutPreference();
-            this.handleResponsive();
-            if (!window.location.pathname.includes('login.html')) {
+            const p = (window.location.pathname || '').toLowerCase();
+            const isV2 = p.includes('_2.html') || p.includes('dashboard_2') || p.includes('socios_2') || p.includes('bote_2') || p.includes('jornadas_2');
+
+            if (!isV2) {
+                this.applyLayoutPreference();
+                this.handleResponsive();
+            }
+            if (!p.includes('login.html') && !isV2) {
                 this.injectLogout();
             }
         };
@@ -330,14 +335,22 @@ const Auth = {
     },
 
     injectLogout: function () {
-        if (window.location.pathname.includes('login.html') || 
-            window.location.pathname.includes('bote_2.html') || 
-            window.location.pathname.includes('socios_2.html') ||
-            window.location.pathname.includes('dashboard_2.html')) return;
+        const path = (window.location.pathname || '').toLowerCase();
+        if (path.includes('login.html') || 
+            path.includes('_2.html') || 
+            path.includes('bote_2') || 
+            path.includes('socios_2') || 
+            path.includes('jornadas_2') ||
+            path.includes('dashboard_2')) {
+            const rogueSidebar = document.querySelector('.sidebar-menu');
+            if (rogueSidebar) rogueSidebar.remove();
+            const rogueSep = document.querySelector('.header-separator');
+            if (rogueSep) rogueSep.remove();
+            return;
+        }
 
         // Path current
-        const path = window.location.pathname;
-        const page = path.split('/').pop() || 'index.html';
+        const page = (window.location.pathname || '').split('/').pop() || 'index.html';
 
         // Check if current user is Fernando Lozano (ID: 6)
         let isFernandoLozano = false;
