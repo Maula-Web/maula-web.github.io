@@ -3,3 +3,30 @@ Vamos a ir preparando la versión 2 de la hoja Rellenar Quiniela. Ya sabes. Anal
 
 Prepara la versión 2 de Clasificación. Ya sabes las directrices. Solo lo puedo ver yo. El estilo, el que hemos dado a las otras hojas. Tarjetas explicativas con el estilo que me gusta. No se recalculan los datos. Se leen de donde ya están calculados y se muestran. Analiza, cambia añade y corrige lo que veas que puede mejorar la experiencia y dejame boquiabierto. El menú correcto y los dos modos claro/oscuro.
 Esta hoja puede suponer un reto ya que es una simple tabla de datos. Pero seguro que consigues sorprenderme. No sé. Quizá con algun elemento gráfico dinámico o algún deplegable con información chula. Recuerda mostrar las penalizaciones, los premios y los bonus obtenidos por los socios.
+
+
+Vamos con el plato fuerte. La versión 2 de Resumen. Esta hoja es sobre todo visual. Esto es un resumen de cómo va la temporada.
+Aplica el estilo del resto de hojas, con modo claro/oscuro, estableciendo aspectos viasuales diferentes para cada elemento dependiendo del modo, tarjetas explicativas, elementos graficos interactivos, ventanas emergentes, botoncitos, tarjetas deplegables con datos...
+Lo que se te ocurra para un cuadro de mando digno del siglo XXII. investiga tendencias, estilos, organización y estructura. Proponme KPIs chulos que se puedan deducir de toda la información que genera la peña y que nos sirvan para mejorar nuestro rendimiento.
+Aquí te dejo que improvises, pero dame algo impresionante dentro del estilo de las hojas nuevas.
+no te inventes datos. Todo está ya calculado. Solo tienes que recoger la información y presentarla.
+Es tu oportunidad ¡¡Lúcete!!
+
+Ahora vamos a hacer la hoja de Votaciones. Aplica las mismas directrices que para el resto de hojas. No te olvides de adaptar las ventanas emergentes.
+
+Y por último vamoa a versionar la hoja de administración con el mismo estilo nuevo que hemos usado para el resto de hojas.
+
+Unifica el color del fondo en todas las hojas. Parece que todas tienen el mismo pero el de la hoja Resultados es más oscuro.
+Haz mas grande el logotipo del menú.
+
+Ahora que ya tenemos versiones nuevas de todas las hojas, vamos a desactivar para todos los socios las hojas viejas. 
+Para ello seguiremos los siguientes pasos.
+Las nuevas hojas no se llamaran versión 2, ni 2, ni 2.0 ni nada parecido. Tendrán el nombre normal.
+Se elminarán las menciones a que solo están disponibles para ciertos socios y mensajes similares.
+Las hojas viejas sólo estarán disponibles para el socio Fernando Lozano mediante el control del menú Clásica/Pro. Para el resto de socios sólo estarán disponobles las hojas nuevas. El control de menú no se mostrará al resto de socios.
+Las hojas viejas las voy a dejar ocultas pero accesibles por si tengo que recuperar algo. En un tiempo las terminaremos eliminando.
+Se desactivará la hoja identidad visual y cualquier referencia de esta hoja en el código del resto de la web. Esta hoja no tiene versión nueva. Va a desaparecer totalmente.
+Una vez ocultas las hojas viejas, se mostraran a todos los socios únicamente las hojas nuevas, incluyendo el bote.
+
+
+La prueba de notificación con token para despertar un iphone con la app cerrada y la pantalla apagada, funcionó correctamente. ¿Cuales serían los siguientes pasos?

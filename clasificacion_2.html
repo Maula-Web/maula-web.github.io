@@ -21,9 +21,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS v4 CDN -->
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/light-theme.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        outfit: ['"Outfit"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 
     <!-- Firebase SDKs Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -71,11 +87,104 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
         }
 
+        /* Asegurar PEÑA MAULAS en blanco puro en modo oscuro y pizarra oscura en modo claro */
+        #brand-text-maulas {
+            color: #ffffff !important;
+        }
+        .light-theme #brand-text-maulas {
+            color: #0f172a !important;
+        }
+
+        /* Nombres de los socios en KPI 1 y KPI 2 claros y nítidos en modo oscuro */
+        #kpi-lider-nombre,
+        #kpi-record-socio {
+            color: #ffffff !important;
+        }
+        .light-theme #kpi-lider-nombre,
+        .light-theme #kpi-record-socio {
+            color: #0f172a !important;
+        }
+
+        /* Barra de Control / Botonera Superior */
+        .header-control-bar {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .light-theme .header-control-bar {
+            background: #ffffff !important;
+            border-color: rgba(203, 213, 225, 0.8) !important;
+        }
+
+        .header-title-text {
+            color: #ffffff !important;
+        }
+        .light-theme .header-title-text {
+            color: #0f172a !important;
+        }
+
+        .view-switcher-box {
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .light-theme .view-switcher-box {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        .search-input-control {
+            background: #020617 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(51, 65, 85, 0.8) !important;
+        }
+        .light-theme .search-input-control {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        .search-input-control::placeholder {
+            color: #94a3b8;
+        }
+        .light-theme .search-input-control::placeholder {
+            color: #64748b;
+        }
+
+        .badge-disputadas {
+            background: rgba(15, 23, 42, 0.9);
+            color: #94a3b8;
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+        .light-theme .badge-disputadas {
+            background: #f1f5f9 !important;
+            color: #334155 !important;
+            border-color: #cbd5e1 !important;
+        }
+
         /* REGLA CRÍTICA: Tarjetas explicativas SIEMPRE en primer plano absoluto y 100% OPACAS (#0b0f19) EN MODO OSCURO */
+        #kpi-section {
+            position: relative;
+            z-index: 60;
+            overflow: visible;
+        }
+        .kpi-card {
+            position: relative;
+            overflow: visible;
+        }
+        .kpi-card:hover,
+        .kpi-card:focus-within {
+            z-index: 100050 !important;
+        }
+        .group\/tip {
+            position: relative;
+        }
+        .group\/tip:hover,
+        .group\/tip:focus-within {
+            z-index: 100060 !important;
+        }
         html.dark .tooltip-box,
         html.dark .group\/tip > div[class*="group-hover\/tip:visible"],
         html.dark .group\/tip:hover > div[class*="absolute"],
-        html.dark div[class*="group-hover\/tip:visible"] {
+        html.dark div[class*="group-hover\/tip:visible"],
+        .tooltip-card {
             background-color: #0b0f19 !important;
             background: #0b0f19 !important;
             backdrop-filter: none !important;
@@ -84,19 +193,21 @@
             border: 1.5px solid rgba(245, 158, 11, 0.75) !important;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.98), 0 0 25px rgba(245, 158, 11, 0.2) !important;
             color: #f8fafc !important;
-            z-index: 100060 !important;
+            z-index: 100070 !important;
             pointer-events: auto !important;
         }
 
         .light-theme .tooltip-box,
         .light-theme .group\/tip > div[class*="group-hover\/tip:visible"],
-        .light-theme .group\/tip:hover > div[class*="absolute"] {
+        .light-theme .group\/tip:hover > div[class*="absolute"],
+        .light-theme .tooltip-card {
             background-color: #ffffff !important;
             background: #ffffff !important;
             border: 1.5px solid rgba(217, 119, 6, 0.7) !important;
             box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15) !important;
             color: #0f172a !important;
-            z-index: 100060 !important;
+            z-index: 100070 !important;
+            pointer-events: auto !important;
         }
 
         /* Scrollbars personalizados */
@@ -218,14 +329,15 @@
             color: #0f172a !important;
         }
 
-        .matrix-summary-row td {
+        .matrix-summary-row td,
+        .matrix-header-name,
+        .matrix-corner {
             position: sticky;
-            z-index: 35;
         }
-        .matrix-row-total td { top: 58px; background: rgba(15, 23, 42, 0.95); }
-        .matrix-row-hits td { top: 96px; background: rgba(15, 23, 42, 0.92); }
-        .matrix-row-bonus td { top: 130px; background: rgba(15, 23, 42, 0.92); }
-        .matrix-row-prizes td { top: 164px; background: rgba(15, 23, 42, 0.95); border-bottom: 3px solid rgba(245, 158, 11, 0.7) !important; }
+        .matrix-row-total td { background: rgba(15, 23, 42, 0.98); }
+        .matrix-row-hits td { background: rgba(15, 23, 42, 0.95); }
+        .matrix-row-bonus td { background: rgba(15, 23, 42, 0.95); }
+        .matrix-row-prizes td { background: rgba(15, 23, 42, 0.98); border-bottom: 3px solid rgba(245, 158, 11, 0.7) !important; }
 
         .light-theme .matrix-row-total td { background: #e2e8f0 !important; color: #0f172a !important; }
         .light-theme .matrix-row-hits td { background: #f8fafc !important; color: #0f172a !important; }
@@ -342,8 +454,8 @@
                 <a href="dashboard_2.html" class="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
                     <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow group-hover:scale-105 transition-transform flex-shrink-0">
                     <div class="leading-tight flex flex-col justify-center">
-                        <span class="font-black text-slate-800 dark:text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-500 transition-colors">PEÑA MAULAS</span>
-                        <span class="text-[9px] sm:text-[10px] text-amber-500 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
+                        <span id="brand-text-maulas" class="font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
+                        <span class="text-[9px] sm:text-[10px] text-amber-500 dark:text-amber-400 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
                     </div>
                 </a>
 
@@ -417,31 +529,33 @@
             </div>
         </nav>
 
-        <!-- BARRA DE TÍTULO Y CONTROLES PRINCIPALES -->
-        <header class="glass-panel p-3 sm:p-4 border-amber-500/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <!-- BARRA DE TÍTULO Y CONTROLES PRINCIPALES (MISMO FORMATO VISUAL QUE EL RESTO DE HOJAS) -->
+        <div class="header-control-bar p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 text-xs sm:text-sm shadow-md">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shadow-inner shrink-0">
+                <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg sm:text-xl flex items-center justify-center shadow-inner">
                     🏆
-                </div>
+                </span>
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="text-lg sm:text-xl font-black text-slate-800 dark:text-white tracking-tight">
+                        <strong class="header-title-text font-black text-sm sm:text-base tracking-wide">
                             Clasificación Oficial 2.0
-                        </h1>
-                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/40">
+                        </strong>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40">
                             Temporada 2026-2027
                         </span>
-                        <span id="badge-total-jornadas" class="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
-                            -- Jornadas disputadas
+                        <span id="badge-total-jornadas" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold badge-disputadas flex items-center gap-1.5 shadow-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span id="badge-total-jornadas-text">-- Jornadas disputadas</span>
                         </span>
                     </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5">Puntuaciones acumuladas, matriz histórica jornada a jornada, podio y desglose oficial de bonus.</p>
                 </div>
             </div>
 
             <!-- Controles de Vista y Filtro (Matriz Histórica va DELANTE de Ranking) -->
             <div class="flex flex-wrap items-center gap-2">
                 <!-- Selector de Pestañas de Vista -->
-                <div class="flex items-center bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl border border-slate-300 dark:border-slate-800 shadow-inner">
+                <div class="flex items-center view-switcher-box p-1 rounded-xl shadow-inner">
                     <button type="button" id="tab-btn-matrix" onclick="window.ClasificacionApp.switchView('matrix')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow">
                         <span>📊</span> Matriz Histórica
                     </button>
@@ -455,11 +569,11 @@
 
                 <!-- Buscador de Socio -->
                 <div class="relative">
-                    <input type="text" id="member-search-input" oninput="window.ClasificacionApp.filterMembers(this.value)" placeholder="Buscar socio..." class="w-36 sm:w-44 pl-8 pr-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 shadow-sm font-semibold">
+                    <input type="text" id="member-search-input" oninput="window.ClasificacionApp.filterMembers(this.value)" placeholder="Buscar socio..." class="search-input-control w-36 sm:w-44 pl-8 pr-3 py-1.5 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-amber-500 transition shadow-sm">
                     <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">🔍</span>
                 </div>
             </div>
-        </header>
+        </div>
 
         <!-- =====================================================================
              NIVEL 2: EL PODIO DE HONOR (COMPACTO Y ELEGANTE)
@@ -489,15 +603,15 @@
                 </div>
                 <div class="pt-1.5 mt-1.5 border-t border-slate-200 dark:border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Aciertos</span>
+                        <span class="text-slate-500 dark:text-slate-300 text-[9px] block font-semibold">Aciertos</span>
                         <strong id="podium-hits-2" class="text-slate-900 dark:text-white">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Bonus</span>
+                        <span class="text-slate-500 dark:text-slate-300 text-[9px] block font-semibold">Bonus</span>
                         <strong id="podium-bonus-2" class="text-emerald-600 dark:text-emerald-400">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Premios</span>
+                        <span class="text-slate-500 dark:text-slate-300 text-[9px] block font-semibold">Premios</span>
                         <strong id="podium-prize-2" class="text-purple-600 dark:text-purple-400">--€</strong>
                     </div>
                 </div>
@@ -527,15 +641,15 @@
                 </div>
                 <div class="pt-1.5 mt-1.5 border-t border-amber-500/40 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Aciertos</span>
+                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[9px] block font-semibold">Aciertos</span>
                         <strong id="podium-hits-1" class="text-slate-900 dark:text-white text-xs">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Bonus</span>
+                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[9px] block font-semibold">Bonus</span>
                         <strong id="podium-bonus-1" class="text-emerald-600 dark:text-emerald-400 text-xs">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Premios</span>
+                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[9px] block font-semibold">Premios</span>
                         <strong id="podium-prize-1" class="text-purple-600 dark:text-purple-300 text-xs">--€</strong>
                     </div>
                 </div>
@@ -565,15 +679,15 @@
                 </div>
                 <div class="pt-1.5 mt-1.5 border-t border-slate-200 dark:border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Aciertos</span>
+                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[9px] block font-semibold">Aciertos</span>
                         <strong id="podium-hits-3" class="text-slate-900 dark:text-white">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Bonus</span>
+                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[9px] block font-semibold">Bonus</span>
                         <strong id="podium-bonus-3" class="text-emerald-600 dark:text-emerald-400">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Premios</span>
+                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[9px] block font-semibold">Premios</span>
                         <strong id="podium-prize-3" class="text-purple-600 dark:text-purple-400">--€</strong>
                     </div>
                 </div>
@@ -583,12 +697,12 @@
         <!-- =====================================================================
              NIVEL 3: BENTO KPIS CON TARJETAS EXPLICATIVAS (ℹ️)
              ===================================================================== -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+        <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 relative z-50 overflow-visible">
             <!-- KPI 1: Líder & Distancia -->
-            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/50 flex items-center gap-1 shadow-sm">
                             <span>👑</span> Líder General
                         </span>
 
@@ -596,7 +710,7 @@
                             <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
                                 <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>👑</span> Campeón de la Peña
                                 </strong>
@@ -608,7 +722,7 @@
                         </div>
                     </div>
 
-                    <h4 id="kpi-lider-nombre" class="text-base font-black text-slate-800 dark:text-white truncate">Calculando...</h4>
+                    <h4 id="kpi-lider-nombre" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
                     <div class="flex items-baseline gap-2 mt-0.5">
                         <span id="kpi-lider-puntos" class="text-xl font-black text-amber-600 dark:text-amber-400 font-mono">-- pts</span>
                         <span id="kpi-lider-ventaja" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">+-- sobre el 2º</span>
@@ -622,10 +736,10 @@
             </div>
 
             <!-- KPI 2: Récord de Jornada -->
-            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 border border-emerald-500/50 flex items-center gap-1 shadow-sm">
                             <span>🎯</span> Récord en 1 Jornada
                         </span>
 
@@ -633,7 +747,7 @@
                             <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
                                 <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>🎯</span> Puntuación Récord
                                 </strong>
@@ -645,7 +759,7 @@
                         </div>
                     </div>
 
-                    <h4 id="kpi-record-socio" class="text-base font-black text-slate-800 dark:text-white truncate">Calculando...</h4>
+                    <h4 id="kpi-record-socio" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
                     <div class="flex items-baseline gap-2 mt-0.5">
                         <span id="kpi-record-puntos" class="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">-- pts</span>
                         <span id="kpi-record-jornada" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">Jornada --</span>
@@ -659,10 +773,10 @@
             </div>
 
             <!-- KPI 3: Bolsa de Premios (€) -->
-            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-500/25 text-purple-900 dark:text-purple-200 border border-purple-500/50 flex items-center gap-1 shadow-sm">
                             <span>💰</span> Premios Repartidos
                         </span>
 
@@ -670,7 +784,7 @@
                             <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
                                 <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>💰</span> Premios en Metálico
                                 </strong>
@@ -692,10 +806,10 @@
             </div>
 
             <!-- KPI 4: Balance Bonus vs Penalizaciones -->
-            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/40 flex items-center gap-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-500/25 text-sky-900 dark:text-sky-200 border border-sky-500/50 flex items-center gap-1 shadow-sm">
                             <span>⚖️</span> Bonus y Penalizaciones
                         </span>
 
@@ -703,7 +817,7 @@
                             <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
                                 <strong class="text-blue-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>⚖️</span> Sistema de Bonus y Sanciones
                                 </strong>
@@ -995,14 +1109,16 @@
                     this.initChart();
 
                     // Actualizar contador de jornadas en título
-                    const badgeJ = document.getElementById('badge-total-jornadas');
+                    const badgeJ = document.getElementById('badge-total-jornadas-text') || document.getElementById('badge-total-jornadas');
                     const disputadas = this.jornadas.filter(j => j.matches && j.matches.some(m => m.result && m.result.trim() !== '')).length;
                     if (badgeJ) badgeJ.textContent = `${disputadas} Jornadas disputadas`;
 
-                    // Redimensionar gráfico en resize de ventana
+                    // Redimensionar gráfico y ajustar tabla en resize de ventana
                     window.addEventListener('resize', () => {
                         if (this.currentView === 'chart') {
                             this.renderChartSVG();
+                        } else if (this.currentView === 'matrix') {
+                            this.adjustMatrixStickyHeaders();
                         }
                     });
 
@@ -1473,6 +1589,27 @@
                 tbody += `</tbody>`;
 
                 table.innerHTML = thead + tbody;
+                this.adjustMatrixStickyHeaders();
+            }
+
+            // Cálculo dinámico de posiciones sticky en thead para evitar cualquier corte o solapamiento
+            adjustMatrixStickyHeaders() {
+                const table = document.getElementById('matrix-table');
+                if (!table) return;
+                const theadRows = table.querySelectorAll('thead tr');
+                let currentTop = 0;
+                theadRows.forEach((tr, rIdx) => {
+                    const cells = tr.querySelectorAll('th, td');
+                    cells.forEach(cell => {
+                        cell.style.top = currentTop + 'px';
+                        if (cell.classList.contains('matrix-sticky-col') || cell.classList.contains('matrix-corner')) {
+                            cell.style.zIndex = 55 - rIdx;
+                        } else {
+                            cell.style.zIndex = 45 - rIdx;
+                        }
+                    });
+                    currentTop += tr.offsetHeight;
+                });
             }
 
             // --- GRÁFICO DINÁMICO DE EVOLUCIÓN (PROPORCIONAL EN PÍXELES REALES, FUENTE NATIVA) ---
@@ -1672,6 +1809,8 @@
                 if (viewName === 'chart') {
                     this.renderChartChips();
                     setTimeout(() => this.renderChartSVG(), 50);
+                } else if (viewName === 'matrix') {
+                    setTimeout(() => this.adjustMatrixStickyHeaders(), 30);
                 }
             }
 
