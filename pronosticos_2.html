@@ -522,61 +522,175 @@
             transform: scale(1.1) !important;
         }
 
-        /* Filas de partido en el modal */
-        .pronostico-row, .doubles-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.65rem 0.9rem;
-            background: rgba(30, 41, 59, 0.45);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 0.8rem;
-            margin-bottom: 0.45rem;
-            transition: all 0.15s ease;
-            gap: 0.75rem;
+        /* =========================================================================
+           FILAS DE PARTIDO EN EL MODAL FLOTANTE (SIN CORTES DE NOMBRES DE EQUIPOS)
+           ========================================================================= */
+        #modal-editor-boleto .pronostico-row, 
+        #modal-editor-boleto .doubles-row {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0.65rem 1.1rem !important;
+            background: rgba(30, 41, 59, 0.45) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 0.85rem !important;
+            margin-bottom: 0.45rem !important;
+            transition: all 0.15s ease !important;
+            gap: 1rem !important;
         }
-        .pronostico-row:hover, .doubles-row:hover {
-            background: rgba(30, 41, 59, 0.85);
-            border-color: rgba(245, 158, 11, 0.4);
+        #modal-editor-boleto .pronostico-row:hover, 
+        #modal-editor-boleto .doubles-row:hover {
+            background: rgba(30, 41, 59, 0.85) !important;
+            border-color: rgba(245, 158, 11, 0.4) !important;
         }
-        .p-match-info {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex: 1;
-            min-width: 0;
+        .light-theme #modal-editor-boleto .pronostico-row,
+        .light-theme #modal-editor-boleto .doubles-row {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
         }
-        .p-match-num {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--primary-orange);
-            font-weight: 900;
-            min-width: 1.6rem;
+        .light-theme #modal-editor-boleto .pronostico-row:hover,
+        .light-theme #modal-editor-boleto .doubles-row:hover {
+            background: #f8fafc !important;
+            border-color: #cbd5e1 !important;
         }
-        .match-team {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            overflow: hidden;
+
+        /* Columna de información de partido: ancho generoso para que los equipos se lean completos */
+        #modal-editor-boleto .p-match-info {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 0.65rem !important;
+            flex: 0 0 auto !important;
+            width: 440px !important;
+            max-width: 470px !important;
+            min-width: 380px !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding-right: 0.85rem !important;
+            margin: 0 !important;
         }
-        .team-name {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .light-theme #modal-editor-boleto .p-match-info {
+            border-right-color: rgba(0, 0, 0, 0.08) !important;
         }
-        .team-logo {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
+
+        #modal-editor-boleto .p-match-num {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.85rem !important;
+            color: var(--primary-orange) !important;
+            font-weight: 900 !important;
+            min-width: 1.8rem !important;
+            flex-shrink: 0 !important;
         }
-        .p-options {
-            display: flex;
-            gap: 0.4rem;
-            align-items: center;
-            justify-content: flex-end;
+
+        #modal-editor-boleto .match-team {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.45rem !important;
+            flex: 1 1 0 !important;
+            min-width: 160px !important;
+            max-width: none !important;
+            overflow: visible !important;
+        }
+        #modal-editor-boleto .home-team {
+            justify-content: flex-end !important;
+            text-align: right !important;
+        }
+        #modal-editor-boleto .away-team {
+            justify-content: flex-start !important;
+            text-align: left !important;
+        }
+
+        #modal-editor-boleto .team-name {
+            font-weight: 700 !important;
+            font-size: 0.85rem !important;
+            color: var(--text-main) !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            max-width: none !important;
+            width: auto !important;
+        }
+        .light-theme #modal-editor-boleto .team-name {
+            color: #0f172a !important;
+        }
+
+        #modal-editor-boleto .team-logo {
+            width: 20px !important;
+            height: 20px !important;
+            object-fit: contain !important;
+            flex-shrink: 0 !important;
+        }
+        #modal-editor-boleto .match-vs-separator {
+            color: #64748b !important;
+            font-weight: 900 !important;
+            font-size: 0.85rem !important;
+            margin: 0 2px !important;
+            flex-shrink: 0 !important;
+        }
+
+        #modal-editor-boleto .p-others {
+            flex: 1 1 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 3px !important;
+            min-width: 60px !important;
+            overflow-x: auto !important;
+        }
+
+        #modal-editor-boleto .p-options {
+            flex: 0 0 auto !important;
+            display: flex !important;
+            gap: 0.45rem !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        #modal-editor-boleto .p-percentages {
+            flex: 0 0 65px !important;
+            min-width: 65px !important;
+        }
+
+        /* Estilos específicos para la pestaña de dobles */
+        #modal-editor-boleto .doubles-row .team-name {
+            font-size: 0.82rem !important;
+            max-width: none !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+        }
+        #modal-editor-boleto .doubles-row .team-info-stacked {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+            min-width: 140px !important;
+        }
+        #modal-editor-boleto .doubles-row .team-line {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            white-space: nowrap !important;
+        }
+
+        @media (max-width: 768px) {
+            #modal-editor-boleto .p-match-info {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                border-right: none !important;
+                padding-right: 0 !important;
+                justify-content: space-between !important;
+            }
+            #modal-editor-boleto .match-team {
+                min-width: 110px !important;
+            }
+            #modal-editor-boleto .pronostico-row {
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+            }
+            #modal-editor-boleto .p-others {
+                order: 3 !important;
+                width: 100% !important;
+            }
         }
 
         /* Divisores de bloques en el modal */
@@ -1092,7 +1206,7 @@
          (SE ABRE AL PINCHAR EN EL PRONÓSTICO DE UN SOCIO O PULSAR EDITAR BOLETO)
          ===================================================================== -->
     <div id="modal-editor-boleto" style="display: none;" onclick="if(event.target === this) window.closeEditorModal()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
-        <div class="glass-panel w-full max-w-4xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal">
+        <div class="glass-panel w-full max-w-5xl xl:max-w-6xl 2xl:max-w-7xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal">
             
             <!-- Cabecera del Modal -->
             <div class="bg-slate-900/90 p-4 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
@@ -1417,8 +1531,33 @@
                 window.app.loadForecast();
             }
 
-            // Cambiar pestaña si se solicitó dobles
-            if (openDoublesTab) {
+            // Comprobar si este socio es el responsable de dobles para esta jornada
+            const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+            const responsible = window.getEligibleDoublesMember(j);
+            const isDoublesEligible = (responsible && String(responsible.id) === String(window.app.currentMemberId)) || (window.app && window.app.correctionMode);
+
+            const tabBtnDoubles = document.getElementById('tab-btn-doubles');
+            const tabBtnBase = document.getElementById('tab-btn-base');
+
+            // Si un socio NO tiene que rellenar la quiniela de dobles, no mostrar el control para ir a esa pantalla
+            if (tabBtnDoubles) {
+                if (isDoublesEligible) {
+                    tabBtnDoubles.style.display = 'flex';
+                    if (tabBtnBase) {
+                        tabBtnBase.classList.remove('w-full');
+                        tabBtnBase.classList.add('flex-1');
+                    }
+                } else {
+                    tabBtnDoubles.style.display = 'none';
+                    if (tabBtnBase) {
+                        tabBtnBase.classList.remove('flex-1');
+                        tabBtnBase.classList.add('w-full');
+                    }
+                }
+            }
+
+            // Cambiar pestaña si se solicitó dobles y es elegible (nunca para un socio no elegible)
+            if (openDoublesTab && isDoublesEligible) {
                 window.switchEditorTab('doubles');
             } else {
                 window.switchEditorTab('base');
@@ -1429,11 +1568,16 @@
             const subEl = document.getElementById('modal-editor-subtitle');
             if (window.app && window.app.members) {
                 const m = window.app.members.find(mem => String(mem.id) === String(window.app.currentMemberId));
-                const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
                 const mName = m ? AppUtils.getMemberName(m) : 'Socio';
                 const jNum = j ? `Jornada ${j.number}` : '';
-                if (titleEl) titleEl.textContent = `Boleto de Quiniela - ${mName}`;
-                if (subEl) subEl.textContent = `${jNum} • Rellena los 15 signos o la combinación de dobles`;
+                if (titleEl) {
+                    titleEl.innerHTML = `Boleto de Quiniela - <span class="text-amber-400">${mName}</span> ${isDoublesEligible ? '<span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/25 text-purple-300 border border-purple-500/50 font-black ml-2 shadow-sm">🎲 Responsable Dobles</span>' : ''}`;
+                }
+                if (subEl) {
+                    subEl.textContent = isDoublesEligible 
+                        ? `${jNum} • Rellena los 15 signos o la combinación de dobles autorizada`
+                        : `${jNum} • Rellena los 15 signos del pronóstico individual`;
+                }
             }
 
             modal.style.display = 'flex';
@@ -1564,11 +1708,13 @@
                 headerRow.appendChild(stickyTh);
 
                 // Columnas de Cada Socio
+                const responsibleMember = window.getEligibleDoublesMember(targetJornadaForHeader);
+
                 sortedMembers.forEach((m) => {
                     const th = document.createElement('th');
                     th.className = 'summary-header-cell';
-                    th.style.minWidth = '46px';
-                    th.style.maxWidth = '52px';
+                    th.style.minWidth = '48px';
+                    th.style.maxWidth = '58px';
                     th.setAttribute('data-mid', m.id);
                     
                     const led = this.getMemberStatusLed(m.id, targetJornadaForHeader);
@@ -1576,10 +1722,25 @@
                     const nameParts = AppUtils.getMemberName(m).split(' ');
                     const shortName = nameParts[0].length > 7 ? nameParts[0].substring(0, 6) + '.' : nameParts[0];
 
+                    const isDoublesMember = responsibleMember && String(responsibleMember.id) === String(m.id);
+
+                    if (isDoublesMember) {
+                        th.classList.add('bg-purple-950/30', 'border-b-2', 'border-purple-500');
+                        th.style.boxShadow = 'inset 0 0 14px rgba(168, 85, 247, 0.25)';
+                        th.style.minWidth = '56px';
+                    }
+
+                    const doublesBadge = isDoublesMember ? `
+                        <span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-purple-500/30 text-purple-400 dark:text-purple-300 border border-purple-500/60 text-[9px] font-black tracking-tight mt-0.5 shadow-sm animate-pulse" title="🎲 Responsable de la Quiniela de Dobles en Jornada ${targetJornadaForHeader ? targetJornadaForHeader.number : ''}">
+                            🎲 DOBLES
+                        </span>
+                    ` : '';
+
                     th.innerHTML = `
-                        <div class="flex flex-col items-center justify-center gap-1 cursor-pointer group py-1" onclick="window.openEditorModal(${m.id}, false, '${targetJornadaForHeader ? targetJornadaForHeader.id : ''}')">
+                        <div class="flex flex-col items-center justify-center gap-0.5 cursor-pointer group py-1" onclick="window.openEditorModal(${m.id}, false, '${targetJornadaForHeader ? targetJornadaForHeader.id : ''}')">
                             <span class="led-status-indicator led-${led.status}" title="${jNumText}${led.title}"></span>
-                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-amber-400 transition-colors" title="${AppUtils.getMemberName(m)}">${shortName}</span>
+                            <span class="text-[11px] font-bold ${isDoublesMember ? 'text-purple-500 dark:text-purple-300 font-black' : 'text-slate-700 dark:text-slate-300'} group-hover:text-amber-400 transition-colors" title="${AppUtils.getMemberName(m)}${isDoublesMember ? ' (Responsable Quiniela de Dobles)' : ''}">${shortName}</span>
+                            ${doublesBadge}
                         </div>
                     `;
                     headerRow.appendChild(th);
@@ -1708,6 +1869,8 @@
                     `;
 
                     // Celdas de Pronósticos en VERTICAL por cada Socio
+                    const jDoublesMember = window.getEligibleDoublesMember(j);
+
                     sortedMembers.forEach((m) => {
                         const jIdStr = String(j.id);
                         const mIdStr = String(m.id);
@@ -1719,6 +1882,8 @@
                         }
 
                         const cellLed = this.getMemberStatusLed(m.id, j);
+                        const isCellDoubles = jDoublesMember && String(jDoublesMember.id) === String(m.id);
+                        const doublesBadgeCell = isCellDoubles ? `<span class="text-[9px] text-purple-400 font-bold ml-0.5 animate-pulse" title="Responsable de Dobles J${j.number}">🎲</span>` : '';
                         let cellContent = '';
 
                         if (isPlayed) {
@@ -1756,6 +1921,7 @@
                                     <div class="flex items-center gap-1 leading-none mb-0.5 h-3">
                                         ${diceBadge}
                                         ${lateBadge}
+                                        ${doublesBadgeCell}
                                     </div>
                                     ${signsHtml}
                                 </div>
@@ -1778,13 +1944,17 @@
                                 <div class="flex flex-col items-center justify-center py-1 select-none opacity-40">
                                     <div class="flex items-center gap-1 leading-none mb-0.5 h-3">
                                         <span class="led-status-indicator led-${cellLed.status}"></span>
+                                        ${doublesBadgeCell}
                                     </div>
                                     ${emptyHtml}
                                 </div>
                             `;
                         }
 
-                        rowHtml += `<td class="summary-cell" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}">${cellContent}</td>`;
+                        const doubleCellClass = isCellDoubles ? 'ring-1 ring-inset ring-purple-500/40 bg-purple-950/10' : '';
+                        const doubleCellTitle = isCellDoubles ? ` (Responsable de Dobles J${j.number})` : '';
+
+                        rowHtml += `<td class="summary-cell ${doubleCellClass}" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}${doubleCellTitle}">${cellContent}</td>`;
                     });
 
                     // Columna de Dobles para esta Jornada (mismo fondo uniforme sin tintes extra)
