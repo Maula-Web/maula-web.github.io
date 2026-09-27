@@ -5,7 +5,7 @@
  * 1. App Shell Pre-caching & Offline Fallback (PWA)
  * 2. Firebase Cloud Messaging (FCM) Compat en segundo plano
  * 3. W3C Web Push Protocol (Apple APNs en iOS 16.4+ y Google FCM en Android)
- * Versión de caché: maulas-pwa-v1.52
+ * Versión de caché: maulas-pwa-v1.53
  * =========================================================================
  */
 
@@ -60,7 +60,7 @@ try {
     console.warn('[service-worker.js] Aviso cargando Firebase Messaging en SW:', e);
 }
 
-const CACHE_NAME = 'maulas-pwa-v1.52';
+const CACHE_NAME = 'maulas-pwa-v1.53';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -79,6 +79,7 @@ const CORE_ASSETS = [
     'bote.html',
     'bote_2.html',
     'resumen-temporada.html',
+    'resumen_2.html',
     'votaciones.html',
     'admin.html',
     'login.html',

@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PEÑA MAULAS - Resumen 2.0 Pro · Centro de Inteligencia</title>
+
+    <!-- Favicon & Mobile App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f59e0b">
+
+    <!-- Fonts: Plus Jakarta Sans, Inter, Montserrat, JetBrains Mono, Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS v3 -->
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/light-theme.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        outfit: ['"Outfit"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js 4.4 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Firebase SDKs Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Estilos Críticos y Variables Visuales -->
+    <style>
+        :root {
+            --color-bg-base: #06080e;
+            --color-card: rgba(15, 23, 42, 0.75);
+            --color-card-border: rgba(245, 158, 11, 0.25);
+            --color-card-hover: rgba(245, 158, 11, 0.45);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--color-bg-base);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .light-theme body {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass-panel {
+            background: var(--color-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--color-card-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+        }
+
+        .light-theme .glass-panel {
+            background: #ffffff !important;
+            border-color: rgba(203, 213, 225, 0.8) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Asegurar PEÑA MAULAS en blanco puro en modo oscuro y pizarra oscura en modo claro */
+        #brand-text-maulas {
+            color: #ffffff !important;
+        }
+        .light-theme #brand-text-maulas {
+            color: #0f172a !important;
+        }
+
+        /* Barra de Control / Botonera Superior */
+        .header-control-bar {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .light-theme .header-control-bar {
+            background: #ffffff !important;
+            border-color: rgba(203, 213, 225, 0.8) !important;
+        }
+
+        .header-title-text {
+            color: #ffffff !important;
+        }
+        .light-theme .header-title-text {
+            color: #0f172a !important;
+        }
+
+        .view-switcher-box {
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .light-theme .view-switcher-box {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        .search-input-control {
+            background: #020617 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(51, 65, 85, 0.8) !important;
+        }
+        .light-theme .search-input-control {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        .search-input-control::placeholder {
+            color: #94a3b8;
+        }
+        .light-theme .search-input-control::placeholder {
+            color: #64748b;
+        }
+
+        /* REGLA CRÍTICA: Tarjetas explicativas SIEMPRE en primer plano absoluto y 100% OPACAS (#0b0f19) EN MODO OSCURO */
+        #kpi-section {
+            position: relative;
+            z-index: 60;
+            overflow: visible;
+        }
+        .kpi-card {
+            position: relative;
+            overflow: visible;
+        }
+        .kpi-card:hover,
+        .kpi-card:focus-within {
+            z-index: 100050 !important;
+        }
+        .group\/tip {
+            position: relative;
+        }
+        .group\/tip:hover,
+        .group\/tip:focus-within {
+            z-index: 100060 !important;
+        }
+
+        /* Tarjeta Explicativa Global Flotante */
+        #resumen-floating-card {
+            background-color: #0b0f19 !important;
+            background: #0b0f19 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            opacity: 0;
+            transform: scale(0.96);
+            transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1.5px solid rgba(245, 158, 11, 0.85) !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.98), 0 0 25px rgba(245, 158, 11, 0.25) !important;
+            color: #f8fafc !important;
+            z-index: 100080 !important;
+            pointer-events: none !important;
+        }
+
+        .light-theme #resumen-floating-card {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            border: 1.5px solid rgba(217, 119, 6, 0.85) !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22) !important;
+            color: #0f172a !important;
+        }
+
+        /* Scrollbars personalizados */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 6px;
+        }
+        .light-theme .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.35);
+            border-radius: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(245, 158, 11, 0.6);
+        }
+
+        /* Estilo para los botones de perspectiva */
+        .tab-btn-active {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            color: #020617 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3) !important;
+            border-color: rgba(245, 158, 11, 0.8) !important;
+        }
+
+        .light-theme .tab-btn-active {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3) !important;
+        }
+
+        /* Chips de socios */
+        .member-chip-btn.active {
+            background-color: rgba(245, 158, 11, 0.25) !important;
+            border-color: rgba(245, 158, 11, 0.8) !important;
+            color: #f59e0b !important;
+            font-weight: 800;
+        }
+        .light-theme .member-chip-btn.active {
+            background-color: rgba(245, 158, 11, 0.15) !important;
+            border-color: rgba(217, 119, 6, 0.8) !important;
+            color: #b45309 !important;
+        }
+    </style>
+
+    <!-- Script de Inicio Rápido de Tema y Acceso Restringido -->
+    <script>
+        (function () {
+            // 1. Detección temprana de tema
+            const savedTheme = localStorage.getItem('maulas_theme_mode');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light-theme');
+            } else {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light-theme');
+            }
+
+            // 2. Control de Acceso Exclusivo (Fernando Lozano)
+            function checkAccess() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
+                if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') return true;
+
+                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                if (!userStr) return false;
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.id == 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) return true;
+                    if (user.role === 'admin') return true;
+                } catch (e) { }
+                return false;
+            }
+
+            window.__isUserAuthorized = checkAccess();
+            if (!window.__isUserAuthorized) {
+                document.addEventListener('DOMContentLoaded', () => {
+                    const restr = document.getElementById('restricted-screen');
+                    const main = document.getElementById('main-content');
+                    if (restr) restr.style.display = 'flex';
+                    if (main) main.style.display = 'none';
+                });
+            }
+        })();
+    </script>
+</head>
+
+<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
+
+    <!-- Servicios y SDKs de la Peña -->
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/telegram-service.js"></script>
+
+    <!-- =====================================================================
+         PANTALLA DE ACCESO RESTRINGIDO (Oculta por defecto para evitar parpadeos)
+         ===================================================================== -->
+    <div id="restricted-screen" style="display: none;" class="min-h-[85vh] items-center justify-center p-4">
+        <div class="glass-panel max-w-xl w-full p-8 text-center space-y-6 border-amber-500/40 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-12 -top-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-4xl">
+                🚧
+            </div>
+
+            <div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    Fase de Pruebas Exclusiva
+                </span>
+                <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white mt-3">Resumen 2.0 Pro en Obras</h1>
+                <p class="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
+                    Este nuevo cuadro de mando estadístico e inteligencia de temporada está actualmente en fase de diseño y pruebas exclusiva para <strong>Fernando Lozano</strong>.
+                </p>
+                <p class="text-slate-500 text-xs mt-2">
+                    Estará disponible para toda la peña en cuanto concluyan las pruebas de validación oficial.
+                </p>
+            </div>
+
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="resumen-temporada.html" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                    <span>📊</span> Ir a Resumen 1.0 (Clásico)
+                </a>
+                <a href="login.html" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-sm border border-slate-700 transition-all flex items-center justify-center gap-2">
+                    <span>🔑</span> Iniciar Sesión
+                </a>
+            </div>
+
+            <div class="pt-4 border-t border-slate-300 dark:border-slate-800 text-xs text-slate-500">
+                ¿Eres Fernando Lozano?
+                <button onclick="sessionStorage.clear(); localStorage.clear(); location.href='login.html';" class="text-amber-500 dark:text-amber-400 hover:underline font-semibold ml-1">
+                    Identifícate con tu PIN o Apodo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         CONTENEDOR PRINCIPAL: RESUMEN 2.0 PRO
+         ===================================================================== -->
+    <div id="main-content" class="max-w-[1650px] mx-auto space-y-3 sm:space-y-4" style="display: block;">
+
+        <!-- NAVBAR SUPERIOR MAULAS 2.0 -->
+        <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl">
+            <!-- Izquierda: Brand / Logo -->
+            <div class="flex items-center justify-between gap-2 w-full md:w-auto flex-shrink-0">
+                <a href="dashboard_2.html" class="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow group-hover:scale-105 transition-transform flex-shrink-0">
+                    <div class="leading-tight flex flex-col justify-center">
+                        <span id="brand-text-maulas" class="font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
+                        <span class="text-[9px] sm:text-[10px] text-amber-500 dark:text-amber-400 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
+                    </div>
+                </a>
+
+                <!-- Controles Compactos Móvil -->
+                <div class="flex md:hidden items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                    <div class="flex items-center bg-slate-100 dark:bg-slate-950/80 p-0.5 rounded-lg border border-slate-300 dark:border-amber-500/40 text-[11px] font-bold shadow-inner">
+                        <button type="button" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-slate-500 dark:text-slate-400">1.0</button>
+                        <button type="button" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow">2.0</button>
+                    </div>
+                    <button onclick="location.reload(true);" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-emerald-500 border border-emerald-500/40 text-xs flex items-center justify-center font-bold shadow-sm">🔄</button>
+                </div>
+            </div>
+
+            <!-- Centro: Menú de 9 módulos -->
+            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-600 dark:text-slate-300 overflow-x-auto md:overflow-visible flex-nowrap md:flex-wrap no-scrollbar py-0.5 w-full md:w-auto md:flex-1 justify-start md:justify-center border-t border-slate-200 dark:border-slate-800/60 md:border-t-0 pt-1.5 md:pt-0">
+                <a href="dashboard_2.html" data-version-link="inicio" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏠</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Inicio</span>
+                </a>
+                <a href="socios_2.html" data-version-link="socios" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">👥</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Socios</span>
+                </a>
+                <a href="bote_2.html" data-version-link="bote" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">💰</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Bote</span>
+                </a>
+                <a href="jornadas_2.html" data-version-link="jornadas" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">⚽</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Resultados</span>
+                </a>
+                <a href="pronosticos_2.html" data-version-link="pronosticos" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">📝</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Quiniela</span>
+                </a>
+                <a href="clasificacion_2.html" data-version-link="clasificacion" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏆</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Clasificación</span>
+                </a>
+                <!-- ACTIVO: RESUMEN -->
+                <a href="resumen_2.html" data-version-link="resumen" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/50 font-bold transition shadow-sm flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none scale-105">📊</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Resumen</span>
+                </a>
+                <a href="votaciones.html" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🗳️</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Votaciones</span>
+                </a>
+                <a href="admin.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">⚙️</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Admin</span>
+                </a>
+            </div>
+
+            <!-- Derecha: Switchers Escritorio -->
+            <div class="desktop-only-flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="version-switcher-container">
+                    <button type="button" id="btn-version-v1" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">1.0 Clásica</button>
+                    <button type="button" id="btn-version-v2" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow">🏆 2.0 Pro</button>
+                </div>
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="theme-switcher-container">
+                    <button type="button" id="btn-theme-light" data-theme-btn="light" onclick="if(window.AppTheme) { window.AppTheme.setTheme('light'); } else { document.documentElement.classList.remove('dark'); document.documentElement.classList.add('light-theme'); localStorage.setItem('maulas_theme_mode', 'light'); } if(window.ResumenApp) window.ResumenApp.updateChartTheme();" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition"><span>☀️</span> Claro</button>
+                    <button type="button" id="btn-theme-dark" data-theme-btn="dark" onclick="if(window.AppTheme) { window.AppTheme.setTheme('dark'); } else { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light-theme'); localStorage.setItem('maulas_theme_mode', 'dark'); } if(window.ResumenApp) window.ResumenApp.updateChartTheme();" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 dark:text-slate-950 dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:font-bold shadow transition"><span>🌙</span> Oscuro</button>
+                </div>
+                <button onclick="location.reload(true);" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1" title="Actualizar datos">
+                    <span>🔄</span>
+                </button>
+                <button onclick="window.Auth && window.Auth.logout ? window.Auth.logout() : (sessionStorage.clear(), localStorage.clear(), location.href='login.html')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-slate-300 dark:border-slate-800 text-xs font-bold transition flex items-center gap-1" title="Cerrar sesión">
+                    <span>🚪</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- BARRA DE TÍTULO Y CONTROLES PRINCIPALES -->
+        <div class="header-control-bar p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 text-xs sm:text-sm shadow-md">
+            <div class="flex items-center gap-3">
+                <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg sm:text-xl flex items-center justify-center shadow-inner">
+                    📊
+                </span>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <strong class="header-title-text font-black text-sm sm:text-base tracking-wide">
+                            Centro de Inteligencia & Resumen 2.0
+                        </strong>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40">
+                            Temporada 2026-2027
+                        </span>
+                        <span class="badge-disputadas px-2 py-0.5 rounded-full text-[10px] font-mono font-bold" id="kpi-header-badge">
+                            Cargando datos oficiales...
+                        </span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Estudio Estadístico Integral · Tendencias, Fiabilidad de Clubes, Récords y Evolución
+                    </p>
+                </div>
+            </div>
+
+            <!-- Resumen Rápido en Mini-Pills -->
+            <div class="flex items-center gap-2 flex-wrap lg:justify-end">
+                <div class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-800 text-center flex items-center gap-2">
+                    <span class="text-xs">📅</span>
+                    <div class="text-left">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-tight">Jornadas</span>
+                        <strong class="font-mono text-xs font-black text-slate-800 dark:text-white" id="header-stat-jornadas">--</strong>
+                    </div>
+                </div>
+                <div class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-800 text-center flex items-center gap-2">
+                    <span class="text-xs">🎯</span>
+                    <div class="text-left">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-tight">Acierto Peña</span>
+                        <strong class="font-mono text-xs font-black text-emerald-600 dark:text-emerald-400" id="header-stat-acierto">--%</strong>
+                    </div>
+                </div>
+                <div class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-800 text-center flex items-center gap-2">
+                    <span class="text-xs">💰</span>
+                    <div class="text-left">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block leading-tight">Premios</span>
+                        <strong class="font-mono text-xs font-black text-purple-600 dark:text-purple-400" id="header-stat-premios">-- €</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             NIVEL 1: BENTO GRID DE 5 SUPER-KPIS DE TEMPORADA
+             ===================================================================== -->
+        <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- KPI 1: Efectividad Global Peña -->
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-emerald-500/50 transition-all duration-300 group"
+                 data-card-type="kpi-efectividad">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                        <span>🎯</span> Acierto Global
+                    </span>
+                    <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                        📊
+                    </span>
+                </div>
+                <div class="my-2">
+                    <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-white" id="kpi-val-efectividad">
+                        --%
+                    </div>
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center justify-between">
+                        <span id="kpi-sub-efectividad">-- aciertos / jornada</span>
+                        <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold" id="kpi-media-boleto">--/14</span>
+                    </div>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700" id="kpi-bar-efectividad" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- KPI 2: El Bombazo de la Temporada (Récord Individual) -->
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-amber-500/50 transition-all duration-300 group"
+                 data-card-type="kpi-bombazo">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                        <span>🚀</span> Mejor Boleto
+                    </span>
+                    <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                        👑
+                    </span>
+                </div>
+                <div class="my-2">
+                    <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-amber-600 dark:text-amber-400" id="kpi-val-bombazo">
+                        -- aciertos
+                    </div>
+                    <div class="text-[11px] text-slate-800 dark:text-slate-200 font-bold truncate mt-0.5" id="kpi-socio-bombazo">
+                        Sin datos aún
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-800 pt-1 font-mono">
+                    <span id="kpi-jornada-bombazo">Récord absoluto</span>
+                    <span class="text-amber-600 dark:text-amber-400 font-bold" id="kpi-puntos-bombazo">+-- pts</span>
+                </div>
+            </div>
+
+            <!-- KPI 3: Bote Total en Metálico -->
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-purple-500/50 transition-all duration-300 group"
+                 data-card-type="kpi-premios">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                        <span>💰</span> Premios Totales
+                    </span>
+                    <span class="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                        💶
+                    </span>
+                </div>
+                <div class="my-2">
+                    <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-purple-600 dark:text-purple-300" id="kpi-val-premios">
+                        0,00 €
+                    </div>
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate" id="kpi-socio-premios">
+                        0 premios oficiales
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-800 pt-1 font-mono">
+                    <span id="kpi-count-premios">Repartidos</span>
+                    <span class="text-purple-600 dark:text-purple-400 font-bold" id="kpi-max-premio">Máx: -- €</span>
+                </div>
+            </div>
+
+            <!-- KPI 4: Míster Fiabilidad (Regularidad) -->
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-blue-500/50 transition-all duration-300 group"
+                 data-card-type="kpi-fiabilidad">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                        <span>🛡️</span> Regularidad
+                    </span>
+                    <span class="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                        ⭐
+                    </span>
+                </div>
+                <div class="my-2">
+                    <div class="text-xl sm:text-2xl font-black truncate text-slate-900 dark:text-white" id="kpi-val-fiable-nombre">
+                        --
+                    </div>
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                        <span id="kpi-sub-fiable">En zona de puntos</span>
+                        <strong class="font-mono text-blue-600 dark:text-blue-400" id="kpi-pct-fiable">--%</strong>
+                    </div>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-400 transition-all duration-700" id="kpi-bar-fiable" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- KPI 5: Talismán vs Trampa -->
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-orange-500/50 transition-all duration-300 group"
+                 data-card-type="kpi-equipos">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-orange-600 dark:text-orange-400 flex items-center gap-1.5">
+                        <span>⚖️</span> Talismán / Trampa
+                    </span>
+                    <span class="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                        ⚽
+                    </span>
+                </div>
+                <div class="my-1.5 space-y-1 text-xs">
+                    <div class="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+                        <span class="truncate font-semibold flex items-center gap-1"><span>🟢</span> <span id="kpi-talisman-nombre">--</span></span>
+                        <strong class="font-mono" id="kpi-talisman-pct">--%</strong>
+                    </div>
+                    <div class="flex justify-between items-center text-rose-600 dark:text-rose-400">
+                        <span class="truncate font-semibold flex items-center gap-1"><span>🔴</span> <span id="kpi-trampa-nombre">--</span></span>
+                        <strong class="font-mono" id="kpi-trampa-pct">--%</strong>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-1 flex justify-between font-mono">
+                    <span>Fiabilidad clubes</span>
+                    <span class="text-orange-600 dark:text-orange-400">Ver radar →</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             NIVEL 2: SELECTOR DE PERSPECTIVA (6 VISTAS INTERACTIVAS)
+             ===================================================================== -->
+        <section class="glass-panel p-2 sm:p-2.5 shadow-md">
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                <button type="button" onclick="window.ResumenApp.switchView('evolucion')" id="tab-btn-evolucion"
+                        class="tab-btn-active px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 border border-transparent">
+                    <span>📈</span> Evolución & Comparativa
+                </button>
+                <button type="button" onclick="window.ResumenApp.switchView('casillas')" id="tab-btn-casillas"
+                        class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>🎯</span> Radiografía 1-14 (Casillas)
+                </button>
+                <button type="button" onclick="window.ResumenApp.switchView('clubes')" id="tab-btn-clubes"
+                        class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>⚽</span> Termómetro de Clubes
+                </button>
+                <button type="button" onclick="window.ResumenApp.switchView('jornadas')" id="tab-btn-jornadas"
+                        class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>📊</span> Rendimiento por Jornada
+                </button>
+                <button type="button" onclick="window.ResumenApp.switchView('dobles')" id="tab-btn-dobles"
+                        class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>🎲</span> Quiniela de Dobles
+                </button>
+                <button type="button" onclick="window.ResumenApp.switchView('duelo')" id="tab-btn-duelo"
+                        class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>⚡</span> Duelo 1 vs 1
+                </button>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             VISTA 1: EVOLUCIÓN TEMPORAL MULTI-SOCIO & CHART INTERACTIVO
+             ===================================================================== -->
+        <div id="view-container-evolucion" class="space-y-3">
+            <!-- Barra de Selección de Socios & Controles de Zoom -->
+            <div class="glass-panel p-3 sm:p-4 space-y-3">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5">
+                    <div>
+                        <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>📈</span> Gráfica de Puntuaciones Acumuladas
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                            Haz clic en los socios para añadirlos o quitarlos del gráfico (máximo 5). Haz clic en los puntos del gráfico para ver el boleto de esa jornada.
+                        </p>
+                    </div>
+
+                    <!-- Botones de Acción Rápida -->
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <button type="button" onclick="window.ResumenApp.selectTop(4)" class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-bold transition">
+                            ⭐ Top 4
+                        </button>
+                        <button type="button" onclick="window.ResumenApp.selectTop(3)" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold transition">
+                            🥇 Podio (Top 3)
+                        </button>
+                        <button type="button" onclick="window.ResumenApp.selectAllMembers()" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold transition">
+                            👥 Todos
+                        </button>
+                        <button type="button" onclick="window.ResumenApp.clearSelection()" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-[11px] font-bold transition">
+                            ✕ Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chips de Socios para Selección Visual -->
+                <div id="members-chip-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                    <!-- Inyectado por JS -->
+                </div>
+
+                <!-- Controles de Ventana Temporal (Zoom & Sliders) -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Rango:</span>
+                        <button type="button" onclick="window.ResumenApp.setZoomPreset(5)" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-amber-500/20 hover:text-amber-500 text-[11px] transition">
+                            Últimas 5
+                        </button>
+                        <button type="button" onclick="window.ResumenApp.setZoomPreset(10)" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-amber-500/20 hover:text-amber-500 text-[11px] transition">
+                            Últimas 10
+                        </button>
+                        <button type="button" onclick="window.ResumenApp.setZoomPreset('all')" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-amber-500/20 hover:text-amber-500 text-[11px] transition">
+                            Toda la Temporada
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400">Ventana:</span>
+                            <input type="range" id="chart-zoom-slider" min="3" max="40" value="40"
+                                   class="w-24 sm:w-32 accent-amber-500 cursor-pointer">
+                            <span id="chart-zoom-label" class="font-mono font-bold text-amber-600 dark:text-amber-400 text-[11px]">Toda</span>
+                        </div>
+                        <div class="flex items-center gap-2" id="offset-container">
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400">Desplazar:</span>
+                            <input type="range" id="chart-offset-slider" min="0" max="0" value="0"
+                                   class="w-20 sm:w-28 accent-emerald-500 cursor-pointer">
+                            <span id="chart-offset-label" class="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-[11px]">J1-J40</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas del Gráfico Chart.js -->
+                <div class="relative w-full h-[360px] sm:h-[420px] lg:h-[480px] mt-2">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Panel de Ficha Técnica / Jornada Seleccionada al hacer clic -->
+            <div id="point-detail-panel" class="glass-panel p-4 hidden border-amber-500/50 shadow-2xl transition-all">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-black">
+                            📋
+                        </span>
+                        <div>
+                            <h4 class="font-black text-sm text-slate-900 dark:text-white" id="panel-socio-name">
+                                Detalle de Jornada
+                            </h4>
+                            <span class="text-xs text-slate-500 dark:text-slate-400" id="panel-jornada-badge">
+                                Jornada --
+                            </span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="document.getElementById('point-detail-panel').classList.add('hidden')"
+                            class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition text-sm">
+                        ✕ Cerrar
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-3 text-center">
+                    <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 block">Puntos Acumulados</span>
+                        <strong class="font-mono text-base font-black text-amber-600 dark:text-amber-400" id="panel-stat-acumulados">-- pts</strong>
+                    </div>
+                    <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 block">Puntos Jornada</span>
+                        <strong class="font-mono text-base font-black text-emerald-600 dark:text-emerald-400" id="panel-stat-puntos-j">+-- pts</strong>
+                    </div>
+                    <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 block">Aciertos Boleto</span>
+                        <strong class="font-mono text-base font-black text-slate-900 dark:text-white" id="panel-stat-hits">--</strong>
+                    </div>
+                    <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 block">Premio Bote</span>
+                        <strong class="font-mono text-base font-black text-purple-600 dark:text-purple-400" id="panel-stat-prize">0,00 €</strong>
+                    </div>
+                </div>
+
+                <div id="panel-matches-container" class="mt-2 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                    <!-- Inyectado por JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             VISTA 2: RADIOGRAFÍA CASILLA POR CASILLA (1 A 14)
+             ===================================================================== -->
+        <div id="view-container-casillas" class="space-y-3 hidden">
+            <div class="glass-panel p-4 space-y-2">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>🎯</span> Radiografía Estadística de los 14 Partidos
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                            Análisis del porcentaje de acierto de la peña en cada casilla de la quiniela a lo largo de toda la temporada.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-mono">
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/30">⭐ Casilla Oro</span>
+                        <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/30">🚩 Casilla Trampa</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="casillas-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+                <!-- 14 casillas inyectadas por JS -->
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             VISTA 3: TERMÓMETRO DE CLUBES (FIABILIDAD ESTADÍSTICA)
+             ===================================================================== -->
+        <div id="view-container-clubes" class="space-y-3 hidden">
+            <div class="glass-panel p-4 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>⚽</span> Termómetro de Fiabilidad de Clubes
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                            ¿Qué equipos acierta siempre la peña y con cuáles suele tropezar? Ordenados por efectividad estadística.
+                        </p>
+                    </div>
+
+                    <!-- Buscador & Filtros -->
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="team-search-input" placeholder="Buscar equipo..."
+                               oninput="window.ResumenApp.filterTeams(this.value)"
+                               class="search-input-control px-3 py-1.5 rounded-xl text-xs focus:outline-none w-44 sm:w-56">
+                        <select id="team-filter-select" onchange="window.ResumenApp.filterTeamsByCategory(this.value)"
+                                class="search-input-control px-2.5 py-1.5 rounded-xl text-xs focus:outline-none">
+                            <option value="all">Todos los Clubes</option>
+                            <option value="reliable">Top Fiables (>70%)</option>
+                            <option value="trap">Trampas (<50%)</option>
+                            <option value="min5">Mínimo 5 partidos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid de Equipos -->
+                <div id="teams-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                    <!-- Inyectado por JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             VISTA 4: RENDIMIENTO POR JORNADA
+             ===================================================================== -->
+        <div id="view-container-jornadas" class="space-y-3 hidden">
+            <div class="glass-panel p-4 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>📊</span> Desglose de Rendimiento Jornada a Jornada
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                            Evolución de la efectividad colectiva en cada fin de semana. Resalta las mejores jornadas colectivas y las más duras.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-mono">
+                        <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold"><span>👑</span> Récord</span>
+                        <span class="flex items-center gap-1 text-rose-600 dark:text-rose-400 font-bold"><span>🥶</span> Jornada Difícil</span>
+                        <span class="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-bold"><span>💰</span> Bote</span>
+                    </div>
+                </div>
+
+                <div id="jornadas-performance-bars" class="flex gap-2 overflow-x-auto custom-scroll py-3 items-end min-h-[220px]">
+                    <!-- Inyectado por JS -->
+                </div>
+            </div>
+
+            <!-- Tabla Resumen de Jornadas -->
+            <div class="glass-panel p-4">
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
+                    Historial Completo de Jornadas Disputadas
+                </h4>
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="py-2.5 px-3">Jornada</th>
+                                <th class="py-2.5 px-3">Fecha</th>
+                                <th class="py-2.5 px-3 text-center">% Acierto Peña</th>
+                                <th class="py-2.5 px-3 text-center">Media Aciertos</th>
+                                <th class="py-2.5 px-3 text-center">Mejor Socio</th>
+                                <th class="py-2.5 px-3 text-center">Premios Bote</th>
+                                <th class="py-2.5 px-3 text-center">Pleno PIG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jornadas-summary-tbody" class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
+                            <!-- Inyectado por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             VISTA 5: QUINIELAS DE DOBLES (REDUCIDAS)
+             ===================================================================== -->
+        <div id="view-container-dobles" class="space-y-3 hidden">
+            <!-- Bento superior de impacto de dobles -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="glass-panel p-4 flex items-center gap-3">
+                    <span class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-600 dark:text-purple-400 text-2xl flex items-center justify-center font-black">
+                        🎲
+                    </span>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-500 block">Quinielas Jugadas</span>
+                        <strong class="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white" id="dobles-stat-total">--</strong>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 flex items-center gap-3">
+                    <span class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-2xl flex items-center justify-center font-black">
+                        📈
+                    </span>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-500 block">Media Aciertos Dobles</span>
+                        <strong class="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400" id="dobles-stat-media">--</strong>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 flex items-center gap-3">
+                    <span class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 text-2xl flex items-center justify-center font-black">
+                        ⭐
+                    </span>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-500 block">Ventaja vs Sencilla</span>
+                        <strong class="text-xl sm:text-2xl font-black font-mono text-amber-600 dark:text-amber-400" id="dobles-stat-ventaja">+-- aciertos</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Quinielas de Dobles -->
+            <div class="glass-panel p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>🎲</span> Histórico Oficial de Quinielas de Dobles
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                            Registro de boletos con reducciones oficiales jugados por los socios de la peña.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="py-2.5 px-3">Jornada</th>
+                                <th class="py-2.5 px-3">Socio Responsable</th>
+                                <th class="py-2.5 px-3 text-center">Aciertos Dobles</th>
+                                <th class="py-2.5 px-3 text-center">Ventaja vs Sencilla</th>
+                                <th class="py-2.5 px-3">Pronósticos Reducidos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dobles-history-tbody" class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
+                            <!-- Inyectado por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             VISTA 6: COMPARADOR 1 VS 1 (DUELO DIRECTO)
+             ===================================================================== -->
+        <div id="view-container-duelo" class="space-y-3 hidden">
+            <div class="glass-panel p-4 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>⚡</span> Comparador Cara a Cara (Duelo Directo)
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                            Selecciona a dos compañeros de la peña y analiza su enfrentamiento directo en la temporada.
+                        </p>
+                    </div>
+
+                    <!-- Selectores de Socios -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="duelo-select-a" onchange="window.ResumenApp.updateDuelo()"
+                                class="search-input-control px-3 py-1.5 rounded-xl text-xs font-bold focus:outline-none">
+                            <!-- Inyectado por JS -->
+                        </select>
+                        <span class="text-xs font-black text-amber-500">VS</span>
+                        <select id="duelo-select-b" onchange="window.ResumenApp.updateDuelo()"
+                                class="search-input-control px-3 py-1.5 rounded-xl text-xs font-bold focus:outline-none">
+                            <!-- Inyectado por JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Marcador de Duelo Directo -->
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900/60 to-blue-500/10 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-around gap-4 text-center">
+                    <div class="space-y-1">
+                        <div class="text-3xl" id="duelo-avatar-a">👤</div>
+                        <h4 class="font-black text-base text-slate-900 dark:text-white" id="duelo-name-a">Socio A</h4>
+                        <div class="text-2xl font-black font-mono text-amber-500" id="duelo-victorias-a">0</div>
+                        <span class="text-[10px] uppercase font-bold text-slate-500">Jornadas Ganadas</span>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono" id="duelo-empates">
+                            0 Empates
+                        </span>
+                        <span class="text-[10px] text-slate-500 mt-1" id="duelo-total-jornadas">de -- jornadas disputadas</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="text-3xl" id="duelo-avatar-b">👤</div>
+                        <h4 class="font-black text-base text-slate-900 dark:text-white" id="duelo-name-b">Socio B</h4>
+                        <div class="text-2xl font-black font-mono text-blue-500" id="duelo-victorias-b">0</div>
+                        <span class="text-[10px] uppercase font-bold text-slate-500">Jornadas Ganadas</span>
+                    </div>
+                </div>
+
+                <!-- Comparativa Métrica a Métrica -->
+                <div id="duelo-metrics-container" class="space-y-2.5 pt-2">
+                    <!-- Inyectado por JS -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =====================================================================
+         TARJETA EXPLICATIVA GLOBAL FLOTANTE (Primer Plano Absoluto z-[100080])
+         ===================================================================== -->
+    <div id="resumen-floating-card" class="fixed hidden pointer-events-none z-[100080] p-3.5 rounded-2xl border text-xs shadow-2xl max-w-xs sm:max-w-sm"></div>
+
+    <!-- =====================================================================
+         MODAL EMERGENTE MULTIUSO (Detalles y Fichas de Partidos)
+         ===================================================================== -->
+    <div id="resumen-detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100100] hidden items-center justify-center p-3">
+        <div class="glass-panel w-full max-w-3xl max-h-[90vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+                        📋
+                    </span>
+                    <h3 class="font-black text-sm text-slate-900 dark:text-white" id="modal-detail-title">
+                        Detalle
+                    </h3>
+                </div>
+                <button type="button" onclick="document.getElementById('resumen-detail-modal').style.display = 'none'"
+                        class="px-3 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-slate-700 dark:text-slate-300 text-xs font-bold transition">
+                    ✕ Cerrar
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto custom-scroll flex-1" id="modal-detail-content">
+                <!-- Inyectado por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         CONTROLADOR PRINCIPAL JAVASCRIPT: RESUMEN 2.0 APP
+         ===================================================================== -->
+    <script>
+        class Resumen2App {
+            constructor() {
+                this.members = [];
+                this.jornadas = [];
+                this.pronosticos = [];
+                this.pronosticosExtra = [];
+                this.memberStats = {};
+                this.selectedMembers = new Set();
+                this.activeView = 'evolucion';
+                this.chart = null;
+
+                // Zoom / Rango
+                this.viewJornadasCount = 0;
+                this.viewOffset = 0;
+                this.totalJornadas = 0;
+
+                // Clubes & Casillas
+                this.teamStats = {};
+                this.casillaStats = [];
+                this.jornadaPerformance = [];
+
+                this.init();
+            }
+
+            /**
+             * Formatea moneda en notación española estricta (puntos de miles y coma decimal)
+             */
+            formatMoney(val) {
+                if (typeof AppUtils !== 'undefined' && AppUtils.formatEuro) {
+                    return AppUtils.formatEuro(val);
+                }
+                if (val === null || val === undefined || isNaN(val)) return '0,00 €';
+                const num = Number(val);
+                const parts = num.toFixed(2).split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return `${parts[0]},${parts[1]} €`;
+            }
+
+            async init() {
+                try {
+                    if (window.DataService) await window.DataService.init();
+
+                    console.log("[Resumen2] Cargando datos oficiales de la temporada...");
+                    const data = await window.DataService.loadSeasonData();
+                    this.members = data.members || [];
+                    this.jornadas = (data.jornadas || []).sort((a, b) => a.number - b.number);
+                    this.pronosticos = data.pronosticos || [];
+                    this.pronosticosExtra = data.pronosticosExtra || [];
+
+                    // Filtro de jornadas jugadas
+                    this.playedJornadas = this.jornadas.filter(j => {
+                        const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '' && j.matches[0].result !== undefined;
+                        const d = AppUtils.parseDate(j.date);
+                        const isValidDate = d && AppUtils.isSunday(d);
+                        return hasResult && isValidDate;
+                    });
+                    this.totalJornadas = this.playedJornadas.length;
+
+                    // Calcular métricas
+                    this.calculateAllStats();
+
+                    // Renderizar interfaz
+                    this.renderHeaderAndKPIs();
+                    this.initChart();
+                    this.renderCasillas();
+                    this.renderClubes();
+                    this.renderJornadasPerformance();
+                    this.renderDobles();
+                    this.initDueloSelectors();
+                    this.initFloatingCards();
+                    this.initZoomSliders();
+
+                    // Inicializar versión PWA
+                    if (window.AppVersion && window.AppVersion.init) {
+                        window.AppVersion.init();
+                    }
+
+                    console.log("[Resumen2] Inicializado con éxito. Jornadas jugadas:", this.totalJornadas);
+                } catch (err) {
+                    console.error("[Resumen2] Error en la inicialización:", err);
+                }
+            }
+
+            /**
+             * Calcula las estadísticas completas de la temporada
+             */
+            calculateAllStats() {
+                // 1. Inicializar estructura de socios
+                this.memberStats = {};
+                this.members.forEach(m => {
+                    this.memberStats[m.id] = {
+                        member: m,
+                        name: AppUtils.getMemberName(m),
+                        grandTotal: 0,
+                        baseTotal: 0,
+                        bonusTotal: 0,
+                        prizesTotal: 0,
+                        jornadasPlayed: 0,
+                        jornadasWithPoints: 0, // >= 10 aciertos
+                        history: [], // [{ jNum, pointsAcum, dayPoints, dayHits, dayPrize, jId }]
+                        bestHits: 0,
+                        bestHitsJornada: 0
+                    };
+                });
+
+                // Mapa de pronósticos O(1)
+                const pronosMap = new Map();
+                this.pronosticos.forEach(p => {
+                    if (!p) return;
+                    const jIds = [p.jId, p.jornadaId].filter(x => x !== undefined && x !== null).map(String);
+                    const mIds = [p.mId, p.memberId].filter(x => x !== undefined && x !== null).map(String);
+                    jIds.forEach(j => {
+                        mIds.forEach(m => {
+                            pronosMap.set(`${j}_${m}`, p);
+                        });
+                    });
+                });
+
+                // Inicializar casillas 0 a 13
+                this.casillaStats = Array.from({ length: 14 }, (_, i) => ({
+                    casillaIndex: i,
+                    matchNum: i + 1,
+                    totalPronosticos: 0,
+                    totalHits: 0,
+                    signosOficiales: { '1': 0, 'X': 0, '2': 0 },
+                    signosSocios: { '1': 0, 'X': 0, '2': 0 },
+                    recentMatches: []
+                }));
+
+                // Inicializar clubes
+                this.teamStats = {};
+
+                // Inicializar rendimiento por jornada
+                this.jornadaPerformance = [];
+
+                let totalHitsPeña = 0;
+                let totalPronosPeña = 0;
+
+                // 2. Iterar jornada a jornada
+                this.playedJornadas.forEach(j => {
+                    let jHitsTotal = 0;
+                    let jPronosCount = 0;
+                    let jPrizesTotal = 0;
+                    let jBestMember = { name: '', hits: -1, points: -1 };
+
+                    const officialResults = (j.matches || []).map(m => m.result);
+
+                    // Casillas y Equipos en esta jornada
+                    (j.matches || []).forEach((m, mIdx) => {
+                        if (mIdx < 14) {
+                            const offRes = m.result;
+                            const normSign = ScoringSystem.normalizeSign(offRes);
+                            if (normSign) {
+                                this.casillaStats[mIdx].signosOficiales[normSign] = (this.casillaStats[mIdx].signosOficiales[normSign] || 0) + 1;
+                            }
+                            this.casillaStats[mIdx].recentMatches.push({
+                                jNum: j.number,
+                                home: m.home,
+                                away: m.away,
+                                result: offRes
+                            });
+
+                            // Registro de equipos
+                            [m.home, m.away].forEach(team => {
+                                if (team && !this.teamStats[team]) {
+                                    this.teamStats[team] = { name: team, totalMatches: 0, hits: 0, totalPicks: 0 };
+                                }
+                                if (team) this.teamStats[team].totalMatches++;
+                            });
+                        }
+                    });
+
+                    // Evaluar a cada socio en esta jornada
+                    this.members.forEach(m => {
+                        const p = pronosMap.get(`${j.id}_${m.id}`);
+                        let points = 0;
+                        let hits = -1;
+                        let prize = 0;
+
+                        if (p) {
+                            const ev = ScoringSystem.evaluateMember(m, j, p);
+                            if (ev.played) {
+                                hits = ev.hits;
+                                points = ev.points;
+                                prize = ev.prize || 0;
+                                const sel = p.selection || p.forecasts || [];
+
+                                this.memberStats[m.id].jornadasPlayed++;
+                                this.memberStats[m.id].baseTotal += hits;
+                                this.memberStats[m.id].bonusTotal += (points - hits);
+                                this.memberStats[m.id].prizesTotal += prize;
+
+                                if (hits >= 10) {
+                                    this.memberStats[m.id].jornadasWithPoints++;
+                                }
+
+                                if (hits > this.memberStats[m.id].bestHits) {
+                                    this.memberStats[m.id].bestHits = hits;
+                                    this.memberStats[m.id].bestHitsJornada = j.number;
+                                }
+
+                                jHitsTotal += hits;
+                                jPronosCount++;
+                                jPrizesTotal += prize;
+                                totalHitsPeña += hits;
+                                totalPronosPeña++;
+
+                                if (hits > jBestMember.hits || (hits === jBestMember.hits && points > jBestMember.points)) {
+                                    jBestMember = { name: this.memberStats[m.id].name, hits, points };
+                                }
+
+                                // Contabilizar casillas y equipos
+                                (j.matches || []).forEach((match, idx) => {
+                                    if (idx < 14) {
+                                        const userSign = ScoringSystem.normalizeSign(sel[idx]);
+                                        const offSign = ScoringSystem.normalizeSign(officialResults[idx]);
+                                        const isHit = userSign && offSign && userSign === offSign;
+
+                                        this.casillaStats[idx].totalPronosticos++;
+                                        if (userSign) {
+                                            this.casillaStats[idx].signosSocios[userSign] = (this.casillaStats[idx].signosSocios[userSign] || 0) + 1;
+                                        }
+                                        if (isHit) {
+                                            this.casillaStats[idx].totalHits++;
+                                        }
+
+                                        // Equipos
+                                        [match.home, match.away].forEach(team => {
+                                            if (team && this.teamStats[team]) {
+                                                this.teamStats[team].totalPicks++;
+                                                if (isHit) this.teamStats[team].hits++;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+
+                        this.memberStats[m.id].grandTotal += points;
+                        this.memberStats[m.id].history.push({
+                            jNum: j.number,
+                            jId: j.id,
+                            pointsAcum: this.memberStats[m.id].grandTotal,
+                            dayPoints: points,
+                            dayHits: hits,
+                            dayPrize: prize
+                        });
+                    });
+
+                    // Guardar rendimiento jornada
+                    const jAvgHits = jPronosCount > 0 ? (jHitsTotal / jPronosCount) : 0;
+                    const jPctAcierto = jPronosCount > 0 ? ((jHitsTotal / (jPronosCount * 14)) * 100) : 0;
+                    const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
+
+                    this.jornadaPerformance.push({
+                        jornada: j,
+                        number: j.number,
+                        date: j.date,
+                        totalHits: jHitsTotal,
+                        pronosCount: jPronosCount,
+                        avgHits: jAvgHits,
+                        pctAcierto: jPctAcierto,
+                        prizesTotal: jPrizesTotal,
+                        bestMember: jBestMember,
+                        hasPig: hasPig
+                    });
+                });
+
+                // Métrica global
+                this.globalPctAcierto = totalPronosPeña > 0 ? ((totalHitsPeña / (totalPronosPeña * 14)) * 100) : 0;
+                this.globalAvgHits = totalPronosPeña > 0 ? (totalHitsPeña / totalPronosPeña) : 0;
+            }
+
+            /**
+             * Renderiza el encabezado y las 5 tarjetas de Super-KPIs
+             */
+            renderHeaderAndKPIs() {
+                // Header pills
+                document.getElementById('kpi-header-badge').textContent = `${this.totalJornadas} Jornadas Disputadas`;
+                document.getElementById('header-stat-jornadas').textContent = this.totalJornadas;
+                document.getElementById('header-stat-acierto').textContent = `${this.globalPctAcierto.toFixed(1)}%`;
+
+                // Sumar premios de todos los socios
+                let totalPrizes = 0;
+                let maxPrizeSocio = { name: '', amount: 0 };
+                let bestRecord = { hits: 0, name: '', jNum: 0, points: 0 };
+
+                let bestRegularidad = { name: '', pct: 0, points: 0 };
+
+                Object.values(this.memberStats).forEach(s => {
+                    totalPrizes += s.prizesTotal;
+                    if (s.prizesTotal > maxPrizeSocio.amount) {
+                        maxPrizeSocio = { name: s.name, amount: s.prizesTotal };
+                    }
+                    if (s.bestHits > bestRecord.hits) {
+                        bestRecord = { hits: s.bestHits, name: s.name, jNum: s.bestHitsJornada, points: 0 };
+                    }
+                    const regPct = s.jornadasPlayed > 0 ? ((s.jornadasWithPoints / s.jornadasPlayed) * 100) : 0;
+                    if (regPct > bestRegularidad.pct || (regPct === bestRegularidad.pct && s.grandTotal > bestRegularidad.points)) {
+                        bestRegularidad = { name: s.name, pct: regPct, points: s.grandTotal };
+                    }
+                });
+
+                document.getElementById('header-stat-premios').textContent = this.formatMoney(totalPrizes);
+
+                // KPI 1: Efectividad Global Peña
+                document.getElementById('kpi-val-efectividad').textContent = `${this.globalPctAcierto.toFixed(1)}%`;
+                document.getElementById('kpi-sub-efectividad').textContent = `${this.globalAvgHits.toFixed(1)} aciertos / jornada`;
+                document.getElementById('kpi-media-boleto').textContent = `${this.globalAvgHits.toFixed(1)}/14`;
+                document.getElementById('kpi-bar-efectividad').style.width = `${Math.min(100, this.globalPctAcierto)}%`;
+
+                // KPI 2: Bombazo Récord
+                document.getElementById('kpi-val-bombazo').textContent = `${bestRecord.hits} aciertos`;
+                document.getElementById('kpi-socio-bombazo').textContent = bestRecord.name ? `Por ${bestRecord.name}` : 'En disputa';
+                document.getElementById('kpi-jornada-bombazo').textContent = bestRecord.jNum > 0 ? `Jornada ${bestRecord.jNum}` : 'Récord histórico';
+                document.getElementById('kpi-puntos-bombazo').textContent = bestRecord.hits >= 14 ? '+30 bonus' : (bestRecord.hits === 13 ? '+15 bonus' : '+10 bonus');
+
+                // KPI 3: Bote Total en Metálico
+                document.getElementById('kpi-val-premios').textContent = this.formatMoney(totalPrizes);
+                document.getElementById('kpi-socio-premios').textContent = maxPrizeSocio.amount > 0 ? `Líder: ${maxPrizeSocio.name}` : 'Sin premios oficiales aún';
+                document.getElementById('kpi-max-premio').textContent = maxPrizeSocio.amount > 0 ? `Máx: ${this.formatMoney(maxPrizeSocio.amount)}` : '0,00 €';
+
+                // KPI 4: Míster Fiabilidad
+                document.getElementById('kpi-val-fiable-nombre').textContent = bestRegularidad.name || 'Sin datos';
+                document.getElementById('kpi-pct-fiable').textContent = `${bestRegularidad.pct.toFixed(0)}%`;
+                document.getElementById('kpi-bar-fiable').style.width = `${bestRegularidad.pct}%`;
+
+                // KPI 5: Talismán vs Trampa
+                const teamList = Object.values(this.teamStats).filter(t => t.totalMatches >= 3);
+                teamList.sort((a, b) => {
+                    const rateA = a.totalPicks > 0 ? (a.hits / a.totalPicks) : 0;
+                    const rateB = b.totalPicks > 0 ? (b.hits / b.totalPicks) : 0;
+                    return rateB - rateA;
+                });
+
+                if (teamList.length > 0) {
+                    const talisman = teamList[0];
+                    const trampa = teamList[teamList.length - 1];
+                    const talPct = talisman.totalPicks > 0 ? ((talisman.hits / talisman.totalPicks) * 100) : 0;
+                    const traPct = trampa.totalPicks > 0 ? ((trampa.hits / trampa.totalPicks) * 100) : 0;
+
+                    document.getElementById('kpi-talisman-nombre').textContent = talisman.name;
+                    document.getElementById('kpi-talisman-pct').textContent = `${talPct.toFixed(0)}%`;
+                    document.getElementById('kpi-trampa-nombre').textContent = trampa.name;
+                    document.getElementById('kpi-trampa-pct').textContent = `${traPct.toFixed(0)}%`;
+                }
+            }
+
+            /**
+             * Inicializa el Gran Gráfico de Evolución Temporal
+             */
+            initChart() {
+                // Renderizar Chips de selección de socios
+                const chipContainer = document.getElementById('members-chip-container');
+                if (chipContainer) {
+                    const sortedMembers = Object.values(this.memberStats).sort((a, b) => b.grandTotal - a.grandTotal);
+                    chipContainer.innerHTML = sortedMembers.map((s, idx) => {
+                        let medal = '';
+                        if (idx === 0) medal = '🥇 ';
+                        else if (idx === 1) medal = '🥈 ';
+                        else if (idx === 2) medal = '🥉 ';
+
+                        return `
+                            <button type="button" onclick="window.ResumenApp.toggleMemberSelection(${s.member.id})"
+                                    id="chip-member-${s.member.id}"
+                                    class="member-chip-btn px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-amber-500/50 transition flex items-center gap-1.5 flex-shrink-0 shadow-xs">
+                                <span>${medal}</span>
+                                <span>${s.name}</span>
+                                <span class="font-mono text-[10px] opacity-75 font-bold">(${s.grandTotal})</span>
+                            </button>
+                        `;
+                    }).join('');
+                }
+
+                // Autoseleccionar Top 4 por defecto
+                const top4 = Object.values(this.memberStats).sort((a, b) => b.grandTotal - a.grandTotal).slice(0, 4);
+                this.selectedMembers.clear();
+                top4.forEach(s => this.selectedMembers.add(s.member.id));
+
+                this.viewJornadasCount = this.totalJornadas;
+                this.viewOffset = 0;
+
+                this.renderChart();
+            }
+
+            /**
+             * Configuración cromática y visual de Chart.js
+             */
+            renderChart() {
+                const ctx = document.getElementById('evolutionChart');
+                if (!ctx) return;
+
+                // Actualizar estilo visual de los chips
+                this.members.forEach(m => {
+                    const btn = document.getElementById(`chip-member-${m.id}`);
+                    if (btn) {
+                        if (this.selectedMembers.has(m.id)) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    }
+                });
+
+                // Ventana de jornadas
+                if (this.viewJornadasCount <= 0 || this.viewJornadasCount > this.totalJornadas) {
+                    this.viewJornadasCount = this.totalJornadas;
+                }
+                const maxOffset = Math.max(0, this.totalJornadas - this.viewJornadasCount);
+                if (this.viewOffset > maxOffset) this.viewOffset = maxOffset;
+                if (this.viewOffset < 0) this.viewOffset = 0;
+
+                const filteredJornadas = this.playedJornadas.slice(this.viewOffset, this.viewOffset + this.viewJornadasCount);
+                const labels = filteredJornadas.map(j => `J${j.number}`);
+
+                // Paleta de colores atractiva de alto contraste
+                const colorPalette = [
+                    '#f59e0b', // Ámbar
+                    '#10b981', // Esmeralda
+                    '#3b82f6', // Azul eléctrico
+                    '#a855f7', // Púrpura
+                    '#f43f5e', // Rosa neón
+                    '#06b6d4', // Cyan
+                    '#eab308', // Amarillo oro
+                    '#ec4899', // Fucsia
+                    '#8b5cf6', // Violeta
+                    '#14b8a6'  // Teal
+                ];
+
+                const isDark = document.documentElement.classList.contains('dark');
+                const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
+                const textColor = isDark ? '#94a3b8' : '#475569';
+
+                const datasets = [];
+                let colorIdx = 0;
+
+                this.members.forEach(m => {
+                    if (this.selectedMembers.has(m.id)) {
+                        const s = this.memberStats[m.id];
+                        const historySlice = s.history.slice(this.viewOffset, this.viewOffset + this.viewJornadasCount);
+                        const color = colorPalette[colorIdx % colorPalette.length];
+                        colorIdx++;
+
+                        datasets.push({
+                            label: s.name,
+                            data: historySlice.map(h => h.pointsAcum),
+                            fullHistory: historySlice,
+                            memberId: m.id,
+                            borderColor: color,
+                            backgroundColor: color,
+                            tension: 0.35,
+                            borderWidth: 2.5,
+                            pointRadius: 4.5,
+                            pointHoverRadius: 7.5,
+                            pointBackgroundColor: color,
+                            pointBorderColor: isDark ? '#020617' : '#ffffff',
+                            pointBorderWidth: 2
+                        });
+                    }
+                });
+
+                if (this.chart) this.chart.destroy();
+
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        onClick: (e, elements) => {
+                            if (elements.length > 0) {
+                                const el = elements[0];
+                                const ds = this.chart.data.datasets[el.datasetIndex];
+                                const point = ds.fullHistory[el.index];
+                                this.showPointDetail(point.memberId, point.jNum);
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 14,
+                                    font: { family: 'Plus Jakarta Sans', size: 11, weight: '700' },
+                                    color: textColor
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: isDark ? '#0b0f19' : '#ffffff',
+                                titleColor: isDark ? '#ffffff' : '#0f172a',
+                                bodyColor: isDark ? '#cbd5e1' : '#334155',
+                                borderColor: 'rgba(245, 158, 11, 0.5)',
+                                borderWidth: 1.5,
+                                padding: 10,
+                                cornerRadius: 10,
+                                bodyFont: { family: 'JetBrains Mono', size: 11 },
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const h = ctx.dataset.fullHistory[ctx.dataIndex];
+                                        return `${ctx.dataset.label}: ${ctx.parsed.y} pts (+${h.dayPoints} en J${h.jNum} · ${h.dayHits} ac.)`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: gridColor },
+                                ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: textColor }
+                            },
+                            y: {
+                                grid: { color: gridColor },
+                                ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: textColor }
+                            }
+                        }
+                    }
+                });
+
+                this.updateZoomControlsUI();
+            }
+
+            /**
+             * Muestra el detalle completo de un punto (socio y jornada)
+             */
+            showPointDetail(memberId, jNum) {
+                const s = this.memberStats[memberId];
+                const j = this.playedJornadas.find(x => x.number === jNum);
+                if (!s || !j) return;
+
+                const h = s.history.find(x => x.jNum === jNum);
+                if (!h) return;
+
+                const panel = document.getElementById('point-detail-panel');
+                panel.classList.remove('hidden');
+
+                document.getElementById('panel-socio-name').textContent = s.name;
+                document.getElementById('panel-jornada-badge').textContent = `Jornada ${jNum} · Disputada el ${j.date}`;
+
+                document.getElementById('panel-stat-acumulados').textContent = `${h.pointsAcum} pts`;
+                document.getElementById('panel-stat-puntos-j').textContent = `+${h.dayPoints} pts`;
+                document.getElementById('panel-stat-hits').textContent = `${h.dayHits} aciertos`;
+                document.getElementById('panel-stat-prize').textContent = this.formatMoney(h.dayPrize);
+
+                // Buscar pronóstico del socio
+                const p = this.pronosticos.find(x => (x.jId === j.id || x.jornadaId === j.id) && (x.mId === memberId || x.memberId === memberId));
+                const sel = (p && (p.selection || p.forecasts)) || [];
+
+                let matchesHtml = `
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="py-1.5 px-2.5 text-center">#</th>
+                                <th class="py-1.5 px-2.5">Partido</th>
+                                <th class="py-1.5 px-2.5 text-center">Pronóstico</th>
+                                <th class="py-1.5 px-2.5 text-center">Oficial</th>
+                                <th class="py-1.5 px-2.5 text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
+                `;
+
+                (j.matches || []).forEach((m, idx) => {
+                    const userVal = sel[idx] || '-';
+                    const offVal = m.result;
+                    const uNorm = ScoringSystem.normalizeSign(userVal);
+                    const oNorm = ScoringSystem.normalizeSign(offVal);
+                    const isHit = (idx < 14 && uNorm && oNorm && uNorm === oNorm) || (idx === 14 && userVal === offVal);
+
+                    const statusBadge = isHit
+                        ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">✓ Acierto</span>`
+                        : (userVal !== '-' ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-600 dark:text-rose-400">✕ Fallo</span>` : `<span class="text-slate-400">-</span>`);
+
+                    matchesHtml += `
+                        <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 ${isHit ? 'bg-emerald-500/5' : ''}">
+                            <td class="py-1 px-2 text-center text-slate-400 font-bold">${idx + 1}</td>
+                            <td class="py-1 px-2 font-sans font-semibold text-slate-800 dark:text-slate-200">${m.home} - ${m.away}</td>
+                            <td class="py-1 px-2 text-center font-bold">${userVal}</td>
+                            <td class="py-1 px-2 text-center font-bold text-amber-500">${offVal}</td>
+                            <td class="py-1 px-2 text-center">${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+
+                matchesHtml += `</tbody></table>`;
+                document.getElementById('panel-matches-container').innerHTML = matchesHtml;
+
+                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            /**
+             * VISTA 2: Casillas 1 a 14
+             */
+            renderCasillas() {
+                const container = document.getElementById('casillas-grid');
+                if (!container) return;
+
+                // Encontrar casilla con más y menos acierto
+                let maxRate = -1, minRate = 101;
+                this.casillaStats.forEach(c => {
+                    const rate = c.totalPronosticos > 0 ? (c.totalHits / c.totalPronosticos * 100) : 0;
+                    if (rate > maxRate) maxRate = rate;
+                    if (rate < minRate) minRate = rate;
+                });
+
+                container.innerHTML = this.casillaStats.map(c => {
+                    const rate = c.totalPronosticos > 0 ? ((c.totalHits / c.totalPronosticos) * 100) : 0;
+                    const isGold = rate === maxRate && maxRate > 0;
+                    const isTrap = rate === minRate && minRate < 100;
+
+                    const barColor = rate >= 70 ? 'from-emerald-500 to-teal-400' : (rate >= 50 ? 'from-blue-500 to-indigo-400' : 'from-rose-500 to-amber-500');
+
+                    // Signo más frecuente
+                    let topSign = '1';
+                    let maxCount = -1;
+                    Object.entries(c.signosOficiales).forEach(([s, cnt]) => {
+                        if (cnt > maxCount) { maxCount = cnt; topSign = s; }
+                    });
+
+                    return `
+                        <div class="glass-panel p-3 flex flex-col justify-between cursor-pointer hover:border-amber-500/50 transition group shadow-sm ${isGold ? 'border-amber-500/80 shadow-amber-500/10' : (isTrap ? 'border-rose-500/60' : '')}"
+                             onclick="window.ResumenApp.openCasillaDetail(${c.casillaIndex})">
+                            <div class="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800">
+                                <span class="font-mono text-xs font-black text-slate-500 dark:text-slate-400">Casilla #${c.matchNum}</span>
+                                ${isGold ? '<span class="text-xs font-black text-amber-500" title="Casilla Talismán">⭐ Oro</span>' : (isTrap ? '<span class="text-xs font-black text-rose-500" title="Casilla Trampa">🚩 Trampa</span>' : '')}
+                            </div>
+                            <div class="my-2 text-center">
+                                <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">${rate.toFixed(0)}%</div>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">${c.totalHits}/${c.totalPronosticos} aciertos</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-2">
+                                <div class="h-full bg-gradient-to-r ${barColor}" style="width: ${rate}%"></div>
+                            </div>
+                            <div class="text-[10px] text-slate-500 flex justify-between font-mono pt-1 border-t border-slate-200 dark:border-slate-800">
+                                <span>Signo rey: <strong class="text-amber-500">${topSign}</strong></span>
+                                <span class="text-blue-500 group-hover:underline">Ver detalle →</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            openCasillaDetail(idx) {
+                const c = this.casillaStats[idx];
+                if (!c) return;
+
+                const modal = document.getElementById('resumen-detail-modal');
+                const title = document.getElementById('modal-detail-title');
+                const content = document.getElementById('modal-detail-content');
+
+                title.textContent = `Radiografía Detallada de la Casilla #${c.matchNum}`;
+
+                const rate = c.totalPronosticos > 0 ? ((c.totalHits / c.totalPronosticos) * 100).toFixed(1) : 0;
+
+                let html = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 block">Efectividad Peña</span>
+                                <strong class="text-xl font-black font-mono text-emerald-500">${rate}%</strong>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 block">Total Aciertos</span>
+                                <strong class="text-xl font-black font-mono text-slate-900 dark:text-white">${c.totalHits}</strong>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 block">Signos Oficiales</span>
+                                <span class="font-mono text-xs font-bold text-amber-500">1: ${c.signosOficiales['1'] || 0} | X: ${c.signosOficiales['X'] || 0} | 2: ${c.signosOficiales['2'] || 0}</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 block">Pronósticos Peña</span>
+                                <span class="font-mono text-xs font-bold text-blue-500">1: ${c.signosSocios['1'] || 0} | X: ${c.signosSocios['X'] || 0} | 2: ${c.signosSocios['2'] || 0}</span>
+                            </div>
+                        </div>
+
+                        <h4 class="text-xs font-black uppercase text-slate-600 dark:text-slate-400 mt-2">
+                            Historial de Partidos que cayeron en la Casilla #${c.matchNum}
+                        </h4>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
+                                    <tr>
+                                        <th class="py-2 px-3">Jornada</th>
+                                        <th class="py-2 px-3">Enfrentamiento</th>
+                                        <th class="py-2 px-3 text-center">Resultado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
+                                    ${c.recentMatches.map(m => `
+                                        <tr>
+                                            <td class="py-1.5 px-3 font-bold text-slate-500">Jornada ${m.jNum}</td>
+                                            <td class="py-1.5 px-3 font-sans font-semibold text-slate-800 dark:text-slate-200">${m.home} - ${m.away}</td>
+                                            <td class="py-1.5 px-3 text-center font-bold text-amber-500">${m.result}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                content.innerHTML = html;
+                modal.style.display = 'flex';
+            }
+
+            /**
+             * VISTA 3: Termómetro de Clubes
+             */
+            renderClubes(filterText = '', filterCategory = 'all') {
+                const container = document.getElementById('teams-grid');
+                if (!container) return;
+
+                let list = Object.values(this.teamStats);
+
+                if (filterText) {
+                    list = list.filter(t => t.name.toLowerCase().includes(filterText.toLowerCase()));
+                }
+
+                if (filterCategory === 'reliable') {
+                    list = list.filter(t => t.totalPicks > 0 && ((t.hits / t.totalPicks) * 100) >= 70);
+                } else if (filterCategory === 'trap') {
+                    list = list.filter(t => t.totalPicks > 0 && ((t.hits / t.totalPicks) * 100) < 50);
+                } else if (filterCategory === 'min5') {
+                    list = list.filter(t => t.totalMatches >= 5);
+                }
+
+                list.sort((a, b) => {
+                    const rA = a.totalPicks > 0 ? (a.hits / a.totalPicks) : 0;
+                    const rB = b.totalPicks > 0 ? (b.hits / b.totalPicks) : 0;
+                    return rB - rA;
+                });
+
+                container.innerHTML = list.map(t => {
+                    const rate = t.totalPicks > 0 ? ((t.hits / t.totalPicks) * 100) : 0;
+                    const barColor = rate >= 70 ? 'from-emerald-500 to-teal-400' : (rate >= 50 ? 'from-blue-500 to-indigo-400' : 'from-rose-500 to-red-400');
+                    const badgeClass = rate >= 70 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : (rate >= 50 ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400');
+
+                    return `
+                        <div class="glass-panel p-3.5 flex flex-col justify-between hover:border-amber-500/40 transition">
+                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 dark:border-slate-800">
+                                <span class="font-bold text-xs text-slate-900 dark:text-white truncate" title="${t.name}">
+                                    ⚽ ${t.name}
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-black ${badgeClass}">
+                                    ${rate.toFixed(0)}%
+                                </span>
+                            </div>
+                            <div class="my-2">
+                                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-1.5">
+                                    <div class="h-full bg-gradient-to-r ${barColor}" style="width: ${rate}%"></div>
+                                </div>
+                                <div class="flex justify-between text-[11px] text-slate-500 font-mono">
+                                    <span>${t.hits} aciertos</span>
+                                    <span>${t.totalMatches} partidos</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            filterTeams(text) {
+                const cat = document.getElementById('team-filter-select').value;
+                this.renderClubes(text, cat);
+            }
+
+            filterTeamsByCategory(cat) {
+                const text = document.getElementById('team-search-input').value;
+                this.renderClubes(text, cat);
+            }
+
+            /**
+             * VISTA 4: Rendimiento por Jornada
+             */
+            renderJornadasPerformance() {
+                const barContainer = document.getElementById('jornadas-performance-bars');
+                const tableBody = document.getElementById('jornadas-summary-tbody');
+                if (!barContainer || !tableBody) return;
+
+                // Encontrar mejor y peor jornada
+                let maxAvg = -1, minAvg = 15;
+                this.jornadaPerformance.forEach(jp => {
+                    if (jp.avgHits > maxAvg) maxAvg = jp.avgHits;
+                    if (jp.avgHits < minAvg) minAvg = jp.avgHits;
+                });
+
+                // Barras interactivas
+                barContainer.innerHTML = this.jornadaPerformance.map(jp => {
+                    const isBest = jp.avgHits === maxAvg && maxAvg > 0;
+                    const isWorst = jp.avgHits === minAvg;
+                    const barH = Math.max(15, Math.min(100, (jp.avgHits / 14) * 100));
+
+                    const barColor = isBest ? 'bg-amber-500' : (isWorst ? 'bg-rose-500' : 'bg-emerald-500');
+
+                    return `
+                        <div class="flex flex-col items-center gap-1.5 flex-shrink-0 w-11 sm:w-14 group cursor-pointer"
+                             onclick="window.ResumenApp.openJornadaEscrutinio(${jp.number})">
+                            <span class="text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300">${jp.avgHits.toFixed(1)}</span>
+                            <div class="w-full h-32 bg-slate-200 dark:bg-slate-900 rounded-lg p-0.5 flex items-end relative overflow-hidden group-hover:border group-hover:border-amber-500/60 transition">
+                                <div class="w-full ${barColor} rounded transition-all duration-500" style="height: ${barH}%"></div>
+                                ${jp.prizesTotal > 0 ? '<span class="absolute top-1 right-1 text-[10px]">💰</span>' : ''}
+                                ${jp.hasPig ? '<span class="absolute top-1 left-1 text-[10px]">🐷</span>' : ''}
+                            </div>
+                            <span class="text-[10px] font-mono font-bold text-slate-500 group-hover:text-amber-500 transition">J${jp.number}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                // Tabla resumen de jornadas
+                tableBody.innerHTML = this.jornadaPerformance.map(jp => {
+                    const prizeStr = jp.prizesTotal > 0 ? this.formatMoney(jp.prizesTotal) : '-';
+                    const isBest = jp.avgHits === maxAvg && maxAvg > 0;
+
+                    return `
+                        <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40">
+                            <td class="py-2 px-3 font-bold text-slate-800 dark:text-slate-200">
+                                Jornada ${jp.number} ${isBest ? '👑' : ''}
+                            </td>
+                            <td class="py-2 px-3 text-slate-500 font-sans">${jp.date}</td>
+                            <td class="py-2 px-3 text-center font-bold text-emerald-600 dark:text-emerald-400">${jp.pctAcierto.toFixed(1)}%</td>
+                            <td class="py-2 px-3 text-center font-black">${jp.avgHits.toFixed(1)}/14</td>
+                            <td class="py-2 px-3 text-center font-sans font-semibold text-slate-700 dark:text-slate-300">
+                                ${jp.bestMember.name ? `${jp.bestMember.name} (${jp.bestMember.hits} ac.)` : '-'}
+                            </td>
+                            <td class="py-2 px-3 text-center text-purple-600 dark:text-purple-400 font-bold">${prizeStr}</td>
+                            <td class="py-2 px-3 text-center">${jp.hasPig ? '🐷 PIG' : '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            openJornadaEscrutinio(jNum) {
+                const jp = this.jornadaPerformance.find(x => x.number === jNum);
+                if (!jp) return;
+
+                const modal = document.getElementById('resumen-detail-modal');
+                const title = document.getElementById('modal-detail-title');
+                const content = document.getElementById('modal-detail-content');
+
+                title.textContent = `Escrutinio Colectivo · Jornada ${jNum}`;
+
+                const j = jp.jornada;
+                let html = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                            <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] text-slate-500 block uppercase font-bold">Media de la Peña</span>
+                                <strong class="text-xl font-mono font-black text-emerald-500">${jp.avgHits.toFixed(1)} / 14</strong>
+                            </div>
+                            <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] text-slate-500 block uppercase font-bold">Acierto %</span>
+                                <strong class="text-xl font-mono font-black text-slate-900 dark:text-white">${jp.pctAcierto.toFixed(1)}%</strong>
+                            </div>
+                            <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] text-slate-500 block uppercase font-bold">Mejor Pronosticador</span>
+                                <strong class="text-sm font-bold text-amber-500">${jp.bestMember.name || '-'}</strong>
+                            </div>
+                            <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                <span class="text-[10px] text-slate-500 block uppercase font-bold">Premios Bote</span>
+                                <strong class="text-sm font-mono font-black text-purple-500">${this.formatMoney(jp.prizesTotal)}</strong>
+                            </div>
+                        </div>
+
+                        <h4 class="text-xs font-black uppercase text-slate-600 dark:text-slate-400">Resultados Oficiales</h4>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
+                                    <tr>
+                                        <th class="py-1.5 px-3 text-center">#</th>
+                                        <th class="py-1.5 px-3">Partido</th>
+                                        <th class="py-1.5 px-3 text-center">Resultado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
+                                    ${(j.matches || []).map((m, idx) => `
+                                        <tr>
+                                            <td class="py-1.5 px-3 text-center text-slate-400 font-bold">${idx + 1}</td>
+                                            <td class="py-1.5 px-3 font-sans font-semibold">${m.home} - ${m.away}</td>
+                                            <td class="py-1.5 px-3 text-center font-bold text-amber-500">${m.result}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                content.innerHTML = html;
+                modal.style.display = 'flex';
+            }
+
+            /**
+             * VISTA 5: Quinielas de Dobles (Reducidas)
+             */
+            renderDobles() {
+                const tbody = document.getElementById('dobles-history-tbody');
+                if (!tbody) return;
+
+                const doblesList = [];
+                let totalHitsDobles = 0;
+                let totalVentaja = 0;
+
+                this.pronosticosExtra.forEach(p => {
+                    const m = this.members.find(mem => mem.id == (p.mId || p.memberId));
+                    const j = this.playedJornadas.find(jor => jor.id == (p.jId || p.jornadaId));
+
+                    if (m && j) {
+                        const offResults = (j.matches || []).map(mat => mat.result);
+                        let hits = 0;
+                        const sel = p.selection || [];
+
+                        sel.forEach((s, idx) => {
+                            if (idx < 14 && offResults[idx] && s && s.includes(offResults[idx])) hits++;
+                        });
+
+                        // Comparar con la media de la peña en esa jornada
+                        const jp = this.jornadaPerformance.find(x => x.number === j.number);
+                        const avgSencilla = jp ? jp.avgHits : 0;
+                        const diff = hits - avgSencilla;
+
+                        totalHitsDobles += hits;
+                        totalVentaja += diff;
+
+                        doblesList.push({
+                            jNum: j.number,
+                            member: m,
+                            memberName: AppUtils.getMemberName(m),
+                            hits: hits,
+                            diff: diff,
+                            selection: sel
+                        });
+                    }
+                });
+
+                doblesList.sort((a, b) => b.jNum - a.jNum);
+
+                const count = doblesList.length;
+                document.getElementById('dobles-stat-total').textContent = count;
+                const mediaDobles = count > 0 ? (totalHitsDobles / count).toFixed(1) : '0.0';
+                document.getElementById('dobles-stat-media').textContent = `${mediaDobles} / 14`;
+                const mediaVentaja = count > 0 ? (totalVentaja / count).toFixed(1) : '0.0';
+                document.getElementById('dobles-stat-ventaja').textContent = `+${mediaVentaja} aciertos`;
+
+                if (count === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 font-sans">Aún no se han disputado quinielas de dobles esta temporada.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = doblesList.map(d => {
+                    const badgeColor = d.hits >= 12 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : (d.hits >= 10 ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400');
+                    const diffColor = d.diff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400';
+
+                    return `
+                        <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40">
+                            <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200">Jornada ${d.jNum}</td>
+                            <td class="py-2.5 px-3 font-sans font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                <span class="text-amber-500">⭐</span> <span>${d.memberName}</span>
+                            </td>
+                            <td class="py-2.5 px-3 text-center">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-black ${badgeColor}">
+                                    ${d.hits} aciertos
+                                </span>
+                            </td>
+                            <td class="py-2.5 px-3 text-center font-bold ${diffColor}">
+                                ${d.diff >= 0 ? '+' : ''}${d.diff.toFixed(1)} vs sencilla
+                            </td>
+                            <td class="py-2.5 px-3 font-mono text-[11px] text-slate-500 dark:text-slate-400 max-w-xs truncate" title="${d.selection.join(', ')}">
+                                ${d.selection.slice(0, 14).join(', ')}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            /**
+             * VISTA 6: Duelo Directo 1 vs 1
+             */
+            initDueloSelectors() {
+                const selA = document.getElementById('duelo-select-a');
+                const selB = document.getElementById('duelo-select-b');
+                if (!selA || !selB) return;
+
+                const sorted = Object.values(this.memberStats).sort((a, b) => a.name.localeCompare(b.name));
+
+                const optionsHtml = sorted.map(s => `<option value="${s.member.id}">${s.name}</option>`).join('');
+                selA.innerHTML = optionsHtml;
+                selB.innerHTML = optionsHtml;
+
+                // Seleccionar socio 6 (Fernando) o el primero si no existe, y el segundo
+                if (sorted.some(s => s.member.id == 6)) {
+                    selA.value = '6';
+                    selB.value = sorted.find(s => s.member.id != 6)?.member.id || sorted[1].member.id;
+                } else if (sorted.length >= 2) {
+                    selA.value = sorted[0].member.id;
+                    selB.value = sorted[1].member.id;
+                }
+
+                this.updateDuelo();
+            }
+
+            updateDuelo() {
+                const idA = parseInt(document.getElementById('duelo-select-a').value);
+                const idB = parseInt(document.getElementById('duelo-select-b').value);
+
+                const sA = this.memberStats[idA];
+                const sB = this.memberStats[idB];
+                if (!sA || !sB) return;
+
+                document.getElementById('duelo-name-a').textContent = sA.name;
+                document.getElementById('duelo-name-b').textContent = sB.name;
+
+                // Enfrentamiento jornada a jornada
+                let winsA = 0, winsB = 0, empates = 0, totalJ = 0;
+
+                this.playedJornadas.forEach(j => {
+                    const hA = sA.history.find(h => h.jNum === j.number);
+                    const hB = sB.history.find(h => h.jNum === j.number);
+
+                    if (hA && hB && hA.dayHits !== -1 && hB.dayHits !== -1) {
+                        totalJ++;
+                        if (hA.dayPoints > hB.dayPoints) winsA++;
+                        else if (hB.dayPoints > hA.dayPoints) winsB++;
+                        else empates++;
+                    }
+                });
+
+                document.getElementById('duelo-victorias-a').textContent = winsA;
+                document.getElementById('duelo-victorias-b').textContent = winsB;
+                document.getElementById('duelo-empates').textContent = `${empates} Empates`;
+                document.getElementById('duelo-total-jornadas').textContent = `de ${totalJ} jornadas disputadas`;
+
+                // Comparativa métrica a métrica
+                const metrics = [
+                    { label: 'Puntos Totales General', valA: sA.grandTotal, valB: sB.grandTotal, suffix: ' pts', higherBetter: true },
+                    { label: 'Aciertos Base', valA: sA.baseTotal, valB: sB.baseTotal, suffix: '', higherBetter: true },
+                    { label: 'Bonus Neto Ganado', valA: sA.bonusTotal, valB: sB.bonusTotal, suffix: ' pts', higherBetter: true },
+                    { label: 'Premios en Metálico', valA: sA.prizesTotal, valB: sB.prizesTotal, suffix: '', higherBetter: true, isMoney: true },
+                    { label: 'Mejor Boleto Temporada', valA: sA.bestHits, valB: sB.bestHits, suffix: ' aciertos', higherBetter: true },
+                    { label: 'Jornadas con Puntos (>=10)', valA: sA.jornadasWithPoints, valB: sB.jornadasWithPoints, suffix: '', higherBetter: true }
+                ];
+
+                const container = document.getElementById('duelo-metrics-container');
+                container.innerHTML = metrics.map(m => {
+                    const strA = m.isMoney ? this.formatMoney(m.valA) : `${m.valA}${m.suffix}`;
+                    const strB = m.isMoney ? this.formatMoney(m.valB) : `${m.valB}${m.suffix}`;
+
+                    const winA = m.valA > m.valB;
+                    const winB = m.valB > m.valA;
+
+                    return `
+                        <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                            <span class="font-mono font-black ${winA ? 'text-amber-500 font-extrabold text-sm' : 'text-slate-600 dark:text-slate-400'}">${strA}</span>
+                            <span class="font-sans font-bold text-slate-700 dark:text-slate-300 text-center uppercase text-[11px]">${m.label}</span>
+                            <span class="font-mono font-black ${winB ? 'text-blue-500 font-extrabold text-sm' : 'text-slate-600 dark:text-slate-400'}">${strB}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            /**
+             * Cambiar de vista principal (Evolución, Casillas, Clubes, Jornadas, Dobles, Duelo)
+             */
+            switchView(viewName) {
+                this.activeView = viewName;
+
+                const views = ['evolucion', 'casillas', 'clubes', 'jornadas', 'dobles', 'duelo'];
+                views.forEach(v => {
+                    const container = document.getElementById(`view-container-${v}`);
+                    const btn = document.getElementById(`tab-btn-${v}`);
+                    if (container) {
+                        if (v === viewName) {
+                            container.classList.remove('hidden');
+                        } else {
+                            container.classList.add('hidden');
+                        }
+                    }
+                    if (btn) {
+                        if (v === viewName) {
+                            btn.className = 'tab-btn-active px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 border border-transparent';
+                        } else {
+                            btn.className = 'px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition flex items-center gap-1.5 flex-shrink-0';
+                        }
+                    }
+                });
+
+                if (viewName === 'evolucion' && this.chart) {
+                    this.chart.resize();
+                }
+            }
+
+            /**
+             * Manejo de selección de socios en gráfica
+             */
+            toggleMemberSelection(id) {
+                if (this.selectedMembers.has(id)) {
+                    this.selectedMembers.delete(id);
+                } else {
+                    if (this.selectedMembers.size >= 5) {
+                        alert('Puedes comparar hasta un máximo de 5 socios a la vez en la gráfica.');
+                        return;
+                    }
+                    this.selectedMembers.add(id);
+                }
+                this.renderChart();
+            }
+
+            selectTop(n) {
+                const sorted = Object.values(this.memberStats).sort((a, b) => b.grandTotal - a.grandTotal);
+                this.selectedMembers.clear();
+                sorted.slice(0, n).forEach(s => this.selectedMembers.add(s.member.id));
+                this.renderChart();
+            }
+
+            selectAllMembers() {
+                this.selectedMembers.clear();
+                this.members.slice(0, 5).forEach(m => this.selectedMembers.add(m.id));
+                this.renderChart();
+            }
+
+            clearSelection() {
+                this.selectedMembers.clear();
+                this.renderChart();
+            }
+
+            /**
+             * Zoom y deslizador de jornadas
+             */
+            setZoomPreset(val) {
+                if (val === 'all') {
+                    this.viewJornadasCount = this.totalJornadas;
+                    this.viewOffset = 0;
+                } else {
+                    this.viewJornadasCount = Math.min(this.totalJornadas, parseInt(val));
+                    this.viewOffset = Math.max(0, this.totalJornadas - this.viewJornadasCount);
+                }
+                this.renderChart();
+            }
+
+            initZoomSliders() {
+                const zSlider = document.getElementById('chart-zoom-slider');
+                const oSlider = document.getElementById('chart-offset-slider');
+                if (!zSlider || !oSlider) return;
+
+                zSlider.max = this.totalJornadas;
+                zSlider.value = this.totalJornadas;
+
+                zSlider.addEventListener('input', (e) => {
+                    this.viewJornadasCount = parseInt(e.target.value);
+                    const maxOffset = Math.max(0, this.totalJornadas - this.viewJornadasCount);
+                    if (this.viewOffset > maxOffset) this.viewOffset = maxOffset;
+                    this.renderChart();
+                });
+
+                oSlider.addEventListener('input', (e) => {
+                    this.viewOffset = parseInt(e.target.value);
+                    this.renderChart();
+                });
+            }
+
+            updateZoomControlsUI() {
+                const zSlider = document.getElementById('chart-zoom-slider');
+                const oSlider = document.getElementById('chart-offset-slider');
+                const zLabel = document.getElementById('chart-zoom-label');
+                const oLabel = document.getElementById('chart-offset-label');
+                const oContainer = document.getElementById('offset-container');
+
+                if (!zSlider || !oSlider) return;
+
+                zSlider.max = this.totalJornadas;
+                zSlider.value = this.viewJornadasCount;
+
+                if (this.viewJornadasCount >= this.totalJornadas) {
+                    zLabel.textContent = 'Toda';
+                    if (oContainer) oContainer.style.opacity = '0.35';
+                } else {
+                    zLabel.textContent = `${this.viewJornadasCount} J`;
+                    if (oContainer) oContainer.style.opacity = '1';
+                }
+
+                const maxOffset = Math.max(0, this.totalJornadas - this.viewJornadasCount);
+                oSlider.max = maxOffset;
+                oSlider.value = this.viewOffset;
+
+                const firstJ = this.viewOffset + 1;
+                const lastJ = Math.min(this.totalJornadas, this.viewOffset + this.viewJornadasCount);
+                oLabel.textContent = `J${firstJ}—J${lastJ}`;
+            }
+
+            updateChartTheme() {
+                setTimeout(() => {
+                    if (this.chart) this.renderChart();
+                }, 50);
+            }
+
+            /**
+             * SISTEMA DE TARJETAS EXPLICATIVAS FLOTANTES (#resumen-floating-card)
+             */
+            initFloatingCards() {
+                document.addEventListener('mouseover', (e) => {
+                    const target = e.target.closest('[data-card-type]');
+                    if (!target) {
+                        this.hideFloatingCard();
+                        return;
+                    }
+
+                    const type = target.getAttribute('data-card-type');
+                    const content = this.generateExplanatoryCardContent(type);
+                    if (content) {
+                        this.showFloatingCard(e, content.html, content.theme);
+                    }
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    const target = e.target.closest('[data-card-type]');
+                    if (target) {
+                        this.positionFloatingCard(e);
+                    }
+                });
+
+                document.addEventListener('mouseleave', () => {
+                    this.hideFloatingCard();
+                });
+            }
+
+            generateExplanatoryCardContent(type) {
+                if (type === 'kpi-efectividad') {
+                    return {
+                        theme: 'emerald',
+                        html: `
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between pb-1 border-b border-emerald-500/40">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/50">
+                                        🎯 Efectividad Colectiva
+                                    </span>
+                                    <span class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400">${this.globalPctAcierto.toFixed(1)}%</span>
+                                </div>
+                                <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    Porcentaje de signos acertados por toda la peña sobre los 14 partidos base de cada boleto oficial.
+                                </p>
+                                <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono space-y-0.5">
+                                    <div class="flex justify-between"><span>Aciertos medios:</span><strong class="text-emerald-600 dark:text-emerald-400">${this.globalAvgHits.toFixed(1)} / 14</strong></div>
+                                    <div class="flex justify-between"><span>Jornadas evaluadas:</span><strong>${this.totalJornadas}</strong></div>
+                                </div>
+                            </div>
+                        `
+                    };
+                }
+
+                if (type === 'kpi-bombazo') {
+                    return {
+                        theme: 'amber',
+                        html: `
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between pb-1 border-b border-amber-500/40">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/50">
+                                        🚀 Récord en 1 Boleto
+                                    </span>
+                                    <span class="text-xs font-mono font-black text-amber-600 dark:text-amber-400">Pico Máximo</span>
+                                </div>
+                                <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    El mejor boleto individual de un socio en una sola jornada en toda la temporada.
+                                </p>
+                                <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono space-y-0.5">
+                                    <div class="flex justify-between"><span>Bonus otorgado:</span><strong class="text-emerald-600 dark:text-emerald-400">+30 / +15 pts</strong></div>
+                                    <div class="flex justify-between"><span>Impacto:</span><strong>Impulsa al socio al liderato</strong></div>
+                                </div>
+                            </div>
+                        `
+                    };
+                }
+
+                if (type === 'kpi-premios') {
+                    return {
+                        theme: 'purple',
+                        html: `
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between pb-1 border-b border-purple-500/40">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-800 dark:text-purple-300 border border-purple-500/50">
+                                        💰 Premios Oficiales
+                                    </span>
+                                    <span class="text-xs font-mono font-black text-purple-600 dark:text-purple-400">Botes LAE</span>
+                                </div>
+                                <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    Dinero en metálico ganado en botes oficiales de Loterías y Apuestas del Estado y repartido a los socios.
+                                </p>
+                                <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono">
+                                    <span>Notación española estricta (puntos de millar y coma decimal).</span>
+                                </div>
+                            </div>
+                        `
+                    };
+                }
+
+                if (type === 'kpi-fiabilidad') {
+                    return {
+                        theme: 'blue',
+                        html: `
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between pb-1 border-b border-blue-500/40">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-800 dark:text-blue-300 border border-blue-500/50">
+                                        🛡️ Míster Regularidad
+                                    </span>
+                                    <span class="text-xs font-mono font-black text-blue-600 dark:text-blue-400">Constancia</span>
+                                </div>
+                                <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    Premia al socio con mayor porcentaje de jornadas alcanzando la zona de puntos (mínimo 10 aciertos).
+                                </p>
+                                <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono">
+                                    <span>Mayor fiabilidad = Menos fallos catastróficos.</span>
+                                </div>
+                            </div>
+                        `
+                    };
+                }
+
+                if (type === 'kpi-equipos') {
+                    return {
+                        theme: 'orange',
+                        html: `
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between pb-1 border-b border-orange-500/40">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-500/20 text-orange-800 dark:text-orange-300 border border-orange-500/50">
+                                        ⚽ Radar de Clubes
+                                    </span>
+                                    <span class="text-xs font-mono font-black text-orange-600 dark:text-orange-400">Fiabilidad</span>
+                                </div>
+                                <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    Identifica el equipo donde la peña más acierta (Talismán) y el equipo con mayor índice de errores (Trampa).
+                                </p>
+                            </div>
+                        `
+                    };
+                }
+
+                return null;
+            }
+
+            showFloatingCard(e, htmlContent, theme = 'amber') {
+                const card = document.getElementById('resumen-floating-card');
+                if (!card) return;
+
+                card.innerHTML = htmlContent;
+
+                if (theme === 'emerald') card.style.borderColor = 'rgba(16, 185, 129, 0.85)';
+                else if (theme === 'purple') card.style.borderColor = 'rgba(168, 85, 247, 0.85)';
+                else if (theme === 'blue') card.style.borderColor = 'rgba(59, 130, 246, 0.85)';
+                else if (theme === 'orange') card.style.borderColor = 'rgba(249, 115, 22, 0.85)';
+                else card.style.borderColor = 'rgba(245, 158, 11, 0.85)';
+
+                card.classList.remove('hidden');
+                this.positionFloatingCard(e);
+
+                requestAnimationFrame(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'scale(1)';
+                });
+            }
+
+            positionFloatingCard(e) {
+                const card = document.getElementById('resumen-floating-card');
+                if (!card || card.classList.contains('hidden')) return;
+
+                const rect = card.getBoundingClientRect();
+                const cardW = rect.width || 280;
+                const cardH = rect.height || 140;
+
+                let targetX = e.clientX + 14;
+                let targetY = e.clientY + 14;
+
+                if (targetX + cardW > window.innerWidth - 14) {
+                    targetX = e.clientX - cardW - 14;
+                }
+                if (targetY + cardH > window.innerHeight - 14) {
+                    targetY = e.clientY - cardH - 14;
+                }
+
+                targetX = Math.max(10, Math.min(targetX, window.innerWidth - cardW - 10));
+                targetY = Math.max(10, Math.min(targetY, window.innerHeight - cardH - 10));
+
+                card.style.left = `${targetX}px`;
+                card.style.top = `${targetY}px`;
+            }
+
+            hideFloatingCard() {
+                const card = document.getElementById('resumen-floating-card');
+                if (!card) return;
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.96)';
+                setTimeout(() => {
+                    if (card.style.opacity === '0') {
+                        card.classList.add('hidden');
+                    }
+                }, 150);
+            }
+        }
+
+        // Inicializar aplicación al cargar el DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            window.ResumenApp = new Resumen2App();
+        });
+    </script>
+</body>
+
+</html>
