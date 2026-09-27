@@ -36,19 +36,16 @@
         }
     </script>
 
-    <!-- Custom CSS for V2 & Data Grid -->
+    <!-- Custom CSS for V2, Vertical Table and Modal -->
     <style>
         :root {
             --bg-primary: #f8fafc;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --bg-panel: rgba(255, 255, 255, 0.9);
-            --border-color: rgba(0, 0, 0, 0.08);
-            --row-bg: rgba(241, 245, 249, 0.6);
-            --row-hover: rgba(226, 232, 240, 0.8);
-            --btn-bg: rgba(241, 245, 249, 1);
-            --btn-text: #475569;
-            --btn-border: #cbd5e1;
+            --bg-panel: rgba(255, 255, 255, 0.95);
+            --border-color: rgba(0, 0, 0, 0.12);
+            --row-bg: rgba(241, 245, 249, 0.7);
+            --row-hover: rgba(226, 232, 240, 0.9);
             --primary-orange: #f59e0b;
             --primary-green: #10b981;
         }
@@ -57,13 +54,10 @@
             --bg-primary: #0b0f19;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
-            --bg-panel: rgba(15, 23, 42, 0.6);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --row-bg: rgba(30, 41, 59, 0.4);
-            --row-hover: rgba(30, 41, 59, 0.8);
-            --btn-bg: rgba(15, 23, 42, 0.8);
-            --btn-text: #94a3b8;
-            --btn-border: rgba(255, 255, 255, 0.1);
+            --bg-panel: rgba(15, 23, 42, 0.75);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --row-bg: rgba(30, 41, 59, 0.5);
+            --row-hover: rgba(30, 41, 59, 0.9);
         }
 
         body {
@@ -74,9 +68,9 @@
 
         .dark body {
             background-image: 
-                radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.06) 0px, transparent 50%),
+                radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.07) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 50%);
+                radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.04) 0px, transparent 50%);
             background-attachment: fixed;
         }
 
@@ -89,129 +83,129 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        /* MINI PÍLDORAS DE SIGNOS 1-X-2 (Estilo Resultados 2.0 pero compactas para visualización vertical) */
-        .sign-mini {
+        /* =========================================================================
+           PÍLDORAS VERTICALES DE SIGNOS 1-X-2 (IDÉNTICAS A IMAGEN 2 DEL USUARIO)
+           ========================================================================= */
+        .sign-pill-v {
+            width: 27px;
+            height: 25px;
+            border-radius: 9px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 20px;
-            border-radius: 5px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
             font-weight: 800;
-            line-height: 1;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            font-size: 12px;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             user-select: none;
+            line-height: 1;
         }
-        .sign-mini:hover {
-            transform: scale(1.15);
+        .sign-pill-v:hover {
+            transform: scale(1.18);
             z-index: 20;
         }
 
-        /* 1: Verde Esmeralda */
-        .sign-mini-1 {
+        /* Signo 1: Verde Esmeralda (Imagen 2) */
+        .sign-pill-v-1 {
             background: rgba(16, 185, 129, 0.18);
-            color: #059669;
-            border: 1px solid rgba(16, 185, 129, 0.45);
-        }
-        .dark .sign-mini-1 {
-            background: rgba(16, 185, 129, 0.25);
             color: #34d399;
-            border-color: rgba(16, 185, 129, 0.6);
-            box-shadow: 0 0 6px rgba(16, 185, 129, 0.25);
+            border: 1.5px solid rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
         }
 
-        /* X: Azul Celeste */
-        .sign-mini-X {
+        /* Signo X: Azul Celeste (Imagen 2) */
+        .sign-pill-v-X {
             background: rgba(14, 165, 233, 0.18);
-            color: #0284c7;
-            border: 1px solid rgba(14, 165, 233, 0.45);
-        }
-        .dark .sign-mini-X {
-            background: rgba(14, 165, 233, 0.25);
             color: #38bdf8;
-            border-color: rgba(14, 165, 233, 0.6);
-            box-shadow: 0 0 6px rgba(14, 165, 233, 0.25);
+            border: 1.5px solid rgba(14, 165, 233, 0.5);
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.25);
         }
 
-        /* 2: Ámbar Dorado */
-        .sign-mini-2 {
+        /* Signo 2: Amarillo / Ámbar (Imagen 2) */
+        .sign-pill-v-2 {
             background: rgba(245, 158, 11, 0.18);
-            color: #d97706;
-            border: 1px solid rgba(245, 158, 11, 0.45);
-        }
-        .dark .sign-mini-2 {
-            background: rgba(245, 158, 11, 0.25);
             color: #fbbf24;
-            border-color: rgba(245, 158, 11, 0.6);
-            box-shadow: 0 0 6px rgba(245, 158, 11, 0.25);
+            border: 1.5px solid rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
         }
 
         /* Pleno al 15 */
-        .sign-mini-p15 {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1px 5px;
-            min-width: 24px;
-            height: 20px;
-            border-radius: 5px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-            font-weight: 900;
+        .sign-pill-v-p15 {
             background: rgba(245, 158, 11, 0.25);
             color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.7);
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
-        }
-
-        /* Signos dobles o especiales (ej: 1X, 1X2) */
-        .sign-mini-custom {
+            border: 1.5px solid rgba(245, 158, 11, 0.7);
+            font-size: 10px;
+            font-weight: 900;
+            padding: 0 5px;
+            min-width: 27px;
+            height: 25px;
+            border-radius: 9px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 1px 4px;
-            min-width: 24px;
-            height: 20px;
-            border-radius: 5px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-            font-weight: 900;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Signos Dobles Combinados (ej: 1X, 12, 1X2) */
+        .sign-pill-v-custom {
             background: rgba(168, 85, 247, 0.2);
             color: #c084fc;
-            border: 1px solid rgba(168, 85, 247, 0.6);
+            border: 1.5px solid rgba(168, 85, 247, 0.6);
+            font-size: 10px;
+            font-weight: 900;
+            padding: 0 4px;
+            min-width: 27px;
+            height: 25px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Signo no relleno (-) */
-        .sign-mini-empty {
+        /* Signo Pendiente / Sin Rellenar (-) */
+        .sign-pill-v-empty {
+            width: 27px;
+            height: 25px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background: rgba(100, 116, 139, 0.1);
             color: #64748b;
-            border: 1px dashed rgba(100, 116, 139, 0.3);
+            border: 1px dashed rgba(100, 116, 139, 0.35);
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* TABLA GENERAL DE PRONÓSTICOS VERTICALES */
+        /* =========================================================================
+           TABLA DE DATOS DATA GRID (SEPARADORES VERTICALES Y HORIZONTALES CLAROS)
+           ========================================================================= */
         #forecast-summary-table {
             border-collapse: separate;
             border-spacing: 0;
             width: auto;
             min-width: 100%;
         }
+
         .summary-header-cell {
             background: var(--bg-panel);
             color: var(--text-muted);
             font-weight: 800;
             font-size: 0.75rem;
-            padding: 0.75rem 0.4rem;
+            padding: 0.85rem 0.35rem;
             border-bottom: 2px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
             text-align: center;
             vertical-align: middle;
             white-space: nowrap;
         }
+
         .summary-cell {
-            padding: 0.6rem 0.25rem;
-            border-bottom: 1px solid var(--border-color);
+            padding: 0.65rem 0.3rem;
+            border-bottom: 2px solid var(--border-color);
             border-right: 1px solid var(--border-color);
             vertical-align: top;
             text-align: center;
@@ -219,21 +213,37 @@
         }
         .summary-cell:hover {
             background: var(--row-hover) !important;
-            box-shadow: inset 0 0 0 1px var(--primary-orange);
+            box-shadow: inset 0 0 0 1.5px var(--primary-orange);
             cursor: pointer;
         }
 
-        /* Columna Sticky de Jornada e Índice de Partidos 1-15 */
+        /* Separadores verticales reforzados entre columnas */
+        #forecast-summary-table td, #forecast-summary-table th {
+            border-right: 1px solid rgba(148, 163, 184, 0.2) !important;
+        }
+        .dark #forecast-summary-table td, .dark #forecast-summary-table th {
+            border-right: 1px solid rgba(51, 65, 85, 0.7) !important;
+        }
+
+        /* Separador horizontal reforzado entre Jornadas */
+        #forecast-summary-table tbody tr {
+            border-bottom: 3px solid rgba(148, 163, 184, 0.4) !important;
+        }
+        .dark #forecast-summary-table tbody tr {
+            border-bottom: 3px solid rgba(51, 65, 85, 0.9) !important;
+        }
+
+        /* Columna Sticky de Jornada e Índice 1-15 */
         .summary-sticky-col {
             position: sticky;
             left: 0;
             background: var(--bg-panel);
             z-index: 30;
-            border-right: 2px solid var(--border-color);
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.08);
+            border-right: 3px solid var(--primary-orange) !important;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.12);
         }
         .dark .summary-sticky-col {
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.35);
+            box-shadow: 4px 0 16px rgba(0, 0, 0, 0.5);
         }
 
         /* LED indicador luminoso */
@@ -248,23 +258,93 @@
         .led-yellow { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
         .led-red { background: #f43f5e; box-shadow: 0 0 6px #f43f5e; }
 
-        /* FILAS DEL BOLETO EN EL EDITOR (Tactile rows) */
+        /* =========================================================================
+           BOTONES TÁCTILES DEL BOLETO EN LA VENTANA MODAL (1 EN VERDE, X AZUL, 2 AMARILLO)
+           ========================================================================= */
+        .chk-option, .p15-option {
+            background: rgba(15, 23, 42, 0.6);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 0.6rem;
+            padding: 0.45rem 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-width: 2.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .chk-option:hover, .p15-option:hover {
+            transform: scale(1.08);
+            border-color: rgba(245, 158, 11, 0.6);
+        }
+
+        /* 1 SELECCIONADO: VERDE */
+        .p-options .chk-option.selected:first-child,
+        .chk-option.selected.active-1,
+        .p-options .chk-option.selected[data-sign="1"] {
+            background: #10b981 !important;
+            color: #022c22 !important;
+            border-color: #34d399 !important;
+            font-weight: 900 !important;
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.6) !important;
+            transform: scale(1.1) !important;
+        }
+
+        /* X SELECCIONADO: AZUL */
+        .p-options .chk-option.selected:nth-child(2),
+        .chk-option.selected.active-X,
+        .p-options .chk-option.selected[data-sign="X"] {
+            background: #0ea5e9 !important;
+            color: #082f49 !important;
+            border-color: #38bdf8 !important;
+            font-weight: 900 !important;
+            box-shadow: 0 0 14px rgba(14, 165, 233, 0.6) !important;
+            transform: scale(1.1) !important;
+        }
+
+        /* 2 SELECCIONADO: AMARILLO / ÁMBAR */
+        .p-options .chk-option.selected:last-child,
+        .chk-option.selected.active-2,
+        .p-options .chk-option.selected[data-sign="2"] {
+            background: #f59e0b !important;
+            color: #451a03 !important;
+            border-color: #fbbf24 !important;
+            font-weight: 900 !important;
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.6) !important;
+            transform: scale(1.1) !important;
+        }
+
+        /* Pleno al 15 seleccionado */
+        .p15-option.selected {
+            background: #f59e0b !important;
+            color: #0b0f19 !important;
+            border-color: #fbbf24 !important;
+            font-weight: 900 !important;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.5) !important;
+            transform: scale(1.1) !important;
+        }
+
+        /* Filas de partido en el modal */
         .pronostico-row, .doubles-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.6rem 0.85rem;
-            background: var(--row-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            margin-bottom: 0.4rem;
-            transition: all 0.2s ease;
+            padding: 0.65rem 0.9rem;
+            background: rgba(30, 41, 59, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.8rem;
+            margin-bottom: 0.45rem;
+            transition: all 0.15s ease;
             gap: 0.75rem;
         }
         .pronostico-row:hover, .doubles-row:hover {
-            background: var(--row-hover);
+            background: rgba(30, 41, 59, 0.85);
             border-color: rgba(245, 158, 11, 0.4);
-            transform: translateX(2px);
         }
         .p-match-info {
             display: flex;
@@ -275,10 +355,10 @@
         }
         .p-match-num {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--primary-orange);
-            font-weight: 800;
-            min-width: 1.5rem;
+            font-weight: 900;
+            min-width: 1.6rem;
         }
         .match-team {
             display: flex;
@@ -287,7 +367,7 @@
             overflow: hidden;
         }
         .team-name {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.85rem;
             color: var(--text-main);
             white-space: nowrap;
@@ -299,69 +379,37 @@
             height: 20px;
             object-fit: contain;
         }
-
-        /* Opciones 1-X-2 táctiles */
         .p-options {
             display: flex;
             gap: 0.4rem;
             align-items: center;
             justify-content: flex-end;
         }
-        .chk-option, .p15-option {
-            background: var(--btn-bg);
-            color: var(--btn-text);
-            border: 1px solid var(--btn-border);
-            border-radius: 0.5rem;
-            padding: 0.4rem 0.85rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            min-width: 2.4rem;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-        }
-        .chk-option:hover, .p15-option:hover {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--primary-orange);
-            border-color: rgba(245, 158, 11, 0.5);
-            transform: scale(1.05);
-        }
-        .chk-option.selected, .p15-option.selected {
-            background: #10b981 !important;
-            color: #064e3b !important;
-            border-color: #34d399 !important;
-            font-weight: 900;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-            transform: scale(1.08);
-        }
 
-        /* Divisores de bloques */
+        /* Divisores de bloques en el modal */
         .p-divider-block {
             height: 1px;
-            background: rgba(245, 158, 11, 0.25);
-            margin: 0.75rem 0;
+            background: rgba(245, 158, 11, 0.3);
+            margin: 0.85rem 0;
             width: 100%;
         }
         .p-divider-p15 {
             display: flex;
             align-items: center;
-            margin: 1rem 0 0.6rem;
+            margin: 1.1rem 0 0.75rem;
         }
         .p-divider-p15::before, .p-divider-p15::after {
             content: '';
             flex: 1;
             height: 1px;
-            background: rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.35);
         }
         .boleto-block-label {
-            padding: 0 0.75rem;
-            font-size: 0.7rem;
-            font-weight: 800;
+            padding: 0 0.85rem;
+            font-size: 0.75rem;
+            font-weight: 900;
             color: var(--primary-orange);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
         }
 
         /* Porcentajes */
@@ -389,11 +437,19 @@
 
         /* Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: var(--bg-panel); border-radius: 9999px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.4); border-radius: 9999px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.5); border-radius: 9999px; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--primary-orange); }
 
-        /* Modales */
+        /* Animación suave para modales */
+        @keyframes modalScaleIn {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal {
+            animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         #audit-modal-overlay.active, #help-doubles-modal.active, #view-jornada-modal.active { display: flex !important; }
     </style>
 </head>
@@ -438,7 +494,7 @@
     </div>
 
     <!-- CONTENEDOR PRINCIPAL V2 -->
-    <div id="main-content" class="max-w-[1600px] mx-auto space-y-4 sm:space-y-5" style="display: none;">
+    <div id="main-content" class="max-w-[1650px] mx-auto space-y-4 sm:space-y-5" style="display: none;">
 
         <!-- =====================================================================
              NIVEL 1: NAVBAR MODERNA SUPERIOR (IDÉNTICA A BOTE 2 Y RESULTADOS 2)
@@ -528,8 +584,8 @@
             <div class="flex items-center gap-3">
                 <span class="p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg sm:text-xl">📝</span>
                 <div>
-                    <strong class="text-slate-800 dark:text-amber-400 font-extrabold text-sm sm:text-base">Pronósticos 2.0 - Sellado Oficial & Cuadro de Mando de la Quiniela</strong>
-                    <p class="text-slate-600 dark:text-slate-400 text-xs">Consulta las apuestas de cada socio en vertical, el método de dobles y gestiona tu pronóstico semanal.</p>
+                    <strong class="text-slate-800 dark:text-amber-400 font-extrabold text-sm sm:text-base">Pronósticos 2.0 - Cuadro de Mando & Sellado Oficial</strong>
+                    <p class="text-slate-600 dark:text-slate-400 text-xs">Parrilla colectiva de apuestas en vertical por socio, gestión de dobles y validación semanal.</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 text-xs flex-wrap justify-center">
@@ -544,15 +600,17 @@
         </div>
 
         <!-- =====================================================================
-             NIVEL 3: HUB DE CONTROL Y SELECTORES (ESTILO JORNADAS 2.0)
+             NIVEL 3: HUB DE CONTROL Y SELECTORES
              ===================================================================== -->
         <section class="glass-panel p-4 sm:p-5 border-amber-500/40 space-y-4">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
                 <div class="flex items-center gap-2.5 flex-wrap">
                     
-                    <!-- SELECTOR DE JORNADA CON FLECHAS ◀ ▶ -->
+                    <!-- SELECTOR DE JORNADA CON FLECHAS ◀ Y ▶ CORREGIDAS
+                         ◀ : REDUCE EL NÚMERO DE JORNADA
+                         ▶ : AUMENTA EL NÚMERO DE JORNADA -->
                     <div class="flex items-center gap-1.5">
-                        <button type="button" id="btn-jornada-prev" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior">
+                        <button type="button" id="btn-jornada-prev" onclick="window.navigateJornadaByNumber(-1)" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior (reducir número)">
                             ◀
                         </button>
                         
@@ -564,7 +622,7 @@
                             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 text-xs pointer-events-none">▼</span>
                         </div>
 
-                        <button type="button" id="btn-jornada-next" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente">
+                        <button type="button" id="btn-jornada-next" onclick="window.navigateJornadaByNumber(1)" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente (aumentar número)">
                             ▶
                         </button>
                     </div>
@@ -578,24 +636,15 @@
                         <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
                     </div>
 
-                    <!-- CHIP DE PLAZO / FECHA LÍMITE -->
-                    <span class="px-3 py-1.5 rounded-xl text-xs font-bold font-mono bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center gap-1.5 shadow-sm">
-                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                        <span id="deadline-info">Cargando plazo...</span>
-                    </span>
+                    <!-- CHIP DE PLAZO OFICIAL / CIERRE CON ALTO CONTRASTE -->
+                    <div id="deadline-info-wrap" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-slate-900 border border-slate-700 text-white flex items-center gap-2 shadow-sm">
+                        <span id="deadline-led-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="deadline-info" class="text-slate-100">Cargando plazo...</span>
+                    </div>
                 </div>
 
                 <!-- BOTONES DE ACCIÓN DEL HUB -->
                 <div class="flex items-center gap-2 flex-wrap justify-end">
-                    <!-- Modo Corrección Toggle -->
-                    <label class="flex items-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 transition shadow-sm">
-                        <div class="relative inline-block w-9 h-5">
-                            <input type="checkbox" id="chk-correction-mode" class="peer sr-only">
-                            <div class="w-9 h-5 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500 shadow-inner"></div>
-                        </div>
-                        <span id="lbl-correction" class="text-xs font-bold text-slate-700 dark:text-slate-300">Modo Corrección</span>
-                    </label>
-
                     <button type="button" id="btn-help-doubles" class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-blue-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                         <span>❓</span> Ayuda Sellado
                     </button>
@@ -608,115 +657,205 @@
         </section>
 
         <!-- =====================================================================
-             NIVEL 4: BENTO KPIS (4 TARJETAS RESUMEN DE INFORMACIÓN)
+             NIVEL 4: 4 TARJETAS BENTO RESUMEN (CON EXPLICATIVAS ℹ️ & RELOJ DASHBOARD)
              ===================================================================== -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-            <!-- KPI 1: Estado del Plazo de Sellado -->
+            <!-- KPI 1: Plazo Oficial con Reloj Digital Sincronizado -->
             <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40 flex items-center gap-1">
                             <span>⏱️</span> Plazo Oficial
                         </span>
-                        <span class="text-lg">📅</span>
+
+                        <!-- Tarjeta Explicativa ℹ️ -->
+                        <div class="group/tip relative inline-flex cursor-help shrink-0">
+                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                ℹ️
+                            </div>
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                    <span>⏱️</span> Plazo Límite de Relleno
+                                </strong>
+                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                    <p class="text-amber-200 font-semibold">Regla Maula Oficial: El jueves a las 17:00h es la hora límite para rellenar la quiniela.</p>
+                                    <p>Permite al administrador calcular la combinación autorizada y asignar los dobles a tiempo. Los pronósticos posteriores se marcan como tardíos y aplican penalización al bote.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h4 id="kpi-plazo-estado" class="text-lg sm:text-xl font-black text-slate-800 dark:text-white font-mono">En Plazo</h4>
-                    <p id="kpi-plazo-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Cierre oficial el viernes antes de que arranque la jornada.</p>
+
+                    <!-- Estado del Plazo -->
+                    <div class="flex items-center justify-between mt-1">
+                        <h4 id="kpi-plazo-estado" class="text-lg font-black text-slate-800 dark:text-white font-mono">En Plazo</h4>
+                        <span id="kpi-cd-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Abierto</span>
+                    </div>
+
+                    <!-- Reloj Cuenta Atrás Sincronizado con Dashboard 2 -->
+                    <div class="mt-2.5 p-2 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-0.5">Tiempo Restante para el Cierre</span>
+                        <div id="kpi-countdown-timer" class="font-mono text-sm sm:text-base font-black text-amber-400 tracking-wider">
+                            --d --h --m --s
+                        </div>
+                    </div>
                 </div>
+
                 <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                    <span>Reglamento Maula</span>
-                    <span class="text-amber-500 font-bold">Sin penalización</span>
+                    <span>Límite Semanal</span>
+                    <span id="kpi-deadline-date" class="text-amber-500 font-bold">Jueves 17:00h</span>
                 </div>
             </div>
 
-            <!-- KPI 2: Pronósticos Recibidos -->
+            <!-- KPI 2: Censo Sellado -->
             <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
                             <span>📋</span> Censo Sellado
                         </span>
-                        <span class="text-lg">👥</span>
+
+                        <!-- Tarjeta Explicativa ℹ️ -->
+                        <div class="group/tip relative inline-flex cursor-help shrink-0">
+                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                ℹ️
+                            </div>
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                                    <span>📋</span> Censo y Participación
+                                </strong>
+                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                    <p>Computa en tiempo real qué porcentaje de los 16 socios de la peña ha registrado sus 14 signos y el Pleno al 15.</p>
+                                    <p class="text-emerald-300">Si un socio tiene activado el comodín de ausencia (Dado 🎲), el sistema rellenará al azar sus signos sin penalización.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-baseline gap-2">
+
+                    <div class="flex items-baseline gap-2 mt-1">
                         <h4 id="kpi-recibidos-count" class="text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">-- / 16</h4>
                         <span id="kpi-recibidos-pct" class="text-xs font-bold text-slate-500 dark:text-slate-400">0%</span>
                     </div>
+
                     <!-- Barra de progreso -->
-                    <div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+                    <div class="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full mt-2.5 overflow-hidden">
                         <div id="kpi-recibidos-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style="width: 0%;"></div>
                     </div>
                 </div>
+
                 <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
                     <span>Estado colectivo</span>
                     <span id="kpi-recibidos-sub" class="text-emerald-500 font-bold">Calculando...</span>
                 </div>
             </div>
 
-            <!-- KPI 3: Gestión de Dobles y Método -->
+            <!-- KPI 3: Gestión de Dobles (Con botón para ir a rellenar dobles) -->
             <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1">
                             <span>🎲</span> Quiniela Dobles
                         </span>
-                        <span class="text-lg">🎯</span>
+
+                        <!-- Tarjeta Explicativa ℹ️ -->
+                        <div class="group/tip relative inline-flex cursor-help shrink-0">
+                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                ℹ️
+                            </div>
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
+                                    <span>🎲</span> Boleto Colectivo de Dobles
+                                </strong>
+                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                    <p>La combinación de dobles autorizada por la peña (Reducida 2: 7 dobles = 16 apuestas = 12,00 €).</p>
+                                    <p class="text-purple-300">El socio que obtuvo mayor puntuación en la jornada anterior tiene el privilegio de elegir los 7 partidos dobles.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h4 id="doubles-counter" class="text-base sm:text-lg font-black text-purple-600 dark:text-purple-400 font-mono leading-tight">0 Dobles, 0 Triples</h4>
-                    <p id="kpi-dobles-metodo" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Reducida 2: 7 Dobles (16 apuestas)</p>
+
+                    <h4 id="kpi-dobles-status-clean" class="text-base font-black text-purple-600 dark:text-purple-400 font-mono leading-tight">Reducida 2: 7 Dobles</h4>
+                    <p id="kpi-dobles-responsable" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Coste oficial: 12.00 € (16 apuestas)</p>
+
+                    <!-- Control para rellenar dobles directamente en modal -->
+                    <button type="button" onclick="window.openEditorForDoubles()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
+                        <span>🎲</span> Rellenar Quiniela de Dobles
+                    </button>
                 </div>
+
                 <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                    <span>Coste Oficial</span>
-                    <span id="cost-info" class="font-mono text-amber-500 font-bold">12.00 €</span>
+                    <span>Estado Sellado</span>
+                    <span id="kpi-dobles-badge" class="text-purple-400 font-bold">Comprobar</span>
                 </div>
             </div>
 
-            <!-- KPI 4: Socio Seleccionado Activo -->
+            <!-- KPI 4: Socio Activo (Con botón funcional para editar su boleto) -->
             <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/40 flex items-center gap-1">
                             <span>👤</span> Socio Activo
                         </span>
-                        <span class="text-lg">⭐</span>
+
+                        <!-- Tarjeta Explicativa ℹ️ -->
+                        <div class="group/tip relative inline-flex cursor-help shrink-0">
+                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                ℹ️
+                            </div>
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                <strong class="text-sky-400 block mb-1 font-bold flex items-center gap-1.5">
+                                    <span>👤</span> Gestión de Boleto Individual
+                                </strong>
+                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                    <p>Indica el socio cargado actualmente en el sistema. Puedes consultar su boleto, ver sus aciertos o modificar sus pronósticos.</p>
+                                    <p class="text-amber-200 font-semibold">Haz clic en "Editar Boleto" para abrir la ventana emergente con los 15 partidos.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                     <h4 id="kpi-socio-name" class="text-lg font-black text-slate-800 dark:text-white truncate">Selecciona socio</h4>
                     <div id="kpi-socio-status" class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
                         <span class="led-status-indicator led-red"></span>
                         <span>Sin pronóstico cargado</span>
                     </div>
+
+                    <!-- Botón funcional para abrir ventana modal de edición -->
+                    <button type="button" onclick="window.openEditorForCurrentMember()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
+                        <span>✏️</span> Editar Boleto de este Socio
+                    </button>
                 </div>
+
                 <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between items-center">
-                    <span>Acción rápida</span>
-                    <button type="button" onclick="document.getElementById('editor-toggle-btn').click();" class="text-amber-500 font-bold hover:underline">Editar Boleto ↓</button>
+                    <span>Penalización unos</span>
+                    <span id="cost-info-kpi" class="text-emerald-500 font-mono font-bold">0.00 €</span>
                 </div>
             </div>
 
         </div>
 
         <!-- =====================================================================
-             NIVEL 5 (PRINCIPAL): PANEL GENERAL DE SELLADO (PRONÓSTICOS EN VERTICAL)
+             NIVEL 5: PANEL GENERAL DE SELLADO (PRONÓSTICOS DE CADA SOCIO EN VERTICAL)
              ===================================================================== -->
         <section class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4">
-            <!-- Header de la tabla -->
+            
             <div class="flex flex-col sm:flex-row justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800 gap-3">
                 <div class="flex items-center gap-2.5">
                     <span class="p-2 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg">📊</span>
                     <div>
                         <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
                             <span>Panel General de Sellado</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">Visualización Vertical 1-X-2</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">Parrilla Vertical 1-X-2</span>
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Todos los pronósticos alineados en columnas verticales por socio. Haz clic en cualquier casilla para editar.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Todos los pronósticos en columnas verticales por socio. Haz clic en cualquier casilla para abrir su boleto.</p>
                     </div>
                 </div>
 
                 <!-- Leyenda de Estados y Signos -->
-                <div class="flex items-center gap-3 text-xs font-bold flex-wrap justify-end">
-                    <span class="flex items-center gap-1.5"><span class="sign-mini sign-mini-1 scale-90">1</span> Local</span>
-                    <span class="flex items-center gap-1.5"><span class="sign-mini sign-mini-X scale-90">X</span> Empate</span>
-                    <span class="flex items-center gap-1.5"><span class="sign-mini sign-mini-2 scale-90">2</span> Visitante</span>
+                <div class="flex items-center gap-2.5 text-xs font-bold flex-wrap justify-end">
+                    <span class="flex items-center gap-1.5"><span class="sign-pill-v sign-pill-v-1 scale-75">1</span> Local</span>
+                    <span class="flex items-center gap-1.5"><span class="sign-pill-v sign-pill-v-X scale-75">X</span> Empate</span>
+                    <span class="flex items-center gap-1.5"><span class="sign-pill-v sign-pill-v-2 scale-75">2</span> Visitante</span>
                     <span class="border-l border-slate-300 dark:border-slate-700 h-4 mx-1"></span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-green"></span> Completo</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-yellow"></span> Falta Dobles</span>
@@ -724,145 +863,151 @@
                 </div>
             </div>
 
-            <!-- Tabla de Datos Data Grid con scroll horizontal suave -->
-            <div id="summary-container" class="w-full overflow-x-auto custom-scroll rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/50 shadow-inner">
+            <!-- Tabla Data Grid con separadores verticales y horizontales -->
+            <div id="summary-container" class="w-full overflow-x-auto custom-scroll rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
                 <table id="forecast-summary-table">
                     <thead>
-                        <!-- Generado por el script mejorado -->
+                        <!-- Generado dinámicamente -->
                     </thead>
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
-                        <!-- Generado por el script mejorado -->
+                    <tbody class="divide-y-2 divide-slate-300 dark:divide-slate-800">
+                        <!-- Generado dinámicamente con píldoras verticales -->
                     </tbody>
                 </table>
             </div>
-            
-            <div class="text-right text-[11px] text-slate-500 dark:text-slate-400 pt-1">
-                * Pulsa en la columna de cualquier socio para cargar y rellenar su quiniela en el editor inferior.
-            </div>
-        </section>
 
-        <!-- =====================================================================
-             NIVEL 6: EDITOR DE QUINIELA INDIVIDUAL Y DOBLES (DESPLEGABLE / COMPACTO)
-             ===================================================================== -->
-        <section id="forecast-editor-card" class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4">
-            
-            <!-- Barra de control del editor (Siempre visible con botón para plegar/desplegar) -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
-                <div class="flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg">📝</span>
-                    <div>
-                        <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
-                            <span>Editor de Boleto</span>
-                            <span id="active-selection-badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-slate-100 dark:bg-slate-800 text-amber-500 font-bold border border-slate-300 dark:border-slate-700">Selecciona un socio</span>
-                        </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Rellena los 15 signos oficiales de la quiniela individual y la combinación de dobles autorizada.</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <button type="button" id="editor-toggle-btn" class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                        <span id="editor-toggle-icon">▼</span>
-                        <span id="editor-toggle-text">Ocultar Editor</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Contenido desplegable del editor -->
-            <div id="editor-collapsible-body" class="space-y-4">
-                
-                <!-- Status y selección activa -->
-                <div id="active-selection-info" class="text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
-                    <!-- Inyectado por JS -->
-                </div>
-
-                <div id="status-message" class="text-center min-h-[24px] font-bold text-sm"></div>
-
-                <!-- GRID EN 2 COLUMNAS (QUINIELA BASE & DOBLES) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                    
-                    <!-- COLUMNA IZQUIERDA: QUINIELA BASE (15 PARTIDOS) -->
-                    <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
-                                <h4 class="font-black text-slate-800 dark:text-white text-base flex items-center gap-2">
-                                    <span>⚽</span> Quiniela Base (15 Partidos)
-                                </h4>
-                                <span class="text-xs text-slate-500 font-mono">14 signos + Pleno</span>
-                            </div>
-
-                            <div id="forecast-container" class="space-y-1 max-h-[600px] overflow-y-auto custom-scroll pr-1">
-                                <!-- 15 Filas de partidos generadas por JS -->
-                            </div>
-                        </div>
-
-                        <!-- Botones de Guardado Base -->
-                        <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
-                            <button id="btn-clear-forecast" class="hidden px-4 py-2 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 rounded-xl hover:bg-rose-200 dark:hover:bg-rose-500/20 font-bold text-xs transition shadow-sm">
-                                🗑️ Limpiar Todo
-                            </button>
-                            <button id="btn-save" class="hidden px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition shadow-[0_0_15px_rgba(16,185,129,0.4)] ml-auto">
-                                💾 Guardar Pronóstico Base
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- COLUMNA DERECHA: GESTIÓN DE DOBLES -->
-                    <div id="doubles-section" class="hidden p-4 sm:p-5 rounded-2xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-500/30 flex-col justify-between">
-                        <div>
-                            <!-- Header de Dobles -->
-                            <div id="doubles-status-card" class="flex justify-between items-center mb-3 pb-2 border-b border-purple-200 dark:border-purple-500/20">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xl">🎲</span>
-                                    <div>
-                                        <h4 class="font-black text-slate-800 dark:text-white text-base">Quiniela de Dobles</h4>
-                                        <span class="text-[11px] text-purple-600 dark:text-purple-300">Socio responsable esta jornada</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Selector de Método -->
-                            <div class="mb-3 space-y-1.5">
-                                <label class="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Método de Sellado:</label>
-                                <select id="sel-method" class="bg-white dark:bg-slate-900 border border-purple-300 dark:border-purple-500/40 text-slate-800 dark:text-white rounded-xl px-3.5 py-2 font-bold focus:outline-none focus:border-purple-500 w-full text-xs shadow-sm">
-                                    <option value="directo">Apuestas Directas</option>
-                                    <option value="reducida-1">Reducida 1: 4 Triples (9 apuestas)</option>
-                                    <option value="reducida-2">Reducida 2: 7 Dobles (16 apuestas)</option>
-                                    <option value="reducida-3">Reducida 3: 3 Dobles + 3 Triples (24 apuestas)</option>
-                                    <option value="reducida-4">Reducida 4: 2 Triples + 6 Dobles (64 apuestas)</option>
-                                    <option value="reducida-5">Reducida 5: 8 Triples (81 apuestas)</option>
-                                    <option value="reducida-6">Reducida 6: 11 Dobles (132 apuestas)</option>
-                                </select>
-                                
-                                <button id="btn-copy-forecast" class="w-full mt-2 px-3.5 py-1.5 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/40 rounded-xl hover:bg-indigo-200 dark:hover:bg-indigo-500/30 transition font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
-                                    📋 Copiar Pronósticos de la Quiniela Base
-                                </button>
-                            </div>
-
-                            <div id="doubles-status" class="text-center font-bold text-xs mb-2 text-purple-500"></div>
-
-                            <!-- Contenedor de Dobles -->
-                            <div id="doubles-container" class="space-y-1 max-h-[480px] overflow-y-auto custom-scroll pr-1">
-                                <!-- 15 Filas de dobles generadas por JS -->
-                            </div>
-                        </div>
-
-                        <!-- Botón Guardar Dobles -->
-                        <div class="mt-4 pt-3 border-t border-purple-200 dark:border-purple-500/20">
-                            <button id="btn-save-doubles" class="w-full px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs transition shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                                💾 Guardar Quiniela de Dobles
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
+            <div class="text-right text-[11px] text-slate-500 dark:text-slate-400 pt-1 font-mono">
+                💡 Haz clic en la columna de cualquier socio para abrir su ventana emergente de edición.
             </div>
         </section>
 
     </div>
 
     <!-- =====================================================================
-         MODALES AUXILIARES REQUERIDOS POR EL MOTOR JS
+         VENTANA MODAL FLOTANTE DE EDICIÓN DE BOLETO
+         (SE ABRE AL PINCHAR EN EL PRONÓSTICO DE UN SOCIO O PULSAR EDITAR BOLETO)
+         ===================================================================== -->
+    <div id="modal-editor-boleto" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
+        <div class="glass-panel w-full max-w-4xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal">
+            
+            <!-- Cabecera del Modal -->
+            <div class="bg-slate-900/90 p-4 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl p-2 rounded-xl bg-amber-500/20 text-amber-400">📝</span>
+                    <div>
+                        <h3 id="modal-editor-title" class="text-base sm:text-lg font-black text-white">Editar Boleto de Quiniela</h3>
+                        <p id="modal-editor-subtitle" class="text-xs text-slate-400">Rellena los 15 signos del pronóstico individual</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Modo Corrección Toggle (EXCLUSIVO DE LA VENTANA DE EDICIÓN) -->
+                    <label class="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-700 hover:border-slate-500 transition shadow-inner">
+                        <div class="relative inline-block w-8 h-4">
+                            <input type="checkbox" id="chk-correction-mode" class="peer sr-only">
+                            <div class="w-8 h-4 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-amber-500"></div>
+                        </div>
+                        <span id="lbl-correction" class="text-[11px] font-bold text-slate-300">Modo Corrección</span>
+                    </label>
+
+                    <button type="button" onclick="window.closeEditorModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold text-lg transition">✕</button>
+                </div>
+            </div>
+
+            <!-- Pestañas de Navegación del Modal: Quiniela Base / Quiniela Dobles -->
+            <div class="flex border-b border-slate-800 bg-slate-950/60 p-2 gap-2 shrink-0">
+                <button type="button" id="tab-btn-base" onclick="window.switchEditorTab('base')" class="flex-1 py-2 px-3 rounded-xl font-black text-xs transition bg-amber-500 text-slate-950 shadow-md">
+                    ⚽ Quiniela Base (15 Partidos)
+                </button>
+                <button type="button" id="tab-btn-doubles" onclick="window.switchEditorTab('doubles')" class="flex-1 py-2 px-3 rounded-xl font-bold text-xs transition bg-slate-900 text-slate-400 hover:text-white">
+                    🎲 Quiniela de Dobles
+                </button>
+            </div>
+
+            <!-- Cuerpo del Modal Scrollable -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-5 custom-scroll space-y-4">
+                
+                <!-- Barra de aviso y penalización de unos -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/70 border border-slate-800">
+                    <div id="active-selection-info" class="text-xs font-bold text-slate-300">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div id="cost-info" class="font-mono text-xs font-bold text-amber-400">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div id="status-message" class="text-center font-bold text-sm min-h-[20px]"></div>
+
+                <!-- CONTENIDO PESTAÑA 1: QUINIELA BASE -->
+                <div id="editor-view-base" class="space-y-1">
+                    <div id="forecast-container" class="space-y-1">
+                        <!-- 15 Filas de partidos generadas por pronosticos.js -->
+                    </div>
+                </div>
+
+                <!-- CONTENIDO PESTAÑA 2: QUINIELA DE DOBLES -->
+                <div id="editor-view-doubles" class="hidden space-y-4">
+                    <div id="doubles-section" class="flex flex-col gap-3">
+                        <div class="p-4 rounded-xl bg-purple-950/30 border border-purple-500/40">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <h4 class="font-black text-white text-base">Configuración de Dobles</h4>
+                                    <p class="text-xs text-purple-300">Elige el método de sellado de la peña</p>
+                                </div>
+                                <div id="doubles-counter" class="font-mono text-xs font-black px-3 py-1.5 rounded-lg bg-slate-950 text-amber-400 border border-purple-500/50">
+                                    0 Dobles, 0 Triples
+                                </div>
+                            </div>
+
+                            <select id="sel-method" class="w-full p-2.5 bg-slate-900 border border-purple-500/50 text-white rounded-xl font-bold text-xs focus:outline-none focus:border-purple-400">
+                                <option value="directo">Apuestas Directas</option>
+                                <option value="reducida-1">Reducida 1: 4 Triples (9 apuestas)</option>
+                                <option value="reducida-2">Reducida 2: 7 Dobles (16 apuestas)</option>
+                                <option value="reducida-3">Reducida 3: 3 Dobles + 3 Triples (24 apuestas)</option>
+                                <option value="reducida-4">Reducida 4: 2 Triples + 6 Dobles (64 apuestas)</option>
+                                <option value="reducida-5">Reducida 5: 8 Triples (81 apuestas)</option>
+                                <option value="reducida-6">Reducida 6: 11 Dobles (132 apuestas)</option>
+                            </select>
+
+                            <button type="button" id="btn-copy-forecast" class="w-full mt-2.5 px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/50 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5">
+                                📋 Copiar Pronósticos de la Quiniela Base
+                            </button>
+                        </div>
+
+                        <div id="doubles-status" class="text-center font-bold text-xs text-purple-400"></div>
+
+                        <div id="doubles-container" class="space-y-1">
+                            <!-- 15 Filas de dobles generadas por JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer del Modal -->
+            <div class="bg-slate-900/90 p-4 border-t border-slate-800 flex items-center justify-between gap-3 shrink-0">
+                <button type="button" id="btn-clear-forecast" class="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition">
+                    🗑️ Limpiar Todo
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.closeEditorModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+                        Cerrar
+                    </button>
+                    <button type="button" id="btn-save" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition shadow-lg">
+                        💾 Guardar Pronóstico Base
+                    </button>
+                    <button type="button" id="btn-save-doubles" class="hidden px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs transition shadow-lg">
+                        💾 Guardar Quiniela de Dobles
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODALES AUXILIARES REQUERIDOS (AUDITORÍA, AYUDA Y VER COLECTIVO)
          ===================================================================== -->
     <!-- Modal 1: Auditoría de Corrección -->
     <div id="audit-modal-overlay" class="hidden fixed inset-0 bg-slate-900/80 dark:bg-slate-950/85 backdrop-blur-sm z-[99999] items-center justify-center p-4">
@@ -985,413 +1130,564 @@
     <script src="js/frases.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/dice-service.js"></script>
+    
+    <!-- Script de Pronósticos V1 -->
     <script src="js/pronosticos.js?v=20240323_v1"></script>
 
     <!-- =====================================================================
-         MOTOR DE ENRIQUECIMIENTO V2 (VERTICAL DATA GRID & BENTO KPIS)
+         MOTOR DE EXTENSIÓN V2:
+         - RENDERIZADO VERTICAL EXACTO DE LA TABLA (IMAGEN 2)
+         - GESTIÓN DE VENTANA MODAL FLOTANTE
+         - RELOJ CUENTA ATRÁS DASHBOARD 2
+         - CORRECCIÓN DE COLORES 1-VERDE, X-AZUL, 2-AMARILLO
          ===================================================================== -->
     <script>
+        // 1. NAVEGACIÓN DE JORNADA (◀ REDUCE NÚMERO, ▶ AUMENTA NÚMERO)
+        window.navigateJornadaByNumber = function(direction) {
+            const sel = document.getElementById('sel-jornada');
+            if (!sel || !sel.options || sel.options.length === 0) return;
+
+            const opts = Array.from(sel.options).map((opt, idx) => {
+                const m = opt.textContent.match(/Jornada\s+(\d+)/i);
+                return {
+                    index: idx,
+                    num: m ? parseInt(m[1]) : idx
+                };
+            });
+
+            const curr = opts.find(o => o.index === sel.selectedIndex);
+            if (!curr) return;
+
+            // Ordenar por número ascendente (J1, J2, J3, ...)
+            opts.sort((a, b) => a.num - b.num);
+            const currSortedIdx = opts.findIndex(o => o.index === curr.index);
+            const targetSortedIdx = currSortedIdx + direction;
+
+            if (targetSortedIdx >= 0 && targetSortedIdx < opts.length) {
+                sel.selectedIndex = opts[targetSortedIdx].index;
+                sel.dispatchEvent(new Event('change'));
+            }
+        };
+
+        // 2. GESTIÓN DE LA VENTANA MODAL DEL EDITOR
+        window.openEditorModal = function(memberId = null, openDoublesTab = false) {
+            const modal = document.getElementById('modal-editor-boleto');
+            if (!modal) return;
+
+            if (window.app) {
+                if (memberId) {
+                    window.app.currentMemberId = memberId;
+                    if (window.app.selMember) window.app.selMember.value = memberId;
+                }
+                window.app.loadForecast();
+            }
+
+            // Cambiar pestaña si se solicitó dobles
+            if (openDoublesTab) {
+                window.switchEditorTab('doubles');
+            } else {
+                window.switchEditorTab('base');
+            }
+
+            // Actualizar título del modal
+            const titleEl = document.getElementById('modal-editor-title');
+            const subEl = document.getElementById('modal-editor-subtitle');
+            if (window.app && window.app.members) {
+                const m = window.app.members.find(mem => String(mem.id) === String(window.app.currentMemberId));
+                const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+                const mName = m ? AppUtils.getMemberName(m) : 'Socio';
+                const jNum = j ? `Jornada ${j.number}` : '';
+                if (titleEl) titleEl.textContent = `Boleto de Quiniela - ${mName}`;
+                if (subEl) subEl.textContent = `${jNum} • Rellena los 15 signos o la combinación de dobles`;
+            }
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeEditorModal = function() {
+            const modal = document.getElementById('modal-editor-boleto');
+            if (modal) modal.style.display = 'none';
+            document.body.style.overflow = '';
+            // Refrescar tabla vertical por si hubo cambios
+            if (window.app && window.app.renderSummaryTable) {
+                window.app.renderSummaryTable();
+            }
+        };
+
+        window.openEditorForCurrentMember = function() {
+            const selM = document.getElementById('sel-member');
+            const mId = selM ? selM.value : null;
+            window.openEditorModal(mId, false);
+        };
+
+        window.openEditorForDoubles = function() {
+            window.openEditorModal(null, true);
+        };
+
+        window.switchEditorTab = function(tab) {
+            const viewBase = document.getElementById('editor-view-base');
+            const viewDoubles = document.getElementById('editor-view-doubles');
+            const tabBtnBase = document.getElementById('tab-btn-base');
+            const tabBtnDoubles = document.getElementById('tab-btn-doubles');
+            const btnSaveBase = document.getElementById('btn-save');
+            const btnSaveDoubles = document.getElementById('btn-save-doubles');
+
+            if (tab === 'base') {
+                if (viewBase) viewBase.classList.remove('hidden');
+                if (viewDoubles) viewDoubles.classList.add('hidden');
+                if (tabBtnBase) {
+                    tabBtnBase.className = 'flex-1 py-2 px-3 rounded-xl font-black text-xs transition bg-amber-500 text-slate-950 shadow-md';
+                }
+                if (tabBtnDoubles) {
+                    tabBtnDoubles.className = 'flex-1 py-2 px-3 rounded-xl font-bold text-xs transition bg-slate-900 text-slate-400 hover:text-white';
+                }
+                if (btnSaveBase) btnSaveBase.classList.remove('hidden');
+                if (btnSaveDoubles) btnSaveDoubles.classList.add('hidden');
+            } else {
+                if (viewBase) viewBase.classList.add('hidden');
+                if (viewDoubles) viewDoubles.classList.remove('hidden');
+                if (tabBtnBase) {
+                    tabBtnBase.className = 'flex-1 py-2 px-3 rounded-xl font-bold text-xs transition bg-slate-900 text-slate-400 hover:text-white';
+                }
+                if (tabBtnDoubles) {
+                    tabBtnDoubles.className = 'flex-1 py-2 px-3 rounded-xl font-black text-xs transition bg-purple-600 text-white shadow-md';
+                }
+                if (btnSaveBase) btnSaveBase.classList.add('hidden');
+                if (btnSaveDoubles) btnSaveDoubles.classList.remove('hidden');
+            }
+        };
+
+        // 3. SOBREESCRIBIR INMEDIATAMENTE EL PROTOTYPE DE PronosticoManager
+        if (window.PronosticoManager) {
+            
+            // Interceptar renderSummaryTable para generar las píldoras verticales idénticas a Imagen 2
+            PronosticoManager.prototype.renderSummaryTable = function() {
+                if (!this.summaryTable) return;
+
+                const thead = this.summaryTable.querySelector('thead');
+                const tbody = this.summaryTable.querySelector('tbody');
+                if (!thead || !tbody) return;
+                thead.innerHTML = '';
+                tbody.innerHTML = '';
+
+                const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
+                // Jornada de referencia para encabezados LED
+                const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+                let targetJornadaForHeader = null;
+                if (this.currentJornadaId) {
+                    targetJornadaForHeader = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
+                }
+                if (!targetJornadaForHeader) {
+                    targetJornadaForHeader = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
+                }
+
+                // CABECERA THEAD
+                const headerRow = document.createElement('tr');
+                
+                // Columna Sticky de Jornada e Índice 1-15
+                const stickyTh = document.createElement('th');
+                stickyTh.className = 'summary-sticky-col summary-header-cell';
+                stickyTh.style.minWidth = '115px';
+                stickyTh.innerHTML = `
+                    <div class="flex items-center justify-between px-1">
+                        <span class="font-black text-amber-500 text-xs">Jornada</span>
+                        <span class="text-[10px] font-mono text-slate-400 font-bold"># 1-15</span>
+                    </div>
+                `;
+                headerRow.appendChild(stickyTh);
+
+                // Columnas de Cada Socio
+                sortedMembers.forEach((m) => {
+                    const th = document.createElement('th');
+                    th.className = 'summary-header-cell';
+                    th.style.minWidth = '48px';
+                    th.style.maxWidth = '55px';
+                    th.setAttribute('data-mid', m.id);
+                    
+                    const led = this.getMemberStatusLed(m.id, targetJornadaForHeader);
+                    const jNumText = targetJornadaForHeader ? `J${targetJornadaForHeader.number}: ` : '';
+                    const nameParts = AppUtils.getMemberName(m).split(' ');
+                    const shortName = nameParts[0].length > 7 ? nameParts[0].substring(0, 6) + '.' : nameParts[0];
+
+                    th.innerHTML = `
+                        <div class="flex flex-col items-center justify-center gap-1 cursor-pointer group py-1" onclick="window.openEditorModal(${m.id}, false)">
+                            <span class="led-status-indicator led-${led.status}" title="${jNumText}${led.title}"></span>
+                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-amber-400 transition-colors" title="${AppUtils.getMemberName(m)}">${shortName}</span>
+                        </div>
+                    `;
+                    headerRow.appendChild(th);
+                });
+
+                // Columna Quiniela Dobles
+                const thDoubles = document.createElement('th');
+                thDoubles.className = 'summary-header-cell';
+                thDoubles.style.minWidth = '54px';
+                thDoubles.innerHTML = `
+                    <div class="flex flex-col items-center justify-center gap-1 cursor-pointer py-1" onclick="window.openEditorModal(null, true)">
+                        <span class="text-xs">🎲</span>
+                        <span class="text-[10px] font-black text-purple-400">DOBLES</span>
+                    </div>
+                `;
+                headerRow.appendChild(thDoubles);
+
+                thead.appendChild(headerRow);
+
+                // Mapas de Búsqueda Rápida O(1)
+                const pronosticosMap = new Map();
+                const jornadasConPronostico = new Set();
+                if (this.pronosticos && Array.isArray(this.pronosticos)) {
+                    this.pronosticos.forEach(p => {
+                        if (!p) return;
+                        const jIds = [];
+                        if (p.jId !== undefined && p.jId !== null) jIds.push(String(p.jId));
+                        if (p.jornadaId !== undefined && p.jornadaId !== null) jIds.push(String(p.jornadaId));
+                        const mIds = [];
+                        if (p.mId !== undefined && p.mId !== null) mIds.push(String(p.mId));
+                        if (p.memberId !== undefined && p.memberId !== null) mIds.push(String(p.memberId));
+
+                        jIds.forEach(j => {
+                            jornadasConPronostico.add(j);
+                            mIds.forEach(m => {
+                                pronosticosMap.set(`${j}_${m}`, p);
+                            });
+                        });
+                    });
+                }
+
+                const pronosticosExtraMap = new Map();
+                const jornadasConDobles = new Set();
+                if (this.pronosticosExtra && Array.isArray(this.pronosticosExtra)) {
+                    this.pronosticosExtra.forEach(p => {
+                        if (!p) return;
+                        const jId = String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId);
+                        const hasValid = p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                        if (hasValid) {
+                            jornadasConDobles.add(jId);
+                            pronosticosExtraMap.set(jId, p);
+                        }
+                    });
+                }
+
+                // Filtrar Jornadas Relevantes
+                let sortedJornadas = [...this.jornadas].sort((a, b) => b.number - a.number);
+                sortedJornadas = sortedJornadas.filter(j => {
+                    const hasMatches = j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
+                    const hasForecasts = jornadasConPronostico.has(String(j.id));
+                    const hasDobles = jornadasConDobles.has(String(j.id));
+                    return hasMatches || hasForecasts || hasDobles;
+                });
+
+                if (sortedJornadas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="100%" class="p-8 text-center text-slate-500 font-bold">No hay pronósticos registrados todavía.</td></tr>';
+                    return;
+                }
+
+                // CONSTRUCCIÓN DE FILAS CON PÍLDORAS EN VERTICAL
+                let tbodyHtml = '';
+                sortedJornadas.forEach(j => {
+                    let dateFormatted = j.date;
+                    try {
+                        const d = AppUtils.parseDate(j.date);
+                        if (d) dateFormatted = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+                    } catch (e) {}
+
+                    const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
+
+                    // Columna Sticky Izquierda con el índice del 1 al 15 perfectamente alineado
+                    let rowHtml = `<tr>
+                        <td class="summary-sticky-col summary-cell p-2">
+                            <div class="flex items-start justify-between gap-1.5 h-full">
+                                <div class="flex flex-col text-left justify-start">
+                                    <div class="font-black text-amber-500 text-sm flex items-center gap-1">
+                                        <span>J${j.number}</span>
+                                        ${hasPig ? '<span title="Partido PIG">🐷</span>' : ''}
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 font-mono mt-0.5">${dateFormatted}</div>
+                                </div>
+                                <div class="flex flex-col gap-[3px] items-center font-mono text-[9px] text-slate-400 dark:text-slate-500 font-bold border-l border-slate-300 dark:border-slate-800 pl-1.5 select-none">
+                                    <span class="h-[25px] flex items-center">1</span>
+                                    <span class="h-[25px] flex items-center">2</span>
+                                    <span class="h-[25px] flex items-center">3</span>
+                                    <span class="h-[25px] flex items-center">4</span>
+                                    <div class="w-3 border-b border-slate-400 dark:border-slate-700 my-0.5"></div>
+                                    <span class="h-[25px] flex items-center">5</span>
+                                    <span class="h-[25px] flex items-center">6</span>
+                                    <span class="h-[25px] flex items-center">7</span>
+                                    <span class="h-[25px] flex items-center">8</span>
+                                    <div class="w-3 border-b border-slate-400 dark:border-slate-700 my-0.5"></div>
+                                    <span class="h-[25px] flex items-center">9</span>
+                                    <span class="h-[25px] flex items-center">10</span>
+                                    <span class="h-[25px] flex items-center">11</span>
+                                    <div class="w-3 border-b border-slate-400 dark:border-slate-700 my-0.5"></div>
+                                    <span class="h-[25px] flex items-center">12</span>
+                                    <span class="h-[25px] flex items-center">13</span>
+                                    <span class="h-[25px] flex items-center">14</span>
+                                    <div class="w-3 border-b border-amber-500 my-0.5"></div>
+                                    <span class="h-[25px] flex items-center text-amber-500 font-black">15</span>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+
+                    // Celdas de Pronósticos en VERTICAL por cada Socio
+                    sortedMembers.forEach((m) => {
+                        const jIdStr = String(j.id);
+                        const mIdStr = String(m.id);
+                        const p = pronosticosMap.get(`${jIdStr}_${mIdStr}`);
+
+                        let isPlayed = false;
+                        if (p && p.selection && Array.isArray(p.selection)) {
+                            isPlayed = p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                        }
+
+                        const cellLed = this.getMemberStatusLed(m.id, j);
+                        let cellContent = '';
+
+                        if (isPlayed) {
+                            let signsHtml = '';
+                            for (let i = 0; i < 15; i++) {
+                                const rawSign = p.selection ? p.selection[i] : null;
+                                const s = (rawSign && String(rawSign).trim() !== '' && String(rawSign).trim() !== '-') ? String(rawSign).trim() : '-';
+                                
+                                let pillClass = 'sign-pill-v-empty';
+                                if (s === '1') pillClass = 'sign-pill-v-1';
+                                else if (s === 'X' || s === 'x') pillClass = 'sign-pill-v-X';
+                                else if (s === '2') pillClass = 'sign-pill-v-2';
+                                else if (s !== '-') pillClass = 'sign-pill-v-custom';
+
+                                const isBlockDivider = [3, 7, 10, 13].includes(i);
+                                const divLine = isBlockDivider ? '<div class="w-full my-0.5 border-b border-slate-300 dark:border-slate-700"></div>' : '';
+
+                                if (i === 14) {
+                                    signsHtml += `
+                                        ${divLine}
+                                        <div class="flex items-center justify-center">
+                                            <span class="sign-pill-v-p15" title="Pleno al 15: ${s}">${s}</span>
+                                        </div>
+                                    `;
+                                } else {
+                                    signsHtml += `
+                                        <div class="flex items-center justify-center">
+                                            <span class="sign-pill-v ${pillClass}" title="Partido ${i+1}: ${s}">${s}</span>
+                                        </div>
+                                        ${divLine}
+                                    `;
+                                }
+                            }
+
+                            const diceBadge = p.isDice ? '<span class="text-[10px]" title="Relleno con Dado 🎲">🎲</span>' : '';
+                            const lateBadge = p.late ? '<span class="text-[10px] text-amber-500 font-bold" title="Enviado con Retraso ⏱️">⏱️</span>' : '';
+
+                            cellContent = `
+                                <div class="flex flex-col items-center justify-center gap-[3px] py-1 select-none">
+                                    <div class="flex items-center gap-1 leading-none mb-0.5">
+                                        ${diceBadge}
+                                        ${lateBadge}
+                                    </div>
+                                    ${signsHtml}
+                                </div>
+                            `;
+                        } else {
+                            cellContent = `
+                                <div class="flex flex-col items-center justify-center h-full min-h-[440px] opacity-40 text-slate-400 font-mono text-xs">
+                                    <span class="led-status-indicator led-${cellLed.status} mb-1"></span>
+                                    <span>-</span>
+                                </div>
+                            `;
+                        }
+
+                        rowHtml += `<td class="summary-cell" onclick="window.openEditorModal(${m.id}, false)" title="Abrir boleto de ${AppUtils.getMemberName(m)}">${cellContent}</td>`;
+                    });
+
+                    // Columna de Dobles para esta Jornada en VERTICAL
+                    const jIdStr = String(j.id);
+                    const pExtra = pronosticosExtraMap.get(jIdStr);
+                    let isDoublesPlayed = false;
+                    if (pExtra && pExtra.selection && Array.isArray(pExtra.selection)) {
+                        isDoublesPlayed = pExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                    }
+
+                    let doublesContent = '';
+                    if (isDoublesPlayed) {
+                        let dHtml = '';
+                        for (let i = 0; i < 15; i++) {
+                            const raw = pExtra.selection ? pExtra.selection[i] : null;
+                            const s = (raw && String(raw).trim() !== '' && String(raw).trim() !== '-') ? String(raw).trim() : '-';
+                            
+                            let pillClass = 'sign-pill-v-empty';
+                            if (s === '1') pillClass = 'sign-pill-v-1';
+                            else if (s === 'X' || s === 'x') pillClass = 'sign-pill-v-X';
+                            else if (s === '2') pillClass = 'sign-pill-v-2';
+                            else if (s !== '-') pillClass = 'sign-pill-v-custom';
+
+                            const isBlockDivider = [3, 7, 10, 13].includes(i);
+                            const divLine = isBlockDivider ? '<div class="w-full my-0.5 border-b border-purple-300 dark:border-purple-800"></div>' : '';
+
+                            dHtml += `
+                                <div class="flex items-center justify-center">
+                                    <span class="sign-pill-v ${pillClass}" title="Doble Partido ${i+1}: ${s}">${s}</span>
+                                </div>
+                                ${divLine}
+                            `;
+                        }
+                        doublesContent = `<div class="flex flex-col items-center justify-center gap-[3px] py-1 select-none">${dHtml}</div>`;
+                    } else {
+                        doublesContent = `<div class="flex flex-col items-center justify-center h-full min-h-[440px] opacity-30 text-purple-400 font-mono text-xs"><span>-</span></div>`;
+                    }
+
+                    rowHtml += `<td class="summary-cell bg-purple-500/5 hover:bg-purple-500/20" onclick="window.openEditorModal(null, true)" title="Abrir quiniela de dobles">${doublesContent}</td>`;
+                    rowHtml += `</tr>`;
+                    tbodyHtml += rowHtml;
+                });
+
+                tbody.innerHTML = tbodyHtml;
+                if (this.updateKPIsCustom) this.updateKPIsCustom();
+            };
+
+            // 4. ACTUALIZACIÓN INTELIGENTE DE LOS BENTO KPIS
+            PronosticoManager.prototype.updateKPIsCustom = function() {
+                const jId = this.currentJornadaId;
+                const jornada = this.jornadas ? (this.jornadas.find(j => String(j.id) === String(jId)) || this.jornadas[0]) : null;
+                if (!jornada) return;
+
+                // A. KPI Plazo Oficial y Fecha Límite
+                const { isLockedRef } = this.isJornadaLocked(jornada);
+                const kpiPlazoEstado = document.getElementById('kpi-plazo-estado');
+                const kpiCdBadge = document.getElementById('kpi-cd-badge');
+                if (kpiPlazoEstado) {
+                    kpiPlazoEstado.textContent = isLockedRef ? 'Plazo Cerrado' : 'Plazo Abierto';
+                    kpiPlazoEstado.className = `text-lg font-black font-mono ${isLockedRef ? 'text-rose-500' : 'text-emerald-500'}`;
+                }
+                if (kpiCdBadge) {
+                    kpiCdBadge.textContent = isLockedRef ? 'Cerrado' : 'Abierto';
+                    kpiCdBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${isLockedRef ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`;
+                }
+
+                // Sincronizar Cuenta Atrás con Dashboard 2
+                const matchDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
+                if (matchDate) {
+                    const deadline = window.AppUtils ? window.AppUtils.calculateDeadline(matchDate) : new Date(matchDate.getTime() - 3 * 24 * 3600 * 1000);
+                    const kpiDateEl = document.getElementById('kpi-deadline-date');
+                    if (kpiDateEl) {
+                        kpiDateEl.textContent = deadline.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                    }
+                    
+                    // Actualizar el temporizador en tiempo real
+                    if (window.cdTimerInterval) clearInterval(window.cdTimerInterval);
+                    const updateCountdown = () => {
+                        const now = new Date().getTime();
+                        const diff = deadline.getTime() - now;
+                        const timerEl = document.getElementById('kpi-countdown-timer');
+                        if (!timerEl) return;
+                        if (diff <= 0) {
+                            timerEl.textContent = '00d 00h 00m 00s (Expirado)';
+                            timerEl.className = 'font-mono text-xs font-black text-rose-400';
+                            return;
+                        }
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+                        timerEl.textContent = `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+                        timerEl.className = 'font-mono text-sm sm:text-base font-black text-amber-400 tracking-wider';
+                    };
+                    updateCountdown();
+                    window.cdTimerInterval = setInterval(updateCountdown, 1000);
+                }
+
+                // B. KPI Censo Sellado
+                const totalSocios = (this.members || []).length || 16;
+                let recibidos = 0;
+                (this.members || []).forEach(m => {
+                    const led = this.getMemberStatusLed(m.id, jornada);
+                    if (led && (led.status === 'green' || led.status === 'yellow')) recibidos++;
+                });
+                const pct = Math.round((recibidos / totalSocios) * 100);
+
+                const countEl = document.getElementById('kpi-recibidos-count');
+                const pctEl = document.getElementById('kpi-recibidos-pct');
+                const barEl = document.getElementById('kpi-recibidos-bar');
+                const subEl = document.getElementById('kpi-recibidos-sub');
+
+                if (countEl) countEl.textContent = `${recibidos} / ${totalSocios}`;
+                if (pctEl) pctEl.textContent = `${pct}%`;
+                if (barEl) barEl.style.width = `${pct}%`;
+                if (subEl) subEl.textContent = recibidos === totalSocios ? '100% Completo 🎉' : `${totalSocios - recibidos} pendientes`;
+
+                // C. KPI Socio Activo
+                const mId = this.currentMemberId;
+                const member = this.members ? this.members.find(m => String(m.id) === String(mId)) : null;
+                const nameEl = document.getElementById('kpi-socio-name');
+                const statusEl = document.getElementById('kpi-socio-status');
+
+                if (member && nameEl) {
+                    nameEl.textContent = AppUtils.getMemberName(member);
+                    const led = this.getMemberStatusLed(member.id, jornada);
+                    if (statusEl) {
+                        statusEl.innerHTML = `
+                            <span class="led-status-indicator led-${led.status}"></span>
+                            <span class="font-bold">${led.title}</span>
+                        `;
+                    }
+                }
+
+                // D. Chip de Cierre en Hub con alto contraste
+                const deadlineTextEl = document.getElementById('deadline-info');
+                const wrapEl = document.getElementById('deadline-info-wrap');
+                const dotEl = document.getElementById('deadline-led-dot');
+                if (deadlineTextEl && wrapEl) {
+                    const txt = deadlineTextEl.textContent || '';
+                    if (txt.toLowerCase().includes('expirado') || txt.toLowerCase().includes('cerrado')) {
+                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-rose-500/20 text-rose-300 border border-rose-500/50 flex items-center gap-2 shadow-sm';
+                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+                    } else {
+                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 flex items-center gap-2 shadow-sm';
+                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+                    }
+                }
+            };
+
+            // Interceptar loadForecast para actualizar colores de botones y abrir modal si se desea
+            const originalLoadForecast = PronosticoManager.prototype.loadForecast;
+            PronosticoManager.prototype.loadForecast = function() {
+                originalLoadForecast.apply(this, arguments);
+                
+                // Actualizar KPIs
+                if (this.updateKPIsCustom) this.updateKPIsCustom();
+
+                // Reasignar colores 1-verde, X-azul, 2-amarillo a los botones seleccionados
+                setTimeout(() => {
+                    const options = document.querySelectorAll('.p-options .chk-option');
+                    options.forEach(opt => {
+                        const sign = opt.textContent.trim();
+                        opt.setAttribute('data-sign', sign);
+                    });
+                }, 50);
+            };
+        }
+
+        // 5. INICIALIZACIÓN GLOBAL CUANDO EL DOM ESTÉ LISTO
         document.addEventListener('DOMContentLoaded', () => {
-            // Reloj en tiempo real
-            function updateClock() {
+            // Reloj en tiempo real del banner superior
+            function updateLiveClock() {
                 const now = new Date();
                 const clockEl = document.getElementById('current-clock-label');
                 if (clockEl) {
-                    const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    clockEl.textContent = `⏱️ ${timeStr}`;
+                    clockEl.textContent = `⏱️ ${now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
                 }
             }
-            setInterval(updateClock, 1000);
-            updateClock();
+            setInterval(updateLiveClock, 1000);
+            updateLiveClock();
 
-            // Toggle plegar/desplegar el editor de boleto
-            const toggleBtn = document.getElementById('editor-toggle-btn');
-            const toggleText = document.getElementById('editor-toggle-text');
-            const toggleIcon = document.getElementById('editor-toggle-icon');
-            const editorBody = document.getElementById('editor-collapsible-body');
-            
-            if (toggleBtn && editorBody) {
-                toggleBtn.addEventListener('click', () => {
-                    const isHidden = editorBody.style.display === 'none';
-                    editorBody.style.display = isHidden ? 'block' : 'none';
-                    if (toggleText) toggleText.textContent = isHidden ? 'Ocultar Editor' : 'Mostrar Editor';
-                    if (toggleIcon) toggleIcon.textContent = isHidden ? '▼' : '▲';
-                });
-            }
-
-            // Flechas ◀ y ▶ para el selector de Jornada del Hub
-            const btnPrev = document.getElementById('btn-jornada-prev');
-            const btnNext = document.getElementById('btn-jornada-next');
-            const selJ = document.getElementById('sel-jornada');
-
-            if (btnPrev && selJ) {
-                btnPrev.addEventListener('click', () => {
-                    if (selJ.selectedIndex > 0) {
-                        selJ.selectedIndex--;
-                        selJ.dispatchEvent(new Event('change'));
-                    }
-                });
-            }
-            if (btnNext && selJ) {
-                btnNext.addEventListener('click', () => {
-                    if (selJ.selectedIndex < selJ.options.length - 1) {
-                        selJ.selectedIndex++;
-                        selJ.dispatchEvent(new Event('change'));
-                    }
-                });
-            }
-
-            // SOBREESCRIBIR RENDERIZADO DE TABLA PARA MOSTRAR SIGNOS EN VERTICAL
-            if (window.PronosticoManager) {
-                PronosticoManager.prototype.renderSummaryTable = function() {
-                    if (!this.summaryTable) return;
-
-                    const thead = this.summaryTable.querySelector('thead');
-                    const tbody = this.summaryTable.querySelector('tbody');
-                    if (!thead || !tbody) return;
-                    thead.innerHTML = '';
-                    tbody.innerHTML = '';
-
-                    const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
-
-                    // Determinar jornada activa de referencia
-                    const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
-                    let targetJornadaForHeader = null;
-                    if (this.currentJornadaId) {
-                        targetJornadaForHeader = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
-                    }
-                    if (!targetJornadaForHeader) {
-                        targetJornadaForHeader = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
-                    }
-
-                    // CABECERA THEAD (COMPACTA Y ALINEADA)
-                    const headerRow = document.createElement('tr');
-                    
-                    // Columna Sticky de Jornada e Índice de Partidos
-                    const stickyTh = document.createElement('th');
-                    stickyTh.className = 'summary-sticky-col summary-header-cell';
-                    stickyTh.style.minWidth = '110px';
-                    stickyTh.innerHTML = `
-                        <div class="flex items-center justify-between px-1">
-                            <span class="font-black text-amber-500">Jornada</span>
-                            <span class="text-[10px] font-mono text-slate-400 font-bold" title="Partidos del 1 al 15"># 1-15</span>
-                        </div>
-                    `;
-                    headerRow.appendChild(stickyTh);
-
-                    // Columnas de Socios (Ancho muy compacto ~48px-52px)
-                    sortedMembers.forEach((m) => {
-                        const th = document.createElement('th');
-                        th.className = 'summary-header-cell';
-                        th.style.minWidth = '46px';
-                        th.style.maxWidth = '54px';
-                        th.setAttribute('data-mid', m.id);
-                        
-                        const led = this.getMemberStatusLed(m.id, targetJornadaForHeader);
-                        const jNumText = targetJornadaForHeader ? `J${targetJornadaForHeader.number}: ` : '';
-                        const nameParts = AppUtils.getMemberName(m).split(' ');
-                        const shortName = nameParts[0].length > 7 ? nameParts[0].substring(0, 6) + '.' : nameParts[0];
-
-                        th.innerHTML = `
-                            <div class="flex flex-col items-center justify-center gap-1 cursor-pointer group" onclick="if(window.app){window.app.selMember.value='${m.id}'; window.app.selMember.dispatchEvent(new Event('change'));}">
-                                <span class="led-status-indicator led-${led.status}" title="${jNumText}${led.title}"></span>
-                                <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-amber-500 transition-colors" title="${AppUtils.getMemberName(m)}">${shortName}</span>
-                            </div>
-                        `;
-                        headerRow.appendChild(th);
-                    });
-
-                    // Columna de Quiniela Dobles
-                    const thDoubles = document.createElement('th');
-                    thDoubles.className = 'summary-header-cell';
-                    thDoubles.style.minWidth = '54px';
-                    thDoubles.innerHTML = `
-                        <div class="flex flex-col items-center justify-center gap-1">
-                            <span class="text-xs">🎲</span>
-                            <span class="text-[10px] font-black text-purple-400">DOBLES</span>
-                        </div>
-                    `;
-                    headerRow.appendChild(thDoubles);
-
-                    thead.appendChild(headerRow);
-
-                    // MAPAS DE ACCESO RÁPIDO O(1)
-                    const pronosticosMap = new Map();
-                    const jornadasConPronostico = new Set();
-                    if (this.pronosticos && Array.isArray(this.pronosticos)) {
-                        this.pronosticos.forEach(p => {
-                            if (!p) return;
-                            const jIds = [];
-                            if (p.jId !== undefined && p.jId !== null) jIds.push(String(p.jId));
-                            if (p.jornadaId !== undefined && p.jornadaId !== null) jIds.push(String(p.jornadaId));
-                            const mIds = [];
-                            if (p.mId !== undefined && p.mId !== null) mIds.push(String(p.mId));
-                            if (p.memberId !== undefined && p.memberId !== null) mIds.push(String(p.memberId));
-
-                            jIds.forEach(j => {
-                                jornadasConPronostico.add(j);
-                                mIds.forEach(m => {
-                                    pronosticosMap.set(`${j}_${m}`, p);
-                                });
-                            });
-                        });
-                    }
-
-                    const pronosticosExtraMap = new Map();
-                    const jornadasConDobles = new Set();
-                    if (this.pronosticosExtra && Array.isArray(this.pronosticosExtra)) {
-                        this.pronosticosExtra.forEach(p => {
-                            if (!p) return;
-                            const jId = String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId);
-                            const hasValid = p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                            if (hasValid) {
-                                jornadasConDobles.add(jId);
-                                pronosticosExtraMap.set(jId, p);
-                            }
-                        });
-                    }
-
-                    // FILTRAR Y ORDENAR JORNADAS
-                    let sortedJornadas = [...this.jornadas].sort((a, b) => b.number - a.number);
-                    sortedJornadas = sortedJornadas.filter(j => {
-                        const hasMatches = j.matches && j.matches.some(m => m.home && m.home.trim() !== '');
-                        const hasForecasts = jornadasConPronostico.has(String(j.id));
-                        const hasDobles = jornadasConDobles.has(String(j.id));
-                        return hasMatches || hasForecasts || hasDobles;
-                    });
-
-                    if (sortedJornadas.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="100%" class="p-8 text-center text-slate-500 font-bold">No hay pronósticos registrados todavía.</td></tr>';
-                        return;
-                    }
-
-                    // CONSTRUCCIÓN DEL TBODY FILA POR FILA
-                    let tbodyHtml = '';
-                    sortedJornadas.forEach(j => {
-                        let dateFormatted = j.date;
-                        try {
-                            const d = AppUtils.parseDate(j.date);
-                            if (d) dateFormatted = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
-                        } catch (e) {}
-
-                        const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
-
-                        // Columna Sticky de Jornada con los índices 1 a 15 a la derecha
-                        let rowHtml = `<tr>
-                            <td class="summary-sticky-col summary-cell p-2">
-                                <div class="flex items-start justify-between gap-1.5 h-full">
-                                    <div class="flex flex-col text-left justify-start">
-                                        <div class="font-black text-amber-500 text-sm flex items-center gap-1">
-                                            <span>J${j.number}</span>
-                                            ${hasPig ? '<span title="Partido PIG">🐷</span>' : ''}
-                                        </div>
-                                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">${dateFormatted}</div>
-                                    </div>
-                                    <div class="flex flex-col gap-[3px] items-center font-mono text-[9px] text-slate-400 dark:text-slate-500 font-bold border-l border-slate-200 dark:border-slate-800 pl-1.5 select-none">
-                                        <span>1</span><span>2</span><span>3</span><span>4</span>
-                                        <div class="w-2.5 border-b border-slate-300 dark:border-slate-800 my-0.5"></div>
-                                        <span>5</span><span>6</span><span>7</span><span>8</span>
-                                        <div class="w-2.5 border-b border-slate-300 dark:border-slate-800 my-0.5"></div>
-                                        <span>9</span><span>10</span><span>11</span>
-                                        <div class="w-2.5 border-b border-slate-300 dark:border-slate-800 my-0.5"></div>
-                                        <span>12</span><span>13</span><span>14</span>
-                                        <div class="w-2.5 border-b border-amber-500/50 my-0.5"></div>
-                                        <span class="text-amber-500 font-black">15</span>
-                                    </div>
-                                </div>
-                            </td>
-                        `;
-
-                        // Celdas de cada Socio con los 15 signos en VERTICAL
-                        sortedMembers.forEach((m) => {
-                            const jIdStr = String(j.id);
-                            const mIdStr = String(m.id);
-                            const p = pronosticosMap.get(`${jIdStr}_${mIdStr}`);
-
-                            let isPlayed = false;
-                            if (p && p.selection && Array.isArray(p.selection)) {
-                                isPlayed = p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                            }
-
-                            const cellLed = this.getMemberStatusLed(m.id, j);
-                            let cellContent = '';
-
-                            if (isPlayed) {
-                                let signsHtml = '';
-                                for (let i = 0; i < 15; i++) {
-                                    const rawSign = p.selection ? p.selection[i] : null;
-                                    const s = (rawSign && String(rawSign).trim() !== '' && String(rawSign).trim() !== '-') ? String(rawSign).trim() : '-';
-                                    
-                                    let pillClass = 'sign-mini-empty';
-                                    if (s === '1') pillClass = 'sign-mini-1';
-                                    else if (s === 'X' || s === 'x') pillClass = 'sign-mini-X';
-                                    else if (s === '2') pillClass = 'sign-mini-2';
-                                    else if (s !== '-') pillClass = 'sign-mini-custom';
-
-                                    const isBlockDivider = [3, 7, 10, 13].includes(i);
-                                    const divLine = isBlockDivider ? '<div class="w-full my-0.5 border-b border-slate-200 dark:border-slate-800"></div>' : '';
-
-                                    if (i === 14) {
-                                        signsHtml += `
-                                            ${divLine}
-                                            <div class="flex items-center justify-center mt-0.5">
-                                                <span class="sign-mini-p15" title="Pleno al 15: ${s}">${s}</span>
-                                            </div>
-                                        `;
-                                    } else {
-                                        signsHtml += `
-                                            <div class="flex items-center justify-center">
-                                                <span class="sign-mini ${pillClass}" title="P${i+1}: ${s}">${s}</span>
-                                            </div>
-                                            ${divLine}
-                                        `;
-                                    }
-                                }
-
-                                const diceBadge = p.isDice ? '<span class="text-[10px] mb-1" title="Relleno con Dado 🎲">🎲</span>' : '';
-                                const lateBadge = p.late ? '<span class="text-[10px] text-amber-500 font-bold mb-1" title="Enviado con Retraso ⏱️">⏱️</span>' : '';
-
-                                cellContent = `
-                                    <div class="flex flex-col items-center justify-center gap-[3px] py-1 select-none">
-                                        <div class="flex items-center gap-0.5 leading-none">
-                                            ${diceBadge}
-                                            ${lateBadge}
-                                        </div>
-                                        ${signsHtml}
-                                    </div>
-                                `;
-                            } else {
-                                cellContent = `
-                                    <div class="flex flex-col items-center justify-center h-full min-h-[340px] opacity-40 text-slate-400 font-mono text-xs">
-                                        <span class="led-status-indicator led-${cellLed.status} mb-1"></span>
-                                        <span>-</span>
-                                    </div>
-                                `;
-                            }
-
-                            rowHtml += `<td class="summary-cell" data-jid="${j.id}" data-mid="${m.id}" title="Ver o editar pronóstico de ${AppUtils.getMemberName(m)}">${cellContent}</td>`;
-                        });
-
-                        // Columna de Dobles para esta Jornada
-                        const jIdStr = String(j.id);
-                        const pExtra = pronosticosExtraMap.get(jIdStr);
-                        let isDoublesPlayed = false;
-                        if (pExtra && pExtra.selection && Array.isArray(pExtra.selection)) {
-                            isDoublesPlayed = pExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                        }
-
-                        let doublesContent = '';
-                        if (isDoublesPlayed) {
-                            let dHtml = '';
-                            for (let i = 0; i < 15; i++) {
-                                const raw = pExtra.selection ? pExtra.selection[i] : null;
-                                const s = (raw && String(raw).trim() !== '' && String(raw).trim() !== '-') ? String(raw).trim() : '-';
-                                
-                                let pillClass = 'sign-mini-empty';
-                                if (s === '1') pillClass = 'sign-mini-1';
-                                else if (s === 'X' || s === 'x') pillClass = 'sign-mini-X';
-                                else if (s === '2') pillClass = 'sign-mini-2';
-                                else if (s !== '-') pillClass = 'sign-mini-custom';
-
-                                const isBlockDivider = [3, 7, 10, 13].includes(i);
-                                const divLine = isBlockDivider ? '<div class="w-full my-0.5 border-b border-purple-200 dark:border-purple-900/60"></div>' : '';
-
-                                dHtml += `
-                                    <div class="flex items-center justify-center">
-                                        <span class="sign-mini ${pillClass}" title="Doble P${i+1}: ${s}">${s}</span>
-                                    </div>
-                                    ${divLine}
-                                `;
-                            }
-                            doublesContent = `<div class="flex flex-col items-center justify-center gap-[3px] py-1 select-none">${dHtml}</div>`;
-                        } else {
-                            doublesContent = `<div class="flex flex-col items-center justify-center h-full min-h-[340px] opacity-30 text-purple-400 font-mono text-xs"><span>-</span></div>`;
-                        }
-
-                        rowHtml += `<td class="summary-cell bg-purple-500/5 hover:bg-purple-500/15" data-jid="${j.id}" data-isdoubles="true" title="Ver quiniela de dobles">${doublesContent}</td>`;
-                        rowHtml += `</tr>`;
-                        tbodyHtml += rowHtml;
-                    });
-
-                    tbody.innerHTML = tbodyHtml;
-                    this.updateKPIs();
-                };
-
-                // MÉTODO AUXILIAR PARA ACTUALIZAR LOS BENTO KPIS EN TIEMPO REAL
-                PronosticoManager.prototype.updateKPIs = function() {
-                    const jId = this.currentJornadaId;
-                    const jornada = this.jornadas.find(j => String(j.id) === String(jId)) || this.jornadas[0];
-                    if (!jornada) return;
-
-                    // 1. KPI Plazo
-                    const { isLockedRef } = this.isJornadaLocked(jornada);
-                    const kpiPlazoEstado = document.getElementById('kpi-plazo-estado');
-                    const kpiPlazoDesc = document.getElementById('kpi-plazo-desc');
-                    if (kpiPlazoEstado) {
-                        kpiPlazoEstado.textContent = isLockedRef ? 'Plazo Cerrado' : 'Plazo Abierto';
-                        kpiPlazoEstado.className = `text-lg sm:text-xl font-black font-mono ${isLockedRef ? 'text-rose-500' : 'text-emerald-500'}`;
-                    }
-                    if (kpiPlazoDesc) {
-                        kpiPlazoDesc.textContent = isLockedRef ? 'Jornada bloqueada. Admite cambios solo en corrección.' : 'Sellado libre de quinielas antes del cierre.';
-                    }
-
-                    // 2. KPI Pronósticos Recibidos
-                    const totalSocios = (this.members || []).length || 16;
-                    let recibidos = 0;
-                    (this.members || []).forEach(m => {
-                        const led = this.getMemberStatusLed(m.id, jornada);
-                        if (led && (led.status === 'green' || led.status === 'yellow')) recibidos++;
-                    });
-                    const pct = Math.round((recibidos / totalSocios) * 100);
-
-                    const countEl = document.getElementById('kpi-recibidos-count');
-                    const pctEl = document.getElementById('kpi-recibidos-pct');
-                    const barEl = document.getElementById('kpi-recibidos-bar');
-                    const subEl = document.getElementById('kpi-recibidos-sub');
-
-                    if (countEl) countEl.textContent = `${recibidos} / ${totalSocios}`;
-                    if (pctEl) pctEl.textContent = `${pct}%`;
-                    if (barEl) barEl.style.width = `${pct}%`;
-                    if (subEl) subEl.textContent = recibidos === totalSocios ? '100% Completo 🎉' : `${totalSocios - recibidos} pendientes`;
-
-                    // 3. KPI Socio Activo
-                    const mId = this.currentMemberId;
-                    const member = this.members.find(m => String(m.id) === String(mId));
-                    const nameEl = document.getElementById('kpi-socio-name');
-                    const badgeEl = document.getElementById('active-selection-badge');
-                    const statusEl = document.getElementById('kpi-socio-status');
-
-                    if (member && nameEl) {
-                        const fullName = AppUtils.getMemberName(member);
-                        nameEl.textContent = fullName;
-                        if (badgeEl) badgeEl.textContent = `${fullName} • J${jornada.number}`;
-                        
-                        const led = this.getMemberStatusLed(member.id, jornada);
-                        if (statusEl) {
-                            statusEl.innerHTML = `
-                                <span class="led-status-indicator led-${led.status}"></span>
-                                <span class="font-bold">${led.title}</span>
-                            `;
-                        }
-                    }
-                };
-
-                // Enganchar actualización de KPIs al cambiar de jornada o socio
-                const origLoadForecast = PronosticoManager.prototype.loadForecast;
-                PronosticoManager.prototype.loadForecast = function() {
-                    origLoadForecast.apply(this, arguments);
-                    if (this.updateKPIs) this.updateKPIs();
-                    // Al seleccionar un socio, desplegar el editor si estaba plegado
-                    const editorBody = document.getElementById('editor-collapsible-body');
-                    const toggleText = document.getElementById('editor-toggle-text');
-                    const toggleIcon = document.getElementById('editor-toggle-icon');
-                    if (editorBody && editorBody.style.display === 'none') {
-                        editorBody.style.display = 'block';
-                        if (toggleText) toggleText.textContent = 'Ocultar Editor';
-                        if (toggleIcon) toggleIcon.textContent = '▼';
-                    }
-                };
-            }
+            // Forzar renderizado de la tabla vertical en cuanto window.app esté disponible
+            setTimeout(() => {
+                if (window.app) {
+                    window.app.renderSummaryTable();
+                    if (window.app.updateKPIsCustom) window.app.updateKPIsCustom();
+                }
+            }, 300);
         });
     </script>
 </body>
