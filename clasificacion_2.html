@@ -1121,6 +1121,20 @@
                 this.init();
             }
 
+            /**
+             * Formatea importes en notación española estricta (puntos de millar y coma decimal)
+             */
+            formatMoney(val) {
+                if (typeof AppUtils !== 'undefined' && AppUtils.formatEuro) {
+                    return AppUtils.formatEuro(val);
+                }
+                if (val === null || val === undefined || isNaN(val)) return '0,00 €';
+                const num = Number(val);
+                const parts = num.toFixed(2).split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return `${parts[0]},${parts[1]} €`;
+            }
+
             async init() {
                 try {
                     if (window.DataService) await window.DataService.init();
@@ -1321,7 +1335,7 @@
                     document.getElementById('podium-points-1').textContent = `${top1.grandTotal} pts`;
                     document.getElementById('podium-hits-1').textContent = top1.baseTotal;
                     document.getElementById('podium-bonus-1').textContent = top1.bonusTotal >= 0 ? `+${top1.bonusTotal}` : top1.bonusTotal;
-                    document.getElementById('podium-prize-1').textContent = `${top1.prizeTotal.toFixed(2)}€`;
+                    document.getElementById('podium-prize-1').textContent = this.formatMoney(top1.prizeTotal);
                 }
                 if (top2) {
                     const card2 = document.getElementById('podium-card-2');
@@ -1335,7 +1349,7 @@
                     document.getElementById('podium-diff-2').textContent = diff2 === 0 ? 'Empatado' : `-${diff2} pts`;
                     document.getElementById('podium-hits-2').textContent = top2.baseTotal;
                     document.getElementById('podium-bonus-2').textContent = top2.bonusTotal >= 0 ? `+${top2.bonusTotal}` : top2.bonusTotal;
-                    document.getElementById('podium-prize-2').textContent = `${top2.prizeTotal.toFixed(2)}€`;
+                    document.getElementById('podium-prize-2').textContent = this.formatMoney(top2.prizeTotal);
                 }
                 if (top3) {
                     const card3 = document.getElementById('podium-card-3');
@@ -1349,7 +1363,7 @@
                     document.getElementById('podium-diff-3').textContent = diff3 === 0 ? 'Empatado' : `-${diff3} pts`;
                     document.getElementById('podium-hits-3').textContent = top3.baseTotal;
                     document.getElementById('podium-bonus-3').textContent = top3.bonusTotal >= 0 ? `+${top3.bonusTotal}` : top3.bonusTotal;
-                    document.getElementById('podium-prize-3').textContent = `${top3.prizeTotal.toFixed(2)}€`;
+                    document.getElementById('podium-prize-3').textContent = this.formatMoney(top3.prizeTotal);
                 }
             }
 
@@ -1407,8 +1421,8 @@
                     }
                 });
 
-                document.getElementById('kpi-premios-total').textContent = `${totalPremios.toFixed(2)} €`;
-                document.getElementById('kpi-premios-top-socio').textContent = maxPremiado.amount > 0 ? `Máx: ${maxPremiado.name} (${maxPremiado.amount.toFixed(2)}€)` : 'Sin premios todavía';
+                document.getElementById('kpi-premios-total').textContent = this.formatMoney(totalPremios);
+                document.getElementById('kpi-premios-top-socio').textContent = maxPremiado.amount > 0 ? `Máx: ${maxPremiado.name} (${this.formatMoney(maxPremiado.amount)})` : 'Sin premios todavía';
                 document.getElementById('kpi-premios-count').textContent = `${sociosPremiados} socios`;
 
                 // KPI 4: Balance Bonus vs Penalizaciones
@@ -1542,7 +1556,7 @@
                             </td>
                             <td class="py-2.5 px-3 text-center font-mono font-bold">
                                 ${s.prizeTotal > 0 
-                                    ? `<span class="cursor-help px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-400 transition" data-card-type="prize" data-card-id="${s.member.id}">${s.prizeTotal.toFixed(2)}€</span>`
+                                    ? `<span class="cursor-help px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-400 transition" data-card-type="prize" data-card-id="${s.member.id}">${this.formatMoney(s.prizeTotal)}</span>`
                                     : `<span class="text-slate-400 dark:text-slate-500 text-xs">-</span>`
                                 }
                             </td>
@@ -1630,7 +1644,7 @@
                 `;
                 sortedMembers.forEach(m => {
                     const p = this.memberStats[m.id].prizeTotal;
-                    thead += `<td class="py-2 px-2.5 text-center text-purple-600 dark:text-purple-300 border-r border-slate-200 dark:border-slate-700/40 cursor-help" data-card-type="prize" data-card-id="${m.id}">${p > 0 ? p.toFixed(2) + '€' : '-'}</td>`;
+                    thead += `<td class="py-2 px-2.5 text-center text-purple-600 dark:text-purple-300 border-r border-slate-200 dark:border-slate-700/40 cursor-help" data-card-type="prize" data-card-id="${m.id}">${p > 0 ? this.formatMoney(p) : '-'}</td>`;
                 });
                 thead += `</tr></thead>`;
 
@@ -1959,7 +1973,7 @@
                 const bEl = document.getElementById('drawer-stat-bonus');
                 bEl.textContent = `${s.bonusTotal >= 0 ? '+' : ''}${s.bonusTotal}`;
                 bEl.className = `text-xl font-black font-mono ${s.bonusTotal >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
-                document.getElementById('drawer-stat-prizes').textContent = `${s.prizeTotal.toFixed(2)}€`;
+                document.getElementById('drawer-stat-prizes').textContent = this.formatMoney(s.prizeTotal);
 
                 // Desglose de Bonus
                 const bContainer = document.getElementById('drawer-bonus-breakdown');
@@ -2010,7 +2024,7 @@
                             <td class="py-1.5 px-3 text-center text-slate-900 dark:text-white font-bold">${data.hits}</td>
                             <td class="py-1.5 px-3 text-center ${bonusClass} font-bold">${bonusStr}</td>
                             <td class="py-1.5 px-3 text-center text-amber-600 dark:text-amber-400 font-black">${data.points}</td>
-                            <td class="py-1.5 px-3 text-center text-purple-600 dark:text-purple-400">${data.prize > 0 ? data.prize.toFixed(2) + '€' : '-'}</td>
+                            <td class="py-1.5 px-3 text-center text-purple-600 dark:text-purple-400">${data.prize > 0 ? this.formatMoney(data.prize) : '-'}</td>
                             <td class="py-1.5 px-3 text-center">${statusBadge}</td>
                         </tr>
                     `;
@@ -2291,7 +2305,7 @@
                         ? s.prizesList.map(p => `
                             <div class="p-1.5 rounded-lg bg-slate-200/60 dark:bg-slate-950/80 border border-purple-500/20 flex items-center justify-between text-[11px]">
                                 <span class="text-slate-700 dark:text-slate-300">Jornada ${p.jNum} (${p.hits} aciertos)</span>
-                                <strong class="text-purple-600 dark:text-purple-300 font-black">+${p.amount.toFixed(2)} €</strong>
+                                <strong class="text-purple-600 dark:text-purple-300 font-black">+${this.formatMoney(p.amount)}</strong>
                             </div>
                         `).join('')
                         : `<div class="p-2 rounded-lg bg-slate-200/60 dark:bg-slate-950/80 text-slate-500 text-center text-xs">Sin premios registrados</div>`;
@@ -2304,7 +2318,7 @@
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1 shadow-sm">
                                         <span>💰</span> Socio Premiado
                                     </span>
-                                    <span class="text-xs font-mono font-black text-purple-600 dark:text-purple-300">${s.prizeTotal.toFixed(2)} €</span>
+                                    <span class="text-xs font-mono font-black text-purple-600 dark:text-purple-300">${this.formatMoney(s.prizeTotal)}</span>
                                 </div>
                                 <div class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
                                     <span>🏆</span> <span>${s.name}</span>
@@ -2455,7 +2469,7 @@
                                         ${cell.prize > 0 ? `
                                             <div class="flex justify-between items-center text-purple-600 dark:text-purple-400 border-t border-slate-300 dark:border-slate-800 pt-1">
                                                 <span>Premio ganado:</span>
-                                                <strong class="font-black">+${cell.prize.toFixed(2)} €</strong>
+                                                <strong class="font-black">+${this.formatMoney(cell.prize)}</strong>
                                             </div>
                                         ` : ''}
                                     </div>

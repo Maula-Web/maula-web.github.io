@@ -49,6 +49,20 @@ class Jornadas2AppController {
     }
 
     /**
+     * Formateador de moneda en notación española (puntos de miles y coma decimal)
+     */
+    formatMoney(val) {
+        if (typeof AppUtils !== 'undefined' && AppUtils.formatEuro) {
+            return AppUtils.formatEuro(val);
+        }
+        if (val === null || val === undefined || isNaN(val)) return '0,00 €';
+        const num = Number(val);
+        const parts = num.toFixed(2).split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return `${parts[0]},${parts[1]} €`;
+    }
+
+    /**
      * Comprobación estricta de identidad: Fernando Lozano
      */
     checkAccessFernandoLozano() {
@@ -605,7 +619,7 @@ class Jornadas2AppController {
                     if (pVal > 0) {
                         totalPrizeMoney += pVal;
                         winnersCount++;
-                        winnerNames.push(`${member.phone || member.name} (${ev.hits} aciertos: ${pVal.toFixed(2)} €)`);
+                        winnerNames.push(`${member.phone || member.name} (${ev.hits} aciertos: ${this.formatMoney(pVal)})`);
                     }
                 }
             }
@@ -633,14 +647,14 @@ class Jornadas2AppController {
                         if (typeof pVal === 'string') pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
                         if (count > 0 && pVal > 0) {
                             totalPrizeMoney += count * pVal;
-                            winnerNames.push(`Dobles Peña (${h} aciertos: ${(count * pVal).toFixed(2)} €)`);
+                            winnerNames.push(`Dobles Peña (${h} aciertos: ${this.formatMoney(count * pVal)})`);
                         }
                     });
                 }
             });
         }
 
-        elTotal.textContent = `${totalPrizeMoney.toFixed(2)} €`;
+        elTotal.textContent = this.formatMoney(totalPrizeMoney);
         if (winnerNames.length > 0) {
             elDetail.textContent = winnerNames.join(', ');
             elDetail.className = 'text-xs text-emerald-400 font-semibold truncate';
@@ -826,8 +840,8 @@ class Jornadas2AppController {
                 : '<span class="text-slate-500 italic">Ningún acertante</span>';
 
             const prizeAmountHtml = pVal > 0
-                ? `<span class="font-extrabold text-amber-400 font-mono text-sm">${pVal.toFixed(2)} €</span>`
-                : '<span class="text-slate-500">0.00 €</span>';
+                ? `<span class="font-extrabold text-amber-400 font-mono text-sm">${this.formatMoney(pVal)}</span>`
+                : '<span class="text-slate-500 font-mono">0,00 €</span>';
 
             return `
                 <tr class="hover:bg-slate-900/40 transition">
@@ -1108,7 +1122,7 @@ class Jornadas2AppController {
             return `
                 <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
                     <label class="block text-[11px] font-semibold text-slate-400 mb-1">${cat.label}</label>
-                    <input type="text" data-prize-cat="${cat.key}" value="${val > 0 ? val.toFixed(2) + ' €' : '0,00 €'}" 
+                    <input type="text" data-prize-cat="${cat.key}" value="${this.formatMoney(val)}" 
                         onblur="window.JornadasApp.formatPrizeInput(this)"
                         class="w-full px-2 py-1 bg-slate-900 border border-slate-700 focus:border-amber-500 rounded-lg text-white font-mono text-xs text-right focus:outline-none">
                 </div>
@@ -1117,10 +1131,11 @@ class Jornadas2AppController {
     }
 
     formatPrizeInput(input) {
-        let val = input.value.replace('€', '').replace(',', '.').trim();
-        let num = parseFloat(val);
+        let num = (window.AppUtils && window.AppUtils.parseEuro)
+            ? window.AppUtils.parseEuro(input.value)
+            : (parseFloat(input.value.replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.')) || 0);
         if (isNaN(num) || num < 0) num = 0;
-        input.value = num > 0 ? `${num.toFixed(2)} €` : '0,00 €';
+        input.value = this.formatMoney(num);
     }
 
     /**
@@ -1166,8 +1181,9 @@ class Jornadas2AppController {
         const prizes = {};
         document.querySelectorAll('#form-prizes-editor-grid input[data-prize-cat]').forEach(inp => {
             const cat = inp.getAttribute('data-prize-cat');
-            const clean = inp.value.replace('€', '').replace(',', '.').trim();
-            const val = parseFloat(clean);
+            const val = (window.AppUtils && window.AppUtils.parseEuro)
+                ? window.AppUtils.parseEuro(inp.value)
+                : (parseFloat(inp.value.replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.')) || 0);
             if (val > 0) prizes[cat] = val;
         });
 
@@ -1555,7 +1571,7 @@ class Jornadas2AppController {
                     ${Object.keys(res.prizes).map(k => `
                         <div class="p-1 rounded bg-slate-900 text-slate-300 flex justify-between">
                             <span>${k === '15' ? 'P15' : k + 'A'}:</span>
-                            <strong class="text-emerald-400">${res.prizes[k].toFixed(2)} €</strong>
+                            <strong class="text-emerald-400">${this.formatMoney(res.prizes[k])}</strong>
                         </div>
                     `).join('')}
                 </div>

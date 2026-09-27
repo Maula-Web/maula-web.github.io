@@ -499,12 +499,21 @@ var AppUtils = window.AppUtils || {
      */
     formatEuro(value) {
         if (value === null || value === undefined || isNaN(value)) return '0,00 €';
-        return new Intl.NumberFormat('es-ES', {
-            style: 'currency',
-            currency: 'EUR',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(value);
+        const num = Number(value);
+        const parts = num.toFixed(2).split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return `${parts[0]},${parts[1]} €`;
+    },
+
+    /**
+     * Formats a number in Spanish notation (1.234,56)
+     */
+    formatNumberEs(value, decimals = 2) {
+        if (value === null || value === undefined || isNaN(value)) return '0,00';
+        const num = Number(value);
+        const parts = num.toFixed(decimals).split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return `${parts[0]},${parts[1]}`;
     },
 
     /**
