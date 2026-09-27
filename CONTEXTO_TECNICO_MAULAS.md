@@ -553,6 +553,157 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ---
 
+## 19. Nueva Sección: Socios 2.0 (`socios_2.html`, `js/socios_2.js`)
+
+### 19.1. Propósito y Acceso Restringido (Gatekeeper)
+- Modernización integral del panel de miembros de la peña, adoptando una arquitectura modular basada en **Bento Grid** y métricas individuales avanzadas.
+- **Acceso Autorizado**: Reservado en fase de pruebas exclusivamente para **Fernando Lozano** (ID: 6). Para cualquier otro usuario o sesión no identificada, se muestra la pantalla de acceso restringido con aviso "Sección en Obras" y enlaces de retorno seguro.
+
+### 19.2. Bento Grid y Rendimiento de Socios
+- Selector interactivo de socios con avatar, alias, antigüedad y estado en la temporada.
+- **Métricas Clave de Temporada**:
+  - Puntos acumulados en la clasificación general.
+  - Total de aciertos base acumulados.
+  - Posición actual en el ranking.
+  - Jornadas ganadas (trofeos de la semana).
+  - Veces Maula / farolillo rojo.
+  - Porcentaje de efectividad y acierto en pronósticos.
+  - Balance consolidado en el Bote de la Peña.
+- **Historial Detallado de Jornadas**: Cuadrícula de rendimiento jornada a jornada con indicación visual de puntos, aciertos, condición de ganador, maula o sellado por el Dado.
+
+### 19.3. Integración del Dado de Quinielas (`DiceService`) con Flatpickr
+- Configuración interactiva de ausencias y viajes del socio directamente desde su ficha.
+- Selector de rangos de fechas (`fechaInicio` a `fechaFin`) mediante la librería **Flatpickr**, adaptada visualmente con tema dark y resaltes dorados corporativos.
+- Regla inquebrantable: máximo **3 jornadas por temporada** selladas por el Dado para evitar el absentismo injustificado.
+
+### 19.4. Tarjetas Explicativas (`ℹ️`)
+- Incorporación de cuadros azules explicativos con icono `ℹ️` en hover instantáneo (`group-hover/tip`).
+- Posicionamiento en primer plano absoluto (`z-[100060]`), fondo oscuro sólido `#0b0f19`, texto blanco nítido y borde dorado.
+- Se configuraron con `pointer-events-none` en el tooltip flotante para no interferir con los clics sobre botones y selectores subyacentes.
+
+---
+
+## 20. Nueva Sección: Dashboard 2.0 (`dashboard_2.html`, `js/dashboard_2.js`)
+
+### 20.1. Filosofía de Centro de Mando Operativo
+- Rediseño conceptual de la página de inicio como un centro de control dinámico e interactivo, exclusivo en pruebas para Fernando Lozano.
+- Sincronización en tiempo real con Firestore y coherencia con la identidad corporativa de la **Temporada 2026-2027**.
+
+### 20.2. Bento KPI 1: Cuenta Atrás y Horario Límite de Relleno
+- Indicador visual dinámico con cuenta regresiva en días, horas, minutos y segundos hacia el cierre semanal.
+- **Aclaración de Regla Maula**: La fecha límite fijada (**Jueves a las 17:00h**) es el plazo improrrogable para que **todas las quinielas individuales estén rellenas en la plataforma web**. No exige que el sellado físico en la administración de loterías se realice a esa hora exacta.
+
+### 20.3. Bento KPI 2: Participación de la Peña y Modal Interactivo
+- Monitorización en vivo del número de socios que han enviado su quiniela ($N$ de 19) con porcentaje y barra de progreso animada.
+- Botón interactivo **"¿Quién falta por enviar?"**: Despliega un modal que discrimina claramente en dos bloques a los socios que ya han completado su pronóstico y a los que aún tienen su quiniela pendiente.
+
+### 20.4. Bento KPI 3: Roles Dinámicos de Jornada (Sella / Rellena Dobles)
+- **Sella**: Asignado al socio que quedó último / Maula en la jornada inmediata anterior.
+- **Rellena Dobles**: *"El socio que consiguió la mayor puntuación en la última jornada, tiene el privilegio de rellenar la columna de dobles."*
+- **Terminología Universal**: Se eliminó cualquier referencia estática a "7 dobles", unificando todos los textos bajo el término **"signos dobles"**, adaptándose con flexibilidad a jornadas en las que se juegan 4 o 7 dobles según la combinación aprobada.
+
+### 20.5. Bento KPI 4: Premios Comunitarios e Individuales
+- Monitorización financiera semanal que totaliza los premios conseguidos por la peña, desglosando tanto los premios de boletos individuales como los **premios obtenidos mediante la columna comunitaria de dobles**.
+
+### 20.6. Bento KPI 5: Líder de la Clasificación General
+- Muestra el socio en primera posición del campeonato, sus puntos acumulados y la distancia sobre el segundo.
+- **Cómputo Real de Jornadas**: El indicador de jornadas disputadas calcula estrictamente las jornadas jugadas en tiempo real en la temporada activa (ej. 6 jornadas reales en 2026-2027), erradicando cifras estáticas erróneas (como 38 jornadas).
+
+### 20.7. Bento KPI 6: Tarjeta Híbrida Rotativa PIG / Farolillo Rojo (Rana 🐸)
+- Ubicada estratégicamente a la derecha de la tarjeta del Líder.
+- **Semanas con Partido de Interés General (PIG)**: Muestra los resultados obtenidos por los tres equipos de interés general (Real Madrid, Barcelona, Atlético de Madrid en cualquier partido del boleto, no limitado al Pleno al 15), detallando los socios acertantes y los **perdedores penalizados** según los parámetros del Bote.
+- **Semanas sin PIG**: La tarjeta conmuta automáticamente a la tarjeta de **"Último Clasificado" / Farolillo Rojo**, luciendo el símbolo distintivo de una **Rana 🐸**.
+
+### 20.8. Ergonomía en Tarjetas Explicativas (`ℹ️`)
+- Activación al situar el ratón sobre el cuadro azul explicativo.
+- Eliminación de etiquetas nativas duplicadas del navegador (`title="Ver información"`), garantizando que solo emerja la tarjeta oficial de alta definición.
+
+---
+
+## 21. Nueva Sección: Resultados Partidos 2.0 (`jornadas_2.html`, `js/jornadas_2.js`)
+
+### 21.1. Propósito y Modernización de Escrutinio
+- Renovación exhaustiva de la vista de partidos, resultados y administración de jornadas oficiales.
+- **Regla Maula Oficial**: Todas las jornadas de la peña se computan en domingo.
+
+### 21.2. Hub de Control y Navegación 2.0
+- Barra superior con navegación secuencial rápida mediante botones **◀ Anterior** y **Siguiente ▶**.
+- Selector desplegable estilizado de jornadas (`#jornada-select-dropdown`) con badge de estado dinámico (Finalizada, En Juego, Pendiente).
+- **Carrusel Táctil de Píldoras de Jornada (`#jornadas-pills-carousel`)**: Barra deslizable horizontal con acceso directo a cada jornada de la temporada y contador en tiempo real.
+- Botones de acción rápida para administradores: `📋 Importar Partidos`, `📥 Importar Resultados`, `✏️ Editar Jornada` y `➕ Nueva`.
+
+### 21.3. Bento KPIs de la Jornada
+- **KPI 1: Calendario y Fecha Oficial**: Fecha de disputa y recuento de partidos registrados (15 / 15).
+- **KPI 2: Distribución de Signos 1-X-2**: Recuento y barras porcentuales de victorias locales (1), empates (X) y victorias visitantes (2) en los primeros 14 partidos.
+- **KPI 3: Partido PIG**: Identificador visual del partido de Interés General con escudos o indicativo de "Sin partido PIG".
+- **KPI 4: Premios Oficiales Loterías y Apuestas del Estado**: Desglose de las 6 categorías oficiales (Pleno al 15, 14, 13, 12, 11 y 10 aciertos) con número de acertantes e importe en euros por acertante.
+
+### 21.4. Cuadrícula de 15 Partidos y Botoneras Táctiles
+- Tarjetas individuales para cada partido con escudos oficiales normalizados, marcador, fecha y hora de juego.
+- Signos destacados con colores semánticos: verde para el `1`, azul cielo para la `X` y ámbar cálido para el `2`.
+- Pleno al 15 con desglose de goles locales y visitantes (`0`, `1`, `2`, `M`).
+- Botonera táctil interactiva para edición ágil de signos durante la captura de resultados.
+
+---
+
+## 22. Sistema Universal de Versiones (1.0 Clásica <-> 2.0 Pro) y Navegación Dock
+
+### 22.1. Arquitectura de `window.AppVersion` (`js/utils.js`)
+- Controlador centralizado que gestiona el modo activo de la plataforma: `'v1'` (Versión Clásica) o `'v2'` (Versión 2.0 Pro).
+- Persistencia automática de la preferencia en `localStorage ('maulas_app_version')`.
+- Conmutador universal en la cabecera superior:
+  - `[ 1.0 Clásica | ⚡ 2.0 Pro ]`
+- Mapeo bidireccional automático de rutas al alternar versión:
+  - Inicio: `index.html` $\leftrightarrow$ `dashboard_2.html`
+  - Socios: `socios.html` $\leftrightarrow$ `socios_2.html`
+  - Bote: `bote.html` $\leftrightarrow$ `bote_2.html`
+  - Resultados: `jornadas.html` $\leftrightarrow$ `jornadas_2.html`
+- Adaptación dinámica de todos los enlaces con atributo `data-version-link` en el DOM.
+
+### 22.2. Menú Dock Superior con 9 Selectores Siempre Visibles
+- Se estandarizó la barra de navegación superior en todas las páginas 2.0 con los 9 selectores oficiales:
+  1. 🏠 **Inicio** (`dashboard_2.html` / `index.html`)
+  2. 👥 **Socios** (`socios_2.html` / `socios.html`)
+  3. 💰 **Bote** (`bote_2.html` / `bote.html`)
+  4. ⚽ **Resultados** (`jornadas_2.html` / `jornadas.html`)
+  5. 📝 **Quiniela** (`pronosticos.html`)
+  6. 🏆 **Clasificación** (`resultados.html`)
+  7. 📊 **Resumen** (`resumen-temporada.html`)
+  8. 🗳️ **Votaciones** (`votaciones.html`)
+  9. ⚙️ **Admin** (`admin.html`)
+- **Adaptabilidad y Responsividad**:
+  - Se eliminó la restricción rígida `hidden xl:flex` que ocultaba los selectores en portátiles con escalado de pantalla al 125% o ventanas no maximizadas (<1280px).
+  - El menú se transformó en un dock flexible `overflow-x-auto lg:overflow-visible no-scrollbar` con elementos `flex-shrink-0`.
+  - El ancho del contenedor principal se amplió a `max-w-[1500px]` - `max-w-[1600px]`, asegurando que todos los botones respiren con comodidad y nunca se colapsen.
+  - Para pantallas móviles reducidas se mantiene el botón desplegable auxiliar `🧭 Sección` (`lg:hidden`).
+- **Identidad de Marca**: Rótulo unificado con `PEÑA MAULAS` en una sola línea y `Temporada 2026-2027` en la línea inferior.
+
+---
+
+## 23. Sistema Global de Modo Claro y Modo Oscuro (Design System 2026)
+
+### 23.1. Arquitectura de `window.AppTheme` (`js/utils.js`) y `css/light-theme.css`
+- Sistema universal de conmutación de color con interruptor en la cabecera:
+  `[ ☀️ Claro | 🌙 Oscuro ]`
+- Persistencia en `localStorage ('maulas_theme_mode')`.
+- Inicialización inmediata antes de pintar el DOM para eliminar cualquier efecto de parpadeo (FOUC).
+
+### 23.2. Modo Oscuro (100% Intacto)
+- El modo oscuro por defecto de la aplicación se mantiene **completamente intacto, sin modificar ninguno de sus valores ni estilos originales**.
+
+### 23.3. Modo Claro de Alta Gama (Tendencias UI 2026: Frosted Porcelain & Obsidian)
+- **Lienzo Marfil Porcelana (`#f8fafc`)**: Fondo claro mate con gradientes radiales fijos en tonos sutiles de ámbar y esmeralda.
+- **Paneles Glass Cerámicos**: Las tarjetas `.glass-panel` adoptan fondo blanco traslúcido (`rgba(255, 255, 255, 0.88)`), desenfoque de fondo (`backdrop-filter: blur(20px)`) y bordes nítidos (`#e2e8f0`).
+- **Jerarquía Tipográfica Obsidian**: Textos principales en negro grafito (`#0f172a`), secundarios en gris pizarra (`#1e293b`) y de lectura en pizarra suave (`#334155`), asegurando un contraste óptimo bajo luz natural.
+- **Acentos Cromáticos Cálidos**: Tonos ámbar dorado (`#d97706`/`#b45309`) y verde esmeralda (`#059669`).
+- **Regla de Oro en Tarjetas Explicativas (`ℹ️`)**: En Modo Claro, las tarjetas explicativas conservan su **fondo negro medianoche sólido (`#0b0f19`) con texto blanco nítido y ribete dorado**, garantizando máximo contraste y evitando que se fundan con el lienzo claro.
+
+### 23.4. Integración en Service Worker y Caché
+- Archivo `css/light-theme.css` incorporado a los recursos críticos (`CORE_ASSETS`) de `service-worker.js`.
+- Versión de caché de la PWA actualizada a `maulas-pwa-v1.21`.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
@@ -562,5 +713,6 @@ Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
 3. Indícale en qué vista de la web o qué archivo quieres que se enfoque y qué error concreto ocurre.
 
 *(Nota: Este archivo debe editarse y actualizarse cada vez que implementemos una regla de negocio nueva que sea compleja de entender para alguien externo).*
+
 
 
