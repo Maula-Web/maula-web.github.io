@@ -797,19 +797,35 @@
                         </p>
                     </div>
 
-                    <!-- Buscador & Filtros -->
-                    <div class="flex items-center gap-2">
+                    <!-- Buscador & Filtros & Ordenación -->
+                    <div class="flex flex-wrap items-center gap-2">
                         <input type="text" id="team-search-input" placeholder="Buscar equipo..."
-                               oninput="window.ResumenApp.filterTeams(this.value)"
-                               class="search-input-control px-3 py-1.5 rounded-xl text-xs focus:outline-none w-44 sm:w-56">
-                        <select id="team-filter-select" onchange="window.ResumenApp.filterTeamsByCategory(this.value)"
+                               oninput="window.ResumenApp.applyTeamFilters()"
+                               class="search-input-control px-3 py-1.5 rounded-xl text-xs focus:outline-none w-36 sm:w-44">
+                        <select id="team-sort-select" onchange="window.ResumenApp.applyTeamFilters()"
+                                class="search-input-control px-2.5 py-1.5 rounded-xl text-xs focus:outline-none font-bold">
+                            <option value="weighted">🧠 Fiabilidad Ponderada (Recomendado)</option>
+                            <option value="hits">🔥 Más Aciertos Totales</option>
+                            <option value="rate">🎯 % Acierto Puro</option>
+                            <option value="matches">⚽ Más Partidos Jugados</option>
+                        </select>
+                        <select id="team-filter-select" onchange="window.ResumenApp.applyTeamFilters()"
                                 class="search-input-control px-2.5 py-1.5 rounded-xl text-xs focus:outline-none">
                             <option value="all">Todos los Clubes</option>
+                            <option value="min2">Mínimo 2 partidos (Filtrar aislados)</option>
+                            <option value="min3">Mínimo 3 partidos (Consolidados)</option>
                             <option value="reliable">Top Fiables (>70%)</option>
                             <option value="trap">Trampas (<50%)</option>
-                            <option value="min5">Mínimo 5 partidos</option>
                         </select>
                     </div>
+                </div>
+
+                <!-- Banner explicativo de compensación estadística -->
+                <div class="flex items-center gap-2 p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-700 dark:text-blue-300">
+                    <span class="text-base flex-shrink-0">⚖️</span>
+                    <p class="leading-relaxed">
+                        <strong>Compensación estadística activada:</strong> Se utiliza el índice de <em>Fiabilidad Ponderada</em> (% de acierto ponderado por volumen de partidos: <code class="font-mono text-[10px] bg-blue-500/10 px-1 py-0.5 rounded">% × √partidos</code>) para evitar que un club con 1 solo partido y 100% supere a clubes con decenas de aciertos consolidados (ej. Barça). Puedes cambiar el criterio arriba.
+                    </p>
                 </div>
 
                 <!-- Grid de Equipos -->
@@ -1361,19 +1377,34 @@
                 document.getElementById('kpi-pct-fiable').textContent = `${bestRegularidad.pct.toFixed(0)}%`;
                 document.getElementById('kpi-bar-fiable').style.width = `${bestRegularidad.pct}%`;
 
-                // KPI 5: Talismán vs Trampa
-                const teamList = Object.values(this.teamStats).filter(t => t.totalMatches >= 3);
-                teamList.sort((a, b) => {
-                    const rateA = a.totalPicks > 0 ? (a.hits / a.totalPicks) : 0;
-                    const rateB = b.totalPicks > 0 ? (b.hits / b.totalPicks) : 0;
-                    return rateB - rateA;
+                // KPI 5: Talismán vs Trampa (Compensación estadística por volumen de partidos)
+                // Se priorizan clubes con muestra representativa (mínimo 2 partidos)
+                const candidateTeams = Object.values(this.teamStats).filter(t => t.totalMatches >= 2);
+                const usableTeams = candidateTeams.length >= 2 ? candidateTeams : Object.values(this.teamStats);
+
+                // Calcular métricas ponderadas
+                usableTeams.forEach(t => {
+                    const r = t.totalPicks > 0 ? (t.hits / t.totalPicks) : 0;
+                    t._kpiRate = r * 100;
+                    t._kpiScore = (r * 100) * Math.sqrt(t.totalMatches);
                 });
 
-                if (teamList.length > 0) {
-                    const talisman = teamList[0];
-                    const trampa = teamList[teamList.length - 1];
-                    const talPct = talisman.totalPicks > 0 ? ((talisman.hits / talisman.totalPicks) * 100) : 0;
-                    const traPct = trampa.totalPicks > 0 ? ((trampa.hits / trampa.totalPicks) * 100) : 0;
+                // Ordenar por score ponderado para Talismán (premia porcentaje y volumen de partidos)
+                const sortedTalisman = [...usableTeams].sort((a, b) => b._kpiScore - a._kpiScore);
+
+                // Ordenar por menor tasa para Trampa
+                const sortedTrampa = [...usableTeams].sort((a, b) => {
+                    if (Math.abs(a._kpiRate - b._kpiRate) < 5) {
+                        return b.totalMatches - a.totalMatches;
+                    }
+                    return a._kpiRate - b._kpiRate;
+                });
+
+                if (sortedTalisman.length > 0 && sortedTrampa.length > 0) {
+                    const talisman = sortedTalisman[0];
+                    const trampa = sortedTrampa[0];
+                    const talPct = talisman._kpiRate;
+                    const traPct = trampa._kpiRate;
 
                     const talLogo = (typeof AppUtils !== 'undefined' && AppUtils.getTeamLogo) ? AppUtils.getTeamLogo(talisman.name) : '';
                     const traLogo = (typeof AppUtils !== 'undefined' && AppUtils.getTeamLogo) ? AppUtils.getTeamLogo(trampa.name) : '';
@@ -1382,12 +1413,12 @@
                     const traLogoHtml = traLogo ? `<img src="${traLogo}" alt="${trampa.name}" class="w-4 h-4 object-contain inline-block flex-shrink-0 drop-shadow-xs" onerror="this.style.display='none';">` : '';
 
                     const elTal = document.getElementById('kpi-talisman-nombre');
-                    if (elTal) elTal.innerHTML = `${talLogoHtml} <span class="truncate">${talisman.name}</span>`;
+                    if (elTal) elTal.innerHTML = `${talLogoHtml} <span class="truncate">${talisman.name}</span> <span class="text-[9px] text-slate-400 font-mono ml-0.5">(${talisman.totalMatches}p)</span>`;
                     const elTalPct = document.getElementById('kpi-talisman-pct');
                     if (elTalPct) elTalPct.textContent = `${talPct.toFixed(0)}%`;
 
                     const elTra = document.getElementById('kpi-trampa-nombre');
-                    if (elTra) elTra.innerHTML = `${traLogoHtml} <span class="truncate">${trampa.name}</span>`;
+                    if (elTra) elTra.innerHTML = `${traLogoHtml} <span class="truncate">${trampa.name}</span> <span class="text-[9px] text-slate-400 font-mono ml-0.5">(${trampa.totalMatches}p)</span>`;
                     const elTraPct = document.getElementById('kpi-trampa-pct');
                     if (elTraPct) elTraPct.textContent = `${traPct.toFixed(0)}%`;
                 }
@@ -1753,9 +1784,24 @@
             }
 
             /**
-             * VISTA 3: Radar de Clubes
+             * VISTA 3: Radar de Clubes con Compensación Estadística
              */
-            renderClubes(filterText = '', filterCategory = 'all') {
+            applyTeamFilters() {
+                const searchVal = document.getElementById('team-search-input')?.value || '';
+                const filterCat = document.getElementById('team-filter-select')?.value || 'all';
+                const sortMode = document.getElementById('team-sort-select')?.value || 'weighted';
+                this.renderClubes(searchVal, filterCat, sortMode);
+            }
+
+            filterTeams(text) {
+                this.applyTeamFilters();
+            }
+
+            filterTeamsByCategory(cat) {
+                this.applyTeamFilters();
+            }
+
+            renderClubes(filterText = '', filterCategory = 'all', sortMode = 'weighted') {
                 const container = document.getElementById('teams-grid');
                 if (!container) return;
 
@@ -1769,20 +1815,66 @@
                     list = list.filter(t => t.totalPicks > 0 && ((t.hits / t.totalPicks) * 100) >= 70);
                 } else if (filterCategory === 'trap') {
                     list = list.filter(t => t.totalPicks > 0 && ((t.hits / t.totalPicks) * 100) < 50);
+                } else if (filterCategory === 'min2') {
+                    list = list.filter(t => t.totalMatches >= 2);
+                } else if (filterCategory === 'min3') {
+                    list = list.filter(t => t.totalMatches >= 3);
                 } else if (filterCategory === 'min5') {
                     list = list.filter(t => t.totalMatches >= 5);
                 }
 
-                list.sort((a, b) => {
-                    const rA = a.totalPicks > 0 ? (a.hits / a.totalPicks) : 0;
-                    const rB = b.totalPicks > 0 ? (b.hits / b.totalPicks) : 0;
-                    return rB - rA;
+                // Cálculo de métricas para cada equipo
+                list.forEach(t => {
+                    t.rate = t.totalPicks > 0 ? (t.hits / t.totalPicks) : 0;
+                    t.pct = t.rate * 100;
+                    // Score de fiabilidad ponderada: % acierto * sqrt(partidos)
+                    // Con esto, 4 partidos al 92% (184 pts) supera limpiamente a 1 partido al 100% (100 pts)
+                    t.weightedScore = t.pct * Math.sqrt(t.totalMatches);
                 });
 
-                container.innerHTML = list.map(t => {
-                    const rate = t.totalPicks > 0 ? ((t.hits / t.totalPicks) * 100) : 0;
+                // Ordenación según selección
+                list.sort((a, b) => {
+                    if (sortMode === 'weighted') {
+                        if (Math.abs(b.weightedScore - a.weightedScore) > 0.01) {
+                            return b.weightedScore - a.weightedScore;
+                        }
+                        return b.hits - a.hits;
+                    } else if (sortMode === 'hits') {
+                        if (b.hits !== a.hits) return b.hits - a.hits;
+                        return b.pct - a.pct;
+                    } else if (sortMode === 'rate') {
+                        if (Math.abs(b.pct - a.pct) > 0.01) return b.pct - a.pct;
+                        return b.totalMatches - a.totalMatches;
+                    } else if (sortMode === 'matches') {
+                        if (b.totalMatches !== a.totalMatches) return b.totalMatches - a.totalMatches;
+                        return b.hits - a.hits;
+                    }
+                    return b.weightedScore - a.weightedScore;
+                });
+
+                if (list.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full py-8 text-center text-slate-400 font-mono text-xs">
+                            No se encontraron clubes con los filtros seleccionados.
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = list.map((t, rankIdx) => {
+                    const rate = t.pct;
                     const barColor = rate >= 70 ? 'from-emerald-500 to-teal-400' : (rate >= 50 ? 'from-blue-500 to-indigo-400' : 'from-rose-500 to-red-400');
                     const badgeClass = rate >= 70 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : (rate >= 50 ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400');
+
+                    // Badge de representatividad de la muestra
+                    let sampleBadge = '';
+                    if (t.totalMatches >= 3) {
+                        sampleBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" title="Muestra sólida (3 o más partidos)">🟢 Sólida</span>`;
+                    } else if (t.totalMatches === 2) {
+                        sampleBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400" title="Muestra media (2 partidos)">🟡 Media</span>`;
+                    } else {
+                        sampleBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-500/15 text-slate-500 dark:text-slate-400" title="1 solo partido. Muestra aislada">⚪ 1 partido</span>`;
+                    }
 
                     const logoUrl = (typeof AppUtils !== 'undefined' && AppUtils.getTeamLogo) ? AppUtils.getTeamLogo(t.name) : '';
                     const logoHtml = logoUrl
@@ -1794,37 +1886,34 @@
                         <div class="glass-panel p-3.5 flex flex-col justify-between hover:border-amber-500/40 transition">
                             <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 dark:border-slate-800 gap-2">
                                 <div class="flex items-center gap-2 truncate pr-1 min-w-0">
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">#${rankIdx + 1}</span>
                                     ${logoHtml}
                                     <span class="font-bold text-xs text-slate-900 dark:text-white truncate" title="${t.name}">
                                         ${t.name}
                                     </span>
                                 </div>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-black ${badgeClass} flex-shrink-0">
-                                    ${rate.toFixed(0)}%
-                                </span>
+                                <div class="flex items-center gap-1 flex-shrink-0">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-black ${badgeClass}">
+                                        ${rate.toFixed(0)}%
+                                    </span>
+                                </div>
                             </div>
                             <div class="my-2">
                                 <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-1.5">
                                     <div class="h-full bg-gradient-to-r ${barColor}" style="width: ${rate}%"></div>
                                 </div>
-                                <div class="flex justify-between text-[11px] text-slate-500 font-mono">
-                                    <span>${t.hits} aciertos</span>
-                                    <span>${t.totalMatches} partidos</span>
+                                <div class="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                                    <span><strong>${t.hits}</strong>/${t.totalPicks} aciertos</span>
+                                    <span><strong>${t.totalMatches}</strong> ${t.totalMatches === 1 ? 'partido' : 'partidos'}</span>
                                 </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-100 dark:border-slate-800/80 text-slate-400 font-mono">
+                                <span title="Fórmula: % acierto × √partidos">Índice: <strong class="text-amber-500 font-bold">${t.weightedScore.toFixed(0)} pts</strong></span>
+                                ${sampleBadge}
                             </div>
                         </div>
                     `;
                 }).join('');
-            }
-
-            filterTeams(text) {
-                const cat = document.getElementById('team-filter-select').value;
-                this.renderClubes(text, cat);
-            }
-
-            filterTeamsByCategory(cat) {
-                const text = document.getElementById('team-search-input').value;
-                this.renderClubes(text, cat);
             }
 
             /**
