@@ -2013,10 +2013,11 @@
                         const db2 = [4,5,6,7].map(i => colorSignD(dsel[i], i)).join('');
                         const db3 = [8,9,10].map(i => colorSignD(dsel[i], i)).join('');
                         const db4 = [11,12,13].map(i => colorSignD(dsel[i], i)).join('');
+                        // Los dobles SIEMPRE incluyen P15 si hay partido PIG en la jornada
                         let dp15 = '';
-                        if (hasPig15) {
+                        if (hasPigAnywhere) {
                             const s15d = dsel[14] ? String(dsel[14]).trim() : '-';
-                            dp15 = `<div class="forecast-p15-block">${colorSignD(s15d !== '-' ? s15d : null, 14)}</div>`;
+                            dp15 = `<div class="forecast-p15-block" title="Pleno al 15 (Dobles)">${colorSignD(s15d !== '-' ? s15d : null, 14)}</div>`;
                         }
                         doublesContent = `
                             <div class="forecast-h-cell">
@@ -2032,7 +2033,9 @@
                             </div>
                         `;
                     } else {
-                        doublesContent = `<div class="forecast-h-cell opacity-40"><div class="forecast-h-badges"></div><div class="forecast-h-block forecast-h-empty">----</div><div class="forecast-h-sep"></div><div class="forecast-h-block forecast-h-empty">----</div></div>`;
+                        // Estado vacío: mostrar también el hueco del P15 si aplica
+                        const emptyP15 = hasPigAnywhere ? `<div class="forecast-p15-block"><span class="sign-h-empty">-</span></div>` : '';
+                        doublesContent = `<div class="forecast-h-cell opacity-40"><div class="forecast-h-badges"></div><div class="forecast-h-block forecast-h-empty">----</div><div class="forecast-h-sep"></div><div class="forecast-h-block forecast-h-empty">----</div><div class="forecast-h-sep"></div><div class="forecast-h-block forecast-h-empty">---</div><div class="forecast-h-sep"></div><div class="forecast-h-block forecast-h-empty">---</div>${emptyP15}</div>`;
                     }
 
                     rowHtml += `<td class="summary-cell" onclick="window.openEditorForDoubles('${j.id}')" title="Abrir quiniela de dobles">${doublesContent}</td>`;
