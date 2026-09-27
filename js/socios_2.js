@@ -115,7 +115,7 @@ class SociosAppController {
     }
 
     /**
-     * Carga de datos reales desde Firestore y cálculo de Bote y Conectividad
+     * Carga de datos reales desde Firestore y recuperación de balances de Bote 2
      */
     async loadLiveFirebaseData() {
         try {
@@ -124,16 +124,17 @@ class SociosAppController {
                 this.members = await window.DataService.getAll('members') || [];
                 this.pronosticos = await window.DataService.getAll('pronosticos') || [];
                 this.jornadas = await window.DataService.getAll('jornadas') || [];
-                this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
-                this.repartos = await window.DataService.getAll('repartos') || [];
-                this.cierresVuelta = await window.DataService.getAll('cierres_vuelta') || [];
-                this.ingresos = await window.DataService.getAll('ingresos') || [];
-                this.cashPayments = await window.DataService.getAll('reembolsos_efectivo') || [];
+            }
+            if (!this.members || this.members.length === 0) {
+                if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027']) {
+                    this.members = window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries || [];
+                }
             }
             this.pushSubscriptions = await this.loadPushSubscriptions();
-            this.calculateMemberBalances();
+            this.loadMemberBalancesFromBote2();
         } catch (e) {
             console.error('[Socios 2.0] Error cargando datos de Firestore:', e);
+            this.loadMemberBalancesFromBote2();
         }
     }
 
@@ -153,27 +154,52 @@ class SociosAppController {
     }
 
     /**
-     * Cálculo de balances del Bote usando BoteEngine
+     * Recupera los balances oficiales consolidados de los socios directamente de Bote 2 (sin volver a calcular)
      */
-    calculateMemberBalances() {
-        try {
-            if (window.BoteEngine && this.members.length > 0) {
-                const engine = new window.BoteEngine();
-                this.memberBalances = engine.calculateMemberBalances(
-                    this.members,
-                    this.jornadas,
-                    this.pronosticos,
-                    this.pronosticosExtra,
-                    this.repartos,
-                    this.cierresVuelta,
-                    this.ingresos,
-                    this.cashPayments
-                );
+    loadMemberBalancesFromBote2() {
+        this.memberBalances = new Map();
+
+        // 1. Obtener la fuente oficial consolidada de Bote 2
+        let memberSummaries = [];
+        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
+            const sd = window.BoteApp.getSeasonData();
+            if (sd && Array.isArray(sd.memberSummaries) && sd.memberSummaries.length > 0) {
+                memberSummaries = sd.memberSummaries;
             }
-        } catch (err) {
-            console.error('[Socios 2.0] Error calculando balances de bote:', err);
-            this.memberBalances = new Map();
         }
+        
+        if (memberSummaries.length === 0 && window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries) {
+            memberSummaries = window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries;
+        }
+
+        const norm = (s) => (s || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+        // 2. Mapear cada socio con su saldo y estado exacto de Bote 2
+        memberSummaries.forEach(s => {
+            const mId = parseInt(s.id);
+            const saldo = typeof s.saldo === 'number' ? s.saldo : parseFloat(s.saldo || 0);
+            const isTes = this.isTesorero(s);
+            // Saldo deudor ordinario solo si es negativo (< -0.009) y NO es el Tesorero
+            const isDeud = saldo < -0.009 && !isTes;
+
+            const entry = {
+                memberId: mId,
+                name: s.name,
+                saldo: saldo,
+                totIn: s.totIn || 0,
+                totOut: s.totOut || 0,
+                isTesorero: isTes,
+                isDeudor: isDeud,
+                isActivoBote: !isDeud || isTes,
+                status: isTes ? 'tesorero' : (isDeud ? 'deudor' : 'activo'),
+                color: isTes ? 'amber' : (isDeud ? 'rose' : 'emerald')
+            };
+
+            this.memberBalances.set(mId, entry);
+            if (s.name) {
+                this.memberBalances.set(`name_${norm(s.name)}`, entry);
+            }
+        });
     }
 
     /**
@@ -208,10 +234,31 @@ class SociosAppController {
      * - Solvente (>= 0): Verde, activo en Bote.
      */
     getMemberDebtStatus(member) {
-        const bal = this.memberBalances.get(member.id);
+        if (!member) {
+            return {
+                status: 'activo',
+                isTesorero: false,
+                isDeudor: false,
+                isActivo: true,
+                saldo: 0,
+                saldoFormatted: '+0.00€',
+                badgeText: '🟢 Al corriente (+0.00€)',
+                badgeTag: '🟢 Activo en Bote',
+                subtext: 'Activo con derecho pleno al Bote',
+                color: 'emerald',
+                badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+            };
+        }
+
+        const mIdNum = parseInt(member.id);
+        const norm = (s) => (s || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        const bal = this.memberBalances.get(mIdNum) || 
+                    this.memberBalances.get(String(member.id)) || 
+                    this.memberBalances.get(`name_${norm(member.name)}`);
+
         const saldo = bal ? bal.saldo : 0;
         const isTes = this.isTesorero(member);
-        const isDeud = saldo < -0.009;
+        const isDeud = saldo < -0.009 && !isTes;
 
         if (isTes) {
             return {
@@ -220,12 +267,12 @@ class SociosAppController {
                 isDeudor: false,
                 isActivo: true,
                 saldo: saldo,
-                saldoFormatted: `${saldo >= 0 ? '+' : ''}${saldo.toFixed(2)}€`,
-                badgeText: `🟡 Tesorero (${saldo >= 0 ? '+' : ''}${saldo.toFixed(2)}€)`,
+                saldoFormatted: `${saldo.toFixed(2)}€`,
+                badgeText: `🟡 Tesorero (${saldo.toFixed(2)}€)`,
                 badgeTag: '🟡 Tesorero',
                 subtext: 'Regulariza en repartos de temporada',
                 color: 'amber',
-                badgeClass: 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
             };
         }
 
@@ -252,7 +299,7 @@ class SociosAppController {
             isActivo: true,
             saldo: saldo,
             saldoFormatted: `+${saldo.toFixed(2)}€`,
-            badgeText: `🟢 Al corriente (${saldo >= 0 ? '+' : ''}${saldo.toFixed(2)}€)`,
+            badgeText: `🟢 Al corriente (+${saldo.toFixed(2)}€)`,
             badgeTag: '🟢 Activo en Bote',
             subtext: 'Activo con derecho pleno al Bote',
             color: 'emerald',
@@ -316,7 +363,7 @@ class SociosAppController {
         const activeBoteCount = solventesCount + (tesorero ? 1 : 0);
 
         if (elTotal) {
-            elTotal.textContent = `${activeBoteCount} / ${totalSocios}`;
+            elTotal.textContent = totalSocios;
         }
 
         if (elCensoStatus) {
@@ -333,7 +380,7 @@ class SociosAppController {
             if (deudores.length > 0) {
                 elCensoSubtext.innerHTML = `<span class="text-rose-400 font-semibold">${deudores.length} no activos en Bote</span> · ${solventesCount} solventes`;
             } else {
-                elCensoSubtext.textContent = 'Todos los socios al corriente y activos en Bote';
+                elCensoSubtext.innerHTML = `${solventesCount} solventes · <span class="text-amber-400 font-semibold">1 en regularización</span>`;
             }
         }
 
@@ -383,7 +430,7 @@ class SociosAppController {
                             <strong class="text-amber-400 font-bold">${tesorero.info.saldoFormatted}</strong>
                         </div>
                         <p class="text-[10px] text-amber-300/90 mt-1 leading-snug">
-                            Regulariza su situación contable de forma planificada al realizar los repartos a lo largo de la temporada.
+                            Único socio con saldo pendiente temporal (${tesorero.info.saldoFormatted}). Regulariza su situación de forma planificada al realizar los repartos a lo largo de la temporada.
                         </p>
                     </div>
                 `;

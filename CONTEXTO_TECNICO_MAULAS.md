@@ -775,6 +775,14 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
   - `status: 'tesorero'` (amarillo) si es Marcelo Pérez.
   - `status: 'activo'` (verde) si `saldo >= -0.009`.
 
+### 25.5. Fuente de Saldos en Socios 2.0: Consolidado de Bote 2 sin Recalcular
+- **Problema de Recálculo Parcial en Firestore**: Las colecciones atómicas en Firestore (`ingresos`, `repartos`) pueden no contener la totalidad de transferencias bancarias o depósitos iniciales que sí están consolidados en la tesorería histórica de Bote 2. Recalcular desde cero en Socios 2 provocaba que 7 socios con saldo bajo pero positivo (JA Valdivieso: +1.59€, Heradio: +9.19€, Martín: +10.20€, Carlos: +16.79€, Ramón: +21.69€, Raúl Romera: +22.46€, Alvaro: +25.84€) aparecieran erróneamente con saldo negativo/deudor.
+- **Solución Arquitectónica Definitiva**: Socios 2 (`js/socios_2.js`) **NO recalcula** de colecciones atómicas; consume de forma directa y sincronizada los balances oficiales consolidados de Bote 2 (`window.BoteApp.getSeasonData().memberSummaries` o `window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries`).
+- **Estado Oficial del Censo**:
+  - **18 Socios Solventes (100% de socios ordinarios)**: Todos con saldo positivo (> 0.00€) y derecho pleno al Bote.
+  - **1 Socio en Regularización (Tesorero, Marcelo Pérez)**: Único miembro con saldo pendiente temporal (-10.40€), regularizado de forma planificada en los repartos de temporada (distintivo amarillo).
+  - **0 Socios Deudores Ordinarios**.
+
 ---
 
 ## Recomendación de Flujo para la IA
