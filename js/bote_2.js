@@ -425,7 +425,7 @@ class BoteAppController {
             season,
             config,
             summary: {
-                cajaReal: cajaReal > 0 ? cajaReal : totalSaldosVirtuales + 104.72,
+                cajaReal: cajaReal > 0 ? cajaReal : totalSaldosVirtuales + 61.78,
                 totalSaldosVirtuales,
                 totalIngresos,
                 totalGastos,
@@ -579,6 +579,7 @@ class BoteAppController {
         const cardIn = document.getElementById('card-total-ingresos');
         const cardOut = document.getElementById('card-total-gastos');
         const cardPrem = document.getElementById('card-total-premios');
+        const cardSuperavit = document.getElementById('card-superavit-val');
         const bSocios = document.getElementById('badge-socios-count');
         const bJornadas = document.getElementById('badge-jornadas-count');
 
@@ -587,6 +588,10 @@ class BoteAppController {
         if (cardIn) cardIn.textContent = (s.totalIngresos || 0).toFixed(2) + ' €';
         if (cardOut) cardOut.textContent = (s.totalGastos || 0).toFixed(2) + ' €';
         if (cardPrem) cardPrem.textContent = (s.totalPremios || 0).toFixed(2) + ' €';
+        if (cardSuperavit) {
+            const superavit = (s.cajaReal || 0) - (s.totalSaldosVirtuales || 0);
+            cardSuperavit.textContent = `${superavit >= 0 ? '+' : ''}${superavit.toFixed(2)} €`;
+        }
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
         if (bJornadas) bJornadas.textContent = data.jornadaSummaries.length;
 
