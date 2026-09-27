@@ -658,11 +658,84 @@ window.AppVersion = {
     }
 };
 
+// =========================================================================
+// GESTOR DE TEMA (MODO OSCURO INTACTO <-> MODO CLARO ALTA GAMA)
+// =========================================================================
+window.AppTheme = {
+    getTheme() {
+        const stored = localStorage.getItem('maulas_theme_mode');
+        if (stored === 'light' || stored === 'dark') return stored;
+        return 'dark'; // Modo oscuro 100% intacto por defecto
+    },
+
+    setTheme(theme) {
+        localStorage.setItem('maulas_theme_mode', theme);
+        this.applyTheme(theme);
+    },
+
+    toggle() {
+        const current = this.getTheme();
+        const next = (current === 'light') ? 'dark' : 'light';
+        this.setTheme(next);
+    },
+
+    applyTheme(theme) {
+        const root = document.documentElement;
+        const body = document.body;
+        if (theme === 'light') {
+            root.classList.remove('dark');
+            root.classList.add('light-theme');
+            if (body) {
+                body.classList.remove('dark');
+                body.classList.add('light-theme');
+            }
+        } else {
+            root.classList.remove('light-theme');
+            root.classList.add('dark');
+            if (body) {
+                body.classList.remove('light-theme');
+                body.classList.add('dark');
+            }
+        }
+        this.updateButtons(theme);
+    },
+
+    updateButtons(theme) {
+        const btnLight = document.getElementById('btn-theme-light');
+        const btnDark = document.getElementById('btn-theme-dark');
+        if (btnLight && btnDark) {
+            if (theme === 'light') {
+                btnLight.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                btnDark.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+            } else {
+                btnDark.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                btnLight.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+            }
+        }
+    },
+
+    init() {
+        const theme = this.getTheme();
+        this.applyTheme(theme);
+    }
+};
+
+// Inicializar de inmediato para evitar parpadeos
+if (typeof window !== 'undefined' && window.AppTheme) {
+    window.AppTheme.init();
+}
+
 // Inicializar al cargar el DOM
 if (typeof document !== 'undefined') {
+    const onDomReady = () => {
+        if (window.AppVersion) window.AppVersion.init();
+        if (window.AppTheme) window.AppTheme.init();
+    };
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => window.AppVersion && window.AppVersion.init());
+        document.addEventListener('DOMContentLoaded', onDomReady);
     } else {
-        window.AppVersion.init();
+        onDomReady();
     }
 }
+

@@ -1,0 +1,399 @@
+/**
+ * Peña Maulas - Design System: Light Mode (Modo Claro Alta Gama)
+ * Inspirado en las últimas tendencias 2026: Frosted Porcelain Canvas,
+ * Obsidian Typography & Warm Amber/Emerald Accents.
+ *
+ * Mantiene intacto el Modo Oscuro por defecto y transforma con exquisita
+ * elegancia, contraste nítido y legibilidad insuperable cuando se activa .light-theme.
+ */
+
+/* =========================================================================
+   1. CANVAS Y ESTRUCTURA BASE
+   ========================================================================= */
+html.light-theme,
+body.light-theme {
+    --color-bg-base: #f8fafc;
+    --color-bg: #f8fafc;
+    --color-card: rgba(255, 255, 255, 0.90);
+    --color-card-border: rgba(226, 232, 240, 0.95);
+    --color-card-hover: rgba(217, 119, 6, 0.35);
+    --color-primary: #d97706;
+    --color-primary-dark: #b45309;
+    --color-primary-light: #f59e0b;
+    --color-emerald: #059669;
+    --color-rose: #e11d48;
+    --color-amber: #d97706;
+
+    background-color: #f8fafc !important;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.08) 0px, transparent 55%),
+        radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 55%) !important;
+    background-attachment: fixed !important;
+    color: #0f172a !important;
+}
+
+/* =========================================================================
+   2. PANELES Y TARJETAS (FROSTED PORCELAIN GLASS)
+   ========================================================================= */
+.light-theme .glass-panel {
+    background: rgba(255, 255, 255, 0.88) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.95) !important;
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03) !important;
+}
+
+.light-theme .glass-panel:hover {
+    border-color: rgba(217, 119, 6, 0.4) !important;
+    box-shadow: 0 14px 34px -5px rgba(217, 119, 6, 0.08), 0 4px 14px -2px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* =========================================================================
+   3. TIPOGRAFÍA Y JERARQUÍA DE CONTRASTE (OBSIDIAN & SLATE)
+   ========================================================================= */
+.light-theme .text-white {
+    color: #0f172a !important;
+}
+
+.light-theme .text-slate-100,
+.light-theme .text-slate-200 {
+    color: #1e293b !important;
+}
+
+.light-theme .text-slate-300 {
+    color: #334155 !important;
+}
+
+.light-theme .text-slate-400 {
+    color: #64748b !important;
+}
+
+.light-theme .text-slate-500 {
+    color: #64748b !important;
+}
+
+/* Acentos cromáticos de alta saturación y contraste */
+.light-theme .text-amber-300,
+.light-theme .text-amber-400 {
+    color: #b45309 !important;
+}
+
+.light-theme .text-emerald-300,
+.light-theme .text-emerald-400 {
+    color: #047857 !important;
+}
+
+.light-theme .text-rose-300,
+.light-theme .text-rose-400 {
+    color: #be123c !important;
+}
+
+.light-theme .text-sky-300,
+.light-theme .text-sky-400,
+.light-theme .text-cyan-300,
+.light-theme .text-cyan-400 {
+    color: #0369a1 !important;
+}
+
+/* =========================================================================
+   4. FONDOS DE SUPERFICIES Y BORDES
+   ========================================================================= */
+.light-theme .bg-slate-950,
+.light-theme .bg-slate-900,
+.light-theme .bg-\[\#06080e\],
+.light-theme .bg-\[\#090d16\],
+.light-theme .bg-\[\#0b0f19\]:not(.tooltip-box):not([class*="group-hover\/tip"]) {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+.light-theme .bg-slate-800 {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.light-theme .bg-slate-800\/50,
+.light-theme .bg-slate-800\/60,
+.light-theme .bg-slate-800\/80 {
+    background-color: rgba(241, 245, 249, 0.85) !important;
+    border-color: #e2e8f0 !important;
+}
+
+.light-theme .border-slate-800,
+.light-theme .border-slate-700 {
+    border-color: #e2e8f0 !important;
+}
+
+.light-theme .border-slate-600 {
+    border-color: #cbd5e1 !important;
+}
+
+.light-theme .border-amber-500\/30,
+.light-theme .border-amber-500\/40,
+.light-theme .border-amber-500\/50 {
+    border-color: rgba(217, 119, 6, 0.35) !important;
+}
+
+.light-theme .border-emerald-500\/30,
+.light-theme .border-emerald-500\/40 {
+    border-color: rgba(5, 150, 105, 0.35) !important;
+}
+
+/* Píldoras y Badges con colores pastel elegantes */
+.light-theme .bg-amber-500\/20,
+.light-theme .bg-amber-500\/10 {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+
+.light-theme .bg-emerald-500\/20,
+.light-theme .bg-emerald-500\/10 {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+}
+
+.light-theme .bg-rose-500\/20,
+.light-theme .bg-rose-500\/10 {
+    background-color: #ffe4e6 !important;
+    color: #9f1239 !important;
+}
+
+.light-theme .bg-sky-500\/20,
+.light-theme .bg-sky-500\/10 {
+    background-color: #e0f2fe !important;
+    color: #0369a1 !important;
+}
+
+.light-theme .bg-white\/10,
+.light-theme .bg-white\/5 {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+/* =========================================================================
+   5. NAVBAR Y ELEMENTOS DE NAVEGACIÓN EN MODO CLARO
+   ========================================================================= */
+.light-theme nav.glass-panel {
+    background: rgba(255, 255, 255, 0.94) !important;
+    border-color: rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05) !important;
+}
+
+.light-theme nav a {
+    color: #334155 !important;
+}
+
+.light-theme nav a:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+/* Elemento activo en el menú Dock */
+.light-theme nav a.bg-amber-500\/20 {
+    background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+    color: #92400e !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.25) !important;
+}
+
+.light-theme nav a.bg-amber-500\/20 span {
+    color: #92400e !important;
+}
+
+/* Votaciones en modo claro */
+.light-theme nav a[href="votaciones.html"] {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Contenedores de interruptores de versión y tema */
+.light-theme #version-switcher-container,
+.light-theme #theme-switcher-container {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme #btn-version-v1:not(.bg-gradient-to-r),
+.light-theme #btn-version-v2:not(.bg-gradient-to-r),
+.light-theme #btn-theme-light:not(.bg-gradient-to-r),
+.light-theme #btn-theme-dark:not(.bg-gradient-to-r) {
+    color: #64748b !important;
+}
+
+.light-theme #btn-version-v1:hover,
+.light-theme #btn-version-v2:hover,
+.light-theme #btn-theme-light:hover,
+.light-theme #btn-theme-dark:hover {
+    color: #0f172a !important;
+}
+
+/* Desplegable de Sección */
+.light-theme #nav-section-dropdown-wrap button {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #b45309 !important;
+}
+
+.light-theme #nav-section-dropdown {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15) !important;
+}
+
+.light-theme #nav-section-dropdown a {
+    color: #334155 !important;
+}
+
+.light-theme #nav-section-dropdown a:hover {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+/* Botones de acción rápida en navbar (Actualizar, Salir) */
+.light-theme nav button[title*="Actualizar"] {
+    background-color: #ffffff !important;
+    border-color: rgba(5, 150, 105, 0.4) !important;
+    color: #047857 !important;
+}
+.light-theme nav button[title*="Actualizar"]:hover {
+    background-color: #ecfdf5 !important;
+}
+
+.light-theme nav button[title*="Cerrar"] {
+    background-color: #ffffff !important;
+    border-color: rgba(225, 29, 72, 0.4) !important;
+    color: #be123c !important;
+}
+.light-theme nav button[title*="Cerrar"]:hover {
+    background-color: #fff1f2 !important;
+}
+
+/* =========================================================================
+   6. BOTONERAS TÁCTILES Y ENTRADAS DE DATOS
+   ========================================================================= */
+.light-theme .tactile-opt-btn {
+    background-color: #ffffff !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.light-theme .tactile-opt-btn:hover {
+    background-color: #f8fafc !important;
+    border-color: #94a3b8 !important;
+}
+
+.light-theme .tactile-opt-btn.active-1 {
+    background: #059669 !important;
+    color: #ffffff !important;
+    border-color: #047857 !important;
+    box-shadow: 0 0 14px rgba(5, 150, 105, 0.35) !important;
+}
+
+.light-theme .tactile-opt-btn.active-X {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    border-color: #0369a1 !important;
+    box-shadow: 0 0 14px rgba(2, 132, 199, 0.35) !important;
+}
+
+.light-theme .tactile-opt-btn.active-2 {
+    background: #d97706 !important;
+    color: #ffffff !important;
+    border-color: #b45309 !important;
+    box-shadow: 0 0 14px rgba(217, 119, 6, 0.35) !important;
+}
+
+.light-theme .tactile-opt-btn.active-pleno {
+    background: #d97706 !important;
+    color: #ffffff !important;
+    border-color: #b45309 !important;
+    box-shadow: 0 0 14px rgba(217, 119, 6, 0.35) !important;
+}
+
+/* Entradas de formulario, selects y fechas */
+.light-theme input,
+.light-theme select,
+.light-theme textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+.light-theme input:focus,
+.light-theme select:focus,
+.light-theme textarea:focus {
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+}
+
+/* =========================================================================
+   7. MODALES Y DIÁLOGOS FLOTANTES
+   ========================================================================= */
+.light-theme .modal-glass-backdrop,
+.light-theme .modal-overlay,
+.light-theme .fixed.inset-0.bg-black\/80 {
+    background-color: rgba(15, 23, 42, 0.45) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.light-theme .animate-modal,
+.light-theme .modal {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25) !important;
+}
+
+/* =========================================================================
+   8. REGLA DE ORO: TARJETAS EXPLICATIVAS (ℹ️) EN MODO CLARO
+   Deben mantenerse con fondo oscuro sólido (#0b0f19) de alta gama,
+   texto blanco nítido y borde dorado. Sobre el lienzo claro tienen un
+   impacto visual fascinante (máximo contraste y cero confusiones con el fondo).
+   ========================================================================= */
+.light-theme .tooltip-box,
+.light-theme .group\/tip > div[class*="group-hover\/tip:visible"],
+.light-theme .group\/tip:hover > div[class*="absolute"],
+.light-theme div[class*="group-hover\/tip:visible"] {
+    background-color: #0b0f19 !important;
+    background: #0b0f19 !important;
+    color: #f8fafc !important;
+    border: 1.5px solid #d97706 !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35), 0 0 20px rgba(217, 119, 6, 0.2) !important;
+    opacity: 1 !important;
+    z-index: 100060 !important;
+}
+
+.light-theme .tooltip-box *,
+.light-theme .group\/tip > div[class*="group-hover\/tip:visible"] *,
+.light-theme .group\/tip:hover > div[class*="absolute"] * {
+    color: #f8fafc !important;
+}
+
+.light-theme .tooltip-box .text-amber-400,
+.light-theme .group\/tip:hover > div[class*="absolute"] .text-amber-400 {
+    color: #fbbf24 !important;
+}
+
+/* =========================================================================
+   9. TABLAS, CARROUSELES Y DESGLOSES
+   ========================================================================= */
+.light-theme table th {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #e2e8f0 !important;
+}
+
+.light-theme table td {
+    border-color: #f1f5f9 !important;
+}
+
+.light-theme table tr:hover td {
+    background-color: #f8fafc !important;
+}
+
+.light-theme .jornadas-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(217, 119, 6, 0.4);
+}

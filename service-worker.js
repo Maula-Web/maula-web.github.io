@@ -3,7 +3,7 @@
  * Versión de caché: maulas-pwa-v1.0
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.20';
+const CACHE_NAME = 'maulas-pwa-v1.21';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -26,6 +26,7 @@ const CORE_ASSETS = [
     'manual.html',
     'MANUAL_COMPLETO_2026.html',
     'css/styles.css',
+    'css/light-theme.css',
     'css/resumen-styles.css',
     'manifest.json',
     'apple-touch-icon.png',
