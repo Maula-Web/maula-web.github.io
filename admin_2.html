@@ -51,31 +51,34 @@
     <!-- Estilos Críticos y Variables Visuales -->
     <style>
         :root {
-            --color-bg-base: #06080e;
-            --color-card: rgba(15, 23, 42, 0.75);
+            --color-bg-base: #090d16;
+            --color-bg: #090d16;
+            --color-card: rgba(18, 24, 38, 0.85);
             --color-card-border: rgba(245, 158, 11, 0.25);
             --color-card-hover: rgba(245, 158, 11, 0.45);
         }
 
         body {
-            background-color: var(--color-bg-base);
-            background-image:
-                radial-gradient(at 10% 15%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
-                radial-gradient(at 90% 85%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #090d16;
+            color: #f1f5f9;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 145, 0, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(255, 145, 0, 0.05) 0px, transparent 50%);
             background-attachment: fixed;
             min-height: 100vh;
-            color: #f8fafc;
-            font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+            overflow-x: hidden;
         }
 
         .light-theme body,
-        html.light-theme {
-            background-color: #f1f5f9 !important;
-            background-image:
-                radial-gradient(at 10% 15%, rgba(245, 158, 11, 0.12) 0px, transparent 50%),
-                radial-gradient(at 90% 85%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.06) 0px, transparent 50%) !important;
+        html.light-theme body {
+            background-color: #f8f5ed !important;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(217, 119, 6, 0.04) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 55%) !important;
+            background-attachment: fixed !important;
             color: #0f172a !important;
         }
 
@@ -289,9 +292,9 @@
             <!-- Izquierda: Brand / Logo -->
             <div class="flex items-center justify-between gap-2 w-full md:w-auto flex-shrink-0">
                 <a href="dashboard_2.html" class="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
-                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow group-hover:scale-105 transition-transform flex-shrink-0">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-10 h-10 sm:w-11 sm:h-11 xl:w-12 xl:h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform flex-shrink-0">
                     <div class="leading-tight flex flex-col justify-center">
-                        <span id="brand-text-maulas" class="font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
+                        <span id="brand-text-maulas" class="font-black text-white text-base sm:text-lg tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
                         <span class="text-[9px] sm:text-[10px] text-amber-500 dark:text-amber-400 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
                     </div>
                 </a>
