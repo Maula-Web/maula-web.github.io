@@ -6,7 +6,7 @@ Esta hoja puede suponer un reto ya que es una simple tabla de datos. Pero seguro
 
 
 Vamos con el plato fuerte. La versión 2 de Resumen. Esta hoja es sobre todo visual. Esto es un resumen de cómo va la temporada.
-Aplica el estilo del resto de hojas, con modo claro/oscuro, estableciendo aspectos viasuales diferentes para cada elemento dependiendo del modo, tarjetas explicativas, elementos graficos interactivos, ventanas emergentes, botoncitos, tarjetas deplegables con datos...
+Aplica el estilo del resto de hojas, con modo claro/oscuro, estableciendo aspectos visuales diferentes para cada elemento dependiendo del modo, tarjetas explicativas, elementos graficos interactivos, ventanas emergentes, botoncitos, tarjetas deplegables con datos...
 Lo que se te ocurra para un cuadro de mando digno del siglo XXII. investiga tendencias, estilos, organización y estructura. Proponme KPIs chulos que se puedan deducir de toda la información que genera la peña y que nos sirvan para mejorar nuestro rendimiento.
 Aquí te dejo que improvises, pero dame algo impresionante dentro del estilo de las hojas nuevas.
 no te inventes datos. Todo está ya calculado. Solo tienes que recoger la información y presentarla.
@@ -18,6 +18,9 @@ Y por último vamoa a versionar la hoja de administración con el mismo estilo n
 
 Unifica el color del fondo en todas las hojas. Parece que todas tienen el mismo pero el de la hoja Resultados es más oscuro.
 Haz mas grande el logotipo del menú.
+
+Adapta la estructura a las pantallas de móvil. Quizá podemos hacer que las tarjetas de la parte superior ocupen menos para mostrar mejor la información de cada hoja. Una versión compacta respecto a PC.
+
 
 Ahora que ya tenemos versiones nuevas de todas las hojas, vamos a desactivar para todos los socios las hojas viejas. 
 Para ello seguiremos los siguientes pasos.

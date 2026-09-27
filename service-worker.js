@@ -60,7 +60,7 @@ try {
     console.warn('[service-worker.js] Aviso cargando Firebase Messaging en SW:', e);
 }
 
-const CACHE_NAME = 'maulas-pwa-v1.57';
+const CACHE_NAME = 'maulas-pwa-v1.58';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -83,6 +83,7 @@ const CORE_ASSETS = [
     'votaciones.html',
     'votaciones_2.html',
     'admin.html',
+    'admin_2.html',
     'login.html',
     'theme-editor.html',
     'manual.html',

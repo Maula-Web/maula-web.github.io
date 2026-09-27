@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PEÑA MAULAS - Administración 2.0 · Centro de Control</title>
+
+    <!-- Favicon & Mobile App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f59e0b">
+
+    <!-- Fonts: Plus Jakarta Sans, Inter, Montserrat, JetBrains Mono, Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS v3 -->
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/light-theme.css">
+
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Firebase SDKs Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        outfit: ['"Outfit"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos Críticos y Variables Visuales -->
+    <style>
+        :root {
+            --color-bg-base: #06080e;
+            --color-card: rgba(15, 23, 42, 0.75);
+            --color-card-border: rgba(245, 158, 11, 0.25);
+            --color-card-hover: rgba(245, 158, 11, 0.45);
+        }
+
+        body {
+            background-color: var(--color-bg-base);
+            background-image:
+                radial-gradient(at 10% 15%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
+                radial-gradient(at 90% 85%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+        }
+
+        .light-theme body,
+        html.light-theme {
+            background-color: #f1f5f9 !important;
+            background-image:
+                radial-gradient(at 10% 15%, rgba(245, 158, 11, 0.12) 0px, transparent 50%),
+                radial-gradient(at 90% 85%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.06) 0px, transparent 50%) !important;
+            color: #0f172a !important;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            border-radius: 1rem;
+        }
+
+        .light-theme .glass-panel {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.4);
+            border-radius: 4px;
+        }
+        .light-theme .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(226, 232, 240, 0.8);
+        }
+        .light-theme .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.6);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Responsive Controls */
+        @media (min-width: 768px) {
+            .desktop-only-flex { display: flex !important; }
+        }
+        @media (max-width: 767px) {
+            .desktop-only-flex { display: none !important; }
+        }
+
+        /* Inputs & Form Controls */
+        .form-control-v2 {
+            background: #020617 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(245, 158, 11, 0.3) !important;
+            transition: all 0.2s ease;
+        }
+        .form-control-v2:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) !important;
+        }
+        .light-theme .form-control-v2 {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        .light-theme .form-control-v2:focus {
+            border-color: #d97706 !important;
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15) !important;
+        }
+
+        /* Tab Active Button */
+        .tab-btn-active {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            color: #020617 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Explanatory Floating Card */
+        #admin-floating-card {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+            color: #f8fafc;
+        }
+        .light-theme #admin-floating-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+            color: #0f172a;
+        }
+
+        /* Pulsing indicator */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.15); }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+
+    <!-- Script de Inicio Rápido de Tema y Acceso Restringido -->
+    <script>
+        (function () {
+            // 1. Detección temprana de tema
+            const savedTheme = localStorage.getItem('maulas_theme_mode');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light-theme');
+            } else {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light-theme');
+            }
+
+            // 2. Control de Acceso Exclusivo (Fernando Lozano / Admin)
+            function checkAccess() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
+                if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') return true;
+
+                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                if (!userStr) return false;
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.id == 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) return true;
+                    if (user.role === 'admin') return true;
+                } catch (e) { }
+                return false;
+            }
+
+            window.__isUserAuthorized = checkAccess();
+            if (!window.__isUserAuthorized) {
+                document.addEventListener('DOMContentLoaded', () => {
+                    const restr = document.getElementById('restricted-screen');
+                    const main = document.getElementById('main-content');
+                    if (restr) restr.style.display = 'flex';
+                    if (main) main.style.display = 'none';
+                });
+            }
+        })();
+    </script>
+</head>
+
+<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
+
+    <!-- Servicios y SDKs de la Peña -->
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/telegram-service.js"></script>
+
+    <!-- =====================================================================
+         PANTALLA DE ACCESO RESTRINGIDO (Oculta por defecto para evitar parpadeos)
+         ===================================================================== -->
+    <div id="restricted-screen" style="display: none;" class="min-h-[85vh] items-center justify-center p-4">
+        <div class="glass-panel max-w-xl w-full p-8 text-center space-y-6 border-amber-500/40 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-12 -top-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-4xl">
+                🛡️
+            </div>
+
+            <div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                    Área Restringida · Solo Administrador
+                </span>
+                <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white mt-3">Consola Central 2.0</h1>
+                <p class="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
+                    El panel de configuración avanzada, reglas de puntuación, bots de Telegram y custodia documental está restringido exclusivamente a <strong>Fernando Lozano</strong>.
+                </p>
+                <p class="text-slate-500 text-xs mt-2">
+                    Si eres miembro de la junta o necesitas modificar algún parámetro, contacta directamente con el Administrador.
+                </p>
+            </div>
+
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="admin.html" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                    <span>⚙️</span> Ir a Administración 1.0 (Clásica)
+                </a>
+                <a href="login.html" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-sm border border-slate-700 transition-all flex items-center justify-center gap-2">
+                    <span>🔑</span> Iniciar Sesión
+                </a>
+            </div>
+
+            <div class="pt-4 border-t border-slate-300 dark:border-slate-800 text-xs text-slate-500">
+                ¿Eres Fernando Lozano?
+                <button onclick="sessionStorage.clear(); localStorage.clear(); location.href='login.html';" class="text-amber-500 dark:text-amber-400 hover:underline font-semibold ml-1">
+                    Identifícate con tu PIN o Apodo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         CONTENEDOR PRINCIPAL: ADMINISTRACIÓN 2.0 PRO
+         ===================================================================== -->
+    <div id="main-content" class="max-w-[1650px] mx-auto space-y-3 sm:space-y-4" style="display: block;">
+
+        <!-- NAVBAR SUPERIOR MAULAS 2.0 -->
+        <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl">
+            <!-- Izquierda: Brand / Logo -->
+            <div class="flex items-center justify-between gap-2 w-full md:w-auto flex-shrink-0">
+                <a href="dashboard_2.html" class="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow group-hover:scale-105 transition-transform flex-shrink-0">
+                    <div class="leading-tight flex flex-col justify-center">
+                        <span id="brand-text-maulas" class="font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
+                        <span class="text-[9px] sm:text-[10px] text-amber-500 dark:text-amber-400 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
+                    </div>
+                </a>
+
+                <!-- Controles Compactos Móvil -->
+                <div class="flex md:hidden items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                    <div class="flex items-center bg-slate-100 dark:bg-slate-950/80 p-0.5 rounded-lg border border-slate-300 dark:border-amber-500/40 text-[11px] font-bold shadow-inner">
+                        <button type="button" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-slate-500 dark:text-slate-400">1.0</button>
+                        <button type="button" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow">2.0</button>
+                    </div>
+                    <button onclick="location.reload(true);" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-emerald-500 border border-emerald-500/40 text-xs flex items-center justify-center font-bold shadow-sm">🔄</button>
+                </div>
+            </div>
+
+            <!-- Centro: Menú de 9 módulos -->
+            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-600 dark:text-slate-300 overflow-x-auto md:overflow-visible flex-nowrap md:flex-wrap no-scrollbar py-0.5 w-full md:w-auto md:flex-1 justify-start md:justify-center border-t border-slate-200 dark:border-slate-800/60 md:border-t-0 pt-1.5 md:pt-0">
+                <a href="dashboard_2.html" data-version-link="inicio" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏠</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Inicio</span>
+                </a>
+                <a href="socios_2.html" data-version-link="socios" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">👥</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Socios</span>
+                </a>
+                <a href="bote_2.html" data-version-link="bote" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">💰</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Bote</span>
+                </a>
+                <a href="jornadas_2.html" data-version-link="jornadas" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">⚽</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Resultados</span>
+                </a>
+                <a href="pronosticos_2.html" data-version-link="pronosticos" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">📝</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Quiniela</span>
+                </a>
+                <a href="clasificacion_2.html" data-version-link="clasificacion" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏆</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Clasificación</span>
+                </a>
+                <a href="resumen_2.html" data-version-link="resumen" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">📊</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Resumen</span>
+                </a>
+                <a href="votaciones_2.html" data-version-link="votaciones" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🗳️</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Votaciones</span>
+                </a>
+                <!-- ACTIVO: ADMIN -->
+                <a href="admin_2.html" data-version-link="admin" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/50 font-bold transition shadow-sm flex-shrink-0">
+                    <span class="text-sm xl:text-base leading-none scale-105">⚙️</span>
+                    <span class="text-[11px] xl:text-xs font-bold whitespace-nowrap">Admin</span>
+                </a>
+            </div>
+
+            <!-- Derecha: Switchers Escritorio -->
+            <div class="desktop-only-flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="version-switcher-container">
+                    <button type="button" id="btn-version-v1" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">1.0 Clásica</button>
+                    <button type="button" id="btn-version-v2" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow">🏆 2.0 Pro</button>
+                </div>
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="theme-switcher-container">
+                    <button type="button" id="btn-theme-light" data-theme-btn="light" onclick="if(window.AppTheme) { window.AppTheme.setTheme('light'); } else { document.documentElement.classList.remove('dark'); document.documentElement.classList.add('light-theme'); localStorage.setItem('maulas_theme_mode', 'light'); } if(window.AdminApp) window.AdminApp.updateTheme();" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition"><span>☀️</span> Claro</button>
+                    <button type="button" id="btn-theme-dark" data-theme-btn="dark" onclick="if(window.AppTheme) { window.AppTheme.setTheme('dark'); } else { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light-theme'); localStorage.setItem('maulas_theme_mode', 'dark'); } if(window.AdminApp) window.AdminApp.updateTheme();" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 dark:text-slate-950 dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:font-bold shadow transition"><span>🌙</span> Oscuro</button>
+                </div>
+                <button onclick="location.reload(true);" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1" title="Actualizar datos">
+                    <span>🔄</span>
+                </button>
+                <button onclick="window.Auth && window.Auth.logout ? window.Auth.logout() : (sessionStorage.clear(), localStorage.clear(), location.href='login.html')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-slate-300 dark:border-slate-800 text-xs font-bold transition flex items-center gap-1" title="Cerrar sesión">
+                    <span>🚪</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- =====================================================================
+             CABECERA PRINCIPAL & INDICADORES DE SISTEMA
+             ===================================================================== -->
+        <header class="glass-panel p-4 sm:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative overflow-hidden">
+            <div class="space-y-1.5 relative z-10">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                        Consola Root · Fernando Lozano
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse-subtle"></span>
+                        Firestore Online
+                    </span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                        Temporada Activa: <strong class="text-amber-500" id="header-season-label">2026-2027</strong>
+                    </span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Centro de Administración <span class="bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent">2.0 Pro</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed">
+                    Control global de parámetros: sistema de puntuaciones dinámicas, pasarela de alertas Telegram, aviso Habemus Quinielam, custodia de documentos y logs de auditoría.
+                </p>
+            </div>
+
+            <!-- Accesos rápidos y manual -->
+            <div class="flex items-center gap-2 relative z-10 flex-wrap sm:flex-nowrap">
+                <a href="MANUAL_COMPLETO_2026.html" target="_blank" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-slate-700 transition flex items-center gap-1.5">
+                    <span>📖</span> Ver Manual 2026
+                </a>
+                <button onclick="window.AdminApp && window.AdminApp.refreshAllData()" class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 hover:scale-105 active:scale-95 transition flex items-center gap-1.5">
+                    <span>⚡</span> Sincronizar Todo
+                </button>
+            </div>
+
+            <!-- Decoración de fondo sutil -->
+            <div class="absolute -right-16 -top-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        </header>
+
+        <!-- =====================================================================
+             BENTO KPIS: RESUMEN EJECUTIVO DE ADMINISTRACIÓN (4 TARJETAS)
+             ===================================================================== -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+
+            <!-- KPI 1: Seguridad & Sesión -->
+            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+                 data-tooltip-title="🔐 Seguridad & Auditoría Central"
+                 data-tooltip-desc="Contraseña maestra activa en el sistema. Registro cronológico inmutable de todas las acciones administrativas realizadas en la peña.">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Seguridad & Sesión</span>
+                    <span class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-sm">🔐</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span class="text-2xl font-black text-slate-900 dark:text-white" id="kpi-master-pwd-status">Protegido</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>Eventos en log:</span>
+                    <strong class="text-amber-500 font-mono" id="kpi-log-count">0</strong>
+                </div>
+            </div>
+
+            <!-- KPI 2: Pasarela Telegram -->
+            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+                 data-tooltip-title="🤖 Gateway & Bots Telegram"
+                 data-tooltip-desc="Canal de comunicación directa con el grupo oficial de la peña: reporte automático de resultados, avisos semanales y Habemus Quinielam.">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pasarela Telegram</span>
+                    <span class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sm">🤖</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span class="text-2xl font-black text-sky-500 dark:text-sky-400" id="kpi-tg-status">Configurado</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>Habemus:</span>
+                    <strong class="text-emerald-500 font-semibold" id="kpi-habemus-status">Activo</strong>
+                </div>
+            </div>
+
+            <!-- KPI 3: Reglas de Puntuación -->
+            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+                 data-tooltip-title="⚙️ Motor de Puntuaciones Activo"
+                 data-tooltip-desc="Baremos vigentes de bonificaciones (15 a 10 aciertos) y penalizaciones (3 a 0 aciertos). Aplican de forma automática desde su fecha efectiva.">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Reglas Puntuación</span>
+                    <span class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-sm">⚙️</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span class="text-2xl font-black text-emerald-500 dark:text-emerald-400" id="kpi-rules-bonus">+30 pts</span>
+                    <span class="text-xs text-rose-500 font-bold" id="kpi-rules-penalty">-5 pts</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>Vigentes desde:</span>
+                    <strong class="text-amber-500 font-mono text-[10px]" id="kpi-rules-date">--/--/----</strong>
+                </div>
+            </div>
+
+            <!-- KPI 4: Custodia Documental -->
+            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+                 data-tooltip-title="📂 Repositorio & Plantillas"
+                 data-tooltip-desc="Archivos oficiales de la peña almacenados de forma segura en Base64 en Firestore, junto al backup de la lista oficial de socios.">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Custodia Documental</span>
+                    <span class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-sm">📂</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span class="text-2xl font-black text-purple-500 dark:text-purple-400" id="kpi-doc-count">0 docs</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>Plantilla Socios:</span>
+                    <strong class="text-emerald-500 font-semibold" id="kpi-template-status">Sincronizada</strong>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =====================================================================
+             BARRA DE PESTAÑAS / SELECTOR DE MÓDULOS DE ADMINISTRACIÓN
+             ===================================================================== -->
+        <div class="glass-panel p-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="admin-tabs-bar">
+            <button type="button" onclick="switchAdminTab('all')" data-admin-tab="all" class="tab-btn-active px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5">
+                <span>✨</span> Todos los Módulos
+            </button>
+            <button type="button" onclick="switchAdminTab('scoring')" data-admin-tab="scoring" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition whitespace-nowrap flex items-center gap-1.5">
+                <span>⚙️</span> Puntuaciones
+            </button>
+            <button type="button" onclick="switchAdminTab('habemus')" data-admin-tab="habemus" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition whitespace-nowrap flex items-center gap-1.5">
+                <span>🐸</span> Habemus & Avisos
+            </button>
+            <button type="button" onclick="switchAdminTab('telegram')" data-admin-tab="telegram" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition whitespace-nowrap flex items-center gap-1.5">
+                <span>📢</span> Telegram Bots
+            </button>
+            <button type="button" onclick="switchAdminTab('docs')" data-admin-tab="docs" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition whitespace-nowrap flex items-center gap-1.5">
+                <span>📂</span> Documentación
+            </button>
+            <button type="button" onclick="switchAdminTab('security')" data-admin-tab="security" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition whitespace-nowrap flex items-center gap-1.5">
+                <span>🛡️</span> Seguridad & Respaldos
+            </button>
+            <button type="button" onclick="switchAdminTab('prank')" data-admin-tab="prank" id="tab-btn-prank" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition whitespace-nowrap flex items-center gap-1.5">
+                <span>🎭</span> Echar a Emilio
+            </button>
+            <button type="button" onclick="switchAdminTab('logs')" data-admin-tab="logs" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition whitespace-nowrap flex items-center gap-1.5">
+                <span>📜</span> Registro de Logs
+            </button>
+        </div>
+
+        <!-- =====================================================================
+             SECCIONES PRINCIPALES (PANELES MODULARES)
+             ===================================================================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="admin-modules-grid">
+
+            <!-- =================================================================
+                 MÓDULO 1: ⚙️ PUNTUACIONES Y PENALIZACIONES
+                 ================================================================= -->
+            <section id="module-scoring" class="glass-panel p-4 sm:p-6 space-y-4 border-amber-500/40 relative">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-base">⚙️</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Motor de Puntuaciones</h2>
+                            <p class="text-xs text-slate-500">Bonificaciones y penalizaciones por aciertos</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                        Retrocompatible
+                    </span>
+                </div>
+
+                <div id="rules-info" class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-600 dark:text-amber-300 flex items-center gap-2">
+                    <span>📅</span>
+                    <span>Cargando fecha de vigencia...</span>
+                </div>
+
+                <form id="config-form" class="space-y-4">
+                    <!-- Bonificaciones -->
+                    <div class="space-y-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
+                            ✨ Bonificaciones (Puntos Extra)
+                        </span>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="bonus15" class="text-xs font-bold text-slate-700 dark:text-slate-300">15 Aciertos</label>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="text-emerald-500 font-black text-xs">+</span>
+                                    <input type="number" id="bonus15" class="form-control-v2 w-full p-1.5 text-center font-black rounded-lg text-sm" min="0" required>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="bonus14" class="text-xs font-bold text-slate-700 dark:text-slate-300">14 Aciertos</label>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="text-emerald-500 font-black text-xs">+</span>
+                                    <input type="number" id="bonus14" class="form-control-v2 w-full p-1.5 text-center font-black rounded-lg text-sm" min="0" required>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="bonus13" class="text-xs font-bold text-slate-700 dark:text-slate-300">13 Aciertos</label>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="text-emerald-500 font-black text-xs">+</span>
+                                    <input type="number" id="bonus13" class="form-control-v2 w-full p-1.5 text-center font-black rounded-lg text-sm" min="0" required>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="bonus12" class="text-xs font-bold text-slate-700 dark:text-slate-300">12 Aciertos</label>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="text-emerald-500 font-black text-xs">+</span>
+                                    <input type="number" id="bonus12" class="form-control-v2 w-full p-1.5 text-center font-black rounded-lg text-sm" min="0" required>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="bonus11" class="text-xs font-bold text-slate-700 dark:text-slate-300">11 Aciertos</label>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="text-emerald-500 font-black text-xs">+</span>
+                                    <input type="number" id="bonus11" class="form-control-v2 w-full p-1.5 text-center font-black rounded-lg text-sm" min="0" required>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="bonus10" class="text-xs font-bold text-slate-700 dark:text-slate-300">10 Aciertos</label>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="text-emerald-500 font-black text-xs">+</span>
+                                    <input type="number" id="bonus10" class="form-control-v2 w-full p-1.5 text-center font-black rounded-lg text-sm" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Penalizaciones -->
+                    <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                        <span class="text-xs font-black uppercase tracking-wider text-rose-500 dark:text-rose-400 block">
+                            ⚠️ Penalizaciones (Resta de Puntos)
+                        </span>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="penalty3" class="text-xs font-bold text-slate-700 dark:text-slate-300">3 Aciertos</label>
+                                <input type="number" id="penalty3" class="form-control-v2 w-full mt-1 p-1.5 text-center font-black rounded-lg text-sm text-rose-500" required>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="penalty2" class="text-xs font-bold text-slate-700 dark:text-slate-300">2 Aciertos</label>
+                                <input type="number" id="penalty2" class="form-control-v2 w-full mt-1 p-1.5 text-center font-black rounded-lg text-sm text-rose-500" required>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="penalty1" class="text-xs font-bold text-slate-700 dark:text-slate-300">1 Acierto</label>
+                                <input type="number" id="penalty1" class="form-control-v2 w-full mt-1 p-1.5 text-center font-black rounded-lg text-sm text-rose-500" required>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                                <label for="penalty0" class="text-xs font-bold text-slate-700 dark:text-slate-300">0 Aciertos</label>
+                                <input type="number" id="penalty0" class="form-control-v2 w-full mt-1 p-1.5 text-center font-black rounded-lg text-sm text-rose-500" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3">
+                        <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2.5 rounded-xl text-sm transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
+                            <span>💾</span> Guardar Reglas de Puntuación
+                        </button>
+                        <div id="save-msg" class="text-center text-xs font-bold text-emerald-500 mt-2" style="display: none;">
+                            ¡Reglas guardadas correctamente!
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- =================================================================
+                 MÓDULO 2: 🐸 HABEMUS QUINIELAM & AVISO SEMANAL
+                 ================================================================= -->
+            <section id="module-habemus" class="glass-panel p-4 sm:p-6 space-y-4 border-emerald-500/40 relative">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-base">🐸</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Habemus Quinielam</h2>
+                            <p class="text-xs text-slate-500">Notificación automática al completar todos los socios</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
+                        Telegram Live
+                    </span>
+                </div>
+
+                <form id="habemus-form" class="space-y-3">
+                    <!-- Toggle Switch Notificar -->
+                    <label class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 cursor-pointer">
+                        <input type="checkbox" id="habemus-enabled" checked class="w-4 h-4 text-emerald-500 rounded focus:ring-emerald-400">
+                        <span class="text-xs font-bold text-slate-800 dark:text-slate-200">🔔 Notificar cuando todos los socios hayan jugado</span>
+                    </label>
+
+                    <!-- Selector de Jornada y Estado -->
+                    <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label for="habemus-jornada-select" class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                Jornada en curso (<span id="habemus-season-label" class="text-amber-500">2026-2027</span>):
+                            </label>
+                        </div>
+                        <select id="habemus-jornada-select" class="form-control-v2 w-full p-2 rounded-lg text-xs font-semibold" onchange="updateHabemusStatus()">
+                            <option value="">Cargando jornadas...</option>
+                        </select>
+                        <div id="habemus-jornada-status" class="text-xs font-mono text-slate-600 dark:text-slate-400 pt-1">
+                            Calculando participación...
+                        </div>
+                    </div>
+
+                    <!-- Mensaje Habemus -->
+                    <div>
+                        <label for="habemus-msg" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Mensaje para el canal de Telegram:
+                        </label>
+                        <textarea id="habemus-msg" rows="3" class="form-control-v2 w-full p-2.5 rounded-xl text-xs font-mono"></textarea>
+                    </div>
+
+                    <!-- Botones de Acción Habemus -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow">
+                            <span>💾</span> Guardar
+                        </button>
+                        <button type="button" onclick="testHabemus()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow">
+                            <span>📤</span> Probar Envío
+                        </button>
+                        <button type="button" onclick="resetHabemusSent()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow">
+                            <span>🔄</span> Reset Enviado
+                        </button>
+                    </div>
+                    <div id="habemus-save-msg" class="text-center text-xs font-bold text-emerald-500 mt-1" style="display: none;">
+                        ¡Configuración Habemus guardada!
+                    </div>
+                    <p class="text-[10px] text-slate-500">
+                        * Probar envía el aviso de inmediato al grupo. Reset permite re-notificar si se añaden o rectifican pronósticos.
+                    </p>
+                </form>
+            </section>
+
+            <!-- =================================================================
+                 MÓDULO 3: ⏰ AVISO SEMANAL RECORDATORIO (JUEVES)
+                 ================================================================= -->
+            <section id="module-reminder" class="glass-panel p-4 sm:p-6 space-y-4 border-amber-500/40 relative">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-base">⏰</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Aviso Semanal Recordatorio</h2>
+                            <p class="text-xs text-slate-500">Recordatorio para completar quinielas antes del límite</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                        Cron Telegram
+                    </span>
+                </div>
+
+                <form id="reminder-form" class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="reminder-day" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Día de la semana</label>
+                            <select id="reminder-day" class="form-control-v2 w-full p-2 rounded-lg text-xs font-semibold">
+                                <option value="1">Lunes</option>
+                                <option value="2">Martes</option>
+                                <option value="3">Miércoles</option>
+                                <option value="4" selected>Jueves</option>
+                                <option value="5">Viernes</option>
+                                <option value="6">Sábado</option>
+                                <option value="0">Domingo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="reminder-hour" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Hora de envío (0-23h)</label>
+                            <input type="number" id="reminder-hour" min="0" max="23" value="9" class="form-control-v2 w-full p-2 rounded-lg text-xs font-semibold">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="reminder-start" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Activo desde</label>
+                            <input type="date" id="reminder-start" class="form-control-v2 w-full p-2 rounded-lg text-xs font-mono">
+                        </div>
+                        <div>
+                            <label for="reminder-end" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Activo hasta</label>
+                            <input type="date" id="reminder-end" class="form-control-v2 w-full p-2 rounded-lg text-xs font-mono">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="reminder-msg" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Mensaje personalizado:
+                        </label>
+                        <textarea id="reminder-msg" rows="3" class="form-control-v2 w-full p-2.5 rounded-xl text-xs font-mono"></textarea>
+                        <small class="text-[10px] text-slate-500">Usa el marcador <strong>{jornada}</strong> para insertar el número dinámico de la jornada activa.</small>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                            <span>💾</span> Guardar Configuración de Aviso
+                        </button>
+                        <div id="reminder-save-msg" class="text-center text-xs font-bold text-emerald-500 mt-2" style="display: none;">
+                            ¡Aviso semanal guardado correctamente!
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- =================================================================
+                 MÓDULO 4: 📢 CONFIGURACIÓN TELEGRAM GATEWAY
+                 ================================================================= -->
+            <section id="module-telegram" class="glass-panel p-4 sm:p-6 space-y-4 border-sky-500/40 relative">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-base">📢</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Pasarela Telegram Bots</h2>
+                            <p class="text-xs text-slate-500">Credenciales del Bot y enlace con el Grupo Oficial</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-500 border border-sky-500/30">
+                        API Oficial
+                    </span>
+                </div>
+
+                <form id="telegram-form" class="space-y-3">
+                    <!-- Bot Token -->
+                    <div>
+                        <label for="tg-token" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Bot Token:</label>
+                        <div class="flex gap-2">
+                            <input type="password" id="tg-token" placeholder="123456:ABC-DEF..." class="form-control-v2 flex-1 p-2 rounded-xl text-xs font-mono" disabled>
+                            <button type="button" onclick="toggleEdit('tg-token')" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1" title="Desbloquear edición">
+                                <span>🔓</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat ID -->
+                    <div>
+                        <label for="tg-chat" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Chat ID del Grupo:</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="tg-chat" placeholder="-100..." class="form-control-v2 flex-1 p-2 rounded-xl text-xs font-mono" disabled>
+                            <button type="button" onclick="toggleEdit('tg-chat')" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-bold transition" title="Desbloquear edición">
+                                <span>🔓</span>
+                            </button>
+                            <button type="button" onclick="fetchChatId()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition flex items-center gap-1">
+                                <span>🔍</span> Autodetectar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Opciones de Envío -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 cursor-pointer">
+                            <input type="checkbox" id="tg-enabled" class="w-4 h-4 text-sky-500 rounded focus:ring-sky-400">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">🔔 Reporte Automático Jornada</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 cursor-pointer">
+                            <input type="checkbox" id="tg-reminder-enabled" class="w-4 h-4 text-sky-500 rounded focus:ring-sky-400">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">🕒 Recordatorio Semanal</span>
+                        </label>
+                    </div>
+
+                    <!-- Nota explicativa -->
+                    <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-600 dark:text-amber-300">
+                        <strong>Guía rápida:</strong> Si el autodetector no localiza el Chat ID, haz al bot <b>Administrador</b> del grupo y envía cualquier mensaje en el chat. También puedes añadir el bot <code>@myidbot</code> y escribir <code>/getgroupid</code>.
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="flex gap-2 pt-1">
+                        <button type="submit" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                            <span>💾</span> Guardar Configuración Telegram
+                        </button>
+                        <button type="button" onclick="testTelegram()" class="px-4 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center gap-1.5">
+                            <span>🚀</span> Probar
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- =================================================================
+                 MÓDULO 5: 📂 CUSTODIA DOCUMENTAL
+                 ================================================================= -->
+            <section id="module-docs" class="glass-panel p-4 sm:p-6 space-y-4 border-purple-500/40 relative">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-base">📂</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Documentación de la Peña</h2>
+                            <p class="text-xs text-slate-500">Estatutos, actas, fotos y normativas oficiales</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-500 border border-purple-500/30">
+                        Nube Base64
+                    </span>
+                </div>
+
+                <!-- Selector de Subida -->
+                <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2">
+                    <input type="file" id="doc-file-input" class="hidden" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button type="button" onclick="document.getElementById('doc-file-input').click()" class="flex-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold py-2 rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2">
+                            <span>📎</span> <span id="doc-select-btn-label">Seleccionar Archivo</span>
+                        </button>
+                        <button id="btn-upload-doc" class="bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:pointer-events-none text-white font-bold px-5 py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5" disabled>
+                            <span>📤</span> Subir a la Nube
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Formatos permitidos: PDF, Word (.docx), Texto (.txt), Imágenes (JPG, PNG).</p>
+                </div>
+
+                <!-- Lista de Documentos -->
+                <div>
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
+                        <span>Documentos Guardados</span>
+                        <span class="text-purple-500 font-mono" id="doc-count-badge">0 archivos</span>
+                    </div>
+                    <ul id="doc-list" class="space-y-2 max-h-[250px] overflow-y-auto custom-scroll pr-1">
+                        <!-- Generado dinámicamente -->
+                        <li class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 text-center text-xs text-slate-500">
+                            Cargando documentos...
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 MÓDULO 6: 🛡️ SEGURIDAD, PLANTILLAS & MANTENIMIENTO
+                 ================================================================= -->
+            <section id="module-security" class="glass-panel p-4 sm:p-6 space-y-4 border-amber-500/40 relative">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-base">🛡️</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Seguridad & Respaldos</h2>
+                            <p class="text-xs text-slate-500">Credenciales maestras, plantillas y mantenimiento crítico</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30">
+                        Alta Seguridad
+                    </span>
+                </div>
+
+                <!-- Sub-tarjeta 1: Contraseña Maestra -->
+                <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-slate-800 dark:text-slate-200">🔐 Contraseña Maestra General</span>
+                    </div>
+                    <form id="pwd-form" class="flex gap-2">
+                        <input type="password" id="new-pwd" placeholder="Nueva contraseña maestra..." class="form-control-v2 flex-1 p-2 rounded-xl text-xs font-mono" required>
+                        <button type="button" onclick="togglePasswordVisibility('new-pwd', this)" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-bold transition">👁️</button>
+                        <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition">
+                            Cambiar
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Sub-tarjeta 2: Respaldo Plantilla de Socios -->
+                <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-slate-800 dark:text-slate-200">💾 Respaldo de Socios Oficial</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        Guarda la lista completa de socios actual (con correos, PINs y nicks) como la <b>plantilla por defecto</b> de la peña para futuras restauraciones.
+                    </p>
+                    <button id="btn-save-members-template" onclick="saveMembersAsDefault(this)" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                        <span>💾</span> Grabar Socios Actuales como Plantilla Default
+                    </button>
+                    <div id="save-members-msg" class="text-center text-xs font-bold text-emerald-500 mt-1" style="display: none;">
+                        ¡Plantilla guardada con éxito!
+                    </div>
+                </div>
+
+                <!-- Sub-tarjeta 3: Zona de Peligro (Borrado de Jornadas) -->
+                <div class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-rose-500 text-sm">🗑️</span>
+                        <span class="text-xs font-black uppercase tracking-wider text-rose-500">Zona de Peligro · Borrado Total de Jornadas</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Elimina permanentemente todas las jornadas y resultados registrados en la base de datos. Requiere doble confirmación escribiendo la palabra <b>BORRAR</b>.
+                    </p>
+                    <button id="btn-delete-all-jornadas-admin" onclick="deleteAllJornadasAdmin()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                        <span>⚠️</span> BORRAR TODAS LAS JORNADAS
+                    </button>
+                    <div id="delete-jornadas-msg" class="text-center text-xs font-bold text-rose-500 mt-1" style="display: none;"></div>
+                </div>
+
+                <!-- Sub-tarjeta 4: Recarga Fábrica (Disabled) -->
+                <button id="btn-seed-data" onclick="runManualSeed(this)" disabled class="w-full bg-slate-800 text-slate-500 border border-slate-700 font-bold py-2 rounded-xl text-xs cursor-not-allowed opacity-50 flex items-center justify-center gap-1.5">
+                    <span>⚠️</span> Recargar Datos Fábrica (Deshabilitado por Seguridad)
+                </button>
+            </section>
+
+            <!-- =================================================================
+                 MÓDULO 7: 🎭 ECHAR A EMILIO (BROMA PEÑISTA)
+                 ================================================================= -->
+            <section id="prank-admin-card" class="glass-panel p-4 sm:p-6 space-y-4 border-rose-500/40 relative">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-base">🎭</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-rose-500">Echar a Emilio (Broma Peñista)</h2>
+                            <p class="text-xs text-slate-500">Gestión de expulsión temporal y claves de socios</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30">
+                        Top Secret
+                    </span>
+                </div>
+
+                <form id="prank-form" class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="prank-duration" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tiempo Expulsión (minutos):</label>
+                            <input type="number" id="prank-duration" min="5" max="60" value="15" class="form-control-v2 w-full p-2 rounded-lg text-xs font-mono">
+                        </div>
+                        <div>
+                            <label for="prank-password" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Clave para Socios:</label>
+                            <input type="text" id="prank-password" class="form-control-v2 w-full p-2 rounded-lg text-xs font-mono">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="prank-msg" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Mensaje Telegram:</label>
+                        <textarea id="prank-msg" rows="2" class="form-control-v2 w-full p-2 rounded-xl text-xs font-mono"></textarea>
+                        <small class="text-[10px] text-slate-500">Usa "Nombre" para sustituir el socio que ejecuta la expulsión.</small>
+                    </div>
+
+                    <!-- Monitor en Vivo del Estado de Emilio -->
+                    <div id="prank-current-status" class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-center space-y-1" style="display: none;">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-rose-500">🚨 Emilio está actualmente expulsado</span>
+                        <div id="prank-timer-display" class="text-2xl font-black font-mono text-rose-500">00:00:00</div>
+                        <div id="prank-expelled-by" class="text-[11px] text-slate-500"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                            <span>💾</span> Guardar Broma
+                        </button>
+                        <button type="button" onclick="resetEmilioStatus()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                            <span>🔓</span> Restaurar Acceso a Emilio
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- =================================================================
+                 MÓDULO 8: 📜 REGISTRO DE AUDITORÍA & LOGS
+                 ================================================================= -->
+            <section id="module-logs" class="glass-panel p-4 sm:p-6 space-y-4 border-slate-500/40 relative lg:col-span-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-slate-500/15 border border-slate-500/30 flex items-center justify-center text-base">📜</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Registro de Auditoría de Acciones</h2>
+                            <p class="text-xs text-slate-500">Historial inmutable de modificaciones administrativas y eventos del sistema</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="log-search-input" oninput="filterLogs(this.value)" placeholder="Buscar por usuario o acción..." class="form-control-v2 px-3 py-1.5 rounded-xl text-xs">
+                        <button onclick="loadLogs()" class="px-2.5 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition" title="Refrescar logs">
+                            🔄
+                        </button>
+                    </div>
+                </div>
+
+                <div class="max-h-[350px] overflow-y-auto custom-scroll pr-1" id="log-container">
+                    <div class="p-6 text-center text-xs text-slate-500">
+                        Cargando historial de eventos...
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================================
+         MODAL: VISUALIZADOR DE DOCUMENTOS INTEGRADO
+         ===================================================================== -->
+    <div id="doc-viewer-modal" class="fixed inset-0 z-[200] items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md" style="display: none;">
+        <div class="glass-panel max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border-purple-500/50 shadow-2xl relative">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-100/50 dark:bg-slate-900/50">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📄</span>
+                    <h3 id="doc-viewer-title" class="text-sm sm:text-base font-black text-slate-900 dark:text-white truncate max-w-[280px] sm:max-w-md">Visualizador de Documento</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a id="doc-viewer-download" href="#" download="" class="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition flex items-center gap-1">
+                        <span>⬇️</span> Descargar
+                    </a>
+                    <button onclick="closeDocViewer()" class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-rose-500/20 hover:text-rose-500 text-slate-600 dark:text-slate-400 font-bold transition flex items-center justify-center">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div id="doc-viewer-body" class="p-4 flex-1 overflow-auto custom-scroll min-h-[300px] flex items-center justify-center bg-slate-950/20">
+                <!-- Se inyecta contenido -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         TARJETA FLOTANTE EXPLICATIVA PARA KPIS Y HERRAMIENTAS
+         ===================================================================== -->
+    <div id="admin-floating-card" class="fixed z-[300] max-w-xs p-3 rounded-2xl pointer-events-none transition-all duration-200 opacity-0 scale-95 shadow-2xl" style="display: none;">
+        <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs font-black uppercase tracking-wider text-amber-500" id="floating-card-title">Título</span>
+        </div>
+        <p class="text-xs text-slate-600 dark:text-slate-300 leading-snug" id="floating-card-desc">Descripción detallada</p>
+    </div>
+
+    <!-- =====================================================================
+         LÓGICA PRINCIPAL DE ADMINISTRACIÓN 2.0 PRO
+         ===================================================================== -->
+    <script>
+        window.AdminApp = {
+            allLogs: [],
+
+            async init() {
+                if (window.DataService) await window.DataService.init();
+
+                await Promise.all([
+                    loadConfig(),
+                    loadLogs(),
+                    loadDocuments(),
+                    loadTelegramConfig(),
+                    loadHabemusConfig(),
+                    loadReminderConfig(),
+                    loadPrankConfig()
+                ]);
+
+                this.setupForms();
+                this.setupDocUpload();
+                this.setupTooltips();
+                this.updateTheme();
+            },
+
+            setupForms() {
+                // Config scoring form
+                const configForm = document.getElementById('config-form');
+                if (configForm) {
+                    configForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        saveConfig();
+                    });
+                }
+
+                // Password form
+                const pwdForm = document.getElementById('pwd-form');
+                if (pwdForm) {
+                    pwdForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const pwd = document.getElementById('new-pwd').value.trim();
+                        if (pwd) {
+                            if (window.Auth && window.Auth.changePassword) {
+                                window.Auth.changePassword(pwd);
+                                document.getElementById('new-pwd').value = '';
+                                alert('Contraseña maestra cambiada correctamente.');
+                            }
+                        }
+                    });
+                }
+
+                // Telegram form
+                const tgForm = document.getElementById('telegram-form');
+                if (tgForm) {
+                    tgForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        saveTelegramConfig();
+                    });
+                }
+
+                // Habemus form
+                const habForm = document.getElementById('habemus-form');
+                if (habForm) {
+                    habForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        saveHabemusConfig();
+                    });
+                }
+
+                // Reminder form
+                const remForm = document.getElementById('reminder-form');
+                if (remForm) {
+                    remForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        saveReminderConfig();
+                    });
+                }
+
+                // Prank form
+                const prankForm = document.getElementById('prank-form');
+                if (prankForm) {
+                    prankForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        savePrankConfig();
+                    });
+                }
+            },
+
+            setupDocUpload() {
+                const fileInput = document.getElementById('doc-file-input');
+                const uploadBtn = document.getElementById('btn-upload-doc');
+                const label = document.getElementById('doc-select-btn-label');
+
+                if (fileInput && uploadBtn) {
+                    fileInput.addEventListener('change', () => {
+                        if (fileInput.files.length > 0) {
+                            uploadBtn.disabled = false;
+                            const name = fileInput.files[0].name;
+                            if (label) label.textContent = name;
+                            uploadBtn.innerHTML = `<span>📤</span> Subir (${name.length > 15 ? name.substring(0, 12) + '...' : name})`;
+                        } else {
+                            uploadBtn.disabled = true;
+                            if (label) label.textContent = 'Seleccionar Archivo';
+                            uploadBtn.innerHTML = '<span>📤</span> Subir a la Nube';
+                        }
+                    });
+
+                    uploadBtn.addEventListener('click', () => {
+                        const file = fileInput.files[0];
+                        if (!file) return;
+
+                        const reader = new FileReader();
+                        reader.onload = async function (e) {
+                            const docData = {
+                                name: file.name,
+                                type: file.type || 'application/octet-stream',
+                                size: file.size || 0,
+                                date: new Date().toISOString(),
+                                content: e.target.result // Base64
+                            };
+
+                            uploadBtn.disabled = true;
+                            uploadBtn.innerHTML = '<span>⏳</span> Subiendo...';
+
+                            try {
+                                await window.DataService.save('docs', docData);
+                                await loadDocuments();
+                                fileInput.value = '';
+                                if (label) label.textContent = 'Seleccionar Archivo';
+                                uploadBtn.disabled = true;
+                                uploadBtn.innerHTML = '<span>📤</span> Subir a la Nube';
+                                alert('Documento subido y custodiado con éxito.');
+
+                                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                                const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+                                if (window.Auth && window.Auth.logAction) {
+                                    await window.Auth.logAction(uName, 'Subió documento: ' + file.name);
+                                }
+                            } catch (err) {
+                                alert('Error al subir documento: ' + err.message);
+                                uploadBtn.disabled = false;
+                                uploadBtn.innerHTML = '<span>📤</span> Reintentar';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+            },
+
+            setupTooltips() {
+                const floatingCard = document.getElementById('admin-floating-card');
+                const titleEl = document.getElementById('floating-card-title');
+                const descEl = document.getElementById('floating-card-desc');
+                if (!floatingCard || !titleEl || !descEl) return;
+
+                document.querySelectorAll('[data-tooltip-title]').forEach(item => {
+                    item.addEventListener('mouseenter', (e) => {
+                        titleEl.textContent = item.getAttribute('data-tooltip-title') || '';
+                        descEl.textContent = item.getAttribute('data-tooltip-desc') || '';
+                        floatingCard.style.display = 'block';
+                        setTimeout(() => {
+                            floatingCard.classList.remove('opacity-0', 'scale-95');
+                            floatingCard.classList.add('opacity-100', 'scale-100');
+                        }, 10);
+                        this.positionTooltip(e, floatingCard);
+                    });
+
+                    item.addEventListener('mousemove', (e) => {
+                        this.positionTooltip(e, floatingCard);
+                    });
+
+                    item.addEventListener('mouseleave', () => {
+                        floatingCard.classList.remove('opacity-100', 'scale-100');
+                        floatingCard.classList.add('opacity-0', 'scale-95');
+                        setTimeout(() => { floatingCard.style.display = 'none'; }, 150);
+                    });
+                });
+            },
+
+            positionTooltip(e, el) {
+                const cardWidth = el.offsetWidth || 260;
+                const cardHeight = el.offsetHeight || 90;
+                let left = e.clientX + 16;
+                let top = e.clientY + 16;
+
+                if (left + cardWidth > window.innerWidth - 10) {
+                    left = e.clientX - cardWidth - 16;
+                }
+                if (top + cardHeight > window.innerHeight - 10) {
+                    top = e.clientY - cardHeight - 16;
+                }
+
+                el.style.left = `${Math.max(10, left)}px`;
+                el.style.top = `${Math.max(10, top)}px`;
+            },
+
+            updateTheme() {
+                const isLight = document.documentElement.classList.contains('light-theme');
+                const brand = document.getElementById('brand-text-maulas');
+                if (brand) {
+                    brand.className = isLight ? 'font-black text-slate-900 text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-600 transition-colors' : 'font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors';
+                }
+            },
+
+            async refreshAllData() {
+                await Promise.all([
+                    loadConfig(),
+                    loadLogs(),
+                    loadDocuments(),
+                    loadTelegramConfig(),
+                    loadHabemusConfig(),
+                    loadReminderConfig(),
+                    loadPrankConfig()
+                ]);
+                alert('¡Datos de administración sincronizados con éxito!');
+            }
+        };
+
+        // =====================================================================
+        // CONTROL DE PESTAÑAS / TABS
+        // =====================================================================
+        function switchAdminTab(tabKey) {
+            document.querySelectorAll('#admin-tabs-bar button').forEach(btn => {
+                if (btn.getAttribute('data-admin-tab') === tabKey) {
+                    btn.className = 'tab-btn-active px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition whitespace-nowrap flex items-center gap-1.5';
+                }
+            });
+
+            const sections = {
+                scoring: document.getElementById('module-scoring'),
+                habemus: document.getElementById('module-habemus'),
+                reminder: document.getElementById('module-reminder'),
+                telegram: document.getElementById('module-telegram'),
+                docs: document.getElementById('module-docs'),
+                security: document.getElementById('module-security'),
+                prank: document.getElementById('prank-admin-card'),
+                logs: document.getElementById('module-logs')
+            };
+
+            const grid = document.getElementById('admin-modules-grid');
+
+            if (tabKey === 'all') {
+                Object.values(sections).forEach(s => {
+                    if (s) s.style.display = '';
+                });
+                if (grid) grid.className = 'grid grid-cols-1 lg:grid-cols-2 gap-4';
+            } else {
+                Object.keys(sections).forEach(k => {
+                    const sec = sections[k];
+                    if (!sec) return;
+                    if (tabKey === 'scoring' && k === 'scoring') sec.style.display = '';
+                    else if (tabKey === 'habemus' && (k === 'habemus' || k === 'reminder')) sec.style.display = '';
+                    else if (tabKey === 'telegram' && k === 'telegram') sec.style.display = '';
+                    else if (tabKey === 'docs' && k === 'docs') sec.style.display = '';
+                    else if (tabKey === 'security' && k === 'security') sec.style.display = '';
+                    else if (tabKey === 'prank' && k === 'prank') sec.style.display = '';
+                    else if (tabKey === 'logs' && k === 'logs') sec.style.display = '';
+                    else sec.style.display = 'none';
+                });
+                if (grid) grid.className = 'grid grid-cols-1 gap-4';
+            }
+        }
+
+        // =====================================================================
+        // CARGA Y GUARDADO DE PUNTUACIONES
+        // =====================================================================
+        async function loadConfig() {
+            if (!window.ScoringSystem) return;
+            const rules = window.ScoringSystem.getConfig();
+
+            for (const [key, val] of Object.entries(rules)) {
+                const el = document.getElementById(key);
+                if (el) el.value = val;
+            }
+
+            // Actualizar KPI
+            const kpiBonus = document.getElementById('kpi-rules-bonus');
+            const kpiPenalty = document.getElementById('kpi-rules-penalty');
+            if (kpiBonus && rules.bonus15 !== undefined) kpiBonus.textContent = `+${rules.bonus15} pts`;
+            if (kpiPenalty && rules.penalty0 !== undefined) kpiPenalty.textContent = `${rules.penalty0} pts`;
+
+            const history = window.ScoringSystem.getHistory ? window.ScoringSystem.getHistory() : [];
+            if (history.length > 0) {
+                const latest = history.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+                const dateStr = new Date(latest.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const infoEl = document.getElementById('rules-info');
+                if (infoEl) {
+                    infoEl.innerHTML = `<span>📅</span> <span>Reglas vigentes aplicadas desde: <strong>${dateStr}</strong></span>`;
+                }
+                const kpiDate = document.getElementById('kpi-rules-date');
+                if (kpiDate) kpiDate.textContent = new Date(latest.date).toLocaleDateString('es-ES');
+            }
+        }
+
+        async function saveConfig() {
+            const newRules = {};
+            const inputs = document.querySelectorAll('#config-form input');
+            let changesStr = "Se actualizarán las siguientes reglas oficiales:\n\n";
+
+            inputs.forEach(inp => {
+                const val = parseInt(inp.value, 10) || 0;
+                newRules[inp.id] = val;
+                const label = inp.closest('div').querySelector('label');
+                changesStr += `- ${label ? label.textContent : inp.id}: ${val} pts\n`;
+            });
+
+            changesStr += "\n¿Confirmar cambios? Esta configuración se aplicará a partir de AHORA (las jornadas anteriores no se verán afectadas).";
+
+            if (!confirm(changesStr)) return;
+
+            if (window.ScoringSystem && window.ScoringSystem.saveConfig) {
+                await window.ScoringSystem.saveConfig(newRules);
+            }
+
+            const msg = document.getElementById('save-msg');
+            if (msg) {
+                msg.style.display = 'block';
+                setTimeout(() => { msg.style.display = 'none'; }, 3500);
+            }
+
+            await loadConfig();
+
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+            if (window.Auth && window.Auth.logAction) {
+                await window.Auth.logAction(uName, 'Actualizó Reglas de Puntuación');
+            }
+        }
+
+        // =====================================================================
+        // CARGA Y FILTRADO DE LOGS (HISTORIAL DE AUDITORÍA)
+        // =====================================================================
+        async function loadLogs() {
+            let logs = [];
+            if (window.DataService) {
+                logs = await window.DataService.getAll('logs');
+            }
+            logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+            window.AdminApp.allLogs = logs;
+
+            const kpiCount = document.getElementById('kpi-log-count');
+            if (kpiCount) kpiCount.textContent = logs.length;
+
+            renderLogs(logs);
+        }
+
+        function renderLogs(logs) {
+            const container = document.getElementById('log-container');
+            if (!container) return;
+
+            if (!logs || logs.length === 0) {
+                container.innerHTML = '<div class="p-6 text-center text-xs text-slate-500">No hay registros de auditoría disponibles.</div>';
+                return;
+            }
+
+            let html = '<div class="space-y-2">';
+            logs.forEach(log => {
+                const date = new Date(log.date).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                html += `
+                    <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-[10px]">👤</span>
+                            <span class="font-bold text-slate-900 dark:text-white">${log.user || 'Desconocido'}</span>
+                            <span class="text-slate-600 dark:text-slate-400 font-medium">— ${log.action || ''}</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400 sm:text-right">${date}</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function filterLogs(query) {
+            if (!query || !query.trim()) {
+                renderLogs(window.AdminApp.allLogs);
+                return;
+            }
+            const q = query.toLowerCase().trim();
+            const filtered = window.AdminApp.allLogs.filter(l =>
+                (l.user && l.user.toLowerCase().includes(q)) ||
+                (l.action && l.action.toLowerCase().includes(q))
+            );
+            renderLogs(filtered);
+        }
+
+        // =====================================================================
+        // DOCUMENTOS EN LA NUBE (CUSTODIA)
+        // =====================================================================
+        async function loadDocuments() {
+            const list = document.getElementById('doc-list');
+            let docs = [];
+            if (window.DataService) {
+                docs = await window.DataService.getAll('docs');
+            }
+
+            const kpiDoc = document.getElementById('kpi-doc-count');
+            if (kpiDoc) kpiDoc.textContent = `${docs.length} docs`;
+            const badge = document.getElementById('doc-count-badge');
+            if (badge) badge.textContent = `${docs.length} archivos`;
+
+            if (!list) return;
+
+            if (docs.length === 0) {
+                list.innerHTML = '<li class="p-4 rounded-xl bg-slate-100 dark:bg-slate-900/60 text-center text-xs text-slate-500">No hay documentos subidos en la nube.</li>';
+                return;
+            }
+
+            list.innerHTML = '';
+            docs.forEach(doc => {
+                const li = document.createElement('li');
+                li.className = 'p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 text-xs';
+
+                const isPdf = doc.name.toLowerCase().endsWith('.pdf') || (doc.type && doc.type.includes('pdf'));
+                const isImg = (doc.type && doc.type.startsWith('image/')) || /\.(jpg|jpeg|png)$/i.test(doc.name);
+                const isWord = /\.(doc|docx)$/i.test(doc.name);
+                const icon = isPdf ? '📕' : (isImg ? '🖼️' : (isWord ? '📘' : '📄'));
+                const dateStr = doc.date ? new Date(doc.date).toLocaleDateString('es-ES') : '';
+
+                li.innerHTML = `
+                    <div class="flex items-center gap-2 truncate flex-1">
+                        <span class="text-base flex-shrink-0">${icon}</span>
+                        <div class="truncate">
+                            <span class="font-bold text-slate-800 dark:text-slate-200 block truncate">${doc.name}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${dateStr}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button onclick="viewDoc('${doc.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1">
+                            <span>👁️</span> Ver
+                        </button>
+                        <button onclick="deleteDoc('${doc.id}', '${doc.name}')" class="px-2 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition flex items-center gap-1" title="Eliminar documento">
+                            <span>🗑️</span>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        async function viewDoc(id) {
+            const docs = await window.DataService.getAll('docs');
+            const doc = docs.find(d => String(d.id) === String(id));
+            if (!doc) return;
+
+            const modal = document.getElementById('doc-viewer-modal');
+            const titleEl = document.getElementById('doc-viewer-title');
+            const bodyEl = document.getElementById('doc-viewer-body');
+            const downloadBtn = document.getElementById('doc-viewer-download');
+
+            if (!modal || !bodyEl) return;
+
+            if (titleEl) titleEl.textContent = doc.name;
+            if (downloadBtn) {
+                downloadBtn.href = doc.content;
+                downloadBtn.download = doc.name;
+            }
+
+            bodyEl.innerHTML = '';
+
+            if (doc.type && doc.type.startsWith('image/')) {
+                bodyEl.innerHTML = `<img src="${doc.content}" alt="${doc.name}" class="max-w-full max-h-[70vh] object-contain rounded-xl shadow-lg border border-slate-700">`;
+            } else if (doc.type === 'text/plain' || doc.name.endsWith('.txt')) {
+                try {
+                    const base64 = doc.content.split(',')[1];
+                    const decoded = decodeURIComponent(escape(atob(base64)));
+                    bodyEl.innerHTML = `<div class="w-full max-w-3xl p-4 rounded-xl bg-slate-900 text-slate-100 font-mono text-xs whitespace-pre-wrap leading-relaxed shadow border border-slate-800">${decoded}</div>`;
+                } catch (e) {
+                    bodyEl.innerHTML = `<iframe src="${doc.content}" class="w-full h-[70vh] rounded-xl border-none"></iframe>`;
+                }
+            } else {
+                bodyEl.innerHTML = `<iframe src="${doc.content}" class="w-full h-[70vh] rounded-xl border-none"></iframe>`;
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeDocViewer() {
+            const modal = document.getElementById('doc-viewer-modal');
+            const bodyEl = document.getElementById('doc-viewer-body');
+            if (modal) modal.style.display = 'none';
+            if (bodyEl) bodyEl.innerHTML = '';
+        }
+
+        async function deleteDoc(id, name) {
+            if (!confirm(`¿Eliminar de forma permanente el documento "${name}" de la nube?`)) return;
+
+            await window.DataService.delete('docs', id);
+            await loadDocuments();
+
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+            if (window.Auth && window.Auth.logAction) {
+                await window.Auth.logAction(uName, 'Eliminó documento: ' + name);
+            }
+        }
+
+        // =====================================================================
+        // HABEMUS QUINIELAM & STATUS
+        // =====================================================================
+        async function loadHabemusConfig() {
+            if (!window.DataService) return;
+            const hab = await window.DataService.getDoc('config', 'habemus');
+            const enabledEl = document.getElementById('habemus-enabled');
+            const msgEl = document.getElementById('habemus-msg');
+            const kpiHab = document.getElementById('kpi-habemus-status');
+
+            if (hab) {
+                if (enabledEl) enabledEl.checked = hab.enabled !== false;
+                if (msgEl) msgEl.value = hab.message || '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
+                if (kpiHab) kpiHab.textContent = hab.enabled !== false ? 'Activo' : 'Desactivado';
+            } else {
+                if (enabledEl) enabledEl.checked = true;
+                if (msgEl) msgEl.value = '🐸 ¡¡HABEMUS QUINIELAM!! 🍻';
+                if (kpiHab) kpiHab.textContent = 'Activo';
+            }
+
+            await populateHabemusJornadas();
+        }
+
+        async function populateHabemusJornadas() {
+            if (!window.DataService) return;
+            const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
+            const seasonLabel = document.getElementById('habemus-season-label');
+            const headerSeason = document.getElementById('header-season-label');
+            if (seasonLabel) seasonLabel.textContent = activeSeason;
+            if (headerSeason) headerSeason.textContent = activeSeason;
+
+            const sel = document.getElementById('habemus-jornada-select');
+            if (!sel) return;
+
+            const jornadas = await window.DataService.getAll('jornadas');
+            const seasonJornadas = (jornadas || [])
+                .filter(j => (j.season || '2026-2027') === activeSeason && j.active)
+                .sort((a, b) => (parseInt(b.number, 10) || 0) - (parseInt(a.number, 10) || 0));
+
+            sel.innerHTML = '';
+            if (!seasonJornadas.length) {
+                sel.innerHTML = '<option value="">No hay jornadas activas esta temporada</option>';
+                return;
+            }
+
+            seasonJornadas.forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j.id;
+                opt.textContent = `Jornada ${j.number} (${j.date || 'Sin fecha'})${j.habemusSent ? ' [Ya enviado]' : ' [Pendiente]'}`;
+                sel.appendChild(opt);
+            });
+
+            await updateHabemusStatus();
+        }
+
+        async function updateHabemusStatus() {
+            const sel = document.getElementById('habemus-jornada-select');
+            const statusDiv = document.getElementById('habemus-jornada-status');
+            if (!sel || !statusDiv) return;
+
+            const jId = sel.value;
+            if (!jId) {
+                statusDiv.innerHTML = '<span class="text-slate-500">Sin jornada seleccionada</span>';
+                return;
+            }
+
+            const [jornadas, members, pronosticos] = await Promise.all([
+                window.DataService.getAll('jornadas'),
+                window.DataService.getAll('members'),
+                window.DataService.getAll('pronosticos')
+            ]);
+
+            const j = (jornadas || []).find(x => String(x.id) === String(jId));
+            if (!j) {
+                statusDiv.innerHTML = '<span class="text-rose-500 font-bold">Jornada no encontrada</span>';
+                return;
+            }
+
+            const activeMembers = (members || []).filter(m => m && m.active !== false);
+            const playedCount = activeMembers.filter(m => {
+                const p = pronosticos.find(pred => {
+                    const pJId = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId || '');
+                    const pMId = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId || '');
+                    return pJId === String(j.id) && pMId === String(m.id);
+                });
+                return p && p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+            }).length;
+
+            const isAll = activeMembers.length > 0 && playedCount >= activeMembers.length;
+            const sentBadge = j.habemusSent ? '<span class="text-emerald-500 font-bold">✅ Enviado</span>' : '<span class="text-amber-500 font-bold">⏳ No enviado</span>';
+            const countBadge = isAll ? `<span class="text-emerald-500 font-black">${playedCount}/${activeMembers.length} (100% Completo)</span>` : `<span class="text-rose-500 font-bold">${playedCount}/${activeMembers.length} jugados</span>`;
+
+            statusDiv.innerHTML = `📊 Participación: ${countBadge} · Habemus Telegram: ${sentBadge}`;
+        }
+
+        async function saveHabemusConfig() {
+            const config = {
+                id: 'habemus',
+                enabled: document.getElementById('habemus-enabled').checked,
+                message: document.getElementById('habemus-msg').value.trim()
+            };
+            await window.DataService.save('config', config);
+
+            const msg = document.getElementById('habemus-save-msg');
+            if (msg) {
+                msg.style.display = 'block';
+                setTimeout(() => { msg.style.display = 'none'; }, 3000);
+            }
+
+            const kpiHab = document.getElementById('kpi-habemus-status');
+            if (kpiHab) kpiHab.textContent = config.enabled ? 'Activo' : 'Desactivado';
+
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+            if (window.Auth && window.Auth.logAction) {
+                await window.Auth.logAction(uName, 'Actualizó Configuración Habemus Quinielam');
+            }
+        }
+
+        async function testHabemus() {
+            if (!window.TelegramService) { alert('TelegramService no está cargado.'); return; }
+            const sel = document.getElementById('habemus-jornada-select');
+            const jId = sel ? sel.value : null;
+            if (!jId) { alert('Selecciona una jornada de la lista.'); return; }
+
+            const jornadas = await window.DataService.getAll('jornadas');
+            const j = (jornadas || []).find(x => String(x.id) === String(jId));
+            const jNum = j ? j.number : jId;
+
+            const res = await window.TelegramService.checkHabemusQuinielam(jId, true);
+            await updateHabemusStatus();
+            if (res && res.ok) {
+                alert(`¡Prueba enviada con éxito para la Jornada ${jNum} al canal de Telegram!`);
+            } else {
+                alert(`Prueba ejecutada para Jornada ${jNum}. Revisa el grupo de Telegram.`);
+            }
+        }
+
+        async function resetHabemusSent() {
+            const sel = document.getElementById('habemus-jornada-select');
+            const jId = sel ? sel.value : null;
+            if (!jId) { alert('Selecciona una jornada de la lista.'); return; }
+
+            const jornadas = await window.DataService.getAll('jornadas');
+            const j = (jornadas || []).find(x => String(x.id) === String(jId));
+            if (!j) { alert('Jornada no encontrada.'); return; }
+
+            const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
+            if (!confirm(`¿Reset "habemusSent" en Jornada ${j.number} (Temporada ${j.season || activeSeason})?\n\nEsto permitirá que se vuelva a enviar el aviso cuando todos completen sus quinielas.`)) return;
+
+            j.habemusSent = false;
+            await window.DataService.save('jornadas', j);
+            await populateHabemusJornadas();
+            alert(`¡Reset realizado con éxito! La Jornada ${j.number} volverá a disparar el aviso Habemus.`);
+        }
+
+        // =====================================================================
+        // AVISO SEMANAL (JUEVES)
+        // =====================================================================
+        async function loadReminderConfig() {
+            if (!window.DataService) return;
+            const config = await window.DataService.getAll('config');
+            const rem = config.find(c => c.id === 'reminder');
+            const defaultMsg = '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://peñamaulas.com)';
+
+            if (rem) {
+                document.getElementById('reminder-day').value = rem.day ?? 4;
+                document.getElementById('reminder-hour').value = rem.hour ?? 9;
+                document.getElementById('reminder-start').value = rem.startDate || '';
+                document.getElementById('reminder-end').value = rem.endDate || '';
+                document.getElementById('reminder-msg').value = rem.message || defaultMsg;
+            } else {
+                document.getElementById('reminder-msg').value = defaultMsg;
+            }
+        }
+
+        async function saveReminderConfig() {
+            const config = {
+                id: 'reminder',
+                day: parseInt(document.getElementById('reminder-day').value, 10),
+                hour: parseInt(document.getElementById('reminder-hour').value, 10),
+                startDate: document.getElementById('reminder-start').value,
+                endDate: document.getElementById('reminder-end').value,
+                message: document.getElementById('reminder-msg').value.trim()
+            };
+            await window.DataService.save('config', config);
+
+            const msg = document.getElementById('reminder-save-msg');
+            if (msg) {
+                msg.style.display = 'block';
+                setTimeout(() => { msg.style.display = 'none'; }, 3000);
+            }
+
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+            if (window.Auth && window.Auth.logAction) {
+                await window.Auth.logAction(uName, 'Actualizó Configuración Aviso Semanal');
+            }
+        }
+
+        // =====================================================================
+        // TELEGRAM BOT CONFIG & TEST
+        // =====================================================================
+        async function loadTelegramConfig() {
+            if (!window.DataService) return;
+            const config = await window.DataService.getAll('config');
+            const tg = config.find(c => c.id === 'telegram');
+            const kpiTg = document.getElementById('kpi-tg-status');
+
+            if (tg) {
+                document.getElementById('tg-token').value = tg.token || '';
+                document.getElementById('tg-chat').value = tg.chatId || '';
+                document.getElementById('tg-enabled').checked = tg.enabled || false;
+                document.getElementById('tg-reminder-enabled').checked = tg.reminderEnabled || false;
+                if (kpiTg) kpiTg.textContent = tg.token ? 'Conectado' : 'Pendiente';
+            } else {
+                if (kpiTg) kpiTg.textContent = 'Pendiente';
+            }
+        }
+
+        async function saveTelegramConfig() {
+            const config = {
+                id: 'telegram',
+                token: document.getElementById('tg-token').value.trim(),
+                chatId: document.getElementById('tg-chat').value.trim(),
+                enabled: document.getElementById('tg-enabled').checked,
+                reminderEnabled: document.getElementById('tg-reminder-enabled').checked
+            };
+            await window.DataService.save('config', config);
+            alert('Configuración de Telegram guardada correctamente.');
+
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+            if (window.Auth && window.Auth.logAction) {
+                await window.Auth.logAction(uName, 'Actualizó Configuración Telegram');
+            }
+        }
+
+        async function testTelegram() {
+            const token = document.getElementById('tg-token').value.trim();
+            const chat = document.getElementById('tg-chat').value.trim();
+            if (!token || !chat) {
+                alert('Falta introducir el Bot Token o el Chat ID.');
+                return;
+            }
+
+            let lastJ = null;
+            if (window.DataService) {
+                const jornadas = await window.DataService.getAll('jornadas');
+                const played = jornadas.filter(j => j.matches && j.matches[0] && j.matches[0].result);
+                if (played.length > 0) {
+                    lastJ = played.sort((a, b) => b.number - a.number)[0];
+                }
+            }
+
+            let useRealData = false;
+            if (lastJ) {
+                useRealData = confirm(`¿Quieres simular el reporte real de la ÚLTIMA JORNADA (J${lastJ.number})?\n\nAceptar: Envía reporte completo formateado.\nCancelar: Envía mensaje corto de prueba.`);
+            }
+
+            if (useRealData && lastJ && window.TelegramService) {
+                const manualConfig = { token: token, chatId: chat, enabled: true };
+                await window.TelegramService.sendJornadaReport(lastJ.id, manualConfig);
+                alert(`Simulación de Jornada ${lastJ.number} enviada al grupo.`);
+            } else {
+                const msg = "🚀 ¡Peña Maulas 2.0! Conexión de Administración configurada correctamente.";
+                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}`;
+
+                try {
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    if (data.ok) alert('¡Mensaje de prueba enviado con éxito al canal de Telegram!');
+                    else throw new Error(data.description);
+                } catch (e) {
+                    alert('Error al enviar mensaje: ' + e.message);
+                }
+            }
+        }
+
+        async function fetchChatId() {
+            const token = document.getElementById('tg-token').value.trim();
+            if (!token) {
+                alert('Primero introduce el Bot Token para poder buscar.');
+                return;
+            }
+
+            try {
+                const url = `https://api.telegram.org/bot${token}/getUpdates`;
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (!data.ok) throw new Error(data.description);
+
+                const updates = data.result;
+                if (!updates || updates.length === 0) {
+                    alert('❌ NO SE ENCUENTRAN MENSAJES.\n\nPara solucionarlo rápido:\n1. Añade el bot @myidbot a tu grupo de Telegram.\n2. Escribe /getgroupid en el grupo.\n3. Copia el número (empieza por -100...) y pégalo aquí.');
+                    return;
+                }
+
+                const lastUpdate = updates[updates.length - 1];
+                let chat = null;
+
+                if (lastUpdate.message) chat = lastUpdate.message.chat;
+                else if (lastUpdate.my_chat_member) chat = lastUpdate.my_chat_member.chat;
+                else if (lastUpdate.channel_post) chat = lastUpdate.channel_post.chat;
+                else if (lastUpdate.callback_query) chat = lastUpdate.callback_query.message.chat;
+
+                if (chat) {
+                    document.getElementById('tg-chat').value = chat.id;
+                    const title = chat.title || chat.username || chat.first_name || 'Privado';
+                    alert(`¡ID Encontrado!\n\nChat: ${title}\nID: ${chat.id}\n\nPulsa "Guardar Configuración Telegram" para almacenarlo.`);
+                } else {
+                    alert('No se pudo identificar el chat. Prueba a escribir un mensaje mencionando al bot en el grupo.');
+                }
+            } catch (e) {
+                alert('Error al buscar ID: ' + e.message);
+            }
+        }
+
+        // =====================================================================
+        // BROMA: ECHAR A EMILIO
+        // =====================================================================
+        async function loadPrankConfig() {
+            if (!window.DataService) return;
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            const user = userStr ? JSON.parse(userStr) : null;
+            const prankCard = document.getElementById('prank-admin-card');
+            const tabBtnPrank = document.getElementById('tab-btn-prank');
+
+            if (user && user.email && user.email.toLowerCase() === 'emilio@maulas.com') {
+                if (prankCard) prankCard.remove();
+                if (tabBtnPrank) tabBtnPrank.remove();
+                return;
+            }
+
+            if (prankCard) prankCard.style.display = 'block';
+            startPrankStatusSync();
+
+            const config = await window.DataService.getAll('config');
+            const prank = config.find(c => c.id === 'prank');
+            if (prank) {
+                document.getElementById('prank-duration').value = prank.duration || 15;
+                document.getElementById('prank-password').value = prank.password || 'MAULA123';
+                document.getElementById('prank-msg').value = prank.message || 'Nombre ha expulsado a Emilio de la web.';
+            } else {
+                document.getElementById('prank-password').value = 'MAULA123';
+                document.getElementById('prank-msg').value = 'Nombre ha expulsado a Emilio de la web.';
+            }
+        }
+
+        async function savePrankConfig() {
+            const config = {
+                id: 'prank',
+                duration: parseInt(document.getElementById('prank-duration').value, 10),
+                password: document.getElementById('prank-password').value.trim(),
+                message: document.getElementById('prank-msg').value.trim()
+            };
+
+            if (config.duration < 5 || config.duration > 60) {
+                alert('El tiempo de expulsión debe estar entre 5 y 60 minutos.');
+                return;
+            }
+
+            await window.DataService.save('config', config);
+            alert('Configuración de la broma guardada con éxito.');
+
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+            if (window.Auth && window.Auth.logAction) {
+                await window.Auth.logAction(uName, 'Actualizó Configuración Broma Emilio');
+            }
+        }
+
+        async function resetEmilioStatus() {
+            if (!confirm('¿Quieres restaurar el acceso de Emilio inmediatamente?')) return;
+
+            if (window.DataService) {
+                const status = {
+                    id: 'emilio_status',
+                    expelledUntil: new Date(0).toISOString(),
+                    expelledBy: 'Admin (Reset)',
+                    timestamp: new Date().toISOString()
+                };
+                await window.DataService.save('config', status);
+                alert('Acceso de Emilio restaurado.');
+
+                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+                if (window.Auth && window.Auth.logAction) {
+                    await window.Auth.logAction(uName, 'Restauró acceso de Emilio manualmente');
+                }
+                startPrankStatusSync();
+            }
+        }
+
+        let prankSyncInterval = null;
+        async function startPrankStatusSync() {
+            if (prankSyncInterval) clearInterval(prankSyncInterval);
+
+            const updateStatus = async () => {
+                if (!window.DataService) return;
+                const config = await window.DataService.getAll('config');
+                const status = config.find(c => c.id === 'emilio_status');
+                const container = document.getElementById('prank-current-status');
+                const timerEl = document.getElementById('prank-timer-display');
+                const byEl = document.getElementById('prank-expelled-by');
+
+                if (status && status.expelledUntil) {
+                    const until = new Date(status.expelledUntil);
+                    const now = new Date();
+                    const diff = until - now;
+
+                    if (diff > 0) {
+                        if (container) container.style.display = 'block';
+                        const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                        const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                        if (timerEl) timerEl.textContent = `${h}:${m}:${s}`;
+                        if (byEl) byEl.textContent = `Expulsado por: ${status.expelledBy || 'Alguien'}`;
+                    } else {
+                        if (container) container.style.display = 'none';
+                    }
+                } else {
+                    if (container) container.style.display = 'none';
+                }
+            };
+
+            await updateStatus();
+            prankSyncInterval = setInterval(updateStatus, 1000);
+        }
+
+        // =====================================================================
+        // RESPALDO DE SOCIOS & BORRADO DE JORNADAS
+        // =====================================================================
+        window.saveMembersAsDefault = async function (btn) {
+            if (!confirm("¿Quieres guardar el estado actual de los socios como la plantilla por defecto? Esto sobrescribirá cualquier copia de seguridad de socios anterior.")) return;
+
+            btn.disabled = true;
+            btn.innerHTML = "<span>⏳</span> Guardando plantilla...";
+
+            try {
+                const count = await window.DataService.saveMembersAsTemplate();
+                const msg = document.getElementById('save-members-msg');
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.textContent = `¡Plantilla guardada con ${count} socios!`;
+                    setTimeout(() => {
+                        msg.style.display = 'none';
+                        btn.disabled = false;
+                        btn.innerHTML = "<span>💾</span> Grabar Socios Actuales como Plantilla Default";
+                    }, 3500);
+                }
+                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+                if (window.Auth && window.Auth.logAction) {
+                    await window.Auth.logAction(uName, `Guardó plantilla de socios (${count} socios)`);
+                }
+                const kpiTpl = document.getElementById('kpi-template-status');
+                if (kpiTpl) kpiTpl.textContent = `${count} socios`;
+            } catch (e) {
+                alert("Error: " + e.message);
+                btn.disabled = false;
+                btn.innerHTML = "<span>💾</span> Grabar Socios Actuales como Plantilla Default";
+            }
+        };
+
+        window.deleteAllJornadasAdmin = async function () {
+            if (!confirm('⚠️ PELIGRO CRÍTICO:\n\n¿Estás seguro de que quieres BORRAR TODA LA INFORMACIÓN DE JORNADAS?\n\nEsta acción eliminará todas las jornadas y sus resultados registrados y no se puede deshacer.')) {
+                return;
+            }
+            const confirmWord = prompt('Para confirmar el borrado total e irreversible de todas las jornadas, escribe la palabra "BORRAR":');
+            if (confirmWord !== 'BORRAR') {
+                alert('Operación cancelada. No se ha modificado ninguna jornada.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-delete-all-jornadas-admin');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳</span> Borrando jornadas del sistema...';
+            }
+
+            try {
+                if (window.DataService) {
+                    const jornadas = await window.DataService.getAll('jornadas');
+                    let count = 0;
+                    for (const j of jornadas) {
+                        await window.DataService.delete('jornadas', j.id);
+                        count++;
+                    }
+                    const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                    const uName = userStr ? JSON.parse(userStr).name : 'Admin';
+                    if (window.Auth && window.Auth.logAction) {
+                        await window.Auth.logAction(uName, `Eliminó todas las jornadas (${count} jornadas)`);
+                    }
+                    alert(`Se han eliminado correctamente ${count} jornadas del sistema.`);
+                    const msg = document.getElementById('delete-jornadas-msg');
+                    if (msg) {
+                        msg.style.display = 'block';
+                        msg.textContent = `¡${count} jornadas eliminadas!`;
+                        setTimeout(() => { msg.style.display = 'none'; }, 4000);
+                    }
+                    await loadLogs();
+                    await populateHabemusJornadas();
+                }
+            } catch (err) {
+                alert('Error al borrar las jornadas: ' + err.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>⚠️</span> BORRAR TODAS LAS JORNADAS';
+                }
+            }
+        };
+
+        window.runManualSeed = async function (btnSeed) {
+            if (confirm("¿Seguro? Esto intentará cargar los datos históricos si faltan.")) {
+                btnSeed.disabled = true;
+                btnSeed.textContent = "Cargando scripts...";
+                try {
+                    const loadScript = (src) => new Promise((res, rej) => {
+                        if (document.querySelector(`script[src="${src}"]`)) return res();
+                        const s = document.createElement('script');
+                        s.src = src;
+                        s.onload = res;
+                        s.onerror = rej;
+                        document.head.appendChild(s);
+                    });
+
+                    await Promise.all([
+                        loadScript('js/data_loader.js'),
+                        loadScript('js/cloud-seeder.js')
+                    ]);
+
+                    let maxRetries = 20;
+                    while ((!window.CloudSeeder || !window.HISTORICAL_DATA) && maxRetries > 0) {
+                        await new Promise(r => setTimeout(r, 200));
+                        maxRetries--;
+                    }
+
+                    if (window.CloudSeeder && window.HISTORICAL_DATA) {
+                        btnSeed.textContent = "Subiendo datos a la nube...";
+                        await window.CloudSeeder.run(window.DataService);
+                        alert("¡Proceso finalizado con Éxito! Refresca la página.");
+                        window.location.reload();
+                    } else {
+                        throw new Error("No se pudieron inicializar los scripts de datos.");
+                    }
+                } catch (e) {
+                    alert("Error cargando scripts: " + e.message);
+                    btnSeed.disabled = false;
+                    btnSeed.textContent = "⚠️ RECARGAR DATOS FÁBRICA";
+                }
+            }
+        };
+
+        window.toggleEdit = function (id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = !el.disabled;
+                if (!el.disabled) el.focus();
+            }
+        };
+
+        window.togglePasswordVisibility = function (id, btn) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.type === 'password') {
+                    el.type = 'text';
+                    if (btn) btn.textContent = '🙈';
+                } else {
+                    el.type = 'password';
+                    if (btn) btn.textContent = '👁️';
+                }
+            }
+        };
+
+        // Escuchar tecla ESC para cerrar modal de visor de documentos
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDocViewer();
+            }
+        });
+
+        // Click fuera del modal para cerrarlo
+        const modalEl = document.getElementById('doc-viewer-modal');
+        if (modalEl) {
+            modalEl.addEventListener('click', (e) => {
+                if (e.target === modalEl) closeDocViewer();
+            });
+        }
+
+        // Inicializar al cargar el DOM si está autorizado
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.__isUserAuthorized) {
+                window.AdminApp.init();
+            }
+        });
+    </script>
+</body>
+
+</html>

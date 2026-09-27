@@ -613,7 +613,8 @@ window.AppVersion = {
         pronosticos: { v1: 'pronosticos.html', v2: 'pronosticos_2.html' },
         clasificacion: { v1: 'resultados.html', v2: 'clasificacion_2.html' },
         resumen: { v1: 'resumen-temporada.html', v2: 'resumen_2.html' },
-        votaciones: { v1: 'votaciones.html', v2: 'votaciones_2.html' }
+        votaciones: { v1: 'votaciones.html', v2: 'votaciones_2.html' },
+        admin: { v1: 'admin.html', v2: 'admin_2.html' }
     },
 
     COUNTERPARTS: {
@@ -633,7 +634,9 @@ window.AppVersion = {
         'resumen-temporada.html': 'resumen_2.html',
         'resumen_2.html': 'resumen-temporada.html',
         'votaciones.html': 'votaciones_2.html',
-        'votaciones_2.html': 'votaciones.html'
+        'votaciones_2.html': 'votaciones.html',
+        'admin.html': 'admin_2.html',
+        'admin_2.html': 'admin.html'
     },
 
     getMode() {
