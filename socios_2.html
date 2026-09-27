@@ -317,12 +317,12 @@
 
             <!-- Menú Horizontal en Pantallas Grandes (Desktop) -->
             <div class="hidden xl:flex items-center gap-1 text-xs font-bold text-slate-300">
-                <a href="dashboard_2.html" class="px-2.5 py-1.5 rounded-lg hover:bg-amber-500/20 hover:text-amber-400 border border-transparent hover:border-amber-500/30 transition">🏠 Inicio 2.0</a>
-                <a href="socios_2.html" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold transition">👥 Socios 2.0</a>
-                <a href="jornadas.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">⚽ Resultados</a>
+                <a href="dashboard_2.html" data-version-link="inicio" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">🏠 Inicio</a>
+                <a href="socios_2.html" data-version-link="socios" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold transition">👥 Socios</a>
+                <a href="bote_2.html" data-version-link="bote" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">💰 Bote</a>
+                <a href="jornadas_2.html" data-version-link="jornadas" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">⚽ Resultados</a>
                 <a href="pronosticos.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">📝 Quiniela</a>
                 <a href="resultados.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">🏆 Clasificación</a>
-                <a href="bote_2.html" class="px-2.5 py-1.5 rounded-lg hover:bg-amber-500/20 hover:text-amber-400 border border-transparent hover:border-amber-500/30 transition">💰 Bote 2.0</a>
                 <a href="resumen-temporada.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">📊 Resumen</a>
                 <a href="votaciones.html" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition font-black">🗳️ Votaciones</a>
                 <a href="admin.html" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">⚙️ Admin</a>
@@ -330,36 +330,40 @@
 
             <!-- Selector Rápido de Sección & Acciones -->
             <div class="flex items-center gap-2">
+                <!-- INTERRUPTOR DE VERSIÓN (V1 Clásica <-> V2.0 Pro) -->
+                <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner" id="version-switcher-container">
+                    <span class="text-[11px] text-slate-400 px-1 hidden lg:inline font-mono">Versión:</span>
+                    <button type="button" id="btn-version-v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white" title="Cambiar a Versión Clásica 1.0">
+                        1.0 Clásica
+                    </button>
+                    <button type="button" id="btn-version-v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Versión 2.0 Activa">
+                        ⚡ 2.0 Pro
+                    </button>
+                </div>
+
                 <!-- Dropdown Selector de Sección (Accesible en móvil, tablet y escritorio) -->
                 <div class="relative inline-block" id="nav-section-dropdown-wrap">
                     <button type="button" onclick="document.getElementById('nav-section-dropdown').classList.toggle('hidden')" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-amber-500/50 hover:border-amber-400 text-amber-400 font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
-                        <span>🧭 Cambiar Sección</span>
+                        <span>🧭 Sección</span>
                         <span class="text-[10px]">▼</span>
                     </button>
-                    <div id="nav-section-dropdown" class="hidden absolute right-0 mt-2 w-60 rounded-2xl bg-[#0b0f19] border border-amber-500/60 shadow-2xl p-2 z-[100080] text-xs font-semibold space-y-1">
-                        <a href="dashboard_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition">
-                            <span class="flex items-center gap-2"><span>🏠</span> Inicio / Dashboard 2.0</span>
-                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Nuevo</span>
-                        </a>
-                        <a href="socios_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-amber-300 bg-amber-500/20 border border-amber-500/40 font-bold">
-                            <span class="flex items-center gap-2"><span>👥</span> Socios 2.0</span>
+                    <div id="nav-section-dropdown" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-[#0b0f19] border border-amber-500/60 shadow-2xl p-2 z-[100080] text-xs font-semibold space-y-1">
+                        <div class="p-2 border-b border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                            <span>Navegación Peña Maulas</span>
+                            <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono text-[10px]">Modo 2.0</span>
+                        </div>
+                        <a href="dashboard_2.html" data-version-link="inicio" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🏠</span> Inicio</a>
+                        <a href="socios_2.html" data-version-link="socios" class="flex items-center justify-between px-3 py-2 rounded-xl text-amber-300 bg-amber-500/20 border border-amber-500/40 font-bold">
+                            <span class="flex items-center gap-2"><span>👥</span> Socios</span>
                             <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300">Activo</span>
                         </a>
-                        <a href="bote_2.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition">
-                            <span class="flex items-center gap-2"><span>💰</span> Bote & Tesorería 2.0</span>
-                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Nuevo</span>
-                        </a>
-                        <a href="jornadas.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚽</span> Resultados Partidos</a>
+                        <a href="bote_2.html" data-version-link="bote" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>💰</span> Bote & Tesorería</a>
+                        <a href="jornadas_2.html" data-version-link="jornadas" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚽</span> Resultados Partidos</a>
                         <a href="pronosticos.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📝</span> Rellenar Quiniela</a>
                         <a href="resultados.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🏆</span> Clasificación General</a>
                         <a href="resumen-temporada.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>📊</span> Resumen Temporada</a>
                         <a href="votaciones.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition font-bold"><span>🗳️</span> Votaciones</a>
                         <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>⚙️</span> Administración</a>
-                        <a href="theme-editor.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition"><span>🎨</span> Identidad Visual</a>
-                        <div class="border-t border-slate-800 my-1 pt-1">
-                            <a href="socios.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-[11px]"><span>←</span> Socios 1.0 (Clásica)</a>
-                            <a href="bote.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-[11px]"><span>←</span> Bote 1.0 (Clásica)</a>
-                        </div>
                     </div>
                 </div>
 

@@ -578,3 +578,91 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     }
 });
+
+// =========================================================================
+// GESTOR DE VERSIONES DE LA APLICACIÓN (V1 CLÁSICA <-> V2.0 PRO)
+// =========================================================================
+window.AppVersion = {
+    PAGE_MAP: {
+        inicio: { v1: 'index.html', v2: 'dashboard_2.html' },
+        socios: { v1: 'socios.html', v2: 'socios_2.html' },
+        bote: { v1: 'bote.html', v2: 'bote_2.html' },
+        jornadas: { v1: 'jornadas.html', v2: 'jornadas_2.html' }
+    },
+
+    COUNTERPARTS: {
+        'index.html': 'dashboard_2.html',
+        'dashboard_2.html': 'index.html',
+        'socios.html': 'socios_2.html',
+        'socios_2.html': 'socios.html',
+        'bote.html': 'bote_2.html',
+        'bote_2.html': 'bote.html',
+        'jornadas.html': 'jornadas_2.html',
+        'jornadas_2.html': 'jornadas.html'
+    },
+
+    getMode() {
+        const stored = localStorage.getItem('maulas_version_mode');
+        if (stored === 'v1' || stored === 'v2') return stored;
+        const file = window.location.pathname.split('/').pop() || '';
+        if (file.includes('_2') || file === 'dashboard_2.html') return 'v2';
+        return 'v1';
+    },
+
+    setMode(mode) {
+        localStorage.setItem('maulas_version_mode', mode);
+        this.updateButtons(mode);
+        this.updateLinks(mode);
+    },
+
+    switchMode(targetMode) {
+        localStorage.setItem('maulas_version_mode', targetMode);
+        const currFile = window.location.pathname.split('/').pop() || '';
+        const counterpart = this.COUNTERPARTS[currFile];
+
+        if (counterpart) {
+            window.location.href = counterpart;
+        } else {
+            this.updateButtons(targetMode);
+            this.updateLinks(targetMode);
+        }
+    },
+
+    updateButtons(mode) {
+        const btnV1 = document.getElementById('btn-version-v1');
+        const btnV2 = document.getElementById('btn-version-v2');
+        if (btnV1 && btnV2) {
+            if (mode === 'v2') {
+                btnV2.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                btnV1.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+            } else {
+                btnV1.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                btnV2.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+            }
+        }
+    },
+
+    updateLinks(mode) {
+        document.querySelectorAll('[data-version-link]').forEach(el => {
+            const key = el.getAttribute('data-version-link');
+            if (this.PAGE_MAP[key]) {
+                el.href = this.PAGE_MAP[key][mode];
+            }
+        });
+    },
+
+    init() {
+        const mode = this.getMode();
+        this.updateButtons(mode);
+        this.updateLinks(mode);
+    }
+};
+
+// Inicializar al cargar el DOM
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => window.AppVersion && window.AppVersion.init());
+    } else {
+        window.AppVersion.init();
+    }
+}
