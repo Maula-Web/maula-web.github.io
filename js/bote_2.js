@@ -3453,6 +3453,8 @@ class BoteAppController {
         }
 
         const data = this.getSeasonData();
+        // Detectar tema activo para colores del gráfico
+        const isLight = document.documentElement.classList.contains('light-theme');
         // Ordenar socios por saldo descendente para efecto ranking / leaderboard
         const members = [...data.memberSummaries].sort((a, b) => b.saldo - a.saldo);
 
@@ -3514,7 +3516,7 @@ class BoteAppController {
                     x: {
                         grid: { color: 'rgba(51, 65, 85, 0.3)' },
                         ticks: {
-                            color: '#94a3b8',
+                            color: isLight ? '#374151' : '#94a3b8',
                             font: { family: 'JetBrains Mono', size: 11 },
                             callback: (v) => v + ' €'
                         }
@@ -3522,7 +3524,7 @@ class BoteAppController {
                     y: {
                         grid: { display: false },
                         ticks: {
-                            color: '#e2e8f0',
+                            color: isLight ? '#1e293b' : '#e2e8f0',
                             font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }
                         }
                     }
