@@ -1784,7 +1784,20 @@
                 headerRow.appendChild(stickyTh);
 
                 // Columnas de Cada Socio
-                const responsibleMember = window.getEligibleDoublesMember(targetJornadaForHeader);
+                // El responsable de dobles se calcula sobre la PRÓXIMA JORNADA, no la seleccionada.
+                // Buscamos la jornada activa más próxima que aún no tenga todos los resultados.
+                const nextJornada = (() => {
+                    const candidates = (this.jornadas || [])
+                        .filter(j => j && j.active && j.matches && j.matches.some(m => m.home && m.home.trim() !== ''))
+                        .sort((a, b) => (parseInt(a.number) || 0) - (parseInt(b.number) || 0));
+                    // Preferir la jornada con menos resultados (próxima sin cerrar)
+                    const open = candidates.find(j => {
+                        const filled = (j.matches || []).filter(m => m.result && m.result !== '' && m.result !== '-').length;
+                        return filled < 14;
+                    });
+                    return open || candidates[candidates.length - 1] || targetJornadaForHeader;
+                })();
+                const responsibleMember = window.getEligibleDoublesMember(nextJornada);
 
                 sortedMembers.forEach((m) => {
                     const th = document.createElement('th');
@@ -1807,7 +1820,7 @@
                     }
 
                     const doublesBadge = isDoublesMember ? `
-                        <span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-purple-500/30 text-purple-400 dark:text-purple-300 border border-purple-500/60 text-[9px] font-black tracking-tight mt-0.5 shadow-sm animate-pulse" title="🎲 Responsable de la Quiniela de Dobles en Jornada ${targetJornadaForHeader ? targetJornadaForHeader.number : ''}">
+                        <span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-purple-500/30 text-purple-400 dark:text-purple-300 border border-purple-500/60 text-[9px] font-black tracking-tight mt-0.5 shadow-sm animate-pulse" title="🎲 Responsable de la Quiniela de Dobles (Próxima Jornada: J${nextJornada ? nextJornada.number : '?'})">
                             🎲 DOBLES
                         </span>
                     ` : '';
