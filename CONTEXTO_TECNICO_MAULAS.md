@@ -785,6 +785,25 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ---
 
+## 26. Consistencia Financiera Universal y Menú Superior Unificado (V2.0 Pro)
+
+### 26.1. Regla Inquebrantable: Origen Financiero Único (Bote 2)
+- **Principio Fundamental**: **Ningún módulo de la web puede recalcular o estimar datos financieros de forma aislada**. Cualquier cifra monetaria expuesta públicamente (Caja Real, saldos individuales, ingresos, gastos o superávit) debe originarse en el motor y resumen consolidado de **Bote 2** (`window.BoteApp.getSeasonData()` o `window.BOTE_FALLBACK_DATA['2026-2027']`).
+- **Tarjeta "Caja Real de la Peña" en Dashboard 2.0**:
+  - **Saldo Total Disponible (Caja Real)**: **808.18 €** (Ingresos totales consolidados 956.68 € menos gastos oficiales de sellado 148.50 €).
+  - **Suma de Saldos de Socios**: **703.46 €** (Suma aritmética de las huchas individuales de los 19 miembros).
+  - **Superávit de la Peña**: **+104.72 €** (Margen contable a favor del fondo común: `cajaReal - totalSaldosVirtuales`).
+  - Se eliminó el antiguo algoritmo simplificado de `(19 * 1.50€) - 14.25€` que arrojaba valores teóricos inconexos.
+
+### 26.2. Menú Superior Universal y Homogéneo
+- **Estructura Calibrada según Resultados 2 (`jornadas_2.html`)**:
+  - **Bloque Izquierdo**: Escudo oficial + "PEÑA MAULAS" (línea 1) + "Temporada 2026-2027" (línea 2).
+  - **Bloque Central**: 9 accesos directos de sección (Inicio, Socios, Bote, Resultados, Quiniela, Clasificación, Resumen, Votaciones, Admin), con resaltado activo dorado para la página en curso.
+  - **Bloque Derecho**: Selector de versión (`1.0 Clásica` / `⚡ 2.0 Pro`), Selector de tema (`☀️ Claro` / `🌙 Oscuro`), Botón `🔄 Actualizar` y Botón `🚪 Salir`.
+  - **Responsive Design**: Reglas `hidden xl:inline` en los textos secundarios ("Claro", "Oscuro", "Actualizar", "Salir") para preservar el área táctil en pantallas medianas sin comprimir ni desplazar los selectores fuera de la vista.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
