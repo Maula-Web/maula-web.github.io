@@ -189,20 +189,33 @@ class BoteEngine {
                 } else if (event.type === 'reparto') {
                     const r = event.data;
                     if (r.type === 'socios') {
-                        const choice = (r.memberChoices || {})[member.id] || 'bote';
+                        const splitAmount = r.totalAmount / members.length;
+                        const isTesorero = this.isTesorero(member);
+                        const hasDebt = boteAcumulado < -0.009;
+
+                        // REGLA OFICIAL DEUDA / TESORERO:
+                        // Los socios con saldo deudor tienen derecho a pronóstico semanal pero no participan libremente
+                        // de retiros de efectivo del bote hasta regularizar su situación. Su cuota se aplica forzosamente
+                        // a amortizar su deuda con la Peña.
+                        // Marcelo Pérez (Tesorero) regulariza reglamentariamente su saldo mediante estos repartos oficiales.
+                        let choice = (r.memberChoices || {})[member.id] || 'bote';
+                        if (hasDebt || isTesorero) {
+                            choice = 'bote';
+                        }
+
                         if (choice === 'bote') {
-                            const splitAmount = r.totalAmount / members.length;
                             boteAcumulado += splitAmount;
 
                             movements.push({
                                 type: 'reparto',
                                 memberId: member.id,
-                                memberName: window.AppUtils.getMemberName(member),
+                                memberName: (window.AppUtils && window.AppUtils.getMemberName) ? window.AppUtils.getMemberName(member) : (member.name || ''),
                                 date: r.date,
-                                description: r.description,
+                                description: r.description || (isTesorero ? 'Reparto de Beneficios (Regularización Tesorería)' : (hasDebt ? 'Reparto de Beneficios (Amortización Deuda)' : 'Reparto de Beneficios')),
                                 neto: splitAmount,
                                 boteAcumulado: boteAcumulado,
-                                isReparto: true
+                                isReparto: true,
+                                isRegularizacion: hasDebt || isTesorero
                             });
                         }
                     }
@@ -214,7 +227,7 @@ class BoteEngine {
                         movements.push({
                             type: 'cierre_vuelta',
                             memberId: member.id,
-                            memberName: window.AppUtils.getMemberName(member),
+                            memberName: (window.AppUtils && window.AppUtils.getMemberName) ? window.AppUtils.getMemberName(member) : (member.name || ''),
                             date: c.date,
                             description: c.tipo === 'primera_vuelta' ? 'Penalización 1ª Vuelta' : 'Penalización Fin de Temporada',
                             neto: -penaltyForMember,
@@ -231,7 +244,7 @@ class BoteEngine {
                     movements.push({
                         type: 'ingreso_libre',
                         memberId: member.id,
-                        memberName: window.AppUtils.getMemberName(member),
+                        memberName: (window.AppUtils && window.AppUtils.getMemberName) ? window.AppUtils.getMemberName(member) : (member.name || ''),
                         date: i.fecha || i.date,
                         jornadaNum: null,
                         jornadaDate: i.fecha || i.date,
@@ -248,6 +261,53 @@ class BoteEngine {
             });
         });
         return movements;
+    }
+
+    /**
+     * Calcula los saldos consolidados de todos los socios y determina su condición en el Bote:
+     * - 'deudor' (rojo): saldo < 0 (conserva derecho a pronóstico semanal pero queda excluido de participar en el bote).
+     * - 'tesorero' (amarillo): Marcelo Pérez (regulariza mediante repartos de temporada).
+     * - 'activo' (verde): saldo >= 0 (al corriente con pleno derecho de Bote).
+     */
+    calculateMemberBalances(members, jornadas, pronosticos, pronosticosExtra, repartos, cierresVuelta, ingresos, cashPayments) {
+        const movements = this.calculateAllMovements(
+            members || [],
+            jornadas || [],
+            pronosticos || [],
+            pronosticosExtra || [],
+            repartos || [],
+            cierresVuelta || [],
+            ingresos || [],
+            cashPayments || []
+        );
+
+        const balances = new Map();
+
+        (members || []).forEach(m => {
+            const mIdStr = String(m.id);
+            const mMovements = movements.filter(mov => String(mov.memberId) === mIdStr);
+            let finalSaldo = 0;
+            if (mMovements.length > 0) {
+                finalSaldo = mMovements[mMovements.length - 1].boteAcumulado;
+            }
+
+            const isTesorero = this.isTesorero(m);
+            const isDeudor = finalSaldo < -0.009;
+
+            balances.set(m.id, {
+                memberId: m.id,
+                member: m,
+                saldo: finalSaldo,
+                isTesorero: isTesorero,
+                isDeudor: isDeudor && !isTesorero,
+                isActivoBote: !isDeudor || isTesorero,
+                status: isTesorero ? 'tesorero' : (isDeudor ? 'deudor' : 'activo'),
+                color: isTesorero ? 'amber' : (isDeudor ? 'rose' : 'emerald'),
+                statusLabel: isTesorero ? 'Tesorero (Regulariza en repartos)' : (isDeudor ? 'Saldo Deudor (No activo en Bote)' : 'Al corriente (Activo en Bote)')
+            });
+        });
+
+        return balances;
     }
 
     calculateJornadaCosts(memberId, members, jornadas, pronosticos, pronosticosExtra, cashPayments, jornada, pronostico, jornadaIndex, infoRedist = null) {

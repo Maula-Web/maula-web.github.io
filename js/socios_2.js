@@ -11,6 +11,13 @@ class SociosAppController {
         this.members = [];
         this.pronosticos = [];
         this.jornadas = [];
+        this.pronosticosExtra = [];
+        this.repartos = [];
+        this.cierresVuelta = [];
+        this.ingresos = [];
+        this.cashPayments = [];
+        this.pushSubscriptions = [];
+        this.memberBalances = new Map();
         this.filteredMembers = [];
         
         this.currentCategory = 'all';
@@ -108,7 +115,7 @@ class SociosAppController {
     }
 
     /**
-     * Carga de datos reales desde Firestore
+     * Carga de datos reales desde Firestore y cálculo de Bote y Conectividad
      */
     async loadLiveFirebaseData() {
         try {
@@ -117,10 +124,140 @@ class SociosAppController {
                 this.members = await window.DataService.getAll('members') || [];
                 this.pronosticos = await window.DataService.getAll('pronosticos') || [];
                 this.jornadas = await window.DataService.getAll('jornadas') || [];
+                this.pronosticosExtra = await window.DataService.getAll('pronosticos_extra') || [];
+                this.repartos = await window.DataService.getAll('repartos') || [];
+                this.cierresVuelta = await window.DataService.getAll('cierres_vuelta') || [];
+                this.ingresos = await window.DataService.getAll('ingresos') || [];
+                this.cashPayments = await window.DataService.getAll('reembolsos_efectivo') || [];
             }
+            this.pushSubscriptions = await this.loadPushSubscriptions();
+            this.calculateMemberBalances();
         } catch (e) {
             console.error('[Socios 2.0] Error cargando datos de Firestore:', e);
         }
+    }
+
+    /**
+     * Carga las suscripciones push de Firestore
+     */
+    async loadPushSubscriptions() {
+        try {
+            const db = window.db || (window.DataService && window.DataService.db);
+            if (!db) return [];
+            const snap = await db.collection('push_subscriptions').get();
+            return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (e) {
+            console.warn('[Socios 2.0] Error cargando suscripciones push:', e);
+            return [];
+        }
+    }
+
+    /**
+     * Cálculo de balances del Bote usando BoteEngine
+     */
+    calculateMemberBalances() {
+        try {
+            if (window.BoteEngine && this.members.length > 0) {
+                const engine = new window.BoteEngine();
+                this.memberBalances = engine.calculateMemberBalances(
+                    this.members,
+                    this.jornadas,
+                    this.pronosticos,
+                    this.pronosticosExtra,
+                    this.repartos,
+                    this.cierresVuelta,
+                    this.ingresos,
+                    this.cashPayments
+                );
+            }
+        } catch (err) {
+            console.error('[Socios 2.0] Error calculando balances de bote:', err);
+            this.memberBalances = new Map();
+        }
+    }
+
+    /**
+     * Comprueba si el socio es Marcelo Pérez (Tesorero)
+     */
+    isTesorero(member) {
+        if (!member) return false;
+        if (window.BoteEngine && window.BoteEngine.isTesorero) {
+            return window.BoteEngine.isTesorero(member);
+        }
+        if (String(member.id) === '14') return true;
+        const name = (member.name || '').toLowerCase();
+        return name.includes('marcelo');
+    }
+
+    /**
+     * Comprueba si el socio tiene notificaciones push activas
+     */
+    hasPushActive(memberId) {
+        const mIdStr = String(memberId);
+        return this.pushSubscriptions.some(sub => {
+            const matchId = String(sub.memberId || '') === mIdStr || sub.id === `member_${mIdStr}`;
+            const isGranted = sub.permission === 'granted' || !!sub.fcmToken;
+            return matchId && isGranted;
+        });
+    }
+
+    /**
+     * Determina el estado de deuda y bote del socio:
+     * - Deudor (< 0): Rojo, derecho a pronóstico semanal, no activo en Bote.
+     * - Tesorero (Marcelo): Amarillo, regulariza en repartos.
+     * - Solvente (>= 0): Verde, activo en Bote.
+     */
+    getMemberDebtStatus(member) {
+        const bal = this.memberBalances.get(member.id);
+        const saldo = bal ? bal.saldo : 0;
+        const isTes = this.isTesorero(member);
+        const isDeud = saldo < -0.009;
+
+        if (isTes) {
+            return {
+                status: 'tesorero',
+                isTesorero: true,
+                isDeudor: false,
+                isActivo: true,
+                saldo: saldo,
+                saldoFormatted: `${saldo >= 0 ? '+' : ''}${saldo.toFixed(2)}€`,
+                badgeText: `🟡 Tesorero (${saldo >= 0 ? '+' : ''}${saldo.toFixed(2)}€)`,
+                badgeTag: '🟡 Tesorero',
+                subtext: 'Regulariza en repartos de temporada',
+                color: 'amber',
+                badgeClass: 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+            };
+        }
+
+        if (isDeud) {
+            return {
+                status: 'deudor',
+                isTesorero: false,
+                isDeudor: true,
+                isActivo: false,
+                saldo: saldo,
+                saldoFormatted: `${saldo.toFixed(2)}€`,
+                badgeText: `🔴 Deudor (${saldo.toFixed(2)}€) · No activo`,
+                badgeTag: '🔴 Saldo Deudor',
+                subtext: 'Excluido del Bote hasta regularizar',
+                color: 'rose',
+                badgeClass: 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+            };
+        }
+
+        return {
+            status: 'activo',
+            isTesorero: false,
+            isDeudor: false,
+            isActivo: true,
+            saldo: saldo,
+            saldoFormatted: `+${saldo.toFixed(2)}€`,
+            badgeText: `🟢 Al corriente (${saldo >= 0 ? '+' : ''}${saldo.toFixed(2)}€)`,
+            badgeTag: '🟢 Activo en Bote',
+            subtext: 'Activo con derecho pleno al Bote',
+            color: 'emerald',
+            badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+        };
     }
 
     /**
@@ -134,6 +271,11 @@ class SociosAppController {
         let dadosActivosHoy = 0;
         let totalDadosUsados = 0;
         let conTelegram = 0;
+        let conPush = 0;
+
+        const deudores = [];
+        let tesorero = null;
+        let solventesCount = 0;
 
         this.members.forEach(m => {
             const uses = window.DiceService ? window.DiceService.getDiceUsageCount(m.id, this.pronosticos) : 0;
@@ -148,20 +290,132 @@ class SociosAppController {
             if (m.tgNick && m.tgNick.trim() !== '') {
                 conTelegram++;
             }
+
+            if (this.hasPushActive(m.id)) {
+                conPush++;
+            }
+
+            const debtInfo = this.getMemberDebtStatus(m);
+            if (debtInfo.isTesorero) {
+                tesorero = { member: m, info: debtInfo };
+            } else if (debtInfo.isDeudor) {
+                deudores.push({ member: m, info: debtInfo });
+            } else {
+                solventesCount++;
+            }
         });
 
         const maxComodinesTemporada = totalSocios * 3;
 
-        // Inyectar en el DOM
+        // Inyectar en KPI 1: Censo Activo & Estado en Bote
         const elTotal = document.getElementById('kpi-total-socios');
+        const elCensoStatus = document.getElementById('kpi-censo-status');
+        const elCensoSubtext = document.getElementById('kpi-censo-subtext');
+        const elTooltipBreakdown = document.getElementById('tooltip-censo-breakdown');
+
+        const activeBoteCount = solventesCount + (tesorero ? 1 : 0);
+
+        if (elTotal) {
+            elTotal.textContent = `${activeBoteCount} / ${totalSocios}`;
+        }
+
+        if (elCensoStatus) {
+            if (deudores.length > 0) {
+                elCensoStatus.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30';
+                elCensoStatus.textContent = `${deudores.length} con deuda`;
+            } else {
+                elCensoStatus.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                elCensoStatus.textContent = '100% Solventes';
+            }
+        }
+
+        if (elCensoSubtext) {
+            if (deudores.length > 0) {
+                elCensoSubtext.innerHTML = `<span class="text-rose-400 font-semibold">${deudores.length} no activos en Bote</span> · ${solventesCount} solventes`;
+            } else {
+                elCensoSubtext.textContent = 'Todos los socios al corriente y activos en Bote';
+            }
+        }
+
+        if (elTooltipBreakdown) {
+            let breakdownHtml = '';
+
+            // 1. Deudores (Rojo)
+            if (deudores.length > 0) {
+                breakdownHtml += `
+                    <div class="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30">
+                        <div class="font-bold text-rose-400 flex items-center justify-between text-xs mb-1">
+                            <span>🔴 Socios con Saldo Deudor (${deudores.length}):</span>
+                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-rose-500/20 text-rose-300 rounded">No Activos en Bote</span>
+                        </div>
+                        <div class="space-y-1 mt-1 text-slate-300 text-[11px] font-mono">
+                            ${deudores.map(d => `
+                                <div class="flex items-center justify-between">
+                                    <span>${d.member.name} (#${d.member.id})</span>
+                                    <strong class="text-rose-400 font-bold">${d.info.saldoFormatted}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <p class="text-[10px] text-rose-300/90 mt-1.5 leading-snug">
+                            * Conservan derecho a pronóstico semanal, pero quedan excluidos de participar en el bote y repartos hasta saldo &ge; 0.
+                        </p>
+                    </div>
+                `;
+            } else {
+                breakdownHtml += `
+                    <div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] flex items-center gap-1.5">
+                        <span>✅</span>
+                        <span>Ningún socio ordinario mantiene deudas con el Bote.</span>
+                    </div>
+                `;
+            }
+
+            // 2. Tesorero Marcelo Pérez (Amarillo)
+            if (tesorero) {
+                breakdownHtml += `
+                    <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 mt-2">
+                        <div class="font-bold text-amber-400 flex items-center justify-between text-xs mb-1">
+                            <span>🟡 Tesorero: ${tesorero.member.name} (#${tesorero.member.id})</span>
+                            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-amber-500/20 text-amber-300 rounded">Régimen Especial</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] font-mono text-slate-300 mt-1">
+                            <span>Saldo actual en Bote:</span>
+                            <strong class="text-amber-400 font-bold">${tesorero.info.saldoFormatted}</strong>
+                        </div>
+                        <p class="text-[10px] text-amber-300/90 mt-1 leading-snug">
+                            Regulariza su situación contable de forma planificada al realizar los repartos a lo largo de la temporada.
+                        </p>
+                    </div>
+                `;
+            }
+
+            // 3. Solventes (Verde)
+            breakdownHtml += `
+                <div class="flex items-center justify-between text-slate-300 text-[11px] pt-2 border-t border-slate-700/60 mt-2">
+                    <span class="text-emerald-400 font-semibold">🟢 Socios solventes al corriente:</span>
+                    <strong class="text-emerald-300 font-bold font-mono">${solventesCount} de ${totalSocios}</strong>
+                </div>
+            `;
+
+            elTooltipBreakdown.innerHTML = breakdownHtml;
+        }
+
+        // Inyectar en KPI 2 & 3: Dados
         const elActivos = document.getElementById('kpi-dados-activos');
         const elUsados = document.getElementById('kpi-dados-usados');
-        const elTg = document.getElementById('kpi-telegram-vinculados');
-
-        if (elTotal) elTotal.textContent = totalSocios;
         if (elActivos) elActivos.textContent = dadosActivosHoy;
         if (elUsados) elUsados.textContent = `${totalDadosUsados} / ${maxComodinesTemporada}`;
+
+        // Inyectar en KPI 4: Conectividad (Telegram + Push)
+        const elTg = document.getElementById('kpi-telegram-vinculados');
+        const elPush = document.getElementById('kpi-push-vinculados');
+        const elBadgeConectividad = document.getElementById('kpi-conectividad-badge');
+
         if (elTg) elTg.textContent = `${conTelegram} / ${totalSocios}`;
+        if (elPush) elPush.textContent = `${conPush} / ${totalSocios}`;
+        if (elBadgeConectividad) {
+            elBadgeConectividad.innerHTML = `🟢 ${conPush} Push · ${conTelegram} TG`;
+        }
 
         // Contadores en las píldoras de filtro
         this.updatePillCounters();
@@ -173,6 +427,8 @@ class SociosAppController {
         let cActive = 0;
         let cExhausted = 0;
         let cTg = 0;
+        let cPush = 0;
+        let cDebt = 0;
 
         this.members.forEach(m => {
             const uses = window.DiceService ? window.DiceService.getDiceUsageCount(m.id, this.pronosticos) : 0;
@@ -181,6 +437,12 @@ class SociosAppController {
                 cActive++;
             }
             if (m.tgNick && m.tgNick.trim() !== '') cTg++;
+            if (this.hasPushActive(m.id)) cPush++;
+            
+            const debtInfo = this.getMemberDebtStatus(m);
+            if (debtInfo.isDeudor || debtInfo.isTesorero) {
+                cDebt++;
+            }
         });
 
         const setTxt = (id, val) => {
@@ -192,6 +454,8 @@ class SociosAppController {
         setTxt('count-dice-active', cActive);
         setTxt('count-dice-exhausted', cExhausted);
         setTxt('count-telegram', cTg);
+        setTxt('count-push', cPush);
+        setTxt('count-debt', cDebt);
     }
 
     /**
@@ -221,6 +485,11 @@ class SociosAppController {
                 if (uses < 3) return false;
             } else if (this.currentCategory === 'telegram') {
                 if (!m.tgNick || m.tgNick.trim() === '') return false;
+            } else if (this.currentCategory === 'push') {
+                if (!this.hasPushActive(m.id)) return false;
+            } else if (this.currentCategory === 'debt') {
+                const debtInfo = this.getMemberDebtStatus(m);
+                if (!debtInfo.isDeudor && !debtInfo.isTesorero) return false;
             }
 
             // Filtro por texto
@@ -252,6 +521,9 @@ class SociosAppController {
             if (this.sortColumn === 'diceUses') {
                 valA = window.DiceService ? window.DiceService.getDiceUsageCount(a.id, this.pronosticos) : 0;
                 valB = window.DiceService ? window.DiceService.getDiceUsageCount(b.id, this.pronosticos) : 0;
+            } else if (this.sortColumn === 'saldo') {
+                valA = this.getMemberDebtStatus(a).saldo;
+                valB = this.getMemberDebtStatus(b).saldo;
             }
 
             if (typeof valA === 'string') valA = valA.toLowerCase();
@@ -362,6 +634,8 @@ class SociosAppController {
             const diceUses = window.DiceService ? window.DiceService.getDiceUsageCount(m.id, this.pronosticos) : 0;
             const isExhausted = diceUses >= 3;
             const isActive = m.diceEnabled && m.diceStartDate && m.diceEndDate && todayStr >= m.diceStartDate && todayStr <= m.diceEndDate && !isExhausted;
+            const debtStatus = this.getMemberDebtStatus(m);
+            const pushActive = this.hasPushActive(m.id);
 
             // Formato de fechas
             let dateRangeStr = '';
@@ -421,7 +695,7 @@ class SociosAppController {
                 <div class="glass-panel member-card p-5 flex flex-col justify-between border-slate-800/80">
                     <div>
                         <!-- Fila Superior: Avatar + Nº Socio -->
-                        <div class="flex items-start justify-between gap-3 mb-4">
+                        <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-400 text-slate-950 font-black text-base flex items-center justify-center shadow-md shadow-amber-500/10">
                                     ${initials}
@@ -438,22 +712,48 @@ class SociosAppController {
                             </span>
                         </div>
 
-                        <!-- Información de Contacto -->
-                        <div class="space-y-1.5 text-xs text-slate-400 mb-4 bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 font-mono">
+                        <!-- Estado en Bote (Solvencia / Deuda / Tesorería) -->
+                        <div class="mb-3.5 p-2 rounded-xl bg-slate-950/50 border border-slate-800/80">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold border inline-flex items-center gap-1 ${debtStatus.badgeClass}">
+                                    ${debtStatus.badgeText}
+                                </span>
+                            </div>
+                            <div class="text-[10px] text-slate-400 mt-1 pl-0.5">
+                                ${debtStatus.subtext}
+                            </div>
+                        </div>
+
+                        <!-- Canales de Conectividad Oficial (Telegram + Push) -->
+                        <div class="space-y-2 text-xs text-slate-400 mb-4 bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 font-mono">
                             <div class="flex items-center gap-2 truncate" title="${m.email}">
                                 <span class="text-slate-500">✉️</span>
-                                <a href="mailto:${m.email}" class="hover:text-amber-400 truncate text-slate-300">${m.email}</a>
+                                <a href="mailto:${m.email}" class="hover:text-amber-400 truncate text-slate-300 text-[11px]">${m.email}</a>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-slate-500">💬</span>
-                                ${m.tgNick ? `
-                                    <a href="https://t.me/${m.tgNick}" target="_blank" rel="noopener" class="text-sky-400 hover:underline flex items-center gap-1">
-                                        <span>@${m.tgNick}</span>
-                                        <span class="text-[10px]">↗</span>
-                                    </a>
-                                ` : `
-                                    <span class="text-slate-600 italic">Sin Telegram</span>
-                                `}
+                            <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-800/60">
+                                <div class="flex items-center gap-1 truncate">
+                                    <span class="text-slate-500">💬</span>
+                                    ${m.tgNick ? `
+                                        <a href="https://t.me/${m.tgNick}" target="_blank" rel="noopener" class="text-sky-400 hover:underline flex items-center gap-1 text-[11px]">
+                                            <span>@${m.tgNick}</span>
+                                            <span class="text-[9px]">↗</span>
+                                        </a>
+                                    ` : `
+                                        <span class="text-slate-600 text-[11px] italic">Sin TG</span>
+                                    `}
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    ${pushActive ? `
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1" title="Notificaciones Push PWA activadas en su dispositivo">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                            Push ON
+                                        </span>
+                                    ` : `
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] text-slate-500 bg-slate-900 border border-slate-800" title="Push inactivo o no autorizado en su navegador">
+                                            Push OFF
+                                        </span>
+                                    `}
+                                </div>
                             </div>
                         </div>
 
@@ -492,7 +792,7 @@ class SociosAppController {
         if (!tbody) return;
 
         if (this.filteredMembers.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500">No se encontraron socios.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500">No se encontraron socios.</td></tr>`;
             return;
         }
 
@@ -502,6 +802,8 @@ class SociosAppController {
             const diceUses = window.DiceService ? window.DiceService.getDiceUsageCount(m.id, this.pronosticos) : 0;
             const isExhausted = diceUses >= 3;
             const isActive = m.diceEnabled && m.diceStartDate && m.diceEndDate && todayStr >= m.diceStartDate && todayStr <= m.diceEndDate && !isExhausted;
+            const debtStatus = this.getMemberDebtStatus(m);
+            const pushActive = this.hasPushActive(m.id);
 
             let dateRangeStr = '';
             if (m.diceStartDate && m.diceEndDate) {
@@ -535,7 +837,33 @@ class SociosAppController {
                     <td class="py-3 px-4 text-amber-400 font-bold">${m.phone || '<span class="text-slate-600 font-normal italic">--</span>'}</td>
                     <td class="py-3 px-4 text-slate-300"><a href="mailto:${m.email}" class="hover:text-amber-400">${m.email}</a></td>
                     <td class="py-3 px-4">
-                        ${m.tgNick ? `<a href="https://t.me/${m.tgNick}" target="_blank" rel="noopener" class="text-sky-400 hover:underline">@${m.tgNick}</a>` : '<span class="text-slate-600 italic">N/A</span>'}
+                        <span class="px-2 py-1 rounded text-[11px] font-bold border inline-flex items-center gap-1 ${debtStatus.badgeClass}">
+                            ${debtStatus.badgeText}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-2">
+                            ${m.tgNick ? `
+                                <a href="https://t.me/${m.tgNick}" target="_blank" rel="noopener" class="text-sky-400 hover:underline text-[11px] font-mono flex items-center gap-0.5" title="Telegram: @${m.tgNick}">
+                                    <span>💬</span>
+                                    <span>@${m.tgNick}</span>
+                                </a>
+                            ` : `
+                                <span class="text-slate-600 text-[11px] italic" title="Sin Telegram">💬 —</span>
+                            `}
+                            <span class="text-slate-700">|</span>
+                            ${pushActive ? `
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1" title="Notificaciones Push PWA Activas">
+                                    <span>🔔</span>
+                                    <span>ON</span>
+                                </span>
+                            ` : `
+                                <span class="px-1.5 py-0.5 rounded text-[10px] text-slate-500 bg-slate-900 border border-slate-800 flex items-center gap-1" title="Notificaciones Push PWA Inactivas">
+                                    <span>🔕</span>
+                                    <span>OFF</span>
+                                </span>
+                            `}
+                        </div>
                     </td>
                     <td class="py-3 px-4">${diceBadge}</td>
                     <td class="py-3 px-4 text-center">

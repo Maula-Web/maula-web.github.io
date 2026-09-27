@@ -484,6 +484,28 @@ body.light-theme {
     color: #047857 !important;
 }
 
+.light-theme .tooltip-box .text-rose-400,
+.light-theme .tooltip-card .text-rose-400,
+.light-theme .group\/tip:hover > div[class*="absolute"] .text-rose-400,
+.light-theme .group:hover > div[class*="absolute"] .text-rose-400 {
+    color: #dc2626 !important;
+}
+
+.light-theme .tooltip-card .bg-rose-500\/10 {
+    background-color: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+}
+
+.light-theme .tooltip-card .bg-amber-500\/10 {
+    background-color: #fffbeb !important;
+    border-color: #fde68a !important;
+}
+
+.light-theme .tooltip-card .bg-emerald-500\/10 {
+    background-color: #ecfdf5 !important;
+    border-color: #a7f3d0 !important;
+}
+
 /* =========================================================================
    10. ELEMENTOS FLOTANTES INFERIORES (RELOJ Y NOTIFICACIONES PUSH)
    ========================================================================= */
@@ -529,7 +551,8 @@ body.light-theme {
 /* =========================================================================
    11. SECCIÓN SOCIOS 2.0 ESPECÍFICA EN MODO CLARO
    ========================================================================= */
-.light-theme .member-card .bg-slate-950\/40 {
+.light-theme .member-card .bg-slate-950\/40,
+.light-theme .member-card .bg-slate-950\/50 {
     background-color: #fbf8f2 !important;
     border-color: #e8dfcf !important;
     color: #334155 !important;

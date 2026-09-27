@@ -749,6 +749,34 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ---
 
+## 25. Censo Activo, Estado en el Bote, Deudores y Conectividad (Socios 2.0)
+
+### 25.1. Regla Oficial de Socios Deudores y Exclusión del Bote
+- **Derecho Deportivo Preservado**: Los socios con saldo negativo (`saldo < 0.00€`) conservan intacto su derecho a rellenar y enviar su pronóstico semanal de quinielas, así como a sumar puntos para la clasificación general de la temporada.
+- **Exclusión del Bote Comunal**: Mientras mantengan saldo deudor, quedan excluidos de participar en el bote de la Peña Maulas y no pueden solicitar retiros de beneficios ni percibir dividendos en efectivo.
+- **Visualización en UI**: Se marcan de manera inequívoca en color **ROJO** (`#ef4444` / `text-rose-400` / `bg-rose-500/20`), con la etiqueta `🔴 Deudor (-X.XX€) · No activo en Bote`.
+- **Amortización Forzosa en Repartos**: En el motor de cálculo (`js/bote-engine.js`), si se ejecuta un reparto de beneficios a lo largo de la temporada, la cuota correspondiente a un socio deudor se aplica de forma imperativa y forzosa a amortizar su deuda con la Peña hasta regularizar su situación.
+
+### 25.2. Régimen Especial del Tesorero (Marcelo Pérez, ID: 14)
+- **Motivación y Gestión Contable**: Como Tesorero de la Peña, Marcelo Pérez custodia la caja física y los movimientos bancarios ordinarios. No realiza aportaciones iniciales por adelantado en la base de datos de ingresos, por lo que su balance inicial o acumulado puede mostrar temporalmente saldo pendiente.
+- **Regularización Programada**: Marcelo regulariza reglamentariamente su balance al ejecutar los repartos oficiales de beneficios a lo largo de la temporada (el importe `splitAmount` se computa a su favor en el Bote).
+- **Visualización en UI**: Se marca exclusivamente en color **AMARILLO / ÁMBAR** (`#f59e0b` / `text-amber-400` / `bg-amber-500/20`), con la etiqueta `🟡 Tesorero (-X.XX€) · Regulariza en repartos`, diferenciándolo explícitamente de cualquier socio deudor ordinario.
+
+### 25.3. Tarjeta CONECTIVIDAD y Sincronización Digital
+- La Tarjeta 4 de Socios 2.0 pasa a denominarse **CONECTIVIDAD** (`📡`), unificando los dos canales de comunicación de la Peña:
+  1. **Comunidad Telegram**: Socios con alias `@usuario` registrado en Firestore para recibir resúmenes y notificaciones del bot oficial.
+  2. **Notificaciones Push PWA**: Socios con permiso concedido (`permission: 'granted'`) y/o token FCM registrado en la colección `push_subscriptions` para avisos directos en su teléfono móvil con pantalla apagada.
+- Incluye tooltip explicativo en primer plano con z-index absoluto y píldora de filtro `🔔 Con Push (N)` para auditar rápidamente qué socios tienen el canal nativo activo.
+
+### 25.4. Motor de Bote Centralizado (`js/bote-engine.js`)
+- `BoteEngine.isTesorero(memberOrId)`: Método canónico estático y de instancia para identificar a Marcelo Pérez (ID 14 o coincidencia de nombre).
+- `BoteEngine.prototype.calculateMemberBalances()`: Método unificado que evalúa todos los movimientos (`calculateAllMovements`), calcula el saldo acumulado real y clasifica a cada socio en:
+  - `status: 'deudor'` (rojo) si `saldo < -0.009` y no es Tesorero.
+  - `status: 'tesorero'` (amarillo) si es Marcelo Pérez.
+  - `status: 'activo'` (verde) si `saldo >= -0.009`.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
@@ -758,6 +786,7 @@ Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
 3. Indícale en qué vista de la web o qué archivo quieres que se enfoque y qué error concreto ocurre.
 
 *(Nota: Este archivo debe editarse y actualizarse cada vez que implementemos una regla de negocio nueva que sea compleja de entender para alguien externo).*
+
 
 
 
