@@ -46,6 +46,11 @@
             overflow-x: hidden;
         }
 
+        .light-theme body {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
         }
@@ -58,6 +63,12 @@
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
             position: relative;
+        }
+
+        .light-theme .glass-panel {
+            background: #ffffff !important;
+            border-color: rgba(203, 213, 225, 0.8) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
         }
 
         /* REGLA CRÍTICA: Tarjetas explicativas SIEMPRE en primer plano absoluto y 100% OPACAS (#0b0f19) EN MODO OSCURO */
@@ -77,6 +88,17 @@
             pointer-events: auto !important;
         }
 
+        .light-theme .tooltip-box,
+        .light-theme .group\/tip > div[class*="group-hover\/tip:visible"],
+        .light-theme .group\/tip:hover > div[class*="absolute"] {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            border: 1.5px solid rgba(217, 119, 6, 0.7) !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15) !important;
+            color: #0f172a !important;
+            z-index: 100060 !important;
+        }
+
         /* Scrollbars personalizados */
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
@@ -85,6 +107,9 @@
         .custom-scroll::-webkit-scrollbar-track {
             background: rgba(15, 23, 42, 0.6);
             border-radius: 6px;
+        }
+        .light-theme .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
         .custom-scroll::-webkit-scrollbar-thumb {
             background: rgba(245, 158, 11, 0.35);
@@ -103,21 +128,37 @@
             animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Podio 3D Elevaciones */
+        /* Podio Compacto y Sofisticado */
         .podium-1 {
             background: linear-gradient(180deg, rgba(234, 179, 8, 0.16) 0%, rgba(15, 23, 42, 0.85) 100%);
             border-color: rgba(234, 179, 8, 0.6);
-            box-shadow: 0 10px 35px rgba(234, 179, 8, 0.2);
+            box-shadow: 0 4px 20px rgba(234, 179, 8, 0.15);
         }
         .podium-2 {
             background: linear-gradient(180deg, rgba(148, 163, 184, 0.15) 0%, rgba(15, 23, 42, 0.85) 100%);
             border-color: rgba(148, 163, 184, 0.5);
-            box-shadow: 0 10px 30px rgba(148, 163, 184, 0.12);
+            box-shadow: 0 4px 15px rgba(148, 163, 184, 0.1);
         }
         .podium-3 {
             background: linear-gradient(180deg, rgba(217, 119, 6, 0.15) 0%, rgba(15, 23, 42, 0.85) 100%);
             border-color: rgba(217, 119, 6, 0.5);
-            box-shadow: 0 10px 30px rgba(217, 119, 6, 0.12);
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.1);
+        }
+
+        .light-theme .podium-1 {
+            background: linear-gradient(180deg, #fef9c3 0%, #ffffff 100%) !important;
+            border-color: rgba(217, 119, 6, 0.5) !important;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.12) !important;
+        }
+        .light-theme .podium-2 {
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+            border-color: rgba(148, 163, 184, 0.6) !important;
+            box-shadow: 0 4px 15px rgba(148, 163, 184, 0.1) !important;
+        }
+        .light-theme .podium-3 {
+            background: linear-gradient(180deg, #ffedd5 0%, #ffffff 100%) !important;
+            border-color: rgba(180, 83, 9, 0.45) !important;
+            box-shadow: 0 4px 15px rgba(180, 83, 9, 0.1) !important;
         }
 
         /* Matriz de Clasificación (Tabla General) */
@@ -141,8 +182,9 @@
         }
         .light-theme .matrix-header-name {
             background: #f1f5f9 !important;
-            border-bottom: 2px solid #cbd5e1;
-            border-right: 1px solid #cbd5e1;
+            border-bottom: 2px solid #cbd5e1 !important;
+            border-right: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
         }
 
         .matrix-sticky-col {
@@ -154,9 +196,10 @@
             box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
         }
         .light-theme .matrix-sticky-col {
-            background: #f8fafc !important;
+            background: #ffffff !important;
             border-right: 2px solid rgba(217, 119, 6, 0.6) !important;
-            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+            color: #0f172a !important;
         }
 
         .matrix-corner {
@@ -172,21 +215,22 @@
             background: #e2e8f0 !important;
             border-right: 2px solid rgba(217, 119, 6, 0.6) !important;
             border-bottom: 2px solid #cbd5e1;
+            color: #0f172a !important;
         }
 
         .matrix-summary-row td {
             position: sticky;
             z-index: 35;
         }
-        .matrix-row-total td { top: 62px; background: rgba(15, 23, 42, 0.95); }
-        .matrix-row-hits td { top: 104px; background: rgba(15, 23, 42, 0.92); }
-        .matrix-row-bonus td { top: 140px; background: rgba(15, 23, 42, 0.92); }
-        .matrix-row-prizes td { top: 176px; background: rgba(15, 23, 42, 0.95); border-bottom: 3px solid rgba(245, 158, 11, 0.7) !important; }
+        .matrix-row-total td { top: 58px; background: rgba(15, 23, 42, 0.95); }
+        .matrix-row-hits td { top: 96px; background: rgba(15, 23, 42, 0.92); }
+        .matrix-row-bonus td { top: 130px; background: rgba(15, 23, 42, 0.92); }
+        .matrix-row-prizes td { top: 164px; background: rgba(15, 23, 42, 0.95); border-bottom: 3px solid rgba(245, 158, 11, 0.7) !important; }
 
-        .light-theme .matrix-row-total td { background: #e2e8f0; }
-        .light-theme .matrix-row-hits td { background: #f1f5f9; }
-        .light-theme .matrix-row-bonus td { background: #f1f5f9; }
-        .light-theme .matrix-row-prizes td { background: #e2e8f0; border-bottom: 3px solid rgba(217, 119, 6, 0.7) !important; }
+        .light-theme .matrix-row-total td { background: #e2e8f0 !important; color: #0f172a !important; }
+        .light-theme .matrix-row-hits td { background: #f8fafc !important; color: #0f172a !important; }
+        .light-theme .matrix-row-bonus td { background: #f8fafc !important; }
+        .light-theme .matrix-row-prizes td { background: #e2e8f0 !important; border-bottom: 3px solid rgba(217, 119, 6, 0.7) !important; }
 
         @media (max-width: 767px) { .desktop-only-flex { display: none !important; } }
         @media (min-width: 768px) { .desktop-only-flex { display: flex !important; } }
@@ -259,8 +303,8 @@
                 <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
                     Fase de Pruebas Exclusiva
                 </span>
-                <h1 class="text-3xl font-extrabold text-white mt-3">Clasificación 2.0 Pro en Obras</h1>
-                <p class="text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
+                <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white mt-3">Clasificación 2.0 Pro en Obras</h1>
+                <p class="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
                     Esta nueva versión de la clasificación y tabla de honor está actualmente en fase de diseño y pruebas exclusiva para <strong>Fernando Lozano</strong>.
                 </p>
                 <p class="text-slate-500 text-xs mt-2">
@@ -277,9 +321,9 @@
                 </a>
             </div>
 
-            <div class="pt-4 border-t border-slate-800 text-xs text-slate-500">
+            <div class="pt-4 border-t border-slate-300 dark:border-slate-800 text-xs text-slate-500">
                 ¿Eres Fernando Lozano?
-                <button onclick="sessionStorage.clear(); localStorage.clear(); location.href='login.html';" class="text-amber-400 hover:underline font-semibold ml-1">
+                <button onclick="sessionStorage.clear(); localStorage.clear(); location.href='login.html';" class="text-amber-500 dark:text-amber-400 hover:underline font-semibold ml-1">
                     Identifícate con tu PIN o Apodo
                 </button>
             </div>
@@ -289,7 +333,7 @@
     <!-- =====================================================================
          CONTENEDOR PRINCIPAL: CLASIFICACIÓN 2.0 PRO
          ===================================================================== -->
-    <div id="main-content" class="max-w-[1650px] mx-auto space-y-4 sm:space-y-6" style="display: block;">
+    <div id="main-content" class="max-w-[1650px] mx-auto space-y-3 sm:space-y-4" style="display: block;">
 
         <!-- NAVBAR SUPERIOR MAULAS 2.0 -->
         <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl">
@@ -374,38 +418,35 @@
         </nav>
 
         <!-- BARRA DE TÍTULO Y CONTROLES PRINCIPALES -->
-        <header class="glass-panel p-4 sm:p-5 border-amber-500/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <header class="glass-panel p-3 sm:p-4 border-amber-500/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shadow-inner shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shadow-inner shrink-0">
                     🏆
                 </div>
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight">
+                        <h1 class="text-lg sm:text-xl font-black text-slate-800 dark:text-white tracking-tight">
                             Clasificación Oficial 2.0
                         </h1>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/40">
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/40">
                             Temporada 2026-2027
                         </span>
-                        <span id="badge-total-jornadas" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+                        <span id="badge-total-jornadas" class="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
                             -- Jornadas disputadas
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        Puntuaciones acumuladas, bonus por grandes aciertos, penalizaciones deportivas y premios en metálico.
-                    </p>
                 </div>
             </div>
 
-            <!-- Controles de Vista y Filtro -->
+            <!-- Controles de Vista y Filtro (Matriz Histórica va DELANTE de Ranking) -->
             <div class="flex flex-wrap items-center gap-2">
                 <!-- Selector de Pestañas de Vista -->
                 <div class="flex items-center bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl border border-slate-300 dark:border-slate-800 shadow-inner">
-                    <button type="button" id="tab-btn-ranking" onclick="window.ClasificacionApp.switchView('ranking')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow">
-                        <span>🏅</span> Ranking
-                    </button>
-                    <button type="button" id="tab-btn-matrix" onclick="window.ClasificacionApp.switchView('matrix')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5">
+                    <button type="button" id="tab-btn-matrix" onclick="window.ClasificacionApp.switchView('matrix')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow">
                         <span>📊</span> Matriz Histórica
+                    </button>
+                    <button type="button" id="tab-btn-ranking" onclick="window.ClasificacionApp.switchView('ranking')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5">
+                        <span>🏅</span> Ranking
                     </button>
                     <button type="button" id="tab-btn-chart" onclick="window.ClasificacionApp.switchView('chart')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5">
                         <span>📈</span> Evolución
@@ -414,108 +455,126 @@
 
                 <!-- Buscador de Socio -->
                 <div class="relative">
-                    <input type="text" id="member-search-input" oninput="window.ClasificacionApp.filterMembers(this.value)" placeholder="Buscar socio..." class="w-36 sm:w-44 pl-8 pr-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-amber-500 shadow-sm font-semibold">
+                    <input type="text" id="member-search-input" oninput="window.ClasificacionApp.filterMembers(this.value)" placeholder="Buscar socio..." class="w-36 sm:w-44 pl-8 pr-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 shadow-sm font-semibold">
                     <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">🔍</span>
                 </div>
             </div>
         </header>
 
         <!-- =====================================================================
-             NIVEL 2: EL PODIO DE HONOR (TOP 3 VISUAL)
+             NIVEL 2: EL PODIO DE HONOR (COMPACTO Y ELEGANTE)
              ===================================================================== -->
-        <section id="podium-section" class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 items-end">
+        <section id="podium-section" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3 items-stretch">
             <!-- 2º Puesto (Plata) -->
-            <div id="podium-card-2" class="glass-panel p-4 sm:p-5 border-slate-400/50 podium-2 rounded-2xl flex flex-col justify-between order-2 md:order-1 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(2)">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-400/20 text-slate-200 border border-slate-400/40 flex items-center gap-1">
-                        <span>🥈</span> 2º Clasificado
-                    </span>
-                    <span class="text-2xl font-black text-slate-400">#2</span>
+            <div id="podium-card-2" class="glass-panel p-2.5 sm:p-3 border-slate-400/50 podium-2 rounded-2xl flex flex-col justify-between order-2 md:order-1 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(2)">
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-200 dark:bg-slate-400/20 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-400/40 flex items-center gap-1">
+                            <span>🥈</span> 2º Clasificado
+                        </span>
+                        <span class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400">#2</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 py-1">
+                        <div class="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-400/20 border border-slate-300 dark:border-slate-400/50 flex items-center justify-center text-lg shadow-sm shrink-0">
+                            🥈
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 id="podium-name-2" class="text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
+                            <div class="flex items-baseline gap-2">
+                                <span id="podium-points-2" class="text-xl font-black font-mono text-slate-800 dark:text-slate-200">-- pts</span>
+                                <span id="podium-diff-2" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">--</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-center py-2">
-                    <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-400/20 border-2 border-slate-300 flex items-center justify-center text-3xl shadow-lg mb-2">
-                        🥈
-                    </div>
-                    <h3 id="podium-name-2" class="text-lg font-black text-white truncate">Cargando...</h3>
-                    <div id="podium-points-2" class="text-3xl font-black font-mono text-slate-200 mt-1">-- pts</div>
-                    <div id="podium-diff-2" class="text-xs font-mono font-bold text-slate-400 mt-0.5">--</div>
-                </div>
-                <div class="pt-3 mt-2 border-t border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[11px] font-mono">
+                <div class="pt-1.5 mt-1.5 border-t border-slate-200 dark:border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
-                        <span class="text-slate-400 text-[10px] block">Aciertos</span>
-                        <strong id="podium-hits-2" class="text-white">--</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Aciertos</span>
+                        <strong id="podium-hits-2" class="text-slate-900 dark:text-white">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-[10px] block">Bonus</span>
-                        <strong id="podium-bonus-2" class="text-emerald-400">--</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Bonus</span>
+                        <strong id="podium-bonus-2" class="text-emerald-600 dark:text-emerald-400">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-[10px] block">Premios</span>
-                        <strong id="podium-prize-2" class="text-purple-400">--€</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Premios</span>
+                        <strong id="podium-prize-2" class="text-purple-600 dark:text-purple-400">--€</strong>
                     </div>
                 </div>
             </div>
 
-            <!-- 1º Puesto (Oro - Centro y Elevado) -->
-            <div id="podium-card-1" class="glass-panel p-5 sm:p-6 border-amber-500/70 podium-1 rounded-2xl flex flex-col justify-between order-1 md:order-2 md:-translate-y-2 transition hover:scale-[1.02] cursor-pointer shadow-2xl" onclick="window.ClasificacionApp.openMemberDrawerByRank(1)">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-500/30 text-amber-300 border border-amber-500/60 flex items-center gap-1 shadow-md animate-pulse">
-                        <span>👑</span> LÍDER DE LA PEÑA
-                    </span>
-                    <span class="text-3xl font-black text-amber-400">#1</span>
+            <!-- 1º Puesto (Oro) -->
+            <div id="podium-card-1" class="glass-panel p-2.5 sm:p-3 border-amber-500/60 podium-1 rounded-2xl flex flex-col justify-between order-1 md:order-2 transition hover:scale-[1.01] cursor-pointer shadow-md" onclick="window.ClasificacionApp.openMemberDrawerByRank(1)">
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 dark:bg-amber-500/30 text-amber-950 dark:text-amber-300 border border-amber-500/40 dark:border-amber-500/60 flex items-center gap-1 shadow-sm">
+                            <span>👑</span> 1º Clasificado
+                        </span>
+                        <span class="text-xs font-mono font-black text-amber-600 dark:text-amber-400">#1</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 py-1">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/30 border border-amber-400 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+                            🥇
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h2 id="podium-name-1" class="text-sm sm:text-base font-black text-amber-900 dark:text-amber-300 truncate">Cargando...</h2>
+                            <div class="flex items-baseline gap-2">
+                                <span id="podium-points-1" class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">-- pts</span>
+                                <span id="podium-diff-1" class="text-[10px] font-mono font-black text-amber-900 dark:text-amber-200">Campeón Provisional</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-center py-3">
-                    <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/30 border-2 border-amber-400 flex items-center justify-center text-4xl shadow-[0_0_25px_rgba(245,158,11,0.4)] mb-2">
-                        🥇
-                    </div>
-                    <h2 id="podium-name-1" class="text-xl sm:text-2xl font-black text-amber-300 truncate">Cargando...</h2>
-                    <div id="podium-points-1" class="text-4xl sm:text-5xl font-black font-mono text-amber-400 drop-shadow mt-1">-- pts</div>
-                    <div id="podium-diff-1" class="text-xs font-mono font-bold text-amber-200/80 mt-1">Campeón Provisional</div>
-                </div>
-                <div class="pt-3 mt-2 border-t border-amber-500/40 grid grid-cols-3 gap-1 text-center text-xs font-mono">
+                <div class="pt-1.5 mt-1.5 border-t border-amber-500/40 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
-                        <span class="text-slate-400 text-[10px] block uppercase font-bold">Aciertos</span>
-                        <strong id="podium-hits-1" class="text-white text-sm">--</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Aciertos</span>
+                        <strong id="podium-hits-1" class="text-slate-900 dark:text-white text-xs">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-[10px] block uppercase font-bold">Bonus</span>
-                        <strong id="podium-bonus-1" class="text-emerald-400 text-sm">--</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Bonus</span>
+                        <strong id="podium-bonus-1" class="text-emerald-600 dark:text-emerald-400 text-xs">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-[10px] block uppercase font-bold">Premios</span>
-                        <strong id="podium-prize-1" class="text-purple-300 text-sm">--€</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Premios</span>
+                        <strong id="podium-prize-1" class="text-purple-600 dark:text-purple-300 text-xs">--€</strong>
                     </div>
                 </div>
             </div>
 
             <!-- 3º Puesto (Bronce) -->
-            <div id="podium-card-3" class="glass-panel p-4 sm:p-5 border-amber-700/50 podium-3 rounded-2xl flex flex-col justify-between order-3 md:order-3 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(3)">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-700/30 text-amber-200 border border-amber-700/50 flex items-center gap-1">
-                        <span>🥉</span> 3º Clasificado
-                    </span>
-                    <span class="text-2xl font-black text-amber-600">#3</span>
+            <div id="podium-card-3" class="glass-panel p-2.5 sm:p-3 border-amber-700/50 podium-3 rounded-2xl flex flex-col justify-between order-3 md:order-3 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(3)">
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-800/15 dark:bg-amber-700/30 text-amber-950 dark:text-amber-200 border border-amber-800/40 dark:border-amber-700/50 flex items-center gap-1">
+                            <span>🥉</span> 3º Clasificado
+                        </span>
+                        <span class="text-xs font-mono font-bold text-amber-700 dark:text-amber-500">#3</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 py-1">
+                        <div class="w-9 h-9 rounded-xl bg-amber-800/20 border border-amber-700/50 flex items-center justify-center text-lg shadow-sm shrink-0">
+                            🥉
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 id="podium-name-3" class="text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
+                            <div class="flex items-baseline gap-2">
+                                <span id="podium-points-3" class="text-xl font-black font-mono text-amber-950 dark:text-amber-200">-- pts</span>
+                                <span id="podium-diff-3" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">--</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-center py-2">
-                    <div class="w-16 h-16 mx-auto rounded-2xl bg-amber-700/20 border-2 border-amber-600 flex items-center justify-center text-3xl shadow-lg mb-2">
-                        🥉
-                    </div>
-                    <h3 id="podium-name-3" class="text-lg font-black text-white truncate">Cargando...</h3>
-                    <div id="podium-points-3" class="text-3xl font-black font-mono text-amber-200 mt-1">-- pts</div>
-                    <div id="podium-diff-3" class="text-xs font-mono font-bold text-slate-400 mt-0.5">--</div>
-                </div>
-                <div class="pt-3 mt-2 border-t border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[11px] font-mono">
+                <div class="pt-1.5 mt-1.5 border-t border-slate-200 dark:border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
-                        <span class="text-slate-400 text-[10px] block">Aciertos</span>
-                        <strong id="podium-hits-3" class="text-white">--</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Aciertos</span>
+                        <strong id="podium-hits-3" class="text-slate-900 dark:text-white">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-[10px] block">Bonus</span>
-                        <strong id="podium-bonus-3" class="text-emerald-400">--</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Bonus</span>
+                        <strong id="podium-bonus-3" class="text-emerald-600 dark:text-emerald-400">--</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-[10px] block">Premios</span>
-                        <strong id="podium-prize-3" class="text-purple-400">--€</strong>
+                        <span class="text-slate-500 dark:text-slate-400 text-[9px] block">Premios</span>
+                        <strong id="podium-prize-3" class="text-purple-600 dark:text-purple-400">--€</strong>
                     </div>
                 </div>
             </div>
@@ -524,21 +583,20 @@
         <!-- =====================================================================
              NIVEL 3: BENTO KPIS CON TARJETAS EXPLICATIVAS (ℹ️)
              ===================================================================== -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             <!-- KPI 1: Líder & Distancia -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40 flex items-center gap-1">
                             <span>👑</span> Líder General
                         </span>
 
-                        <!-- Tarjeta Explicativa ℹ️ -->
                         <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
                                 <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>👑</span> Campeón de la Peña
                                 </strong>
@@ -550,33 +608,32 @@
                         </div>
                     </div>
 
-                    <h4 id="kpi-lider-nombre" class="text-lg font-black text-slate-800 dark:text-white truncate">Calculando...</h4>
-                    <div class="flex items-baseline gap-2 mt-1">
-                        <span id="kpi-lider-puntos" class="text-2xl font-black text-amber-500 dark:text-amber-400 font-mono">-- pts</span>
-                        <span id="kpi-lider-ventaja" class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400">+-- sobre el 2º</span>
+                    <h4 id="kpi-lider-nombre" class="text-base font-black text-slate-800 dark:text-white truncate">Calculando...</h4>
+                    <div class="flex items-baseline gap-2 mt-0.5">
+                        <span id="kpi-lider-puntos" class="text-xl font-black text-amber-600 dark:text-amber-400 font-mono">-- pts</span>
+                        <span id="kpi-lider-ventaja" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">+-- sobre el 2º</span>
                     </div>
                 </div>
 
-                <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
+                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
                     <span>Efectividad</span>
-                    <span id="kpi-lider-efectividad" class="text-amber-500 font-bold font-mono">--%</span>
+                    <span id="kpi-lider-efectividad" class="text-amber-600 dark:text-amber-500 font-bold font-mono">--%</span>
                 </div>
             </div>
 
             <!-- KPI 2: Récord de Jornada -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
                             <span>🎯</span> Récord en 1 Jornada
                         </span>
 
-                        <!-- Tarjeta Explicativa ℹ️ -->
                         <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
                                 <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>🎯</span> Puntuación Récord
                                 </strong>
@@ -588,144 +645,173 @@
                         </div>
                     </div>
 
-                    <h4 id="kpi-record-socio" class="text-lg font-black text-slate-800 dark:text-white truncate">Calculando...</h4>
-                    <div class="flex items-baseline gap-2 mt-1">
-                        <span id="kpi-record-puntos" class="text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">-- pts</span>
-                        <span id="kpi-record-jornada" class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400">Jornada --</span>
+                    <h4 id="kpi-record-socio" class="text-base font-black text-slate-800 dark:text-white truncate">Calculando...</h4>
+                    <div class="flex items-baseline gap-2 mt-0.5">
+                        <span id="kpi-record-puntos" class="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">-- pts</span>
+                        <span id="kpi-record-jornada" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">Jornada --</span>
                     </div>
                 </div>
 
-                <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
+                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
                     <span>Aciertos reales</span>
-                    <span id="kpi-record-hits" class="text-emerald-500 font-bold font-mono">-- aciertos</span>
+                    <span id="kpi-record-hits" class="text-emerald-600 dark:text-emerald-500 font-bold font-mono">-- aciertos</span>
                 </div>
             </div>
 
             <!-- KPI 3: Bolsa de Premios (€) -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1">
                             <span>💰</span> Premios Repartidos
                         </span>
 
-                        <!-- Tarjeta Explicativa ℹ️ -->
                         <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
                                 <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>💰</span> Premios en Metálico
                                 </strong>
                                 <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>Total acumulado de premios ganados por los socios de la peña a través del escrutinio oficial de Loterías del Estado (10, 11, 12, 13, 14 y 15 aciertos).</p>
-                                    <p class="text-purple-300">Estos importes se registran en el libro de caja y benefician al socio o al bote colectivo según los estatutos.</p>
+                                    <p>Total acumulado de premios ganados por los socios de la peña a través del escrutinio oficial de Loterías del Estado (10 a 15 aciertos).</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <h4 id="kpi-premios-total" class="text-2xl font-black text-purple-500 dark:text-purple-400 font-mono">-- €</h4>
-                    <p id="kpi-premios-top-socio" class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">Máx. ganador: Calculando...</p>
+                    <h4 id="kpi-premios-total" class="text-xl font-black text-purple-600 dark:text-purple-400 font-mono">-- €</h4>
+                    <p id="kpi-premios-top-socio" class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Máx. ganador: Calculando...</p>
                 </div>
 
-                <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
+                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
                     <span>Socios premiados</span>
-                    <span id="kpi-premios-count" class="text-purple-400 font-bold font-mono">-- socios</span>
+                    <span id="kpi-premios-count" class="text-purple-600 dark:text-purple-400 font-bold font-mono">-- socios</span>
                 </div>
             </div>
 
             <!-- KPI 4: Balance Bonus vs Penalizaciones -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
+            <div class="glass-panel p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/40 flex items-center gap-1">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/40 flex items-center gap-1">
                             <span>⚖️</span> Bonus y Penalizaciones
                         </span>
 
-                        <!-- Tarjeta Explicativa ℹ️ -->
                         <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
                                 ℹ️
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100060] pointer-events-none text-left">
                                 <strong class="text-blue-400 block mb-1 font-bold flex items-center gap-1.5">
                                     <span>⚖️</span> Sistema de Bonus y Sanciones
                                 </strong>
                                 <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
                                     <p><strong>Bonus por Aciertos:</strong> +30 pts (14/15), +15 pts (13), +10 pts (12), +5 pts (11), +3 pts (10).</p>
                                     <p><strong>Penalizaciones Deportivas:</strong> 3 aciertos (-1), 2 (-2), 1 (-3), 0 (-5 pts).</p>
-                                    <p class="text-rose-400"><strong>Sellado Tardío:</strong> El envío fuera de plazo anula los puntos de la jornada (0 aciertos oficiales).</p>
+                                    <p class="text-rose-400"><strong>Sellado Tardío:</strong> El envío fuera de plazo anula los puntos de la jornada.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-baseline gap-3 mt-1">
+                    <div class="flex items-baseline gap-3 mt-0.5">
                         <div>
-                            <span class="text-[10px] text-slate-400 block font-bold">Bonus Totales</span>
-                            <span id="kpi-bonus-total" class="text-xl font-black text-emerald-400 font-mono">+--</span>
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Bonus</span>
+                            <span id="kpi-bonus-total" class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-mono">+--</span>
                         </div>
-                        <div class="border-l border-slate-700 pl-3">
-                            <span class="text-[10px] text-slate-400 block font-bold">Penalizaciones</span>
-                            <span id="kpi-penal-total" class="text-xl font-black text-rose-400 font-mono">---</span>
+                        <div class="border-l border-slate-300 dark:border-slate-700 pl-3">
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Penalizaciones</span>
+                            <span id="kpi-penal-total" class="text-lg font-black text-rose-600 dark:text-rose-400 font-mono">---</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
+                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
                     <span>Balance neto</span>
-                    <span id="kpi-balance-neto" class="font-bold font-mono text-emerald-400">-- pts</span>
+                    <span id="kpi-balance-neto" class="font-bold font-mono text-emerald-600 dark:text-emerald-400">-- pts</span>
                 </div>
             </div>
         </section>
 
         <!-- =====================================================================
-             VISTA 1: TABLA DE RANKING (CLASIFICACIÓN ORDENADA 1º AL 19º)
+             VISTA 1: MATRIZ GENERAL HISTÓRICA (JORNADA A JORNADA) - POR DEFECTO
              ===================================================================== -->
-        <section id="view-ranking" class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-slate-200 dark:border-slate-800 gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-amber-500/20 text-amber-500 text-lg">🏅</span>
+        <section id="view-matrix" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3" style="display: block;">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-xl bg-amber-500/20 text-amber-500 text-base">📊</span>
                     <div>
-                        <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
-                            <span>Tabla de Honor de la Temporada</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">19 Socios</span>
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
+                            <span>Matriz General de Resultados</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">Todas las Jornadas</span>
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Ordenada por puntuación total acumulada. Haz clic en cualquier socio para abrir su expediente completo.</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Filas superiores fijas con totales generales. Cada fila inferior muestra los aciertos de cada socio.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 text-[11px]">
+                    <span class="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400"><span>👑</span> Mejor</span>
+                    <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
+                    <span class="flex items-center gap-1 font-bold text-rose-600 dark:text-rose-400"><span>🔴</span> Peor</span>
+                    <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
+                    <span class="flex items-center gap-1 font-bold text-purple-600 dark:text-purple-400"><span>🐷</span> PIG</span>
+                </div>
+            </div>
+
+            <div id="matrix-container" class="w-full overflow-auto max-h-[72vh] custom-scroll rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
+                <table id="matrix-table">
+                    <!-- Generado dinámicamente -->
+                </table>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             VISTA 2: TABLA DE RANKING (CLASIFICACIÓN ORDENADA 1º AL 19º CON RANA)
+             ===================================================================== -->
+        <section id="view-ranking" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3" style="display: none;">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-xl bg-amber-500/20 text-amber-500 text-base">🏅</span>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
+                            <span>Tabla de Honor de la Temporada</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">19 Socios</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Ordenada por puntuación total. Haz clic en cualquier socio para abrir su expediente.</p>
                     </div>
                 </div>
 
                 <!-- Filtros rápidos -->
                 <div class="flex items-center gap-1.5 flex-wrap">
-                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('all')" class="category-filter-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 shadow transition" data-filter="all">Todos</button>
-                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('podium')" class="category-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-white transition" data-filter="podium">Top 5</button>
-                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('prizes')" class="category-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-white transition" data-filter="prizes">Con Premios</button>
-                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('penalties')" class="category-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-white transition" data-filter="penalties">Con Penalización</button>
+                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('all')" class="category-filter-btn px-2 py-1 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 shadow transition" data-filter="all">Todos</button>
+                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('podium')" class="category-filter-btn px-2 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-filter="podium">Top 5</button>
+                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('prizes')" class="category-filter-btn px-2 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-filter="prizes">Con Premios</button>
+                    <button type="button" onclick="window.ClasificacionApp.setCategoryFilter('penalties')" class="category-filter-btn px-2 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-filter="penalties">Con Penalización</button>
                 </div>
             </div>
 
             <!-- Tabla Data Grid del Ranking -->
-            <div class="w-full overflow-x-auto custom-scroll rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
+            <div class="w-full overflow-x-auto custom-scroll rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
                 <table class="w-full text-left text-xs">
                     <thead>
-                        <tr class="bg-slate-100 dark:bg-slate-950/90 text-slate-600 dark:text-slate-400 border-b border-slate-300 dark:border-slate-800 uppercase text-[10px] tracking-wider font-extrabold">
-                            <th class="py-3 px-3 text-center w-14">Pos</th>
-                            <th class="py-3 px-4">Socio</th>
-                            <th class="py-3 px-4 text-center">Puntos Totales</th>
-                            <th class="py-3 px-3 text-center">Aciertos Base</th>
-                            <th class="py-3 px-3 text-center">Bonus (+)</th>
-                            <th class="py-3 px-3 text-center">Penal. (-)</th>
-                            <th class="py-3 px-3 text-center">Premios (€)</th>
-                            <th class="py-3 px-3 text-center">Media / J</th>
-                            <th class="py-3 px-3 text-center">Últimas 5 Jornadas</th>
-                            <th class="py-3 px-3 text-center">Ficha</th>
+                        <tr class="bg-slate-100 dark:bg-slate-950/90 text-slate-700 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase text-[10px] tracking-wider font-extrabold">
+                            <th class="py-2.5 px-3 text-center w-16">Pos</th>
+                            <th class="py-2.5 px-4">Socio</th>
+                            <th class="py-2.5 px-4 text-center">Puntos Totales</th>
+                            <th class="py-2.5 px-3 text-center">Aciertos Base</th>
+                            <th class="py-2.5 px-3 text-center">Bonus (+)</th>
+                            <th class="py-2.5 px-3 text-center">Penal. (-)</th>
+                            <th class="py-2.5 px-3 text-center">Premios (€)</th>
+                            <th class="py-2.5 px-3 text-center">Media / J</th>
+                            <th class="py-2.5 px-3 text-center">Últimas 5</th>
+                            <th class="py-2.5 px-3 text-center">Ficha</th>
                         </tr>
                     </thead>
                     <tbody id="ranking-tbody" class="divide-y divide-slate-200 dark:divide-slate-800/80 font-medium">
                         <tr>
-                            <td colspan="10" class="py-12 text-center text-slate-500 font-bold">
+                            <td colspan="10" class="py-8 text-center text-slate-500 font-bold">
                                 ⚙️ Procesando datos oficiales de la peña...
                             </td>
                         </tr>
@@ -735,71 +821,39 @@
         </section>
 
         <!-- =====================================================================
-             VISTA 2: MATRIZ GENERAL HISTÓRICA (JORNADA A JORNADA)
+             VISTA 3: GRÁFICO DINÁMICO DE EVOLUCIÓN (TEXTO NÍTIDO SIN ESTIRAR)
              ===================================================================== -->
-        <section id="view-matrix" class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4" style="display: none;">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-slate-200 dark:border-slate-800 gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-amber-500/20 text-amber-500 text-lg">📊</span>
+        <section id="view-chart" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3" style="display: none;">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-xl bg-amber-500/20 text-amber-500 text-base">📈</span>
                     <div>
-                        <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
-                            <span>Matriz General de Resultados</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">Todas las Jornadas</span>
-                        </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Filas superiores fijas con totales generales. Cada fila inferior muestra los aciertos de cada socio en esa jornada.</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="flex items-center gap-1 font-bold text-amber-500"><span>👑</span> Mejor de la jornada</span>
-                    <span class="border-l border-slate-700 h-3 mx-1"></span>
-                    <span class="flex items-center gap-1 font-bold text-rose-400"><span>🔴</span> Peor jornada</span>
-                    <span class="border-l border-slate-700 h-3 mx-1"></span>
-                    <span class="flex items-center gap-1 font-bold text-purple-400"><span>🐷</span> PIG</span>
-                </div>
-            </div>
-
-            <div id="matrix-container" class="w-full overflow-auto max-h-[75vh] custom-scroll rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
-                <table id="matrix-table">
-                    <!-- Generado dinámicamente -->
-                </table>
-            </div>
-        </section>
-
-        <!-- =====================================================================
-             VISTA 3: GRÁFICO DINÁMICO DE EVOLUCIÓN (SVG INTERACTIVO)
-             ===================================================================== -->
-        <section id="view-chart" class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4" style="display: none;">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-slate-200 dark:border-slate-800 gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-amber-500/20 text-amber-500 text-lg">📈</span>
-                    <div>
-                        <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
                             <span>Evolución de Puntos por Jornada</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">Gráfico Interactivo</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">Gráfico Interactivo</span>
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Compara la trayectoria de puntos acumulados jornada a jornada. Selecciona socios para enfocar la comparativa.</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Compara la trayectoria de puntos acumulados jornada a jornada sin distorsión de escala.</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="window.ClasificacionApp.chartSelectTop(4)" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 text-xs font-bold hover:bg-amber-500/30 transition">Top 4</button>
-                    <button type="button" onclick="window.ClasificacionApp.chartSelectAll()" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition">Todos</button>
-                    <button type="button" onclick="window.ClasificacionApp.chartClearAll()" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition">Limpiar</button>
+                    <button type="button" onclick="window.ClasificacionApp.chartSelectTop(4)" class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/40 text-xs font-bold hover:bg-amber-500/30 transition">Top 4</button>
+                    <button type="button" onclick="window.ClasificacionApp.chartSelectAll()" class="px-2.5 py-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition">Todos</button>
+                    <button type="button" onclick="window.ClasificacionApp.chartClearAll()" class="px-2.5 py-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition">Limpiar</button>
                 </div>
             </div>
 
             <!-- Selector de Socios en Chips -->
-            <div id="chart-member-chips" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto custom-scroll p-2 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-300 dark:border-slate-800">
+            <div id="chart-member-chips" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto custom-scroll p-2 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800">
                 <!-- Inyectado por JS -->
             </div>
 
-            <!-- Lienzo del Gráfico SVG -->
-            <div class="w-full h-80 sm:h-96 relative rounded-xl bg-slate-950/80 p-2 sm:p-4 border border-slate-800 overflow-hidden flex flex-col justify-between">
-                <svg id="chart-svg" class="w-full h-full overflow-visible" preserveAspectRatio="none">
-                    <!-- Curvas inyectadas por JS -->
+            <!-- Lienzo del Gráfico SVG (Proporcional a píxeles reales) -->
+            <div id="chart-container-box" class="w-full h-80 sm:h-96 relative rounded-xl bg-slate-50 dark:bg-slate-950/80 p-2 sm:p-4 border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between">
+                <svg id="chart-svg" class="w-full h-full overflow-visible">
+                    <!-- Curvas inyectadas dinámicamente con medidas exactas en píxeles -->
                 </svg>
-                <div id="chart-tooltip" class="absolute hidden px-3 py-2 rounded-xl bg-slate-900 border border-amber-500 text-white text-xs shadow-2xl pointer-events-none z-30 font-mono"></div>
+                <div id="chart-tooltip" class="absolute hidden px-3 py-1.5 rounded-xl bg-slate-900 border border-amber-500 text-white text-xs shadow-2xl pointer-events-none z-30 font-mono"></div>
             </div>
         </section>
 
@@ -809,51 +863,51 @@
          DRAWER / MODAL LATERAL DE FICHA DEL SOCIO
          ===================================================================== -->
     <div id="member-drawer-modal" style="display: none;" onclick="if(event.target === this) window.ClasificacionApp.closeMemberDrawer()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] items-center justify-center p-3 sm:p-6">
-        <div class="glass-panel w-full max-w-2xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal">
+        <div class="glass-panel w-full max-w-2xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal bg-white dark:bg-slate-900">
             <!-- Cabecera de la Ficha -->
-            <div class="bg-slate-900/90 p-4 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+            <div class="bg-slate-100 dark:bg-slate-900/90 p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-3">
-                    <div id="drawer-avatar" class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-2xl font-black text-amber-400">
+                    <div id="drawer-avatar" class="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-2xl font-black text-amber-500">
                         👤
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 id="drawer-name" class="text-lg font-black text-white">Nombre del Socio</h3>
-                            <span id="drawer-rank-pill" class="px-2 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/50">#1</span>
+                            <h3 id="drawer-name" class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Nombre del Socio</h3>
+                            <span id="drawer-rank-pill" class="px-2 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/50">#1</span>
                         </div>
-                        <p id="drawer-id-text" class="text-xs text-slate-400 font-mono">ID: -- | Socio Oficial</p>
+                        <p id="drawer-id-text" class="text-xs text-slate-500 dark:text-slate-400 font-mono">ID: -- | Socio Oficial</p>
                     </div>
                 </div>
-                <button type="button" onclick="window.ClasificacionApp.closeMemberDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-lg font-bold transition">
+                <button type="button" onclick="window.ClasificacionApp.closeMemberDrawer()" class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center text-lg font-bold transition">
                     &times;
                 </button>
             </div>
 
             <!-- Cuerpo Scrolleable de la Ficha -->
-            <div class="p-4 sm:p-6 overflow-y-auto custom-scroll space-y-5">
+            <div class="p-4 sm:p-5 overflow-y-auto custom-scroll space-y-4">
                 <!-- 4 Tarjetas de Resumen Personal -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Puntos Totales</span>
-                        <span id="drawer-stat-points" class="text-2xl font-black font-mono text-amber-400">--</span>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Puntos Totales</span>
+                        <span id="drawer-stat-points" class="text-xl font-black font-mono text-amber-600 dark:text-amber-400">--</span>
                     </div>
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Aciertos Base</span>
-                        <span id="drawer-stat-hits" class="text-2xl font-black font-mono text-white">--</span>
+                    <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Aciertos Base</span>
+                        <span id="drawer-stat-hits" class="text-xl font-black font-mono text-slate-900 dark:text-white">--</span>
                     </div>
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Bonus / Penal.</span>
-                        <span id="drawer-stat-bonus" class="text-2xl font-black font-mono text-emerald-400">--</span>
+                    <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Bonus / Penal.</span>
+                        <span id="drawer-stat-bonus" class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400">--</span>
                     </div>
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">Premios (€)</span>
-                        <span id="drawer-stat-prizes" class="text-2xl font-black font-mono text-purple-400">--€</span>
+                    <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Premios (€)</span>
+                        <span id="drawer-stat-prizes" class="text-xl font-black font-mono text-purple-600 dark:text-purple-400">--€</span>
                     </div>
                 </div>
 
                 <!-- Detalle de Bonus y Penalizaciones -->
-                <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
-                    <h4 class="text-xs font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2.5">
+                    <h4 class="text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider flex items-center gap-1.5">
                         <span>⚖️</span> Desglose de Bonus y Sanciones
                     </h4>
                     <div id="drawer-bonus-breakdown" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-mono">
@@ -862,13 +916,13 @@
                 </div>
 
                 <!-- Historial Jornada a Jornada -->
-                <div class="space-y-2">
-                    <h4 class="text-xs font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
+                <div class="space-y-1.5">
+                    <h4 class="text-xs font-black uppercase text-slate-600 dark:text-slate-400 tracking-wider flex items-center gap-1.5">
                         <span>📋</span> Historial Jornada a Jornada
                     </h4>
-                    <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/40">
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40">
                         <table class="w-full text-xs text-left">
-                            <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold">
+                            <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
                                 <tr>
                                     <th class="py-2 px-3">Jornada</th>
                                     <th class="py-2 px-3 text-center">Aciertos</th>
@@ -878,7 +932,7 @@
                                     <th class="py-2 px-3 text-center">Estado</th>
                                 </tr>
                             </thead>
-                            <tbody id="drawer-history-tbody" class="divide-y divide-slate-800 font-mono">
+                            <tbody id="drawer-history-tbody" class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
                                 <!-- Inyectado por JS -->
                             </tbody>
                         </table>
@@ -887,8 +941,8 @@
             </div>
 
             <!-- Footer del Modal -->
-            <div class="bg-slate-900/90 p-3 border-t border-slate-800 flex justify-end shrink-0">
-                <button type="button" onclick="window.ClasificacionApp.closeMemberDrawer()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+            <div class="bg-slate-100 dark:bg-slate-900/90 p-3 border-t border-slate-200 dark:border-slate-800 flex justify-end shrink-0">
+                <button type="button" onclick="window.ClasificacionApp.closeMemberDrawer()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition">
                     Cerrar
                 </button>
             </div>
@@ -906,7 +960,7 @@
                 this.pronosticos = [];
                 this.memberStats = {};
                 this.sortedRanking = [];
-                this.currentView = 'ranking';
+                this.currentView = 'matrix'; // MATRIZ HISTÓRICA POR DEFECTO
                 this.activeCategoryFilter = 'all';
                 this.searchQuery = '';
                 this.chartSelectedMembers = new Set();
@@ -914,7 +968,7 @@
                     '#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#8b5cf6',
                     '#06b6d4', '#f97316', '#84cc16', '#6366f1', '#14b8a6',
                     '#d946ef', '#f43f5e', '#eab308', '#22c55e', '#a855f7',
-                    '#38bdf8', '#fb923c', '#a3e635', '#e2e8f0'
+                    '#38bdf8', '#fb923c', '#a3e635', '#94a3b8'
                 ];
 
                 this.init();
@@ -924,7 +978,7 @@
                 try {
                     if (window.DataService) await window.DataService.init();
 
-                    console.log("[Clasificacion2] Cargando datos oficiales de la peña...");
+                    console.log("[Clasificacion2] Cargando datos oficiales...");
                     const data = await window.DataService.loadSeasonData();
                     this.members = data.members || [];
                     this.jornadas = (data.jornadas || []).sort((a, b) => b.number - a.number);
@@ -944,6 +998,13 @@
                     const badgeJ = document.getElementById('badge-total-jornadas');
                     const disputadas = this.jornadas.filter(j => j.matches && j.matches.some(m => m.result && m.result.trim() !== '')).length;
                     if (badgeJ) badgeJ.textContent = `${disputadas} Jornadas disputadas`;
+
+                    // Redimensionar gráfico en resize de ventana
+                    window.addEventListener('resize', () => {
+                        if (this.currentView === 'chart') {
+                            this.renderChartSVG();
+                        }
+                    });
 
                 } catch (err) {
                     console.error("[Clasificacion2] Error en init:", err);
@@ -1076,7 +1137,7 @@
                 });
             }
 
-            // --- RENDERIZADO DEL PODIO (TOP 3) ---
+            // --- RENDERIZADO DEL PODIO (TOP 3 COMPACTO) ---
             renderPodium() {
                 const top1 = this.sortedRanking[0];
                 const top2 = this.sortedRanking[1];
@@ -1093,7 +1154,7 @@
                     const diff2 = top1 ? top1.grandTotal - top2.grandTotal : 0;
                     document.getElementById('podium-name-2').textContent = top2.name;
                     document.getElementById('podium-points-2').textContent = `${top2.grandTotal} pts`;
-                    document.getElementById('podium-diff-2').textContent = diff2 === 0 ? 'Empatado con el 1º' : `-${diff2} pts del líder`;
+                    document.getElementById('podium-diff-2').textContent = diff2 === 0 ? 'Empatado' : `-${diff2} pts`;
                     document.getElementById('podium-hits-2').textContent = top2.baseTotal;
                     document.getElementById('podium-bonus-2').textContent = top2.bonusTotal >= 0 ? `+${top2.bonusTotal}` : top2.bonusTotal;
                     document.getElementById('podium-prize-2').textContent = `${top2.prizeTotal.toFixed(2)}€`;
@@ -1102,7 +1163,7 @@
                     const diff3 = top1 ? top1.grandTotal - top3.grandTotal : 0;
                     document.getElementById('podium-name-3').textContent = top3.name;
                     document.getElementById('podium-points-3').textContent = `${top3.grandTotal} pts`;
-                    document.getElementById('podium-diff-3').textContent = diff3 === 0 ? 'Empatado con el 1º' : `-${diff3} pts del líder`;
+                    document.getElementById('podium-diff-3').textContent = diff3 === 0 ? 'Empatado' : `-${diff3} pts`;
                     document.getElementById('podium-hits-3').textContent = top3.baseTotal;
                     document.getElementById('podium-bonus-3').textContent = top3.bonusTotal >= 0 ? `+${top3.bonusTotal}` : top3.bonusTotal;
                     document.getElementById('podium-prize-3').textContent = `${top3.prizeTotal.toFixed(2)}€`;
@@ -1181,10 +1242,10 @@
                 document.getElementById('kpi-penal-total').textContent = `-${totalNegPenal}`;
                 const balEl = document.getElementById('kpi-balance-neto');
                 balEl.textContent = `${balanceNeto >= 0 ? '+' : ''}${balanceNeto} pts`;
-                balEl.className = `font-bold font-mono ${balanceNeto >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                balEl.className = `font-bold font-mono ${balanceNeto >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
             }
 
-            // --- RENDERIZADO DE LA TABLA DE RANKING (VISTA 1) ---
+            // --- RENDERIZADO DE LA TABLA DE RANKING (CON RANA AL ÚLTIMO) ---
             renderRankingTable() {
                 const tbody = document.getElementById('ranking-tbody');
                 if (!tbody) return;
@@ -1212,22 +1273,28 @@
                 }
 
                 const maxPts = this.sortedRanking[0] ? this.sortedRanking[0].grandTotal : 1;
+                const totalSocios = this.sortedRanking.length;
 
                 let html = '';
                 list.forEach((s) => {
                     const realRank = this.sortedRanking.findIndex(x => x.member.id === s.member.id) + 1;
+                    const isLast = realRank === totalSocios;
                     
-                    let medalBadge = `<span class="font-mono font-bold text-slate-400">#${realRank}</span>`;
+                    let medalBadge = `<span class="font-mono font-bold text-slate-500 dark:text-slate-400">#${realRank}</span>`;
                     let rowBg = '';
                     if (realRank === 1) {
-                        medalBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm">🥇 1º</span>`;
+                        medalBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/50 shadow-sm">🥇 1º</span>`;
                         rowBg = 'bg-amber-500/5';
                     } else if (realRank === 2) {
-                        medalBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-slate-400/20 text-slate-200 border border-slate-400/40">🥈 2º</span>`;
+                        medalBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-400/20 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-400/40">🥈 2º</span>`;
                         rowBg = 'bg-slate-400/5';
                     } else if (realRank === 3) {
-                        medalBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-amber-700/20 text-amber-200 border border-amber-700/50">🥉 3º</span>`;
+                        medalBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-amber-800/15 dark:bg-amber-700/20 text-amber-950 dark:text-amber-200 border border-amber-800/40 dark:border-amber-700/50">🥉 3º</span>`;
                         rowBg = 'bg-amber-700/5';
+                    } else if (isLast) {
+                        // ÚLTIMO CLASIFICADO IDENTIFICADO CON UNA RANA 🐸 (EL MAULA)
+                        medalBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/50 shadow-sm flex items-center justify-center gap-1" title="Último clasificado (El Maula)">🐸 19º</span>`;
+                        rowBg = 'bg-emerald-500/5';
                     }
 
                     const progressPct = maxPts > 0 ? Math.min(100, Math.round((s.grandTotal / maxPts) * 100)) : 0;
@@ -1236,46 +1303,43 @@
                     // Píldoras de racha (Últimas 5)
                     let formHtml = '<div class="flex items-center justify-center gap-1">';
                     s.recentForm.slice(0, 5).forEach(f => {
-                        let colorClass = 'bg-slate-700 text-slate-300';
+                        let colorClass = 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-300';
                         if (f.hits >= 11) colorClass = 'bg-emerald-500 text-slate-950 font-black shadow-sm';
-                        else if (f.hits >= 9) colorClass = 'bg-blue-500/80 text-white font-bold';
-                        else if (f.hits >= 6) colorClass = 'bg-amber-500/80 text-slate-950 font-bold';
+                        else if (f.hits >= 9) colorClass = 'bg-blue-500 text-white font-bold';
+                        else if (f.hits >= 6) colorClass = 'bg-amber-500 text-slate-950 font-bold';
                         else colorClass = 'bg-rose-500 text-white font-bold';
 
                         formHtml += `<span class="w-5 h-5 rounded-md ${colorClass} text-[10px] font-mono flex items-center justify-center" title="J${f.jNum}: ${f.hits} aciertos (${f.points} pts)">${f.hits}</span>`;
                     });
                     formHtml += '</div>';
 
-                    const bonusColor = s.bonusTotal >= 0 ? 'text-emerald-400' : 'text-rose-400';
-                    const bonusPrefix = s.bonusTotal > 0 ? '+' : '';
-
                     html += `
-                        <tr class="${rowBg} hover:bg-slate-800/40 transition cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${s.member.id})">
-                            <td class="py-3 px-3 text-center whitespace-nowrap">${medalBadge}</td>
-                            <td class="py-3 px-4">
+                        <tr class="${rowBg} hover:bg-slate-100 dark:hover:bg-slate-800/40 transition cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${s.member.id})">
+                            <td class="py-2.5 px-3 text-center whitespace-nowrap">${medalBadge}</td>
+                            <td class="py-2.5 px-4">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-amber-400 font-mono shrink-0">
+                                    <div class="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-[10px] font-bold text-amber-600 dark:text-amber-400 font-mono shrink-0">
                                         ${s.member.id}
                                     </div>
-                                    <div class="font-extrabold text-slate-800 dark:text-white">${s.name}</div>
+                                    <div class="font-extrabold text-slate-900 dark:text-white">${s.name}</div>
                                 </div>
                             </td>
-                            <td class="py-3 px-4 text-center">
+                            <td class="py-2.5 px-4 text-center">
                                 <div class="flex flex-col items-center">
-                                    <span class="text-sm font-black font-mono text-amber-500 dark:text-amber-400">${s.grandTotal}</span>
-                                    <div class="w-24 h-1.5 bg-slate-700/50 rounded-full mt-1 overflow-hidden">
+                                    <span class="text-sm font-black font-mono text-amber-600 dark:text-amber-400">${s.grandTotal}</span>
+                                    <div class="w-20 h-1.5 bg-slate-200 dark:bg-slate-700/50 rounded-full mt-0.5 overflow-hidden">
                                         <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400" style="width: ${progressPct}%"></div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-3 px-3 text-center font-mono font-bold text-slate-300">${s.baseTotal}</td>
-                            <td class="py-3 px-3 text-center font-mono font-bold text-emerald-400">${s.positiveBonus > 0 ? '+' + s.positiveBonus : '0'}</td>
-                            <td class="py-3 px-3 text-center font-mono font-bold text-rose-400">${s.negativePenalties > 0 ? '-' + s.negativePenalties : '0'}</td>
-                            <td class="py-3 px-3 text-center font-mono font-bold text-purple-400">${s.prizeTotal > 0 ? s.prizeTotal.toFixed(2) + '€' : '-'}</td>
-                            <td class="py-3 px-3 text-center font-mono font-bold text-slate-400">${media}</td>
-                            <td class="py-3 px-3 text-center">${formHtml}</td>
-                            <td class="py-3 px-3 text-center">
-                                <button type="button" class="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-bold transition">
+                            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-800 dark:text-slate-300">${s.baseTotal}</td>
+                            <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">${s.positiveBonus > 0 ? '+' + s.positiveBonus : '0'}</td>
+                            <td class="py-2.5 px-3 text-center font-mono font-bold text-rose-600 dark:text-rose-400">${s.negativePenalties > 0 ? '-' + s.negativePenalties : '0'}</td>
+                            <td class="py-2.5 px-3 text-center font-mono font-bold text-purple-600 dark:text-purple-400">${s.prizeTotal > 0 ? s.prizeTotal.toFixed(2) + '€' : '-'}</td>
+                            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-600 dark:text-slate-400">${media}</td>
+                            <td class="py-2.5 px-3 text-center">${formHtml}</td>
+                            <td class="py-2.5 px-3 text-center">
+                                <button type="button" class="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[10px] font-bold transition">
                                     👁️
                                 </button>
                             </td>
@@ -1286,7 +1350,7 @@
                 tbody.innerHTML = html;
             }
 
-            // --- RENDERIZADO DE LA MATRIZ GENERAL HISTÓRICA (VISTA 2) ---
+            // --- RENDERIZADO DE LA MATRIZ GENERAL HISTÓRICA (VISTA 1) ---
             renderMatrixTable() {
                 const table = document.getElementById('matrix-table');
                 if (!table) return;
@@ -1296,7 +1360,7 @@
                 // 1. Cabecera THEAD
                 let thead = `<thead>
                     <tr>
-                        <th class="matrix-corner py-3 px-4 text-center font-mono font-black text-amber-500 text-xs">
+                        <th class="matrix-corner py-2.5 px-3 text-center font-mono font-black text-amber-600 dark:text-amber-500 text-xs">
                             JORNADA
                         </th>
                 `;
@@ -1305,9 +1369,9 @@
                     const nameParts = AppUtils.getMemberName(m).split(' ');
                     const shortName = nameParts[0].length > 8 ? nameParts[0].substring(0, 7) + '.' : nameParts[0];
                     thead += `
-                        <th class="matrix-header-name py-3 px-3 text-center cursor-pointer hover:text-amber-400 transition" onclick="window.ClasificacionApp.openMemberDrawer(${m.id})">
-                            <div class="font-extrabold text-slate-800 dark:text-white text-xs">${shortName}</div>
-                            <div class="text-[9px] font-mono text-slate-400 mt-0.5">ID: ${m.id}</div>
+                        <th class="matrix-header-name py-2.5 px-2.5 text-center cursor-pointer hover:text-amber-500 transition" onclick="window.ClasificacionApp.openMemberDrawer(${m.id})">
+                            <div class="font-extrabold text-slate-900 dark:text-white text-xs">${shortName}</div>
+                            <div class="text-[9px] font-mono text-slate-500 dark:text-slate-400">ID: ${m.id}</div>
                         </th>
                     `;
                 });
@@ -1317,51 +1381,51 @@
                 // A. PUNTOS GENERAL
                 thead += `
                     <tr class="matrix-summary-row matrix-row-total text-xs font-mono font-black">
-                        <td class="matrix-sticky-col py-2.5 px-4 font-black text-amber-500 text-left border-b border-slate-700">PUNTOS GENERAL</td>
+                        <td class="matrix-sticky-col py-2 px-3 font-black text-amber-600 dark:text-amber-500 text-left border-b border-slate-200 dark:border-slate-700">PUNTOS GENERAL</td>
                 `;
                 sortedMembers.forEach(m => {
                     const pts = this.memberStats[m.id].grandTotal;
-                    thead += `<td class="py-2.5 px-3 text-center text-amber-400 font-black text-sm border-b border-slate-700/80 border-r border-slate-700/40">${pts}</td>`;
+                    thead += `<td class="py-2 px-2.5 text-center text-amber-600 dark:text-amber-400 font-black text-xs border-b border-slate-200 dark:border-slate-700/80 border-r border-slate-200 dark:border-slate-700/40">${pts}</td>`;
                 });
                 thead += `</tr>`;
 
                 // B. Puntos Semana (Aciertos Base)
                 thead += `
                     <tr class="matrix-summary-row matrix-row-hits text-xs font-mono font-bold">
-                        <td class="matrix-sticky-col py-2 px-4 text-slate-300 text-left border-b border-slate-700">Puntos Semana</td>
+                        <td class="matrix-sticky-col py-1.5 px-3 text-slate-700 dark:text-slate-300 text-left border-b border-slate-200 dark:border-slate-700">Puntos Semana</td>
                 `;
                 sortedMembers.forEach(m => {
                     const hits = this.memberStats[m.id].baseTotal;
-                    thead += `<td class="py-2 px-3 text-center text-slate-200 border-b border-slate-700/80 border-r border-slate-700/40">${hits}</td>`;
+                    thead += `<td class="py-1.5 px-2.5 text-center text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700/80 border-r border-slate-200 dark:border-slate-700/40">${hits}</td>`;
                 });
                 thead += `</tr>`;
 
                 // C. Bonus / Penal
                 thead += `
                     <tr class="matrix-summary-row matrix-row-bonus text-xs font-mono font-bold">
-                        <td class="matrix-sticky-col py-2 px-4 text-slate-300 text-left border-b border-slate-700">Bonus / Penal.</td>
+                        <td class="matrix-sticky-col py-1.5 px-3 text-slate-700 dark:text-slate-300 text-left border-b border-slate-200 dark:border-slate-700">Bonus / Penal.</td>
                 `;
                 sortedMembers.forEach(m => {
                     const b = this.memberStats[m.id].bonusTotal;
-                    const color = b >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                    const color = b >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400';
                     const prefix = b > 0 ? '+' : '';
-                    thead += `<td class="py-2 px-3 text-center ${color} border-b border-slate-700/80 border-r border-slate-700/40">${prefix}${b}</td>`;
+                    thead += `<td class="py-1.5 px-2.5 text-center ${color} border-b border-slate-200 dark:border-slate-700/80 border-r border-slate-200 dark:border-slate-700/40">${prefix}${b}</td>`;
                 });
                 thead += `</tr>`;
 
                 // D. Premios (€)
                 thead += `
                     <tr class="matrix-summary-row matrix-row-prizes text-xs font-mono font-black">
-                        <td class="matrix-sticky-col py-2.5 px-4 text-purple-400 text-left">Premios (€)</td>
+                        <td class="matrix-sticky-col py-2 px-3 text-purple-600 dark:text-purple-400 text-left">Premios (€)</td>
                 `;
                 sortedMembers.forEach(m => {
                     const p = this.memberStats[m.id].prizeTotal;
-                    thead += `<td class="py-2.5 px-3 text-center text-purple-300 border-r border-slate-700/40">${p > 0 ? p.toFixed(2) + '€' : '-'}</td>`;
+                    thead += `<td class="py-2 px-2.5 text-center text-purple-600 dark:text-purple-300 border-r border-slate-200 dark:border-slate-700/40">${p > 0 ? p.toFixed(2) + '€' : '-'}</td>`;
                 });
                 thead += `</tr></thead>`;
 
                 // 2. Cuerpo TBODY (Jornadas)
-                let tbody = `<tbody class="divide-y divide-slate-800 text-xs font-mono">`;
+                let tbody = `<tbody class="divide-y divide-slate-200 dark:divide-slate-800 text-xs font-mono">`;
                 this.visibleJornadas.forEach(j => {
                     let dateFormatted = j.date;
                     try {
@@ -1372,12 +1436,12 @@
                     const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
                     tbody += `<tr>
-                        <td class="matrix-sticky-col py-2 px-4 text-left border-b border-slate-800">
-                            <div class="font-extrabold text-amber-500 text-xs flex items-center gap-1">
+                        <td class="matrix-sticky-col py-1.5 px-3 text-left border-b border-slate-200 dark:border-slate-800">
+                            <div class="font-extrabold text-amber-600 dark:text-amber-500 text-xs flex items-center gap-1">
                                 <span>J${j.number}</span>
                                 ${hasPig ? '<span title="Partido PIG">🐷</span>' : ''}
                             </div>
-                            <div class="text-[10px] text-slate-400 font-mono">${dateFormatted}</div>
+                            <div class="text-[9px] text-slate-500 dark:text-slate-400 font-mono">${dateFormatted}</div>
                         </td>
                     `;
 
@@ -1390,9 +1454,9 @@
                             const isMax = j.stats && cell.points === j.stats.maxScore && j.stats.maxScore > 0;
                             const isMin = j.stats && cell.points === j.stats.minScore && j.stats.minScore !== j.stats.maxScore;
 
-                            if (isMax) cellBg = 'bg-amber-500/20 text-amber-300 font-black';
-                            else if (isMin) cellBg = 'bg-rose-500/10 text-rose-300';
-                            else cellBg = 'text-slate-200';
+                            if (isMax) cellBg = 'bg-amber-500/15 text-amber-800 dark:text-amber-300 font-black';
+                            else if (isMin) cellBg = 'bg-rose-500/10 text-rose-800 dark:text-rose-300';
+                            else cellBg = 'text-slate-800 dark:text-slate-200';
 
                             const crown = isMax ? ' 👑' : '';
                             const lateIcon = cell.isLate && !cell.isPardoned ? ' ⏱️' : '';
@@ -1401,7 +1465,7 @@
                             cellContent = `<span title="J${j.number} - ${AppUtils.getMemberName(m)}: ${cell.hits} aciertos (${cell.points} pts)">${cell.points}${crown}${lateIcon}${pigIcon}</span>`;
                         }
 
-                        tbody += `<td class="py-2 px-3 text-center ${cellBg} border-r border-slate-800 hover:bg-slate-700/40 transition cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${m.id})">${cellContent}</td>`;
+                        tbody += `<td class="py-1.5 px-2.5 text-center ${cellBg} border-r border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/40 transition cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${m.id})">${cellContent}</td>`;
                     });
 
                     tbody += `</tr>`;
@@ -1411,9 +1475,8 @@
                 table.innerHTML = thead + tbody;
             }
 
-            // --- GRÁFICO DINÁMICO DE EVOLUCIÓN (SVG INTERACTIVO) ---
+            // --- GRÁFICO DINÁMICO DE EVOLUCIÓN (PROPORCIONAL EN PÍXELES REALES, FUENTE NATIVA) ---
             initChart() {
-                // Seleccionar Top 4 por defecto
                 this.chartSelectTop(4);
             }
 
@@ -1458,12 +1521,12 @@
                     const color = this.chartColors[idx % this.chartColors.length];
 
                     const activeClass = isSelected
-                        ? 'bg-slate-800 text-white border-2 shadow-sm font-black'
-                        : 'bg-slate-900/60 text-slate-400 border border-slate-800 hover:text-white font-medium';
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white border-2 shadow-sm font-black'
+                        : 'bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white font-medium';
 
                     html += `
-                        <button type="button" onclick="window.ClasificacionApp.toggleChartMember(${s.member.id})" class="px-2.5 py-1 rounded-lg text-xs flex items-center gap-1.5 transition ${activeClass}" style="${isSelected ? `border-color: ${color}; color: ${color};` : ''}">
-                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${color};"></span>
+                        <button type="button" onclick="window.ClasificacionApp.toggleChartMember(${s.member.id})" class="px-2 py-0.5 rounded-lg text-xs flex items-center gap-1.5 transition ${activeClass}" style="${isSelected ? `border-color: ${color}; color: ${color};` : ''}">
+                            <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
                             <span>${s.name}</span>
                         </button>
                     `;
@@ -1474,17 +1537,28 @@
 
             renderChartSVG() {
                 const svg = document.getElementById('chart-svg');
-                if (!svg) return;
+                const box = document.getElementById('chart-container-box');
+                if (!svg || !box) return;
 
                 const jornadasAsc = [...this.visibleJornadas].sort((a, b) => a.number - b.number);
                 if (jornadasAsc.length === 0 || this.chartSelectedMembers.size === 0) {
-                    svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#64748b" font-size="12" font-family="monospace">Selecciona socios arriba para ver su evolución</text>`;
+                    svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#64748b" font-size="12" font-family="'Plus Jakarta Sans', sans-serif">Selecciona socios arriba para ver su evolución</text>`;
                     return;
                 }
 
-                const width = 1000;
-                const height = 400;
-                const padding = { top: 30, right: 40, bottom: 40, left: 50 };
+                // Medición exacta en píxeles para evitar cualquier estiramiento o distorsión de texto
+                const rect = box.getBoundingClientRect();
+                const width = Math.max(500, Math.floor(rect.width - 32));
+                const height = Math.max(260, Math.floor(rect.height - 32));
+
+                svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                svg.removeAttribute('preserveAspectRatio');
+
+                const isLight = document.documentElement.classList.contains('light-theme');
+                const gridColor = isLight ? '#e2e8f0' : '#1e293b';
+                const labelColor = isLight ? '#475569' : '#94a3b8';
+
+                const padding = { top: 20, right: 30, bottom: 35, left: 45 };
                 const plotWidth = width - padding.left - padding.right;
                 const plotHeight = height - padding.top - padding.bottom;
 
@@ -1498,12 +1572,12 @@
                     let runningTotal = 0;
                     const points = [];
 
-                    jornadasAsc.forEach((j, jIdx) => {
+                    jornadasAsc.forEach((j) => {
                         const cell = s.jornadaData[j.id];
                         if (cell && cell.hits !== -1) {
                             runningTotal += cell.points;
                         }
-                        points.push({ jNum: j.number, pts: runningTotal, step: cell ? cell.points : 0 });
+                        points.push({ jNum: j.number, pts: runningTotal });
                         if (runningTotal > maxPts) maxPts = runningTotal;
                     });
 
@@ -1516,24 +1590,18 @@
 
                 if (maxPts === 0) maxPts = 10;
 
-                // Escalas
                 const xScale = (idx) => padding.left + (idx / Math.max(1, jornadasAsc.length - 1)) * plotWidth;
                 const yScale = (val) => padding.top + plotHeight - (val / maxPts) * plotHeight;
 
-                let svgContent = `<defs>
-                    <linearGradient id="grid-grad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#334155" stop-opacity="0.3"/>
-                        <stop offset="100%" stop-color="#334155" stop-opacity="0.05"/>
-                    </linearGradient>
-                </defs>`;
+                let svgContent = '';
 
-                // Ejes y cuadrículas horizontales (4 líneas)
+                // Líneas horizontales de cuadrícula (4 divisiones)
                 for (let i = 0; i <= 4; i++) {
                     const val = Math.round((maxPts / 4) * i);
                     const y = yScale(val);
                     svgContent += `
-                        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#1e293b" stroke-dasharray="4" stroke-width="1"/>
-                        <text x="${padding.left - 8}" y="${y + 4}" text-anchor="end" fill="#64748b" font-size="10" font-family="monospace">${val}</text>
+                        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridColor}" stroke-dasharray="3,3" stroke-width="1"/>
+                        <text x="${padding.left - 8}" y="${y + 4}" text-anchor="end" fill="${labelColor}" font-size="10" font-family="'JetBrains Mono', monospace">${val}</text>
                     `;
                 }
 
@@ -1541,8 +1609,8 @@
                 jornadasAsc.forEach((j, idx) => {
                     const x = xScale(idx);
                     svgContent += `
-                        <line x1="${x}" y1="${padding.top}" x2="${x}" y2="${height - padding.bottom}" stroke="#1e293b" stroke-width="0.5"/>
-                        <text x="${x}" y="${height - padding.bottom + 18}" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace" font-weight="bold">J${j.number}</text>
+                        <line x1="${x}" y1="${padding.top}" x2="${x}" y2="${height - padding.bottom}" stroke="${gridColor}" stroke-width="0.5"/>
+                        <text x="${x}" y="${height - padding.bottom + 18}" text-anchor="middle" fill="${labelColor}" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="bold">J${j.number}</text>
                     `;
                 });
 
@@ -1556,7 +1624,7 @@
                     });
 
                     svgContent += `
-                        <path d="${d}" fill="none" stroke="${ser.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+                        <path d="${d}" fill="none" stroke="${ser.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
                     `;
 
                     // Puntos
@@ -1564,12 +1632,11 @@
                         const x = xScale(idx);
                         const y = yScale(pt.pts);
                         svgContent += `
-                            <circle cx="${x}" cy="${y}" r="4" fill="${ser.color}" stroke="#0b0f19" stroke-width="2" class="cursor-pointer transition-transform hover:scale-150" />
+                            <circle cx="${x}" cy="${y}" r="3.5" fill="${ser.color}" stroke="${isLight ? '#ffffff' : '#0b0f19'}" stroke-width="1.5" />
                         `;
                     });
                 });
 
-                svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
                 svg.innerHTML = svgContent;
             }
 
@@ -1581,14 +1648,14 @@
                 const vm = document.getElementById('view-matrix');
                 const vc = document.getElementById('view-chart');
 
-                if (vr) vr.style.display = viewName === 'ranking' ? 'block' : 'none';
                 if (vm) vm.style.display = viewName === 'matrix' ? 'block' : 'none';
+                if (vr) vr.style.display = viewName === 'ranking' ? 'block' : 'none';
                 if (vc) vc.style.display = viewName === 'chart' ? 'block' : 'none';
 
                 // Botones
                 const btns = {
-                    ranking: document.getElementById('tab-btn-ranking'),
                     matrix: document.getElementById('tab-btn-matrix'),
+                    ranking: document.getElementById('tab-btn-ranking'),
                     chart: document.getElementById('tab-btn-chart')
                 };
 
@@ -1604,7 +1671,7 @@
 
                 if (viewName === 'chart') {
                     this.renderChartChips();
-                    this.renderChartSVG();
+                    setTimeout(() => this.renderChartSVG(), 50);
                 }
             }
 
@@ -1616,7 +1683,7 @@
                     if (f === filterName) {
                         btn.className = 'category-filter-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 shadow transition';
                     } else {
-                        btn.className = 'category-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-white transition';
+                        btn.className = 'category-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
                     }
                 });
                 this.renderRankingTable();
@@ -1649,6 +1716,7 @@
                 if (rank === 1) avatar.textContent = '🥇';
                 else if (rank === 2) avatar.textContent = '🥈';
                 else if (rank === 3) avatar.textContent = '🥉';
+                else if (rank === this.sortedRanking.length) avatar.textContent = '🐸';
                 else avatar.textContent = '👤';
 
                 // Estadísticas
@@ -1656,35 +1724,35 @@
                 document.getElementById('drawer-stat-hits').textContent = s.baseTotal;
                 const bEl = document.getElementById('drawer-stat-bonus');
                 bEl.textContent = `${s.bonusTotal >= 0 ? '+' : ''}${s.bonusTotal}`;
-                bEl.className = `text-2xl font-black font-mono ${s.bonusTotal >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                bEl.className = `text-xl font-black font-mono ${s.bonusTotal >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
                 document.getElementById('drawer-stat-prizes').textContent = `${s.prizeTotal.toFixed(2)}€`;
 
                 // Desglose de Bonus
                 const bContainer = document.getElementById('drawer-bonus-breakdown');
                 bContainer.innerHTML = `
-                    <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex justify-between">
-                        <span class="text-slate-400">14/15 aciertos (+30)</span>
-                        <strong class="text-amber-400">${s.bonusCounts[15] + s.bonusCounts[14]}</strong>
+                    <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">14/15 aciertos (+30)</span>
+                        <strong class="text-amber-600 dark:text-amber-400">${s.bonusCounts[15] + s.bonusCounts[14]}</strong>
                     </div>
-                    <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex justify-between">
-                        <span class="text-slate-400">13 aciertos (+15)</span>
-                        <strong class="text-emerald-400">${s.bonusCounts[13]}</strong>
+                    <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">13 aciertos (+15)</span>
+                        <strong class="text-emerald-600 dark:text-emerald-400">${s.bonusCounts[13]}</strong>
                     </div>
-                    <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex justify-between">
-                        <span class="text-slate-400">12 aciertos (+10)</span>
-                        <strong class="text-blue-400">${s.bonusCounts[12]}</strong>
+                    <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">12 aciertos (+10)</span>
+                        <strong class="text-blue-600 dark:text-blue-400">${s.bonusCounts[12]}</strong>
                     </div>
-                    <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex justify-between">
-                        <span class="text-slate-400">11 aciertos (+5)</span>
-                        <strong class="text-teal-400">${s.bonusCounts[11]}</strong>
+                    <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">11 aciertos (+5)</span>
+                        <strong class="text-teal-600 dark:text-teal-400">${s.bonusCounts[11]}</strong>
                     </div>
-                    <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex justify-between">
-                        <span class="text-slate-400">10 aciertos (+3)</span>
-                        <strong class="text-indigo-400">${s.bonusCounts[10]}</strong>
+                    <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">10 aciertos (+3)</span>
+                        <strong class="text-indigo-600 dark:text-indigo-400">${s.bonusCounts[10]}</strong>
                     </div>
-                    <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 flex justify-between">
-                        <span class="text-rose-400">Penal. bajas / retrasos</span>
-                        <strong class="text-rose-400">-${s.negativePenalties} pts (${s.penaltyCounts.low + s.penaltyCounts.late})</strong>
+                    <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex justify-between">
+                        <span class="text-rose-600 dark:text-rose-400">Penal. bajas / retrasos</span>
+                        <strong class="text-rose-600 dark:text-rose-400">-${s.negativePenalties} pts (${s.penaltyCounts.low + s.penaltyCounts.late})</strong>
                     </div>
                 `;
 
@@ -1695,21 +1763,21 @@
                     const data = s.jornadaData[j.id];
                     if (!data || data.hits === -1) return;
 
-                    let statusBadge = '<span class="text-emerald-400 font-bold">A tiempo</span>';
-                    if (data.isLate && !data.isPardoned) statusBadge = '<span class="text-rose-400 font-bold">Retraso ⏱️</span>';
-                    else if (data.isPardoned) statusBadge = '<span class="text-amber-400 font-bold">Justificado</span>';
+                    let statusBadge = '<span class="text-emerald-600 dark:text-emerald-400 font-bold">A tiempo</span>';
+                    if (data.isLate && !data.isPardoned) statusBadge = '<span class="text-rose-600 dark:text-rose-400 font-bold">Retraso ⏱️</span>';
+                    else if (data.isPardoned) statusBadge = '<span class="text-amber-600 dark:text-amber-400 font-bold">Justificado</span>';
 
                     const bonusStr = data.bonus > 0 ? `+${data.bonus}` : (data.bonus < 0 ? `${data.bonus}` : '-');
-                    const bonusClass = data.bonus > 0 ? 'text-emerald-400' : (data.bonus < 0 ? 'text-rose-400' : 'text-slate-500');
+                    const bonusClass = data.bonus > 0 ? 'text-emerald-600 dark:text-emerald-400' : (data.bonus < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500');
 
                     hHtml += `
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="py-2 px-3 font-bold text-slate-300">Jornada ${j.number}</td>
-                            <td class="py-2 px-3 text-center text-white font-bold">${data.hits}</td>
-                            <td class="py-2 px-3 text-center ${bonusClass} font-bold">${bonusStr}</td>
-                            <td class="py-2 px-3 text-center text-amber-400 font-black">${data.points}</td>
-                            <td class="py-2 px-3 text-center text-purple-400">${data.prize > 0 ? data.prize.toFixed(2) + '€' : '-'}</td>
-                            <td class="py-2 px-3 text-center">${statusBadge}</td>
+                        <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                            <td class="py-1.5 px-3 font-bold text-slate-800 dark:text-slate-300">Jornada ${j.number}</td>
+                            <td class="py-1.5 px-3 text-center text-slate-900 dark:text-white font-bold">${data.hits}</td>
+                            <td class="py-1.5 px-3 text-center ${bonusClass} font-bold">${bonusStr}</td>
+                            <td class="py-1.5 px-3 text-center text-amber-600 dark:text-amber-400 font-black">${data.points}</td>
+                            <td class="py-1.5 px-3 text-center text-purple-600 dark:text-purple-400">${data.prize > 0 ? data.prize.toFixed(2) + '€' : '-'}</td>
+                            <td class="py-1.5 px-3 text-center">${statusBadge}</td>
                         </tr>
                     `;
                 });
