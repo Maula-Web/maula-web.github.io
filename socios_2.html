@@ -29,6 +29,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
+    <script src="js/utils.js"></script>
 
     <!-- Flatpickr (Selector de Fechas y Rangos de Calendario) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -106,11 +107,11 @@
             position: relative;
         }
 
-        /* FONDO TOTALMENTE OPACO SÓLIDO (#0b0f19) SIN NINGUNA TRANSPARENCIA (ESTILO BOTE 2) */
-        .tooltip-card,
-        .group > div[class*="group-hover:visible"],
-        .group:hover > div[class*="absolute"],
-        div[class*="group-hover:visible"] {
+        /* FONDO TOTALMENTE OPACO SÓLIDO EN MODO OSCURO (#0b0f19) */
+        html.dark .tooltip-card,
+        html.dark .group > div[class*="group-hover:visible"],
+        html.dark .group:hover > div[class*="absolute"],
+        html.dark div[class*="group-hover:visible"] {
             background-color: #0b0f19 !important;
             background: #0b0f19 !important;
             backdrop-filter: none !important;

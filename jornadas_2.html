@@ -63,11 +63,11 @@
             position: relative;
         }
 
-        /* REGLA CRÍTICA: Tarjetas explicativas SIEMPRE en primer plano absoluto y 100% OPACAS (#0b0f19) */
-        .tooltip-box,
-        .group\/tip > div[class*="group-hover\/tip:visible"],
-        .group\/tip:hover > div[class*="absolute"],
-        div[class*="group-hover\/tip:visible"] {
+        /* REGLA CRÍTICA: Tarjetas explicativas SIEMPRE en primer plano absoluto y 100% OPACAS (#0b0f19) EN MODO OSCURO */
+        html.dark .tooltip-box,
+        html.dark .group\/tip > div[class*="group-hover\/tip:visible"],
+        html.dark .group\/tip:hover > div[class*="absolute"],
+        html.dark div[class*="group-hover\/tip:visible"] {
             background-color: #0b0f19 !important;
             background: #0b0f19 !important;
             backdrop-filter: none !important;

@@ -694,10 +694,21 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ### 23.3. Modo Claro de Alta Gama (Canvas Cáscara de Huevo & Tarjetas Blanco Puro)
 - **Lienzo Cáscara de Huevo (`#f8f5ed`)**: Fondo suave, cálido y mate con gradientes radiales fijos en tonos sutiles de ámbar y esmeralda. Reduce la fatiga visual y elimina el resplandor frío de los blancos artificiales.
-- **Paneles y Tarjetas Blanco Puro (`#ffffff`)**: Las tarjetas `.glass-panel`, `.bote2-card`, `.match-card-row` y modales se diseñan en blanco puro con ribete cálido lino/arena (`#e8dfcf`) y sombra difusa suave (`box-shadow: 0 6px 24px -4px rgba(120, 90, 40, 0.05)`). Sobre el fondo cáscara de huevo, las tarjetas destacan y flotan con nitidez natural sin requerir bloques oscuros.
+- **Paneles y Tarjetas Blanco Puro (`#ffffff`)**: Las tarjetas `.glass-panel`, `.bote2-card`, `.member-card`, `.match-card-row` y modales se diseñan en blanco puro con ribete cálido lino/arena (`#e8dfcf`) y sombra difusa suave (`box-shadow: 0 6px 24px -4px rgba(120, 90, 40, 0.05)`). Sobre el fondo cáscara de huevo, las tarjetas destacan y flotan con nitidez natural sin requerir bloques oscuros.
+- **Eliminación Total de "Tarjetas Oscuras" y Sub-bloques Negros**:
+  - **Bloques de Cuenta Atrás (DÍAS, HORAS, MIN, SEG)**: En `dashboard_2.html`, los 4 cuadros de cuenta atrás pasan de rectángulos oscuros (`bg-slate-950/80`) a tarjetas blanco puro luminosas con borde lino (`#e8dfcf`), números de alto contraste (horas/minutos en obsidiana `#0f172a`, días en ámbar `#d97706`, segundos en esmeralda `#059669`) y etiquetas limpias en gris pizarra.
+  - **Sub-cajas y Contenedores Internos**: Toda clase `bg-slate-950*`, `bg-slate-900*`, `bg-slate-800*`, `bg-[#0b0f19]`, etc. se transforma en blanco puro (`#ffffff`) o arena suave (`#f5efe4`), impidiendo la aparición de recuadros negros dentro de las tarjetas claras.
+  - **Pistas de Progreso**: La barra de progreso de quinielas se adapta a un carril arena suave (`#eae2d3`), manteniendo su relleno en degradado ámbar-esmeralda.
 - **Jerarquía Tipográfica Obsidian**: Textos principales en negro grafito (`#0f172a`), secundarios en gris pizarra (`#1e293b`) y de lectura en pizarra suave (`#334155`), asegurando un contraste óptimo bajo luz natural.
 - **Acentos Cromáticos Cálidos**: Tonos ámbar dorado (`#d97706`/`#b45309`) y verde esmeralda (`#059669`).
 - **Tarjetas Explicativas (`ℹ️`)**: En Modo Claro se transforman en **tarjetas flotantes luminosas en blanco puro** con ribete fino en oro cálido (`1.5px solid #d97706`), sombra profunda difuminada y tipografía en negro obsidiana (`#1e293b`) y ámbar tostado (`#92400e`). Se erradicaron completamente los bloques negros sobre fondo claro, manteniendo una legibilidad y contraste insuperables. El botón informativo `ℹ️` luce en amarillo ámbar dorado (`#fef3c7`, borde `#f59e0b`, icono `#b45309`).
+- **Elementos Flotantes Inferiores y Protección Móvil**:
+  - **Reloj Global (`#maulas-global-clock`)**: En modo claro luce fondo blanco translúcido (`rgba(255, 255, 255, 0.95)`), borde `#e8dfcf` e icono de usuario en ámbar. En móviles (`<= 768px`) se oculta automáticamente para evitar solapamientos con el botón de notificaciones Push.
+  - **Botón Notificaciones Push (`.push-float-btn`)**: Pasa de negro a un degradado blanco-ámbar luminoso con borde dorado (`#d97706`) y textos en bronce cálido (`#92400e`).
+- **Soporte Pleno en Socios 2 (`socios_2.html`)**:
+  - Integración de `js/utils.js` para gestión activa del tema y sincronización de botones.
+  - Desacoplamiento de reglas inline `#0b0f19` mediante ámbito estricto `html.dark`.
+  - Estilizado de fichas deportivas (`.member-card`), caja de contacto (`#fbf8f2`), barra de búsqueda (`#search-input`), píldoras de filtrado (`.cat-pill`), tabla compacta y selector de fechas Flatpickr en modo claro.
 
 ### 23.4. Integración en Service Worker y Caché
 - Archivo `css/light-theme.css` incorporado a los recursos críticos (`CORE_ASSETS`) de `service-worker.js`.

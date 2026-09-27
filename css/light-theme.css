@@ -34,10 +34,11 @@ body.light-theme {
 }
 
 /* =========================================================================
-   2. PANELES Y TARJETAS (BLANCO PURO LUMINOSO SOBRE CÁSCARA DE HUEVO)
+   2. PANELES Y TARJETAS PRINCIPALES (BLANCO PURO SOBRE CÁSCARA DE HUEVO)
    ========================================================================= */
 .light-theme .glass-panel,
-.light-theme .bote2-card {
+.light-theme .bote2-card,
+.light-theme .member-card {
     background: #ffffff !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
@@ -46,7 +47,8 @@ body.light-theme {
 }
 
 .light-theme .glass-panel:hover,
-.light-theme .bote2-card:hover {
+.light-theme .bote2-card:hover,
+.light-theme .member-card:hover {
     border-color: rgba(217, 119, 6, 0.45) !important;
     box-shadow: 0 12px 30px -4px rgba(217, 119, 6, 0.09), 0 3px 10px -1px rgba(0, 0, 0, 0.03) !important;
 }
@@ -107,35 +109,56 @@ body.light-theme {
 }
 
 /* =========================================================================
-   4. FONDOS DE SUPERFICIES Y BORDES
+   4. ELIMINACIÓN TOTAL DE TARJETAS OSCURAS / BLOQUES NEGROS EN MODO CLARO
+   Afecta a sub-cajas, tarjetas internas, inputs, selects y tiles.
    ========================================================================= */
 .light-theme .bg-slate-950,
+.light-theme .bg-slate-950\/80,
+.light-theme .bg-slate-950\/70,
+.light-theme .bg-slate-950\/60,
+.light-theme .bg-slate-950\/40,
+.light-theme .bg-slate-950\/30,
 .light-theme .bg-slate-900,
+.light-theme .bg-slate-900\/95,
+.light-theme .bg-slate-900\/90,
+.light-theme .bg-slate-900\/80,
+.light-theme .bg-slate-900\/60,
+.light-theme .bg-slate-900\/50,
 .light-theme .bg-\[\#06080e\],
 .light-theme .bg-\[\#090d16\],
-.light-theme .bg-\[\#0b0f19\]:not(.tooltip-box):not([class*="group-hover\/tip"]) {
+.light-theme .bg-\[\#0b0f19\] {
     background-color: #ffffff !important;
     border-color: #e8dfcf !important;
 }
 
-.light-theme .bg-slate-800 {
+/* Tono crema / arena suave para cajas secundarias, pills y botones */
+.light-theme .bg-slate-800,
+.light-theme .bg-slate-800\/80,
+.light-theme .bg-slate-800\/60,
+.light-theme .bg-slate-800\/50 {
     background-color: #f5efe4 !important;
     border-color: #e5decb !important;
+    color: #334155 !important;
 }
 
-.light-theme .bg-slate-800\/50,
-.light-theme .bg-slate-800\/60,
-.light-theme .bg-slate-800\/80 {
-    background-color: rgba(245, 239, 228, 0.85) !important;
-    border-color: #e8dfcf !important;
+.light-theme .bg-slate-700,
+.light-theme .bg-slate-700\/80 {
+    background-color: #eae1d1 !important;
+    border-color: #ded5c3 !important;
+    color: #1e293b !important;
 }
 
+/* Bordes en general */
 .light-theme .border-slate-800,
-.light-theme .border-slate-700 {
+.light-theme .border-slate-800\/80,
+.light-theme .border-slate-800\/60,
+.light-theme .border-slate-700,
+.light-theme .border-slate-700\/80 {
     border-color: #e8dfcf !important;
 }
 
-.light-theme .border-slate-600 {
+.light-theme .border-slate-600,
+.light-theme .border-slate-600\/70 {
     border-color: #ded5c3 !important;
 }
 
@@ -150,7 +173,59 @@ body.light-theme {
     border-color: rgba(5, 150, 105, 0.35) !important;
 }
 
-/* Píldoras y Badges con colores pastel elegantes */
+/* Pistas de barras de progreso */
+.light-theme .w-full.bg-slate-950,
+.light-theme .rounded-full.bg-slate-950,
+.light-theme [class*="rounded-full"][class*="bg-slate-950"] {
+    background-color: #eae2d3 !important;
+    border-color: #ded5c3 !important;
+}
+
+/* Efectos hover para elementos oscuros en modo claro */
+.light-theme .hover\:bg-slate-800:hover,
+.light-theme .hover\:bg-slate-800\/80:hover {
+    background-color: #eae1d1 !important;
+    color: #0f172a !important;
+}
+
+.light-theme .hover\:bg-slate-700:hover,
+.light-theme .hover\:bg-slate-700\/80:hover {
+    background-color: #dfd4c0 !important;
+    color: #0f172a !important;
+}
+
+.light-theme .hover\:bg-slate-900:hover {
+    background-color: #fbf8f2 !important;
+    color: #0f172a !important;
+}
+
+/* =========================================================================
+   5. BLOQUES DE LA CUENTA ATRÁS (DÍAS, HORAS, MIN, SEG)
+   Transforma los rectángulos negros del countdown en elegantes tarjetas claras.
+   ========================================================================= */
+.light-theme #cd-days,
+.light-theme #cd-hours,
+.light-theme #cd-mins,
+.light-theme #cd-secs {
+    text-shadow: none !important;
+}
+
+.light-theme #cd-hours,
+.light-theme #cd-mins {
+    color: #0f172a !important;
+}
+
+.light-theme #cd-days {
+    color: #d97706 !important;
+}
+
+.light-theme #cd-secs {
+    color: #059669 !important;
+}
+
+/* =========================================================================
+   6. PÍLDORAS Y BADGES PASTEL ELEGANTES
+   ========================================================= */
 .light-theme .bg-amber-500\/20,
 .light-theme .bg-amber-500\/10 {
     background-color: #fef3c7 !important;
@@ -186,7 +261,7 @@ body.light-theme {
 }
 
 /* =========================================================================
-   5. NAVBAR Y ELEMENTOS DE NAVEGACIÓN EN MODO CLARO
+   7. NAVBAR Y NAVEGACIÓN EN MODO CLARO
    ========================================================================= */
 .light-theme nav.glass-panel {
     background: rgba(255, 255, 255, 0.97) !important;
@@ -266,28 +341,6 @@ body.light-theme {
     border-color: #e8dfcf !important;
 }
 
-/* Desplegable de Sección */
-.light-theme #nav-section-dropdown-wrap button {
-    background-color: #ffffff !important;
-    border-color: #e8dfcf !important;
-    color: #b45309 !important;
-}
-
-.light-theme #nav-section-dropdown {
-    background-color: #ffffff !important;
-    border-color: #e8dfcf !important;
-    box-shadow: 0 20px 40px -10px rgba(120, 90, 40, 0.15) !important;
-}
-
-.light-theme #nav-section-dropdown a {
-    color: #334155 !important;
-}
-
-.light-theme #nav-section-dropdown a:hover {
-    background-color: #fbf8f2 !important;
-    color: #0f172a !important;
-}
-
 /* Botones de acción rápida en navbar (Actualizar, Salir) */
 .light-theme nav button[title*="Actualizar"] {
     background-color: #ffffff !important;
@@ -310,8 +363,301 @@ body.light-theme {
 }
 
 /* =========================================================================
-   6. BOTONERAS TÁCTILES Y ENTRADAS DE DATOS
+   8. ENTRADAS DE FORMULARIO, SELECTS, BUSCADORES Y FECHAS
    ========================================================================= */
+.light-theme input,
+.light-theme select,
+.light-theme textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e8dfcf !important;
+}
+
+.light-theme input::placeholder,
+.light-theme textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+.light-theme input:focus,
+.light-theme select:focus,
+.light-theme textarea:focus {
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+}
+
+/* =========================================================================
+   9. TARJETAS EXPLICATIVAS (ℹ️) EN MODO CLARO
+   Elimina los bloques negros. Ahora son tarjetas flotantes en blanco puro
+   luminoso con ribete dorado cálido, sombra suave y tipografía nítida.
+   ========================================================================= */
+/* El botón / icono azul ℹ️ */
+.light-theme .group\/tip > div:first-child,
+.light-theme .group\/tip > div[onclick*="showInfo"],
+.light-theme .group span:has(span.text-amber-400),
+.light-theme .kpi-card span.text-amber-400 {
+    background-color: #fef3c7 !important;
+    border: 1px solid #f59e0b !important;
+    color: #b45309 !important;
+    box-shadow: 0 1px 3px rgba(217, 119, 6, 0.15) !important;
+    border-radius: 6px;
+    padding: 0 4px;
+}
+
+.light-theme .group\/tip > div:first-child:hover,
+.light-theme .group\/tip > div[onclick*="showInfo"]:hover {
+    background-color: #fde68a !important;
+    border-color: #d97706 !important;
+    color: #78350f !important;
+}
+
+/* Las tarjetas emergentes flotantes de tooltips en todas las hojas */
+.light-theme .tooltip-box,
+.light-theme .tooltip-card,
+.light-theme .group\/tip > div[class*="group-hover\/tip:visible"],
+.light-theme .group\/tip:hover > div[class*="absolute"],
+.light-theme div[class*="group-hover\/tip:visible"],
+.light-theme .group > div[class*="group-hover:visible"],
+.light-theme .group:hover > div[class*="absolute"],
+.light-theme div[class*="group-hover:visible"] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1.5px solid #d97706 !important;
+    box-shadow: 0 20px 45px -10px rgba(120, 80, 20, 0.18), 0 8px 18px -4px rgba(0, 0, 0, 0.06) !important;
+    opacity: 1 !important;
+    z-index: 100060 !important;
+}
+
+.light-theme .tooltip-box *,
+.light-theme .tooltip-card *,
+.light-theme .group\/tip > div[class*="group-hover\/tip:visible"] *,
+.light-theme .group\/tip:hover > div[class*="absolute"] *,
+.light-theme .group > div[class*="group-hover:visible"] *,
+.light-theme .group:hover > div[class*="absolute"] * {
+    color: #1e293b !important;
+}
+
+.light-theme .tooltip-box strong,
+.light-theme .tooltip-card strong,
+.light-theme .group\/tip > div[class*="group-hover\/tip:visible"] strong,
+.light-theme .group\/tip:hover > div[class*="absolute"] strong,
+.light-theme .group > div[class*="group-hover:visible"] strong,
+.light-theme .group:hover > div[class*="absolute"] strong {
+    color: #92400e !important;
+}
+
+.light-theme .tooltip-box p,
+.light-theme .tooltip-card p,
+.light-theme .group\/tip > div[class*="group-hover\/tip:visible"] p,
+.light-theme .group\/tip:hover > div[class*="absolute"] p,
+.light-theme .group > div[class*="group-hover:visible"] p,
+.light-theme .group:hover > div[class*="absolute"] p {
+    color: #334155 !important;
+}
+
+.light-theme .tooltip-box .text-amber-400,
+.light-theme .tooltip-box .text-amber-200,
+.light-theme .tooltip-card .text-amber-400,
+.light-theme .group\/tip:hover > div[class*="absolute"] .text-amber-400,
+.light-theme .group:hover > div[class*="absolute"] .text-amber-400 {
+    color: #b45309 !important;
+}
+
+.light-theme .tooltip-box .text-sky-400,
+.light-theme .tooltip-card .text-sky-400,
+.light-theme .group\/tip:hover > div[class*="absolute"] .text-sky-400,
+.light-theme .group:hover > div[class*="absolute"] .text-sky-400 {
+    color: #0284c7 !important;
+}
+
+.light-theme .tooltip-box .text-pink-400,
+.light-theme .tooltip-card .text-pink-400,
+.light-theme .group\/tip:hover > div[class*="absolute"] .text-pink-400,
+.light-theme .group:hover > div[class*="absolute"] .text-pink-400 {
+    color: #be123c !important;
+}
+
+.light-theme .tooltip-box .text-emerald-400,
+.light-theme .tooltip-card .text-emerald-400,
+.light-theme .group\/tip:hover > div[class*="absolute"] .text-emerald-400,
+.light-theme .group:hover > div[class*="absolute"] .text-emerald-400 {
+    color: #047857 !important;
+}
+
+/* =========================================================================
+   10. ELEMENTOS FLOTANTES INFERIORES (RELOJ Y NOTIFICACIONES PUSH)
+   ========================================================================= */
+/* Botón flotante de Push (Heradio) en modo claro */
+.light-theme .push-float-btn {
+    background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%) !important;
+    border: 1.5px solid #d97706 !important;
+    color: #92400e !important;
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.22), 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .push-float-btn:hover {
+    border-color: #b45309 !important;
+    box-shadow: 0 12px 30px rgba(217, 119, 6, 0.35) !important;
+}
+
+.light-theme .push-modal-card {
+    background: #ffffff !important;
+    border: 1.5px solid #e8dfcf !important;
+    box-shadow: 0 25px 60px rgba(120, 90, 40, 0.15) !important;
+    color: #1e293b !important;
+}
+
+/* Reloj global de Peña Maulas (👤 Lozano) en modo claro */
+.light-theme #maulas-global-clock {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #334155 !important;
+    border: 1px solid #e8dfcf !important;
+    box-shadow: 0 4px 15px rgba(120, 90, 40, 0.12) !important;
+}
+
+.light-theme #maulas-global-clock span {
+    color: #b45309 !important;
+}
+
+/* En dispositivos móviles, ocultar el reloj de pie para evitar solapamientos con botones */
+@media (max-width: 768px) {
+    #maulas-global-clock {
+        display: none !important;
+    }
+}
+
+/* =========================================================================
+   11. SECCIÓN SOCIOS 2.0 ESPECÍFICA EN MODO CLARO
+   ========================================================================= */
+.light-theme .member-card .bg-slate-950\/40 {
+    background-color: #fbf8f2 !important;
+    border-color: #e8dfcf !important;
+    color: #334155 !important;
+}
+
+.light-theme .member-card .bg-slate-900 {
+    background-color: #f5efe4 !important;
+    border-color: #e5decb !important;
+    color: #334155 !important;
+}
+
+.light-theme .member-card h3 {
+    color: #0f172a !important;
+}
+
+.light-theme .member-card a {
+    color: #334155 !important;
+}
+
+.light-theme .member-card a:hover {
+    color: #d97706 !important;
+}
+
+.light-theme .cat-pill:not(.bg-amber-500) {
+    background-color: #ffffff !important;
+    border: 1px solid #e8dfcf !important;
+    color: #475569 !important;
+}
+
+.light-theme .cat-pill:not(.bg-amber-500):hover {
+    background-color: #fbf8f2 !important;
+    color: #0f172a !important;
+}
+
+.light-theme #view-mode-grid:not(.bg-amber-500),
+.light-theme #view-mode-table:not(.bg-amber-500) {
+    color: #64748b !important;
+}
+
+.light-theme #view-mode-grid:not(.bg-amber-500):hover,
+.light-theme #view-mode-table:not(.bg-amber-500):hover {
+    color: #0f172a !important;
+}
+
+/* Modales de edición de socio */
+.light-theme #member-modal .bg-slate-900\/60,
+.light-theme #member-modal .bg-slate-950\/70 {
+    background-color: #fbf8f2 !important;
+    border-color: #e8dfcf !important;
+}
+
+.light-theme #member-modal button[onclick*="applyDatePreset"] {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+    color: #334155 !important;
+}
+
+.light-theme #member-modal button[onclick*="applyDatePreset"]:hover {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+
+/* =========================================================================
+   12. SECCIÓN BOTE 2.0 ESPECÍFICA EN MODO CLARO
+   ========================================================================= */
+.light-theme #season-selector {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+    color: #0f172a !important;
+}
+
+.light-theme #season-selector:focus {
+    border-color: #d97706 !important;
+}
+
+.light-theme .nav-tab:not(.bg-gradient-to-r) {
+    background-color: #ffffff !important;
+    border: 1px solid #e8dfcf !important;
+    color: #475569 !important;
+}
+
+.light-theme .nav-tab:not(.bg-gradient-to-r):hover {
+    background-color: #fbf8f2 !important;
+    color: #0f172a !important;
+    border-color: #d97706 !important;
+}
+
+.light-theme #tools-dropdown {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+    box-shadow: 0 20px 45px rgba(120, 90, 40, 0.15) !important;
+}
+
+.light-theme #tools-dropdown a,
+.light-theme #tools-dropdown button {
+    color: #334155 !important;
+}
+
+.light-theme #tools-dropdown a:hover,
+.light-theme #tools-dropdown button:hover {
+    background-color: #fbf8f2 !important;
+    color: #0f172a !important;
+}
+
+/* =========================================================================
+   13. SECCIÓN RESULTADOS / JORNADAS 2.0 ESPECÍFICA EN MODO CLARO
+   ========================================================================= */
+.light-theme #jornada-select-dropdown {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+    color: #0f172a !important;
+}
+
+.light-theme #btn-prev-jornada,
+.light-theme #btn-next-jornada {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+    color: #334155 !important;
+}
+
+.light-theme #btn-prev-jornada:hover,
+.light-theme #btn-next-jornada:hover {
+    background-color: #fbf8f2 !important;
+    border-color: #d97706 !important;
+    color: #0f172a !important;
+}
+
 .light-theme .tactile-opt-btn {
     background-color: #ffffff !important;
     color: #334155 !important;
@@ -351,118 +697,6 @@ body.light-theme {
     box-shadow: 0 0 14px rgba(217, 119, 6, 0.35) !important;
 }
 
-/* Entradas de formulario, selects y fechas */
-.light-theme input,
-.light-theme select,
-.light-theme textarea {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    border-color: #e8dfcf !important;
-}
-
-.light-theme input:focus,
-.light-theme select:focus,
-.light-theme textarea:focus {
-    border-color: #d97706 !important;
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
-}
-
-/* =========================================================================
-   7. MODALES Y DIÁLOGOS FLOTANTES
-   ========================================================================= */
-.light-theme .modal-glass-backdrop,
-.light-theme .modal-overlay,
-.light-theme .fixed.inset-0.bg-black\/80 {
-    background-color: rgba(15, 23, 42, 0.45) !important;
-    backdrop-filter: blur(8px) !important;
-}
-
-.light-theme .animate-modal,
-.light-theme .modal {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    border-color: #e8dfcf !important;
-    box-shadow: 0 25px 60px -15px rgba(120, 90, 40, 0.2) !important;
-}
-
-/* =========================================================================
-   8. TARJETAS EXPLICATIVAS (ℹ️) EN MODO CLARO
-   Elimina los bloques negros. Ahora son tarjetas flotantes en blanco puro
-   luminoso con ribete dorado cálido, sombra suave y tipografía nítida.
-   ========================================================================= */
-/* El botón / icono azul ℹ️ */
-.light-theme .group\/tip > div:first-child,
-.light-theme .group\/tip > div[onclick*="showInfo"] {
-    background-color: #fef3c7 !important;
-    border: 1px solid #f59e0b !important;
-    color: #b45309 !important;
-    box-shadow: 0 1px 3px rgba(217, 119, 6, 0.15) !important;
-}
-
-.light-theme .group\/tip > div:first-child:hover,
-.light-theme .group\/tip > div[onclick*="showInfo"]:hover {
-    background-color: #fde68a !important;
-    border-color: #d97706 !important;
-    color: #78350f !important;
-}
-
-/* La tarjeta emergente flotante del tooltip */
-.light-theme .tooltip-box,
-.light-theme .group\/tip > div[class*="group-hover\/tip:visible"],
-.light-theme .group\/tip:hover > div[class*="absolute"],
-.light-theme div[class*="group-hover\/tip:visible"] {
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-    color: #1e293b !important;
-    border: 1.5px solid #d97706 !important;
-    box-shadow: 0 20px 45px -10px rgba(120, 80, 20, 0.18), 0 8px 18px -4px rgba(0, 0, 0, 0.06) !important;
-    opacity: 1 !important;
-    z-index: 100060 !important;
-}
-
-.light-theme .tooltip-box *,
-.light-theme .group\/tip > div[class*="group-hover\/tip:visible"] *,
-.light-theme .group\/tip:hover > div[class*="absolute"] * {
-    color: #1e293b !important;
-}
-
-.light-theme .tooltip-box strong,
-.light-theme .group\/tip > div[class*="group-hover\/tip:visible"] strong,
-.light-theme .group\/tip:hover > div[class*="absolute"] strong {
-    color: #92400e !important;
-}
-
-.light-theme .tooltip-box p,
-.light-theme .group\/tip > div[class*="group-hover\/tip:visible"] p,
-.light-theme .group\/tip:hover > div[class*="absolute"] p {
-    color: #334155 !important;
-}
-
-.light-theme .tooltip-box .text-amber-400,
-.light-theme .tooltip-box .text-amber-200,
-.light-theme .group\/tip:hover > div[class*="absolute"] .text-amber-400,
-.light-theme .group\/tip:hover > div[class*="absolute"] .text-amber-200 {
-    color: #b45309 !important;
-}
-
-.light-theme .tooltip-box .text-sky-400,
-.light-theme .group\/tip:hover > div[class*="absolute"] .text-sky-400 {
-    color: #0284c7 !important;
-}
-
-.light-theme .tooltip-box .text-pink-400,
-.light-theme .group\/tip:hover > div[class*="absolute"] .text-pink-400 {
-    color: #be123c !important;
-}
-
-.light-theme .tooltip-box .text-emerald-400,
-.light-theme .group\/tip:hover > div[class*="absolute"] .text-emerald-400 {
-    color: #047857 !important;
-}
-
-/* =========================================================================
-   9. TARJETAS DE PARTIDOS Y ESCRUTINIO (RESULTADOS 2.0)
-   ========================================================================= */
 .light-theme .match-card-row {
     background: #ffffff !important;
     border-color: #e8dfcf !important;
@@ -481,8 +715,10 @@ body.light-theme {
 }
 
 /* =========================================================================
-   10. TABLAS, CARROUSELES Y DESGLOSES
+   14. TABLAS Y COMPONENTES DE CALENDARIO FLATPICKR EN MODO CLARO
    ========================================================================= */
+.light-theme table thead,
+.light-theme thead[class*="bg-slate-900"],
 .light-theme table th {
     background-color: #f5efe4 !important;
     color: #334155 !important;
@@ -495,6 +731,37 @@ body.light-theme {
 
 .light-theme table tr:hover td {
     background-color: #fbf8f2 !important;
+}
+
+/* Flatpickr en modo claro */
+.light-theme .flatpickr-calendar {
+    background: #ffffff !important;
+    border: 1px solid #e8dfcf !important;
+    box-shadow: 0 20px 45px rgba(120, 90, 40, 0.15) !important;
+    color: #1e293b !important;
+}
+
+.light-theme .flatpickr-day {
+    color: #334155 !important;
+}
+
+.light-theme .flatpickr-day:hover {
+    background: #fbf8f2 !important;
+}
+
+.light-theme .flatpickr-day.selected,
+.light-theme .flatpickr-day.startRange,
+.light-theme .flatpickr-day.endRange {
+    background: #d97706 !important;
+    color: #ffffff !important;
+    border-color: #b45309 !important;
+}
+
+.light-theme .flatpickr-months,
+.light-theme .flatpickr-current-month,
+.light-theme .flatpickr-month {
+    color: #0f172a !important;
+    fill: #0f172a !important;
 }
 
 .light-theme .jornadas-scroll-container::-webkit-scrollbar-thumb {

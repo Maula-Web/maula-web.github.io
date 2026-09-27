@@ -537,16 +537,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         clockDiv.style.position = 'fixed';
         clockDiv.style.bottom = '10px';
         clockDiv.style.right = '10px';
-        clockDiv.style.background = 'rgba(0, 0, 0, 0.7)';
-        clockDiv.style.color = '#fff';
+        
+        const isInitialLight = (window.AppTheme && window.AppTheme.getTheme() === 'light') || document.documentElement.classList.contains('light-theme');
+        if (isInitialLight) {
+            clockDiv.style.background = 'rgba(255, 255, 255, 0.95)';
+            clockDiv.style.color = '#334155';
+            clockDiv.style.border = '1px solid #e8dfcf';
+            clockDiv.style.boxShadow = '0 4px 15px rgba(120, 90, 40, 0.12)';
+        } else {
+            clockDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+            clockDiv.style.color = '#fff';
+            clockDiv.style.border = 'none';
+            clockDiv.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
+        }
+
         clockDiv.style.padding = '5px 10px';
-        clockDiv.style.borderRadius = '5px';
+        clockDiv.style.borderRadius = '8px';
         clockDiv.style.fontFamily = 'monospace';
-        clockDiv.style.fontSize = '0.9rem';
-        clockDiv.style.zIndex = '9999';
+        clockDiv.style.fontSize = '0.85rem';
+        clockDiv.style.zIndex = '9990';
         clockDiv.style.pointerEvents = 'none'; // Click through
         clockDiv.style.userSelect = 'none';
-        clockDiv.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
         document.body.appendChild(clockDiv);
 
         // Update Function
@@ -562,7 +573,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (u) userName = AppUtils.getMemberName(u);
             } catch (e) { }
 
-            clockDiv.innerHTML = `<span style="color:#ffd54f; font-weight:bold; margin-right:10px;">👤 ${userName}</span> ${dateStr} ${timeStr}`;
+            const isLight = document.documentElement.classList.contains('light-theme');
+            const userColor = isLight ? '#b45309' : '#ffd54f';
+            clockDiv.innerHTML = `<span style="color:${userColor}; font-weight:bold; margin-right:10px;">👤 ${userName}</span> ${dateStr} ${timeStr}`;
         };
 
         // Start
@@ -700,6 +713,22 @@ window.AppTheme = {
                 body.classList.add('dark');
             }
         }
+
+        const clockDiv = document.getElementById('maulas-global-clock');
+        if (clockDiv) {
+            if (theme === 'light') {
+                clockDiv.style.background = 'rgba(255, 255, 255, 0.95)';
+                clockDiv.style.color = '#334155';
+                clockDiv.style.border = '1px solid #e8dfcf';
+                clockDiv.style.boxShadow = '0 4px 15px rgba(120, 90, 40, 0.12)';
+            } else {
+                clockDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+                clockDiv.style.color = '#fff';
+                clockDiv.style.border = 'none';
+                clockDiv.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
+            }
+        }
+
         this.updateButtons(theme);
     },
 
