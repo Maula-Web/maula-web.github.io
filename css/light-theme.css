@@ -1193,4 +1193,71 @@ body.light-theme {
     color: #0f172a !important;
 }
 
+/* 6. Quiniela 2 (Pronósticos 2): Tabla y signos sin recuadros ni fondos crema */
+.light-theme #forecast-summary-table {
+    background: #ffffff !important;
+}
+
+.light-theme #forecast-summary-table td,
+.light-theme #forecast-summary-table th {
+    border-right: 1px solid #cbd5e1 !important;
+}
+
+.light-theme #forecast-summary-table tbody tr {
+    border-bottom: 3px solid #cbd5e1 !important;
+}
+
+.light-theme #forecast-summary-table .summary-cell {
+    background: #ffffff !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+
+.light-theme #forecast-summary-table .summary-cell:hover,
+.light-theme #forecast-summary-table tbody tr:hover td {
+    background: #f1f5f9 !important;
+}
+
+.light-theme #forecast-summary-table .summary-sticky-col {
+    background: #ffffff !important;
+    border-right: 2px solid #d97706 !important;
+    box-shadow: 4px 0 12px rgba(120, 90, 40, 0.08) !important;
+}
+
+.light-theme .sign-v {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.light-theme .sign-v-1 {
+    color: #059669 !important;
+}
+
+.light-theme .sign-v-X {
+    color: #0284c7 !important;
+}
+
+.light-theme .sign-v-2 {
+    color: #d97706 !important;
+}
+
+.light-theme .sign-v-p15 {
+    color: #b45309 !important;
+}
+
+.light-theme .sign-v-custom {
+    color: #7e22ce !important;
+}
+
+.light-theme .sign-v-empty {
+    color: #94a3b8 !important;
+}
+
+.light-theme .table-block-divider {
+    height: 1.5px !important;
+    background: rgba(217, 119, 6, 0.55) !important;
+    box-shadow: 0 0 4px rgba(217, 119, 6, 0.25) !important;
+}
+
+
 

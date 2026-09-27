@@ -147,40 +147,29 @@
             border-bottom: 3px solid #cbd5e1 !important;
         }
 
-        /* Píldoras de Signos en Modo Claro (Contraste Nítido) */
-        .light-theme .sign-pill-v-1 {
-            background: #dcfce7 !important;
-            color: #166534 !important;
-            border: 1.5px solid #22c55e !important;
-            box-shadow: 0 1px 3px rgba(22, 101, 52, 0.15) !important;
+        /* Signos en Modo Claro: Solo texto con su color vibrante, sin cajas ni fondos crema */
+        .light-theme .sign-v {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
-        .light-theme .sign-pill-v-X {
-            background: #e0f2fe !important;
-            color: #0369a1 !important;
-            border: 1.5px solid #0284c7 !important;
-            box-shadow: 0 1px 3px rgba(3, 105, 161, 0.15) !important;
+        .light-theme .sign-v-1 {
+            color: #059669 !important;
         }
-        .light-theme .sign-pill-v-2 {
-            background: #fef3c7 !important;
-            color: #92400e !important;
-            border: 1.5px solid #f59e0b !important;
-            box-shadow: 0 1px 3px rgba(146, 64, 14, 0.15) !important;
+        .light-theme .sign-v-X {
+            color: #0284c7 !important;
         }
-        .light-theme .sign-pill-v-p15 {
-            background: #fef3c7 !important;
+        .light-theme .sign-v-2 {
+            color: #d97706 !important;
+        }
+        .light-theme .sign-v-p15 {
             color: #b45309 !important;
-            border: 1.5px solid #d97706 !important;
-            box-shadow: 0 0 6px rgba(217, 119, 6, 0.25) !important;
         }
-        .light-theme .sign-pill-v-custom {
-            background: #f3e8ff !important;
-            color: #6b21a8 !important;
-            border: 1.5px solid #a855f7 !important;
+        .light-theme .sign-v-custom {
+            color: #7e22ce !important;
         }
-        .light-theme .sign-pill-v-empty {
-            background: #f8fafc !important;
+        .light-theme .sign-v-empty {
             color: #94a3b8 !important;
-            border: 1px dashed #cbd5e1 !important;
         }
 
         /* Modal Editor en Modo Claro */
@@ -291,166 +280,163 @@
         }
 
         /* =========================================================================
-           PÍLDORAS VERTICALES DE SIGNOS 1-X-2 (EXACTAS A LA IMAGEN 2 DEL USUARIO)
+           SIGNOS VERTICALES COMPACTOS 1-X-2 (SOLO TEXTO CON COLOR, SIN RECUADROS)
            ========================================================================= */
-        .sign-pill-v {
-            width: 28px;
-            height: 25px;
-            border-radius: 9px;
-            display: inline-flex;
+        .sign-v {
+            display: flex;
             align-items: center;
             justify-content: center;
+            height: 18px;
+            line-height: 18px;
             font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            font-size: 12px;
-            transition: all 0.15s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            font-size: 13px;
+            font-weight: 900;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
             user-select: none;
-            line-height: 1;
+            transition: transform 0.15s ease;
         }
-        .sign-pill-v:hover {
-            transform: scale(1.18);
-            z-index: 20;
-        }
-
-        /* Signo 1: Verde Esmeralda (Imagen 2) */
-        .sign-pill-v-1 {
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
-            border: 1.5px solid rgba(16, 185, 129, 0.6);
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        .sign-v:hover {
+            transform: scale(1.35);
         }
 
-        /* Signo X: Azul Celeste (Imagen 2) */
-        .sign-pill-v-X {
-            background: rgba(14, 165, 233, 0.2);
-            color: #38bdf8;
-            border: 1.5px solid rgba(14, 165, 233, 0.6);
-            box-shadow: 0 0 8px rgba(14, 165, 233, 0.3);
+        /* Signo 1: Verde Esmeralda vivo */
+        .sign-v-1 {
+            color: #34d399 !important;
         }
 
-        /* Signo 2: Amarillo / Ámbar (Imagen 2) */
-        .sign-pill-v-2 {
-            background: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
-            border: 1.5px solid rgba(245, 158, 11, 0.6);
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+        /* Signo X: Azul Cielo vivo */
+        .sign-v-X {
+            color: #38bdf8 !important;
+        }
+
+        /* Signo 2: Amarillo / Ámbar vivo */
+        .sign-v-2 {
+            color: #fbbf24 !important;
         }
 
         /* Pleno al 15 */
-        .sign-pill-v-p15 {
-            background: rgba(245, 158, 11, 0.25);
-            color: #f59e0b;
-            border: 1.5px solid rgba(245, 158, 11, 0.7);
-            font-size: 10px;
-            font-weight: 900;
-            padding: 0 5px;
-            min-width: 28px;
-            height: 25px;
-            border-radius: 9px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'JetBrains Mono', monospace;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        .sign-v-p15 {
+            color: #f59e0b !important;
+            font-size: 11px;
+            letter-spacing: -0.5px;
         }
 
         /* Signos Dobles Combinados (ej: 1X, 12, 1X2) */
-        .sign-pill-v-custom {
-            background: rgba(168, 85, 247, 0.2);
-            color: #c084fc;
-            border: 1.5px solid rgba(168, 85, 247, 0.6);
-            font-size: 10px;
-            font-weight: 900;
-            padding: 0 4px;
-            min-width: 28px;
-            height: 25px;
-            border-radius: 9px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'JetBrains Mono', monospace;
+        .sign-v-custom {
+            color: #c084fc !important;
+            font-size: 11px;
+            letter-spacing: -0.5px;
         }
 
         /* Signo Pendiente / Sin Rellenar (-) */
-        .sign-pill-v-empty {
-            width: 28px;
-            height: 25px;
-            border-radius: 9px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(100, 116, 139, 0.1);
-            color: #64748b;
-            border: 1px dashed rgba(100, 116, 139, 0.35);
-            font-size: 11px;
-            font-family: 'JetBrains Mono', monospace;
+        .sign-v-empty {
+            color: #475569 !important;
+            font-weight: 700;
         }
 
         /* =========================================================================
-           TABLA DE DATOS DATA GRID (SEPARADORES VERTICALES Y HORIZONTALES CLAROS)
+           SEPARADORES DE BLOQUES DE PARTIDOS (VISIBLES, ELEGANTES Y PROMINENTES)
+           ========================================================================= */
+        .table-block-divider {
+            height: 1.5px;
+            background: rgba(245, 158, 11, 0.55);
+            margin: 3px 0;
+            width: 100%;
+            border-radius: 1px;
+            box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+        }
+        .light-theme .table-block-divider {
+            background: rgba(217, 119, 6, 0.55);
+            box-shadow: 0 0 4px rgba(217, 119, 6, 0.25);
+        }
+
+        /* =========================================================================
+           TABLA DE DATOS DATA GRID (ESTILO BOTE 2: FONDOS UNIFORMES Y ELEGANTES)
            ========================================================================= */
         #forecast-summary-table {
             border-collapse: separate;
             border-spacing: 0;
             width: auto;
             min-width: 100%;
+            background: transparent !important;
         }
 
         .summary-header-cell {
-            background: var(--bg-panel);
-            color: var(--text-muted);
+            background: #090d16 !important;
+            color: #94a3b8 !important;
             font-weight: 800;
             font-size: 0.75rem;
-            padding: 0.85rem 0.35rem;
-            border-bottom: 2px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
+            padding: 0.75rem 0.35rem;
+            border-bottom: 2px solid rgba(51, 65, 85, 0.7);
+            border-right: 1px solid rgba(51, 65, 85, 0.5);
             text-align: center;
             vertical-align: middle;
             white-space: nowrap;
         }
 
         .summary-cell {
-            padding: 0.65rem 0.35rem;
-            border-bottom: 2px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
+            padding: 0.45rem 0.35rem;
+            background: transparent !important;
+            border-bottom: 2px solid rgba(51, 65, 85, 0.7);
+            border-right: 1px solid rgba(51, 65, 85, 0.5);
             vertical-align: top;
             text-align: center;
             transition: background-color 0.15s ease;
         }
         .summary-cell:hover {
-            background: var(--row-hover) !important;
+            background: rgba(30, 41, 59, 0.5) !important;
             box-shadow: inset 0 0 0 1.5px var(--primary-orange);
             cursor: pointer;
         }
 
-        /* Separadores verticales reforzados entre columnas */
+        #forecast-summary-table tbody tr:hover td {
+            background: rgba(30, 41, 59, 0.35) !important;
+        }
+
+        /* Separadores verticales entre columnas */
         #forecast-summary-table td, #forecast-summary-table th {
-            border-right: 1px solid rgba(148, 163, 184, 0.25) !important;
+            border-right: 1px solid rgba(51, 65, 85, 0.6) !important;
         }
-        .dark #forecast-summary-table td, .dark #forecast-summary-table th {
-            border-right: 1px solid rgba(51, 65, 85, 0.8) !important;
+        .light-theme #forecast-summary-table td, .light-theme #forecast-summary-table th {
+            border-right: 1px solid #cbd5e1 !important;
         }
 
-        /* Separador horizontal reforzado entre Jornadas */
+        /* Separador horizontal entre Jornadas */
         #forecast-summary-table tbody tr {
-            border-bottom: 3px solid rgba(148, 163, 184, 0.4) !important;
+            border-bottom: 3px solid rgba(51, 65, 85, 0.9) !important;
         }
-        .dark #forecast-summary-table tbody tr {
-            border-bottom: 3px solid rgba(51, 65, 85, 0.95) !important;
+        .light-theme #forecast-summary-table tbody tr {
+            border-bottom: 3px solid #cbd5e1 !important;
         }
 
-        /* Columna Sticky de Jornada e Índice 1-15 */
+        /* Columna Sticky de Jornada e Índice */
         .summary-sticky-col {
             position: sticky;
             left: 0;
-            background: var(--bg-panel);
+            background: #090d16 !important;
             z-index: 30;
-            border-right: 3px solid var(--primary-orange) !important;
-            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.12);
-        }
-        .dark .summary-sticky-col {
+            border-right: 2px solid rgba(245, 158, 11, 0.6) !important;
             box-shadow: 4px 0 16px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Colores más claros y nítidos para textos de Cierre y Plazo expirado */
+        #deadline-info,
+        #deadline-info * {
+            font-weight: 800 !important;
+        }
+        #deadline-info span[style*="var(--danger)"] {
+            color: #fda4af !important;
+        }
+        #deadline-info span[style*="var(--primary-green)"] {
+            color: #6ee7b7 !important;
+        }
+        .light-theme #deadline-info span[style*="var(--danger)"] {
+            color: #e11d48 !important;
+        }
+        .light-theme #deadline-info span[style*="var(--primary-green)"] {
+            color: #059669 !important;
         }
 
         /* LED indicador luminoso */
@@ -1070,10 +1056,11 @@
                 </div>
 
                 <!-- Leyenda de Estados y Signos -->
-                <div class="flex items-center gap-2.5 text-xs font-bold flex-wrap justify-end">
-                    <span class="flex items-center gap-1.5"><span class="sign-pill-v sign-pill-v-1 scale-75">1</span> Local</span>
-                    <span class="flex items-center gap-1.5"><span class="sign-pill-v sign-pill-v-X scale-75">X</span> Empate</span>
-                    <span class="flex items-center gap-1.5"><span class="sign-pill-v sign-pill-v-2 scale-75">2</span> Visitante</span>
+                <div class="flex items-center gap-3 text-xs font-bold flex-wrap justify-end">
+                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-1 font-mono text-sm">1</span> Local</span>
+                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-X font-mono text-sm">X</span> Empate</span>
+                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-2 font-mono text-sm">2</span> Visitante</span>
+                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-custom font-mono text-xs">1X</span> Doble</span>
                     <span class="border-l border-slate-300 dark:border-slate-700 h-4 mx-1"></span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-green"></span> Completo</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-yellow"></span> Falta Dobles</span>
@@ -1361,6 +1348,14 @@
          - SOPORTE INTEGRAL DE MODO CLARO Y OSCURO
          ===================================================================== -->
     <script>
+        // 0. DETERMINAR SI EL PLENO AL 15 ES REQUERIDO EN LA JORNADA (SOLO SI ES PARTIDO PIG)
+        window.isJornadaP15Required = function(j) {
+            if (!j || !j.matches || !j.matches[14]) return false;
+            const m15 = j.matches[14];
+            if (!m15.home || !m15.away) return false;
+            return typeof AppUtils !== 'undefined' && typeof AppUtils.isPigMatch === 'function' && AppUtils.isPigMatch(m15.home, m15.away);
+        };
+
         // 1. NAVEGACIÓN DE JORNADA (◀ REDUCE NÚMERO, ▶ AUMENTA NÚMERO)
         window.navigateJornadaByNumber = function(direction) {
             const sel = document.getElementById('sel-jornada');
@@ -1531,7 +1526,7 @@
                 window.openEditorModal(mId, false, jId);
             };
 
-            // B. Interceptar renderSummaryTable para generar las píldoras verticales idénticas a Imagen 2
+            // B. Interceptar renderSummaryTable: vertical compacto, sin cajas/recuadros, estilo Bote 2 y P15 condicional
             PM.prototype.renderSummaryTable = function() {
                 if (!this.summaryTable) return;
 
@@ -1556,14 +1551,14 @@
                 // CABECERA THEAD
                 const headerRow = document.createElement('tr');
                 
-                // Columna Sticky de Jornada e Índice 1-15
+                // Columna Sticky de Jornada e Índice
                 const stickyTh = document.createElement('th');
                 stickyTh.className = 'summary-sticky-col summary-header-cell';
                 stickyTh.style.minWidth = '115px';
                 stickyTh.innerHTML = `
                     <div class="flex items-center justify-between px-1">
                         <span class="font-black text-amber-500 text-xs">Jornada</span>
-                        <span class="text-[10px] font-mono text-slate-400 font-bold"># 1-15</span>
+                        <span class="text-[10px] font-mono text-slate-400 font-bold"># Partidos</span>
                     </div>
                 `;
                 headerRow.appendChild(stickyTh);
@@ -1572,8 +1567,8 @@
                 sortedMembers.forEach((m) => {
                     const th = document.createElement('th');
                     th.className = 'summary-header-cell';
-                    th.style.minWidth = '50px';
-                    th.style.maxWidth = '56px';
+                    th.style.minWidth = '46px';
+                    th.style.maxWidth = '52px';
                     th.setAttribute('data-mid', m.id);
                     
                     const led = this.getMemberStatusLed(m.id, targetJornadaForHeader);
@@ -1593,7 +1588,7 @@
                 // Columna Quiniela Dobles
                 const thDoubles = document.createElement('th');
                 thDoubles.className = 'summary-header-cell';
-                thDoubles.style.minWidth = '55px';
+                thDoubles.style.minWidth = '52px';
                 thDoubles.innerHTML = `
                     <div class="flex flex-col items-center justify-center gap-1 cursor-pointer py-1" onclick="window.openEditorForDoubles('${targetJornadaForHeader ? targetJornadaForHeader.id : ''}')">
                         <span class="text-xs">🎲</span>
@@ -1654,7 +1649,7 @@
                     return;
                 }
 
-                // CONSTRUCCIÓN DE FILAS CON PÍLDORAS EN VERTICAL EXACTAS A LA IMAGEN 2
+                // CONSTRUCCIÓN DE FILAS CON SIGNOS COMPACTOS (SOLO TEXTO) Y P15 CONDICIONAL
                 let tbodyHtml = '';
                 sortedJornadas.forEach(j => {
                     let dateFormatted = j.date;
@@ -1663,39 +1658,50 @@
                         if (d) dateFormatted = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
                     } catch (e) {}
 
-                    const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
+                    const hasPig15 = window.isJornadaP15Required(j);
+                    const hasPigAnywhere = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
-                    // Columna Sticky Izquierda con el índice del 1 al 15
+                    // Columna Sticky Izquierda con el índice del 1 al 14 (o 15 si es PIG)
+                    let indexHtml = `
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">1</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">2</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">3</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">4</span>
+                        <div class="table-block-divider"></div>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">5</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">6</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">7</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">8</span>
+                        <div class="table-block-divider"></div>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">9</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">10</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">11</span>
+                        <div class="table-block-divider"></div>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">12</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">13</span>
+                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">14</span>
+                    `;
+                    if (hasPig15) {
+                        indexHtml += `
+                            <div class="table-block-divider"></div>
+                            <span class="sign-v text-amber-500 dark:text-amber-400 font-black" title="Pleno al 15 (PIG)">15</span>
+                        `;
+                    }
+
                     let rowHtml = `<tr>
                         <td class="summary-sticky-col summary-cell p-2">
                             <div class="flex items-start justify-between gap-1.5 h-full">
                                 <div class="flex flex-col text-left justify-start">
                                     <div class="font-black text-amber-500 text-sm flex items-center gap-1">
                                         <span>J${j.number}</span>
-                                        ${hasPig ? '<span title="Partido PIG">🐷</span>' : ''}
+                                        ${hasPigAnywhere ? '<span title="Partido PIG">🐷</span>' : ''}
                                     </div>
                                     <div class="text-[10px] text-slate-400 font-mono mt-0.5">${dateFormatted}</div>
+                                    <div class="text-[9px] text-slate-500 font-mono mt-1">${hasPig15 ? '15 partidos' : '14 partidos'}</div>
                                 </div>
-                                <div class="flex flex-col gap-[3px] items-center font-mono text-[9px] text-slate-400 dark:text-slate-500 font-bold border-l border-slate-300 dark:border-slate-800 pl-1.5 select-none">
-                                    <span class="h-[25px] flex items-center">1</span>
-                                    <span class="h-[25px] flex items-center">2</span>
-                                    <span class="h-[25px] flex items-center">3</span>
-                                    <span class="h-[25px] flex items-center">4</span>
-                                    <div class="w-3 border-b border-slate-400 dark:border-slate-700 my-0.5"></div>
-                                    <span class="h-[25px] flex items-center">5</span>
-                                    <span class="h-[25px] flex items-center">6</span>
-                                    <span class="h-[25px] flex items-center">7</span>
-                                    <span class="h-[25px] flex items-center">8</span>
-                                    <div class="w-3 border-b border-slate-400 dark:border-slate-700 my-0.5"></div>
-                                    <span class="h-[25px] flex items-center">9</span>
-                                    <span class="h-[25px] flex items-center">10</span>
-                                    <span class="h-[25px] flex items-center">11</span>
-                                    <div class="w-3 border-b border-slate-400 dark:border-slate-700 my-0.5"></div>
-                                    <span class="h-[25px] flex items-center">12</span>
-                                    <span class="h-[25px] flex items-center">13</span>
-                                    <span class="h-[25px] flex items-center">14</span>
-                                    <div class="w-3 border-b border-amber-500 my-0.5"></div>
-                                    <span class="h-[25px] flex items-center text-amber-500 font-black">15</span>
+                                <div class="flex flex-col items-center border-l border-slate-300 dark:border-slate-800 pl-1.5 select-none">
+                                    <div class="h-3 mb-0.5"></div>
+                                    ${indexHtml}
                                 </div>
                             </div>
                         </td>
@@ -1717,42 +1723,37 @@
 
                         if (isPlayed) {
                             let signsHtml = '';
-                            for (let i = 0; i < 15; i++) {
+                            for (let i = 0; i < 14; i++) {
                                 const rawSign = p.selection ? p.selection[i] : null;
                                 const s = (rawSign && String(rawSign).trim() !== '' && String(rawSign).trim() !== '-') ? String(rawSign).trim() : '-';
                                 
-                                let pillClass = 'sign-pill-v-empty';
-                                if (s === '1') pillClass = 'sign-pill-v-1';
-                                else if (s === 'X' || s === 'x') pillClass = 'sign-pill-v-X';
-                                else if (s === '2') pillClass = 'sign-pill-v-2';
-                                else if (s !== '-') pillClass = 'sign-pill-v-custom';
+                                let signClass = 'sign-v-empty';
+                                if (s === '1') signClass = 'sign-v-1';
+                                else if (s === 'X' || s === 'x') signClass = 'sign-v-X';
+                                else if (s === '2') signClass = 'sign-v-2';
+                                else if (s !== '-') signClass = 'sign-v-custom';
 
-                                const isBlockDivider = [3, 7, 10, 13].includes(i);
-                                const divLine = isBlockDivider ? '<div class="w-full my-0.5 border-b border-slate-300 dark:border-slate-700"></div>' : '';
-
-                                if (i === 14) {
-                                    signsHtml += `
-                                        ${divLine}
-                                        <div class="flex items-center justify-center">
-                                            <span class="sign-pill-v-p15" title="Pleno al 15: ${s}">${s}</span>
-                                        </div>
-                                    `;
-                                } else {
-                                    signsHtml += `
-                                        <div class="flex items-center justify-center">
-                                            <span class="sign-pill-v ${pillClass}" title="Partido ${i+1}: ${s}">${s}</span>
-                                        </div>
-                                        ${divLine}
-                                    `;
+                                signsHtml += `<span class="sign-v ${signClass}" title="Partido ${i+1}: ${s}">${s}</span>`;
+                                if ([3, 7, 10].includes(i)) {
+                                    signsHtml += `<div class="table-block-divider"></div>`;
                                 }
+                            }
+
+                            if (hasPig15) {
+                                const raw15 = p.selection ? p.selection[14] : null;
+                                const s15 = (raw15 && String(raw15).trim() !== '' && String(raw15).trim() !== '-') ? String(raw15).trim() : '-';
+                                signsHtml += `
+                                    <div class="table-block-divider"></div>
+                                    <span class="sign-v sign-v-p15" title="Pleno al 15 (PIG): ${s15}">${s15}</span>
+                                `;
                             }
 
                             const diceBadge = p.isDice ? '<span class="text-[10px]" title="Relleno con Dado 🎲">🎲</span>' : '';
                             const lateBadge = p.late ? '<span class="text-[10px] text-amber-500 font-bold" title="Enviado con Retraso ⏱️">⏱️</span>' : '';
 
                             cellContent = `
-                                <div class="flex flex-col items-center justify-center gap-[3px] py-1 select-none">
-                                    <div class="flex items-center gap-1 leading-none mb-0.5">
+                                <div class="flex flex-col items-center justify-center py-1 select-none">
+                                    <div class="flex items-center gap-1 leading-none mb-0.5 h-3">
                                         ${diceBadge}
                                         ${lateBadge}
                                     </div>
@@ -1760,10 +1761,25 @@
                                 </div>
                             `;
                         } else {
+                            let emptyHtml = '';
+                            for (let i = 0; i < 14; i++) {
+                                emptyHtml += `<span class="sign-v sign-v-empty">-</span>`;
+                                if ([3, 7, 10].includes(i)) {
+                                    emptyHtml += `<div class="table-block-divider opacity-40"></div>`;
+                                }
+                            }
+                            if (hasPig15) {
+                                emptyHtml += `
+                                    <div class="table-block-divider opacity-40"></div>
+                                    <span class="sign-v sign-v-empty">-</span>
+                                `;
+                            }
                             cellContent = `
-                                <div class="flex flex-col items-center justify-center h-full min-h-[440px] opacity-40 text-slate-400 font-mono text-xs">
-                                    <span class="led-status-indicator led-${cellLed.status} mb-1"></span>
-                                    <span>-</span>
+                                <div class="flex flex-col items-center justify-center py-1 select-none opacity-40">
+                                    <div class="flex items-center gap-1 leading-none mb-0.5 h-3">
+                                        <span class="led-status-indicator led-${cellLed.status}"></span>
+                                    </div>
+                                    ${emptyHtml}
                                 </div>
                             `;
                         }
@@ -1771,7 +1787,7 @@
                         rowHtml += `<td class="summary-cell" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}">${cellContent}</td>`;
                     });
 
-                    // Columna de Dobles para esta Jornada en VERTICAL
+                    // Columna de Dobles para esta Jornada (mismo fondo uniforme sin tintes extra)
                     const jIdStr = String(j.id);
                     const pExtra = pronosticosExtraMap.get(jIdStr);
                     let isDoublesPlayed = false;
@@ -1782,32 +1798,59 @@
                     let doublesContent = '';
                     if (isDoublesPlayed) {
                         let dHtml = '';
-                        for (let i = 0; i < 15; i++) {
+                        for (let i = 0; i < 14; i++) {
                             const raw = pExtra.selection ? pExtra.selection[i] : null;
                             const s = (raw && String(raw).trim() !== '' && String(raw).trim() !== '-') ? String(raw).trim() : '-';
                             
-                            let pillClass = 'sign-pill-v-empty';
-                            if (s === '1') pillClass = 'sign-pill-v-1';
-                            else if (s === 'X' || s === 'x') pillClass = 'sign-pill-v-X';
-                            else if (s === '2') pillClass = 'sign-pill-v-2';
-                            else if (s !== '-') pillClass = 'sign-pill-v-custom';
+                            let signClass = 'sign-v-empty';
+                            if (s === '1') signClass = 'sign-v-1';
+                            else if (s === 'X' || s === 'x') signClass = 'sign-v-X';
+                            else if (s === '2') signClass = 'sign-v-2';
+                            else if (s !== '-') signClass = 'sign-v-custom';
 
-                            const isBlockDivider = [3, 7, 10, 13].includes(i);
-                            const divLine = isBlockDivider ? '<div class="w-full my-0.5 border-b border-purple-300 dark:border-purple-800"></div>' : '';
-
+                            dHtml += `<span class="sign-v ${signClass}" title="Doble Partido ${i+1}: ${s}">${s}</span>`;
+                            if ([3, 7, 10].includes(i)) {
+                                dHtml += `<div class="table-block-divider"></div>`;
+                            }
+                        }
+                        if (hasPig15) {
+                            const raw15 = pExtra.selection ? pExtra.selection[14] : null;
+                            const s15 = (raw15 && String(raw15).trim() !== '' && String(raw15).trim() !== '-') ? String(raw15).trim() : '-';
                             dHtml += `
-                                <div class="flex items-center justify-center">
-                                    <span class="sign-pill-v ${pillClass}" title="Doble Partido ${i+1}: ${s}">${s}</span>
-                                </div>
-                                ${divLine}
+                                <div class="table-block-divider"></div>
+                                <span class="sign-v sign-v-p15" title="Pleno al 15 (PIG): ${s15}">${s15}</span>
                             `;
                         }
-                        doublesContent = `<div class="flex flex-col items-center justify-center gap-[3px] py-1 select-none">${dHtml}</div>`;
+                        doublesContent = `
+                            <div class="flex flex-col items-center justify-center py-1 select-none">
+                                <div class="h-3 mb-0.5"></div>
+                                ${dHtml}
+                            </div>
+                        `;
                     } else {
-                        doublesContent = `<div class="flex flex-col items-center justify-center h-full min-h-[440px] opacity-30 text-purple-400 font-mono text-xs"><span>-</span></div>`;
+                        let emptyDHtml = '';
+                        for (let i = 0; i < 14; i++) {
+                            emptyDHtml += `<span class="sign-v sign-v-empty text-purple-400/40">-</span>`;
+                            if ([3, 7, 10].includes(i)) {
+                                emptyDHtml += `<div class="table-block-divider opacity-40"></div>`;
+                            }
+                        }
+                        if (hasPig15) {
+                            emptyDHtml += `
+                                <div class="table-block-divider opacity-40"></div>
+                                <span class="sign-v sign-v-empty text-purple-400/40">-</span>
+                            `;
+                        }
+                        doublesContent = `
+                            <div class="flex flex-col items-center justify-center py-1 select-none opacity-40">
+                                <div class="h-3 mb-0.5"></div>
+                                ${emptyDHtml}
+                            </div>
+                        `;
                     }
 
-                    rowHtml += `<td class="summary-cell bg-purple-500/5 hover:bg-purple-500/20" onclick="window.openEditorForDoubles('${j.id}')" title="Abrir quiniela de dobles">${doublesContent}</td>`;
+                    // Fondo idéntico al resto de celdas (estilo Bote 2)
+                    rowHtml += `<td class="summary-cell" onclick="window.openEditorForDoubles('${j.id}')" title="Abrir quiniela de dobles">${doublesContent}</td>`;
                     rowHtml += `</tr>`;
                     tbodyHtml += rowHtml;
                 });
@@ -1823,7 +1866,6 @@
                 if (!jornada) return;
 
                 // 1. KPI Plazo Oficial y Cuenta Atrás Sincronizada con Dashboard 2
-                // Buscar la próxima jornada dominical en curso o por disputar (idéntica lógica a dashboard_2.js)
                 const upcomingJornada = (this.jornadas || [])
                     .filter(j => {
                         if (!j || !j.active) return false;
@@ -1842,11 +1884,11 @@
                 const kpiCdBadge = document.getElementById('kpi-cd-badge');
                 if (kpiPlazoEstado) {
                     kpiPlazoEstado.textContent = isLockedRef ? 'Plazo Cerrado' : 'Plazo Abierto';
-                    kpiPlazoEstado.className = `text-lg font-black font-mono ${isLockedRef ? 'text-rose-500' : 'text-emerald-500 dark:text-emerald-400'}`;
+                    kpiPlazoEstado.className = `text-lg font-black font-mono ${isLockedRef ? 'text-rose-300 dark:text-rose-200' : 'text-emerald-300 dark:text-emerald-200'}`;
                 }
                 if (kpiCdBadge) {
                     kpiCdBadge.textContent = isLockedRef ? 'Cerrado' : 'Abierto';
-                    kpiCdBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${isLockedRef ? 'bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'}`;
+                    kpiCdBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${isLockedRef ? 'bg-rose-500/20 text-rose-300 dark:text-rose-200 border border-rose-400/50' : 'bg-emerald-500/20 text-emerald-300 dark:text-emerald-200 border border-emerald-400/50'}`;
                 }
 
                 // Parsear fecha y calcular deadline oficial (Jueves 17:00h)
@@ -1887,7 +1929,7 @@
                         if (!timerEl) return;
                         if (diff <= 0) {
                             timerEl.textContent = '00d 00h 00m 00s (Expirado)';
-                            timerEl.className = 'font-mono text-xs font-black text-rose-500 dark:text-rose-400';
+                            timerEl.className = 'font-mono text-xs font-black text-rose-300 dark:text-rose-200';
                             return;
                         }
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -1895,7 +1937,7 @@
                         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                         const s = Math.floor((diff % (1000 * 60)) / 1000);
                         timerEl.textContent = `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
-                        timerEl.className = 'font-mono text-sm sm:text-base font-black text-amber-500 dark:text-amber-400 tracking-wider';
+                        timerEl.className = 'font-mono text-sm sm:text-base font-black text-amber-300 dark:text-amber-200 tracking-wider';
                     };
                     updateCountdown();
                     window.cdTimerInterval = setInterval(updateCountdown, 1000);
@@ -1953,26 +1995,60 @@
                     }
                 }
 
-                // 5. Chip de Cierre en Hub con alto contraste
+                // 5. Chip de Cierre en Hub con alto contraste (texto en tono más claro)
                 const deadlineTextEl = document.getElementById('deadline-info');
                 const wrapEl = document.getElementById('deadline-info-wrap');
                 const dotEl = document.getElementById('deadline-led-dot');
                 if (deadlineTextEl && wrapEl) {
                     const txt = deadlineTextEl.textContent || '';
                     if (txt.toLowerCase().includes('expirado') || txt.toLowerCase().includes('cerrado')) {
-                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-rose-500/20 text-rose-500 dark:text-rose-300 border border-rose-500/50 flex items-center gap-2 shadow-sm';
-                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-rose-500/20 text-rose-300 dark:text-rose-200 border border-rose-400/50 flex items-center gap-2 shadow-sm';
+                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
                     } else {
-                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/50 flex items-center gap-2 shadow-sm';
-                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-emerald-500/20 text-emerald-300 dark:text-emerald-200 border border-emerald-400/50 flex items-center gap-2 shadow-sm';
+                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
                     }
                 }
             };
 
-            // D. Interceptar loadForecast para aplicar atributos de signos
+            // D. Interceptar loadForecast: texto de Cierre/Expirado más claro y supresión de Pleno al 15 si no es PIG
             const originalLoadForecast = PM.prototype.loadForecast;
             PM.prototype.loadForecast = function() {
                 originalLoadForecast.apply(this, arguments);
+
+                const j = this.jornadas ? this.jornadas.find(jor => String(jor.id) === String(this.currentJornadaId)) : null;
+                if (j && this.deadlineInfo) {
+                    const deadline = this.calculateDeadline(j.date);
+                    const now = new Date();
+                    const isLate = deadline ? (now > deadline) : false;
+                    if (deadline) {
+                        const dStr = deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) + ' ' + deadline.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        this.deadlineInfo.innerHTML = isLate ?
+                            `<span class="font-black text-rose-300 dark:text-rose-200 tracking-wide">Plazo expirado (${dStr})</span>` :
+                            `<span class="font-black text-emerald-300 dark:text-emerald-200 tracking-wide">Cierre: ${dStr}</span>`;
+                        const ledDot = document.getElementById('deadline-led-dot');
+                        if (ledDot) {
+                            ledDot.className = `w-2.5 h-2.5 rounded-full ${isLate ? 'bg-rose-400' : 'bg-emerald-400 animate-pulse'}`;
+                        }
+                    }
+                }
+
+                // Supresión total de Pleno al 15 si la jornada no es PIG
+                if (j) {
+                    const hasPig15 = window.isJornadaP15Required(j);
+                    if (this.container) {
+                        const p15Row = this.container.querySelector('.p-options[data-idx="14"]')?.closest('.pronostico-row');
+                        const p15Divider = this.container.querySelector('.p-divider-p15');
+                        if (p15Row) p15Row.style.display = hasPig15 ? 'flex' : 'none';
+                        if (p15Divider) p15Divider.style.display = hasPig15 ? 'flex' : 'none';
+                    }
+                    if (this.doublesContainer) {
+                        const d15Row = this.doublesContainer.querySelector('.prediction-inputs[data-idx="14"]')?.closest('.pronostico-row');
+                        const d15Divider = this.doublesContainer.querySelector('.p-divider-p15');
+                        if (d15Row) d15Row.style.display = hasPig15 ? 'flex' : 'none';
+                        if (d15Divider) d15Divider.style.display = hasPig15 ? 'flex' : 'none';
+                    }
+                }
                 
                 if (this.updateKPIsCustom) this.updateKPIsCustom();
 
@@ -1983,6 +2059,37 @@
                         opt.setAttribute('data-sign', sign);
                     });
                 }, 50);
+            };
+
+            // E. Interceptar renderDoublesForm para suprimir Pleno al 15 en modal de dobles si no es PIG
+            const origRenderDoublesForm = PM.prototype.renderDoublesForm;
+            PM.prototype.renderDoublesForm = function(jornada, isLocked) {
+                if (origRenderDoublesForm) origRenderDoublesForm.apply(this, arguments);
+                if (jornada && this.doublesContainer) {
+                    const hasPig15 = window.isJornadaP15Required(jornada);
+                    const d15Row = this.doublesContainer.querySelector('.prediction-inputs[data-idx="14"]')?.closest('.pronostico-row');
+                    const d15Divider = this.doublesContainer.querySelector('.p-divider-p15');
+                    if (d15Row) d15Row.style.display = hasPig15 ? 'flex' : 'none';
+                    if (d15Divider) d15Divider.style.display = hasPig15 ? 'flex' : 'none';
+                }
+            };
+
+            // F. Interceptar saveDoubles para que no falle validación si Pleno al 15 no es PIG
+            const origSaveDoubles = PM.prototype.saveDoubles;
+            PM.prototype.saveDoubles = function() {
+                const j = this.jornadas ? this.jornadas.find(jor => String(jor.id) === String(this.currentJornadaId)) : null;
+                const hasPig15 = window.isJornadaP15Required(j);
+                if (!hasPig15 && this.doublesContainer) {
+                    const p15Home = this.doublesContainer.querySelector('.p15-option[data-team="home"]');
+                    const p15Away = this.doublesContainer.querySelector('.p15-option[data-team="away"]');
+                    if (p15Home && !this.doublesContainer.querySelector('.p15-option[data-team="home"].selected')) {
+                        p15Home.classList.add('selected');
+                    }
+                    if (p15Away && !this.doublesContainer.querySelector('.p15-option[data-team="away"].selected')) {
+                        p15Away.classList.add('selected');
+                    }
+                }
+                return origSaveDoubles.apply(this, arguments);
             };
         }
 
