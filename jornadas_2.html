@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PEÑA MAULAS - Resultados Partidos 2.0</title>
 
     <!-- Favicon & Mobile App Icons -->
@@ -19,10 +19,10 @@
     <meta name="application-name" content="Peña Maulas">
     <meta name="theme-color" content="#f59e0b">
 
-    <!-- Fonts: Inter, Montserrat, JetBrains Mono, Outfit -->
+    <!-- Fonts: Plus Jakarta Sans, Inter, Montserrat, JetBrains Mono, Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS v4 CDN -->
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
@@ -42,7 +42,7 @@
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             background-color: var(--color-bg-base);
             color: #f8fafc;
             min-height: 100vh;
@@ -172,7 +172,7 @@
     </style>
 </head>
 
-<body class="p-3 sm:p-5 lg:p-6 bg-[#06080e] selection:bg-amber-500 selection:text-slate-950">
+<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
 
     <!-- Firebase & Servicios de Dominio -->
     <script src="js/firebase-init.js"></script>
