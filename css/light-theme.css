@@ -108,6 +108,30 @@ body.light-theme {
     color: #0369a1 !important;
 }
 
+.light-theme .text-pink-300,
+.light-theme .text-pink-400,
+.light-theme .text-pink-500 {
+    color: #9d174d !important;
+}
+
+.light-theme .text-purple-200,
+.light-theme .text-purple-300,
+.light-theme .text-purple-400,
+.light-theme .text-purple-500 {
+    color: #6b21a8 !important;
+}
+
+.light-theme .text-blue-200,
+.light-theme .text-blue-300,
+.light-theme .text-blue-400 {
+    color: #1d4ed8 !important;
+}
+
+.light-theme .text-orange-400,
+.light-theme .text-orange-500 {
+    color: #c2410c !important;
+}
+
 /* =========================================================================
    4. ELIMINACIÓN TOTAL DE TARJETAS OSCURAS / BLOQUES NEGROS EN MODO CLARO
    Afecta a sub-cajas, tarjetas internas, inputs, selects y tiles.
@@ -124,6 +148,7 @@ body.light-theme {
 .light-theme .bg-slate-900\/80,
 .light-theme .bg-slate-900\/60,
 .light-theme .bg-slate-900\/50,
+.light-theme .bg-slate-900\/40,
 .light-theme .bg-\[\#06080e\],
 .light-theme .bg-\[\#090d16\],
 .light-theme .bg-\[\#0b0f19\] {
@@ -790,3 +815,253 @@ body.light-theme {
 .light-theme .jornadas-scroll-container::-webkit-scrollbar-thumb {
     background: rgba(217, 119, 6, 0.4);
 }
+
+/* =========================================================================
+   15. AJUSTES ESPECÍFICOS DASHBOARD 2 EN MODO CLARO
+   ========================================================================= */
+
+/* A. Tarjeta ALERTA PIG: Textos en rosa oscurecidos a frambuesa intenso (#9d174d) */
+.light-theme #pig-hybrid-widget .text-pink-300,
+.light-theme #pig-hybrid-widget .text-pink-400,
+.light-theme #pig-hybrid-widget [class*="text-pink"],
+.light-theme #pig-content .text-pink-300,
+.light-theme #pig-content .text-pink-400,
+.light-theme #pig-content [class*="text-pink"],
+.light-theme #pig-tip-title {
+    color: #9d174d !important;
+    font-weight: 600 !important;
+}
+
+.light-theme #pig-hybrid-widget .bg-pink-500\/20 {
+    background-color: #fdf2f8 !important;
+    border-color: #fbcfe8 !important;
+}
+
+/* B. Tarjeta ALERTA PIG: Texto "Penalización Bote 2:" oscurecido a ámbar tostado (#92400e) */
+.light-theme #pig-hybrid-widget .text-amber-300\/90,
+.light-theme #pig-hybrid-widget .text-amber-300,
+.light-theme #pig-hybrid-widget [class*="text-amber-300"],
+.light-theme #pig-content .text-amber-300\/90,
+.light-theme #pig-content .text-amber-300,
+.light-theme #pig-content [class*="text-amber-300"] {
+    color: #92400e !important;
+    font-weight: 600 !important;
+}
+
+/* C. Botón "ECHAR A EMILIO": Texto en blanco puro sobre fondo rojo */
+.light-theme #btn-expulsar-emilio,
+.light-theme #btn-expulsar-emilio *,
+.light-theme button#btn-expulsar-emilio.text-white {
+    color: #ffffff !important;
+}
+
+
+/* =========================================================================
+   16. AJUSTES ESPECÍFICOS BOTE 2 EN MODO CLARO
+   ========================================================================= */
+
+/* A. Lista de Socios: Iniciales de socios a la izquierda del nombre */
+.light-theme #members-table-body td .w-8.h-8,
+.light-theme td div.w-8.h-8[class*="text-orange-400"],
+.light-theme #members-table-body div[class*="text-orange-400"],
+.light-theme td div[class*="border-orange-500"] {
+    color: #c2410c !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, #fef3c7 0%, #fee2e2 100%) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+}
+
+/* B. Lista de Socios: Texto que informa el número de socio (Socio #X) */
+.light-theme #members-table-body span.text-\[11px\].text-slate-500,
+.light-theme #members-table-body span.text-slate-500 {
+    color: #334155 !important;
+    font-weight: 600 !important;
+}
+
+/* C. Modal Extracto de Socio: Cabecera luminosa y texto explicativo resaltado */
+.light-theme #modal-extracto-socio div[class*="bg-gradient-to-r"] {
+    background: linear-gradient(135deg, #ffffff 0%, #fffcf5 50%, #fef3c7 100%) !important;
+    border-bottom: 1.5px solid #e8dfcf !important;
+}
+
+.light-theme #modal-extracto-socio #extracto-avatar {
+    background: #fef3c7 !important;
+    color: #c2410c !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    font-weight: 800 !important;
+}
+
+.light-theme #modal-extracto-socio #extracto-socio-nombre {
+    color: #0f172a !important;
+}
+
+.light-theme #modal-extracto-socio p.text-slate-400,
+.light-theme #modal-extracto-socio .text-slate-400 {
+    color: #92400e !important;
+    font-weight: 700 !important;
+}
+
+.light-theme #modal-extracto-socio button[onclick*="closeModal"] {
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.light-theme #modal-extracto-socio button[onclick*="closeModal"]:hover {
+    background-color: #fee2e2 !important;
+    color: #be123c !important;
+}
+
+/* D. Vista Jornadas: Deslizador de Jornada */
+.light-theme #slider-jornada-badge {
+    background-color: #fef3c7 !important;
+    color: #c2410c !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    font-weight: 700 !important;
+}
+
+.light-theme #view-jornadas .text-orange-400 {
+    color: #c2410c !important;
+}
+
+/* E. Vista Jornadas: Penalización Maula de la Jornada */
+.light-theme #jornada-table-body span.text-purple-400,
+.light-theme #jornada-table-body span[class*="text-purple-400"],
+.light-theme #jornada-table-body strong.text-purple-400 {
+    color: #6b21a8 !important;
+    font-weight: 700 !important;
+}
+
+.light-theme #jornada-table-body span.bg-purple-500\/20 {
+    background-color: #f3e8ff !important;
+    border-color: #d8b4fe !important;
+    color: #6b21a8 !important;
+}
+
+/* F. Vista Jornadas: Importe del Reembolso Sellado */
+.light-theme #jornada-table-body span.text-purple-300,
+.light-theme #jornada-table-body span[class*="text-purple-300"] {
+    color: #581c87 !important;
+    font-weight: 800 !important;
+}
+
+/* G. Vista Jornadas: Premio Oficial Individual */
+.light-theme #jornada-table-body span.text-blue-300,
+.light-theme #jornada-table-body span[class*="text-blue-300"],
+.light-theme #jornada-table-body strong.text-blue-400 {
+    color: #1d4ed8 !important;
+    font-weight: 700 !important;
+}
+
+.light-theme #jornada-table-body span.bg-blue-500\/20 {
+    background-color: #eff6ff !important;
+    border-color: #bfdbfe !important;
+    color: #1d4ed8 !important;
+}
+
+/* H. Matriz Cuadrante: Estado de aciertos de socios penalizados */
+/* Requisito de usuario: Cuadro a rojo oscuro y texto a rosa claro */
+.light-theme #matriz-tbody .bg-rose-950\/70,
+.light-theme #matriz-tbody [class*="bg-rose-950"] {
+    background-color: #881337 !important;
+    border-color: #be123c !important;
+    color: #fecdd3 !important;
+}
+
+.light-theme #matriz-tbody .bg-rose-950\/70 *,
+.light-theme #matriz-tbody [class*="bg-rose-950"] * {
+    color: #fecdd3 !important;
+}
+
+.light-theme #matriz-tbody .bg-rose-500\/25 {
+    background-color: #881337 !important;
+    border-color: #be123c !important;
+    color: #fecdd3 !important;
+}
+
+.light-theme #matriz-tbody .bg-rose-500\/25 * {
+    color: #fecdd3 !important;
+}
+
+/* I. Flujo de Caja: Celda BOTE ACUMULADO PEÑA */
+/* Requisito de usuario: Fondo en tono muy claro y texto en verde oscurecido (el otro texto dejarlo como está) */
+.light-theme #flujo-table-body td.bg-slate-900\/40,
+.light-theme #flujo-table-body td:last-child {
+    background-color: #fef8ee !important;
+    border-color: #fde68a !important;
+}
+
+.light-theme #flujo-table-body td.bg-slate-900\/40:hover,
+.light-theme #flujo-table-body td:last-child:hover {
+    background-color: #fef3c7 !important;
+}
+
+.light-theme #flujo-table-body td .text-emerald-400\/80,
+.light-theme #flujo-table-body td span[class*="text-emerald"],
+.light-theme #flujo-table-body td div[class*="text-emerald"] {
+    color: #047857 !important;
+    font-weight: 600 !important;
+}
+
+/* J. Dobles & Premios: Textos violeta y azul oscurecidos */
+.light-theme #view-premios .text-purple-300,
+.light-theme #view-premios .text-purple-200,
+.light-theme #view-premios .text-purple-400 {
+    color: #6b21a8 !important;
+    font-weight: 700 !important;
+}
+
+.light-theme #view-premios .text-blue-300,
+.light-theme #view-premios .text-blue-200,
+.light-theme #view-premios .text-blue-400 {
+    color: #1d4ed8 !important;
+    font-weight: 700 !important;
+}
+
+.light-theme #view-premios .bg-purple-950\/20,
+.light-theme #view-premios div[class*="border-purple-500"] {
+    background-color: #faf5ff !important;
+    border-color: #e9d5ff !important;
+}
+
+.light-theme #view-premios .bg-blue-950\/20,
+.light-theme #view-premios div[class*="border-blue-500"] {
+    background-color: #f0f7ff !important;
+    border-color: #dbeafe !important;
+}
+
+.light-theme #view-premios .bg-amber-950\/20 {
+    background-color: #fffbeb !important;
+    border-color: #fef3c7 !important;
+}
+
+.light-theme #view-premios span.bg-purple-500\/20 {
+    background-color: #f3e8ff !important;
+    border-color: #d8b4fe !important;
+    color: #6b21a8 !important;
+}
+
+.light-theme #view-premios span.bg-blue-500\/20 {
+    background-color: #eff6ff !important;
+    border-color: #bfdbfe !important;
+    color: #1d4ed8 !important;
+}
+
+.light-theme #view-premios button.bg-purple-600\/20 {
+    background-color: #f3e8ff !important;
+    border-color: #c084fc !important;
+    color: #6b21a8 !important;
+}
+
+.light-theme #view-premios button.bg-purple-600\/20:hover {
+    background-color: #e9d5ff !important;
+    color: #581c87 !important;
+}
+
+/* Modal Reducción Autorizada R2 */
+.light-theme th.bg-purple-950 {
+    background-color: #f3e8ff !important;
+    border-color: #d8b4fe !important;
+    color: #6b21a8 !important;
+}
+

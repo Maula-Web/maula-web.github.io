@@ -804,6 +804,52 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ---
 
+## 27. Calibración y Perfeccionamiento del Modo Claro de Alta Gama (V2.0 Pro)
+
+### 27.1. Invariabilidad Absoluta del Modo Oscuro
+- El Modo Oscuro de la aplicación se mantiene al **100% inalterado** en todas las hojas.
+- Todas las correcciones visuales de contraste y jerarquía cromática se circunscriben estricta y exclusivamente a la clase de ámbito `.light-theme` dentro de `css/light-theme.css`.
+
+### 27.2. Dashboard 2.0: Tarjeta ALERTA PIG y Botón de Expulsión
+- **Tarjeta ALERTA PIG**:
+  - Textos en rosa (badge, descripción de partidos y etiquetas): oscurecidos de su tono pálido original a un **frambuesa profundo** (`#9d174d`, contraste 8.2:1), preservando el fondo suave.
+  - Texto "Penalización Bote 2:": oscurecido de amarillo pálido a un **ámbar tostado de alta gama** (`#92400e`, contraste 7.5:1).
+- **Botón "ECHAR A EMILIO"**:
+  - Corrección de cascada CSS: la regla genérica `.light-theme .text-white` transformaba el texto del botón en oscuro sobre fondo rojo. Se implementó una regla de máxima especificidad (`.light-theme #btn-expulsar-emilio, .light-theme #btn-expulsar-emilio * { color: #ffffff !important; }`), garantizando texto en blanco puro impecable sobre el degradado `from-rose-600 to-red-700`.
+
+### 27.3. Bote 2.0: Identidad de Socios y Extractos
+- **Iniciales de Socios en la Lista**: Los avatares con las iniciales de cada socio a la izquierda del nombre se calibraron con texto **naranja tostado / terracota** (`#c2410c`) y fondo degradado crema-ámbar suave (`linear-gradient(135deg, #fef3c7, #fee2e2)`), logrando una lectura instantánea.
+- **Número de Socio (`Socio #X`)**: El subtítulo gris se oscureció a pizarra oscuro carbón (`#334155`), mejorando su contraste frente al fondo de fila.
+- **Modal Extracto Bancario de Socio**:
+  - La cabecera del modal sustituyó el fondo oscuro remanente por un degradado porcelana luminoso (`linear-gradient(135deg, #ffffff 0%, #fffcf5 50%, #fef3c7 100%)`).
+  - El texto explicativo *"Historial de movimientos y saldo reconstruido jornada a jornada"* se realzó en **ámbar tostado en negrita** (`#92400e`, font-weight 700), resolviendo la falta de contraste señalada por el usuario.
+
+### 27.4. Bote 2.0: Vista Jornadas y Deslizador
+- **Deslizador de Jornada**: Texto "🧭 Deslizador de Jornada:" y badge interactivo de jornada `#slider-jornada-badge` configurados en naranja cálido de alta saturación (`#c2410c`) sobre fondo crema dorado (`#fef3c7`).
+- **Penalización Maula de la Jornada**: Chip de sanción (`💀 1.00€`) oscurecido a púrpura regio (`#6b21a8`) con fondo lavanda claro (`#f3e8ff`).
+- **Importe del Reembolso Sellado**: La cifra de sellado adelantado (`+24.75 €`) pasa a púrpura saturado de máxima nitidez (`#581c87`, font-mono bold).
+- **Premio Individual Oficial**: Chip de premio individual (`🔵 Individual ℹ️`) calibrado a azul cobalto intenso (`#1d4ed8`) sobre cápsula pastel (`#eff6ff`).
+
+### 27.5. Bote 2.0: Matriz Cuadrante (Socios Penalizados)
+- **Transformación de Celda de Aciertos**: En cumplimiento estricto del requerimiento visual del usuario, el cuadro de estado de aciertos para socios que incurrieron en penalizaciones (exceso de unos, bajos aciertos, PIG o maula) se transformó a:
+  - **Fondo del cuadro**: **Rojo oscuro** (`#881337` / `border: #be123c`).
+  - **Texto numérico de aciertos**: **Rosa claro pastel** (`#fecdd3`), garantizando contraste WCAG AAA superlativo.
+
+### 27.6. Bote 2.0: Flujo de Caja (Bote Acumulado de la Peña)
+- **Eliminación del Bloque Gris**: La celda de la columna "BOTE ACUMULADO PEÑA" tenía un fondo gris opaco que dificultaba la lectura del crecimiento neto.
+- **Nuevo Tratamiento Visual**:
+  - Fondo de celda en **tono muy claro y cálido** (`#fef8ee`, hover `#fef3c7`).
+  - Cifra de crecimiento semanal (`(Crec: +X.XX €)`): oscurecida a **verde esmeralda bosque** (`#047857`, font-weight 600).
+  - Cifra del Bote Acumulado: preservada en su ámbar cálido corporativo (`#b45309`), según la directriz del usuario.
+
+### 27.7. Bote 2.0: Dobles y Premios
+- Los textos de la vista de Dobles & Premios que antes se percibían pálidos en modo claro se reforzaron:
+  - Textos violetas de Quinielas de Dobles: oscurecidos a púrpura profundo (`#6b21a8`).
+  - Textos azules de Pronósticos Individuales: oscurecidos a azul zafiro (`#1d4ed8`).
+  - Paneles superiores y desgloses de reducción autorizada R2: dotados de fondos porcelana luminosos (`#faf5ff` y `#f0f7ff`) con ribetes finos acordes al Design System Maulas.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
