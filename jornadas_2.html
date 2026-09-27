@@ -169,7 +169,10 @@
             font-weight: 800;
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
         }
-    </style>
+    
+        @media (max-width: 767px) { .desktop-only-flex { display: none !important; } }
+        @media (min-width: 768px) { .desktop-only-flex { display: flex !important; } }
+</style>
 </head>
 
 <body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
@@ -307,7 +310,7 @@
             </div>
 
             <!-- Controles en Escritorio (>= lg) -->
-            <div class="hidden md:flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+            <div class="desktop-only-flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 <!-- INTERRUPTOR DE VERSIÓN (V1 Clásica <-> V2.0 Pro) -->
                 <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner" id="version-switcher-container">
                     <button type="button" id="btn-version-v1" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white" title="Cambiar a Versión Clásica 1.0">
@@ -942,6 +945,7 @@
 </body>
 
 </html>
+
 
 
 
