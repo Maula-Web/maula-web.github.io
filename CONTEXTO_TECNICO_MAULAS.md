@@ -6,20 +6,27 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 
 ## 2. Arquitectura y Tecnologías
 
-- **Frontend**: HTML5, CSS (Vanilla), JS (Vanilla). Sin frameworks pesados.
+- **Frontend**: HTML5, CSS (Vanilla + Tailwind CSS v4 / CDN), JS (Vanilla ES6+). Sin frameworks pesados.
 - **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`) con persistencia offline en IndexedDB (`db.enablePersistence({ synchronizeTabs: true })`).
-- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons.
+- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v1.21`).
+- **Hojas de Estilo y Sistema de Diseño (`/css/`)**:
+  - `styles.css`: Estilos base, tema oscuro original, utilidades y animaciones.
+  - `resumen-styles.css`: Reglas específicas para gráficas y paneles del resumen de temporada.
+  - `light-theme.css`: Sistema de diseño global para Modo Claro (Tendencias 2026: Frosted Porcelain Canvas, paneles cerámicos, tipografía Obsidian y preservación de alto contraste para tooltips).
 - **Módulos JS (Carpeta `/js/`)**:
   - `auth.js`: Autenticación, control de accesos, inyección de iconos/metadatos PWA y registro del Service Worker en toda la aplicación.
-  - `bote.js`: Interfaz de usuario del bote, desglose visual de saldos, extractos, gráficos y simulación histórica de la peña.
+  - `utils.js`: Utilidades centralizadas (`AppUtils`), normalización de nombres y escudos, parseo robusto de fechas, controlador global de versiones (`AppVersion` para alternar 1.0 Clásica <-> 2.0 Pro) y gestor universal de temas (`AppTheme` para alternar Modo Claro <-> Modo Oscuro).
+  - `dashboard.js` / `dashboard_2.js`: Paneles de inicio y centros de mando (v1 clásica y v2.0 Bento Grid interactivo con cuenta atrás, participación en vivo, asignación de roles Sella/Rellena Dobles, premios y tarjeta híbrida PIG/Rana).
+  - `socios_2.js`: Nueva arquitectura de gestión de socios 2.0, KPIs individuales, estadísticas de rendimiento e integración con el Dado de Quinielas.
+  - `bote.js` / `bote_2.js` / `bote_2_data.js`: Interfaces de usuario del Bote (v1 clásica y v2.0 Tesorería & Auditoría Financiera), desglose visual de saldos, extractos, gráficos y simulación histórica de la peña.
   - `bote-engine.js`: Motor matemático desacoplado de finanzas (saldos individuales, costes variables de dobles, exenciones automáticas, timeline de transacciones, repartos y liquidaciones de temporada).
+  - `jornadas.js` / `jornadas_2.js`: Módulos de gestión y visualización de partidos y resultados (v1 clásica y v2.0 Hub de Control interactivo con carrusel de jornadas, escrutinio visual 1X2, botoneras táctiles y premios oficiales).
   - `dice-service.js`: Servicio del "Dado de Quinielas" (🎲), automatización de sellado aleatorio para socios ausentes o de viaje dentro de rangos de fechas definidos (máximo 3 jornadas por temporada).
   - `text-importer.js`: Analizador inteligente de texto copiado de webs externas (Revista Quinielista y Loterías y Apuestas del Estado) para importar jornadas, partidos, resultados y desglose oficial de premios por categoría.
   - `pronosticos.js`: Gestión de las apuestas individuales y la columna combinada (MAULA). Incluye auto-guardado silencioso, lógica de desmarcado de signos, bloqueo de jornadas iniciadas, indicador visual del Dado y notificaciones.
   - `scoring.js`: Lógica de puntuación (bonificaciones, penalizaciones, lógica PIG/Pleno al 15).
   - `resumen-temporada.js`: Clasificación acumulada de la temporada y estadísticas detalladas por socio, incluyendo herramientas de **visualización avanzada (Zoom y Ventana Deslizante)** para las gráficas.
   - `resultados.js`: Generación de la tabla de resultados acumulada (Aciertos Base) y gestión de penalizaciones.
-  - `dashboard.js`: Panel de inicio con el líder actual, próxima jornada, premios semanales y **asignación dinámica de roles** (Sella/Rellena).
   - `rss-importer.js`: Motor histórico de extracción de datos, partidos y resultados desde fuentes de terceros (redirigido a `text-importer.js`).
   - `telegram-service.js`: Integración de notificaciones, informes de resultados y recordatorios automatizados.
   - `votaciones.js`: Módulo de propuestas, quórum y votaciones democráticas de la peña con edición de fechas límite e integración con Telegram.
