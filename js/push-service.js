@@ -13,10 +13,28 @@
 
 const FCM_VAPID_KEY = 'BOX8-fovp0YY2MfIMJjL2c76KvzwRg8EBKm-P40NcU0SDKg7Y269-J3hg5AEqRpTrq5sgmTNDTid1InSWBStiLQ';
 
+/**
+ * Convierte una clave VAPID en Base64 URL Safe a Uint8Array para pushManager.subscribe
+ */
+function urlB64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
 const PushService = {
     initialized: false,
     timerInterval: null,
     heradioUnsubscribe: null,
+    myFCMToken: null,
+    mySubscription: null,
 
     /**
      * Determina el rol del usuario conectado
@@ -101,46 +119,91 @@ const PushService = {
     },
 
     /**
-     * Solicita y registra el Token FCM oficial de Google para el dispositivo
+     * Solicita y registra tanto la suscripción W3C Web Push nativa (Apple APNs / Google FCM)
+     * como el Token FCM oficial de Google para el dispositivo.
      */
     async requestFCMToken(memberId, memberName) {
         try {
             await this.ensureFirebaseMessagingSDK();
-            if (!window.firebase || !window.firebase.messaging) {
-                console.warn('[PushService] Firebase Messaging no disponible.');
-                return null;
-            }
 
             let swReg = null;
             if ('serviceWorker' in navigator) {
-                swReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-                console.log('[PushService] Service Worker de FCM registrado:', swReg.scope);
-            }
-
-            const messaging = firebase.messaging();
-            const currentToken = await messaging.getToken({
-                vapidKey: FCM_VAPID_KEY,
-                serviceWorkerRegistration: swReg
-            });
-
-            if (currentToken) {
-                console.log(`[PushService] Token FCM obtenido para ${memberName}:`, currentToken);
-                const db = window.db || (window.DataService && window.DataService.db);
-                if (db) {
-                    await db.collection('push_subscriptions').doc(`member_${memberId}`).set({
-                        memberId: memberId,
-                        memberName: memberName,
-                        fcmToken: currentToken,
-                        fcmUpdatedAt: new Date().toISOString(),
-                        permission: 'granted',
-                        userAgent: navigator.userAgent
-                    }, { merge: true });
+                try {
+                    swReg = await navigator.serviceWorker.ready;
+                } catch (e) {
+                    console.warn('[PushService] Error esperando SW ready:', e);
                 }
-                return currentToken;
-            } else {
-                console.warn('[PushService] No se pudo obtener el token FCM.');
-                return null;
+                if (!swReg) {
+                    swReg = await navigator.serviceWorker.register('./service-worker.js');
+                }
             }
+
+            // 1. Obtener Suscripción W3C Web Push nativa (Apple APNs en iOS 16.4+ / FCM en Android)
+            let nativeSub = null;
+            if (swReg && 'pushManager' in swReg) {
+                try {
+                    nativeSub = await swReg.pushManager.getSubscription();
+                    if (!nativeSub && Notification.permission === 'granted') {
+                        const convertedKey = urlB64ToUint8Array(FCM_VAPID_KEY);
+                        nativeSub = await swReg.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: convertedKey
+                        });
+                        console.log('[PushService] Suscripción W3C Push creada:', nativeSub.endpoint);
+                    }
+                } catch (w3cErr) {
+                    console.warn('[PushService] Aviso en W3C pushManager.subscribe:', w3cErr);
+                }
+            }
+            if (nativeSub && memberId === 6) {
+                this.mySubscription = nativeSub;
+            }
+
+            // 2. Obtener Token FCM oficial de Google
+            let currentToken = null;
+            if (window.firebase && window.firebase.messaging) {
+                try {
+                    const messaging = firebase.messaging();
+                    currentToken = await messaging.getToken({
+                        vapidKey: FCM_VAPID_KEY,
+                        serviceWorkerRegistration: swReg
+                    });
+                    console.log(`[PushService] Token FCM obtenido para ${memberName}:`, currentToken);
+                } catch (fcmErr) {
+                    console.warn('[PushService] Aviso obteniendo Token FCM:', fcmErr);
+                }
+            }
+            if (currentToken && memberId === 6) {
+                this.myFCMToken = currentToken;
+                this.updateUIStatus();
+            }
+
+            // 3. Persistir suscripción completa y metadatos en Firestore
+            const db = window.db || (window.DataService && window.DataService.db);
+            if (db) {
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
+                const platform = /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'iOS' : /Android/.test(navigator.userAgent) ? 'Android' : 'Desktop';
+                const subJson = nativeSub ? nativeSub.toJSON() : null;
+
+                const docData = {
+                    memberId: memberId,
+                    memberName: memberName,
+                    fcmToken: currentToken || null,
+                    subscription: subJson || null,
+                    endpoint: nativeSub ? nativeSub.endpoint : null,
+                    fcmUpdatedAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    permission: ('Notification' in window) ? Notification.permission : 'unsupported',
+                    userAgent: navigator.userAgent,
+                    isStandalone: isStandalone,
+                    platform: platform
+                };
+
+                await db.collection('push_subscriptions').doc(`member_${memberId}`).set(docData, { merge: true });
+                console.log(`[PushService] Suscripción completa registrada en Firestore para ${memberName}`);
+            }
+
+            return currentToken;
         } catch (err) {
             console.error('[PushService] Error en requestFCMToken:', err);
             return null;
@@ -183,7 +246,11 @@ const PushService = {
         }
 
         try {
-            const reg = await navigator.serviceWorker.ready;
+            let reg = await navigator.serviceWorker.getRegistration('./');
+            if (!reg) {
+                reg = await navigator.serviceWorker.register('./service-worker.js');
+            }
+            await navigator.serviceWorker.ready;
             console.log('[PushService] Service Worker activo:', reg.scope);
             return reg;
         } catch (e) {
@@ -612,13 +679,29 @@ const PushService = {
             if (!db) return;
 
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
+            let nativeSub = null;
+            if ('serviceWorker' in navigator) {
+                try {
+                    const reg = await navigator.serviceWorker.ready;
+                    if (reg && reg.pushManager) {
+                        nativeSub = await reg.pushManager.getSubscription();
+                    }
+                } catch (e) {}
+            }
+
+            const platform = /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'iOS' : /Android/.test(navigator.userAgent) ? 'Android' : 'Desktop';
+            const subJson = nativeSub ? nativeSub.toJSON() : null;
+
             const subData = {
                 memberId: memberId,
                 memberName: memberName,
                 permission: ('Notification' in window) ? Notification.permission : 'unsupported',
+                subscription: subJson || null,
+                endpoint: nativeSub ? nativeSub.endpoint : null,
                 updatedAt: new Date().toISOString(),
                 userAgent: navigator.userAgent,
-                isStandalone: isStandalone
+                isStandalone: isStandalone,
+                platform: platform
             };
 
             await db.collection('push_subscriptions').doc(`member_${memberId}`).set(subData, { merge: true });
@@ -833,7 +916,7 @@ const PushService = {
         if (input) input.value = text;
     },
 
-    updateUIStatus() {
+    async updateUIStatus() {
         const statusBox = document.getElementById('push-permission-status');
         const permBtn = document.getElementById('push-btn-grant-permission');
         const actionArea = document.getElementById('push-action-buttons');
@@ -842,16 +925,77 @@ const PushService = {
 
         const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+
+        // Si aún no tenemos el token en memoria, consultar Firestore
+        if (!this.myFCMToken) {
+            try {
+                const db = window.db || (window.DataService && window.DataService.db);
+                if (db) {
+                    const doc = await db.collection('push_subscriptions').doc('member_6').get();
+                    if (doc.exists && doc.data().fcmToken) {
+                        this.myFCMToken = doc.data().fcmToken;
+                    }
+                }
+            } catch (e) {}
+        }
 
         if (perm === 'granted') {
+            let tokenHtml = '';
+            if (this.myFCMToken) {
+                tokenHtml = `
+                    <div style="margin-top:12px; padding:10px 12px; background:rgba(34, 197, 94, 0.12); border:1px solid #22c55e; border-radius:10px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between;">
+                            <span style="color:#4ade80; font-weight:700; font-size:0.82rem;">🚀 Token FCM de tu Dispositivo:</span>
+                            <button onclick="PushService.copyMyToken()" style="
+                                background:#ff9100;
+                                color:#fff;
+                                border:none;
+                                border-radius:6px;
+                                padding:3px 10px;
+                                font-size:0.75rem;
+                                font-weight:700;
+                                cursor:pointer;
+                            ">📋 Copiar Token</button>
+                        </div>
+                        <input type="text" readonly id="my-fcm-token-val" value="${this.myFCMToken}" style="
+                            width:100%;
+                            background:rgba(15, 23, 42, 0.9);
+                            border:1px solid rgba(255,255,255,0.2);
+                            color:#cbd5e1;
+                            padding:4px 8px;
+                            border-radius:6px;
+                            font-size:0.7rem;
+                            margin-top:6px;
+                            box-sizing:border-box;
+                        " />
+                    </div>
+                `;
+            }
+
+            let iosHtml = '';
+            if (isIOS) {
+                iosHtml = `
+                    <div style="margin-top:10px; background:rgba(234, 88, 12, 0.12); border:1px solid #ea580c; border-radius:8px; padding:10px 12px; font-size:0.76rem; color:#fdba74; line-height:1.45;">
+                        <div style="font-weight:700; color:#fff; margin-bottom:3px;">🍎 Requisitos Oficiales de Apple (iOS 16.4+):</div>
+                        ${!isStandalone ? '⚠️ <strong>¡Atención!</strong> Estás en Safari web. Para recibir notificaciones con la app cerrada, pulsa <strong>Compartir (⬆️) &gt; Añadir a pantalla de inicio 📲</strong> y abre la peña desde el icono.' : '✅ <strong>PWA añadida a Pantalla de Inicio</strong> (Requisito Apple cumplido).'}
+                        <div style="margin-top:4px; color:#fed7aa;">
+                            🌙 <strong>Modo Concentración / No Molestar:</strong> Si tienes el icono de la luna activo en tu iPhone, iOS silenciará la pantalla de bloqueo salvo que autorices a Peña Maulas en <em>Ajustes de iOS &gt; Modos de concentración</em>.
+                        </div>
+                    </div>
+                `;
+            }
+
             statusBox.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; color:#4ade80; font-weight:bold;">
                     <span style="font-size:1.3rem;">✅</span>
                     <span>Permisos de notificación concedidos en tu móvil</span>
                 </div>
                 <div style="font-size:0.8rem; color:#94a3b8; margin-top:4px;">
-                    ${isStandalone ? '📱 Modo PWA / App instalada detectado' : '🌐 Ejecutándose en navegador web'}
+                    ${isStandalone ? '📱 Modo PWA / App instalada detectado' : '🌐 Ejecutándose en navegador web'} &bull; ${isIOS ? 'iPhone (iOS)' : 'Android / Web'}
                 </div>
+                ${tokenHtml}
+                ${iosHtml}
             `;
             if (permBtn) permBtn.style.display = 'none';
             if (actionArea) actionArea.style.display = 'flex';
@@ -862,7 +1006,7 @@ const PushService = {
                     <span>Permiso bloqueado en este dispositivo</span>
                 </div>
                 <div style="font-size:0.8rem; color:#cbd5e1; margin-top:4px; line-height:1.4;">
-                    Para probar, pulsa en el candado 🔒 de la barra del navegador y activa "Notificaciones".
+                    Para probar, pulsa en el candado 🔒 de la barra del navegador y activa "Notificaciones", o en Ajustes de iOS / Android.
                 </div>
             `;
             if (permBtn) permBtn.style.display = 'none';
@@ -879,6 +1023,20 @@ const PushService = {
             `;
             if (permBtn) permBtn.style.display = 'block';
             if (actionArea) actionArea.style.display = 'none';
+        }
+    },
+
+    copyMyToken() {
+        const input = document.getElementById('my-fcm-token-val');
+        if (input) {
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            this.showToast('✅ Tu Token FCM ha sido copiado al portapapeles');
+        } else if (this.myFCMToken) {
+            navigator.clipboard.writeText(this.myFCMToken);
+            this.showToast('✅ Tu Token FCM ha sido copiado al portapapeles');
+        } else {
+            alert('No se ha detectado el token todavía. Comprueba que el permiso esté concedido.');
         }
     },
 
@@ -1257,30 +1415,55 @@ const PushService = {
                         </button>
 
                         <!-- Zona de Pruebas Propias -->
-                        <div id="push-action-buttons" style="display:none; flex-direction:column; gap:10px;">
+                        <div id="push-action-buttons" style="display:none; flex-direction:column; gap:12px;">
+                            <!-- 1. Notificación Inmediata -->
                             <button class="push-btn-secondary push-btn-trigger" onclick="PushService.sendImmediateTest()">
                                 <span style="font-size:1.2rem;">⚡</span>
                                 <div style="text-align:left;">
                                     <div style="font-size:0.92rem; font-weight:bold;">1. Notificación Inmediata</div>
-                                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">Suena y vibra ahora mismo en tu teléfono</div>
+                                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">Suena y vibra ahora mismo con la app abierta</div>
                                 </div>
                             </button>
 
+                            <!-- 2. Prueba en 5s con pantalla bloqueada -->
                             <button class="push-btn-primary push-btn-trigger" onclick="PushService.scheduleDelayedTest(5)">
                                 <span style="font-size:1.2rem;">⏱️</span>
                                 <div style="text-align:left;">
-                                    <div style="font-size:0.92rem; font-weight:bold;">2. Probar en 5 segundos (Móvil Bloqueado)</div>
-                                    <div style="font-size:0.75rem; color:#ffedd5; font-weight:normal;">Pulsa y apaga la pantalla o sal al escritorio</div>
+                                    <div style="font-size:0.92rem; font-weight:bold;">2. Probar en 5s (Pantalla Bloqueada)</div>
+                                    <div style="font-size:0.75rem; color:#ffedd5; font-weight:normal;">Pulsa y BLOQUEA la pantalla con el botón (sin cerrar la app)</div>
                                 </div>
                             </button>
 
-                            <button class="push-btn-secondary push-btn-trigger" onclick="PushService.scheduleDelayedTest(10)" style="opacity:0.9;">
-                                <span style="font-size:1.2rem;">⏳</span>
-                                <div style="text-align:left;">
-                                    <div style="font-size:0.92rem; font-weight:bold;">3. Probar en 10 segundos</div>
-                                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">Para bloquear el móvil con más calma</div>
+                            <!-- 3. Prueba con la App 100% CERRADA (Prueba Remota Cloud) -->
+                            <div style="background:rgba(15, 23, 42, 0.7); border:1.5px solid #ff9100; border-radius:12px; padding:12px;">
+                                <div style="color:#ffd700; font-weight:bold; font-size:0.88rem; display:flex; align-items:center; gap:6px;">
+                                    <span>☁️</span> <span>3. Probar con la App CERRADA (Cloud Push Oficial)</span>
                                 </div>
-                            </button>
+                                <div style="font-size:0.76rem; color:#cbd5e1; margin-top:6px; line-height:1.45;">
+                                    Al <strong>cerrar la app</strong> (deslizarla hacia arriba en la multitarea de iOS/Android), el sistema operativo <strong>destruye los temporizadores locales</strong> de JavaScript. La <strong>única forma</strong> de despertar un móvil cerrado es enviando un paquete real desde la nube (Apple APNs o Google FCM).
+                                </div>
+                                <div style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+                                    <button onclick="PushService.copyMyToken()" style="
+                                        background:linear-gradient(135deg, #ff9100 0%, #ea580c 100%);
+                                        color:#fff;
+                                        border:none;
+                                        border-radius:8px;
+                                        padding:8px 12px;
+                                        font-size:0.8rem;
+                                        font-weight:700;
+                                        cursor:pointer;
+                                        display:flex;
+                                        align-items:center;
+                                        justify-content:center;
+                                        gap:6px;
+                                    ">
+                                        📋 Copiar Mi Token FCM para Prueba en Nube
+                                    </button>
+                                    <div style="font-size:0.72rem; color:#94a3b8; line-height:1.35;">
+                                        <strong>Pasos:</strong> Copia tu Token, cierra esta app deslizando en multitarea, y envía la prueba desde <a href="https://console.firebase.google.com/project/maulasweb/notification" target="_blank" style="color:#60a5fa; text-decoration:underline;">Firebase Console</a> o ejecutando en terminal: <code style="background:rgba(0,0,0,0.5); padding:2px 4px; border-radius:4px; color:#ffd700;">node scripts/send_push.js --to 6</code>.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Cuenta atrás interactiva -->

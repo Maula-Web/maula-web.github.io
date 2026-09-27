@@ -712,7 +712,40 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 
 ### 23.4. Integración en Service Worker y Caché
 - Archivo `css/light-theme.css` incorporado a los recursos críticos (`CORE_ASSETS`) de `service-worker.js`.
-- Versión de caché de la PWA actualizada a `maulas-pwa-v1.21`.
+- Versión de caché de la PWA actualizada a `maulas-pwa-v1.23`.
+
+---
+
+## 24. Sistema Universal de Notificaciones Push (iOS 16.4+ APNs y Android FCM)
+
+### 24.1. Diagnóstico del Ciclo de Vida del Sistema Operativo (App Abierta vs. App Cerrada)
+- **App Abierta (Pantalla encendida)**: El motor JavaScript corre en la memoria RAM del teléfono. Temporizadores (`setTimeout`) y sockets en tiempo real de Firestore (`onSnapshot`) funcionan con normalidad.
+- **App Abierta (Pantalla apagada)**: Al pulsar el botón físico de bloqueo sin cerrar la app, tanto iOS como Android conceden una ventana de gracia de ejecución en segundo plano (entre 10 y 30 segundos). Un temporizador local de 5 o 10 segundos disparado justo antes de bloquearse consigue ejecutarse, llamar a `showNotification()` y despertar la pantalla.
+- **App Cerrada (Eliminada de la multitarea)**: Al deslizar la app hacia arriba para cerrarla, el sistema operativo (iOS WebKit y Android) envía una señal de terminación forzada (`SIGKILL`) que **destruye de inmediato todos los procesos y temporizadores JavaScript en memoria**.
+- **Regla Crítica de Arquitectura**: **Ningún temporizador local puede ejecutar código en un terminal móvil si la app ha sido cerrada**. La **única vía técnica** para despertar un teléfono móvil (iOS o Android) con la app cerrada y la pantalla apagada es un **Paquete Push Remoto enviado a través de la Red** desde la nube hacia Apple (**APNs**) o Google (**FCM**).
+
+### 24.2. Requisitos Estrictos de Apple para iPhone (iOS 16.4+)
+1. **Obligatoriedad de PWA en Pantalla de Inicio**: En iOS (WebKit), Web Push **únicamente funciona** si la web se ejecuta en modo PWA autónoma (`display: standalone`). En pestañas normales de Safari, iOS no permite recibir notificaciones remotas con la app cerrada. El usuario debe pulsar **Compartir (⬆️) > Añadir a pantalla de inicio 📲** y abrir siempre la aplicación desde dicho icono.
+2. **Modo de Concentración / No Molestar (🌙)**: Si el iPhone tiene activado el modo "No Molestar" (icono de la luna en la barra superior), iOS silencia las notificaciones y no enciende la pantalla de bloqueo salvo que la PWA "Peña Maulas" esté expresamente permitida en *Ajustes de iOS > Modos de concentración > Permitir notificaciones*.
+3. **Suscripción W3C PushManager**: Requiere la conversión de la clave pública VAPID mediante `urlB64ToUint8Array` para obtener el endpoint nativo de Apple (`https://web.push.apple.com/...`).
+
+### 24.3. Arquitectura Unificada de Service Worker (`service-worker.js` & `firebase-messaging-sw.js`)
+- **Un solo Service Worker registrado**: Toda la plataforma registra exclusivamente `./service-worker.js` (eliminando sobreescrituras de caché o pérdidas de suscripción al alternar scripts).
+- `firebase-messaging-sw.js` delega mediante `importScripts('./service-worker.js')` para compatibilidad retroactiva.
+- **Doble Escucha en Segundo Plano**:
+  1. `fcmMessaging.onBackgroundMessage`: Para mensajes directos de Firebase Cloud Messaging.
+  2. `self.addEventListener('push', ...)`: Para paquetes estándar W3C Web Push (Apple APNs y Google FCM) con extracción robusta de campos (`notification` y `data`) y fallback resistente a excepciones en WebKit.
+- `notificationclick`: Cierra el aviso y enfoca o abre la ventana de Peña Maulas.
+
+### 24.4. Panel de Notificaciones y Utilidad de Envío (`js/push-service.js` y `scripts/send_push.js`)
+- **Persistencia en Firestore (`push_subscriptions/member_{id}`)**: Almacena `fcmToken`, `subscription` (JSON W3C completo con endpoint y claves `p256dh`/`auth`), `platform`, `isStandalone`, `permission` y `userAgent`.
+- **Panel de Fernando Lozano (ID: 6)**:
+  - Muestra su Token FCM propio con botón de copiado en 1 clic (`📋 Copiar Token`).
+  - Detecta si está en modo PWA o navegador web y muestra advertencias específicas de Apple si detecta iPhone.
+  - Distingue claramente entre la "Prueba Local (Pantalla bloqueada con app abierta en segundo plano)" y la "Prueba Oficial Cloud (App 100% cerrada)".
+- **Herramienta de Terminal (`scripts/send_push.js`)**:
+  - Script Node.js que consulta en tiempo real las suscripciones de Firestore.
+  - Permite consultar tokens de Fernando (`--to 6`) o Heradio (`--to 8`) y ofrece pautas para envío de pruebas oficiales con app cerrada vía Firebase Console o Web Push.
 
 ---
 

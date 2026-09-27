@@ -1,9 +1,66 @@
 /**
- * Service Worker - Peña Maulas PWA
- * Versión de caché: maulas-pwa-v1.0
+ * Service Worker Unificado - Peña Maulas PWA
+ * =========================================================================
+ * Combina:
+ * 1. App Shell Pre-caching & Offline Fallback (PWA)
+ * 2. Firebase Cloud Messaging (FCM) Compat en segundo plano
+ * 3. W3C Web Push Protocol (Apple APNs en iOS 16.4+ y Google FCM en Android)
+ * Versión de caché: maulas-pwa-v1.23
+ * =========================================================================
  */
 
-const CACHE_NAME = 'maulas-pwa-v1.21';
+// 0. SDKs de Firebase Messaging para escucha de notificaciones Push oficiales de Google
+try {
+    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyClk1Z8cUSWqSII_KWVyDo3oExgbg4hUDo",
+        authDomain: "maulasweb.firebaseapp.com",
+        projectId: "maulasweb",
+        storageBucket: "maulasweb.firebasestorage.app",
+        messagingSenderId: "731951291672",
+        appId: "1:731951291672:web:ac053aac5aecc8774dd26d"
+    };
+
+    if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+        const fcmMessaging = firebase.messaging();
+
+        // Handler FCM oficial de Google en segundo plano
+        fcmMessaging.onBackgroundMessage((payload) => {
+            console.log('[service-worker.js] Notificación Push FCM recibida en segundo plano:', payload);
+
+            const notificationTitle = payload.notification?.title || payload.data?.title || '⚽ Peña Maulas';
+            const notificationBody = payload.notification?.body || payload.data?.body || 'Nueva notificación oficial de la Peña Maulas.';
+            const targetUrl = payload.data?.url || payload.fcmOptions?.link || './';
+
+            const notificationOptions = {
+                body: notificationBody,
+                icon: payload.notification?.icon || payload.data?.icon || 'icons/icon-192x192.png',
+                badge: 'icons/favicon-32x32.png',
+                vibrate: [300, 100, 300, 100, 300],
+                tag: payload.data?.tag || 'fcm-push-' + Date.now(),
+                renotify: true,
+                requireInteraction: true,
+                silent: false,
+                actions: [
+                    { action: 'open_app', title: '📲 Ver Peña Maulas' }
+                ],
+                data: {
+                    url: targetUrl,
+                    receivedAt: Date.now()
+                }
+            };
+
+            return self.registration.showNotification(notificationTitle, notificationOptions);
+        });
+    }
+} catch (e) {
+    console.warn('[service-worker.js] Aviso cargando Firebase Messaging en SW:', e);
+}
+
+const CACHE_NAME = 'maulas-pwa-v1.23';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -63,7 +120,6 @@ const CORE_ASSETS = [
     'js/theme-editor.js',
     'js/telegram-service.js',
     'js/push-service.js',
-    'firebase-messaging-sw.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js',
@@ -121,7 +177,6 @@ self.addEventListener('fetch', (event) => {
     if (!url.protocol.startsWith('http')) return;
 
     // NO interceptar peticiones a la API directa de Firestore DB ni a Telegram
-    // Firestore gestiona su propia persistencia offline mediante IndexedDB
     if (
         url.hostname === 'firestore.googleapis.com' ||
         url.hostname.endsWith('.firestore.googleapis.com') ||
@@ -152,7 +207,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // B. Archivos estáticos (CSS, JS, imágenes, fuentes, iconos): Stale-While-Revalidate
+    // B. Archivos estáticos: Stale-While-Revalidate
     event.respondWith(
         caches.match(req).then((cachedResp) => {
             const fetchPromise = fetch(req)
@@ -163,9 +218,7 @@ self.addEventListener('fetch', (event) => {
                     }
                     return networkResp;
                 })
-                .catch(() => {
-                    // Si falla la red (offline), la promesa falla pero devolvemos cachedResp si existe
-                });
+                .catch(() => {});
 
             return cachedResp || fetchPromise;
         })
@@ -173,13 +226,13 @@ self.addEventListener('fetch', (event) => {
 });
 
 // =========================================================================
-// 4. NOTIFICACIONES PUSH PWA (Web Push API de fondo y pantalla de bloqueo)
+// 4. NOTIFICACIONES PUSH PWA (Web Push API nativa de fondo y pantalla de bloqueo)
 // =========================================================================
 
 self.addEventListener('push', (event) => {
-    console.log('[Service Worker] Evento Push recibido:', event);
+    console.log('[Service Worker] Evento Push remoto recibido:', event);
     let payload = {
-        title: 'Peña Maulas ⚽',
+        title: '⚽ Peña Maulas',
         body: 'Nueva notificación oficial de la Peña Maulas.',
         icon: 'icons/icon-192x192.png',
         badge: 'icons/favicon-32x32.png',
@@ -191,8 +244,21 @@ self.addEventListener('push', (event) => {
         try {
             const json = event.data.json();
             payload = { ...payload, ...json };
+            if (json.notification) {
+                payload.title = json.notification.title || payload.title;
+                payload.body = json.notification.body || payload.body;
+                if (json.notification.icon) payload.icon = json.notification.icon;
+            }
+            if (json.data) {
+                if (json.data.title) payload.title = json.data.title;
+                if (json.data.body) payload.body = json.data.body;
+                if (json.data.url) payload.url = json.data.url;
+                if (json.data.icon) payload.icon = json.data.icon;
+            }
         } catch (e) {
-            payload.body = event.data.text();
+            try {
+                payload.body = event.data.text() || payload.body;
+            } catch (err) {}
         }
     }
 
@@ -200,7 +266,6 @@ self.addEventListener('push', (event) => {
         body: payload.body,
         icon: payload.icon || 'icons/icon-192x192.png',
         badge: payload.badge || 'icons/favicon-32x32.png',
-        vibrate: [300, 100, 300, 100, 300],
         tag: payload.tag || 'maulas-notification',
         renotify: true,
         requireInteraction: true,
@@ -215,7 +280,14 @@ self.addEventListener('push', (event) => {
     };
 
     event.waitUntil(
-        self.registration.showNotification(payload.title, options)
+        self.registration.showNotification(payload.title, options).catch((err) => {
+            console.warn('[Service Worker] showNotification falló con opciones avanzadas, reintentando básico:', err);
+            return self.registration.showNotification(payload.title, {
+                body: payload.body,
+                icon: 'icons/icon-192x192.png',
+                data: { url: payload.url || './' }
+            });
+        })
     );
 });
 
@@ -238,13 +310,13 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-// Mensajería desde la aplicación para programar pruebas retardadas (móvil bloqueado o app cerrada)
+// Mensajería desde la aplicación para programar pruebas locales
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
         const delay = event.data.delay || 5000;
         const payload = event.data.payload || {
             title: '⚽ Peña Maulas (Móvil Bloqueado)',
-            body: '¡Hola Fernando Lozano! Las notificaciones funcionan con el terminal bloqueado.',
+            body: '¡Hola Fernando Lozano! Notificación local recibida.',
             icon: 'icons/icon-192x192.png',
             badge: 'icons/favicon-32x32.png',
             tag: 'test-delayed'
