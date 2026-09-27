@@ -818,43 +818,31 @@ class Dashboard2AppController {
 
     /**
      * Widget Bote en caja - Sincronizado al 100% con los cálculos oficiales consolidados de Bote 2
+     * FUENTE OFICIAL: BOTE_FALLBACK_DATA['2026-2027'].summary (nunca se recalcula aquí)
+     * Si BoteEngine está activo en vivo sobreescribe con los datos de Firestore
      */
     renderBoteWidget(playedJornadas) {
         const elTotal = document.getElementById('dashboard-bote-total');
         const elNeto = document.getElementById('dashboard-bote-neto');
         const elPremios = document.getElementById('dashboard-bote-premios');
 
-        let cajaReal = 829.48;
-        let totalSaldos = 767.70;
-        let superavit = 61.78;
-
-        // 1. Recuperar los datos oficiales consolidados de Bote 2 (sin recalcular nada)
+        // Fuente de verdad canónica: BOTE_FALLBACK_DATA (siempre disponible, nunca se recalcula)
         let summary = null;
+        if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
+            summary = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
+        }
+
+        // Si BoteEngine está activo en vivo (en bote_2.html), usa sus datos calculados de Firestore
         if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
             const sd = window.BoteApp.getSeasonData();
-            if (sd && sd.summary) {
+            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') {
                 summary = sd.summary;
             }
         }
 
-        if (!summary) {
-            const cached = localStorage.getItem('maulas_bote2_summary');
-            if (cached) {
-                try {
-                    summary = JSON.parse(cached);
-                } catch (e) { }
-            }
-        }
-
-        if (!summary && window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
-            summary = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
-        }
-
-        if (summary) {
-            cajaReal = typeof summary.cajaReal === 'number' ? summary.cajaReal : parseFloat(summary.cajaReal || 829.48);
-            totalSaldos = typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : parseFloat(summary.totalSaldosVirtuales || 767.70);
-            superavit = typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos);
-        }
+        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 829.48) : 829.48;
+        let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 767.70) : 767.70;
+        let superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : 61.78;
 
         if (elTotal) elTotal.textContent = `${cajaReal.toFixed(2)} €`;
         if (elNeto) elNeto.textContent = `${totalSaldos.toFixed(2)} €`;
