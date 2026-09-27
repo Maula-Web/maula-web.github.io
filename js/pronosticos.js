@@ -2659,6 +2659,8 @@ class PronosticoManager {
     }
 }
 
+window.PronosticoManager = PronosticoManager;
+
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new PronosticoManager();
 });

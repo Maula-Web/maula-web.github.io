@@ -13,13 +13,15 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
 
-    <!-- Fonts -->
+    <!-- Fonts & Design System -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS v3 -->
     <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/light-theme.css">
 
     <script>
         tailwind.config = {
@@ -84,10 +86,215 @@
         }
 
         /* =========================================================================
-           PÍLDORAS VERTICALES DE SIGNOS 1-X-2 (IDÉNTICAS A IMAGEN 2 DEL USUARIO)
+           SISTEMA DE MODO CLARO (LIGHT THEME) DE ALTA GAMA PARA QUINIELA 2.0
+           ========================================================================= */
+        .light-theme {
+            --bg-primary: #f8f5ed;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --bg-panel: #ffffff;
+            --border-color: #e2e8f0;
+            --row-bg: #ffffff;
+            --row-hover: #f1f5f9;
+            --primary-orange: #d97706;
+            --primary-green: #059669;
+        }
+
+        .light-theme body {
+            background-color: #f8f5ed !important;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(217, 119, 6, 0.04) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 55%) !important;
+            color: #0f172a !important;
+        }
+
+        .light-theme .glass-panel {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 4px 16px -2px rgba(120, 90, 40, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        /* Tabla de Resumen en Modo Claro */
+        .light-theme #forecast-summary-table {
+            background: #ffffff !important;
+        }
+        .light-theme .summary-header-cell {
+            background: #f8fafc !important;
+            color: #334155 !important;
+            border-bottom: 2px solid #cbd5e1 !important;
+            border-right: 1px solid #cbd5e1 !important;
+        }
+        .light-theme .summary-cell {
+            background: #ffffff !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            border-right: 1px solid #cbd5e1 !important;
+        }
+        .light-theme .summary-cell:hover {
+            background: #f1f5f9 !important;
+            box-shadow: inset 0 0 0 1.5px #d97706 !important;
+        }
+        .light-theme .summary-sticky-col {
+            background: #ffffff !important;
+            border-right: 3px solid #d97706 !important;
+            box-shadow: 4px 0 12px rgba(120, 90, 40, 0.08) !important;
+        }
+        .light-theme #forecast-summary-table td,
+        .light-theme #forecast-summary-table th {
+            border-right: 1px solid #cbd5e1 !important;
+        }
+        .light-theme #forecast-summary-table tbody tr {
+            border-bottom: 3px solid #cbd5e1 !important;
+        }
+
+        /* Píldoras de Signos en Modo Claro (Contraste Nítido) */
+        .light-theme .sign-pill-v-1 {
+            background: #dcfce7 !important;
+            color: #166534 !important;
+            border: 1.5px solid #22c55e !important;
+            box-shadow: 0 1px 3px rgba(22, 101, 52, 0.15) !important;
+        }
+        .light-theme .sign-pill-v-X {
+            background: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1.5px solid #0284c7 !important;
+            box-shadow: 0 1px 3px rgba(3, 105, 161, 0.15) !important;
+        }
+        .light-theme .sign-pill-v-2 {
+            background: #fef3c7 !important;
+            color: #92400e !important;
+            border: 1.5px solid #f59e0b !important;
+            box-shadow: 0 1px 3px rgba(146, 64, 14, 0.15) !important;
+        }
+        .light-theme .sign-pill-v-p15 {
+            background: #fef3c7 !important;
+            color: #b45309 !important;
+            border: 1.5px solid #d97706 !important;
+            box-shadow: 0 0 6px rgba(217, 119, 6, 0.25) !important;
+        }
+        .light-theme .sign-pill-v-custom {
+            background: #f3e8ff !important;
+            color: #6b21a8 !important;
+            border: 1.5px solid #a855f7 !important;
+        }
+        .light-theme .sign-pill-v-empty {
+            background: #f8fafc !important;
+            color: #94a3b8 !important;
+            border: 1px dashed #cbd5e1 !important;
+        }
+
+        /* Modal Editor en Modo Claro */
+        .light-theme #modal-editor-boleto {
+            background: rgba(15, 23, 42, 0.6) !important;
+        }
+        .light-theme #modal-editor-boleto > div {
+            background: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+        .light-theme #modal-editor-boleto .bg-slate-900\/90 {
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+        .light-theme #modal-editor-title {
+            color: #0f172a !important;
+        }
+        .light-theme #modal-editor-subtitle {
+            color: #475569 !important;
+        }
+        .light-theme #modal-editor-boleto .bg-slate-950\/60 {
+            background: #f1f5f9 !important;
+            border-color: #e2e8f0 !important;
+        }
+        .light-theme #tab-btn-doubles.bg-slate-900 {
+            background: #ffffff !important;
+            color: #64748b !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        .light-theme #tab-btn-base.bg-slate-900 {
+            background: #ffffff !important;
+            color: #64748b !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        .light-theme #modal-editor-boleto .bg-slate-900\/70 {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .light-theme #active-selection-info {
+            color: #1e293b !important;
+        }
+        .light-theme .pronostico-row,
+        .light-theme .doubles-row {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .light-theme .pronostico-row:hover,
+        .light-theme .doubles-row:hover {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+        .light-theme .team-name {
+            color: #0f172a !important;
+        }
+        .light-theme .chk-option,
+        .light-theme .p15-option {
+            background: #ffffff !important;
+            color: #475569 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+        }
+        .light-theme .chk-option:hover,
+        .light-theme .p15-option:hover {
+            border-color: #d97706 !important;
+            color: #0f172a !important;
+        }
+        .light-theme #modal-editor-boleto label.bg-slate-950 {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+        .light-theme #lbl-correction {
+            color: #334155 !important;
+        }
+        .light-theme #modal-editor-boleto button[onclick*="closeEditorModal"] {
+            background: #f1f5f9 !important;
+            color: #475569 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        .light-theme #modal-editor-boleto button[onclick*="closeEditorModal"]:hover {
+            background: #fee2e2 !important;
+            color: #be123c !important;
+        }
+        .light-theme #sel-method {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        .light-theme #doubles-counter {
+            background: #ffffff !important;
+            color: #7e22ce !important;
+            border-color: #d8b4fe !important;
+        }
+        .light-theme #btn-copy-forecast {
+            background: #eff6ff !important;
+            color: #1d4ed8 !important;
+            border-color: #93c5fd !important;
+        }
+        .light-theme #btn-copy-forecast:hover {
+            background: #dbeafe !important;
+        }
+        .light-theme .bg-purple-950\/30 {
+            background: #faf5ff !important;
+            border-color: #d8b4fe !important;
+        }
+        .light-theme .text-purple-300 {
+            color: #6b21a8 !important;
+        }
+
+        /* =========================================================================
+           PÍLDORAS VERTICALES DE SIGNOS 1-X-2 (EXACTAS A LA IMAGEN 2 DEL USUARIO)
            ========================================================================= */
         .sign-pill-v {
-            width: 27px;
+            width: 28px;
             height: 25px;
             border-radius: 9px;
             display: inline-flex;
@@ -108,26 +315,26 @@
 
         /* Signo 1: Verde Esmeralda (Imagen 2) */
         .sign-pill-v-1 {
-            background: rgba(16, 185, 129, 0.18);
+            background: rgba(16, 185, 129, 0.2);
             color: #34d399;
-            border: 1.5px solid rgba(16, 185, 129, 0.5);
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
+            border: 1.5px solid rgba(16, 185, 129, 0.6);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
         }
 
         /* Signo X: Azul Celeste (Imagen 2) */
         .sign-pill-v-X {
-            background: rgba(14, 165, 233, 0.18);
+            background: rgba(14, 165, 233, 0.2);
             color: #38bdf8;
-            border: 1.5px solid rgba(14, 165, 233, 0.5);
-            box-shadow: 0 0 8px rgba(14, 165, 233, 0.25);
+            border: 1.5px solid rgba(14, 165, 233, 0.6);
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.3);
         }
 
         /* Signo 2: Amarillo / Ámbar (Imagen 2) */
         .sign-pill-v-2 {
-            background: rgba(245, 158, 11, 0.18);
+            background: rgba(245, 158, 11, 0.2);
             color: #fbbf24;
-            border: 1.5px solid rgba(245, 158, 11, 0.5);
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+            border: 1.5px solid rgba(245, 158, 11, 0.6);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
         }
 
         /* Pleno al 15 */
@@ -138,7 +345,7 @@
             font-size: 10px;
             font-weight: 900;
             padding: 0 5px;
-            min-width: 27px;
+            min-width: 28px;
             height: 25px;
             border-radius: 9px;
             display: inline-flex;
@@ -156,7 +363,7 @@
             font-size: 10px;
             font-weight: 900;
             padding: 0 4px;
-            min-width: 27px;
+            min-width: 28px;
             height: 25px;
             border-radius: 9px;
             display: inline-flex;
@@ -167,7 +374,7 @@
 
         /* Signo Pendiente / Sin Rellenar (-) */
         .sign-pill-v-empty {
-            width: 27px;
+            width: 28px;
             height: 25px;
             border-radius: 9px;
             display: inline-flex;
@@ -204,7 +411,7 @@
         }
 
         .summary-cell {
-            padding: 0.65rem 0.3rem;
+            padding: 0.65rem 0.35rem;
             border-bottom: 2px solid var(--border-color);
             border-right: 1px solid var(--border-color);
             vertical-align: top;
@@ -219,10 +426,10 @@
 
         /* Separadores verticales reforzados entre columnas */
         #forecast-summary-table td, #forecast-summary-table th {
-            border-right: 1px solid rgba(148, 163, 184, 0.2) !important;
+            border-right: 1px solid rgba(148, 163, 184, 0.25) !important;
         }
         .dark #forecast-summary-table td, .dark #forecast-summary-table th {
-            border-right: 1px solid rgba(51, 65, 85, 0.7) !important;
+            border-right: 1px solid rgba(51, 65, 85, 0.8) !important;
         }
 
         /* Separador horizontal reforzado entre Jornadas */
@@ -230,7 +437,7 @@
             border-bottom: 3px solid rgba(148, 163, 184, 0.4) !important;
         }
         .dark #forecast-summary-table tbody tr {
-            border-bottom: 3px solid rgba(51, 65, 85, 0.9) !important;
+            border-bottom: 3px solid rgba(51, 65, 85, 0.95) !important;
         }
 
         /* Columna Sticky de Jornada e Índice 1-15 */
@@ -283,37 +490,37 @@
             border-color: rgba(245, 158, 11, 0.6);
         }
 
-        /* 1 SELECCIONADO: VERDE */
-        .p-options .chk-option.selected:first-child,
+        /* 1 SELECCIONADO: VERDE ESMERALDA */
+        .chk-option.selected:first-child,
         .chk-option.selected.active-1,
-        .p-options .chk-option.selected[data-sign="1"] {
+        .chk-option.selected[data-sign="1"] {
             background: #10b981 !important;
-            color: #022c22 !important;
-            border-color: #34d399 !important;
+            color: #ffffff !important;
+            border-color: #059669 !important;
             font-weight: 900 !important;
             box-shadow: 0 0 14px rgba(16, 185, 129, 0.6) !important;
             transform: scale(1.1) !important;
         }
 
-        /* X SELECCIONADO: AZUL */
-        .p-options .chk-option.selected:nth-child(2),
+        /* X SELECCIONADO: AZUL CIELO */
+        .chk-option.selected:nth-child(2),
         .chk-option.selected.active-X,
-        .p-options .chk-option.selected[data-sign="X"] {
+        .chk-option.selected[data-sign="X"] {
             background: #0ea5e9 !important;
-            color: #082f49 !important;
-            border-color: #38bdf8 !important;
+            color: #ffffff !important;
+            border-color: #0284c7 !important;
             font-weight: 900 !important;
             box-shadow: 0 0 14px rgba(14, 165, 233, 0.6) !important;
             transform: scale(1.1) !important;
         }
 
         /* 2 SELECCIONADO: AMARILLO / ÁMBAR */
-        .p-options .chk-option.selected:last-child,
+        .chk-option.selected:last-child,
         .chk-option.selected.active-2,
-        .p-options .chk-option.selected[data-sign="2"] {
+        .chk-option.selected[data-sign="2"] {
             background: #f59e0b !important;
-            color: #451a03 !important;
-            border-color: #fbbf24 !important;
+            color: #ffffff !important;
+            border-color: #d97706 !important;
             font-weight: 900 !important;
             box-shadow: 0 0 14px rgba(245, 158, 11, 0.6) !important;
             transform: scale(1.1) !important;
@@ -322,8 +529,8 @@
         /* Pleno al 15 seleccionado */
         .p15-option.selected {
             background: #f59e0b !important;
-            color: #0b0f19 !important;
-            border-color: #fbbf24 !important;
+            color: #ffffff !important;
+            border-color: #d97706 !important;
             font-weight: 900 !important;
             box-shadow: 0 0 12px rgba(245, 158, 11, 0.5) !important;
             transform: scale(1.1) !important;
@@ -456,31 +663,50 @@
 
 <body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Auth Check Inline Script to prevent flash -->
+    <!-- Auth Check Inline Script & Instant Theme Sync -->
     <script>
-        function checkAccess() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
-            if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') return true;
-            
-            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-            if (!userStr) return false;
-            try {
-                const user = JSON.parse(userStr);
-                if (user.id == 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) return true;
-                if (user.role === 'admin') return true;
-            } catch(e) {}
-            return false;
-        }
-        
-        // Sincronizar tema instantáneo
-        const theme = localStorage.getItem('maulas_theme') || 'dark';
-        if (theme === 'light') document.documentElement.classList.remove('dark');
-        else document.documentElement.classList.add('dark');
+        (function() {
+            // 1. Sincronizar tema instantáneo antes de pintar nada
+            const savedTheme = localStorage.getItem('maulas_theme_mode') || localStorage.getItem('maulas_theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light-theme');
+            } else {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light-theme');
+            }
+
+            // 2. Control de Acceso Exclusivo (Fernando Lozano)
+            function checkAccess() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
+                if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') return true;
+                
+                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                if (!userStr) return false;
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.id == 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) return true;
+                    if (user.role === 'admin') return true;
+                } catch(e) {}
+                return false;
+            }
+
+            window.__isUserAuthorized = checkAccess();
+            if (!window.__isUserAuthorized) {
+                // Solo si el usuario NO es Fernando Lozano se activa el bloqueo
+                document.addEventListener('DOMContentLoaded', () => {
+                    const restr = document.getElementById('restricted-screen');
+                    const main = document.getElementById('main-content');
+                    if (restr) restr.style.display = 'flex';
+                    if (main) main.style.display = 'none';
+                });
+            }
+        })();
     </script>
 
-    <!-- FASE DE PRUEBAS EXCLUSIVA (Restricted Screen) -->
-    <div id="restricted-screen" class="fixed inset-0 bg-slate-100 dark:bg-slate-950 z-[999999] flex-col items-center justify-center p-6 text-center" style="display: flex;">
+    <!-- FASE DE PRUEBAS EXCLUSIVA (Restricted Screen - Oculto por defecto para evitar parpadeos) -->
+    <div id="restricted-screen" class="fixed inset-0 bg-slate-100 dark:bg-slate-950 z-[999999] flex-col items-center justify-center p-6 text-center" style="display: none;">
         <div class="glass-panel p-8 md:p-12 max-w-lg w-full flex flex-col items-center border-rose-500/30 shadow-xl">
             <div class="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mb-6 border border-rose-500/50">
                 <span class="text-4xl">🛑</span>
@@ -494,7 +720,7 @@
     </div>
 
     <!-- CONTENEDOR PRINCIPAL V2 -->
-    <div id="main-content" class="max-w-[1650px] mx-auto space-y-4 sm:space-y-5" style="display: none;">
+    <div id="main-content" class="max-w-[1650px] mx-auto space-y-4 sm:space-y-5" style="display: block;">
 
         <!-- =====================================================================
              NIVEL 1: NAVBAR MODERNA SUPERIOR (IDÉNTICA A BOTE 2 Y RESULTADOS 2)
@@ -516,23 +742,23 @@
 
             <!-- Center Nav -->
             <div class="flex items-center gap-1 xl:gap-1.5 text-slate-600 dark:text-slate-300 overflow-x-auto md:overflow-visible flex-nowrap md:flex-wrap no-scrollbar py-0.5 w-full md:w-auto md:flex-1 justify-start md:justify-center border-t border-slate-200 dark:border-slate-800/60 md:border-t-0 pt-1.5 md:pt-0">
-                <a href="dashboard_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                <a href="dashboard_2.html" data-version-link="inicio" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏠</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Inicio</span>
                 </a>
-                <a href="socios_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                <a href="socios_2.html" data-version-link="socios" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">👥</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Socios</span>
                 </a>
-                <a href="bote_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                <a href="bote_2.html" data-version-link="bote" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">💰</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Bote</span>
                 </a>
-                <a href="jornadas_2.html" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                <a href="jornadas_2.html" data-version-link="jornadas" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">⚽</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Resultados</span>
                 </a>
-                <a href="pronosticos_2.html" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/50 font-bold transition shadow-sm flex-shrink-0">
+                <a href="pronosticos_2.html" data-version-link="pronosticos" class="flex flex-col items-center justify-center px-2 sm:px-2.5 xl:px-3 py-1 rounded-xl text-center bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/50 font-bold transition shadow-sm flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none scale-105">📝</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Quiniela</span>
                 </a>
@@ -557,25 +783,17 @@
             <!-- Right Controls -->
             <div class="desktop-only-flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="version-switcher-container">
-                    <button type="button" id="btn-version-v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">1.0 Clásica</button>
-                    <button type="button" id="btn-version-v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow">📝 2.0 Pro</button>
+                    <button type="button" id="btn-version-v1" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">1.0 Clásica</button>
+                    <button type="button" id="btn-version-v2" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow">📝 2.0 Pro</button>
                 </div>
                 <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-amber-500/40 text-xs font-bold shadow-inner" id="theme-switcher-container">
-                    <button type="button" id="btn-theme-light" onclick="if(window.AppTheme) { window.AppTheme.setTheme('light'); document.documentElement.classList.remove('dark'); localStorage.setItem('maulas_theme', 'light'); }" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition"><span>☀️</span> Claro</button>
-                    <button type="button" id="btn-theme-dark" onclick="if(window.AppTheme) { window.AppTheme.setTheme('dark'); document.documentElement.classList.add('dark'); localStorage.setItem('maulas_theme', 'dark'); }" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 dark:text-slate-950 dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:font-bold shadow transition"><span>🌙</span> Oscuro</button>
+                    <button type="button" id="btn-theme-light" data-theme-btn="light" onclick="if(window.AppTheme) { window.AppTheme.setTheme('light'); } else { document.documentElement.classList.remove('dark'); document.documentElement.classList.add('light-theme'); localStorage.setItem('maulas_theme_mode', 'light'); }" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition"><span>☀️</span> Claro</button>
+                    <button type="button" id="btn-theme-dark" data-theme-btn="dark" onclick="if(window.AppTheme) { window.AppTheme.setTheme('dark'); } else { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light-theme'); localStorage.setItem('maulas_theme_mode', 'dark'); }" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 dark:text-slate-950 dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:font-bold shadow transition"><span>🌙</span> Oscuro</button>
                 </div>
                 <button onclick="location.reload(true);" class="px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-slate-300 dark:border-emerald-500/40 text-xs font-bold hover:bg-emerald-50 dark:hover:bg-slate-800 transition"><span>🔄</span> Actualizar</button>
                 <button onclick="sessionStorage.clear();localStorage.clear();location.href='login.html';" class="px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-rose-600 dark:text-rose-400 border border-slate-300 dark:border-slate-700 text-xs font-bold hover:bg-rose-50 dark:hover:bg-slate-800 transition"><span>🚪</span> Salir</button>
             </div>
         </nav>
-
-        <!-- Script de Autorización Inmediata -->
-        <script>
-            if (checkAccess()) {
-                document.getElementById('restricted-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-            }
-        </script>
 
         <!-- =====================================================================
              NIVEL 2: BARRA DE TÍTULO & ANUNCIO OFICIAL
@@ -661,7 +879,7 @@
              ===================================================================== -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-            <!-- KPI 1: Plazo Oficial con Reloj Digital Sincronizado -->
+            <!-- KPI 1: Plazo Oficial con Reloj Digital Sincronizado con Dashboard 2 -->
             <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-2">
@@ -693,9 +911,9 @@
                     </div>
 
                     <!-- Reloj Cuenta Atrás Sincronizado con Dashboard 2 -->
-                    <div class="mt-2.5 p-2 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-0.5">Tiempo Restante para el Cierre</span>
-                        <div id="kpi-countdown-timer" class="font-mono text-sm sm:text-base font-black text-amber-400 tracking-wider">
+                    <div class="mt-2.5 p-2 rounded-xl bg-slate-950/80 dark:bg-slate-950/80 bg-slate-100 border border-slate-300 dark:border-slate-800 text-center">
+                        <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-0.5">Tiempo Restante para el Cierre</span>
+                        <div id="kpi-countdown-timer" class="font-mono text-sm sm:text-base font-black text-amber-500 dark:text-amber-400 tracking-wider">
                             --d --h --m --s
                         </div>
                     </div>
@@ -707,7 +925,7 @@
                 </div>
             </div>
 
-            <!-- KPI 2: Censo Sellado -->
+            <!-- KPI 2: Censo Sellado (19 Socios) -->
             <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-2">
@@ -725,7 +943,7 @@
                                     <span>📋</span> Censo y Participación
                                 </strong>
                                 <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>Computa en tiempo real qué porcentaje de los 16 socios de la peña ha registrado sus 14 signos y el Pleno al 15.</p>
+                                    <p>Computa en tiempo real qué porcentaje de los 19 socios de la peña ha registrado sus 14 signos y el Pleno al 15.</p>
                                     <p class="text-emerald-300">Si un socio tiene activado el comodín de ausencia (Dado 🎲), el sistema rellenará al azar sus signos sin penalización.</p>
                                 </div>
                             </div>
@@ -733,7 +951,7 @@
                     </div>
 
                     <div class="flex items-baseline gap-2 mt-1">
-                        <h4 id="kpi-recibidos-count" class="text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">-- / 16</h4>
+                        <h4 id="kpi-recibidos-count" class="text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">-- / 19</h4>
                         <span id="kpi-recibidos-pct" class="text-xs font-bold text-slate-500 dark:text-slate-400">0%</span>
                     </div>
 
@@ -749,7 +967,7 @@
                 </div>
             </div>
 
-            <!-- KPI 3: Gestión de Dobles (Con botón para ir a rellenar dobles) -->
+            <!-- KPI 3: Gestión de Dobles (Con botón para ir a rellenar dobles del socio responsable) -->
             <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
                 <div>
                     <div class="flex items-center justify-between mb-2">
@@ -768,24 +986,24 @@
                                 </strong>
                                 <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
                                     <p>La combinación de dobles autorizada por la peña (Reducida 2: 7 dobles = 16 apuestas = 12,00 €).</p>
-                                    <p class="text-purple-300">El socio que obtuvo mayor puntuación en la jornada anterior tiene el privilegio de elegir los 7 partidos dobles.</p>
+                                    <p class="text-purple-300">El socio responsable de dobles es el ganador de la jornada previa o el siguiente por orden de desempate.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <h4 id="kpi-dobles-status-clean" class="text-base font-black text-purple-600 dark:text-purple-400 font-mono leading-tight">Reducida 2: 7 Dobles</h4>
-                    <p id="kpi-dobles-responsable" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Coste oficial: 12.00 € (16 apuestas)</p>
+                    <p id="kpi-dobles-responsable" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Responsable: Calculando...</p>
 
-                    <!-- Control para rellenar dobles directamente en modal -->
+                    <!-- Control para rellenar dobles directamente en modal del socio que debe hacerla -->
                     <button type="button" onclick="window.openEditorForDoubles()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
                         <span>🎲</span> Rellenar Quiniela de Dobles
                     </button>
                 </div>
 
                 <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                    <span>Estado Sellado</span>
-                    <span id="kpi-dobles-badge" class="text-purple-400 font-bold">Comprobar</span>
+                    <span>Coste Oficial</span>
+                    <span class="text-purple-500 dark:text-purple-400 font-bold font-mono">12.00 €</span>
                 </div>
             </div>
 
@@ -863,7 +1081,7 @@
                 </div>
             </div>
 
-            <!-- Tabla Data Grid con separadores verticales y horizontales -->
+            <!-- Tabla Data Grid con separadores verticales y horizontales bien marcados -->
             <div id="summary-container" class="w-full overflow-x-auto custom-scroll rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
                 <table id="forecast-summary-table">
                     <thead>
@@ -886,7 +1104,7 @@
          VENTANA MODAL FLOTANTE DE EDICIÓN DE BOLETO
          (SE ABRE AL PINCHAR EN EL PRONÓSTICO DE UN SOCIO O PULSAR EDITAR BOLETO)
          ===================================================================== -->
-    <div id="modal-editor-boleto" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
+    <div id="modal-editor-boleto" style="display: none;" onclick="if(event.target === this) window.closeEditorModal()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
         <div class="glass-panel w-full max-w-4xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal">
             
             <!-- Cabecera del Modal -->
@@ -962,7 +1180,7 @@
                             <select id="sel-method" class="w-full p-2.5 bg-slate-900 border border-purple-500/50 text-white rounded-xl font-bold text-xs focus:outline-none focus:border-purple-400">
                                 <option value="directo">Apuestas Directas</option>
                                 <option value="reducida-1">Reducida 1: 4 Triples (9 apuestas)</option>
-                                <option value="reducida-2">Reducida 2: 7 Dobles (16 apuestas)</option>
+                                <option value="reducida-2" selected>Reducida 2: 7 Dobles (16 apuestas)</option>
                                 <option value="reducida-3">Reducida 3: 3 Dobles + 3 Triples (24 apuestas)</option>
                                 <option value="reducida-4">Reducida 4: 2 Triples + 6 Dobles (64 apuestas)</option>
                                 <option value="reducida-5">Reducida 5: 8 Triples (81 apuestas)</option>
@@ -1010,7 +1228,7 @@
          MODALES AUXILIARES REQUERIDOS (AUDITORÍA, AYUDA Y VER COLECTIVO)
          ===================================================================== -->
     <!-- Modal 1: Auditoría de Corrección -->
-    <div id="audit-modal-overlay" class="hidden fixed inset-0 bg-slate-900/80 dark:bg-slate-950/85 backdrop-blur-sm z-[99999] items-center justify-center p-4">
+    <div id="audit-modal-overlay" style="display: none;" class="fixed inset-0 bg-slate-900/80 dark:bg-slate-950/85 backdrop-blur-sm z-[99999] items-center justify-center p-4">
         <div class="glass-panel w-full max-w-lg p-6 border-amber-500/40 shadow-2xl">
             <h2 class="text-xl font-black text-slate-800 dark:text-white mb-3 border-b border-slate-200 dark:border-slate-700/50 pb-3 flex items-center gap-2">
                 <span>📝</span> Auditoría de Corrección
@@ -1038,7 +1256,7 @@
     </div>
 
     <!-- Modal 2: Ver Pronósticos Colectivos -->
-    <div id="view-jornada-modal" class="hidden fixed inset-0 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
+    <div id="view-jornada-modal" style="display: none;" class="fixed inset-0 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
         <div class="glass-panel w-full h-[95vh] flex flex-col border-emerald-500/40 overflow-hidden shadow-2xl">
             <div class="bg-slate-100 dark:bg-slate-900/80 p-3 sm:p-4 border-b border-slate-200 dark:border-emerald-500/20 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div class="flex flex-wrap items-center gap-3 sm:gap-6 w-full sm:w-auto">
@@ -1065,7 +1283,7 @@
     </div>
 
     <!-- Modal 3: Ayuda Sellado de Dobles -->
-    <div id="help-doubles-modal" class="hidden fixed inset-0 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
+    <div id="help-doubles-modal" style="display: none;" class="fixed inset-0 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
         <div class="glass-panel w-full h-[95vh] max-w-7xl flex flex-col border-blue-500/40 overflow-hidden shadow-2xl">
             <div class="bg-slate-100 dark:bg-slate-900/80 p-4 border-b border-slate-200 dark:border-blue-500/20 flex justify-between items-center">
                 <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
@@ -1132,14 +1350,15 @@
     <script src="js/dice-service.js"></script>
     
     <!-- Script de Pronósticos V1 -->
-    <script src="js/pronosticos.js?v=20240323_v1"></script>
+    <script src="js/pronosticos.js?v=20240323_v3"></script>
 
     <!-- =====================================================================
          MOTOR DE EXTENSIÓN V2:
          - RENDERIZADO VERTICAL EXACTO DE LA TABLA (IMAGEN 2)
          - GESTIÓN DE VENTANA MODAL FLOTANTE
-         - RELOJ CUENTA ATRÁS DASHBOARD 2
+         - RELOJ CUENTA ATRÁS SINCRONIZADO CON DASHBOARD 2
          - CORRECCIÓN DE COLORES 1-VERDE, X-AZUL, 2-AMARILLO
+         - SOPORTE INTEGRAL DE MODO CLARO Y OSCURO
          ===================================================================== -->
     <script>
         // 1. NAVEGACIÓN DE JORNADA (◀ REDUCE NÚMERO, ▶ AUMENTA NÚMERO)
@@ -1169,15 +1388,36 @@
             }
         };
 
-        // 2. GESTIÓN DE LA VENTANA MODAL DEL EDITOR
-        window.openEditorModal = function(memberId = null, openDoublesTab = false) {
+        // 2. BUSCAR EL SOCIO RESPONSABLE DE LA QUINIELA DE DOBLES
+        window.getEligibleDoublesMember = function(jornada) {
+            if (!window.app || !window.app.members || window.app.members.length === 0) return null;
+            const j = jornada || (window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null);
+            if (!j) return null;
+            
+            if (typeof window.app.checkEligibility === 'function') {
+                for (const m of window.app.members) {
+                    const elig = window.app.checkEligibility(j.number, m.id, true);
+                    if (elig && elig.eligible) {
+                        return m;
+                    }
+                }
+            }
+            return window.app.members[0];
+        };
+
+        // 3. GESTIÓN DE LA VENTANA MODAL DEL EDITOR
+        window.openEditorModal = function(memberId = null, openDoublesTab = false, jornadaId = null) {
             const modal = document.getElementById('modal-editor-boleto');
             if (!modal) return;
 
             if (window.app) {
+                if (jornadaId) {
+                    window.app.currentJornadaId = String(jornadaId);
+                    if (window.app.selJornada) window.app.selJornada.value = String(jornadaId);
+                }
                 if (memberId) {
-                    window.app.currentMemberId = memberId;
-                    if (window.app.selMember) window.app.selMember.value = memberId;
+                    window.app.currentMemberId = String(memberId);
+                    if (window.app.selMember) window.app.selMember.value = String(memberId);
                 }
                 window.app.loadForecast();
             }
@@ -1209,7 +1449,8 @@
             const modal = document.getElementById('modal-editor-boleto');
             if (modal) modal.style.display = 'none';
             document.body.style.overflow = '';
-            // Refrescar tabla vertical por si hubo cambios
+            
+            // Refrescar tabla vertical
             if (window.app && window.app.renderSummaryTable) {
                 window.app.renderSummaryTable();
             }
@@ -1217,12 +1458,21 @@
 
         window.openEditorForCurrentMember = function() {
             const selM = document.getElementById('sel-member');
-            const mId = selM ? selM.value : null;
-            window.openEditorModal(mId, false);
+            const selJ = document.getElementById('sel-jornada');
+            const mId = selM ? selM.value : (window.app ? window.app.currentMemberId : null);
+            const jId = selJ ? selJ.value : (window.app ? window.app.currentJornadaId : null);
+            window.openEditorModal(mId, false, jId);
         };
 
-        window.openEditorForDoubles = function() {
-            window.openEditorModal(null, true);
+        window.openEditorForDoubles = function(jornadaId = null) {
+            if (jornadaId && window.app) {
+                window.app.currentJornadaId = String(jornadaId);
+                if (window.app.selJornada) window.app.selJornada.value = String(jornadaId);
+            }
+            const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+            const responsible = window.getEligibleDoublesMember(j);
+            const mId = responsible ? responsible.id : (window.app ? window.app.currentMemberId : null);
+            window.openEditorModal(mId, true, j ? j.id : null);
         };
 
         window.switchEditorTab = function(tab) {
@@ -1255,14 +1505,34 @@
                 }
                 if (btnSaveBase) btnSaveBase.classList.add('hidden');
                 if (btnSaveDoubles) btnSaveDoubles.classList.remove('hidden');
+
+                // Asegurar que si el formulario de dobles no tiene filas, se renderice
+                if (window.app && window.app.renderDoublesForm) {
+                    const doublesBox = document.getElementById('doubles-container');
+                    if (doublesBox && doublesBox.children.length === 0) {
+                        const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+                        if (j) {
+                            const { isLockedRef } = window.app.isJornadaLocked(j);
+                            window.app.renderDoublesForm(j, isLockedRef && !window.app.correctionMode);
+                        }
+                    }
+                }
             }
         };
 
-        // 3. SOBREESCRIBIR INMEDIATAMENTE EL PROTOTYPE DE PronosticoManager
-        if (window.PronosticoManager) {
+        // 4. SOBREESCRIBIR DIRECTAMENTE EL PROTOTYPE DE PronosticoManager
+        const PM = window.PronosticoManager || (typeof PronosticoManager !== 'undefined' ? PronosticoManager : null);
+        if (PM) {
             
-            // Interceptar renderSummaryTable para generar las píldoras verticales idénticas a Imagen 2
-            PronosticoManager.prototype.renderSummaryTable = function() {
+            // A. Interceptar selectAndLoad para abrir modal
+            const origSelectAndLoad = PM.prototype.selectAndLoad;
+            PM.prototype.selectAndLoad = function(jId, mId) {
+                origSelectAndLoad.apply(this, arguments);
+                window.openEditorModal(mId, false, jId);
+            };
+
+            // B. Interceptar renderSummaryTable para generar las píldoras verticales idénticas a Imagen 2
+            PM.prototype.renderSummaryTable = function() {
                 if (!this.summaryTable) return;
 
                 const thead = this.summaryTable.querySelector('thead');
@@ -1302,8 +1572,8 @@
                 sortedMembers.forEach((m) => {
                     const th = document.createElement('th');
                     th.className = 'summary-header-cell';
-                    th.style.minWidth = '48px';
-                    th.style.maxWidth = '55px';
+                    th.style.minWidth = '50px';
+                    th.style.maxWidth = '56px';
                     th.setAttribute('data-mid', m.id);
                     
                     const led = this.getMemberStatusLed(m.id, targetJornadaForHeader);
@@ -1312,7 +1582,7 @@
                     const shortName = nameParts[0].length > 7 ? nameParts[0].substring(0, 6) + '.' : nameParts[0];
 
                     th.innerHTML = `
-                        <div class="flex flex-col items-center justify-center gap-1 cursor-pointer group py-1" onclick="window.openEditorModal(${m.id}, false)">
+                        <div class="flex flex-col items-center justify-center gap-1 cursor-pointer group py-1" onclick="window.openEditorModal(${m.id}, false, '${targetJornadaForHeader ? targetJornadaForHeader.id : ''}')">
                             <span class="led-status-indicator led-${led.status}" title="${jNumText}${led.title}"></span>
                             <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-amber-400 transition-colors" title="${AppUtils.getMemberName(m)}">${shortName}</span>
                         </div>
@@ -1323,9 +1593,9 @@
                 // Columna Quiniela Dobles
                 const thDoubles = document.createElement('th');
                 thDoubles.className = 'summary-header-cell';
-                thDoubles.style.minWidth = '54px';
+                thDoubles.style.minWidth = '55px';
                 thDoubles.innerHTML = `
-                    <div class="flex flex-col items-center justify-center gap-1 cursor-pointer py-1" onclick="window.openEditorModal(null, true)">
+                    <div class="flex flex-col items-center justify-center gap-1 cursor-pointer py-1" onclick="window.openEditorForDoubles('${targetJornadaForHeader ? targetJornadaForHeader.id : ''}')">
                         <span class="text-xs">🎲</span>
                         <span class="text-[10px] font-black text-purple-400">DOBLES</span>
                     </div>
@@ -1384,7 +1654,7 @@
                     return;
                 }
 
-                // CONSTRUCCIÓN DE FILAS CON PÍLDORAS EN VERTICAL
+                // CONSTRUCCIÓN DE FILAS CON PÍLDORAS EN VERTICAL EXACTAS A LA IMAGEN 2
                 let tbodyHtml = '';
                 sortedJornadas.forEach(j => {
                     let dateFormatted = j.date;
@@ -1395,7 +1665,7 @@
 
                     const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
-                    // Columna Sticky Izquierda con el índice del 1 al 15 perfectamente alineado
+                    // Columna Sticky Izquierda con el índice del 1 al 15
                     let rowHtml = `<tr>
                         <td class="summary-sticky-col summary-cell p-2">
                             <div class="flex items-start justify-between gap-1.5 h-full">
@@ -1498,7 +1768,7 @@
                             `;
                         }
 
-                        rowHtml += `<td class="summary-cell" onclick="window.openEditorModal(${m.id}, false)" title="Abrir boleto de ${AppUtils.getMemberName(m)}">${cellContent}</td>`;
+                        rowHtml += `<td class="summary-cell" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}">${cellContent}</td>`;
                     });
 
                     // Columna de Dobles para esta Jornada en VERTICAL
@@ -1537,7 +1807,7 @@
                         doublesContent = `<div class="flex flex-col items-center justify-center h-full min-h-[440px] opacity-30 text-purple-400 font-mono text-xs"><span>-</span></div>`;
                     }
 
-                    rowHtml += `<td class="summary-cell bg-purple-500/5 hover:bg-purple-500/20" onclick="window.openEditorModal(null, true)" title="Abrir quiniela de dobles">${doublesContent}</td>`;
+                    rowHtml += `<td class="summary-cell bg-purple-500/5 hover:bg-purple-500/20" onclick="window.openEditorForDoubles('${j.id}')" title="Abrir quiniela de dobles">${doublesContent}</td>`;
                     rowHtml += `</tr>`;
                     tbodyHtml += rowHtml;
                 });
@@ -1546,35 +1816,69 @@
                 if (this.updateKPIsCustom) this.updateKPIsCustom();
             };
 
-            // 4. ACTUALIZACIÓN INTELIGENTE DE LOS BENTO KPIS
-            PronosticoManager.prototype.updateKPIsCustom = function() {
+            // C. ACTUALIZACIÓN INTELIGENTE DE LOS BENTO KPIS
+            PM.prototype.updateKPIsCustom = function() {
                 const jId = this.currentJornadaId;
                 const jornada = this.jornadas ? (this.jornadas.find(j => String(j.id) === String(jId)) || this.jornadas[0]) : null;
                 if (!jornada) return;
 
-                // A. KPI Plazo Oficial y Fecha Límite
+                // 1. KPI Plazo Oficial y Cuenta Atrás Sincronizada con Dashboard 2
+                // Buscar la próxima jornada dominical en curso o por disputar (idéntica lógica a dashboard_2.js)
+                const upcomingJornada = (this.jornadas || [])
+                    .filter(j => {
+                        if (!j || !j.active) return false;
+                        const d = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
+                        return d && (window.AppUtils ? window.AppUtils.isSunday(d) : true);
+                    })
+                    .sort((a, b) => a.number - b.number)
+                    .find(j => {
+                        const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length : 0;
+                        return filled < 15;
+                    }) || jornada;
+
+                const countdownJornada = upcomingJornada || jornada;
                 const { isLockedRef } = this.isJornadaLocked(jornada);
                 const kpiPlazoEstado = document.getElementById('kpi-plazo-estado');
                 const kpiCdBadge = document.getElementById('kpi-cd-badge');
                 if (kpiPlazoEstado) {
                     kpiPlazoEstado.textContent = isLockedRef ? 'Plazo Cerrado' : 'Plazo Abierto';
-                    kpiPlazoEstado.className = `text-lg font-black font-mono ${isLockedRef ? 'text-rose-500' : 'text-emerald-500'}`;
+                    kpiPlazoEstado.className = `text-lg font-black font-mono ${isLockedRef ? 'text-rose-500' : 'text-emerald-500 dark:text-emerald-400'}`;
                 }
                 if (kpiCdBadge) {
                     kpiCdBadge.textContent = isLockedRef ? 'Cerrado' : 'Abierto';
-                    kpiCdBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${isLockedRef ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`;
+                    kpiCdBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${isLockedRef ? 'bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'}`;
                 }
 
-                // Sincronizar Cuenta Atrás con Dashboard 2
-                const matchDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
-                if (matchDate) {
-                    const deadline = window.AppUtils ? window.AppUtils.calculateDeadline(matchDate) : new Date(matchDate.getTime() - 3 * 24 * 3600 * 1000);
+                // Parsear fecha y calcular deadline oficial (Jueves 17:00h)
+                let matchDate = null;
+                if (window.AppUtils && typeof window.AppUtils.parseDate === 'function') {
+                    matchDate = window.AppUtils.parseDate(countdownJornada.date);
+                }
+                if (!matchDate) {
+                    const parts = String(countdownJornada.date).split(/[\/\-]/);
+                    if (parts.length === 3) {
+                        if (parts[0].length === 4) matchDate = new Date(parts[0], parts[1]-1, parts[2]);
+                        else matchDate = new Date(parts[2], parts[1]-1, parts[0]);
+                    } else {
+                        matchDate = new Date(countdownJornada.date);
+                    }
+                }
+
+                if (matchDate && !isNaN(matchDate.getTime())) {
+                    let deadline = null;
+                    if (window.AppUtils && typeof window.AppUtils.calculateDeadline === 'function') {
+                        deadline = window.AppUtils.calculateDeadline(matchDate);
+                    }
+                    if (!deadline || isNaN(deadline.getTime())) {
+                        deadline = new Date(matchDate.getTime() - 3 * 24 * 3600 * 1000);
+                        deadline.setHours(17, 0, 0, 0);
+                    }
+
                     const kpiDateEl = document.getElementById('kpi-deadline-date');
                     if (kpiDateEl) {
-                        kpiDateEl.textContent = deadline.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                        kpiDateEl.textContent = `Jueves ${deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })} a las 17:00h`;
                     }
                     
-                    // Actualizar el temporizador en tiempo real
                     if (window.cdTimerInterval) clearInterval(window.cdTimerInterval);
                     const updateCountdown = () => {
                         const now = new Date().getTime();
@@ -1583,7 +1887,7 @@
                         if (!timerEl) return;
                         if (diff <= 0) {
                             timerEl.textContent = '00d 00h 00m 00s (Expirado)';
-                            timerEl.className = 'font-mono text-xs font-black text-rose-400';
+                            timerEl.className = 'font-mono text-xs font-black text-rose-500 dark:text-rose-400';
                             return;
                         }
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -1591,20 +1895,29 @@
                         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                         const s = Math.floor((diff % (1000 * 60)) / 1000);
                         timerEl.textContent = `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
-                        timerEl.className = 'font-mono text-sm sm:text-base font-black text-amber-400 tracking-wider';
+                        timerEl.className = 'font-mono text-sm sm:text-base font-black text-amber-500 dark:text-amber-400 tracking-wider';
                     };
                     updateCountdown();
                     window.cdTimerInterval = setInterval(updateCountdown, 1000);
                 }
 
-                // B. KPI Censo Sellado
-                const totalSocios = (this.members || []).length || 16;
+                // 2. KPI Censo Sellado (Calculado exactamente sobre los 19 Socios de la peña)
+                const totalSocios = (this.members && this.members.length >= 19) ? this.members.length : 19;
                 let recibidos = 0;
                 (this.members || []).forEach(m => {
-                    const led = this.getMemberStatusLed(m.id, jornada);
-                    if (led && (led.status === 'green' || led.status === 'yellow')) recibidos++;
+                    const mIdStr = String(m.id);
+                    const jIdStr = String(jornada.id);
+                    const p = (this.pronosticos || []).find(pred => {
+                        const pj = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId);
+                        const pm = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId);
+                        return pj === jIdStr && pm === mIdStr;
+                    });
+                    if (p && p.selection && Array.isArray(p.selection)) {
+                        const filled = p.selection.filter(s => s && String(s).trim() !== '' && String(s) !== '-').length;
+                        if (filled >= 14) recibidos++;
+                    }
                 });
-                const pct = Math.round((recibidos / totalSocios) * 100);
+                const pct = totalSocios > 0 ? Math.round((recibidos / totalSocios) * 100) : 0;
 
                 const countEl = document.getElementById('kpi-recibidos-count');
                 const pctEl = document.getElementById('kpi-recibidos-pct');
@@ -1616,7 +1929,14 @@
                 if (barEl) barEl.style.width = `${pct}%`;
                 if (subEl) subEl.textContent = recibidos === totalSocios ? '100% Completo 🎉' : `${totalSocios - recibidos} pendientes`;
 
-                // C. KPI Socio Activo
+                // 3. KPI Quiniela Dobles (Mostrar Nombre del Responsable)
+                const responsible = window.getEligibleDoublesMember(jornada);
+                const respEl = document.getElementById('kpi-dobles-responsable');
+                if (respEl) {
+                    respEl.textContent = responsible ? `Responsable: ${AppUtils.getMemberName(responsible)}` : 'Responsable: Por asignar';
+                }
+
+                // 4. KPI Socio Activo
                 const mId = this.currentMemberId;
                 const member = this.members ? this.members.find(m => String(m.id) === String(mId)) : null;
                 const nameEl = document.getElementById('kpi-socio-name');
@@ -1633,33 +1953,31 @@
                     }
                 }
 
-                // D. Chip de Cierre en Hub con alto contraste
+                // 5. Chip de Cierre en Hub con alto contraste
                 const deadlineTextEl = document.getElementById('deadline-info');
                 const wrapEl = document.getElementById('deadline-info-wrap');
                 const dotEl = document.getElementById('deadline-led-dot');
                 if (deadlineTextEl && wrapEl) {
                     const txt = deadlineTextEl.textContent || '';
                     if (txt.toLowerCase().includes('expirado') || txt.toLowerCase().includes('cerrado')) {
-                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-rose-500/20 text-rose-300 border border-rose-500/50 flex items-center gap-2 shadow-sm';
-                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-rose-500/20 text-rose-500 dark:text-rose-300 border border-rose-500/50 flex items-center gap-2 shadow-sm';
+                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
                     } else {
-                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 flex items-center gap-2 shadow-sm';
-                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+                        wrapEl.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/50 flex items-center gap-2 shadow-sm';
+                        if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
                     }
                 }
             };
 
-            // Interceptar loadForecast para actualizar colores de botones y abrir modal si se desea
-            const originalLoadForecast = PronosticoManager.prototype.loadForecast;
-            PronosticoManager.prototype.loadForecast = function() {
+            // D. Interceptar loadForecast para aplicar atributos de signos
+            const originalLoadForecast = PM.prototype.loadForecast;
+            PM.prototype.loadForecast = function() {
                 originalLoadForecast.apply(this, arguments);
                 
-                // Actualizar KPIs
                 if (this.updateKPIsCustom) this.updateKPIsCustom();
 
-                // Reasignar colores 1-verde, X-azul, 2-amarillo a los botones seleccionados
                 setTimeout(() => {
-                    const options = document.querySelectorAll('.p-options .chk-option');
+                    const options = document.querySelectorAll('.p-options .chk-option, .prediction-inputs .chk-option');
                     options.forEach(opt => {
                         const sign = opt.textContent.trim();
                         opt.setAttribute('data-sign', sign);
@@ -1668,7 +1986,7 @@
             };
         }
 
-        // 5. INICIALIZACIÓN GLOBAL CUANDO EL DOM ESTÉ LISTO
+        // 5. INICIALIZACIÓN GLOBAL REACTIVA
         document.addEventListener('DOMContentLoaded', () => {
             // Reloj en tiempo real del banner superior
             function updateLiveClock() {
@@ -1681,13 +1999,34 @@
             setInterval(updateLiveClock, 1000);
             updateLiveClock();
 
-            // Forzar renderizado de la tabla vertical en cuanto window.app esté disponible
-            setTimeout(() => {
-                if (window.app) {
+            // Polling reactivo suave hasta que window.app haya cargado los socios y jornadas de Firestore
+            let attempts = 0;
+            const checkAppData = setInterval(() => {
+                attempts++;
+                if (window.app && window.app.members && window.app.members.length > 0) {
+                    clearInterval(checkAppData);
+                    
+                    // Asegurar selección inicial de Jornada y Socio
+                    if (!window.app.currentJornadaId && window.app.selJornada && window.app.selJornada.value) {
+                        window.app.currentJornadaId = window.app.selJornada.value;
+                    }
+                    if (!window.app.currentMemberId) {
+                        const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                        let logged = null;
+                        try { if (userStr) logged = JSON.parse(userStr); } catch(e) {}
+                        window.app.currentMemberId = (logged && logged.id) ? String(logged.id) : '6';
+                        if (window.app.selMember) window.app.selMember.value = window.app.currentMemberId;
+                    }
+
                     window.app.renderSummaryTable();
                     if (window.app.updateKPIsCustom) window.app.updateKPIsCustom();
+                } else if (attempts > 60) {
+                    clearInterval(checkAppData);
+                    if (window.app && window.app.renderSummaryTable) {
+                        window.app.renderSummaryTable();
+                    }
                 }
-            }, 300);
+            }, 100);
         });
     </script>
 </body>

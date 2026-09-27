@@ -600,7 +600,8 @@ window.AppVersion = {
         inicio: { v1: 'index.html', v2: 'dashboard_2.html' },
         socios: { v1: 'socios.html', v2: 'socios_2.html' },
         bote: { v1: 'bote.html', v2: 'bote_2.html' },
-        jornadas: { v1: 'jornadas.html', v2: 'jornadas_2.html' }
+        jornadas: { v1: 'jornadas.html', v2: 'jornadas_2.html' },
+        pronosticos: { v1: 'pronosticos.html', v2: 'pronosticos_2.html' }
     },
 
     COUNTERPARTS: {
@@ -611,7 +612,9 @@ window.AppVersion = {
         'bote.html': 'bote_2.html',
         'bote_2.html': 'bote.html',
         'jornadas.html': 'jornadas_2.html',
-        'jornadas_2.html': 'jornadas.html'
+        'jornadas_2.html': 'jornadas.html',
+        'pronosticos.html': 'pronosticos_2.html',
+        'pronosticos_2.html': 'pronosticos.html'
     },
 
     getMode() {
