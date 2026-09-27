@@ -1721,8 +1721,8 @@ class PronosticoManager {
             // Sort members by ID (Member Number)
             const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-            this.viewJornadaTitle.textContent = `Ver Pronósticos - Jornada ${jornada.number}`;
-            this.viewJornadaContent.innerHTML = '<p style="padding:40px; font-size:1.2rem; font-weight:bold; color:#673ab7; animation: blink 1s infinite;">⚙️ Procesando datos y generando tabla...</p>';
+            this.viewJornadaTitle.textContent = `Ver Pronósticos — Jornada ${jornada.number}`;
+            this.viewJornadaContent.innerHTML = '<p style="padding:40px; font-size:1rem; font-weight:bold; color:#f59e0b; text-align:center;">⚙️ Generando tabla...</p>';
 
             // Critical fix: Ensure opacity is 1 and z-index is high
             this.viewJornadaModal.style.display = 'flex';
@@ -1758,178 +1758,217 @@ class PronosticoManager {
             const leftHome = wNum + 'px';
             const leftAway = (wNum + wTeam) + 'px';
 
-            // Build Enhanced Table (Much LARGER as requested)
+            // ────────────────────────────────────────────────────
+            //  TABLA PRONÓSTICOS COLECTIVOS — estilo Bote 2 / v2
+            // ────────────────────────────────────────────────────
+            const isLightTheme = document.body.classList.contains('light-theme');
+
+            // Color tokens (dark/light)
+            const BG_TABLE        = isLightTheme ? '#f8fafc'       : '#0c1220';
+            const BG_THEAD        = isLightTheme ? '#1e293b'       : '#060b14';
+            const BG_STICKY       = isLightTheme ? '#f1f5f9'       : '#0a1120';
+            const BG_ROW_EVEN     = isLightTheme ? '#f8fafc'       : 'rgba(15,23,42,0.6)';
+            const BG_ROW_ODD      = isLightTheme ? '#f1f5f9'       : 'rgba(10,18,40,0.4)';
+            const BG_RESULT_CELL  = isLightTheme ? '#1e293b'       : '#060b14';
+            const BG_DOUBLES_COL  = isLightTheme ? 'rgba(139,92,246,0.08)' : 'rgba(139,92,246,0.12)';
+            const BG_HIT          = isLightTheme ? '#d1fae5'       : 'rgba(16,185,129,0.18)';
+            const BG_PERFECT      = isLightTheme ? '#fef9c3'       : 'rgba(234,179,8,0.15)';
+            const BG_FOOT         = isLightTheme ? '#1e293b'       : '#060b14';
+            const C_TEXT          = isLightTheme ? '#e2e8f0'       : '#94a3b8';
+            const C_AMBER         = isLightTheme ? '#d97706'       : '#f59e0b';
+            const C_TEAM          = isLightTheme ? '#0f172a'       : '#e2e8f0';
+            const C_HIT_BORDER    = isLightTheme ? '#059669'       : '#10b981';
+            const C_RESULT        = isLightTheme ? '#f8fafc'       : '#e2e8f0';
+            const C_DOUBLES       = isLightTheme ? '#a78bfa'       : '#c4b5fd';
+            const C_SIGN_1        = isLightTheme ? '#059669'       : '#34d399';
+            const C_SIGN_X        = isLightTheme ? '#0284c7'       : '#38bdf8';
+            const C_SIGN_2        = isLightTheme ? '#d97706'       : '#fbbf24';
+            const C_SIGN_CUSTOM   = isLightTheme ? '#7c3aed'       : '#c084fc';
+            const BORDER_COL      = isLightTheme ? 'rgba(148,163,184,0.25)' : 'rgba(51,65,85,0.5)';
+            const BORDER_BLOCK    = isLightTheme ? 'rgba(217,119,6,0.6)'   : 'rgba(245,158,11,0.5)';
+
+            const fSizeBase  = isMobile ? '0.72rem' : '0.82rem';
+            const fSizeSign  = isMobile ? '0.95rem' : '1.1rem';
+            const fSizeHits  = isMobile ? '1rem'    : '1.3rem';
+            const padHdr     = isMobile ? '6px 4px' : '10px 8px';
+            const padTeam    = isMobile ? '5px 6px' : '8px 14px';
+            const padCell    = isMobile ? '4px 3px' : '7px 5px';
+            const wNum       = isMobile ? '32px'    : '42px';
+            const wTeam      = isMobile ? '90px'    : '190px';
+            const wMem       = isMobile ? '30px'    : '50px';
+            const hMem       = isMobile ? '100px'   : '180px';
+            const leftHome   = isMobile ? '32px'    : '42px';
+            const leftAway   = isMobile ? '122px'   : '232px';
+            const leftNum    = '0px';
+
+            const signColor = (s) => {
+                if (!s || s === '-') return C_TEXT;
+                if (s === '1') return C_SIGN_1;
+                if (s === 'X') return C_SIGN_X;
+                if (s === '2') return C_SIGN_2;
+                return C_SIGN_CUSTOM;
+            };
+
+            const thBase    = `border-right: 1px solid ${BORDER_COL}; border-bottom: 2px solid ${BORDER_COL}; font-family:'JetBrains Mono',monospace; vertical-align:bottom; padding:${padHdr};`;
+            const tdStickyBase = `position:sticky; z-index:5; background:${BG_STICKY}; border-right:1px solid ${BORDER_COL}; font-family:'JetBrains Mono',monospace; font-weight:700;`;
+
             let html = `
-                <table style="border-collapse: separate; border-spacing: 0; font-size: ${fSizeTable}; background: #fff; width: auto; min-width: ${isMobile ? '100%' : '95%'}; margin-bottom: 40px; border: 3px solid var(--primary-orange); border-radius: 8px;">
-                    <thead style="background: #e0e0e0; position: sticky; top: 0; z-index: 100;">
+                <style>
+                    #cjf-table { border-collapse: separate; border-spacing: 0; font-size: ${fSizeBase}; background: ${BG_TABLE}; width: auto; min-width: ${isMobile ? '100%' : '98%'}; border: 1px solid ${BORDER_COL}; border-radius: 10px; overflow: hidden; }
+                    #cjf-table tr:hover td { background: rgba(245,158,11,0.05) !important; }
+                </style>
+                <table id="cjf-table">
+                    <thead style="position:sticky; top:0; z-index:100; background:${BG_THEAD};">
                         <tr>
-                            <th style="position: sticky; left: ${leftNum}; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: ${padTh}; min-width: ${strWNum}; max-width: ${strWNum}; color: #333; font-size: ${fSizeTh};">#</th>
-                            <th style="position: sticky; left: ${leftHome}; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: ${padTh}; text-align: right; min-width: ${strWTeam}; max-width: ${strWTeam}; color: #333; font-size: ${fSizeTh}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Local</th>
-                            <th style="position: sticky; left: ${leftAway}; z-index: 110; background: #e0e0e0; border: 1px solid #ccc; padding: ${padTh}; text-align: left; min-width: ${strWTeam}; max-width: ${strWTeam}; color: #333; font-size: ${fSizeTh}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Visitante</th>
+                            <th style="${thBase} position:sticky; left:${leftNum}; z-index:110; background:${BG_THEAD}; min-width:${wNum}; max-width:${wNum}; text-align:center; color:${C_AMBER}; font-size:${fSizeBase}; font-weight:900;">#</th>
+                            <th style="${thBase} position:sticky; left:${leftHome}; z-index:110; background:${BG_THEAD}; min-width:${wTeam}; max-width:${wTeam}; text-align:right; color:${C_TEXT}; font-size:${fSizeBase}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Local</th>
+                            <th style="${thBase} position:sticky; left:${leftAway}; z-index:110; background:${BG_THEAD}; min-width:${wTeam}; max-width:${wTeam}; text-align:left; color:${C_TEXT}; font-size:${fSizeBase}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Visitante</th>
             `;
 
-            // Member Columns
+            // Member headers (vertical text)
             sortedMembers.forEach(m => {
                 const f = allForecasts.find(p => String(p.mId || p.memberId) === String(m.id));
                 const diceIcon = (f && f.isDice) ? ' 🎲' : '';
                 const led = this.getMemberStatusLed(m.id, jornada);
-                html += `<th title="${m.name}${diceIcon ? ' (Relleno con Dado)' : ''} - ${led.title}" style="border: 1px solid #ccc; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${fSizeMember}; color: #333; font-weight: 600; white-space: nowrap; overflow:hidden;">
+                html += `<th title="${m.name}${diceIcon} — ${led.title}" style="${thBase} border-right:1px solid ${BORDER_COL}; writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${C_TEXT}; white-space:nowrap; overflow:hidden;">
                     <div style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
-                        <span class="led-status-indicator led-${led.status}" style="transform: rotate(180deg);" title="${led.title}"></span>
+                        <span class="led-status-indicator led-${led.status}" style="transform:rotate(180deg);" title="${led.title}"></span>
                         <span>${m.name}${diceIcon}</span>
                     </div>
                 </th>`;
             });
 
-            // Doubles Columns at the end
+            // Doubles column headers
             allDoubles.forEach(() => {
-                html += `<th style="border: 2px solid var(--primary-orange); padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${isMobile ? '0.8rem' : '1rem'}; color: #fff; background: var(--primary-orange); font-weight: bold; letter-spacing: 1px; white-space: nowrap;">Quiniela Dobles</th>`;
+                html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${C_DOUBLES}; background:${BG_DOUBLES_COL}; border-left:2px solid rgba(139,92,246,0.5); white-space:nowrap;">Quiniela Dobles</th>`;
             });
 
-            // "COLUMNA PERFECTA" Logic
+            // Columna perfecta
             let perfectColumn = null;
             let perfectHits = 0;
             const allResolved = sortedMembers.every(m => allForecasts.some(p => String(p.mId || p.memberId) === String(m.id)));
-
             if (allResolved) {
                 perfectColumn = this.calculatePerfectColumn(jornada);
-                html += `<th style="border: 3px solid #ffd700; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${isMobile ? '0.8rem' : '0.9rem'}; color: #000; background: linear-gradient(to bottom, #ffd700, #ffecb3); font-weight: 900; letter-spacing: 1px; white-space: nowrap; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);">⭐ COLUMNA MAULA</th>`;
+                html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:#fbbf24; background:rgba(234,179,8,0.15); border-left:2px solid rgba(234,179,8,0.5); white-space:nowrap;">⭐ COLUMNA MAULA</th>`;
             }
 
-            // Results Column Header
-            html += `<th style="border: 1px solid #333; padding: ${padTdCell}; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: ${strHMember}; width: ${strWMember}; min-width: ${strWMember}; font-size: ${isMobile ? '0.9rem' : '1.1rem'}; color: #fff; background: #333; font-weight: bold; letter-spacing: 1px; white-space: nowrap;">RESULTADO REAL</th>`;
-
-
+            // Resultado
+            html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${C_AMBER}; border-left:2px solid ${BORDER_BLOCK}; white-space:nowrap;">RESULTADO</th>`;
             html += `</tr></thead><tbody>`;
 
-            // Hit counters for summary row
-            const baseHitsCount = {}; // { memberId: hits }
-            const doublesHitsCount = {}; // { doubleIndex: hits }
+            const baseHitsCount = {};
+            const doublesHitsCount = {};
             sortedMembers.forEach(m => baseHitsCount[m.id] = 0);
             allDoubles.forEach((_, idx) => doublesHitsCount[idx] = 0);
-
             const totalCols = 3 + sortedMembers.length + allDoubles.length + (perfectColumn ? 1 : 0) + 1;
 
             jornada.matches.forEach((match, idx) => {
                 const displayIdx = idx === 14 ? 'P15' : idx + 1;
                 const isBlockEnd = [3, 7, 10, 13].includes(idx);
                 const isP15Divider = idx === 13;
-                const blockBottomBorder = isBlockEnd ? (isP15Divider ? 'border-bottom: 4px solid var(--primary-orange, #ff9100) !important;' : 'border-bottom: 3px solid #757575 !important;') : '';
-                const bgColor = idx % 2 === 0 ? '#fff' : '#f5f5f5';
-
+                const blockBorderStyle = isBlockEnd ? `border-bottom: 3px solid ${BORDER_BLOCK};` : '';
+                const bgRow = idx % 2 === 0 ? BG_ROW_EVEN : BG_ROW_ODD;
                 const officialResult = match.result || null;
 
                 html += `<tr>
-                    <td style="position: sticky; left: ${leftNum}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; ${blockBottomBorder} padding: ${padTdNum}; text-align: center; font-weight: bold; color: var(--primary-orange); font-size: ${fSizeTh}; max-width: ${strWNum}; overflow: hidden;">${displayIdx}</td>
-                    <td style="position: sticky; left: ${leftHome}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; ${blockBottomBorder} padding: ${padTdTeam}; text-align: right; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.home}</td>
-                    <td style="position: sticky; left: ${leftAway}; z-index: 5; background: ${bgColor}; border: 1px solid #ccc; ${blockBottomBorder} padding: ${padTdTeam}; text-align: left; max-width: ${strWTeam}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #333;">${match.away}</td>
+                    <td style="${tdStickyBase} left:${leftNum}; background:${BG_STICKY}; ${blockBorderStyle} padding:${padCell}; text-align:center; color:${C_AMBER}; font-size:${fSizeBase}; min-width:${wNum}; max-width:${wNum};">${displayIdx}</td>
+                    <td style="${tdStickyBase} left:${leftHome}; background:${BG_STICKY}; ${blockBorderStyle} padding:${padTeam}; text-align:right; min-width:${wTeam}; max-width:${wTeam}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${C_TEAM}; font-size:${fSizeBase};">${match.home}</td>
+                    <td style="${tdStickyBase} left:${leftAway}; background:${BG_STICKY}; border-right:2px solid ${BORDER_BLOCK}; ${blockBorderStyle} padding:${padTeam}; text-align:left; min-width:${wTeam}; max-width:${wTeam}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${C_TEAM}; font-size:${fSizeBase};">${match.away}</td>
                 `;
 
-                // Individual Forecasts
                 sortedMembers.forEach(m => {
                     const f = allForecasts.find(p => String(p.mId || p.memberId) === String(m.id));
                     let sign = '-';
-                    let cellStyle = `border: 1px solid #ccc; padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: bold; font-size: ${fSizeCell};`;
+                    let bg = bgRow;
+                    let borderExtra = '';
+                    let colorSign = C_TEXT;
 
                     if (f && f.selection && f.selection[idx]) {
                         sign = f.selection[idx];
+                        colorSign = signColor(sign);
                         const isHit = officialResult && sign === officialResult;
-
-                        if (sign === '1') cellStyle += 'color: #1976d2;';
-                        else if (sign === 'X') cellStyle += 'color: #757575;';
-                        else if (sign === '2') cellStyle += 'color: #d32f2f;';
-
                         if (isHit) {
-                            cellStyle += 'background: #c8e6c9; border: 2px solid #2e7d32;'; // Light green for hit
+                            bg = BG_HIT;
+                            borderExtra = `border:2px solid ${C_HIT_BORDER};`;
                             baseHitsCount[m.id]++;
                         } else if (f.late && !f.pardoned) {
-                            cellStyle += 'background: #fff3e0;';
+                            bg = isLightTheme ? '#fef9c3' : 'rgba(245,158,11,0.08)';
                         }
                     }
 
-                    html += `<td style="${cellStyle} ${blockBottomBorder}">${sign}</td>`;
+                    html += `<td style="background:${bg}; ${borderExtra} border-right:1px solid ${BORDER_COL}; ${blockBorderStyle} padding:${padCell}; text-align:center; min-width:${wMem}; font-weight:900; font-size:${fSizeSign}; color:${colorSign}; font-family:'JetBrains Mono',monospace;">${sign}</td>`;
                 });
 
-                // Doubles Forecasts (Extra columns)
                 allDoubles.forEach((db, dbIdx) => {
                     let sign = '-';
-                    let cellStyle = `border: 2px solid var(--primary-orange); padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${fSizeCell}; color: #fff; background: var(--primary-orange);`;
+                    let bg = BG_DOUBLES_COL;
+                    let borderExtra = `border-left:2px solid rgba(139,92,246,0.4);`;
+                    let colorSign = C_DOUBLES;
 
                     if (db.selection && db.selection[idx]) {
                         sign = db.selection[idx];
                         const isHit = officialResult && sign.includes(officialResult);
-
                         if (isHit) {
-                            cellStyle += 'background: #81c784; color: #fff; border: 2px solid #1b5e20;'; // Darker green for doubles hit
+                            bg = BG_HIT;
+                            borderExtra += `border-top:2px solid ${C_HIT_BORDER}; border-bottom:2px solid ${C_HIT_BORDER};`;
                             doublesHitsCount[dbIdx]++;
                         }
                     }
-                    html += `<td style="${cellStyle} ${blockBottomBorder}">${sign}</td>`;
+                    html += `<td style="background:${bg}; ${borderExtra} border-right:1px solid rgba(139,92,246,0.3); ${blockBorderStyle} padding:${padCell}; text-align:center; min-width:${wMem}; font-weight:900; font-size:${fSizeSign}; color:${colorSign}; font-family:'JetBrains Mono',monospace;">${sign}</td>`;
                 });
 
-                // Perfect Column Cell
                 if (perfectColumn) {
                     const sign = perfectColumn[idx] || '-';
-                    let cellStyle = `border: 3px solid #ffd700; padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${fSizeCell}; color: #b8860b; background: #fffde7;`;
+                    let bg = BG_PERFECT;
+                    let colorSign = '#fbbf24';
+                    let borderExtra = 'border-left:2px solid rgba(234,179,8,0.5);';
                     const isHit = officialResult && sign === officialResult;
                     if (isHit) {
-                        cellStyle += 'background: #ffd700; color: #000; border: 3px solid #ffa000;';
+                        bg = isLightTheme ? '#fef08a' : 'rgba(234,179,8,0.3)';
+                        borderExtra += `border-top:2px solid #f59e0b; border-bottom:2px solid #f59e0b;`;
                         perfectHits++;
                     }
-                    html += `<td style="${cellStyle} ${blockBottomBorder}">${sign}</td>`;
+                    html += `<td style="background:${bg}; ${borderExtra} border-right:1px solid rgba(234,179,8,0.3); ${blockBorderStyle} padding:${padCell}; text-align:center; min-width:${wMem}; font-weight:900; font-size:${fSizeSign}; color:${colorSign}; font-family:'JetBrains Mono',monospace;">${sign}</td>`;
                 }
 
-                // Official Result Cell
                 const resVal = officialResult || '-';
-                html += `<td style="border: 1px solid #333; ${blockBottomBorder} padding: ${padTdCell}; text-align: center; width: ${strWMember}; min-width: ${strWMember}; font-weight: 900; font-size: ${isMobile ? '1.1rem' : '1.5rem'}; color: #fff; background: #444;">${resVal}</td>`;
-
+                const rColor = signColor(resVal);
+                html += `<td style="background:${BG_RESULT_CELL}; border-left:2px solid ${BORDER_BLOCK}; ${blockBorderStyle} padding:${padCell}; text-align:center; min-width:${wMem}; font-weight:900; font-size:${fSizeSign}; color:${rColor}; font-family:'JetBrains Mono',monospace;">${resVal}</td>`;
                 html += `</tr>`;
 
                 if (isBlockEnd) {
                     if (isP15Divider) {
-                        html += `
-                            <tr class="table-block-divider table-p15-divider">
-                                <td colspan="${totalCols}" style="background: linear-gradient(90deg, #e65100, #ff9100, #e65100); height: 26px; text-align: center; color: #fff; font-size: ${isMobile ? '0.75rem' : '0.85rem'}; font-weight: 900; letter-spacing: 2px; padding: 3px 0; border-top: 2px solid #bf360c; border-bottom: 2px solid #bf360c;">
-                                    ★ PLENO AL 15 ★
-                                </td>
-                            </tr>
-                        `;
+                        html += `<tr><td colspan="${totalCols}" style="background:linear-gradient(90deg,rgba(245,158,11,0.15),rgba(245,158,11,0.4),rgba(245,158,11,0.15)); height:20px; text-align:center; color:${C_AMBER}; font-size:0.72rem; font-weight:900; letter-spacing:3px; padding:2px 0; border-top:1px solid ${BORDER_BLOCK}; border-bottom:1px solid ${BORDER_BLOCK}; font-family:'JetBrains Mono',monospace;">★ PLENO AL 15 ★</td></tr>`;
                     } else {
-                        html += `
-                            <tr class="table-block-divider">
-                                <td colspan="${totalCols}" style="background: #ff3600; height: 2px; border: none; padding: 0;"></td>
-                            </tr>
-                        `;
+                        html += `<tr><td colspan="${totalCols}" style="background:${BORDER_BLOCK}; height:2px; border:none; padding:0; opacity:0.8;"></td></tr>`;
                     }
                 }
             });
 
             html += `</tbody>`;
 
-            // SUMMARY ROW (Final Hits)
-            html += `<tfoot style="background: #eee; position: sticky; bottom: 0; z-index: 10;">
-                <tr style="border-top: 3px solid #673ab7; height: ${isMobile ? '40px' : '60px'};">
-                    <td colspan="3" style="text-align: right; padding: ${padTdNum}; font-weight: 900; color: #673ab7; font-size: ${isMobile ? '0.9rem' : '1.2rem'}; background: #f3e5f5;">TOTAL ACIERTOS:</td>
+            // Footer resumen
+            const footCellBase = `font-family:'JetBrains Mono',monospace; font-weight:900; font-size:${fSizeHits}; text-align:center; border-right:1px solid ${BORDER_COL};`;
+            html += `<tfoot style="position:sticky; bottom:0; z-index:10; background:${BG_FOOT};">
+                <tr style="border-top:2px solid ${BORDER_BLOCK}; height:${isMobile ? '38px' : '52px'};">
+                    <td colspan="3" style="text-align:right; padding:8px 14px; font-weight:900; color:${C_AMBER}; font-size:${fSizeBase}; font-family:'JetBrains Mono',monospace; border-right:2px solid ${BORDER_BLOCK};">TOTAL ACIERTOS</td>
             `;
 
             sortedMembers.forEach(m => {
                 const hits = baseHitsCount[m.id];
-                html += `<td style="border: 1px solid #ccc; text-align: center; font-weight: 900; font-size: ${isMobile ? '1.1rem' : '1.5rem'}; color: #2e7d32; background: #e8f5e9;">${hits}</td>`;
+                const hColor = hits > 10 ? '#34d399' : hits > 7 ? '#fbbf24' : C_TEXT;
+                html += `<td style="${footCellBase} color:${hColor};">${hits}</td>`;
             });
 
             allDoubles.forEach((_, idx) => {
                 const hits = doublesHitsCount[idx];
-                html += `<td style="border: 2px solid #673ab7; text-align: center; font-weight: 900; font-size: ${isMobile ? '1.2rem' : '1.6rem'}; color: #fff; background: #2e7d32;">${hits}</td>`;
+                html += `<td style="${footCellBase} color:${C_DOUBLES}; border-left:2px solid rgba(139,92,246,0.4);">${hits}</td>`;
             });
 
             if (perfectColumn) {
-                html += `<td style="border: 3px solid #ffa000; text-align: center; font-weight: 900; font-size: ${isMobile ? '1.3rem' : '1.8rem'}; color: #000; background: #ffd700;">${perfectHits}</td>`;
+                html += `<td style="${footCellBase} color:#fbbf24; border-left:2px solid rgba(234,179,8,0.5);">${perfectHits}</td>`;
             }
-
-            // Empty cell for Results column in footer
-            html += `<td style="background: #333; border: 1px solid #333;"></td>`;
-
-
+            html += `<td style="background:${BG_RESULT_CELL}; border-left:2px solid ${BORDER_BLOCK};"></td>`;
             html += `</tr></tfoot></table>`;
 
             this.viewJornadaContent.innerHTML = html;

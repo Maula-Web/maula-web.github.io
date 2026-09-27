@@ -353,6 +353,87 @@
         }
 
         /* =========================================================================
+           SIGNOS HORIZONTALES (BLOQUES 4-4-3-3) — NUEVA ORIENTACIÓN COMPACTA
+           ========================================================================= */
+        .sign-h-1, .sign-h-X, .sign-h-2, .sign-h-empty, .sign-h-custom {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 900;
+            display: inline;
+            letter-spacing: -0.5px;
+        }
+        .sign-h-1    { color: #34d399; }
+        .sign-h-X    { color: #38bdf8; }
+        .sign-h-2    { color: #fbbf24; }
+        .sign-h-empty { color: #475569; }
+        .sign-h-custom { color: #c084fc; font-size: 10px; }
+        .light-theme .sign-h-1    { color: #059669; }
+        .light-theme .sign-h-X    { color: #0284c7; }
+        .light-theme .sign-h-2    { color: #d97706; }
+        .light-theme .sign-h-empty { color: #94a3b8; }
+        .light-theme .sign-h-custom { color: #7c3aed; }
+
+        /* Contenedor de celda horizontal */
+        .forecast-h-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 2px;
+            gap: 1px;
+            select-none;
+        }
+        .forecast-h-badges {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            min-height: 12px;
+            margin-bottom: 1px;
+        }
+        .forecast-h-block {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+        .forecast-h-empty {
+            color: #475569;
+            opacity: 0.5;
+        }
+        .forecast-h-sep {
+            width: 80%;
+            height: 1px;
+            background: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 4px rgba(245, 158, 11, 0.3);
+            border-radius: 1px;
+            margin: 1px 0;
+        }
+        .forecast-p15-block {
+            font-size: 10px;
+            margin-top: 1px;
+            opacity: 0.9;
+        }
+        .forecast-badge-dice { font-size: 9px; }
+        .forecast-badge-late { font-size: 9px; color: #f59e0b; font-weight: 900; }
+        .forecast-badge-doubles-star {
+            font-size: 11px;
+            color: #a78bfa;
+            text-shadow: 0 0 8px rgba(167, 139, 250, 0.8);
+            font-weight: 900;
+            animation: doubles-star-pulse 2s ease-in-out infinite;
+        }
+        @keyframes doubles-star-pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(167, 139, 250, 0.8); }
+            50% { opacity: 0.6; text-shadow: 0 0 4px rgba(167, 139, 250, 0.4); }
+        }
+        .light-theme .forecast-badge-doubles-star { color: #7c3aed; }
+        .light-theme .forecast-h-sep {
+            background: rgba(217, 119, 6, 0.35);
+        }
+
+        /* =========================================================================
            TABLA DE DATOS DATA GRID (ESTILO BOTE 2: FONDOS UNIFORMES Y ELEGANTES)
            ========================================================================= */
         #forecast-summary-table {
@@ -377,11 +458,11 @@
         }
 
         .summary-cell {
-            padding: 0.45rem 0.35rem;
+            padding: 0.4rem 0.25rem;
             background: transparent !important;
             border-bottom: 2px solid rgba(51, 65, 85, 0.7);
             border-right: 1px solid rgba(51, 65, 85, 0.5);
-            vertical-align: top;
+            vertical-align: middle;
             text-align: center;
             transition: background-color 0.15s ease;
         }
@@ -1163,19 +1244,14 @@
                     <div>
                         <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
                             <span>Panel General de Sellado</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">Parrilla Vertical 1-X-2</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">Parrilla 1-X-2 por Bloque</span>
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Todos los pronósticos en columnas verticales por socio. Haz clic en cualquier casilla para abrir su boleto.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Pronósticos en bloques horizontales por jornada. Haz clic en cualquier celda para editar el boleto.</p>
                     </div>
                 </div>
 
-                <!-- Leyenda de Estados y Signos -->
+                <!-- Leyenda solo de LEDs (los colores de signos son autoexplicativos) -->
                 <div class="flex items-center gap-3 text-xs font-bold flex-wrap justify-end">
-                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-1 font-mono text-sm">1</span> Local</span>
-                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-X font-mono text-sm">X</span> Empate</span>
-                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-2 font-mono text-sm">2</span> Visitante</span>
-                    <span class="flex items-center gap-1.5"><span class="sign-v sign-v-custom font-mono text-xs">1X</span> Doble</span>
-                    <span class="border-l border-slate-300 dark:border-slate-700 h-4 mx-1"></span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-green"></span> Completo</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-yellow"></span> Falta Dobles</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-red"></span> Pendiente</span>
@@ -1810,7 +1886,7 @@
                     return;
                 }
 
-                // CONSTRUCCIÓN DE FILAS CON SIGNOS COMPACTOS (SOLO TEXTO) Y P15 CONDICIONAL
+                // CONSTRUCCIÓN DE FILAS CON SIGNOS HORIZONTALES POR BLOQUE Y P15 CONDICIONAL
                 let tbodyHtml = '';
                 sortedJornadas.forEach(j => {
                     let dateFormatted = j.date;
@@ -1822,53 +1898,20 @@
                     const hasPig15 = window.isJornadaP15Required(j);
                     const hasPigAnywhere = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
-                    // Columna Sticky Izquierda con el índice del 1 al 14 (o 15 si es PIG)
-                    let indexHtml = `
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">1</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">2</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">3</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">4</span>
-                        <div class="table-block-divider"></div>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">5</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">6</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">7</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">8</span>
-                        <div class="table-block-divider"></div>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">9</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">10</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">11</span>
-                        <div class="table-block-divider"></div>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">12</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">13</span>
-                        <span class="sign-v text-slate-400 dark:text-slate-500 font-bold">14</span>
-                    `;
-                    if (hasPig15) {
-                        indexHtml += `
-                            <div class="table-block-divider"></div>
-                            <span class="sign-v text-amber-500 dark:text-amber-400 font-black" title="Pleno al 15 (PIG)">15</span>
-                        `;
-                    }
-
                     let rowHtml = `<tr>
                         <td class="summary-sticky-col summary-cell p-2">
-                            <div class="flex items-start justify-between gap-1.5 h-full">
-                                <div class="flex flex-col text-left justify-start">
-                                    <div class="font-black text-amber-500 text-sm flex items-center gap-1">
-                                        <span>J${j.number}</span>
-                                        ${hasPigAnywhere ? '<span title="Partido PIG">🐷</span>' : ''}
-                                    </div>
-                                    <div class="text-[10px] text-slate-400 font-mono mt-0.5">${dateFormatted}</div>
-                                    <div class="text-[9px] text-slate-500 font-mono mt-1">${hasPig15 ? '15 partidos' : '14 partidos'}</div>
+                            <div class="flex flex-col text-left justify-center gap-0.5">
+                                <div class="font-black text-amber-500 text-sm flex items-center gap-1">
+                                    <span>J${j.number}</span>
+                                    ${hasPigAnywhere ? '<span title="Partido PIG">🐷</span>' : ''}
                                 </div>
-                                <div class="flex flex-col items-center border-l border-slate-300 dark:border-slate-800 pl-1.5 select-none">
-                                    <div class="h-3 mb-0.5"></div>
-                                    ${indexHtml}
-                                </div>
+                                <div class="text-[10px] text-slate-400 font-mono">${dateFormatted}</div>
+                                <div class="text-[9px] text-slate-500 font-mono">${hasPig15 ? '15 partidos' : '14 partidos'}</div>
                             </div>
                         </td>
                     `;
 
-                    // Celdas de Pronósticos en VERTICAL por cada Socio
+                    // Celdas de Pronósticos HORIZONTALES por Bloque por cada Socio
                     const jDoublesMember = window.getEligibleDoublesMember(j);
 
                     sortedMembers.forEach((m) => {
@@ -1883,81 +1926,71 @@
 
                         const cellLed = this.getMemberStatusLed(m.id, j);
                         const isCellDoubles = jDoublesMember && String(jDoublesMember.id) === String(m.id);
-                        const doublesBadgeCell = isCellDoubles ? `<span class="text-[9px] text-purple-400 font-bold ml-0.5 animate-pulse" title="Responsable de Dobles J${j.number}">🎲</span>` : '';
                         let cellContent = '';
 
+                        // Helper para colorear un signo individual con span
+                        const colorSign = (s, idx) => {
+                            if (!s || s === '-') return `<span class="sign-h-empty" title="Partido ${idx+1}">-</span>`;
+                            if (s === '1') return `<span class="sign-h-1" title="Partido ${idx+1}: Local">1</span>`;
+                            if (s === 'X' || s === 'x') return `<span class="sign-h-X" title="Partido ${idx+1}: Empate">X</span>`;
+                            if (s === '2') return `<span class="sign-h-2" title="Partido ${idx+1}: Visitante">2</span>`;
+                            return `<span class="sign-h-custom" title="Partido ${idx+1}: ${s}">${s}</span>`;
+                        };
+
                         if (isPlayed) {
-                            let signsHtml = '';
-                            for (let i = 0; i < 14; i++) {
-                                const rawSign = p.selection ? p.selection[i] : null;
-                                const s = (rawSign && String(rawSign).trim() !== '' && String(rawSign).trim() !== '-') ? String(rawSign).trim() : '-';
-                                
-                                let signClass = 'sign-v-empty';
-                                if (s === '1') signClass = 'sign-v-1';
-                                else if (s === 'X' || s === 'x') signClass = 'sign-v-X';
-                                else if (s === '2') signClass = 'sign-v-2';
-                                else if (s !== '-') signClass = 'sign-v-custom';
+                            // Generar 4 bloques horizontales: 4-4-3-3
+                            const sel = p.selection || [];
+                            const b1 = [0,1,2,3].map(i => colorSign(sel[i], i)).join('');
+                            const b2 = [4,5,6,7].map(i => colorSign(sel[i], i)).join('');
+                            const b3 = [8,9,10].map(i => colorSign(sel[i], i)).join('');
+                            const b4 = [11,12,13].map(i => colorSign(sel[i], i)).join('');
 
-                                signsHtml += `<span class="sign-v ${signClass}" title="Partido ${i+1}: ${s}">${s}</span>`;
-                                if ([3, 7, 10].includes(i)) {
-                                    signsHtml += `<div class="table-block-divider"></div>`;
-                                }
-                            }
-
+                            let p15Html = '';
                             if (hasPig15) {
-                                const raw15 = p.selection ? p.selection[14] : null;
-                                const s15 = (raw15 && String(raw15).trim() !== '' && String(raw15).trim() !== '-') ? String(raw15).trim() : '-';
-                                signsHtml += `
-                                    <div class="table-block-divider"></div>
-                                    <span class="sign-v sign-v-p15" title="Pleno al 15 (PIG): ${s15}">${s15}</span>
-                                `;
+                                const s15 = sel[14] ? String(sel[14]).trim() : '-';
+                                p15Html = `<div class="forecast-p15-block" title="Pleno al 15">${colorSign(s15 !== '-' ? s15 : null, 14)}</div>`;
                             }
 
-                            const diceBadge = p.isDice ? '<span class="text-[10px]" title="Relleno con Dado 🎲">🎲</span>' : '';
-                            const lateBadge = p.late ? '<span class="text-[10px] text-amber-500 font-bold" title="Enviado con Retraso ⏱️">⏱️</span>' : '';
+                            const diceBadge = p.isDice ? '<span class="forecast-badge-dice" title="Relleno con Dado">🎲</span>' : '';
+                            const lateBadge = p.late ? '<span class="forecast-badge-late" title="Enviado tarde">⏱</span>' : '';
+                            const doubleStar = isCellDoubles ? '<span class="forecast-badge-doubles-star" title="Responsable Quiniela Dobles">★</span>' : '';
 
                             cellContent = `
-                                <div class="flex flex-col items-center justify-center py-1 select-none">
-                                    <div class="flex items-center gap-1 leading-none mb-0.5 h-3">
-                                        ${diceBadge}
-                                        ${lateBadge}
-                                        ${doublesBadgeCell}
-                                    </div>
-                                    ${signsHtml}
+                                <div class="forecast-h-cell">
+                                    <div class="forecast-h-badges">${diceBadge}${lateBadge}${doubleStar}<span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span></div>
+                                    <div class="forecast-h-block">${b1}</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block">${b2}</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block">${b3}</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block">${b4}</div>
+                                    ${p15Html}
                                 </div>
                             `;
                         } else {
-                            let emptyHtml = '';
-                            for (let i = 0; i < 14; i++) {
-                                emptyHtml += `<span class="sign-v sign-v-empty">-</span>`;
-                                if ([3, 7, 10].includes(i)) {
-                                    emptyHtml += `<div class="table-block-divider opacity-40"></div>`;
-                                }
-                            }
-                            if (hasPig15) {
-                                emptyHtml += `
-                                    <div class="table-block-divider opacity-40"></div>
-                                    <span class="sign-v sign-v-empty">-</span>
-                                `;
-                            }
+                            const doubleStar = isCellDoubles ? '<span class="forecast-badge-doubles-star" title="Responsable Quiniela Dobles">★</span>' : '';
                             cellContent = `
-                                <div class="flex flex-col items-center justify-center py-1 select-none opacity-40">
-                                    <div class="flex items-center gap-1 leading-none mb-0.5 h-3">
-                                        <span class="led-status-indicator led-${cellLed.status}"></span>
-                                        ${doublesBadgeCell}
-                                    </div>
-                                    ${emptyHtml}
+                                <div class="forecast-h-cell opacity-40">
+                                    <div class="forecast-h-badges"><span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span>${doubleStar}</div>
+                                    <div class="forecast-h-block forecast-h-empty">----</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block forecast-h-empty">----</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block forecast-h-empty">---</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block forecast-h-empty">---</div>
                                 </div>
                             `;
                         }
 
-                        const doubleCellClass = isCellDoubles ? 'ring-1 ring-inset ring-purple-500/40 bg-purple-950/10' : '';
+                        const doubleBorderClass = isCellDoubles ? 'border-l-4 border-l-purple-500' : '';
                         const doubleCellTitle = isCellDoubles ? ` (Responsable de Dobles J${j.number})` : '';
 
-                        rowHtml += `<td class="summary-cell ${doubleCellClass}" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}${doubleCellTitle}">${cellContent}</td>`;
+                        rowHtml += `<td class="summary-cell ${doubleBorderClass}" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}${doubleCellTitle}">${cellContent}</td>`;
                     });
 
-                    // Columna de Dobles para esta Jornada (mismo fondo uniforme sin tintes extra)
+                    // Columna de Dobles para esta Jornada
                     const jIdStr = String(j.id);
                     const pExtra = pronosticosExtraMap.get(jIdStr);
                     let isDoublesPlayed = false;
@@ -1965,61 +1998,43 @@
                         isDoublesPlayed = pExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                     }
 
+                    const colorSignD = (s, idx) => {
+                        if (!s || s === '-') return `<span class="sign-h-empty">-</span>`;
+                        if (s === '1') return `<span class="sign-h-1" title="Doble ${idx+1}: Local">1</span>`;
+                        if (s === 'X' || s === 'x') return `<span class="sign-h-X" title="Doble ${idx+1}: Empate">X</span>`;
+                        if (s === '2') return `<span class="sign-h-2" title="Doble ${idx+1}: Visitante">2</span>`;
+                        return `<span class="sign-h-custom" title="Doble ${idx+1}: ${s}">${s}</span>`;
+                    };
+
                     let doublesContent = '';
                     if (isDoublesPlayed) {
-                        let dHtml = '';
-                        for (let i = 0; i < 14; i++) {
-                            const raw = pExtra.selection ? pExtra.selection[i] : null;
-                            const s = (raw && String(raw).trim() !== '' && String(raw).trim() !== '-') ? String(raw).trim() : '-';
-                            
-                            let signClass = 'sign-v-empty';
-                            if (s === '1') signClass = 'sign-v-1';
-                            else if (s === 'X' || s === 'x') signClass = 'sign-v-X';
-                            else if (s === '2') signClass = 'sign-v-2';
-                            else if (s !== '-') signClass = 'sign-v-custom';
-
-                            dHtml += `<span class="sign-v ${signClass}" title="Doble Partido ${i+1}: ${s}">${s}</span>`;
-                            if ([3, 7, 10].includes(i)) {
-                                dHtml += `<div class="table-block-divider"></div>`;
-                            }
-                        }
+                        const dsel = pExtra.selection || [];
+                        const db1 = [0,1,2,3].map(i => colorSignD(dsel[i], i)).join('');
+                        const db2 = [4,5,6,7].map(i => colorSignD(dsel[i], i)).join('');
+                        const db3 = [8,9,10].map(i => colorSignD(dsel[i], i)).join('');
+                        const db4 = [11,12,13].map(i => colorSignD(dsel[i], i)).join('');
+                        let dp15 = '';
                         if (hasPig15) {
-                            const raw15 = pExtra.selection ? pExtra.selection[14] : null;
-                            const s15 = (raw15 && String(raw15).trim() !== '' && String(raw15).trim() !== '-') ? String(raw15).trim() : '-';
-                            dHtml += `
-                                <div class="table-block-divider"></div>
-                                <span class="sign-v sign-v-p15" title="Pleno al 15 (PIG): ${s15}">${s15}</span>
-                            `;
+                            const s15d = dsel[14] ? String(dsel[14]).trim() : '-';
+                            dp15 = `<div class="forecast-p15-block">${colorSignD(s15d !== '-' ? s15d : null, 14)}</div>`;
                         }
                         doublesContent = `
-                            <div class="flex flex-col items-center justify-center py-1 select-none">
-                                <div class="h-3 mb-0.5"></div>
-                                ${dHtml}
+                            <div class="forecast-h-cell">
+                                <div class="forecast-h-badges"><span class="text-[9px] font-black text-purple-400">🎲</span></div>
+                                <div class="forecast-h-block">${db1}</div>
+                                <div class="forecast-h-sep"></div>
+                                <div class="forecast-h-block">${db2}</div>
+                                <div class="forecast-h-sep"></div>
+                                <div class="forecast-h-block">${db3}</div>
+                                <div class="forecast-h-sep"></div>
+                                <div class="forecast-h-block">${db4}</div>
+                                ${dp15}
                             </div>
                         `;
                     } else {
-                        let emptyDHtml = '';
-                        for (let i = 0; i < 14; i++) {
-                            emptyDHtml += `<span class="sign-v sign-v-empty text-purple-400/40">-</span>`;
-                            if ([3, 7, 10].includes(i)) {
-                                emptyDHtml += `<div class="table-block-divider opacity-40"></div>`;
-                            }
-                        }
-                        if (hasPig15) {
-                            emptyDHtml += `
-                                <div class="table-block-divider opacity-40"></div>
-                                <span class="sign-v sign-v-empty text-purple-400/40">-</span>
-                            `;
-                        }
-                        doublesContent = `
-                            <div class="flex flex-col items-center justify-center py-1 select-none opacity-40">
-                                <div class="h-3 mb-0.5"></div>
-                                ${emptyDHtml}
-                            </div>
-                        `;
+                        doublesContent = `<div class="forecast-h-cell opacity-40"><div class="forecast-h-badges"></div><div class="forecast-h-block forecast-h-empty">----</div><div class="forecast-h-sep"></div><div class="forecast-h-block forecast-h-empty">----</div></div>`;
                     }
 
-                    // Fondo idéntico al resto de celdas (estilo Bote 2)
                     rowHtml += `<td class="summary-cell" onclick="window.openEditorForDoubles('${j.id}')" title="Abrir quiniela de dobles">${doublesContent}</td>`;
                     rowHtml += `</tr>`;
                     tbodyHtml += rowHtml;
