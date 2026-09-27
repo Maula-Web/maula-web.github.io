@@ -647,6 +647,7 @@ const Auth = {
                 navigator.serviceWorker.register('./service-worker.js')
                     .then((reg) => {
                         console.log('PWA: Service Worker registrado con éxito:', reg.scope);
+                        reg.update().catch(() => {});
                     })
                     .catch((err) => {
                         console.warn('PWA: Aviso al registrar Service Worker:', err);

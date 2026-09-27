@@ -788,18 +788,19 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 ## 26. Consistencia Financiera Universal y Menú Superior Unificado (V2.0 Pro)
 
 ### 26.1. Regla Inquebrantable: Origen Financiero Único (Bote 2)
-- **Principio Fundamental**: **Ningún módulo de la web puede recalcular o estimar datos financieros de forma aislada**. Cualquier cifra monetaria expuesta públicamente (Caja Real, saldos individuales, ingresos, gastos o superávit) debe originarse en el motor y resumen consolidado de **Bote 2** (`window.BoteApp.getSeasonData()` o `window.BOTE_FALLBACK_DATA['2026-2027']`).
+- **Principio Fundamental**: **Ningún módulo de la web puede recalcular o estimar datos financieros de forma aislada**. Se prohíbe taxativamente calcular las cosas dos veces. Cualquier cifra monetaria expuesta públicamente (Caja Real, saldos individuales, ingresos, gastos o superávit) debe originarse en el motor y resumen consolidado de **Bote 2** (`window.BoteApp.getSeasonData()`, `maulas_bote2_summary` en `localStorage` o `window.BOTE_FALLBACK_DATA['2026-2027']`).
 - **Tarjeta "Caja Real de la Peña" en Dashboard 2.0**:
-  - **Saldo Total Disponible (Caja Real)**: **808.18 €** (Ingresos totales consolidados 956.68 € menos gastos oficiales de sellado 148.50 €).
-  - **Suma de Saldos de Socios**: **703.46 €** (Suma aritmética de las huchas individuales de los 19 miembros).
-  - **Superávit de la Peña**: **+104.72 €** (Margen contable a favor del fondo común: `cajaReal - totalSaldosVirtuales`).
-  - Se eliminó el antiguo algoritmo simplificado de `(19 * 1.50€) - 14.25€` que arrojaba valores teóricos inconexos.
+  - **Saldo Total Disponible (Caja Real)**: **829.48 €** (Cálculo oficial consolidado de Bote 2).
+  - **Suma de Saldos de Socios**: **767.70 €** (Recuperada directamente del cálculo de Bote 2).
+  - **Superávit de la Peña**: **+61.78 €** (Margen contable a favor del fondo común: `cajaReal - totalSaldosVirtuales` = `829.48 € - 767.70 €`).
+  - Se eliminó cualquier discrepancia con versiones previas (antiguos 808.18 € / 703.46 € erradicados por completo).
 
 ### 26.2. Menú Superior Universal y Homogéneo
 - **Estructura Calibrada según Resultados 2 (`jornadas_2.html`)**:
   - **Bloque Izquierdo**: Escudo oficial + "PEÑA MAULAS" (línea 1) + "Temporada 2026-2027" (línea 2).
   - **Bloque Central**: 9 accesos directos de sección (Inicio, Socios, Bote, Resultados, Quiniela, Clasificación, Resumen, Votaciones, Admin), con resaltado activo dorado para la página en curso.
   - **Bloque Derecho**: Selector de versión (`1.0 Clásica` / `⚡ 2.0 Pro`), Selector de tema (`☀️ Claro` / `🌙 Oscuro`), Botón `🔄 Actualizar` y Botón `🚪 Salir`.
+  - **Protección Antidesbordamiento**: Contenedor central con `min-w-0 flex-shrink overflow-x-auto xl:overflow-visible` y contenedor derecho con `flex-shrink-0 ml-auto lg:ml-0`. Esta regla impide que los 9 selectores centrales empujen los controles de la derecha fuera del viewport en pantallas de 1024px a 1280px o equipos portátiles con escalado de pantalla.
   - **Responsive Design**: Reglas `hidden xl:inline` en los textos secundarios ("Claro", "Oscuro", "Actualizar", "Salir") para preservar el área táctil en pantallas medianas sin comprimir ni desplazar los selectores fuera de la vista.
 
 ---
@@ -847,6 +848,32 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
   - Textos violetas de Quinielas de Dobles: oscurecidos a púrpura profundo (`#6b21a8`).
   - Textos azules de Pronósticos Individuales: oscurecidos a azul zafiro (`#1d4ed8`).
   - Paneles superiores y desgloses de reducción autorizada R2: dotados de fondos porcelana luminosos (`#faf5ff` y `#f0f7ff`) con ribetes finos acordes al Design System Maulas.
+
+---
+
+## 28. Sincronización Contable Absoluta (Bote 2) y Protección Universal de Navegación
+
+### 28.1. Arquitectura de Fuente Única para Bote 2 (Sin Recálculos)
+- **Principio Fundamental de Auditoría**: Todo dato financiero en la web procede en exclusiva del cómputo consolidado de **Bote 2**:
+  - **Caja Real de la Peña**: **829.48 €**.
+  - **Suma de Saldos de los Socios**: **767.70 €**.
+  - **Superávit Acumulado de la Peña**: **+61.78 €**.
+- **Mecanismo de Persistencia y Puente (`localStorage`)**:
+  - `bote_2.js` almacena automáticamente el objeto de resumen consolidado bajo la clave `maulas_bote2_summary` y el listado de miembros bajo `maulas_bote2_members` cada vez que computa datos reales o locales.
+  - `dashboard_2.js` (`renderBoteWidget`) recupera prioritariamente los valores de `window.BoteApp.getSeasonData().summary` o de `localStorage.getItem('maulas_bote2_summary')`, empleando como respaldo estático `829.48 €` y `767.70 €`.
+  - `socios_2.js` (`loadMemberBalancesFromBote2`) lee directamente `maulas_bote2_members` de `localStorage` para garantizar coherencia sin recálculos atómicos.
+  - `bote_2_data.js` actualiza su estructura canónica de temporada 2026-2027 a los valores exactos oficiales.
+
+### 28.2. Blindaje Antidesbordamiento del Menú Superior en Todas las Hojas
+- **Problema de Ocultamiento en Pantallas Medianas**: Cuando el ancho del viewport oscila entre 1024px y 1280px, los 9 elementos de navegación horizontal impedían la compresión del navbar, forzando los controles de la derecha (Versión 1.0/2.0, Modo Claro/Oscuro, Actualizar y Salir) fuera de la pantalla debido a `overflow-x: hidden` en el `body`.
+- **Solución Implementada**:
+  - Contenedor del menú de navegación central configurado con `overflow-x-auto xl:overflow-visible no-scrollbar min-w-0 flex-shrink`.
+  - Contenedor de controles de la derecha dotado de `flex-shrink-0 ml-auto lg:ml-0`.
+  - Garantiza que en cualquier resolución (desde portátiles de 1024px hasta monitores 4K) los controles de la derecha permanezcan anclados, visibles y operativos.
+
+### 28.3. Invalidación Inmediata de Caché PWA
+- Versión de caché de Service Worker incrementada a **`maulas-pwa-v1.26`** en `service-worker.js`.
+- Registro proactivo con `reg.update()` en `js/auth.js` para forzar la actualización del Service Worker en cuanto se abre la web, impidiendo la visualización de versiones cacheadas obsoletas.
 
 ---
 

@@ -166,6 +166,16 @@ class SociosAppController {
             if (sd && Array.isArray(sd.memberSummaries) && sd.memberSummaries.length > 0) {
                 memberSummaries = sd.memberSummaries;
             }
+        if (memberSummaries.length === 0) {
+            const cachedMembers = localStorage.getItem('maulas_bote2_members');
+            if (cachedMembers) {
+                try {
+                    const parsed = JSON.parse(cachedMembers);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        memberSummaries = parsed;
+                    }
+                } catch (e) { }
+            }
         }
         
         if (memberSummaries.length === 0 && window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries) {

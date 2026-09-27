@@ -125,9 +125,10 @@ window.BOTE_FALLBACK_DATA = {
       "penalizacionMaula": 1
     },
     "summary": {
-      "cajaReal": 808.1800000000007,
-      "totalSaldosVirtuales": 703.4600000000002,
-      "totalIngresos": 956.6800000000007,
+      "cajaReal": 829.48,
+      "totalSaldosVirtuales": 767.70,
+      "superavit": 61.78,
+      "totalIngresos": 956.68,
       "totalGastos": 148.5,
       "totalPremios": 5.72,
       "jornadasJugadasCount": 6

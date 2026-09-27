@@ -421,7 +421,7 @@ class BoteAppController {
         const totalPremios = memberSummaries.reduce((sum, m) => sum + m.breakdown.premios, 0);
         const cajaReal = totalIngresos - totalGastos + (jornadaSummaries.reduce((acc, j) => acc + (j.recaudacion - j.gastoSellado), 0));
 
-        return {
+        const seasonModel = {
             season,
             config,
             summary: {
@@ -437,6 +437,40 @@ class BoteAppController {
             movements,
             ingresos: ingresos.filter(i => (i.season || '2026-2027') === season)
         };
+
+        // Guardar automáticamente en localStorage como fuente oficial de la web
+        try {
+            const officialSummary = {
+                ...seasonModel.summary,
+                superavit: seasonModel.summary.cajaReal - seasonModel.summary.totalSaldosVirtuales,
+                updatedAt: new Date().toISOString()
+            };
+            localStorage.setItem('maulas_bote2_summary', JSON.stringify(officialSummary));
+            localStorage.setItem('maulas_bote2_members', JSON.stringify(memberSummaries));
+        } catch (e) {
+            console.warn('Error guardando maulas_bote2_summary en localStorage:', e);
+        }
+
+        return seasonModel;
+    }
+
+    saveOfficialSummaryToStorage() {
+        const sd = this.getSeasonData();
+        if (!sd || !sd.summary) return;
+        try {
+            const s = sd.summary;
+            const officialSummary = {
+                ...s,
+                superavit: s.cajaReal - s.totalSaldosVirtuales,
+                updatedAt: new Date().toISOString()
+            };
+            localStorage.setItem('maulas_bote2_summary', JSON.stringify(officialSummary));
+            if (sd.memberSummaries && Array.isArray(sd.memberSummaries)) {
+                localStorage.setItem('maulas_bote2_members', JSON.stringify(sd.memberSummaries));
+            }
+        } catch (e) {
+            console.warn('Error guardando maulas_bote2_summary en localStorage:', e);
+        }
     }
 
     getSeasonData() {
@@ -2660,6 +2694,7 @@ class BoteAppController {
                 data.summary.totalIngresos += cant;
                 data.summary.totalSaldosVirtuales += cant;
                 data.summary.cajaReal += cant;
+                this.saveOfficialSummaryToStorage();
             }
 
             this.closeModal('modal-ingreso');
