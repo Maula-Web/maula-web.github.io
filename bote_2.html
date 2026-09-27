@@ -401,7 +401,7 @@
     <div id="bote2-main-content" class="max-w-[1500px] mx-auto space-y-4 sm:space-y-6">
 
         <!-- NAVBAR SUPERIOR MAULAS 2.0 (NAVEGACIÓN UNIVERSAL Y SELECTOR DE SECCIÓN) -->
-        <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 border-amber-500/40 flex flex-col md:flex-row md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl">
+        <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 border-amber-500/40 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl">
             <!-- Fila Superior en Móvil / Zona Izquierda en Escritorio -->
             <div class="flex items-center justify-between gap-2 w-full md:w-auto flex-shrink-0">
                 <!-- Brand / Logo & Temporada -->
@@ -436,7 +436,7 @@
             </div>
 
             <!-- Menú Horizontal con los 9 selectores (En móvil fila deslizable; en escritorio centrado) -->
-            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-300 overflow-x-auto no-scrollbar py-0.5 w-full md:flex-1 min-w-0 justify-start md:justify-center border-t border-slate-800/60 md:border-t-0 pt-1.5 md:pt-0">
+            <div class="flex items-center gap-1 xl:gap-1.5 text-slate-300 overflow-x-auto md:overflow-visible flex-nowrap md:flex-wrap no-scrollbar py-0.5 w-full md:w-auto md:flex-1 justify-start md:justify-center border-t border-slate-800/60 md:border-t-0 pt-1.5 md:pt-0">
                 <a href="dashboard_2.html" data-version-link="inicio" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏠</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Inicio</span>
@@ -491,24 +491,24 @@
                 <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner" id="theme-switcher-container">
                     <button type="button" id="btn-theme-light" data-theme-btn="light" onclick="window.AppTheme && window.AppTheme.setTheme('light')" class="px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white" title="Activar Modo Claro">
                         <span>☀️</span>
-                        <span class="hidden xl:inline">Claro</span>
+                        <span class="inline">Claro</span>
                     </button>
                     <button type="button" id="btn-theme-dark" data-theme-btn="dark" onclick="window.AppTheme && window.AppTheme.setTheme('dark')" class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Activar Modo Oscuro">
                         <span>🌙</span>
-                        <span class="hidden xl:inline">Oscuro</span>
+                        <span class="inline">Oscuro</span>
                     </button>
                 </div>
 
                 <!-- Botón Actualizar App -->
                 <button onclick="if(window.Auth && window.Auth.forceAppUpdate){window.Auth.forceAppUpdate();}else{location.reload(true);}" class="px-2 sm:px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1 whitespace-nowrap" title="Forzar descarga de última versión y limpiar caché">
                     <span>🔄</span>
-                    <span class="hidden xl:inline">Actualizar</span>
+                    <span class="inline">Actualizar</span>
                 </button>
 
                 <!-- Botón Salir / Logout -->
                 <button onclick="if(window.Auth && window.Auth.logout){window.Auth.logout();}else{sessionStorage.clear();localStorage.clear();location.href='login.html';}" class="px-2 sm:px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/20 text-rose-400 border border-slate-700 hover:border-rose-500/40 text-xs font-bold transition flex items-center gap-1 whitespace-nowrap" title="Cerrar sesión">
                     <span>🚪</span>
-                    <span class="hidden xl:inline">Salir</span>
+                    <span class="inline">Salir</span>
                 </button>
             </div>
         </nav>
@@ -1768,4 +1768,7 @@
 </body>
 
 </html>
+
+
+
 
