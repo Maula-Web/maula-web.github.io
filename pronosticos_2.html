@@ -1954,10 +1954,12 @@
                             const diceBadge = p.isDice ? '<span class="forecast-badge-dice" title="Relleno con Dado">🎲</span>' : '';
                             const lateBadge = p.late ? '<span class="forecast-badge-late" title="Enviado tarde">⏱</span>' : '';
                             const doubleStar = isCellDoubles ? '<span class="forecast-badge-doubles-star" title="Responsable Quiniela Dobles">★</span>' : '';
+                            // Solo LED no-verde (amarillo=falta dobles, rojo=pendiente)
+                            const ledBadge = cellLed.status !== 'green' ? `<span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span>` : '';
 
                             cellContent = `
                                 <div class="forecast-h-cell">
-                                    <div class="forecast-h-badges">${diceBadge}${lateBadge}${doubleStar}<span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span></div>
+                                    <div class="forecast-h-badges">${diceBadge}${lateBadge}${doubleStar}${ledBadge}</div>
                                     <div class="forecast-h-block">${b1}</div>
                                     <div class="forecast-h-sep"></div>
                                     <div class="forecast-h-block">${b2}</div>
@@ -1970,6 +1972,7 @@
                             `;
                         } else {
                             const doubleStar = isCellDoubles ? '<span class="forecast-badge-doubles-star" title="Responsable Quiniela Dobles">★</span>' : '';
+                            // En vacío siempre mostramos el LED (siempre será rojo o amarillo)
                             cellContent = `
                                 <div class="forecast-h-cell opacity-40">
                                     <div class="forecast-h-badges"><span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span>${doubleStar}</div>
