@@ -1735,28 +1735,7 @@ class PronosticoManager {
                 this.btnCloseMobileFloat.style.display = isMobile ? 'block' : 'none';
             }
 
-            const fSizeTable = isMobile ? '0.8rem' : '1.05rem';
-            const fSizeTh = isMobile ? '0.85rem' : '1.1rem';
-            const padTh = isMobile ? '6px' : '15px';
-            const padTdNum = isMobile ? '6px' : '10px';
-            const padTdTeam = isMobile ? '6px' : '10px 20px';
-            const padTdCell = isMobile ? '4px' : '8px';
 
-            const wNum = isMobile ? 35 : 50;
-            const wTeam = isMobile ? 85 : 200;
-            const wMember = isMobile ? 32 : 60;
-            const hMember = isMobile ? 120 : 220;
-            const fSizeMember = isMobile ? '0.8rem' : '0.95rem';
-            const fSizeCell = isMobile ? '0.9rem' : '1.25rem';
-
-            const strWNum = wNum + 'px';
-            const strWTeam = wTeam + 'px';
-            const strWMember = wMember + 'px';
-            const strHMember = hMember + 'px';
-
-            const leftNum = '0px';
-            const leftHome = wNum + 'px';
-            const leftAway = (wNum + wTeam) + 'px';
 
             // ────────────────────────────────────────────────────
             //  TABLA PRONÓSTICOS COLECTIVOS — estilo Bote 2 / v2
