@@ -98,11 +98,7 @@
         }
 
         .kpi-card:hover,
-        .kpi-card:focus-within,
-        .kpi-card:active,
-        .group:hover,
-        .group:focus-within,
-        .group:active {
+        .group:hover {
             z-index: 100050 !important;
             position: relative;
         }
@@ -465,7 +461,7 @@
         <!-- TARJETAS RESUMEN / KPIS (SIEMPRE EN PRIMER PLANO ABSOLUTO) -->
         <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-50 overflow-visible">
             <!-- KPI 1: Censo Activo & Estado en Bote -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
                     <span class="flex items-center gap-1.5">
                         <span>Censo Activo</span>
@@ -480,7 +476,7 @@
                 <div id="kpi-censo-subtext" class="text-xs text-slate-400 mt-1">Socios registrados en la peña</div>
 
                 <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-88 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
+                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-88 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
                     <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
                         <span>🏛️</span>
                         <span>Censo Oficial y Estado en el Bote</span>
@@ -498,7 +494,7 @@
             </div>
 
             <!-- KPI 2: Dados Activos Esta Jornada -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
                     <span class="flex items-center gap-1.5">
                         <span>Dados en Curso</span>
@@ -513,7 +509,7 @@
                 <div class="text-xs text-slate-400 mt-1">Comodín activado para hoy</div>
 
                 <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
+                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
                     <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
                         <span>🎲</span>
                         <span>Dado de Quinielas Activo</span>
@@ -523,7 +519,7 @@
             </div>
 
             <!-- KPI 3: Comodines Disponibles -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
                     <span class="flex items-center gap-1.5">
                         <span>Comodines de Temporada</span>
@@ -538,7 +534,7 @@
                 <div class="text-xs text-slate-400 mt-1">Máx. 3 por socio en toda la temporada</div>
 
                 <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
+                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
                     <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
                         <span>🎯</span>
                         <span>Límite Anual de Dados</span>
@@ -548,7 +544,7 @@
             </div>
 
             <!-- KPI 4: Conectividad (Telegram + Notificaciones Push) -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible" tabindex="0">
+            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
                 <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
                     <span class="flex items-center gap-1.5">
                         <span>Conectividad</span>
@@ -592,7 +588,7 @@
                 </details>
 
                 <!-- Tooltip Explicativo en Primer Plano Absoluto -->
-                <div class="tooltip-card invisible group-hover:visible group-focus-within:visible group-active:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-auto sm:right-0 sm:w-84 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-auto">
+                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-auto sm:right-0 sm:w-84 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
                     <div class="flex items-center gap-1.5 font-bold text-sky-400 mb-1.5">
                         <span>📡</span>
                         <span>Canales de Conectividad Oficial</span>
