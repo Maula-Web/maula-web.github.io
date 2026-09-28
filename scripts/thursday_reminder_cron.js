@@ -69,19 +69,23 @@ async function main() {
     console.log('📅 Buscando jornada activa...');
     const jornadasSnap = await db.collection('jornadas')
         .where('active', '==', true)
-        .orderBy('number', 'asc')
         .get();
 
-    let targetJornada = null;
+    const activeJornadas = [];
     jornadasSnap.forEach(doc => {
-        if (targetJornada) return;
-        const j = doc.data();
+        activeJornadas.push(doc.data());
+    });
+    activeJornadas.sort((a, b) => (a.number || 0) - (b.number || 0));
+
+    let targetJornada = null;
+    for (const j of activeJornadas) {
         const matches = j.matches || [];
         const filled = matches.filter(m => m.result && m.result !== '').length;
         if (filled < 15) {
             targetJornada = j;
+            break;
         }
-    });
+    }
 
     if (!targetJornada) {
         console.log('ℹ️ No hay ninguna jornada activa pendiente de rellenar. Finalizando sin envíos.');

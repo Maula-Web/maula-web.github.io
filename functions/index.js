@@ -153,16 +153,22 @@ exports.sendThursdayReminder = onSchedule(
         // 1. Buscar la próxima jornada activa sin los 15 resultados
         const jornadasSnap = await db.collection('jornadas')
             .where('active', '==', true)
-            .orderBy('number', 'asc')
             .get();
 
-        let targetJornada = null;
+        const activeJornadas = [];
         jornadasSnap.forEach(doc => {
-            if (targetJornada) return;
-            const j = doc.data();
-            const filled = (j.matches || []).filter(m => m.result && m.result !== '').length;
-            if (filled < 15) targetJornada = j;
+            activeJornadas.push(doc.data());
         });
+        activeJornadas.sort((a, b) => (a.number || 0) - (b.number || 0));
+
+        let targetJornada = null;
+        for (const j of activeJornadas) {
+            const filled = (j.matches || []).filter(m => m.result && m.result !== '').length;
+            if (filled < 15) {
+                targetJornada = j;
+                break;
+            }
+        }
 
         if (!targetJornada) {
             console.log('[sendThursdayReminder] No hay jornada activa con quiniela abierta.');
