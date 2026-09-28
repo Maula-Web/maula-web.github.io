@@ -52,22 +52,7 @@ const Auth = {
         const name = (user.name || '').toLowerCase().trim();
         const phone = (user.phone || '').toLowerCase().trim();
 
-        const isLozano = (
-            uid === '6' ||
-            email === 'lozano@maulas.com' ||
-            name.includes('fernando lozano') ||
-            (name.includes('lozano') && !name.includes('ram')) ||
-            phone.includes('lozano')
-        );
-
-        const isHeradio = (
-            uid === '8' ||
-            email === 'heradio@maulas.com' ||
-            name.includes('heradio')
-        );
-
-        if (!isLozano && !isHeradio) return;
-
+        // Ahora activado para todos los socios autenticados
         const loadPush = () => {
             if (window.PushService) {
                 window.PushService.init();

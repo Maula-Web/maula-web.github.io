@@ -39,6 +39,26 @@ const PushService = {
     /**
      * Determina el rol del usuario conectado
      */
+    getCurrentMember() {
+        try {
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            if (userStr) return JSON.parse(userStr);
+        } catch (e) {}
+        return null;
+    },
+
+    getCurrentMemberId() {
+        const u = this.getCurrentMember();
+        if (!u) return null;
+        return parseInt(u.id, 10) || u.id;
+    },
+
+    getCurrentMemberName() {
+        const u = this.getCurrentMember();
+        if (!u) return 'Socio';
+        return u.name || u.phone || `Socio ${u.id}`;
+    },
+
     getUserRole() {
         try {
             let userStr = sessionStorage.getItem('maulas_user');
@@ -90,6 +110,11 @@ const PushService = {
                 name.includes('heradio')
             ) {
                 return 'receiver_heradio';
+            }
+
+            // 3. Cualquier otro socio registrado de la peña (Receptor Universal)
+            if (uid || name || email) {
+                return 'receiver';
             }
 
             return null;
@@ -233,6 +258,13 @@ const PushService = {
         } else if (role === 'receiver_heradio') {
             // HERADIO: Solo gestionar permisos, token FCM y escucha
             this.initHeradioReceiver();
+        } else if (role === 'receiver') {
+            // CUALQUIER SOCIO: Gestionar permisos, token FCM y escucha personalizada
+            const mId = this.getCurrentMemberId();
+            const mName = this.getCurrentMemberName();
+            if (mId) {
+                this.initMemberReceiver(mId, mName);
+            }
         }
     },
 
@@ -262,6 +294,229 @@ const PushService = {
     // =========================================================================
     // FLUJO PARA HERADIO (ID 8) - SIMPLE Y DISCRETO
     // =========================================================================
+
+    // =========================================================================
+    // FLUJO UNIVERSAL PARA CUALQUIER SOCIO (RECEPTOR)
+    // =========================================================================
+
+    async initMemberReceiver(memberId, memberName) {
+        const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+
+        if (perm === 'granted') {
+            await this.registerSubscriptionInFirestore(memberId, memberName);
+            await this.requestFCMToken(memberId, memberName);
+            this.startMemberInboxListener(memberId, memberName);
+        } else if (perm === 'default') {
+            if (!sessionStorage.getItem('push_banner_dismissed')) {
+                this.injectMemberPermissionBanner(memberId, memberName);
+            }
+        }
+    },
+
+    injectMemberPermissionBanner(memberId, memberName) {
+        if (document.getElementById('member-push-banner')) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'member-push-banner';
+        banner.style.cssText = `
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 30px);
+            max-width: 520px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1.5px solid #ff9100;
+            border-radius: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: #f8fafc;
+            font-family: inherit;
+            animation: push-modal-in 0.3s ease-out;
+        `;
+
+        banner.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:1.6rem;">⚽</span>
+                <div>
+                    <div style="font-weight:700; font-size:0.95rem; color:#ffd700;">
+                        Notificaciones Peña Maulas
+                    </div>
+                    <div style="font-size:0.8rem; color:#cbd5e1; margin-top:2px;">
+                        Hola ${memberName}, activa las notificaciones oficiales para recibir recordatorios de quiniela y resultados.
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button id="member-btn-permit" style="
+                    background: linear-gradient(135deg, #ff9100 0%, #ea580c 100%);
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 8px 14px;
+                    font-weight: 700;
+                    font-size: 0.82rem;
+                    cursor: pointer;
+                    white-space: nowrap;
+                ">Activar</button>
+                <button onclick="sessionStorage.setItem('push_banner_dismissed','true'); document.getElementById('member-push-banner').remove()" style="
+                    background: none;
+                    border: none;
+                    color: #94a3b8;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 4px;
+                ">✕</button>
+            </div>
+        `;
+
+        document.body.appendChild(banner);
+
+        document.getElementById('member-btn-permit').onclick = async () => {
+            await this.requestPermissionForMember(memberId, memberName);
+        };
+    },
+
+    async requestPermissionForMember(memberId, memberName) {
+        if (!('Notification' in window)) {
+            alert('Este dispositivo no soporta notificaciones web.');
+            return;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            const banner = document.getElementById('member-push-banner');
+            if (banner) banner.remove();
+
+            if (permission === 'granted') {
+                await this.registerSubscriptionInFirestore(memberId, memberName);
+                await this.requestFCMToken(memberId, memberName);
+                this.startMemberInboxListener(memberId, memberName);
+
+                try {
+                    const reg = await navigator.serviceWorker.ready;
+                    reg.showNotification('⚽ Peña Maulas', {
+                        body: `¡Notificaciones activadas, ${memberName}! Tu dispositivo está sincronizado.`,
+                        icon: 'icons/icon-192x192.png',
+                        badge: 'icons/favicon-32x32.png',
+                        vibrate: [300, 100, 300, 100, 300],
+                        requireInteraction: true,
+                        silent: false,
+                        tag: 'member-welcome-' + memberId,
+                        data: { url: './' }
+                    });
+                } catch (e) {}
+            } else if (permission === 'denied') {
+                alert('Has bloqueado los permisos. Si deseas activarlos más adelante, hazlo desde los ajustes del navegador.');
+            }
+        } catch (e) {
+            console.error('[PushService] Error pidiendo permisos al socio:', e);
+        }
+    },
+
+    startMemberInboxListener(memberId, memberName) {
+        const db = window.db || (window.DataService && window.DataService.db);
+        if (!db) return;
+
+        let lastSeenNonce = localStorage.getItem(`last_seen_nonce_${memberId}`) || '';
+        if (this.memberUnsubscribe) this.memberUnsubscribe();
+
+        this.memberUnsubscribe = db.collection('push_inbox').doc(`member_${memberId}`).onSnapshot((doc) => {
+            if (!doc.exists) return;
+            const data = doc.data();
+            if (!data || !data.nonce || data.nonce === lastSeenNonce) return;
+
+            const now = Date.now();
+            if (data.timestamp && (now - data.timestamp > 900000)) return;
+
+            lastSeenNonce = data.nonce;
+            localStorage.setItem(`last_seen_nonce_${memberId}`, lastSeenNonce);
+
+            this.showIncomingAlertToMember(data.title || '⚽ Peña Maulas', data.body || '');
+
+            const showNotificationNative = async () => {
+                const title = data.title || '⚽ Peña Maulas';
+                const options = {
+                    body: data.body || 'Notificación oficial de la Peña Maulas.',
+                    icon: 'icons/icon-192x192.png',
+                    badge: 'icons/favicon-32x32.png',
+                    vibrate: [300, 100, 300, 100, 300],
+                    tag: 'inbox-' + data.nonce,
+                    requireInteraction: true,
+                    silent: false,
+                    actions: [{ action: 'open_app', title: '📲 Ver Peña Maulas' }],
+                    data: { url: data.url || './' }
+                };
+
+                try {
+                    const reg = await Promise.race([
+                        navigator.serviceWorker.ready,
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('SW timeout')), 2500))
+                    ]);
+                    await reg.showNotification(title, options);
+                } catch (e) {
+                    try { new Notification(title, options); } catch (err2) {}
+                }
+            };
+
+            showNotificationNative();
+        }, (err) => {
+            console.warn('[PushService] Error en listener del socio:', err);
+        });
+    },
+
+    showIncomingAlertToMember(title, body) {
+        if ('vibrate' in navigator) {
+            try { navigator.vibrate([300, 100, 300, 100, 300]); } catch(e){}
+        }
+
+        let alertBox = document.getElementById('member-incoming-alert');
+        if (!alertBox) {
+            alertBox = document.createElement('div');
+            alertBox.id = 'member-incoming-alert';
+            alertBox.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 32px);
+                max-width: 500px;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                border: 2px solid #ff9100;
+                border-radius: 16px;
+                padding: 16px 20px;
+                box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 25px rgba(255,145,0,0.3);
+                z-index: 100000;
+                color: #fff;
+                font-family: inherit;
+                animation: push-modal-in 0.3s ease-out;
+            `;
+            document.body.appendChild(alertBox);
+        }
+
+        alertBox.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:1.4rem;">🔔</span>
+                    <strong style="color:#ffd700; font-size:1rem;">${title}</strong>
+                </div>
+                <button onclick="document.getElementById('member-incoming-alert').remove()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0 4px;">✕</button>
+            </div>
+            <div style="font-size:0.95rem; color:#f8fafc; line-height:1.4;">
+                ${body}
+            </div>
+        `;
+
+        setTimeout(() => {
+            const el = document.getElementById('member-incoming-alert');
+            if (el) el.remove();
+        }, 15000);
+    },
 
     async initHeradioReceiver() {
         const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
