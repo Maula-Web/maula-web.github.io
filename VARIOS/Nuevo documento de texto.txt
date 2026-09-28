@@ -23,9 +23,9 @@ Adapta la estructura a las pantallas de móvil. Quizá podemos hacer que las tar
 
 Estoy pensando en llevar los selectores en PC, al mismo sitio que en móvil. Creo que quedará todo más coherente
 
-Ahora que ya tenemos versiones nuevas de todas las hojas, vamos a desactivar para todos los socios las hojas viejas. 
+Ahora que ya tenemos versiones nuevas de todas las hojas, vamos a desactivar para todos los socios las hojas viejas. Tanto en PC como en dispositivos móviles. 
 Para ello seguiremos los siguientes pasos.
-1. Las nuevas hojas no se llamaran versión 2, ni 2, ni 2.0 ni nada parecido. Tendrán el nombre normal. Cambialo.
+1. Las nuevas hojas no se llamaran versión 2, ni 2, ni 2.0 ni nada parecido. Tendrán el nombre normal. Cambialos.
 2. Elimina las menciones en todos los textos a que estas hojas solo están disponibles para ciertos socios y mensajes similares.
 3. Las hojas viejas sólo estarán disponibles para el socio Fernando Lozano mediante el control del menú Clásica/Pro. Para el resto de socios sólo estarán disponibles las hojas nuevas. Ese control de menú no se mostrará al resto de socios.
 4. Las hojas viejas las vamos a dejar ocultas pero sin eliminar por si tengo que recuperar algo. En un tiempo las terminaremos eliminando.

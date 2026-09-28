@@ -174,13 +174,15 @@ class Dashboard2AppController {
 
             const playedCount = playedJornadas.length;
 
-            // 2. Mapa O(1) de pronósticos por jornada y socio
+                        // 2. Mapa O(1) de pronósticos por jornada y socio
             const pronosticosMap = new Map();
             this.pronosticos.forEach(pr => {
                 if (!pr) return;
                 const jIds = [];
                 if (pr.jId !== undefined && pr.jId !== null) jIds.push(String(pr.jId));
                 if (pr.jornadaId !== undefined && pr.jornadaId !== null) jIds.push(String(pr.jornadaId));
+                if (pr.jornada_num !== undefined && pr.jornada_num !== null) jIds.push(String(pr.jornada_num));
+                if (pr.jNum !== undefined && pr.jNum !== null) jIds.push(String(pr.jNum));
 
                 const mIds = [];
                 if (pr.mId !== undefined && pr.mId !== null) mIds.push(String(pr.mId));
@@ -245,7 +247,8 @@ class Dashboard2AppController {
 
                             if (pigInfo && jornada.matches && jornada.matches[pigInfo.index]) {
                                 isPig = true;
-                                const pred = p.forecast && p.forecast[pigInfo.index] ? String(p.forecast[pigInfo.index]).trim().toUpperCase() : '';
+                                const predArr = (p && p.selection) || (p && p.forecast);
+                                const pred = predArr && predArr[pigInfo.index] ? String(predArr[pigInfo.index]).trim().toUpperCase() : '';
                                 const pigM = jornada.matches[pigInfo.index];
                                 const res = pigM ? String(pigM.result || '').trim().toUpperCase() : '';
                                 const normRes = window.ScoringSystem ? window.ScoringSystem.normalizeSign(res) : res;
@@ -488,6 +491,11 @@ class Dashboard2AppController {
             else alertBote.classList.add('hidden');
         }
 
+        const btnRellenar = document.querySelector('#live-banner-actions a');
+        if (btnRellenar && nextJ) {
+            btnRellenar.href = `pronosticos_2.html?openEditor=true&jId=${encodeURIComponent(nextJ.id)}`;
+        }
+
         if (inProgress) {
             if (icon) icon.innerHTML = '⚡';
             if (tag) {
@@ -591,14 +599,33 @@ class Dashboard2AppController {
         if (!nextJ) return;
 
         const nextJId = String(nextJ.id);
-        const total = this.members.length || 19;
+        const nextJNum = nextJ.number !== undefined ? String(nextJ.number) : '';
+        const total = (this.members && this.members.length >= 19) ? this.members.length : 19;
+
+        const elBadgeJ = document.getElementById('participation-jornada-badge');
+        if (elBadgeJ) {
+            elBadgeJ.textContent = `(Jornada ${nextJ.number})`;
+        }
 
         this.submittedMembers = [];
         this.pendingMembers = [];
 
         this.members.forEach(m => {
-            const p = pronosticosMap.get(`${nextJId}_${m.id}`);
-            const hasSubmitted = p && p.forecast && p.forecast.length > 0;
+            const mId = String(m.id);
+            let p = pronosticosMap.get(`${nextJId}_${mId}`) || (nextJNum ? pronosticosMap.get(`${nextJNum}_${mId}`) : null);
+            if (!p && Array.isArray(this.pronosticos)) {
+                p = this.pronosticos.find(pr => {
+                    if (!pr) return false;
+                    const pj = String(pr.jId !== undefined && pr.jId !== null ? pr.jId : (pr.jornadaId !== undefined ? pr.jornadaId : ''));
+                    const pm = String(pr.mId !== undefined && pr.mId !== null ? pr.mId : (pr.memberId !== undefined ? pr.memberId : ''));
+                    return (pj === nextJId || (nextJNum && pj === nextJNum)) && pm === mId;
+                });
+            }
+
+            const sel = p ? (Array.isArray(p.selection) ? p.selection : (Array.isArray(p.forecast) ? p.forecast : [])) : [];
+            const filled = sel.filter(s => s && String(s).trim() !== '' && String(s) !== '-').length;
+            const hasSubmitted = filled >= 14;
+
             const name = window.AppUtils ? window.AppUtils.getMemberName(m) : (m.phone || m.name);
 
             if (hasSubmitted) {
@@ -609,7 +636,7 @@ class Dashboard2AppController {
         });
 
         const submittedCount = this.submittedMembers.length;
-        const pct = Math.round((submittedCount / total) * 100);
+        const pct = total > 0 ? Math.round((submittedCount / total) * 100) : 0;
 
         const elSubCount = document.getElementById('submitted-count');
         const elTotCount = document.getElementById('total-members-count');
@@ -623,13 +650,32 @@ class Dashboard2AppController {
 
         // Comprobar estado del usuario logueado
         const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-        const user = userStr ? JSON.parse(userStr) : null;
+        let user = null;
+        try { if (userStr) user = JSON.parse(userStr); } catch (e) {}
         const elBadge = document.getElementById('my-forecast-badge');
 
         if (elBadge && user) {
-            const pUser = pronosticosMap.get(`${nextJId}_${user.id}`);
-            const hasSubmitted = pUser && pUser.forecast && pUser.forecast.length > 0;
-            if (hasSubmitted) {
+            const userMember = this.members.find(m => 
+                String(m.id) === String(user.id) ||
+                (user.email && m.email && m.email.toLowerCase() === user.email.toLowerCase()) ||
+                (user.name && m.name && m.name.toLowerCase() === user.name.toLowerCase()) ||
+                (user.phone && m.phone && m.phone.toLowerCase() === user.phone.toLowerCase())
+            );
+            const userMid = userMember ? String(userMember.id) : String(user.id);
+            let pUser = pronosticosMap.get(`${nextJId}_${userMid}`) || (nextJNum ? pronosticosMap.get(`${nextJNum}_${userMid}`) : null);
+            if (!pUser && Array.isArray(this.pronosticos)) {
+                pUser = this.pronosticos.find(pr => {
+                    if (!pr) return false;
+                    const pj = String(pr.jId !== undefined && pr.jId !== null ? pr.jId : (pr.jornadaId !== undefined ? pr.jornadaId : ''));
+                    const pm = String(pr.mId !== undefined && pr.mId !== null ? pr.mId : (pr.memberId !== undefined ? pr.memberId : ''));
+                    return (pj === nextJId || (nextJNum && pj === nextJNum)) && pm === userMid;
+                });
+            }
+            const selUser = pUser ? (Array.isArray(pUser.selection) ? pUser.selection : (Array.isArray(pUser.forecast) ? pUser.forecast : [])) : [];
+            const userFilled = selUser.filter(s => s && String(s).trim() !== '' && String(s) !== '-').length;
+            const userHasSubmitted = userFilled >= 14;
+
+            if (userHasSubmitted) {
                 elBadge.textContent = '✅ Ya la has enviado';
                 elBadge.className = 'text-emerald-400 font-bold';
             } else {
