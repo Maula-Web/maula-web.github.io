@@ -403,7 +403,6 @@ const Auth = {
                 <a href="resumen-temporada.html" class="btn-primary btn-resumen ${page === 'resumen-temporada.html' ? 'active' : ''}">RESUMEN TEMPORADA</a>
                 <a href="votaciones.html" class="btn-primary btn-votaciones ${page === 'votaciones.html' ? 'active' : ''}" style="background:white; color:black; font-weight:900;">VOTACIONES</a>
                 <a href="admin.html" class="btn-primary btn-admin ${page === 'admin.html' ? 'active' : ''}">ADMINISTRACIÓN</a>
-                <a href="theme-editor.html" class="btn-primary btn-theme-editor ${page === 'theme-editor.html' ? 'active' : ''}" style="color:var(--primary-gold); border-color:var(--primary-gold);">IDENTIDAD VISUAL</a>
             `;
             document.body.prepend(sidebar);
         } else {
@@ -514,16 +513,9 @@ const Auth = {
                 else sidebar.appendChild(votBtn);
             }
 
-            // 2. Ensure Theme Editor button exists
-            if (!sidebar.querySelector('a[href="theme-editor.html"]')) {
-                const themeBtn = document.createElement('a');
-                themeBtn.href = "theme-editor.html";
-                themeBtn.className = `btn-primary btn-theme-editor ${page === 'theme-editor.html' ? 'active' : ''}`;
-                themeBtn.style.color = "var(--primary-gold)";
-                themeBtn.style.borderColor = "var(--primary-gold)";
-                themeBtn.textContent = "IDENTIDAD VISUAL";
-                sidebar.appendChild(themeBtn);
-            }
+                        // Eliminar botón Identidad Visual si existiera
+            const oldThemeBtn = sidebar.querySelector('a[href="theme-editor.html"]');
+            if (oldThemeBtn) oldThemeBtn.remove();
         }
 
         // 2. Ensure Multicolour Separator exists

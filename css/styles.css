@@ -4110,4 +4110,14 @@ nav .overflow-x-auto,
 }
 
 
-
+
+/* =========================================================================
+   CONTROL DE VERSIÓN CLÁSICA/PRO: EXCLUSIVO PARA FERNANDO LOZANO
+   ========================================================================= */
+.non-fernando #version-switcher-container,
+.non-fernando #version-switcher-container-mobile,
+.non-fernando [data-version-btn],
+.non-fernando #btn-version-v1,
+.non-fernando #btn-version-v2 {
+    display: none !important;
+}

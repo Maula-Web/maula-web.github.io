@@ -602,7 +602,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // =========================================================================
-// GESTOR DE VERSIONES DE LA APLICACIÓN (V1 CLÁSICA <-> V2.0 PRO)
+// GESTOR DE VERSIONES DE LA APLICACIÓN (V1 CLÁSICA <-> PRO)
 // =========================================================================
 window.AppVersion = {
     PAGE_MAP: {
@@ -630,16 +630,64 @@ window.AppVersion = {
         'pronosticos_2.html': 'pronosticos.html',
         'resultados.html': 'clasificacion_2.html',
         'clasificacion_2.html': 'resultados.html',
-        'resultados_2.html': 'resultados.html',
+        'resultados_2.html': 'clasificacion_2.html',
         'resumen-temporada.html': 'resumen_2.html',
         'resumen_2.html': 'resumen-temporada.html',
         'votaciones.html': 'votaciones_2.html',
         'votaciones_2.html': 'votaciones.html',
         'admin.html': 'admin_2.html',
+        'theme-editor.html': 'dashboard_2.html',
         'admin_2.html': 'admin.html'
     },
 
+    OLD_TO_NEW: {
+        'index.html': 'dashboard_2.html',
+        'socios.html': 'socios_2.html',
+        'bote.html': 'bote_2.html',
+        'jornadas.html': 'jornadas_2.html',
+        'pronosticos.html': 'pronosticos_2.html',
+        'resultados.html': 'clasificacion_2.html',
+        'resumen-temporada.html': 'resumen_2.html',
+        'votaciones.html': 'votaciones_2.html',
+        'admin.html': 'admin_2.html',
+        'theme-editor.html': 'dashboard_2.html'
+    },
+
+    isFernandoLozano() {
+        try {
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            if (!userStr) return false;
+            const u = JSON.parse(userStr);
+            const uid = String(u.id || '');
+            const umail = (u.email || '').toLowerCase().trim();
+            const uname = (u.name || '').toLowerCase().trim();
+            const uphone = (u.phone || '').toLowerCase().trim();
+            return (
+                uid === '6' ||
+                umail === 'lozano@maulas.com' ||
+                uname.includes('fernando lozano') ||
+                (uname.includes('lozano') && !uname.includes('ram')) ||
+                uphone.includes('lozano')
+            );
+        } catch (e) {
+            return false;
+        }
+    },
+
+    checkAccessGuard() {
+        const currFile = (window.location.pathname || '').split('/').pop() || 'index.html';
+        // Si es una hoja vieja y el usuario NO es Fernando Lozano, redirigir de inmediato a la hoja nueva
+        if (this.OLD_TO_NEW[currFile]) {
+            if (!this.isFernandoLozano()) {
+                window.location.replace(this.OLD_TO_NEW[currFile]);
+                return true;
+            }
+        }
+        return false;
+    },
+
     getMode() {
+        if (!this.isFernandoLozano()) return 'v2';
         const stored = localStorage.getItem('maulas_version_mode');
         if (stored === 'v1' || stored === 'v2') return stored;
         const file = window.location.pathname.split('/').pop() || '';
@@ -648,12 +696,14 @@ window.AppVersion = {
     },
 
     setMode(mode) {
+        if (!this.isFernandoLozano()) return;
         localStorage.setItem('maulas_version_mode', mode);
         this.updateButtons(mode);
         this.updateLinks(mode);
     },
 
     switchMode(targetMode) {
+        if (!this.isFernandoLozano()) return;
         localStorage.setItem('maulas_version_mode', targetMode);
         const currFile = window.location.pathname.split('/').pop() || '';
         const counterpart = this.COUNTERPARTS[currFile];
@@ -684,24 +734,64 @@ window.AppVersion = {
     },
 
     updateLinks(mode) {
+        const effectiveMode = this.isFernandoLozano() ? mode : 'v2';
         document.querySelectorAll('[data-version-link]').forEach(el => {
             const key = el.getAttribute('data-version-link');
             if (this.PAGE_MAP[key]) {
-                el.href = this.PAGE_MAP[key][mode];
+                el.href = this.PAGE_MAP[key][effectiveMode];
             }
         });
     },
 
+    updateVisibility() {
+        const isFernando = this.isFernandoLozano();
+        if (!isFernando) {
+            document.documentElement.classList.add('non-fernando');
+        } else {
+            document.documentElement.classList.remove('non-fernando');
+        }
+
+        const switchers = document.querySelectorAll(
+            '#version-switcher-container, #version-switcher-container-mobile, .version-switcher-wrapper, [data-version-btn], #btn-version-v1, #btn-version-v2'
+        );
+        switchers.forEach(el => {
+            if (isFernando) {
+                el.style.display = '';
+            } else {
+                el.style.setProperty('display', 'none', 'important');
+            }
+        });
+    },
+
+    injectOldPageSwitcher() {
+        if (!this.isFernandoLozano()) return;
+        const currFile = (window.location.pathname || '').split('/').pop() || 'index.html';
+        const counterpart = this.OLD_TO_NEW[currFile];
+        if (!counterpart) return;
+
+        if (document.getElementById('fernando-version-switcher')) return;
+
+        const floatDiv = document.createElement('div');
+        floatDiv.id = 'fernando-version-switcher';
+        floatDiv.style.cssText = 'position:fixed; bottom:16px; right:16px; z-index:999999; background:rgba(15,23,42,0.92); border:1px solid #f59e0b; padding:6px 12px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.8); display:flex; align-items:center; gap:8px; font-family:sans-serif; font-size:12px; font-weight:bold; backdrop-filter:blur(8px);';
+        floatDiv.innerHTML = `
+            <span style="color:#f59e0b;">Versión:</span>
+            <span style="background:#f59e0b; color:#0f172a; padding:3px 8px; border-radius:6px;">Clásica</span>
+            <a href="${counterpart}" style="color:#94a3b8; text-decoration:none; padding:3px 8px; border-radius:6px; background:#1e293b; border:1px solid #334155; transition:all 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Ir a Pro ➔</a>
+        `;
+        document.body.appendChild(floatDiv);
+    },
+
     init() {
+        if (this.checkAccessGuard()) return;
+        this.updateVisibility();
         const mode = this.getMode();
         this.updateButtons(mode);
         this.updateLinks(mode);
+        this.injectOldPageSwitcher();
     }
 };
 
-// =========================================================================
-// GESTOR DE TEMA (MODO OSCURO INTACTO <-> MODO CLARO ALTA GAMA)
-// =========================================================================
 window.AppTheme = {
     getTheme() {
         const stored = localStorage.getItem('maulas_theme_mode');
@@ -791,8 +881,14 @@ window.AppTheme = {
 };
 
 // Inicializar de inmediato para evitar parpadeos
-if (typeof window !== 'undefined' && window.AppTheme) {
-    window.AppTheme.init();
+if (typeof window !== 'undefined') {
+    if (window.AppVersion) {
+        window.AppVersion.checkAccessGuard();
+        window.AppVersion.updateVisibility();
+    }
+    if (window.AppTheme) {
+        window.AppTheme.init();
+    }
 }
 
 // Inicializar al cargar el DOM
