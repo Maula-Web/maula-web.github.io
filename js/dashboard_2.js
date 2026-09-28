@@ -762,7 +762,7 @@ class Dashboard2AppController {
                         <span class="text-slate-300 ml-1">${perdedores.length > 0 ? perdedores.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
                     </div>
                     <div class="text-[11px] text-amber-300/90 pt-1.5 border-t border-slate-800 flex items-center justify-between">
-                        <span>Penalización Bote 2:</span>
+                        <span>Penalización:</span>
                         <span class="font-mono font-bold text-rose-400">-${penaltyVal} € / socio</span>
                     </div>
                 </div>
