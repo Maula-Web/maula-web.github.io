@@ -1272,7 +1272,11 @@ nav .overflow-x-auto,
 .no-scrollbar,
 .jornadas-scroll-container,
 .view-switcher-box,
-#main-content {
+#main-content,
+.match-card-row,
+#boleto-matches-container,
+#view-matrix,
+#matrix-container {
     min-width: 0 !important;
     max-width: 100% !important;
 }

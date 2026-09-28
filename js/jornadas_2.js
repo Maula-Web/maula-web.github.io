@@ -740,37 +740,43 @@ class Jornadas2AppController {
                 : 'border border-slate-800 bg-slate-950/60';
 
             html += `
-                <div class="match-card-row p-3 sm:p-4 rounded-xl ${rowBorder} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <!-- Casilla & PIG -->
-                    <div class="flex items-center gap-2.5 sm:w-24 shrink-0">
-                        <span class="w-7 h-7 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-xs font-mono font-bold text-slate-200">
-                            ${isPleno ? 'P15' : idx + 1}
-                        </span>
-                        ${pigBadgeHtml}
+                <div class="match-card-row p-2.5 sm:p-4 rounded-xl ${rowBorder} flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 w-full max-w-full min-w-0 overflow-hidden">
+                    <!-- Fila Superior en Móvil / Zona Izquierda en Escritorio: Casilla & PIG + Signo Oficial en Móvil -->
+                    <div class="flex items-center justify-between sm:justify-start w-full sm:w-auto shrink-0 gap-2">
+                        <div class="flex items-center gap-2 sm:w-24 shrink-0">
+                            <span class="w-7 h-7 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-xs font-mono font-bold text-slate-200">
+                                ${isPleno ? 'P15' : idx + 1}
+                            </span>
+                            ${pigBadgeHtml}
+                        </div>
+                        <!-- Signo Oficial visible arriba a la derecha en móvil (< sm) -->
+                        <div class="sm:hidden flex items-center shrink-0">
+                            ${signHtml}
+                        </div>
                     </div>
 
-                    <!-- Equipos & Escudos -->
-                    <div class="flex-1 grid grid-cols-11 items-center gap-2 text-xs sm:text-sm">
+                    <!-- Equipos & Escudos: min-w-0 estricto para impedir desbordes horizontales -->
+                    <div class="flex-1 grid grid-cols-11 items-center gap-1 sm:gap-2 text-xs sm:text-sm min-w-0 w-full">
                         <!-- Local -->
-                        <div class="col-span-5 flex items-center justify-end gap-2.5 text-right font-bold text-white">
-                            <span class="truncate">${home || '<em class="text-slate-600 font-normal">Equipo Local</em>'}</span>
-                            ${homeLogo ? `<img src="${homeLogo}" class="w-6 h-6 object-contain shrink-0" onerror="this.style.display='none'">` : '<span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px] shrink-0">⚽</span>'}
+                        <div class="col-span-5 flex items-center justify-end gap-1.5 sm:gap-2.5 text-right font-bold text-white min-w-0 overflow-hidden">
+                            <span class="truncate block text-right text-[11px] sm:text-sm font-semibold">${home || '<em class="text-slate-600 font-normal">Equipo Local</em>'}</span>
+                            ${homeLogo ? `<img src="${homeLogo}" class="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0" onerror="this.style.display='none'">` : '<span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-800 flex items-center justify-center text-[9px] sm:text-[10px] shrink-0">⚽</span>'}
                         </div>
 
                         <!-- VS / Separador -->
-                        <div class="col-span-1 text-center font-mono font-bold text-slate-500 text-xs">
+                        <div class="col-span-1 text-center font-mono font-bold text-slate-500 text-[10px] sm:text-xs shrink-0">
                             vs
                         </div>
 
                         <!-- Visitante -->
-                        <div class="col-span-5 flex items-center justify-start gap-2.5 text-left font-bold text-white">
-                            ${awayLogo ? `<img src="${awayLogo}" class="w-6 h-6 object-contain shrink-0" onerror="this.style.display='none'">` : '<span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px] shrink-0">⚽</span>'}
-                            <span class="truncate">${away || '<em class="text-slate-600 font-normal">Equipo Visitante</em>'}</span>
+                        <div class="col-span-5 flex items-center justify-start gap-1.5 sm:gap-2.5 text-left font-bold text-white min-w-0 overflow-hidden">
+                            ${awayLogo ? `<img src="${awayLogo}" class="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0" onerror="this.style.display='none'">` : '<span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-800 flex items-center justify-center text-[9px] sm:text-[10px] shrink-0">⚽</span>'}
+                            <span class="truncate block text-left text-[11px] sm:text-sm font-semibold">${away || '<em class="text-slate-600 font-normal">Equipo Visitante</em>'}</span>
                         </div>
                     </div>
 
-                    <!-- Signo Oficial -->
-                    <div class="sm:w-28 shrink-0 flex items-center justify-end">
+                    <!-- Signo Oficial en Escritorio (>= sm) -->
+                    <div class="hidden sm:flex sm:w-28 shrink-0 items-center justify-end">
                         ${signHtml}
                     </div>
                 </div>

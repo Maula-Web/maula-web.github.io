@@ -935,8 +935,25 @@
                         <span class="text-[9px] sm:text-[10px] text-amber-500 font-mono whitespace-nowrap block mt-0.5">Temporada 2026-2027</span>
                     </div>
                 </a>
+                <!-- Controles Compactos Móvil (< md) -->
                 <div class="flex md:hidden items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                     <button onclick="location.reload(true);" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-emerald-500 border border-emerald-500/40 text-xs flex items-center justify-center font-bold shadow-sm">🔄</button>
+                    <!-- Selector Versión Móvil -->
+                    <div class="flex items-center bg-slate-100 dark:bg-slate-950/80 p-0.5 rounded-lg border border-slate-300 dark:border-amber-500/40 text-[11px] font-bold shadow-inner" id="version-switcher-container-mobile">
+                        <button type="button" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-1.5 py-0.5 rounded text-[11px] font-semibold transition text-slate-500 dark:text-slate-400" title="1.0 Clásica">1.0</button>
+                        <button type="button" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-1.5 py-0.5 rounded text-[11px] font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="⚡ 2.0 Pro">⚡2.0</button>
+                    </div>
+
+                    <!-- Selector Tema Móvil -->
+                    <div class="flex items-center bg-slate-100 dark:bg-slate-950/80 p-0.5 rounded-lg border border-slate-300 dark:border-amber-500/40 text-[11px] font-bold shadow-inner" id="theme-switcher-container-mobile">
+                        <button type="button" data-theme-btn="light" onclick="window.AppTheme && window.AppTheme.setTheme('light')" class="px-1.5 py-0.5 rounded text-xs transition text-slate-700 dark:text-slate-400" title="Modo Claro">☀️</button>
+                        <button type="button" data-theme-btn="dark" onclick="window.AppTheme && window.AppTheme.setTheme('dark')" class="px-1.5 py-0.5 rounded text-xs transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Modo Oscuro">🌙</button>
+                    </div>
+
+                    <!-- Botón Actualizar Móvil -->
+                    <button onclick="if(window.Auth && window.Auth.forceAppUpdate){window.Auth.forceAppUpdate();}else{location.reload(true);}" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-slate-300 dark:border-emerald-500/40 text-xs flex items-center justify-center font-bold shadow-sm" title="Actualizar">🔄</button>
+
+                    <!-- Botón Salir Móvil -->
+                    <button onclick="if(window.Auth && window.Auth.logout){window.Auth.logout();}else{sessionStorage.clear();localStorage.clear();location.href='login.html';}" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-slate-300 dark:border-slate-700 text-xs flex items-center justify-center font-bold shadow-sm" title="Cerrar sesión">🚪</button>
                 </div>
             </div>
 
@@ -966,7 +983,7 @@
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏆</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Clasificación</span>
                 </a>
-                <a href="resumen-temporada.html" data-version-link="resumen" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
+                <a href="resumen_2.html" data-version-link="resumen" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-200 dark:hover:bg-slate-800 transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">📊</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Resumen</span>
                 </a>

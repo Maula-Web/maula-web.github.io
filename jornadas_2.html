@@ -312,7 +312,7 @@
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🏆</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Clasificación</span>
                 </a>
-                <a href="resumen-temporada.html" data-version-link="resumen" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
+                <a href="resumen_2.html" data-version-link="resumen" class="flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-slate-800 hover:text-white transition group flex-shrink-0">
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">📊</span>
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Resumen</span>
                 </a>
@@ -387,60 +387,63 @@
         <!-- =====================================================================
              HUB DE CONTROL Y SELECTOR DE JORNADAS 2.0 (DESPLEGABLE & PÍLDORAS)
              ===================================================================== -->
-        <section class="glass-panel p-4 sm:p-5 border-amber-500/40 space-y-4 order-4 lg:order-3">
+        <section class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-4 lg:order-3 min-w-0 max-w-full overflow-hidden">
             <!-- Barra Superior del Hub: Selector desplegable moderno + Botones Admin -->
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <!-- Flecha Anterior -->
-                    <button type="button" id="btn-prev-jornada" onclick="window.JornadasApp.navigateJornada(-1)" class="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada anterior">
-                        ◀
-                    </button>
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto min-w-0">
+                    <!-- Fila con Flechas y Selector Dropdown juntos en una sola línea -->
+                    <div class="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+                        <!-- Flecha Anterior -->
+                        <button type="button" id="btn-prev-jornada" onclick="window.JornadasApp.navigateJornada(-1)" class="w-9 h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada anterior">
+                            ◀
+                        </button>
 
-                    <!-- Selector Desplegable Estilizado de Jornadas -->
-                    <div class="relative min-w-[240px] sm:min-w-[320px]">
-                        <label for="jornada-select-dropdown" class="sr-only">Seleccionar Jornada</label>
-                        <select id="jornada-select-dropdown" onchange="window.JornadasApp.handleSelectJornada(this.value)" class="w-full pl-3.5 pr-8 py-2 bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-inner">
-                            <option value="">Cargando jornadas...</option>
-                        </select>
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
+                        <!-- Selector Desplegable Estilizado de Jornadas -->
+                        <div class="relative flex-1 min-w-0">
+                            <label for="jornada-select-dropdown" class="sr-only">Seleccionar Jornada</label>
+                            <select id="jornada-select-dropdown" onchange="window.JornadasApp.handleSelectJornada(this.value)" class="w-full pl-3 pr-7 py-2 bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-inner truncate">
+                                <option value="">Cargando jornadas...</option>
+                            </select>
+                            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
+                        </div>
+
+                        <!-- Flecha Siguiente -->
+                        <button type="button" id="btn-next-jornada" onclick="window.JornadasApp.navigateJornada(1)" class="w-9 h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada siguiente">
+                            ▶
+                        </button>
                     </div>
 
-                    <!-- Flecha Siguiente -->
-                    <button type="button" id="btn-next-jornada" onclick="window.JornadasApp.navigateJornada(1)" class="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada siguiente">
-                        ▶
-                    </button>
-
                     <!-- Badge Dinámico de Estado de la Jornada Seleccionada -->
-                    <span id="selected-jornada-status-chip" class="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                    <span id="selected-jornada-status-chip" class="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 inline-flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto">
                         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                         <span id="selected-jornada-status-text">Finalizada</span>
                     </span>
                 </div>
 
                 <!-- Botones de Acción / Herramientas de Administrador -->
-                <div class="flex items-center gap-2 flex-wrap justify-end">
-                    <button type="button" onclick="window.JornadasApp.openImportMatchesModal()" class="px-3 py-2 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-start lg:justify-end">
+                    <button type="button" onclick="window.JornadasApp.openImportMatchesModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
                         <span>📋</span> Importar Partidos
                     </button>
-                    <button type="button" onclick="window.JornadasApp.openImportResultsModal()" class="px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow">
+                    <button type="button" onclick="window.JornadasApp.openImportResultsModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
                         <span>📥</span> Importar Resultados
                     </button>
-                    <button type="button" onclick="window.JornadasApp.openEditModalCurrent()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/50 text-xs font-bold transition flex items-center gap-1.5 shadow">
+                    <button type="button" onclick="window.JornadasApp.openEditModalCurrent()" class="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/50 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
                         <span>✏️</span> Editar Jornada
                     </button>
-                    <button type="button" onclick="window.JornadasApp.openNewJornadaModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow">
+                    <button type="button" onclick="window.JornadasApp.openNewJornadaModal()" class="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-[11px] sm:text-xs transition flex items-center gap-1.5 shadow">
                         <span>➕</span> Nueva
                     </button>
                 </div>
             </div>
 
             <!-- Carrusel Deslizable de Píldoras de Navegación Rápida -->
-            <div class="pt-2 border-t border-slate-800/80">
+            <div class="pt-2 border-t border-slate-800/80 min-w-0 max-w-full">
                 <div class="flex items-center justify-between text-xs text-slate-400 mb-1.5">
                     <span class="font-medium">Jornadas oficiales de la temporada (Domingos):</span>
                     <span id="total-jornadas-counter" class="font-mono text-amber-400">0 jornadas</span>
                 </div>
-                <div id="jornadas-pills-carousel" class="jornadas-scroll-container flex items-center gap-2 overflow-x-auto pb-2 pt-1 select-none">
+                <div id="jornadas-pills-carousel" class="jornadas-scroll-container flex items-center gap-2 overflow-x-auto pb-2 pt-1 select-none min-w-0 max-w-full">
                     <!-- Injected by JS -->
                 </div>
             </div>
@@ -683,7 +686,7 @@
         <!-- =====================================================================
              BOLETO OFICIAL DE 15 PARTIDOS (DISEÑO DEPORTIVO MAULAS 2.0)
              ===================================================================== -->
-        <section class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4 order-5">
+        <section class="glass-panel p-3 sm:p-6 border-amber-500/40 space-y-4 order-5 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800 flex-wrap gap-2">
                 <div class="flex items-center gap-2.5">
                     <span class="p-2 rounded-xl bg-amber-500/20 text-amber-400 text-lg">📝</span>
@@ -704,7 +707,7 @@
             </div>
 
             <!-- Lista de Partidos (Bloques 1 al 4 + Pleno al 15) -->
-            <div id="boleto-matches-container" class="space-y-3">
+            <div id="boleto-matches-container" class="space-y-3 min-w-0 max-w-full">
                 <p class="text-center text-slate-500 py-10 font-mono text-xs">Cargando partidos de la jornada...</p>
             </div>
         </section>
@@ -712,7 +715,7 @@
         <!-- =====================================================================
              TABLA DE ESCRUTINIO OFICIAL & REPARTO DE PREMIOS (LOTERÍAS DEL ESTADO)
              ===================================================================== -->
-        <section id="section-escrutinio" class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4 order-6">
+        <section id="section-escrutinio" class="glass-panel p-3 sm:p-6 border-amber-500/40 space-y-4 order-6 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800 flex-wrap gap-2">
                 <div class="flex items-center gap-2.5">
                     <span class="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 text-lg">🎁</span>

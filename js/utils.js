@@ -759,17 +759,27 @@ window.AppTheme = {
 
     updateButtons(theme) {
         document.querySelectorAll('[data-theme-btn="light"], #btn-theme-light').forEach(btn => {
+            const isMobile = btn.closest('#theme-switcher-container-mobile');
             if (theme === 'light') {
-                btn.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                btn.className = isMobile 
+                    ? 'px-1.5 py-0.5 rounded text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow'
+                    : 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
             } else {
-                btn.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+                btn.className = isMobile
+                    ? 'px-1.5 py-0.5 rounded text-xs transition text-slate-400'
+                    : 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
             }
         });
         document.querySelectorAll('[data-theme-btn="dark"], #btn-theme-dark').forEach(btn => {
+            const isMobile = btn.closest('#theme-switcher-container-mobile');
             if (theme === 'dark') {
-                btn.className = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                btn.className = isMobile
+                    ? 'px-1.5 py-0.5 rounded text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow'
+                    : 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
             } else {
-                btn.className = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+                btn.className = isMobile
+                    ? 'px-1.5 py-0.5 rounded text-xs transition text-slate-400'
+                    : 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
             }
         });
     },
@@ -790,6 +800,18 @@ if (typeof document !== 'undefined') {
     const onDomReady = () => {
         if (window.AppVersion) window.AppVersion.init();
         if (window.AppTheme) window.AppTheme.init();
+
+        // Auto-centrar la pestaña activa del menú en pantallas de móvil
+        try {
+            if (window.innerWidth < 1024) {
+                const activeNavTab = document.querySelector('nav a[class*="bg-amber-500"], nav a[class*="bg-amber-500/20"]');
+                if (activeNavTab && activeNavTab.scrollIntoView) {
+                    setTimeout(() => {
+                        activeNavTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }, 100);
+                }
+            }
+        } catch (e) { }
     };
 
     if (document.readyState === 'loading') {
