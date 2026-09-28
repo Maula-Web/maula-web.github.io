@@ -14,7 +14,9 @@
  * =========================================================================
  */
 
-const admin = require('firebase-admin');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
+const { getMessaging } = require('firebase-admin/messaging');
 
 // 1. Inicialización de Firebase Admin
 function initFirebase() {
@@ -35,13 +37,13 @@ function initFirebase() {
         process.exit(1);
     }
 
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
+    const app = initializeApp({
+        credential: cert(serviceAccount)
     });
 
     return {
-        db: admin.firestore(),
-        messaging: admin.messaging()
+        db: getFirestore(app),
+        messaging: getMessaging(app)
     };
 }
 
