@@ -110,19 +110,18 @@ async function main() {
 
     console.log(`📋 Pronósticos ya recibidos para Jornada ${jornadaNum}: ${submittedMemberIds.size} socios.`);
 
-    // 4. Obtener todos los socios activos
-    const membersSnap = await db.collection('members')
-        .where('active', '==', true)
-        .get();
+    // 4. Obtener todos los socios
+    const membersSnap = await db.collection('members').get();
 
     const pendingMembers = [];
     membersSnap.forEach(doc => {
         const m = doc.data();
-        const mid = String(m.id);
+        if (m.active === false) return; // descartar solo si está explícitamente inactivo
+        const mid = String(m.id || doc.id);
         if (!submittedMemberIds.has(mid)) {
             pendingMembers.push({
-                id: m.id,
-                name: m.name || m.phone || `Socio ${m.id}`
+                id: m.id || doc.id,
+                name: m.name || m.phone || `Socio ${m.id || doc.id}`
             });
         }
     });
@@ -136,7 +135,7 @@ async function main() {
     }
 
     // 5. Obtener tokens FCM de los socios pendientes
-    const pendingIds = pendingMembers.map(p => Number(p.id));
+    const pendingIdStrings = pendingMembers.map(p => String(p.id));
     const subsSnap = await db.collection('push_subscriptions')
         .where('permission', '==', 'granted')
         .get();
@@ -144,8 +143,8 @@ async function main() {
     const targetTokens = [];
     subsSnap.forEach(doc => {
         const data = doc.data();
-        const mid = Number(data.memberId);
-        if (pendingIds.includes(mid) && data.fcmToken) {
+        const mid = String(data.memberId || doc.id.replace('member_', ''));
+        if (pendingIdStrings.includes(mid) && data.fcmToken) {
             targetTokens.push({
                 token: data.fcmToken,
                 memberId: data.memberId,

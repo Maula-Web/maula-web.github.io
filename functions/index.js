@@ -188,15 +188,15 @@ exports.sendThursdayReminder = onSchedule(
             if (mid !== undefined) submittedIds.add(String(mid));
         });
 
-        // 3. Socios activos que NO rellenaron
-        const membersSnap = await db.collection('members')
-            .where('active', '==', true)
-            .get();
+        // 3. Socios que NO rellenaron
+        const membersSnap = await db.collection('members').get();
         const pendingMemberIds = [];
         membersSnap.forEach(doc => {
             const m = doc.data();
-            if (!submittedIds.has(String(m.id))) {
-                pendingMemberIds.push(m.id);
+            if (m.active === false) return;
+            const mid = String(m.id || doc.id);
+            if (!submittedIds.has(mid)) {
+                pendingMemberIds.push(mid);
             }
         });
 
