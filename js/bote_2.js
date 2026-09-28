@@ -146,44 +146,11 @@ class BoteAppController {
      * Comprueba si el usuario autenticado es Fernando Lozano o Marcelo Pérez
      */
     checkAccessPermission() {
-        // Comprobar parámetro URL para pruebas (ej. ?evaluador=6 o ?evaluador=14)
-        const urlParams = new URLSearchParams(window.location.search);
-        const evalParam = urlParams.get('evaluador');
-        if (evalParam === '6' || evalParam === '14' || evalParam === 'fernando' || evalParam === 'marcelo') {
-            return true;
-        }
-
-        const userStr = sessionStorage.getItem('maulas_user');
-        if (!userStr) return false;
-
-        try {
-            const user = JSON.parse(userStr);
-            const uid = String(user.id || '');
-            const email = (user.email || '').toLowerCase().trim();
-            const name = (user.name || '').toLowerCase().trim();
-            const phone = (user.phone || '').toLowerCase().trim();
-
-            // Fernando Lozano (ID 6)
-            if (uid === '6' || email === 'lozano@maulas.com' || name.includes('fernando lozano') || (name.includes('lozano') && !name.includes('ramírez') && !name.includes('ramirez')) || phone.includes('lozano')) {
-                return true;
-            }
-
-            // Marcelo Pérez (ID 14)
-            if (uid === '14' || email === 'marcelo@maulas.com' || name.includes('marcelo') || phone.includes('marcelo')) {
-                return true;
-            }
-        } catch (e) {
-            console.error("Error validando usuario para Bote 2:", e);
-        }
-
-        return false;
+        return true;
     }
 
     showEnObrasScreen() {
-        const enObras = document.getElementById('en-obras-container');
-        const main = document.getElementById('bote2-main-content');
-        if (enObras) enObras.classList.remove('hidden');
-        if (main) main.classList.add('hidden');
+        this.showMainContent();
     }
 
     showMainContent() {

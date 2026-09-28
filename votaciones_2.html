@@ -227,31 +227,8 @@
                 document.documentElement.classList.remove('light-theme');
             }
 
-            // 2. Control de Acceso Exclusivo (Fernando Lozano)
-            function checkAccess() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
-                if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') return true;
-
-                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-                if (!userStr) return false;
-                try {
-                    const user = JSON.parse(userStr);
-                    if (user.id == 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) return true;
-                    if (user.role === 'admin') return true;
-                } catch (e) { }
-                return false;
-            }
-
-            window.__isUserAuthorized = checkAccess();
-            if (!window.__isUserAuthorized) {
-                document.addEventListener('DOMContentLoaded', () => {
-                    const restr = document.getElementById('restricted-screen');
-                    const main = document.getElementById('main-content');
-                    if (restr) restr.style.display = 'flex';
-                    if (main) main.style.display = 'none';
-                });
-            }
+            // Acceso universal autorizado para todos los socios
+            window.__isUserAuthorized = true;
         })();
     </script>
 </head>
@@ -264,48 +241,6 @@
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/telegram-service.js"></script>
-
-    <!-- =====================================================================
-         PANTALLA DE ACCESO RESTRINGIDO (Oculta por defecto para evitar parpadeos)
-         ===================================================================== -->
-    <div id="restricted-screen" style="display: none;" class="min-h-[85vh] items-center justify-center p-4">
-        <div class="glass-panel max-w-xl w-full p-8 text-center space-y-6 border-amber-500/40 relative overflow-hidden shadow-2xl">
-            <div class="absolute -right-12 -top-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-4xl">
-                🚧
-            </div>
-
-            <div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                    Fase de Pruebas Exclusiva
-                </span>
-                <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white mt-3">Votaciones 2.0 Pro en Obras</h1>
-                <p class="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
-                    Sistema de consultas, propuestas y acuerdos de la Peña Maulas.
-                </p>
-                <p class="text-slate-500 text-xs mt-2">
-                    Estará disponible para toda la peña en cuanto concluyan las pruebas de validación oficial.
-                </p>
-            </div>
-
-            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="votaciones.html" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-                    <span>🗳️</span> Ir a Votaciones 1.0 (Clásica)
-                </a>
-                <a href="login.html" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-sm border border-slate-700 transition-all flex items-center justify-center gap-2">
-                    <span>🔑</span> Iniciar Sesión
-                </a>
-            </div>
-
-            <div class="pt-4 border-t border-slate-300 dark:border-slate-800 text-xs text-slate-500">
-                Identificación de socio:
-                <button onclick="sessionStorage.clear(); localStorage.clear(); location.href='login.html';" class="text-amber-500 dark:text-amber-400 hover:underline font-semibold ml-1">
-                    Identifícate con tu PIN o Apodo
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- =====================================================================
          CONTENEDOR PRINCIPAL: VOTACIONES 2.0 PRO

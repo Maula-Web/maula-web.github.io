@@ -66,28 +66,7 @@ class Jornadas2AppController {
      * Comprobación estricta de identidad: Fernando Lozano
      */
     checkAccessFernandoLozano() {
-        try {
-            const rawUser = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-            if (!rawUser) return false;
-            const user = JSON.parse(rawUser);
-            if (!user) return false;
-
-            if (user.id === 6 || user.id === '6' || user.id === 1 || user.id === '1') return true;
-
-            const name = (user.name || '').toLowerCase();
-            const phone = (user.phone || '').toLowerCase();
-            const email = (user.email || '').toLowerCase();
-
-            return (
-                email.includes('lozano') ||
-                name.includes('fernando lozano') ||
-                (name.includes('lozano') && !name.includes('ram')) ||
-                phone.includes('lozano')
-            );
-        } catch (e) {
-            console.error('[Jornadas 2.0] Error comprobando permisos:', e);
-            return false;
-        }
+        return true;
     }
 
     showRestrictedScreen() {

@@ -876,48 +876,10 @@
                 document.documentElement.classList.remove('light-theme');
             }
 
-            // 2. Control de Acceso Exclusivo (Fernando Lozano)
-            function checkAccess() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
-                if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') return true;
-                
-                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-                if (!userStr) return false;
-                try {
-                    const user = JSON.parse(userStr);
-                    if (user.id == 6 || user.email === 'fernandolozanor@gmail.com' || (user.phone && user.phone.includes('Lozano'))) return true;
-                    if (user.role === 'admin') return true;
-                } catch(e) {}
-                return false;
-            }
-
-            window.__isUserAuthorized = checkAccess();
-            if (!window.__isUserAuthorized) {
-                // Solo si el usuario NO es Fernando Lozano se activa el bloqueo
-                document.addEventListener('DOMContentLoaded', () => {
-                    const restr = document.getElementById('restricted-screen');
-                    const main = document.getElementById('main-content');
-                    if (restr) restr.style.display = 'flex';
-                    if (main) main.style.display = 'none';
-                });
-            }
+            // Acceso universal autorizado para todos los socios
+            window.__isUserAuthorized = true;
         })();
     </script>
-
-    <!-- FASE DE PRUEBAS EXCLUSIVA (Restricted Screen - Oculto por defecto para evitar parpadeos) -->
-    <div id="restricted-screen" class="fixed inset-0 bg-slate-100 dark:bg-slate-950 z-[999999] flex-col items-center justify-center p-6 text-center" style="display: none;">
-        <div class="glass-panel p-8 md:p-12 max-w-lg w-full flex flex-col items-center border-rose-500/30 shadow-xl">
-            <div class="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mb-6 border border-rose-500/50">
-                <span class="text-4xl">🛑</span>
-            </div>
-            <h1 class="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Acceso Restringido</h1>
-            <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">Gestión y sellado de pronósticos oficiales de la Peña Maulas.</p>
-            <button onclick="window.Auth && window.Auth.logout ? window.Auth.logout() : (sessionStorage.clear(), localStorage.clear(), location.href='login.html')" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition flex items-center gap-2">
-                <span>🚪</span> Salir de la cuenta
-            </button>
-        </div>
-    </div>
 
     <!-- CONTENEDOR PRINCIPAL V2 -->
     <div id="main-content" class="max-w-[1650px] mx-auto flex flex-col space-y-4 sm:space-y-5">

@@ -212,48 +212,6 @@
     <script src="js/text-importer.js"></script>
 
     <!-- =====================================================================
-         PANTALLA: ACCESO RESTRINGIDO (Visible para cualquier socio excepto Fernando Lozano)
-         ===================================================================== -->
-    <div id="restricted-screen" class="hidden min-h-[85vh] flex items-center justify-center p-4">
-        <div class="glass-panel max-w-xl w-full p-8 text-center space-y-6 border-amber-500/40 relative overflow-hidden shadow-2xl">
-            <div class="absolute -right-12 -top-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-4xl">
-                🚧
-            </div>
-
-            <div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                    Fase de Pruebas Exclusiva
-                </span>
-                <h1 class="text-3xl font-extrabold text-white mt-3">Resultados Partidos 2.0 en Obras</h1>
-                <p class="text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
-                    Visor de resultados de partidos y escrutinio oficial de la Peña Maulas.
-                </p>
-                <p class="text-slate-500 text-xs mt-2">
-                    Estará disponible para toda la peña en cuanto se concluyan las pruebas de validación oficial.
-                </p>
-            </div>
-
-            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="jornadas.html" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-                    <span>⚽</span> Ir a Resultados 1.0 (Clásica)
-                </a>
-                <a href="login.html" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-sm border border-slate-700 transition-all flex items-center justify-center gap-2">
-                    <span>🔑</span> Iniciar Sesión
-                </a>
-            </div>
-
-            <div class="pt-4 border-t border-slate-800 text-xs text-slate-500">
-                Identificación de socio: 
-                <button onclick="window.JornadasApp && window.JornadasApp.promptLoginEvaluador()" class="text-amber-400 hover:underline font-semibold ml-1">
-                    Identifícate con tu PIN o Apodo
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- =====================================================================
          CONTENIDO PRINCIPAL: RESULTADOS PARTIDOS 2.0 (Visible para Fernando Lozano)
          ===================================================================== -->
     <div id="main-content" class="w-full max-w-[1500px] mx-auto min-w-0 flex flex-col space-y-4 sm:space-y-6">

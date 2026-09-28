@@ -48,37 +48,7 @@ class Dashboard2AppController {
      * Comprueba si el usuario autenticado es Fernando Lozano
      */
     checkAccessPermission() {
-        try {
-            // Comprobar parámetros en URL (?evaluador=6 o ?user=6)
-            const urlParams = new URLSearchParams(window.location.search);
-            const evalParam = (urlParams.get('evaluador') || urlParams.get('user') || urlParams.get('socio') || '').toLowerCase();
-            if (evalParam === '6' || evalParam === 'fernando' || evalParam === 'lozano') {
-                const user = { id: 6, name: 'Fernando Lozano', email: 'lozano@maulas.com', phone: 'Lozano' };
-                sessionStorage.setItem('maulas_user', JSON.stringify(user));
-                localStorage.setItem('maulas_user', JSON.stringify(user));
-                return true;
-            }
-
-            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-            if (!userStr) return false;
-
-            const user = JSON.parse(userStr);
-            const uid = String(user.id || '');
-            const email = (user.email || '').toLowerCase().trim();
-            const name = (user.name || '').toLowerCase().trim();
-            const phone = (user.phone || '').toLowerCase().trim();
-
-            return (
-                uid === '6' ||
-                email === 'lozano@maulas.com' ||
-                name.includes('fernando lozano') ||
-                (name.includes('lozano') && !name.includes('ram')) ||
-                phone.includes('lozano')
-            );
-        } catch (e) {
-            console.error('[Dashboard 2.0] Error comprobando permisos:', e);
-            return false;
-        }
+        return true;
     }
 
     showRestrictedScreen() {
