@@ -1035,64 +1035,9 @@
         </div>
 
         <!-- =====================================================================
-             NIVEL 3: HUB DE CONTROL Y SELECTORES
+             NIVEL 3: TARJETAS BENTO RESUMEN (PLEGABLES EN MÓVIL PARA MAXIMIZAR ESPACIO)
              ===================================================================== -->
-        <section class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-4 lg:order-3">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
-                    
-                    <!-- SELECTOR DE JORNADA CON FLECHAS ◀ Y ▶ -->
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" id="btn-jornada-prev" onclick="window.navigateJornadaByNumber(-1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior (reducir número)">
-                            ◀
-                        </button>
-                        
-                        <div class="relative min-w-[170px] sm:min-w-[240px]">
-                            <label for="sel-jornada" class="sr-only">Seleccionar Jornada</label>
-                            <select id="sel-jornada" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
-                                <!-- Opciones inyectadas por pronosticos.js -->
-                            </select>
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 text-xs pointer-events-none">▼</span>
-                        </div>
-
-                        <button type="button" id="btn-jornada-next" onclick="window.navigateJornadaByNumber(1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente (aumentar número)">
-                            ▶
-                        </button>
-                    </div>
-
-                    <!-- SELECTOR DE SOCIO -->
-                    <div class="relative min-w-[150px] sm:min-w-[200px]">
-                        <label for="sel-member" class="sr-only">Seleccionar Socio</label>
-                        <select id="sel-member" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
-                            <!-- Opciones inyectadas por pronosticos.js -->
-                        </select>
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
-                    </div>
-
-                    <!-- CHIP DE PLAZO OFICIAL / CIERRE CON ALTO CONTRASTE -->
-                    <div id="deadline-info-wrap" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-extrabold font-mono bg-slate-900 border border-slate-700 text-white flex items-center gap-2 shadow-sm">
-                        <span id="deadline-led-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span id="deadline-info" class="text-slate-100">Cargando plazo...</span>
-                    </div>
-                </div>
-
-                <!-- BOTONES DE ACCIÓN DEL HUB -->
-                <div class="flex items-center gap-2 flex-wrap justify-end">
-                    <button type="button" id="btn-help-doubles" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-blue-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                        <span>❓</span> Ayuda Sellado
-                    </button>
-
-                    <button type="button" id="btn-view-jornada" class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md">
-                        <span>👁️</span> Ver Pronósticos Colectivos
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- =====================================================================
-             NIVEL 4: TARJETAS BENTO RESUMEN (PLEGABLES EN MÓVIL PARA MAXIMIZAR ESPACIO)
-             ===================================================================== -->
-        <section class="space-y-2 order-3 lg:order-4">
+        <section class="space-y-2 order-3">
             <!-- Barra Maestra de Despliegue en Móvil (< lg) -->
             <div class="kpi-master-bar flex lg:hidden items-center justify-between px-1 py-0.5 text-xs text-slate-500 dark:text-slate-400 font-bold">
                 <span class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
@@ -1308,6 +1253,61 @@
                     </div>
                 </div>
 
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             NIVEL 4: HUB DE CONTROL Y SELECTORES
+             ===================================================================== -->
+        <section class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+                    
+                    <!-- SELECTOR DE JORNADA CON FLECHAS ◀ Y ▶ -->
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" id="btn-jornada-prev" onclick="window.navigateJornadaByNumber(-1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior (reducir número)">
+                            ◀
+                        </button>
+                        
+                        <div class="relative min-w-[170px] sm:min-w-[240px]">
+                            <label for="sel-jornada" class="sr-only">Seleccionar Jornada</label>
+                            <select id="sel-jornada" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
+                                <!-- Opciones inyectadas por pronosticos.js -->
+                            </select>
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 text-xs pointer-events-none">▼</span>
+                        </div>
+
+                        <button type="button" id="btn-jornada-next" onclick="window.navigateJornadaByNumber(1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente (aumentar número)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <!-- SELECTOR DE SOCIO -->
+                    <div class="relative min-w-[150px] sm:min-w-[200px]">
+                        <label for="sel-member" class="sr-only">Seleccionar Socio</label>
+                        <select id="sel-member" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
+                            <!-- Opciones inyectadas por pronosticos.js -->
+                        </select>
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
+                    </div>
+
+                    <!-- CHIP DE PLAZO OFICIAL / CIERRE CON ALTO CONTRASTE -->
+                    <div id="deadline-info-wrap" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-extrabold font-mono bg-slate-900 border border-slate-700 text-white flex items-center gap-2 shadow-sm">
+                        <span id="deadline-led-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="deadline-info" class="text-slate-100">Cargando plazo...</span>
+                    </div>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN DEL HUB -->
+                <div class="flex items-center gap-2 flex-wrap justify-end">
+                    <button type="button" id="btn-help-doubles" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-blue-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                        <span>❓</span> Ayuda Sellado
+                    </button>
+
+                    <button type="button" id="btn-view-jornada" class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md">
+                        <span>👁️</span> Ver Pronósticos Colectivos
+                    </button>
+                </div>
             </div>
         </section>
 
