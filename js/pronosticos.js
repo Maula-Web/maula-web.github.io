@@ -213,9 +213,18 @@ class PronosticoManager {
         }
 
         this.populateDropdowns();
+        if (!this.currentMemberId && this.selMember && this.selMember.value) {
+            this.currentMemberId = this.selMember.value;
+        }
+        if (!this.currentJornadaId && this.selJornada && this.selJornada.value) {
+            this.currentJornadaId = this.selJornada.value;
+        }
         this.renderSummaryTable();
         this.bindEvents();
         this.updateActiveSelectionUI();
+        if (this.currentMemberId && this.currentJornadaId) {
+            this.loadForecast();
+        }
     }
 
     // ... (populateDropdowns, updateCorrectionUI, etc remains same) ...
@@ -375,6 +384,7 @@ class PronosticoManager {
 
     populateDropdowns() {
         if (this.selMember) {
+            this.selMember.innerHTML = '';
             const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
             sortedMembers.forEach(m => {
@@ -383,6 +393,26 @@ class PronosticoManager {
                 opt.textContent = AppUtils.getMemberName(m);
                 this.selMember.appendChild(opt);
             });
+
+            // Preseleccionar automáticamente el socio conectado
+            try {
+                const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                if (userStr) {
+                    const u = JSON.parse(userStr);
+                    const found = this.members.find(m => 
+                        String(m.id) === String(u.id) ||
+                        (u.email && m.email && m.email.toLowerCase() === u.email.toLowerCase()) ||
+                        (u.name && m.name && m.name.toLowerCase() === u.name.toLowerCase()) ||
+                        (u.phone && m.phone && m.phone.toLowerCase() === u.phone.toLowerCase())
+                    );
+                    if (found && this.selMember.querySelector(`option[value="${found.id}"]`)) {
+                        this.selMember.value = String(found.id);
+                        this.currentMemberId = String(found.id);
+                    }
+                }
+            } catch (e) {
+                console.warn('Error preseleccionando socio logueado:', e);
+            }
         }
 
         if (this.selJornada) {

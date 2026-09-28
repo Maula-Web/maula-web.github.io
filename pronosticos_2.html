@@ -1019,7 +1019,7 @@
             <div class="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
                 <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-base sm:text-xl shrink-0">📝</span>
                 <div class="min-w-0">
-                    <strong class="text-slate-800 dark:text-amber-400 font-extrabold text-xs sm:text-base block truncate">Pronósticos 2.0 - Cuadro de Mando & Sellado</strong>
+                    <strong class="text-amber-500 dark:text-amber-400 font-extrabold text-xs sm:text-base block truncate">PRONÓSTICOS 2.0 - CUADRO DE MANDO & SELLADO</strong>
                     <p class="text-slate-600 dark:text-slate-400 text-xs hidden sm:block">Parrilla colectiva de apuestas en vertical por socio, gestión de dobles y validación semanal.</p>
                 </div>
             </div>
@@ -1323,7 +1323,6 @@
                     <div>
                         <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
                             <span>Panel General de Sellado</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/40">Parrilla 1-X-2 por Bloque</span>
                         </h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400">Pronósticos en bloques horizontales por jornada. Haz clic en cualquier celda para editar el boleto.</p>
                     </div>
@@ -2403,14 +2402,30 @@
                     if (!window.app.currentJornadaId && window.app.selJornada && window.app.selJornada.value) {
                         window.app.currentJornadaId = window.app.selJornada.value;
                     }
-                    if (!window.app.currentMemberId) {
-                        const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-                        let logged = null;
-                        try { if (userStr) logged = JSON.parse(userStr); } catch(e) {}
-                        window.app.currentMemberId = (logged && logged.id) ? String(logged.id) : '6';
+                    const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                    let targetMemberId = null;
+                    if (userStr) {
+                        try {
+                            const u = JSON.parse(userStr);
+                            const found = window.app.members.find(m => 
+                                String(m.id) === String(u.id) ||
+                                (u.email && m.email && m.email.toLowerCase() === u.email.toLowerCase()) ||
+                                (u.name && m.name && m.name.toLowerCase() === u.name.toLowerCase()) ||
+                                (u.phone && m.phone && m.phone.toLowerCase() === u.phone.toLowerCase())
+                            );
+                            if (found) targetMemberId = String(found.id);
+                        } catch(e) {}
+                    }
+                    if (targetMemberId) {
+                        window.app.currentMemberId = targetMemberId;
+                        if (window.app.selMember) window.app.selMember.value = targetMemberId;
+                    } else if (!window.app.currentMemberId) {
+                        window.app.currentMemberId = (window.app.selMember && window.app.selMember.value) ? window.app.selMember.value : (window.app.members[0] ? String(window.app.members[0].id) : '6');
                         if (window.app.selMember) window.app.selMember.value = window.app.currentMemberId;
                     }
 
+                    if (window.app.loadForecast) window.app.loadForecast();
+                    if (window.app.updateActiveSelectionUI) window.app.updateActiveSelectionUI();
                     window.app.renderSummaryTable();
                     if (window.app.updateKPIsCustom) window.app.updateKPIsCustom();
                 } else if (attempts > 60) {
