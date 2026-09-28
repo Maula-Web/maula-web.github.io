@@ -479,137 +479,189 @@
             </div>
         </div>
 
+        <!-- Master toggle bar en móvil para Bento KPIs -->
+        <div class="kpi-master-bar">
+            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📊</span> Métricas de Temporada
+            </span>
+            <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn">
+                <span class="kpi-master-btn-text">Ver todas</span>
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+
         <!-- =====================================================================
              NIVEL 1: BENTO GRID DE 5 SUPER-KPIS DE TEMPORADA
              ===================================================================== -->
         <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <!-- KPI 1: Efectividad Global Peña -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-emerald-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-emerald-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-efectividad">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                         <span>🎯</span> Acierto Global
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        📊
-                    </span>
-                </div>
-                <div class="my-2">
-                    <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-white" id="kpi-val-efectividad">
-                        --%
-                    </div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center justify-between">
-                        <span id="kpi-sub-efectividad">-- aciertos / jornada</span>
-                        <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold" id="kpi-media-boleto">--/14</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400" id="kpi-val-efectividad-compact">--%</span>
+                        <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            📊
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
                 </div>
-                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700" id="kpi-bar-efectividad" style="width: 0%"></div>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-2">
+                        <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-white" id="kpi-val-efectividad">
+                            --%
+                        </div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center justify-between">
+                            <span id="kpi-sub-efectividad">-- aciertos / jornada</span>
+                            <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold" id="kpi-media-boleto">--/14</span>
+                        </div>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700" id="kpi-bar-efectividad" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 2: El Bombazo de la Temporada (Récord Individual) -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-amber-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-amber-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-bombazo">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                         <span>🚀</span> Mejor Boleto
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        👑
-                    </span>
-                </div>
-                <div class="my-2">
-                    <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-amber-600 dark:text-amber-400" id="kpi-val-bombazo">
-                        -- aciertos
-                    </div>
-                    <div class="text-[11px] text-slate-800 dark:text-slate-200 font-bold truncate mt-0.5" id="kpi-socio-bombazo">
-                        Sin datos aún
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-amber-600 dark:text-amber-400" id="kpi-val-bombazo-compact">-- ac.</span>
+                        <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            👑
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
                 </div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-800 pt-1 font-mono">
-                    <span id="kpi-jornada-bombazo">Récord absoluto</span>
-                    <span class="text-amber-600 dark:text-amber-400 font-bold" id="kpi-puntos-bombazo">+-- pts</span>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-2">
+                        <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-amber-600 dark:text-amber-400" id="kpi-val-bombazo">
+                            -- aciertos
+                        </div>
+                        <div class="text-[11px] text-slate-800 dark:text-slate-200 font-bold truncate mt-0.5" id="kpi-socio-bombazo">
+                            Sin datos aún
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-800 pt-1 font-mono">
+                        <span id="kpi-jornada-bombazo">Récord absoluto</span>
+                        <span class="text-amber-600 dark:text-amber-400 font-bold" id="kpi-puntos-bombazo">+-- pts</span>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 3: Bote Total en Metálico -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-purple-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-purple-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-premios">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
                         <span>💰</span> Premios Totales
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        💶
-                    </span>
-                </div>
-                <div class="my-2">
-                    <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-purple-600 dark:text-purple-300" id="kpi-val-premios">
-                        0,00 €
-                    </div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate" id="kpi-socio-premios">
-                        0 premios oficiales
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-purple-600 dark:text-purple-300" id="kpi-val-premios-compact">0 €</span>
+                        <span class="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            💶
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
                 </div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-800 pt-1 font-mono">
-                    <span id="kpi-count-premios">Repartidos</span>
-                    <span class="text-purple-600 dark:text-purple-400 font-bold" id="kpi-max-premio">Máx: -- €</span>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-2">
+                        <div class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-purple-600 dark:text-purple-300" id="kpi-val-premios">
+                            0,00 €
+                        </div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate" id="kpi-socio-premios">
+                            0 premios oficiales
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-800 pt-1 font-mono">
+                        <span id="kpi-count-premios">Repartidos</span>
+                        <span class="text-purple-600 dark:text-purple-400 font-bold" id="kpi-max-premio">Máx: -- €</span>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 4: Míster Fiabilidad (Regularidad) -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-blue-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-blue-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-fiabilidad">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                         <span>🛡️</span> Regularidad
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        ⭐
-                    </span>
-                </div>
-                <div class="my-2">
-                    <div class="text-xl sm:text-2xl font-black truncate text-slate-900 dark:text-white" id="kpi-val-fiable-nombre">
-                        --
-                    </div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
-                        <span id="kpi-sub-fiable">En zona de puntos</span>
-                        <strong class="font-mono text-blue-600 dark:text-blue-400" id="kpi-pct-fiable">--%</strong>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-blue-600 dark:text-blue-400 truncate max-w-[80px]" id="kpi-val-fiable-compact">--</span>
+                        <span class="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            ⭐
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
                 </div>
-                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-400 transition-all duration-700" id="kpi-bar-fiable" style="width: 0%"></div>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-2">
+                        <div class="text-xl sm:text-2xl font-black truncate text-slate-900 dark:text-white" id="kpi-val-fiable-nombre">
+                            --
+                        </div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex justify-between">
+                            <span id="kpi-sub-fiable">En zona de puntos</span>
+                            <strong class="font-mono text-blue-600 dark:text-blue-400" id="kpi-pct-fiable">--%</strong>
+                        </div>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-400 transition-all duration-700" id="kpi-bar-fiable" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 5: Talismán vs Trampa -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-pointer hover:border-orange-500/50 transition-all duration-300 group"
-                 onclick="window.ResumenApp && window.ResumenApp.switchView('clubes')"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card hover:border-orange-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-equipos">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-orange-600 dark:text-orange-400 flex items-center gap-1.5">
                         <span>⚖️</span> Talismán / Trampa
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        ⚽
-                    </span>
-                </div>
-                <div class="my-1.5 space-y-1 text-xs">
-                    <div class="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
-                        <span class="truncate font-semibold flex items-center gap-1 min-w-0 pr-1"><span>🟢</span> <span id="kpi-talisman-nombre" class="flex items-center gap-1 truncate">--</span></span>
-                        <strong class="font-mono flex-shrink-0 ml-1" id="kpi-talisman-pct">--%</strong>
-                    </div>
-                    <div class="flex justify-between items-center text-rose-600 dark:text-rose-400">
-                        <span class="truncate font-semibold flex items-center gap-1 min-w-0 pr-1"><span>🔴</span> <span id="kpi-trampa-nombre" class="flex items-center gap-1 truncate">--</span></span>
-                        <strong class="font-mono flex-shrink-0 ml-1" id="kpi-trampa-pct">--%</strong>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-orange-600 dark:text-orange-400 truncate max-w-[80px]" id="kpi-val-equipos-compact">Radar</span>
+                        <span class="w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            ⚽
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
                 </div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-1 flex justify-between font-mono">
-                    <span>Fiabilidad clubes</span>
-                    <button type="button" onclick="event.stopPropagation(); window.ResumenApp.switchView('clubes');" class="text-orange-600 dark:text-orange-400 font-bold hover:underline flex items-center gap-0.5">
-                        Ver radar →
-                    </button>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-1.5 space-y-1 text-xs">
+                        <div class="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+                            <span class="truncate font-semibold flex items-center gap-1 min-w-0 pr-1"><span>🟢</span> <span id="kpi-talisman-nombre" class="flex items-center gap-1 truncate">--</span></span>
+                            <strong class="font-mono flex-shrink-0 ml-1" id="kpi-talisman-pct">--%</strong>
+                        </div>
+                        <div class="flex justify-between items-center text-rose-600 dark:text-rose-400">
+                            <span class="truncate font-semibold flex items-center gap-1 min-w-0 pr-1"><span>🔴</span> <span id="kpi-trampa-nombre" class="flex items-center gap-1 truncate">--</span></span>
+                            <strong class="font-mono flex-shrink-0 ml-1" id="kpi-trampa-pct">--%</strong>
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-1 flex justify-between font-mono">
+                        <span>Fiabilidad clubes</span>
+                        <button type="button" onclick="event.stopPropagation(); window.ResumenApp && window.ResumenApp.switchView('clubes');" class="text-orange-600 dark:text-orange-400 font-bold hover:underline flex items-center gap-0.5">
+                            Ver radar →
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1369,24 +1421,36 @@
                 document.getElementById('header-stat-premios').textContent = this.formatMoney(totalPrizes);
 
                 // KPI 1: Efectividad Global Peña
-                document.getElementById('kpi-val-efectividad').textContent = `${this.globalPctAcierto.toFixed(1)}%`;
+                const effText = `${this.globalPctAcierto.toFixed(1)}%`;
+                document.getElementById('kpi-val-efectividad').textContent = effText;
+                const kpiValEffComp = document.getElementById('kpi-val-efectividad-compact');
+                if (kpiValEffComp) kpiValEffComp.textContent = effText;
                 document.getElementById('kpi-sub-efectividad').textContent = `${this.globalAvgHits.toFixed(1)} aciertos / jornada`;
                 document.getElementById('kpi-media-boleto').textContent = `${this.globalAvgHits.toFixed(1)}/14`;
                 document.getElementById('kpi-bar-efectividad').style.width = `${Math.min(100, this.globalPctAcierto)}%`;
 
                 // KPI 2: Bombazo Récord
-                document.getElementById('kpi-val-bombazo').textContent = `${bestRecord.hits} aciertos`;
+                const bombazoText = `${bestRecord.hits} aciertos`;
+                document.getElementById('kpi-val-bombazo').textContent = bombazoText;
+                const kpiBombComp = document.getElementById('kpi-val-bombazo-compact');
+                if (kpiBombComp) kpiBombComp.textContent = `${bestRecord.hits} ac.`;
                 document.getElementById('kpi-socio-bombazo').textContent = bestRecord.name ? `Por ${bestRecord.name}` : 'En disputa';
                 document.getElementById('kpi-jornada-bombazo').textContent = bestRecord.jNum > 0 ? `Jornada ${bestRecord.jNum}` : 'Récord histórico';
                 document.getElementById('kpi-puntos-bombazo').textContent = bestRecord.hits >= 14 ? '+30 bonus' : (bestRecord.hits === 13 ? '+15 bonus' : '+10 bonus');
 
                 // KPI 3: Bote Total en Metálico
-                document.getElementById('kpi-val-premios').textContent = this.formatMoney(totalPrizes);
+                const premMoney = this.formatMoney(totalPrizes);
+                document.getElementById('kpi-val-premios').textContent = premMoney;
+                const kpiPremComp = document.getElementById('kpi-val-premios-compact');
+                if (kpiPremComp) kpiPremComp.textContent = premMoney;
                 document.getElementById('kpi-socio-premios').textContent = maxPrizeSocio.amount > 0 ? `Líder: ${maxPrizeSocio.name}` : 'Sin premios oficiales aún';
                 document.getElementById('kpi-max-premio').textContent = maxPrizeSocio.amount > 0 ? `Máx: ${this.formatMoney(maxPrizeSocio.amount)}` : '0,00 €';
 
                 // KPI 4: Míster Fiabilidad
-                document.getElementById('kpi-val-fiable-nombre').textContent = bestRegularidad.name || 'Sin datos';
+                const fiableName = bestRegularidad.name || 'Sin datos';
+                document.getElementById('kpi-val-fiable-nombre').textContent = fiableName;
+                const kpiFiableComp = document.getElementById('kpi-val-fiable-compact');
+                if (kpiFiableComp) kpiFiableComp.textContent = `${bestRegularidad.pct.toFixed(0)}%`;
                 document.getElementById('kpi-pct-fiable').textContent = `${bestRegularidad.pct.toFixed(0)}%`;
                 document.getElementById('kpi-bar-fiable').style.width = `${bestRegularidad.pct}%`;
 
@@ -1434,6 +1498,9 @@
                     if (elTra) elTra.innerHTML = `${traLogoHtml} <span class="truncate">${trampa.name}</span> <span class="text-[9px] text-slate-400 font-mono ml-0.5">(${trampa.totalMatches}p)</span>`;
                     const elTraPct = document.getElementById('kpi-trampa-pct');
                     if (elTraPct) elTraPct.textContent = `${traPct.toFixed(0)}%`;
+
+                    const kpiEquiposComp = document.getElementById('kpi-val-equipos-compact');
+                    if (kpiEquiposComp) kpiEquiposComp.textContent = `${talisman.name.substring(0, 10)}`;
                 }
             }
 

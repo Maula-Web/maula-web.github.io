@@ -583,11 +583,31 @@ class BoteAppController {
         const bSocios = document.getElementById('badge-socios-count');
         const bJornadas = document.getElementById('badge-jornadas-count');
 
-        if (cardCaja) cardCaja.textContent = (s.cajaReal || 0).toFixed(2) + ' €';
+        if (cardCaja) {
+            const val = (s.cajaReal || 0).toFixed(2) + ' €';
+            cardCaja.textContent = val;
+            const cComp = document.getElementById('card-caja-real-compact');
+            if (cComp) cComp.textContent = val;
+        }
         if (cardSuma) cardSuma.textContent = (s.totalSaldosVirtuales || 0).toFixed(2) + ' €';
-        if (cardIn) cardIn.textContent = (s.totalIngresos || 0).toFixed(2) + ' €';
-        if (cardOut) cardOut.textContent = (s.totalGastos || 0).toFixed(2) + ' €';
-        if (cardPrem) cardPrem.textContent = (s.totalPremios || 0).toFixed(2) + ' €';
+        if (cardIn) {
+            const val = (s.totalIngresos || 0).toFixed(2) + ' €';
+            cardIn.textContent = val;
+            const cComp = document.getElementById('card-total-ingresos-compact');
+            if (cComp) cComp.textContent = val;
+        }
+        if (cardOut) {
+            const val = (s.totalGastos || 0).toFixed(2) + ' €';
+            cardOut.textContent = val;
+            const cComp = document.getElementById('card-total-gastos-compact');
+            if (cComp) cComp.textContent = val;
+        }
+        if (cardPrem) {
+            const val = (s.totalPremios || 0).toFixed(2) + ' €';
+            cardPrem.textContent = val;
+            const cComp = document.getElementById('card-total-premios-compact');
+            if (cComp) cComp.textContent = val;
+        }
         if (cardSuperavit) {
             const superavit = (s.cajaReal || 0) - (s.totalSaldosVirtuales || 0);
             cardSuperavit.textContent = `${superavit >= 0 ? '+' : ''}${superavit.toFixed(2)} €`;

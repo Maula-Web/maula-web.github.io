@@ -1259,5 +1259,43 @@ body.light-theme {
     box-shadow: 0 0 4px rgba(217, 119, 6, 0.25) !important;
 }
 
+/* ==========================================================================
+   MOBILE ADAPTABILITY & COLLAPSIBLE TOP KPI CARDS
+   ========================================================================== */
+@media (max-width: 1023px) {
+    .collapsible-kpi {
+        padding: 0.625rem 0.875rem !important;
+        transition: all 0.2s ease-in-out;
+    }
+    .collapsible-kpi-header {
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .collapsible-kpi:not(.kpi-is-expanded) {
+        border-color: rgba(245, 158, 11, 0.25) !important;
+    }
+    .collapsible-kpi.kpi-is-expanded {
+        border-color: rgba(245, 158, 11, 0.55) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+    .kpi-chevron {
+        transition: transform 0.2s ease;
+    }
+}
+
+@media (min-width: 1024px) {
+    .collapsible-kpi-body {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+    }
+    .kpi-chevron,
+    .kpi-master-bar,
+    .kpi-mobile-preview {
+        display: none !important;
+    }
+}
+
 
 

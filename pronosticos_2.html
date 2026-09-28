@@ -998,21 +998,21 @@
         <!-- =====================================================================
              NIVEL 2: BARRA DE TÍTULO & ANUNCIO OFICIAL
              ===================================================================== -->
-        <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
-            <div class="flex items-center gap-3">
-                <span class="p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg sm:text-xl">📝</span>
-                <div>
-                    <strong class="text-slate-800 dark:text-amber-400 font-extrabold text-sm sm:text-base">Pronósticos 2.0 - Cuadro de Mando & Sellado Oficial</strong>
-                    <p class="text-slate-600 dark:text-slate-400 text-xs">Parrilla colectiva de apuestas en vertical por socio, gestión de dobles y validación semanal.</p>
+        <div class="p-2.5 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-2.5 text-xs sm:text-sm">
+            <div class="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
+                <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-base sm:text-xl shrink-0">📝</span>
+                <div class="min-w-0">
+                    <strong class="text-slate-800 dark:text-amber-400 font-extrabold text-xs sm:text-base block truncate">Pronósticos 2.0 - Cuadro de Mando & Sellado</strong>
+                    <p class="text-slate-600 dark:text-slate-400 text-xs hidden sm:block">Parrilla colectiva de apuestas en vertical por socio, gestión de dobles y validación semanal.</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 text-xs flex-wrap justify-center">
-                <span id="current-clock-label" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-[11px] shadow-sm">
+            <div class="flex items-center gap-1.5 sm:gap-2 text-xs flex-wrap justify-between md:justify-end w-full md:w-auto">
+                <span id="current-clock-label" class="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-[10px] sm:text-[11px] shadow-sm">
                     ⏱️ Conectando reloj...
                 </span>
-                <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1.5 shadow-sm">
+                <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs shadow-sm">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                    Cómputo en Tiempo Real
+                    Tiempo Real
                 </span>
             </div>
         </div>
@@ -1020,42 +1020,40 @@
         <!-- =====================================================================
              NIVEL 3: HUB DE CONTROL Y SELECTORES
              ===================================================================== -->
-        <section class="glass-panel p-4 sm:p-5 border-amber-500/40 space-y-4">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
-                <div class="flex items-center gap-2.5 flex-wrap">
+        <section class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
                     
-                    <!-- SELECTOR DE JORNADA CON FLECHAS ◀ Y ▶ CORREGIDAS
-                         ◀ : REDUCE EL NÚMERO DE JORNADA
-                         ▶ : AUMENTA EL NÚMERO DE JORNADA -->
+                    <!-- SELECTOR DE JORNADA CON FLECHAS ◀ Y ▶ -->
                     <div class="flex items-center gap-1.5">
-                        <button type="button" id="btn-jornada-prev" onclick="window.navigateJornadaByNumber(-1)" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior (reducir número)">
+                        <button type="button" id="btn-jornada-prev" onclick="window.navigateJornadaByNumber(-1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior (reducir número)">
                             ◀
                         </button>
                         
-                        <div class="relative min-w-[210px] sm:min-w-[260px]">
+                        <div class="relative min-w-[170px] sm:min-w-[240px]">
                             <label for="sel-jornada" class="sr-only">Seleccionar Jornada</label>
-                            <select id="sel-jornada" class="w-full pl-3.5 pr-8 py-2 bg-white dark:bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
+                            <select id="sel-jornada" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
                                 <!-- Opciones inyectadas por pronosticos.js -->
                             </select>
                             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 text-xs pointer-events-none">▼</span>
                         </div>
 
-                        <button type="button" id="btn-jornada-next" onclick="window.navigateJornadaByNumber(1)" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente (aumentar número)">
+                        <button type="button" id="btn-jornada-next" onclick="window.navigateJornadaByNumber(1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente (aumentar número)">
                             ▶
                         </button>
                     </div>
 
                     <!-- SELECTOR DE SOCIO -->
-                    <div class="relative min-w-[170px] sm:min-w-[210px]">
+                    <div class="relative min-w-[150px] sm:min-w-[200px]">
                         <label for="sel-member" class="sr-only">Seleccionar Socio</label>
-                        <select id="sel-member" class="w-full pl-3.5 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
+                        <select id="sel-member" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
                             <!-- Opciones inyectadas por pronosticos.js -->
                         </select>
                         <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
                     </div>
 
                     <!-- CHIP DE PLAZO OFICIAL / CIERRE CON ALTO CONTRASTE -->
-                    <div id="deadline-info-wrap" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono bg-slate-900 border border-slate-700 text-white flex items-center gap-2 shadow-sm">
+                    <div id="deadline-info-wrap" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-extrabold font-mono bg-slate-900 border border-slate-700 text-white flex items-center gap-2 shadow-sm">
                         <span id="deadline-led-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span id="deadline-info" class="text-slate-100">Cargando plazo...</span>
                     </div>
@@ -1063,11 +1061,11 @@
 
                 <!-- BOTONES DE ACCIÓN DEL HUB -->
                 <div class="flex items-center gap-2 flex-wrap justify-end">
-                    <button type="button" id="btn-help-doubles" class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-blue-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <button type="button" id="btn-help-doubles" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-blue-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                         <span>❓</span> Ayuda Sellado
                     </button>
 
-                    <button type="button" id="btn-view-jornada" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md">
+                    <button type="button" id="btn-view-jornada" class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md">
                         <span>👁️</span> Ver Pronósticos Colectivos
                     </button>
                 </div>
@@ -1075,182 +1073,227 @@
         </section>
 
         <!-- =====================================================================
-             NIVEL 4: 4 TARJETAS BENTO RESUMEN (CON EXPLICATIVAS ℹ️ & RELOJ DASHBOARD)
+             NIVEL 4: TARJETAS BENTO RESUMEN (PLEGABLES EN MÓVIL PARA MAXIMIZAR ESPACIO)
              ===================================================================== -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <section class="space-y-2">
+            <!-- Barra Maestra de Despliegue en Móvil (< lg) -->
+            <div class="kpi-master-bar flex lg:hidden items-center justify-between px-1 py-0.5 text-xs text-slate-500 dark:text-slate-400 font-bold">
+                <span class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                    <span>📊</span> Tarjetas de Información
+                </span>
+                <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
+                    <span class="kpi-master-text">Desplegar todos</span>
+                    <span class="kpi-master-icon text-[10px]">▼</span>
+                </button>
+            </div>
 
-            <!-- KPI 1: Plazo Oficial con Reloj Digital Sincronizado con Dashboard 2 -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40 flex items-center gap-1">
-                            <span>⏱️</span> Plazo Oficial
-                        </span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
 
-                        <!-- Tarjeta Explicativa ℹ️ -->
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
-                                ℹ️
+                <!-- KPI 1: Plazo Oficial con Reloj Digital Sincronizado con Dashboard 2 -->
+                <div class="glass-panel collapsible-kpi p-3 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition" id="kpi-card-plazo">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                                <span>⏱️</span> Plazo Oficial
+                            </span>
+                            <span id="kpi-cd-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Abierto</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <!-- Tarjeta Explicativa ℹ️ -->
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                    <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>⏱️</span> Plazo Límite de Relleno
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p class="text-amber-200 font-semibold">Regla Maula Oficial: El jueves a las 17:00h es la hora límite para rellenar la quiniela.</p>
+                                        <p>Permite al administrador calcular la combinación autorizada y asignar los dobles a tiempo. Los pronósticos posteriores se marcan como tardíos y aplican penalización al bote.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
-                                <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>⏱️</span> Plazo Límite de Relleno
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p class="text-amber-200 font-semibold">Regla Maula Oficial: El jueves a las 17:00h es la hora límite para rellenar la quiniela.</p>
-                                    <p>Permite al administrador calcular la combinación autorizada y asignar los dobles a tiempo. Los pronósticos posteriores se marcan como tardíos y aplican penalización al bote.</p>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2.5">
+                        <div>
+                            <!-- Estado del Plazo -->
+                            <div class="flex items-center justify-between mt-1">
+                                <h4 id="kpi-plazo-estado" class="text-lg font-black text-slate-800 dark:text-white font-mono">En Plazo</h4>
+                            </div>
+
+                            <!-- Reloj Cuenta Atrás Sincronizado con Dashboard 2 -->
+                            <div class="mt-2.5 p-2 rounded-xl bg-slate-950/80 dark:bg-slate-950/80 bg-slate-100 border border-slate-300 dark:border-slate-800 text-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-0.5">Tiempo Restante para el Cierre</span>
+                                <div id="kpi-countdown-timer" class="font-mono text-sm sm:text-base font-black text-amber-500 dark:text-amber-400 tracking-wider">
+                                    --d --h --m --s
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Estado del Plazo -->
-                    <div class="flex items-center justify-between mt-1">
-                        <h4 id="kpi-plazo-estado" class="text-lg font-black text-slate-800 dark:text-white font-mono">En Plazo</h4>
-                        <span id="kpi-cd-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Abierto</span>
-                    </div>
-
-                    <!-- Reloj Cuenta Atrás Sincronizado con Dashboard 2 -->
-                    <div class="mt-2.5 p-2 rounded-xl bg-slate-950/80 dark:bg-slate-950/80 bg-slate-100 border border-slate-300 dark:border-slate-800 text-center">
-                        <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-0.5">Tiempo Restante para el Cierre</span>
-                        <div id="kpi-countdown-timer" class="font-mono text-sm sm:text-base font-black text-amber-500 dark:text-amber-400 tracking-wider">
-                            --d --h --m --s
+                        <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
+                            <span>Límite Semanal</span>
+                            <span id="kpi-deadline-date" class="text-amber-500 font-bold">Jueves 17:00h</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                    <span>Límite Semanal</span>
-                    <span id="kpi-deadline-date" class="text-amber-500 font-bold">Jueves 17:00h</span>
-                </div>
-            </div>
+                <!-- KPI 2: Censo Sellado (19 Socios) -->
+                <div class="glass-panel collapsible-kpi p-3 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition" id="kpi-card-censo">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                                <span>📋</span> Censo Sellado
+                            </span>
+                            <span id="kpi-recibidos-count" class="text-xs sm:text-sm font-black text-emerald-500 dark:text-emerald-400 font-mono">-- / 19</span>
+                            <span id="kpi-recibidos-pct" class="text-[10px] font-bold text-slate-500 dark:text-slate-400">0%</span>
+                        </div>
 
-            <!-- KPI 2: Censo Sellado (19 Socios) -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
-                            <span>📋</span> Censo Sellado
-                        </span>
-
-                        <!-- Tarjeta Explicativa ℹ️ -->
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
-                                ℹ️
-                            </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
-                                <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>📋</span> Censo y Participación
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>Computa en tiempo real qué porcentaje de los 19 socios de la peña ha registrado sus 14 signos y el Pleno al 15.</p>
-                                    <p class="text-emerald-300">Si un socio tiene activado el comodín de ausencia (Dado 🎲), el sistema rellenará al azar sus signos sin penalización.</p>
+                        <div class="flex items-center gap-2">
+                            <!-- Tarjeta Explicativa ℹ️ -->
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                    <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>📋</span> Censo y Participación
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p>Computa en tiempo real qué porcentaje de los 19 socios de la peña ha registrado sus 14 signos y el Pleno al 15.</p>
+                                        <p class="text-emerald-300">Si un socio tiene activado el comodín de ausencia (Dado 🎲), el sistema rellenará al azar sus signos sin penalización.</p>
+                                    </div>
                                 </div>
                             </div>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
                         </div>
                     </div>
 
-                    <div class="flex items-baseline gap-2 mt-1">
-                        <h4 id="kpi-recibidos-count" class="text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">-- / 19</h4>
-                        <span id="kpi-recibidos-pct" class="text-xs font-bold text-slate-500 dark:text-slate-400">0%</span>
-                    </div>
-
-                    <!-- Barra de progreso -->
-                    <div class="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full mt-2.5 overflow-hidden">
-                        <div id="kpi-recibidos-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style="width: 0%;"></div>
-                    </div>
-                </div>
-
-                <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                    <span>Estado colectivo</span>
-                    <span id="kpi-recibidos-sub" class="text-emerald-500 font-bold">Calculando...</span>
-                </div>
-            </div>
-
-            <!-- KPI 3: Gestión de Dobles (Con botón para ir a rellenar dobles del socio responsable) -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1">
-                            <span>🎲</span> Quiniela Dobles
-                        </span>
-
-                        <!-- Tarjeta Explicativa ℹ️ -->
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
-                                ℹ️
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2.5">
+                        <div>
+                            <!-- Barra de progreso -->
+                            <div class="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+                                <div id="kpi-recibidos-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style="width: 0%;"></div>
                             </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
-                                <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>🎲</span> Boleto Colectivo de Dobles
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>La combinación de dobles autorizada por la peña (Reducida 2: 7 dobles = 16 apuestas = 12,00 €).</p>
-                                    <p class="text-purple-300">El socio responsable de dobles es el ganador de la jornada previa o el siguiente por orden de desempate.</p>
+                        </div>
+
+                        <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
+                            <span>Estado colectivo</span>
+                            <span id="kpi-recibidos-sub" class="text-emerald-500 font-bold">Calculando...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Gestión de Dobles -->
+                <div class="glass-panel collapsible-kpi p-3 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition" id="kpi-card-dobles">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1">
+                                <span>🎲</span> Quiniela Dobles
+                            </span>
+                            <span class="text-xs font-bold font-mono text-purple-500 dark:text-purple-400">12.00 €</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <!-- Tarjeta Explicativa ℹ️ -->
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                    <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>🎲</span> Boleto Colectivo de Dobles
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p>La combinación de dobles autorizada por la peña (Reducida 2: 7 dobles = 16 apuestas = 12,00 €).</p>
+                                        <p class="text-purple-300">El socio responsable de dobles es el ganador de la jornada previa o el siguiente por orden de desempate.</p>
+                                    </div>
                                 </div>
                             </div>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
                         </div>
                     </div>
 
-                    <h4 id="kpi-dobles-status-clean" class="text-base font-black text-purple-600 dark:text-purple-400 font-mono leading-tight">Reducida : 7 ó 4 dobles</h4>
-                    <p id="kpi-dobles-responsable" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Responsable: Calculando...</p>
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2.5">
+                        <div>
+                            <h4 id="kpi-dobles-status-clean" class="text-base font-black text-purple-600 dark:text-purple-400 font-mono leading-tight">Reducida : 7 ó 4 dobles</h4>
+                            <p id="kpi-dobles-responsable" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Responsable: Calculando...</p>
 
-                    <!-- Control para rellenar dobles directamente en modal del socio que debe hacerla -->
-                    <button type="button" onclick="window.openEditorForDoubles()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
-                        <span>🎲</span> Rellenar Quiniela de Dobles
-                    </button>
+                            <!-- Control para rellenar dobles -->
+                            <button type="button" onclick="window.openEditorForDoubles()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
+                                <span>🎲</span> Rellenar Quiniela de Dobles
+                            </button>
+                        </div>
+
+                        <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
+                            <span>Coste Oficial</span>
+                            <span class="text-purple-500 dark:text-purple-400 font-bold font-mono">12.00 €</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                    <span>Coste Oficial</span>
-                    <span class="text-purple-500 dark:text-purple-400 font-bold font-mono">12.00 €</span>
-                </div>
-            </div>
+                <!-- KPI 4: Socio Activo -->
+                <div class="glass-panel collapsible-kpi p-3 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition" id="kpi-card-socio">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/40 flex items-center gap-1 shrink-0">
+                                <span>👤</span> Socio Activo
+                            </span>
+                            <span id="kpi-socio-name-compact" class="text-xs font-bold text-slate-800 dark:text-white truncate max-w-[110px] xs:max-w-[150px]">Socio</span>
+                        </div>
 
-            <!-- KPI 4: Socio Activo (Con botón funcional para editar su boleto) -->
-            <div class="glass-panel p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/40 flex items-center gap-1">
-                            <span>👤</span> Socio Activo
-                        </span>
-
-                        <!-- Tarjeta Explicativa ℹ️ -->
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
-                                ℹ️
-                            </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
-                                <strong class="text-sky-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>👤</span> Gestión de Boleto Individual
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>Indica el socio cargado actualmente en el sistema. Puedes consultar su boleto, ver sus aciertos o modificar sus pronósticos.</p>
-                                    <p class="text-amber-200 font-semibold">Haz clic en "Editar Boleto" para abrir la ventana emergente con los 15 partidos.</p>
+                        <div class="flex items-center gap-2">
+                            <!-- Tarjeta Explicativa ℹ️ -->
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] text-xs z-[100060] pointer-events-none text-left">
+                                    <strong class="text-sky-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>👤</span> Gestión de Boleto Individual
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p>Indica el socio cargado actualmente en el sistema. Puedes consultar su boleto, ver sus aciertos o modificar sus pronósticos.</p>
+                                        <p class="text-amber-200 font-semibold">Haz clic en "Editar Boleto" para abrir la ventana emergente con los 15 partidos.</p>
+                                    </div>
                                 </div>
                             </div>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
                         </div>
                     </div>
 
-                    <h4 id="kpi-socio-name" class="text-lg font-black text-slate-800 dark:text-white truncate">Selecciona socio</h4>
-                    <div id="kpi-socio-status" class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
-                        <span class="led-status-indicator led-red"></span>
-                        <span>Sin pronóstico cargado</span>
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2.5">
+                        <div>
+                            <h4 id="kpi-socio-name" class="text-lg font-black text-slate-800 dark:text-white truncate">Selecciona socio</h4>
+                            <div id="kpi-socio-status" class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
+                                <span class="led-status-indicator led-red"></span>
+                                <span>Sin pronóstico cargado</span>
+                            </div>
+
+                            <!-- Botón funcional para abrir ventana modal de edición -->
+                            <button type="button" onclick="window.openEditorForCurrentMember()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
+                                <span>✏️</span> Editar Boleto de este Socio
+                            </button>
+                        </div>
+
+                        <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between items-center">
+                            <span>Penalización unos</span>
+                            <span id="cost-info-kpi" class="text-emerald-500 font-mono font-bold">0.00 €</span>
+                        </div>
                     </div>
-
-                    <!-- Botón funcional para abrir ventana modal de edición -->
-                    <button type="button" onclick="window.openEditorForCurrentMember()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
-                        <span>✏️</span> Editar Boleto de este Socio
-                    </button>
                 </div>
 
-                <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between items-center">
-                    <span>Penalización unos</span>
-                    <span id="cost-info-kpi" class="text-emerald-500 font-mono font-bold">0.00 €</span>
-                </div>
             </div>
+        </section>
 
-        </div>
 
         <!-- =====================================================================
              NIVEL 5: PANEL GENERAL DE SELLADO (PRONÓSTICOS DE CADA SOCIO EN VERTICAL)
@@ -2208,7 +2251,10 @@
                 const statusEl = document.getElementById('kpi-socio-status');
 
                 if (member && nameEl) {
-                    nameEl.textContent = AppUtils.getMemberName(member);
+                    const memberName = AppUtils.getMemberName(member);
+                    nameEl.textContent = memberName;
+                    const compactNameEl = document.getElementById('kpi-socio-name-compact');
+                    if (compactNameEl) compactNameEl.textContent = member.alias || memberName;
                     const led = this.getMemberStatusLed(member.id, jornada);
                     if (statusEl) {
                         statusEl.innerHTML = `

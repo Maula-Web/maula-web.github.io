@@ -654,7 +654,10 @@ class Jornadas2AppController {
             });
         }
 
-        elTotal.textContent = this.formatMoney(totalPrizeMoney);
+        const formattedPrize = this.formatMoney(totalPrizeMoney);
+        elTotal.textContent = formattedPrize;
+        const elTotalCompact = document.getElementById('kpi-prizes-total-compact');
+        if (elTotalCompact) elTotalCompact.textContent = formattedPrize;
         if (winnerNames.length > 0) {
             elDetail.textContent = winnerNames.join(', ');
             elDetail.className = 'text-xs text-emerald-400 font-semibold truncate';

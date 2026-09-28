@@ -461,149 +461,194 @@
             </div>
         </header>
 
+        <!-- Master toggle bar en móvil para Bento KPIs -->
+        <div class="kpi-master-bar">
+            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>👥</span> Métricas del Censo
+            </span>
+            <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn">
+                <span class="kpi-master-btn-text">Ver todas</span>
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+
         <!-- TARJETAS RESUMEN / KPIS (SIEMPRE EN PRIMER PLANO ABSOLUTO) -->
         <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-50 overflow-visible">
             <!-- KPI 1: Censo Activo & Estado en Bote -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
-                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span class="flex items-center gap-1.5">
+            <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
+                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
                         <span>Censo Activo</span>
                         <span class="text-[11px] text-amber-400">ℹ️</span>
                     </span>
-                    <span class="text-lg">🏛️</span>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-compact-val font-mono text-sm font-bold text-white" id="kpi-total-socios-compact">--</span>
+                        <span class="text-base">🏛️</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="flex items-baseline gap-2">
-                    <span id="kpi-total-socios" class="text-3xl font-black text-white font-mono">--</span>
-                    <span id="kpi-censo-status" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100% activos</span>
-                </div>
-                <div id="kpi-censo-subtext" class="text-xs text-slate-400 mt-1">Socios registrados en la peña</div>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-total-socios" class="text-3xl font-black text-white font-mono">--</span>
+                        <span id="kpi-censo-status" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100% activos</span>
+                    </div>
+                    <div id="kpi-censo-subtext" class="text-xs text-slate-400 mt-1">Socios registrados en la peña</div>
 
-                <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
-                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-88 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
-                    <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
-                        <span>🏛️</span>
-                        <span>Censo Oficial y Estado en el Bote</span>
-                    </div>
-                    <p class="leading-relaxed text-slate-200 mb-2">
-                        Control del censo y solvencia en el bote común para la temporada 2026-2027.
-                    </p>
-                    <div id="tooltip-censo-breakdown" class="space-y-1.5 border-t border-slate-700/60 pt-2 text-[11px]">
-                        <!-- Dinámico: Inyectado por JS -->
-                    </div>
-                    <div class="mt-2.5 pt-2 border-t border-slate-700/60 text-[10px] text-slate-400 leading-snug">
-                        ⚖️ <strong>Regla Oficial:</strong> Los socios con saldo deudor conservan su derecho a pronóstico semanal, pero quedan excluidos de participar en el bote y repartos de la peña hasta regularizar su situación. Marcelo Pérez (Tesorero) cuenta con régimen especial y regulariza al realizar los repartos.
+                    <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
+                    <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-88 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
+                        <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
+                            <span>🏛️</span>
+                            <span>Censo Oficial y Estado en el Bote</span>
+                        </div>
+                        <p class="leading-relaxed text-slate-200 mb-2">
+                            Control del censo y solvencia en el bote común para la temporada 2026-2027.
+                        </p>
+                        <div id="tooltip-censo-breakdown" class="space-y-1.5 border-t border-slate-700/60 pt-2 text-[11px]">
+                            <!-- Dinámico: Inyectado por JS -->
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-slate-700/60 text-[10px] text-slate-400 leading-snug">
+                            ⚖️ <strong>Regla Oficial:</strong> Los socios con saldo deudor conservan su derecho a pronóstico semanal, pero quedan excluidos de participar en el bote y repartos de la peña hasta regularizar su situación. Marcelo Pérez (Tesorero) cuenta con régimen especial y regulariza al realizar los repartos.
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- KPI 2: Dados Activos Esta Jornada -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
-                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span class="flex items-center gap-1.5">
+            <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
+                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
                         <span>Dados en Curso</span>
                         <span class="text-[11px] text-amber-400">ℹ️</span>
                     </span>
-                    <span class="text-lg">🎲</span>
-                </div>
-                <div class="flex items-baseline gap-2">
-                    <span id="kpi-dados-activos" class="text-3xl font-black text-amber-400 font-mono">--</span>
-                    <span class="text-xs text-amber-300 font-semibold">viajes / ausencias</span>
-                </div>
-                <div class="text-xs text-slate-400 mt-1">Comodín activado para hoy</div>
-
-                <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
-                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
-                    <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
-                        <span>🎲</span>
-                        <span>Dado de Quinielas Activo</span>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-compact-val font-mono text-sm font-bold text-amber-400" id="kpi-dados-activos-compact">--</span>
+                        <span class="text-base">🎲</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
-                    <p class="leading-relaxed text-slate-200">Indica qué socios tienen activado el rango de fechas de ausencia. El sistema rellenará al azar sus pronósticos sin penalización por retraso.</p>
+                </div>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-dados-activos" class="text-3xl font-black text-amber-400 font-mono">--</span>
+                        <span class="text-xs text-amber-300 font-semibold">viajes / ausencias</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-1">Comodín activado para hoy</div>
+
+                    <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
+                    <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
+                        <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
+                            <span>🎲</span>
+                            <span>Dado de Quinielas Activo</span>
+                        </div>
+                        <p class="leading-relaxed text-slate-200">Indica qué socios tienen activado el rango de fechas de ausencia. El sistema rellenará al azar sus pronósticos sin penalización por retraso.</p>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 3: Comodines Disponibles -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
-                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span class="flex items-center gap-1.5">
+            <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
+                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
                         <span>Comodines de Temporada</span>
                         <span class="text-[11px] text-amber-400">ℹ️</span>
                     </span>
-                    <span class="text-lg">🎯</span>
-                </div>
-                <div class="flex items-baseline gap-2">
-                    <span id="kpi-dados-usados" class="text-3xl font-black text-emerald-400 font-mono">--</span>
-                    <span class="text-xs text-slate-400 font-semibold">usadas en total</span>
-                </div>
-                <div class="text-xs text-slate-400 mt-1">Máx. 3 por socio en toda la temporada</div>
-
-                <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
-                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
-                    <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
-                        <span>🎯</span>
-                        <span>Límite Anual de Dados</span>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-compact-val font-mono text-sm font-bold text-emerald-400" id="kpi-dados-usados-compact">--</span>
+                        <span class="text-base">🎯</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
-                    <p class="leading-relaxed text-slate-200">Conforme al reglamento de la peña, cada socio puede beneficiarse del dado un máximo de 3 jornadas por temporada. Una vez alcanzado, el dado se bloquea.</p>
+                </div>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-dados-usados" class="text-3xl font-black text-emerald-400 font-mono">--</span>
+                        <span class="text-xs text-slate-400 font-semibold">usadas en total</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-1">Máx. 3 por socio en toda la temporada</div>
+
+                    <!-- Tooltip Explicativo en Primer Plano Absoluto (100% Opaco y Nítido) -->
+                    <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-0 sm:right-auto sm:w-80 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
+                        <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
+                            <span>🎯</span>
+                            <span>Límite Anual de Dados</span>
+                        </div>
+                        <p class="leading-relaxed text-slate-200">Conforme al reglamento de la peña, cada socio puede beneficiarse del dado un máximo de 3 jornadas por temporada. Una vez alcanzado, el dado se bloquea.</p>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 4: Conectividad (Telegram + Notificaciones Push) -->
-            <div class="glass-panel p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible">
-                <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span class="flex items-center gap-1.5">
+            <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
+                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
                         <span>Conectividad</span>
                         <span class="text-[11px] text-amber-400">ℹ️</span>
                     </span>
-                    <span class="text-lg">📡</span>
-                </div>
-                <div class="grid grid-cols-2 gap-2 mt-1">
-                    <div>
-                        <div class="flex items-baseline gap-1.5">
-                            <span id="kpi-telegram-vinculados" class="text-2xl font-black text-sky-400 font-mono">--</span>
-                            <span class="text-[11px] text-sky-300 font-semibold">Telegram</span>
-                        </div>
-                        <div class="text-[11px] text-slate-400">Canal y Bot Oficial</div>
-                    </div>
-                    <div class="border-l border-slate-700/60 pl-2.5">
-                        <div class="flex items-baseline gap-1.5">
-                            <span id="kpi-push-vinculados" class="text-2xl font-black text-amber-400 font-mono">--</span>
-                            <span class="text-[11px] text-amber-300 font-semibold">Push PWA</span>
-                        </div>
-                        <div class="text-[11px] text-slate-400">Avisos en Móvil</div>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-sky-400" id="kpi-conectividad-compact">--</span>
+                        <span class="text-base">📡</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
                 </div>
-                <div class="text-xs text-slate-400 mt-2 flex items-center justify-between border-t border-slate-800/80 pt-1.5">
-                    <span>Sincronización digital</span>
-                    <span id="kpi-conectividad-badge" class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">🟢 En línea</span>
-                </div>
-
-                <!-- Desplegable interactivo: Desglose de socios por canal -->
-                <details id="details-conectividad-desglose" class="mt-2.5 group/conectividad border-t border-slate-800/80 pt-1.5 text-xs">
-                    <summary class="cursor-pointer select-none text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center justify-between py-1 transition-colors outline-none">
-                        <span class="flex items-center gap-1.5">
-                            <span>📋</span>
-                            <span>Ver desglose de socios</span>
-                        </span>
-                        <span class="transition-transform group-open/conectividad:rotate-180 text-slate-400 text-xs">▼</span>
-                    </summary>
-                    <div id="conectividad-desglose-content" class="mt-2 space-y-2.5 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-[11px] max-h-60 overflow-y-auto custom-scroll">
-                        <div class="text-slate-400 text-center py-2">Cargando desglose...</div>
-                    </div>
-                </details>
-
-                <!-- Tooltip Explicativo en Primer Plano Absoluto -->
-                <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-auto sm:right-0 sm:w-84 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
-                    <div class="flex items-center gap-1.5 font-bold text-sky-400 mb-1.5">
-                        <span>📡</span>
-                        <span>Canales de Conectividad Oficial</span>
-                    </div>
-                    <div class="space-y-2 text-slate-200">
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
+                    <div class="grid grid-cols-2 gap-2 mt-1">
                         <div>
-                            <strong class="text-sky-400">💬 Comunidad Telegram:</strong>
-                            <p class="text-[11px] text-slate-300 leading-relaxed mt-0.5">Socios con su alias @usuario registrado para recibir avisos del bot, informes de jornadas y votar encuestas democráticas.</p>
+                            <div class="flex items-baseline gap-1.5">
+                                <span id="kpi-telegram-vinculados" class="text-2xl font-black text-sky-400 font-mono">--</span>
+                                <span class="text-[11px] text-sky-300 font-semibold">Telegram</span>
+                            </div>
+                            <div class="text-[11px] text-slate-400">Canal y Bot Oficial</div>
                         </div>
-                        <div class="border-t border-slate-700/60 pt-2">
-                            <strong class="text-amber-400">🔔 Notificaciones Push PWA:</strong>
-                            <p class="text-[11px] text-slate-300 leading-relaxed mt-0.5">Socios que han activado las notificaciones nativas en su móvil (iPhone o Android) para recibir alertas directas de sellado y premios con el terminal bloqueado.</p>
+                        <div class="border-l border-slate-700/60 pl-2.5">
+                            <div class="flex items-baseline gap-1.5">
+                                <span id="kpi-push-vinculados" class="text-2xl font-black text-amber-400 font-mono">--</span>
+                                <span class="text-[11px] text-amber-300 font-semibold">Push PWA</span>
+                            </div>
+                            <div class="text-[11px] text-slate-400">Avisos en Móvil</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-2 flex items-center justify-between border-t border-slate-800/80 pt-1.5">
+                        <span>Sincronización digital</span>
+                        <span id="kpi-conectividad-badge" class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">🟢 En línea</span>
+                    </div>
+
+                    <!-- Desplegable interactivo: Desglose de socios por canal -->
+                    <details id="details-conectividad-desglose" class="mt-2.5 group/conectividad border-t border-slate-800/80 pt-1.5 text-xs">
+                        <summary class="cursor-pointer select-none text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center justify-between py-1 transition-colors outline-none">
+                            <span class="flex items-center gap-1.5">
+                                <span>📋</span>
+                                <span>Ver desglose de socios</span>
+                            </span>
+                            <span class="transition-transform group-open/conectividad:rotate-180 text-slate-400 text-xs">▼</span>
+                        </summary>
+                        <div id="conectividad-desglose-content" class="mt-2 space-y-2.5 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-[11px] max-h-60 overflow-y-auto custom-scroll">
+                            <div class="text-slate-400 text-center py-2">Cargando desglose...</div>
+                        </div>
+                    </details>
+
+                    <!-- Tooltip Explicativo en Primer Plano Absoluto -->
+                    <div class="tooltip-card invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 right-0 sm:left-auto sm:right-0 sm:w-84 mt-2 p-4 bg-[#0b0f19] border border-amber-500/70 rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] text-xs text-slate-200 z-[100060] pointer-events-none">
+                        <div class="flex items-center gap-1.5 font-bold text-sky-400 mb-1.5">
+                            <span>📡</span>
+                            <span>Canales de Conectividad Oficial</span>
+                        </div>
+                        <div class="space-y-2 text-slate-200">
+                            <div>
+                                <strong class="text-sky-400">💬 Comunidad Telegram:</strong>
+                                <p class="text-[11px] text-slate-300 leading-relaxed mt-0.5">Socios con su alias @usuario registrado para recibir avisos del bot, informes de jornadas y votar encuestas democráticas.</p>
+                            </div>
+                            <div class="border-t border-slate-700/60 pt-2">
+                                <strong class="text-amber-400">🔔 Notificaciones Push PWA:</strong>
+                                <p class="text-[11px] text-slate-300 leading-relaxed mt-0.5">Socios que han activado las notificaciones nativas en su móvil (iPhone o Android) para recibir alertas directas de sellado y premios con el terminal bloqueado.</p>
+                            </div>
                         </div>
                     </div>
                 </div>

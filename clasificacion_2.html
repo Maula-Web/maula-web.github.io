@@ -612,32 +612,32 @@
         </div>
 
         <!-- =====================================================================
-             NIVEL 2: EL PODIO DE HONOR (COMPACTO Y ELEGANTE)
+             NIVEL 2: EL PODIO DE HONOR (COMPACTO EN 3 COLUMNAS EN MÓVIL)
              ===================================================================== -->
-        <section id="podium-section" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3 items-stretch">
+        <section id="podium-section" class="grid grid-cols-3 gap-1.5 sm:gap-3 items-stretch">
             <!-- 2º Puesto (Plata) -->
-            <div id="podium-card-2" class="glass-panel p-2.5 sm:p-3 border-slate-400/50 podium-2 rounded-2xl flex flex-col justify-between order-2 md:order-1 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(2)">
+            <div id="podium-card-2" class="glass-panel p-2 sm:p-3 border-slate-400/50 podium-2 rounded-2xl flex flex-col justify-between order-2 sm:order-1 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(2)">
                 <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-200 dark:bg-slate-400/20 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-400/40 flex items-center gap-1">
-                            <span>🥈</span> 2º Clasificado
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-slate-200 dark:bg-slate-400/20 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-400/40 flex items-center gap-1">
+                            <span>🥈</span> <span class="hidden xs:inline">2º Clasificado</span><span class="xs:hidden">2º</span>
                         </span>
-                        <span class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400">#2</span>
+                        <span class="text-[10px] sm:text-xs font-mono font-bold text-slate-500 dark:text-slate-400">#2</span>
                     </div>
-                    <div class="flex items-center gap-2.5 py-1">
-                        <div class="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-400/20 border border-slate-300 dark:border-slate-400/50 flex items-center justify-center text-lg shadow-sm shrink-0">
+                    <div class="flex items-center gap-1.5 sm:gap-2.5 py-0.5 sm:py-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-slate-200 dark:bg-slate-400/20 border border-slate-300 dark:border-slate-400/50 flex items-center justify-center text-sm sm:text-lg shadow-sm shrink-0">
                             🥈
                         </div>
                         <div class="min-w-0 flex-1">
-                            <h3 id="podium-name-2" class="text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
-                            <div class="flex items-baseline gap-2">
-                                <span id="podium-points-2" class="text-xl font-black font-mono text-slate-800 dark:text-slate-200">-- pts</span>
-                                <span id="podium-diff-2" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">--</span>
+                            <h3 id="podium-name-2" class="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
+                            <div class="flex items-baseline gap-1 sm:gap-2">
+                                <span id="podium-points-2" class="text-sm sm:text-xl font-black font-mono text-slate-800 dark:text-slate-200">-- pts</span>
+                                <span id="podium-diff-2" class="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 hidden xs:inline">--</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="pt-1.5 mt-1.5 border-t border-slate-200 dark:border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
+                <div class="pt-1 mt-1 border-t border-slate-200 dark:border-slate-700/60 hidden sm:grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
                         <span class="text-slate-500 dark:text-slate-300 text-[9px] block font-semibold">Aciertos</span>
                         <strong id="podium-hits-2" class="text-slate-900 dark:text-white">--</strong>
@@ -654,28 +654,28 @@
             </div>
 
             <!-- 1º Puesto (Oro) -->
-            <div id="podium-card-1" class="glass-panel p-2.5 sm:p-3 border-amber-500/60 podium-1 rounded-2xl flex flex-col justify-between order-1 md:order-2 transition hover:scale-[1.01] cursor-pointer shadow-md" onclick="window.ClasificacionApp.openMemberDrawerByRank(1)">
+            <div id="podium-card-1" class="glass-panel p-2 sm:p-3 border-amber-500/60 podium-1 rounded-2xl flex flex-col justify-between order-1 sm:order-2 transition hover:scale-[1.01] cursor-pointer shadow-md" onclick="window.ClasificacionApp.openMemberDrawerByRank(1)">
                 <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 dark:bg-amber-500/30 text-amber-950 dark:text-amber-300 border border-amber-500/40 dark:border-amber-500/60 flex items-center gap-1 shadow-sm">
-                            <span>👑</span> 1º Clasificado
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-amber-500/20 dark:bg-amber-500/30 text-amber-950 dark:text-amber-300 border border-amber-500/40 dark:border-amber-500/60 flex items-center gap-1 shadow-sm">
+                            <span>👑</span> <span class="hidden xs:inline">1º Clasificado</span><span class="xs:hidden">1º</span>
                         </span>
-                        <span class="text-xs font-mono font-black text-amber-600 dark:text-amber-400">#1</span>
+                        <span class="text-[10px] sm:text-xs font-mono font-black text-amber-600 dark:text-amber-400">#1</span>
                     </div>
-                    <div class="flex items-center gap-2.5 py-1">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/30 border border-amber-400 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+                    <div class="flex items-center gap-1.5 sm:gap-2.5 py-0.5 sm:py-1">
+                        <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-xl bg-amber-500/30 border border-amber-400 flex items-center justify-center text-sm sm:text-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
                             🥇
                         </div>
                         <div class="min-w-0 flex-1">
-                            <h2 id="podium-name-1" class="text-sm sm:text-base font-black text-amber-900 dark:text-amber-300 truncate">Cargando...</h2>
-                            <div class="flex items-baseline gap-2">
-                                <span id="podium-points-1" class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">-- pts</span>
-                                <span id="podium-diff-1" class="text-[10px] font-mono font-black text-amber-900 dark:text-amber-200">Campeón Provisional</span>
+                            <h2 id="podium-name-1" class="text-xs sm:text-base font-black text-amber-900 dark:text-amber-300 truncate">Cargando...</h2>
+                            <div class="flex items-baseline gap-1 sm:gap-2">
+                                <span id="podium-points-1" class="text-sm sm:text-2xl font-black font-mono text-amber-600 dark:text-amber-400">-- pts</span>
+                                <span id="podium-diff-1" class="text-[9px] sm:text-[10px] font-mono font-black text-amber-900 dark:text-amber-200 hidden xs:inline">Líder</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="pt-1.5 mt-1.5 border-t border-amber-500/40 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
+                <div class="pt-1 mt-1 border-t border-amber-500/40 hidden sm:grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
                         <span class="text-amber-900/80 dark:text-amber-200/90 text-[9px] block font-semibold">Aciertos</span>
                         <strong id="podium-hits-1" class="text-slate-900 dark:text-white text-xs">--</strong>
@@ -692,28 +692,28 @@
             </div>
 
             <!-- 3º Puesto (Bronce) -->
-            <div id="podium-card-3" class="glass-panel p-2.5 sm:p-3 border-amber-700/50 podium-3 rounded-2xl flex flex-col justify-between order-3 md:order-3 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(3)">
+            <div id="podium-card-3" class="glass-panel p-2 sm:p-3 border-amber-700/50 podium-3 rounded-2xl flex flex-col justify-between order-3 sm:order-3 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(3)">
                 <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-800/15 dark:bg-amber-700/30 text-amber-950 dark:text-amber-200 border border-amber-800/40 dark:border-amber-700/50 flex items-center gap-1">
-                            <span>🥉</span> 3º Clasificado
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-amber-800/15 dark:bg-amber-700/30 text-amber-950 dark:text-amber-200 border border-amber-800/40 dark:border-amber-700/50 flex items-center gap-1">
+                            <span>🥉</span> <span class="hidden xs:inline">3º Clasificado</span><span class="xs:hidden">3º</span>
                         </span>
-                        <span class="text-xs font-mono font-bold text-amber-700 dark:text-amber-500">#3</span>
+                        <span class="text-[10px] sm:text-xs font-mono font-bold text-amber-700 dark:text-amber-500">#3</span>
                     </div>
-                    <div class="flex items-center gap-2.5 py-1">
-                        <div class="w-9 h-9 rounded-xl bg-amber-800/20 border border-amber-700/50 flex items-center justify-center text-lg shadow-sm shrink-0">
+                    <div class="flex items-center gap-1.5 sm:gap-2.5 py-0.5 sm:py-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-amber-800/20 border border-amber-700/50 flex items-center justify-center text-sm sm:text-lg shadow-sm shrink-0">
                             🥉
                         </div>
                         <div class="min-w-0 flex-1">
-                            <h3 id="podium-name-3" class="text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
-                            <div class="flex items-baseline gap-2">
-                                <span id="podium-points-3" class="text-xl font-black font-mono text-amber-950 dark:text-amber-200">-- pts</span>
-                                <span id="podium-diff-3" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">--</span>
+                            <h3 id="podium-name-3" class="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
+                            <div class="flex items-baseline gap-1 sm:gap-2">
+                                <span id="podium-points-3" class="text-sm sm:text-xl font-black font-mono text-amber-950 dark:text-amber-200">-- pts</span>
+                                <span id="podium-diff-3" class="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 hidden xs:inline">--</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="pt-1.5 mt-1.5 border-t border-slate-200 dark:border-slate-700/60 grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
+                <div class="pt-1 mt-1 border-t border-slate-200 dark:border-slate-700/60 hidden sm:grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
                     <div>
                         <span class="text-amber-950/80 dark:text-amber-200/90 text-[9px] block font-semibold">Aciertos</span>
                         <strong id="podium-hits-3" class="text-slate-900 dark:text-white">--</strong>
@@ -731,156 +731,205 @@
         </section>
 
         <!-- =====================================================================
-             NIVEL 3: BENTO KPIS CON TARJETAS EXPLICATIVAS (ℹ️)
+             NIVEL 3: BENTO KPIS CON TARJETAS PLEGABLES EN MÓVIL
              ===================================================================== -->
-        <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 relative z-50 overflow-visible">
-            <!-- KPI 1: Líder & Distancia -->
-            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/50 flex items-center gap-1 shadow-sm">
-                            <span>👑</span> Líder General
-                        </span>
-
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
-                                ℹ️
-                            </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
-                                <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>👑</span> Campeón de la Peña
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>El socio que encabeza la clasificación general sumando todos sus aciertos regulares más los bonus otorgados y restando las penalizaciones.</p>
-                                    <p class="text-amber-300">En caso de empate a puntos, el desempate se resuelve por mayor número de aciertos base acumulados.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 id="kpi-lider-nombre" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
-                    <div class="flex items-baseline gap-2 mt-0.5">
-                        <span id="kpi-lider-puntos" class="text-xl font-black text-amber-600 dark:text-amber-400 font-mono">-- pts</span>
-                        <span id="kpi-lider-ventaja" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">+-- sobre el 2º</span>
-                    </div>
-                </div>
-
-                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                    <span>Efectividad</span>
-                    <span id="kpi-lider-efectividad" class="text-amber-600 dark:text-amber-500 font-bold font-mono">--%</span>
-                </div>
+        <section class="space-y-2">
+            <!-- Barra Maestra de Despliegue en Móvil (< lg) -->
+            <div class="kpi-master-bar flex lg:hidden items-center justify-between px-1 py-0.5 text-xs text-slate-500 dark:text-slate-400 font-bold">
+                <span class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                    <span>📊</span> Indicadores y Récords
+                </span>
+                <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
+                    <span class="kpi-master-text">Desplegar todos</span>
+                    <span class="kpi-master-icon text-[10px]">▼</span>
+                </button>
             </div>
 
-            <!-- KPI 2: Récord de Jornada -->
-            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 border border-emerald-500/50 flex items-center gap-1 shadow-sm">
-                            <span>🎯</span> Récord en 1 Jornada
-                        </span>
+            <div id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 relative z-50 overflow-visible">
+                <!-- KPI 1: Líder & Distancia -->
+                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/50 flex items-center gap-1 shadow-sm">
+                                <span>👑</span> Líder General
+                            </span>
+                            <span id="kpi-lider-puntos-compact" class="text-xs font-mono font-black text-amber-600 dark:text-amber-400 lg:hidden">-- pts</span>
+                        </div>
 
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
-                                ℹ️
-                            </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
-                                <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>🎯</span> Puntuación Récord
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>La máxima puntuación obtenida por cualquier socio en una sola jornada durante toda la temporada.</p>
-                                    <p class="text-emerald-300">Incluye los aciertos del boleto base más el bonus oficial correspondiente (+30 por 14/15, +15 por 13, etc.).</p>
+                        <div class="flex items-center gap-2">
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
+                                    <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>👑</span> Campeón de la Peña
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p>El socio que encabeza la clasificación general sumando todos sus aciertos regulares más los bonus otorgados y restando las penalizaciones.</p>
+                                        <p class="text-amber-300">En caso de empate a puntos, el desempate se resuelve por mayor número de aciertos base acumulados.</p>
+                                    </div>
                                 </div>
                             </div>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
                         </div>
                     </div>
 
-                    <h4 id="kpi-record-socio" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
-                    <div class="flex items-baseline gap-2 mt-0.5">
-                        <span id="kpi-record-puntos" class="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">-- pts</span>
-                        <span id="kpi-record-jornada" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">Jornada --</span>
-                    </div>
-                </div>
-
-                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                    <span>Aciertos reales</span>
-                    <span id="kpi-record-hits" class="text-emerald-600 dark:text-emerald-500 font-bold font-mono">-- aciertos</span>
-                </div>
-            </div>
-
-            <!-- KPI 3: Bolsa de Premios (€) -->
-            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-500/25 text-purple-900 dark:text-purple-200 border border-purple-500/50 flex items-center gap-1 shadow-sm">
-                            <span>💰</span> Premios Repartidos
-                        </span>
-
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
-                                ℹ️
-                            </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
-                                <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>💰</span> Premios en Metálico
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p>Total acumulado de premios ganados por los socios de la peña a través del escrutinio oficial de Loterías del Estado (10 a 15 aciertos).</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 id="kpi-premios-total" class="text-xl font-black text-purple-600 dark:text-purple-400 font-mono">-- €</h4>
-                    <p id="kpi-premios-top-socio" class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Máx. ganador: Calculando...</p>
-                </div>
-
-                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                    <span>Socios premiados</span>
-                    <span id="kpi-premios-count" class="text-purple-600 dark:text-purple-400 font-bold font-mono">-- socios</span>
-                </div>
-            </div>
-
-            <!-- KPI 4: Balance Bonus vs Penalizaciones -->
-            <div class="glass-panel kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-500/25 text-sky-900 dark:text-sky-200 border border-sky-500/50 flex items-center gap-1 shadow-sm">
-                            <span>⚖️</span> Bonus y Penalizaciones
-                        </span>
-
-                        <div class="group/tip relative inline-flex cursor-help shrink-0">
-                            <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
-                                ℹ️
-                            </div>
-                            <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
-                                <strong class="text-blue-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>⚖️</span> Sistema de Bonus y Sanciones
-                                </strong>
-                                <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                    <p><strong>Bonus por Aciertos:</strong> +30 pts (14/15), +15 pts (13), +10 pts (12), +5 pts (11), +3 pts (10).</p>
-                                    <p><strong>Penalizaciones Deportivas:</strong> 3 aciertos (-1), 2 (-2), 1 (-3), 0 (-5 pts).</p>
-                                    <p class="text-rose-400"><strong>Sellado Tardío:</strong> El envío fuera de plazo anula los puntos de la jornada.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-baseline gap-3 mt-0.5">
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
                         <div>
-                            <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Bonus</span>
-                            <span id="kpi-bonus-total" class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-mono">+--</span>
+                            <h4 id="kpi-lider-nombre" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <span id="kpi-lider-puntos" class="text-xl font-black text-amber-600 dark:text-amber-400 font-mono">-- pts</span>
+                                <span id="kpi-lider-ventaja" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">+-- sobre el 2º</span>
+                            </div>
                         </div>
-                        <div class="border-l border-slate-300 dark:border-slate-700 pl-3">
-                            <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Penalizaciones</span>
-                            <span id="kpi-penal-total" class="text-lg font-black text-rose-600 dark:text-rose-400 font-mono">---</span>
+
+                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
+                            <span>Efectividad</span>
+                            <span id="kpi-lider-efectividad" class="text-amber-600 dark:text-amber-500 font-bold font-mono">--%</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                    <span>Balance neto</span>
-                    <span id="kpi-balance-neto" class="font-bold font-mono text-emerald-600 dark:text-emerald-400">-- pts</span>
+                <!-- KPI 2: Récord de Jornada -->
+                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 border border-emerald-500/50 flex items-center gap-1 shadow-sm">
+                                <span>🎯</span> Récord en 1 J
+                            </span>
+                            <span id="kpi-record-puntos-compact" class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 lg:hidden">-- pts</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
+                                    <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>🎯</span> Puntuación Récord
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p>La máxima puntuación obtenida por cualquier socio en una sola jornada durante toda la temporada.</p>
+                                        <p class="text-emerald-300">Incluye los aciertos del boleto base más el bonus oficial correspondiente (+30 por 14/15, +15 por 13, etc.).</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
+                        <div>
+                            <h4 id="kpi-record-socio" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <span id="kpi-record-puntos" class="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">-- pts</span>
+                                <span id="kpi-record-jornada" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">Jornada --</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
+                            <span>Aciertos reales</span>
+                            <span id="kpi-record-hits" class="text-emerald-600 dark:text-emerald-500 font-bold font-mono">-- aciertos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Bolsa de Premios (€) -->
+                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-500/25 text-purple-900 dark:text-purple-200 border border-purple-500/50 flex items-center gap-1 shadow-sm">
+                                <span>💰</span> Premios
+                            </span>
+                            <span id="kpi-premios-total-compact" class="text-xs font-mono font-black text-purple-600 dark:text-purple-400 lg:hidden">-- €</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
+                                    <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>💰</span> Premios en Metálico
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p>Total acumulado de premios ganados por los socios de la peña a través del escrutinio oficial de Loterías del Estado (10 a 15 aciertos).</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
+                        <div>
+                            <h4 id="kpi-premios-total" class="text-xl font-black text-purple-600 dark:text-purple-400 font-mono">-- €</h4>
+                            <p id="kpi-premios-top-socio" class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Máx. ganador: Calculando...</p>
+                        </div>
+
+                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
+                            <span>Socios premiados</span>
+                            <span id="kpi-premios-count" class="text-purple-600 dark:text-purple-400 font-bold font-mono">-- socios</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 4: Balance Bonus vs Penalizaciones -->
+                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                    <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-500/25 text-sky-900 dark:text-sky-200 border border-sky-500/50 flex items-center gap-1 shadow-sm">
+                                <span>⚖️</span> Bonus / Penal
+                            </span>
+                            <span id="kpi-balance-neto-compact" class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 lg:hidden">-- pts</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
+                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                    ℹ️
+                                </div>
+                                <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
+                                    <strong class="text-blue-400 block mb-1 font-bold flex items-center gap-1.5">
+                                        <span>⚖️</span> Sistema de Bonus y Sanciones
+                                    </strong>
+                                    <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
+                                        <p><strong>Bonus por Aciertos:</strong> +30 pts (14/15), +15 pts (13), +10 pts (12), +5 pts (11), +3 pts (10).</p>
+                                        <p><strong>Penalizaciones Deportivas:</strong> 3 aciertos (-1), 2 (-2), 1 (-3), 0 (-5 pts).</p>
+                                        <p class="text-rose-400"><strong>Sellado Tardío:</strong> El envío fuera de plazo anula los puntos de la jornada.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform">▼</span>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Plegable en Móvil -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
+                        <div>
+                            <div class="flex items-baseline gap-3 mt-0.5">
+                                <div>
+                                    <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Bonus</span>
+                                    <span id="kpi-bonus-total" class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-mono">+--</span>
+                                </div>
+                                <div class="border-l border-slate-300 dark:border-slate-700 pl-3">
+                                    <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Penalizaciones</span>
+                                    <span id="kpi-penal-total" class="text-lg font-black text-rose-600 dark:text-rose-400 font-mono">---</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
+                            <span>Balance neto</span>
+                            <span id="kpi-balance-neto" class="font-bold font-mono text-emerald-600 dark:text-emerald-400">-- pts</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1388,6 +1437,8 @@
                 if (top1) {
                     document.getElementById('kpi-lider-nombre').textContent = top1.name;
                     document.getElementById('kpi-lider-puntos').textContent = `${top1.grandTotal} pts`;
+                    const liderComp = document.getElementById('kpi-lider-puntos-compact');
+                    if (liderComp) liderComp.textContent = `${top1.grandTotal} pts`;
                     const ventaja = top2 ? top1.grandTotal - top2.grandTotal : 0;
                     document.getElementById('kpi-lider-ventaja').textContent = `+${ventaja} pts sobre el 2º`;
                     const totalPosibles = top1.jornadasPlayed * 14;
@@ -1415,6 +1466,8 @@
 
                 document.getElementById('kpi-record-socio').textContent = recordSocio || 'Sin datos';
                 document.getElementById('kpi-record-puntos').textContent = `${recordPts} pts`;
+                const recComp = document.getElementById('kpi-record-puntos-compact');
+                if (recComp) recComp.textContent = `${recordPts} pts`;
                 document.getElementById('kpi-record-jornada').textContent = `Jornada ${recordJNum}`;
                 document.getElementById('kpi-record-hits').textContent = `${recordHits} aciertos`;
 
@@ -1433,7 +1486,10 @@
                     }
                 });
 
-                document.getElementById('kpi-premios-total').textContent = this.formatMoney(totalPremios);
+                const formattedPremios = this.formatMoney(totalPremios);
+                document.getElementById('kpi-premios-total').textContent = formattedPremios;
+                const premComp = document.getElementById('kpi-premios-total-compact');
+                if (premComp) premComp.textContent = formattedPremios;
                 document.getElementById('kpi-premios-top-socio').textContent = maxPremiado.amount > 0 ? `Máx: ${maxPremiado.name} (${this.formatMoney(maxPremiado.amount)})` : 'Sin premios todavía';
                 document.getElementById('kpi-premios-count').textContent = `${sociosPremiados} socios`;
 
@@ -1449,6 +1505,10 @@
                 const balanceNeto = totalPosBonus - totalNegPenal;
                 document.getElementById('kpi-bonus-total').textContent = `+${totalPosBonus}`;
                 document.getElementById('kpi-penal-total').textContent = `-${totalNegPenal}`;
+                const netoText = `${balanceNeto >= 0 ? '+' : ''}${balanceNeto} pts`;
+                document.getElementById('kpi-balance-neto').textContent = netoText;
+                const netoComp = document.getElementById('kpi-balance-neto-compact');
+                if (netoComp) netoComp.textContent = netoText;
                 const balEl = document.getElementById('kpi-balance-neto');
                 balEl.textContent = `${balanceNeto >= 0 ? '+' : ''}${balanceNeto} pts`;
                 balEl.className = `font-bold font-mono ${balanceNeto >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;

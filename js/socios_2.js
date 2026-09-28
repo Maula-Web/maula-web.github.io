@@ -380,6 +380,10 @@ class SociosAppController {
         if (elTotal) {
             elTotal.textContent = totalSocios;
         }
+        const elTotalComp = document.getElementById('kpi-total-socios-compact');
+        if (elTotalComp) {
+            elTotalComp.textContent = `${totalSocios} socios`;
+        }
 
         if (elCensoStatus) {
             if (deudores.length > 0) {
@@ -468,6 +472,11 @@ class SociosAppController {
         if (elActivos) elActivos.textContent = dadosActivosHoy;
         if (elUsados) elUsados.textContent = `${totalDadosUsados} / ${maxComodinesTemporada}`;
 
+        const elActivosComp = document.getElementById('kpi-dados-activos-compact');
+        if (elActivosComp) elActivosComp.textContent = `${dadosActivosHoy} hoy`;
+        const elUsadosComp = document.getElementById('kpi-dados-usados-compact');
+        if (elUsadosComp) elUsadosComp.textContent = `${totalDadosUsados} usadas`;
+
         // Inyectar en KPI 4: Conectividad (Telegram + Push)
         const elTg = document.getElementById('kpi-telegram-vinculados');
         const elPush = document.getElementById('kpi-push-vinculados');
@@ -477,6 +486,10 @@ class SociosAppController {
         if (elPush) elPush.textContent = `${conPush} / ${totalSocios}`;
         if (elBadgeConectividad) {
             elBadgeConectividad.innerHTML = `🟢 ${conPush} Push · ${conTelegram} TG`;
+        }
+        const elConectComp = document.getElementById('kpi-conectividad-compact');
+        if (elConectComp) {
+            elConectComp.textContent = `${conPush} Push · ${conTelegram} TG`;
         }
 
         // Inyectar Desglose de Conectividad (Telegram + Push) en el desplegable

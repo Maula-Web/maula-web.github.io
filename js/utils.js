@@ -799,3 +799,70 @@ if (typeof document !== 'undefined') {
     }
 }
 
+// ==========================================================================
+// CONTROLADOR UNIVERSAL DE TARJETAS PLEGABLES EN MÓVIL (KPIs COMPACTOS)
+// ==========================================================================
+if (typeof window !== 'undefined') {
+    window.toggleKpiCard = function(triggerEl) {
+        if (window.innerWidth >= 1024) return; // En PC siempre desplegado
+        const card = triggerEl.closest('.collapsible-kpi') || triggerEl;
+        if (!card) return;
+        const body = card.querySelector('.collapsible-kpi-body');
+        const chevron = card.querySelector('.kpi-chevron');
+        if (!body) return;
+
+        const isHidden = body.classList.contains('hidden');
+        if (isHidden) {
+            body.classList.remove('hidden');
+            if (chevron) chevron.classList.add('rotate-180');
+            card.classList.add('kpi-is-expanded');
+        } else {
+            body.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+            card.classList.remove('kpi-is-expanded');
+        }
+
+        // Actualizar el estado del botón maestro de la sección si existe
+        const section = card.closest('section') || card.closest('.kpi-container') || card.parentElement;
+        if (section) {
+            const masterBtn = section.querySelector('.kpi-master-btn');
+            if (masterBtn) {
+                const allBodies = section.querySelectorAll('.collapsible-kpi-body');
+                const anyHidden = Array.from(allBodies).some(b => b.classList.contains('hidden'));
+                const masterText = masterBtn.querySelector('.kpi-master-text');
+                const masterIcon = masterBtn.querySelector('.kpi-master-icon');
+                if (masterText) masterText.textContent = anyHidden ? 'Desplegar todos' : 'Plegar todos';
+                if (masterIcon) masterIcon.textContent = anyHidden ? '▼' : '▲';
+            }
+        }
+    };
+
+    window.toggleAllKpiCards = function(buttonEl) {
+        const section = buttonEl.closest('section') || buttonEl.closest('.kpi-container') || buttonEl.parentElement.parentElement;
+        if (!section) return;
+        const cards = section.querySelectorAll('.collapsible-kpi');
+        const allBodies = section.querySelectorAll('.collapsible-kpi-body');
+        const anyHidden = Array.from(allBodies).some(b => b.classList.contains('hidden'));
+
+        cards.forEach(card => {
+            const body = card.querySelector('.collapsible-kpi-body');
+            const chevron = card.querySelector('.kpi-chevron');
+            if (!body) return;
+            if (anyHidden) {
+                body.classList.remove('hidden');
+                if (chevron) chevron.classList.add('rotate-180');
+                card.classList.add('kpi-is-expanded');
+            } else {
+                body.classList.add('hidden');
+                if (chevron) chevron.classList.remove('rotate-180');
+                card.classList.remove('kpi-is-expanded');
+            }
+        });
+
+        const masterText = buttonEl.querySelector('.kpi-master-text');
+        const masterIcon = buttonEl.querySelector('.kpi-master-icon');
+        if (masterText) masterText.textContent = anyHidden ? 'Plegar todos' : 'Desplegar todos';
+        if (masterIcon) masterIcon.textContent = anyHidden ? '▲' : '▼';
+    };
+}
+

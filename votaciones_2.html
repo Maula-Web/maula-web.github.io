@@ -424,98 +424,143 @@
             </div>
         </header>
 
+        <!-- Master toggle bar en móvil para Bento KPIs -->
+        <div class="kpi-master-bar">
+            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🗳️</span> Métricas de Votación
+            </span>
+            <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn">
+                <span class="kpi-master-btn-text">Ver todas</span>
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+
         <!-- =====================================================================
              BENTO KPIS: RADIOGRAFÍA DE PARTICIPACIÓN Y CONSENSO
              ===================================================================== -->
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+        <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
             <!-- KPI 1: Votaciones Activas -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between cursor-pointer hover:border-amber-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between hover:border-amber-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-activas">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-subtle"></span>
                         En Curso
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        ⏳
-                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-slate-900 dark:text-white" id="kpi-val-activas-compact">0</span>
+                        <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            ⏳
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="my-1.5">
-                    <div class="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-white" id="kpi-val-activas">0</div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-activas">Sin votaciones activas</div>
-                </div>
-                <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
-                    <span>Estado</span>
-                    <strong class="text-emerald-500" id="kpi-status-activas">Abiertas</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-1.5">
+                        <div class="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-white" id="kpi-val-activas">0</div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-activas">Sin votaciones activas</div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
+                        <span>Estado</span>
+                        <strong class="text-emerald-500" id="kpi-status-activas">Abiertas</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 2: Participación Media -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between cursor-pointer hover:border-blue-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between hover:border-blue-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-participacion">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-blue-500 flex items-center gap-1.5">
                         <span>👥</span> Participación
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        📊
-                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-blue-500" id="kpi-val-participacion-compact">0%</span>
+                        <span class="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            📊
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="my-1.5">
-                    <div class="text-2xl sm:text-3xl font-black font-mono text-blue-600 dark:text-blue-400" id="kpi-val-participacion">0%</div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-participacion">Media por consulta</div>
-                </div>
-                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
-                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-700" id="kpi-bar-participacion" style="width: 0%"></div>
-                </div>
-                <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
-                    <span>Quórum peña</span>
-                    <strong class="text-slate-700 dark:text-slate-300" id="kpi-quorum-socios">19 socios</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-1.5">
+                        <div class="text-2xl sm:text-3xl font-black font-mono text-blue-600 dark:text-blue-400" id="kpi-val-participacion">0%</div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-participacion">Media por consulta</div>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+                        <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-700" id="kpi-bar-participacion" style="width: 0%"></div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
+                        <span>Quórum peña</span>
+                        <strong class="text-slate-700 dark:text-slate-300" id="kpi-quorum-socios">19 socios</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 3: Índice de Consenso / Aprobación -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between cursor-pointer hover:border-emerald-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-aprobacion">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
                         <span>⚖️</span> Tasa de Aprobación
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        🏆
-                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-emerald-500" id="kpi-val-aprobacion-compact">0%</span>
+                        <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            🏆
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="my-1.5">
-                    <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400" id="kpi-val-aprobacion">0%</div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-aprobacion">Propuestas con mayoría</div>
-                </div>
-                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
-                    <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700" id="kpi-bar-aprobacion" style="width: 0%"></div>
-                </div>
-                <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
-                    <span>Eficacia acuerdos</span>
-                    <strong class="text-emerald-500" id="kpi-acuerdos-count">0 aprobadas</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-1.5">
+                        <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400" id="kpi-val-aprobacion">0%</div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-aprobacion">Propuestas con mayoría</div>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+                        <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700" id="kpi-bar-aprobacion" style="width: 0%"></div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
+                        <span>Eficacia acuerdos</span>
+                        <strong class="text-emerald-500" id="kpi-acuerdos-count">0 aprobadas</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 4: Acuerdos Históricos -->
-            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between cursor-pointer hover:border-purple-500/50 transition-all duration-300 group"
+            <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between hover:border-purple-500/50 transition-all duration-300 group collapsible-kpi"
                  data-card-type="kpi-historico">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[10px] font-black uppercase tracking-wider text-purple-500 flex items-center gap-1.5">
                         <span>📜</span> Historial Total
                     </span>
-                    <span class="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                        🏛️
-                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-purple-500" id="kpi-val-historico-compact">0</span>
+                        <span class="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                            🏛️
+                        </span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="my-1.5">
-                    <div class="text-2xl sm:text-3xl font-black font-mono text-purple-600 dark:text-purple-400" id="kpi-val-historico">0</div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-historico">Consultas procesadas</div>
-                </div>
-                <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
-                    <span>Votos emitidos</span>
-                    <strong class="text-purple-500" id="kpi-votos-totales">0 votos</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="my-1.5">
+                        <div class="text-2xl sm:text-3xl font-black font-mono text-purple-600 dark:text-purple-400" id="kpi-val-historico">0</div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="kpi-sub-historico">Consultas procesadas</div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-1 flex justify-between font-mono">
+                        <span>Votos emitidos</span>
+                        <strong class="text-purple-500" id="kpi-votos-totales">0 votos</strong>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1024,6 +1069,8 @@
 
                 // KPI 1: Activas
                 document.getElementById('kpi-val-activas').textContent = activeCount;
+                const kpiActComp = document.getElementById('kpi-val-activas-compact');
+                if (kpiActComp) kpiActComp.textContent = `${activeCount}`;
                 if (nextDeadline) {
                     const diff = nextDeadline - now;
                     const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -1037,7 +1084,10 @@
 
                 // KPI 2: Participación
                 const avgParticipation = this.votaciones.length > 0 ? (totalParticipationPctSum / this.votaciones.length) : 0;
-                document.getElementById('kpi-val-participacion').textContent = `${avgParticipation.toFixed(1)}%`;
+                const partText = `${avgParticipation.toFixed(1)}%`;
+                document.getElementById('kpi-val-participacion').textContent = partText;
+                const kpiPartComp = document.getElementById('kpi-val-participacion-compact');
+                if (kpiPartComp) kpiPartComp.textContent = partText;
                 const avgSocios = ((avgParticipation / 100) * totalSocios).toFixed(1);
                 document.getElementById('kpi-sub-participacion').textContent = `${avgSocios} socios de media`;
                 document.getElementById('kpi-bar-participacion').style.width = `${Math.min(100, avgParticipation)}%`;
@@ -1045,13 +1095,18 @@
 
                 // KPI 3: Aprobación
                 const approvalRate = finishedCount > 0 ? ((approvedCount / finishedCount) * 100) : 0;
-                document.getElementById('kpi-val-aprobacion').textContent = `${approvalRate.toFixed(1)}%`;
+                const appText = `${approvalRate.toFixed(1)}%`;
+                document.getElementById('kpi-val-aprobacion').textContent = appText;
+                const kpiAppComp = document.getElementById('kpi-val-aprobacion-compact');
+                if (kpiAppComp) kpiAppComp.textContent = appText;
                 document.getElementById('kpi-sub-aprobacion').textContent = `${approvedCount} de ${finishedCount} aprobadas`;
                 document.getElementById('kpi-bar-aprobacion').style.width = `${Math.min(100, approvalRate)}%`;
                 document.getElementById('kpi-acuerdos-count').textContent = `${approvedCount} acuerdos`;
 
                 // KPI 4: Histórico
                 document.getElementById('kpi-val-historico').textContent = this.votaciones.length;
+                const kpiHistComp = document.getElementById('kpi-val-historico-compact');
+                if (kpiHistComp) kpiHistComp.textContent = `${this.votaciones.length}`;
                 document.getElementById('kpi-sub-historico').textContent = `${finishedCount} cerradas · ${activeCount} activas`;
                 document.getElementById('kpi-votos-totales').textContent = `${totalVotesSum} votos totales`;
 

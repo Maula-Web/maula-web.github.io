@@ -409,77 +409,122 @@
             <div class="absolute -right-16 -top-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
         </header>
 
+        <!-- Master toggle bar en móvil para Bento KPIs -->
+        <div class="kpi-master-bar">
+            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🛡️</span> Resumen Ejecutivo
+            </span>
+            <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn">
+                <span class="kpi-master-btn-text">Ver todas</span>
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+
         <!-- =====================================================================
              BENTO KPIS: RESUMEN EJECUTIVO DE ADMINISTRACIÓN (4 TARJETAS)
              ===================================================================== -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
 
             <!-- KPI 1: Seguridad & Sesión -->
-            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+            <div class="glass-panel p-3.5 sm:p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60 collapsible-kpi"
                  data-tooltip-title="🔐 Seguridad & Auditoría Central"
                  data-tooltip-desc="Contraseña maestra activa en el sistema. Registro cronológico inmutable de todas las acciones administrativas realizadas en la peña.">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Seguridad & Sesión</span>
-                    <span class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-sm">🔐</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-slate-900 dark:text-white" id="kpi-master-pwd-compact">Protegido</span>
+                        <span class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xs">🔐</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="mt-2 flex items-baseline gap-2">
-                    <span class="text-2xl font-black text-slate-900 dark:text-white" id="kpi-master-pwd-status">Protegido</span>
-                </div>
-                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                    <span>Eventos en log:</span>
-                    <strong class="text-amber-500 font-mono" id="kpi-log-count">0</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="mt-2 flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-slate-900 dark:text-white" id="kpi-master-pwd-status">Protegido</span>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                        <span>Eventos en log:</span>
+                        <strong class="text-amber-500 font-mono" id="kpi-log-count">0</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 2: Pasarela Telegram -->
-            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+            <div class="glass-panel p-3.5 sm:p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60 collapsible-kpi"
                  data-tooltip-title="🤖 Gateway & Bots Telegram"
                  data-tooltip-desc="Canal de comunicación directa con el grupo oficial de la peña: reporte automático de resultados, avisos semanales y Habemus Quinielam.">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pasarela Telegram</span>
-                    <span class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sm">🤖</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-sky-500" id="kpi-tg-compact">Configurado</span>
+                        <span class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-xs">🤖</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="mt-2 flex items-baseline gap-2">
-                    <span class="text-2xl font-black text-sky-500 dark:text-sky-400" id="kpi-tg-status">Configurado</span>
-                </div>
-                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                    <span>Habemus:</span>
-                    <strong class="text-emerald-500 font-semibold" id="kpi-habemus-status">Activo</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="mt-2 flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-sky-500 dark:text-sky-400" id="kpi-tg-status">Configurado</span>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                        <span>Habemus:</span>
+                        <strong class="text-emerald-500 font-semibold" id="kpi-habemus-status">Activo</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 3: Reglas de Puntuación -->
-            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+            <div class="glass-panel p-3.5 sm:p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60 collapsible-kpi"
                  data-tooltip-title="⚙️ Motor de Puntuaciones Activo"
                  data-tooltip-desc="Baremos vigentes de bonificaciones (15 a 10 aciertos) y penalizaciones (3 a 0 aciertos). Aplican de forma automática desde su fecha efectiva.">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Reglas Puntuación</span>
-                    <span class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-sm">⚙️</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-emerald-500" id="kpi-rules-compact">+30 pts</span>
+                        <span class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xs">⚙️</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="mt-2 flex items-baseline gap-2">
-                    <span class="text-2xl font-black text-emerald-500 dark:text-emerald-400" id="kpi-rules-bonus">+30 pts</span>
-                    <span class="text-xs text-rose-500 font-bold" id="kpi-rules-penalty">-5 pts</span>
-                </div>
-                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                    <span>Vigentes desde:</span>
-                    <strong class="text-amber-500 font-mono text-[10px]" id="kpi-rules-date">--/--/----</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="mt-2 flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-emerald-500 dark:text-emerald-400" id="kpi-rules-bonus">+30 pts</span>
+                        <span class="text-xs text-rose-500 font-bold" id="kpi-rules-penalty">-5 pts</span>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                        <span>Vigentes desde:</span>
+                        <strong class="text-amber-500 font-mono text-[10px]" id="kpi-rules-date">--/--/----</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- KPI 4: Custodia Documental -->
-            <div class="glass-panel p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60"
+            <div class="glass-panel p-3.5 sm:p-4 relative group cursor-pointer overflow-hidden transition-all duration-300 hover:border-amber-500/60 collapsible-kpi"
                  data-tooltip-title="📂 Repositorio & Plantillas"
                  data-tooltip-desc="Archivos oficiales de la peña almacenados de forma segura en Base64 en Firestore, junto al backup de la lista oficial de socios.">
-                <div class="flex items-center justify-between">
+                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
                     <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Custodia Documental</span>
-                    <span class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-sm">📂</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="kpi-compact-val font-mono text-xs font-bold text-purple-500" id="kpi-doc-compact">0 docs</span>
+                        <span class="w-6 h-6 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-xs">📂</span>
+                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="mt-2 flex items-baseline gap-2">
-                    <span class="text-2xl font-black text-purple-500 dark:text-purple-400" id="kpi-doc-count">0 docs</span>
-                </div>
-                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                    <span>Plantilla Socios:</span>
-                    <strong class="text-emerald-500 font-semibold" id="kpi-template-status">Sincronizada</strong>
+                <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex">
+                    <div class="mt-2 flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-purple-500 dark:text-purple-400" id="kpi-doc-count">0 docs</span>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                        <span>Plantilla Socios:</span>
+                        <strong class="text-emerald-500 font-semibold" id="kpi-template-status">Sincronizada</strong>
+                    </div>
                 </div>
             </div>
 
@@ -1356,6 +1401,8 @@
             const kpiPenalty = document.getElementById('kpi-rules-penalty');
             if (kpiBonus && rules.bonus15 !== undefined) kpiBonus.textContent = `+${rules.bonus15} pts`;
             if (kpiPenalty && rules.penalty0 !== undefined) kpiPenalty.textContent = `${rules.penalty0} pts`;
+            const kpiRulesComp = document.getElementById('kpi-rules-compact');
+            if (kpiRulesComp && rules.bonus15 !== undefined) kpiRulesComp.textContent = `+${rules.bonus15} pts`;
 
             const history = window.ScoringSystem.getHistory ? window.ScoringSystem.getHistory() : [];
             if (history.length > 0) {
@@ -1418,6 +1465,8 @@
 
             const kpiCount = document.getElementById('kpi-log-count');
             if (kpiCount) kpiCount.textContent = logs.length;
+            const kpiMasterComp = document.getElementById('kpi-master-pwd-compact');
+            if (kpiMasterComp) kpiMasterComp.textContent = `${logs.length} logs`;
 
             renderLogs(logs);
         }
@@ -1474,6 +1523,8 @@
 
             const kpiDoc = document.getElementById('kpi-doc-count');
             if (kpiDoc) kpiDoc.textContent = `${docs.length} docs`;
+            const kpiDocComp = document.getElementById('kpi-doc-compact');
+            if (kpiDocComp) kpiDocComp.textContent = `${docs.length} docs`;
             const badge = document.getElementById('doc-count-badge');
             if (badge) badge.textContent = `${docs.length} archivos`;
 
