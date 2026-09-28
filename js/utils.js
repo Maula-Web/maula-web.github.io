@@ -766,6 +766,8 @@ window.AppVersion = {
     injectOldPageSwitcher() {
         if (!this.isFernandoLozano()) return;
         const currFile = (window.location.pathname || '').split('/').pop() || 'index.html';
+        // index.html ya tiene botón destacado inyectado por auth.js
+        if (currFile === 'index.html') return;
         const counterpart = this.OLD_TO_NEW[currFile];
         if (!counterpart) return;
 

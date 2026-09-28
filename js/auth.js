@@ -392,19 +392,25 @@ const Auth = {
                     <span></span>
                     <span></span>
                 </div>
-                ${isFernandoLozano ? `<a href="dashboard_2.html" class="btn-primary btn-dashboard-2 ${page === 'dashboard_2.html' ? 'active' : ''}" style="border: 1px dashed #ff9100; color: #ff9100;" title="Nueva versión de Inicio 2.0 (en pruebas)">INICIO 2</a>` : ''}
                 <a href="socios.html" class="btn-primary btn-socios ${page === 'socios.html' ? 'active' : ''}">SOCIOS</a>
-                ${isFernandoLozano ? `<a href="socios_2.html" class="btn-primary btn-socios-2 ${page === 'socios_2.html' ? 'active' : ''}" style="border: 1px dashed #ff9100; color: #ff9100;" title="Nueva versión de Socios 2.0 (en pruebas)">SOCIOS 2</a>` : ''}
                 <a href="jornadas.html" class="btn-primary btn-jornadas ${page === 'jornadas.html' ? 'active' : ''}">RESULTADOS PARTIDOS</a>
                 <a href="pronosticos.html" class="btn-primary btn-pronosticos ${page === 'pronosticos.html' ? 'active' : ''}">RELLENAR QUINIELA</a>
                 <a href="resultados.html" class="btn-primary btn-resultados ${page === 'resultados.html' ? 'active' : ''}">CLASIFICACIÓN</a>
                 <a href="bote.html" class="btn-primary btn-bote ${page === 'bote.html' ? 'active' : ''}">BOTE</a>
-                <a href="bote_2.html" class="btn-primary btn-bote-2 ${page === 'bote_2.html' ? 'active' : ''}" style="border: 1px dashed #ff9100; color: #ff9100;" title="Nueva versión de Tesorería (en pruebas)">BOTE 2</a>
                 <a href="resumen-temporada.html" class="btn-primary btn-resumen ${page === 'resumen-temporada.html' ? 'active' : ''}">RESUMEN TEMPORADA</a>
                 <a href="votaciones.html" class="btn-primary btn-votaciones ${page === 'votaciones.html' ? 'active' : ''}" style="background:white; color:black; font-weight:900;">VOTACIONES</a>
                 <a href="admin.html" class="btn-primary btn-admin ${page === 'admin.html' ? 'active' : ''}">ADMINISTRACIÓN</a>
             `;
             document.body.prepend(sidebar);
+
+            // Botón exclusivo para Fernando Lozano: ir a versión nueva
+            if (isFernandoLozano && page === 'index.html' && !document.getElementById('btn-goto-new-version')) {
+                const gotoNewBtn = document.createElement('div');
+                gotoNewBtn.id = 'btn-goto-new-version';
+                gotoNewBtn.style.cssText = 'position:fixed; top:12px; right:12px; z-index:99999;';
+                gotoNewBtn.innerHTML = `<a href="dashboard_2.html" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg,#ff9100,#e65100); color:#fff; font-weight:900; font-size:13px; padding:8px 14px; border-radius:10px; text-decoration:none; box-shadow:0 4px 18px rgba(255,145,0,0.45); letter-spacing:0.02em;">🚀 Ir a versión nueva →</a>`;
+                document.body.appendChild(gotoNewBtn);
+            }
         } else {
             // 1. Ensure Menu Toggle exists even if sidebar was hardcoded
             if (!sidebar.querySelector('.menu-toggle')) {
@@ -422,49 +428,6 @@ const Auth = {
                 }
             }
 
-            // 2a-0. Ensure Inicio 2 button exists ONLY for Fernando Lozano
-            if (isFernandoLozano) {
-                if (!sidebar.querySelector('a[href="dashboard_2.html"]')) {
-                    const dash2Btn = document.createElement('a');
-                    dash2Btn.href = "dashboard_2.html";
-                    dash2Btn.className = `btn-primary btn-dashboard-2 ${page === 'dashboard_2.html' ? 'active' : ''}`;
-                    dash2Btn.style.border = "1px dashed #ff9100";
-                    dash2Btn.style.color = "#ff9100";
-                    dash2Btn.title = "Nueva versión de Inicio / Dashboard 2.0 (en pruebas)";
-                    dash2Btn.textContent = "INICIO 2";
-                    const menuToggle = sidebar.querySelector('#mobile-menu-toggle');
-                    if (menuToggle) {
-                        menuToggle.insertAdjacentElement('afterend', dash2Btn);
-                    } else {
-                        sidebar.prepend(dash2Btn);
-                    }
-                }
-            } else {
-                const existingD2 = sidebar.querySelector('a[href="dashboard_2.html"]');
-                if (existingD2) existingD2.remove();
-            }
-
-            // 2a. Ensure Socios 2 button exists ONLY for Fernando Lozano
-            if (isFernandoLozano) {
-                if (!sidebar.querySelector('a[href="socios_2.html"]')) {
-                    const socios2Btn = document.createElement('a');
-                    socios2Btn.href = "socios_2.html";
-                    socios2Btn.className = `btn-primary btn-socios-2 ${page === 'socios_2.html' ? 'active' : ''}`;
-                    socios2Btn.style.border = "1px dashed #ff9100";
-                    socios2Btn.style.color = "#ff9100";
-                    socios2Btn.title = "Nueva versión de Socios 2.0 (en pruebas)";
-                    socios2Btn.textContent = "SOCIOS 2";
-                    const sociosBtn = sidebar.querySelector('a[href="socios.html"]');
-                    if (sociosBtn) {
-                        sociosBtn.insertAdjacentElement('afterend', socios2Btn);
-                    } else {
-                        sidebar.appendChild(socios2Btn);
-                    }
-                }
-            } else {
-                const existingS2 = sidebar.querySelector('a[href="socios_2.html"]');
-                if (existingS2) existingS2.remove();
-            }
 
             // 2b. Ensure Bote button exists
             if (!sidebar.querySelector('a[href="bote.html"]')) {
@@ -481,22 +444,6 @@ const Auth = {
                 }
             }
 
-            // 2b-2. Ensure Bote 2 button exists
-            if (!sidebar.querySelector('a[href="bote_2.html"]')) {
-                const bote2Btn = document.createElement('a');
-                bote2Btn.href = "bote_2.html";
-                bote2Btn.className = `btn-primary btn-bote-2 ${page === 'bote_2.html' ? 'active' : ''}`;
-                bote2Btn.style.border = "1px dashed #ff9100";
-                bote2Btn.style.color = "#ff9100";
-                bote2Btn.title = "Nueva versión de Tesorería (en pruebas)";
-                bote2Btn.textContent = "BOTE 2";
-                const boteBtn = sidebar.querySelector('a[href="bote.html"]');
-                if (boteBtn) {
-                    boteBtn.insertAdjacentElement('afterend', bote2Btn);
-                } else {
-                    sidebar.appendChild(bote2Btn);
-                }
-            }
 
             // 2c. Ensure Votaciones button exists
             if (!sidebar.querySelector('a[href="votaciones.html"]')) {
