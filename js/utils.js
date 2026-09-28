@@ -801,14 +801,23 @@ if (typeof document !== 'undefined') {
         if (window.AppVersion) window.AppVersion.init();
         if (window.AppTheme) window.AppTheme.init();
 
-        // Auto-centrar la pestaña activa del menú en pantallas de móvil
+        // Auto-centrar la pestaña activa del menú en pantallas de móvil (solo el contenedor, nunca la ventana)
         try {
             if (window.innerWidth < 1024) {
                 const activeNavTab = document.querySelector('nav a[class*="bg-amber-500"], nav a[class*="bg-amber-500/20"]');
-                if (activeNavTab && activeNavTab.scrollIntoView) {
-                    setTimeout(() => {
-                        activeNavTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                    }, 100);
+                if (activeNavTab) {
+                    const navContainer = activeNavTab.closest('.overflow-x-auto') || activeNavTab.parentElement;
+                    if (navContainer) {
+                        setTimeout(() => {
+                            const targetScroll = activeNavTab.offsetLeft - (navContainer.clientWidth / 2) + (activeNavTab.clientWidth / 2);
+                            navContainer.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
+                            // Bloquear y resetear cualquier desplazamiento horizontal de la ventana global
+                            if (window.scrollX !== 0 || document.documentElement.scrollLeft !== 0) {
+                                window.scrollTo({ left: 0 });
+                                document.documentElement.scrollLeft = 0;
+                            }
+                        }, 100);
+                    }
                 }
             }
         } catch (e) { }

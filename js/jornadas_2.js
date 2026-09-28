@@ -297,10 +297,11 @@ class Jornadas2AppController {
                 `;
             }).join('');
 
-            // Scroll suave automático a la píldora activa
+            // Scroll suave automático a la píldora activa dentro del carrusel (sin desplazar la ventana)
             const activeBtn = carousel.querySelector('.ring-2');
             if (activeBtn) {
-                activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                const targetScroll = activeBtn.offsetLeft - (carousel.clientWidth / 2) + (activeBtn.clientWidth / 2);
+                carousel.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
             }
         }
 

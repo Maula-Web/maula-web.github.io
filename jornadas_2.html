@@ -42,6 +42,13 @@
             --color-card-hover: rgba(245, 158, 11, 0.45);
         }
 
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: clip !important;
+            position: relative;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             background-color: #090d16;
@@ -52,7 +59,7 @@
                 radial-gradient(at 50% 100%, rgba(255, 145, 0, 0.05) 0px, transparent 50%);
             background-attachment: fixed;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow-x: clip !important;
         }
 
         .light-theme body,
@@ -192,7 +199,7 @@
 </style>
 </head>
 
-<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
+<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black w-full max-w-full overflow-x-hidden">
 
     <!-- Firebase & Servicios de Dominio -->
     <script src="js/firebase-init.js"></script>
@@ -249,7 +256,7 @@
     <!-- =====================================================================
          CONTENIDO PRINCIPAL: RESULTADOS PARTIDOS 2.0 (Visible para Fernando Lozano)
          ===================================================================== -->
-    <div id="main-content" class="max-w-[1500px] mx-auto flex flex-col space-y-4 sm:space-y-6">
+    <div id="main-content" class="w-full max-w-[1500px] mx-auto min-w-0 flex flex-col space-y-4 sm:space-y-6">
 
         <!-- NAVBAR SUPERIOR MAULAS 2.0 (NAVEGACIÓN UNIVERSAL Y SELECTOR DE SECCIÓN) -->
         <nav class="glass-panel p-2 sm:p-2.5 xl:p-3 border-amber-500/40 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 relative z-[100] shadow-xl order-1">
@@ -269,7 +276,7 @@
                     <!-- Selector Versión Móvil -->
                     <div class="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-amber-500/40 text-[11px] font-bold shadow-inner" id="version-switcher-container-mobile">
                         <button type="button" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-1.5 py-0.5 rounded text-[11px] font-semibold transition text-slate-400" title="1.0 Clásica">1.0</button>
-                        <button type="button" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-1.5 py-0.5 rounded text-[11px] font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="⚡ 2.0 Pro">⚡2.0</button>
+                        <button type="button" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-1.5 py-0.5 rounded text-[11px] font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="2.0 Pro">2.0</button>
                     </div>
 
                     <!-- Selector Tema Móvil -->
@@ -334,7 +341,7 @@
                         1.0 Clásica
                     </button>
                     <button type="button" id="btn-version-v2" data-version-btn="v2" onclick="window.AppVersion && window.AppVersion.switchMode('v2')" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Versión 2.0 Activa">
-                        ⚡ 2.0 Pro
+                        2.0 Pro
                     </button>
                 </div>
 
@@ -999,6 +1006,15 @@
 
     <!-- Script Controlador de Resultados 2.0 -->
     <script src="js/jornadas_2.js"></script>
+    <script>
+        // Blindaje contra desplazamiento horizontal accidental en WebKit / Safari iOS
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.scrollX !== 0) window.scrollTo({ left: 0, top: window.scrollY });
+        });
+        window.addEventListener('load', () => {
+            if (window.scrollX !== 0) window.scrollTo({ left: 0, top: window.scrollY });
+        });
+    </script>
 </body>
 
 </html>

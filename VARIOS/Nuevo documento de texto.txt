@@ -19,17 +19,18 @@ Y por último vamoa a versionar la hoja de administración con el mismo estilo n
 Unifica el color del fondo en todas las hojas. Parece que todas tienen el mismo pero el de la hoja Resultados es más oscuro.
 Haz mas grande el logotipo del menú.
 
-Adapta la estructura a las pantallas de móvil. Quizá podemos hacer que las tarjetas de la parte superior ocupen menos para mostrar mejor la información de cada hoja. Una versión compacta respecto a PC.
+Adapta la estructura a las pantallas de móvil. Quizá podemos hacer que las tarjetas de la parte superior ocupen menos para mostrar mejor la información de cada hoja. Una versión compacta respecto a PC. quizá con elementos desplegables que ocupen poco en la pantalla. Me interesa que se vea la parti principal de cada hoja. Las tarjetas de información del tercer nivel podrían plegarse y abrirse cuando se pulse en ellas. Si no entiendes bien a qué me refiero, pregúntame. Por ponerte un ejemplo, la hoja Rellenar Quiniela, me refiero a las tarjetas PLAZO OFICIAL, CENSO SELLADO, etc. Intenta aplicar esa reducción de espacio a toas las hojas en la medida de lo posible.
 
+Estoy pensando en llevar los selectores en PC, al mismo sitio que en móvil. Creo que quedará todo más coherente
 
 Ahora que ya tenemos versiones nuevas de todas las hojas, vamos a desactivar para todos los socios las hojas viejas. 
 Para ello seguiremos los siguientes pasos.
-Las nuevas hojas no se llamaran versión 2, ni 2, ni 2.0 ni nada parecido. Tendrán el nombre normal.
-Se elminarán las menciones a que solo están disponibles para ciertos socios y mensajes similares.
-Las hojas viejas sólo estarán disponibles para el socio Fernando Lozano mediante el control del menú Clásica/Pro. Para el resto de socios sólo estarán disponobles las hojas nuevas. El control de menú no se mostrará al resto de socios.
-Las hojas viejas las voy a dejar ocultas pero accesibles por si tengo que recuperar algo. En un tiempo las terminaremos eliminando.
-Se desactivará la hoja identidad visual y cualquier referencia de esta hoja en el código del resto de la web. Esta hoja no tiene versión nueva. Va a desaparecer totalmente.
-Una vez ocultas las hojas viejas, se mostraran a todos los socios únicamente las hojas nuevas, incluyendo el bote.
-
+1. Las nuevas hojas no se llamaran versión 2, ni 2, ni 2.0 ni nada parecido. Tendrán el nombre normal. Cambialo.
+2. Elimina las menciones en todos los textos a que estas hojas solo están disponibles para ciertos socios y mensajes similares.
+3. Las hojas viejas sólo estarán disponibles para el socio Fernando Lozano mediante el control del menú Clásica/Pro. Para el resto de socios sólo estarán disponibles las hojas nuevas. Ese control de menú no se mostrará al resto de socios.
+4. Las hojas viejas las vamos a dejar ocultas pero sin eliminar por si tengo que recuperar algo. En un tiempo las terminaremos eliminando.
+5. Desactiva la hoja identidad visual y cualquier referencia de esta hoja en el código del resto de la web. Esta hoja no tiene versión nueva. Va a desaparecer totalmente.
+6. Una vez ocultas las hojas viejas, se mostraran a todos los socios únicamente las hojas nuevas, incluyendo el bote. Quita el cartel de en obras.
+Haz estas tareas paso a paso. Antes de continuar con el siguiente paso, esperamos a ver si el anterior ha funcionado.
 
 La prueba de notificación con token para despertar un iphone con la app cerrada y la pantalla apagada, funcionó correctamente. ¿Cuales serían los siguientes pasos?
