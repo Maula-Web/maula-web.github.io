@@ -1777,6 +1777,19 @@
     <!-- Scripts de Datos y Controlador -->
     <script src="js/bote_2_data.js"></script>
     <script src="js/bote_2.js"></script>
+    <!-- Seguridad: garantizar que el contenido principal siempre es visible -->
+    <script>
+        (function () {
+            var mainId = 'bote2-main-content';
+            var main = document.getElementById(mainId);
+            if (main && (main.style.display === 'none' || main.classList.contains('hidden'))) {
+                main.style.display = '';
+                main.classList.remove('hidden');
+            }
+            var restr = document.getElementById('restricted-screen');
+            if (restr) { restr.style.display = 'none'; restr.classList.add('hidden'); }
+        })();
+    </script>
 </body>
 
 </html>
