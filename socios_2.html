@@ -462,15 +462,13 @@
         </header>
 
         <!-- Master toggle bar en móvil para Bento KPIs -->
-        <div class="kpi-master-bar">
-            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div class="kpi-master-bar flex lg:hidden items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 py-1 px-1">
+            <span class="flex items-center gap-1.5 text-slate-300">
                 <span>👥</span> Métricas del Censo
             </span>
-            <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn">
-                <span class="kpi-master-btn-text">Ver todas</span>
-                <svg class="w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
+            <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
+                <span class="kpi-master-text">Desplegar todos</span>
+                <span class="kpi-master-icon text-[10px]">▼</span>
             </button>
         </div>
 
@@ -478,17 +476,15 @@
         <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-50 overflow-visible">
             <!-- KPI 1: Censo Activo & Estado en Bote -->
             <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
-                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
-                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                        <span>Censo Activo</span>
-                        <span class="text-[11px] text-amber-400">ℹ️</span>
-                    </span>
+                <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                     <div class="flex items-center gap-2">
-                        <span class="kpi-compact-val font-mono text-sm font-bold text-white" id="kpi-total-socios-compact">--</span>
-                        <span class="text-base">🏛️</span>
-                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <span>🏛️</span> Censo Activo
+                        </span>
+                        <span id="kpi-total-socios-compact" class="text-xs font-mono font-bold text-white lg:hidden">--</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform shrink-0">▼</span>
                     </div>
                 </div>
                 <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
@@ -519,17 +515,15 @@
 
             <!-- KPI 2: Dados Activos Esta Jornada -->
             <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
-                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
-                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                        <span>Dados en Curso</span>
-                        <span class="text-[11px] text-amber-400">ℹ️</span>
-                    </span>
+                <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                     <div class="flex items-center gap-2">
-                        <span class="kpi-compact-val font-mono text-sm font-bold text-amber-400" id="kpi-dados-activos-compact">--</span>
-                        <span class="text-base">🎲</span>
-                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                            <span>🎲</span> Dados en Curso
+                        </span>
+                        <span id="kpi-dados-activos-compact" class="text-xs font-mono font-bold text-amber-400 lg:hidden">--</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform shrink-0">▼</span>
                     </div>
                 </div>
                 <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
@@ -552,17 +546,15 @@
 
             <!-- KPI 3: Comodines Disponibles -->
             <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
-                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
-                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                        <span>Comodines de Temporada</span>
-                        <span class="text-[11px] text-amber-400">ℹ️</span>
-                    </span>
+                <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                     <div class="flex items-center gap-2">
-                        <span class="kpi-compact-val font-mono text-sm font-bold text-emerald-400" id="kpi-dados-usados-compact">--</span>
-                        <span class="text-base">🎯</span>
-                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                            <span>🎯</span> Comodines
+                        </span>
+                        <span id="kpi-dados-usados-compact" class="text-xs font-mono font-bold text-emerald-400 lg:hidden">--</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform shrink-0">▼</span>
                     </div>
                 </div>
                 <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
@@ -585,17 +577,15 @@
 
             <!-- KPI 4: Conectividad (Telegram + Notificaciones Push) -->
             <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
-                <div class="collapsible-kpi-header" onclick="window.toggleKpiCard(this)">
-                    <span class="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                        <span>Conectividad</span>
-                        <span class="text-[11px] text-amber-400">ℹ️</span>
-                    </span>
+                <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                     <div class="flex items-center gap-2">
-                        <span class="kpi-compact-val font-mono text-xs font-bold text-sky-400" id="kpi-conectividad-compact">--</span>
-                        <span class="text-base">📡</span>
-                        <svg class="kpi-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <span class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                            <span>📡</span> Conectividad
+                        </span>
+                        <span id="kpi-conectividad-compact" class="text-xs font-mono font-bold text-sky-400 lg:hidden">--</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="kpi-chevron lg:hidden w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold transition-transform shrink-0">▼</span>
                     </div>
                 </div>
                 <div class="collapsible-kpi-body flex-col justify-between hidden lg:flex mt-2">
@@ -652,7 +642,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </section>
 
         <!-- BARRA DE BÚSQUEDA, FILTROS Y CONMUTADOR DE VISTAS -->

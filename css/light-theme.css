@@ -1260,8 +1260,53 @@ body.light-theme {
 }
 
 /* ==========================================================================
+   GLOBAL VIEWPORT & MOBILE OVERFLOW CONTROLS
+   ========================================================================== */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden !important;
+}
+
+nav,
+nav .overflow-x-auto,
+.no-scrollbar,
+.jornadas-scroll-container,
+.view-switcher-box,
+#main-content {
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+@media (max-width: 1023px) {
+    .desktop-only-flex {
+        display: none !important;
+    }
+}
+@media (min-width: 1024px) {
+    .desktop-only-flex {
+        display: flex !important;
+    }
+}
+
+/* ==========================================================================
    MOBILE ADAPTABILITY & COLLAPSIBLE TOP KPI CARDS
    ========================================================================== */
+.kpi-chevron {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    max-width: 1.5rem !important;
+    max-height: 1.5rem !important;
+    min-width: 1.5rem !important;
+    min-height: 1.5rem !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    transition: transform 0.2s ease;
+}
+
 @media (max-width: 1023px) {
     .collapsible-kpi {
         padding: 0.625rem 0.875rem !important;
@@ -1278,9 +1323,6 @@ body.light-theme {
     .collapsible-kpi.kpi-is-expanded {
         border-color: rgba(245, 158, 11, 0.55) !important;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-    }
-    .kpi-chevron {
-        transition: transform 0.2s ease;
     }
 }
 
