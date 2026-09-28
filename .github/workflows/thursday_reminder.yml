@@ -1,0 +1,33 @@
+name: Recordatorio Quiniela Jueves
+run-name: ⏰ Recordatorio Quiniela Jueves 16:30
+
+on:
+  schedule:
+    # 14:30 UTC = 16:30 Madrid en horario de verano (CEST, UTC+2)
+    # 15:30 UTC = 16:30 Madrid en horario de invierno (CET, UTC+1)
+    - cron: '30 14,15 * * 4'
+  workflow_dispatch:
+    # Permite ejecutarlo manualmente en cualquier momento desde la pestaña "Actions" de GitHub
+
+jobs:
+  send-reminder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci || npm install
+
+      - name: Ejecutar Recordatorio Push de Quiniela
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: node scripts/thursday_reminder_cron.js
