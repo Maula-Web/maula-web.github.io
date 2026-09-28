@@ -2151,12 +2151,17 @@
             });
         }
 
-        // Inicializar al cargar el DOM si está autorizado
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.__isUserAuthorized) {
+        // Inicializar datos automáticamente al entrar a la hoja de Administración
+        function startAdminApp() {
+            if (window.AdminApp && window.AdminApp.init) {
                 window.AdminApp.init();
             }
-        });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startAdminApp);
+        } else {
+            startAdminApp();
+        }
     </script>
 </body>
 
