@@ -334,7 +334,20 @@ class BoteAppController {
 
             // 2. Socio que juega los dobles en esta jornada (ganador de la jornada anterior)
             const doblesPlayerMov = jMovements.find(m => m.jugaDobles);
-            const maulaMov = jMovements.find(m => (m.penalizacionMaula && m.penalizacionMaula > 0) || m.isLoser);
+            let maulaId = (this.engine && typeof this.engine.getLoserOfJornada === 'function') ? this.engine.getLoserOfJornada(j, members, jornadas, pronosticos) : null;
+            const maulaMov = jMovements.find(m => m.isLoser || (maulaId && String(m.memberId) === String(maulaId)) || (m.penalizacionMaula && m.penalizacionMaula > 0));
+            let maulaName = maulaMov ? maulaMov.memberName : (maulaId ? (members.find(m => String(m.id) === String(maulaId)) || {}).name : null);
+            if (!maulaId && jMovements.length > 0) {
+                const validMovs = jMovements.filter(m => typeof m.aciertos === 'number' && !isNaN(m.aciertos));
+                if (validMovs.length > 0) {
+                    const minAc = Math.min(...validMovs.map(m => m.aciertos));
+                    const worst = validMovs.filter(m => m.aciertos === minAc);
+                    if (worst.length === 1) {
+                        maulaId = String(worst[0].memberId);
+                        maulaName = worst[0].memberName;
+                    }
+                }
+            }
 
             const neto = recaudacion - gastoSellado + premios;
 
@@ -370,10 +383,10 @@ class BoteAppController {
                 winnerName: winnerName,
                 doblesPlayerId: doblesPlayerMov ? String(doblesPlayerMov.memberId) : null,
                 doblesPlayerName: doblesPlayerMov ? doblesPlayerMov.memberName : null,
-                maulaId: maulaMov ? String(maulaMov.memberId) : (sealerMov ? String(sealerMov.memberId) : null),
-                maulaName: maulaMov ? maulaMov.memberName : (sealerMov ? sealerMov.memberName : null),
-                loserId: maulaMov ? String(maulaMov.memberId) : (sealerMov ? String(sealerMov.memberId) : null),
-                loserName: maulaMov ? maulaMov.memberName : (sealerMov ? sealerMov.memberName : null),
+                maulaId: maulaId,
+                maulaName: maulaName,
+                loserId: maulaId,
+                loserName: maulaName,
                 sealerId: sealerMov ? String(sealerMov.memberId) : null,
                 sealerName: sealerMov ? sealerMov.memberName : null,
                 noSellado: !!j.noSellado,
@@ -1103,8 +1116,11 @@ class BoteAppController {
             if (m.exento) {
                 icons += ' <span title="Juega gratis esta jornada (premio o ganador jornada previa)">🎁</span>';
             }
+            if (m.isLoser || (jSummary.loserId && String(m.memberId) === String(jSummary.loserId))) {
+                icons += ' <span title="Maula de la jornada (menor puntuación, sella la próxima)">💀</span>';
+            }
             if (m.isSealer || m.sellado < 0) {
-                icons += m.isSustituto ? ' <span title="Sustituto: este socio selló la quiniela en lugar del Maula oficial" class="text-amber-400 font-bold">🔄💀</span>' : ' <span title="Encargado del sellado (Maula)">💀</span>';
+                icons += m.isSustituto ? ' <span title="Sustituto: este socio selló la quiniela en lugar del Maula oficial" class="text-amber-400 font-bold">🔄🎟️</span>' : ' <span title="Sellador de esta jornada (reembolso lotería)">🎟️</span>';
             }
 
             tr.innerHTML = `
@@ -1477,7 +1493,7 @@ class BoteAppController {
         body.innerHTML = `
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Aciertos:</span>
-                <strong class="text-white">${mov.aciertos !== undefined ? mov.aciertos : '-'}${isWin ? ' <span class="text-emerald-400 font-bold text-xs ml-1">👑 (Ganador)</span>' : ''}${isLoss ? ' <span class="text-rose-400 font-bold text-xs ml-1">💀 (Sellador)</span>' : ''}</strong>
+                <strong class="text-white">${mov.aciertos !== undefined ? mov.aciertos : '-'}${isWin ? ' <span class="text-emerald-400 font-bold text-xs ml-1">👑 (Ganador)</span>' : ''}${isLoss ? ' <span class="text-rose-400 font-bold text-xs ml-1">💀 (Maula)</span>' : ''}</strong>
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Cuota Base:</span>
@@ -1697,7 +1713,7 @@ class BoteAppController {
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Socio encargado:</span>
-                    <strong class="text-rose-300">${jSummary.loserName || 'Designado'}</strong>
+                    <strong class="text-rose-300">${jSummary.sealerName || jSummary.loserName || 'Designado'}</strong>
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs">
                     <span class="text-rose-400 font-bold">Total Sellado Lotería:</span>
@@ -1768,7 +1784,7 @@ class BoteAppController {
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-rose-400 font-semibold">💀 Sellador (reembolso):</span>
-                    <strong class="text-white">${jSummary.loserName || 'N/A'}</strong>
+                    <strong class="text-white">${jSummary.sealerName || jSummary.loserName || 'N/A'}</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Recaudado / Sellado:</span>
@@ -2589,7 +2605,8 @@ class BoteAppController {
             if (m.exento) acText += ' 🎁';
             if (m.isWinner) acText += ' 👑';
             else if (m.jugaDobles) acText += ' 🎲';
-            if (m.isSealer || m.sellado < 0) acText += ' 💀';
+            if (m.isLoser) acText += ' 💀';
+            else if (m.isSealer || m.sellado < 0) acText += ' 🎟️';
 
             let inBreakdown = [];
             if (m.premios > 0) inBreakdown.push(`<span class="text-[10px] text-blue-300 font-bold bg-blue-500/20 px-1 py-0.5 rounded border border-blue-500/30">🔵 Premio Indiv: +${m.premios.toFixed(2)} €</span>`);

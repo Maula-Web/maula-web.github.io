@@ -2993,6 +2993,7 @@ window.BOTE_FALLBACK_DATA = {
             "exento": true,
             "jugaDobles": true,
             "isSelladoInCash": false,
+            "isLoser": true,
             "isSealer": false,
             "pennaIn": 0,
             "pennaOut": 0
@@ -6872,6 +6873,7 @@ window.BOTE_FALLBACK_DATA = {
         "exento": true,
         "jugaDobles": true,
         "isSelladoInCash": false,
+        "isLoser": true,
         "isSealer": false,
         "pennaIn": 0,
         "pennaOut": 0

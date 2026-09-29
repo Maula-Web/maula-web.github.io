@@ -415,8 +415,6 @@ class BoteEngine {
             }
         }
 
-        if (costs.exento) return costs;
-
         if (jornadaPlayed && currentSelection && Array.isArray(currentSelection)) {
             const first14 = currentSelection.slice(0, 14);
             const numUnos = first14.filter(f => f === '1').length;
@@ -520,7 +518,7 @@ class BoteEngine {
         }
 
         if (isCurrentLoser) {
-            costs.penalizacionMaula = this.calculateHistoricalPenalty('maula', null, jDate);
+            costs.penalizacionMaula = costs.exento ? 0 : this.calculateHistoricalPenalty('maula', null, jDate);
         }
 
         return costs;

@@ -584,7 +584,7 @@ class BoteManager {
 
                 html += `
                     <tr>
-                        <td><strong>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}${(m.isSealer || m.sellado < 0) ? ' 💀' : ''}</strong></td>
+                        <td><strong>${m.memberName}${m.exento ? ' 🎁' : ''}${m.jugaDobles ? ' 2️⃣' : ''}${m.isLoser ? ' 💀' : ((m.isSealer || m.sellado < 0) ? ' 🎟️' : '')}</strong></td>
                         <td style="font-weight:900;">${m.aciertos}</td>
                         <td class="positive" style="font-weight:bold;">${(m.aportacion + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0)).toFixed(2)}€</td>
                         <td class="negative">${(m.penalizacionUnos || 0).toFixed(1)}€</td>
