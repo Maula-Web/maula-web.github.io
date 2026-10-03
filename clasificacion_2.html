@@ -866,11 +866,11 @@
         <section class="glass-panel p-2 sm:p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-sm order-5">
             <!-- Selector de Pestañas de Vista -->
             <div class="flex items-center view-switcher-box p-1 rounded-xl shadow-inner overflow-x-auto no-scrollbar">
-                <button type="button" id="tab-btn-matrix" onclick="window.ClasificacionApp.switchView('matrix')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow whitespace-nowrap">
-                    <span>📊</span> Matriz Histórica
-                </button>
-                <button type="button" id="tab-btn-ranking" onclick="window.ClasificacionApp.switchView('ranking')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                <button type="button" id="tab-btn-ranking" onclick="window.ClasificacionApp.switchView('ranking')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow whitespace-nowrap">
                     <span>🏅</span> Ranking
+                </button>
+                <button type="button" id="tab-btn-matrix" onclick="window.ClasificacionApp.switchView('matrix')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                    <span>📊</span> Matriz Histórica
                 </button>
                 <button type="button" id="tab-btn-chart" onclick="window.ClasificacionApp.switchView('chart')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                     <span>📈</span> Evolución
@@ -885,41 +885,9 @@
         </section>
 
         <!-- =====================================================================
-             VISTA 1: MATRIZ GENERAL HISTÓRICA (JORNADA A JORNADA) - POR DEFECTO
+             VISTA 1: TABLA DE RANKING (CLASIFICACIÓN ORDENADA 1º AL 19º CON RANA) - POR DEFECTO
              ===================================================================== -->
-        <section id="view-matrix" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 order-6 min-w-0 max-w-full overflow-hidden" style="display: block;">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2">
-                <div class="flex items-center gap-2">
-                    <span class="p-1.5 rounded-xl bg-amber-500/20 text-amber-500 text-base">📊</span>
-                    <div>
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
-                            <span>Matriz General de Resultados</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">Todas las Jornadas</span>
-                        </h3>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Filas superiores fijas con totales generales. Cada fila inferior muestra los aciertos de cada socio.</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2 text-[11px]">
-                    <span class="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400"><span>👑</span> Mejor</span>
-                    <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
-                    <span class="flex items-center gap-1 font-bold text-rose-600 dark:text-rose-400"><span>🔴</span> Peor</span>
-                    <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
-                    <span class="flex items-center gap-1 font-bold text-purple-600 dark:text-purple-400"><span>🐷</span> PIG</span>
-                </div>
-            </div>
-
-            <div id="matrix-container" class="w-full overflow-auto max-h-[72vh] custom-scroll rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
-                <table id="matrix-table">
-                    <!-- Generado dinámicamente -->
-                </table>
-            </div>
-        </section>
-
-        <!-- =====================================================================
-             VISTA 2: TABLA DE RANKING (CLASIFICACIÓN ORDENADA 1º AL 19º CON RANA)
-             ===================================================================== -->
-        <section id="view-ranking" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 order-6" style="display: none;">
+        <section id="view-ranking" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 order-6" style="display: block;">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2">
                 <div class="flex items-center gap-2">
                     <span class="p-1.5 rounded-xl bg-amber-500/20 text-amber-500 text-base">🏅</span>
@@ -968,6 +936,38 @@
                             </td>
                         </tr>
                     </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             VISTA 2: MATRIZ GENERAL HISTÓRICA (JORNADA A JORNADA)
+             ===================================================================== -->
+        <section id="view-matrix" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 order-6 min-w-0 max-w-full overflow-hidden" style="display: none;">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-xl bg-amber-500/20 text-amber-500 text-base">📊</span>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
+                            <span>Matriz General de Resultados</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">Todas las Jornadas</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Filas superiores fijas con totales generales. Cada fila inferior muestra los aciertos de cada socio.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 text-[11px]">
+                    <span class="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400"><span>👑</span> Mejor</span>
+                    <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
+                    <span class="flex items-center gap-1 font-bold text-rose-600 dark:text-rose-400"><span>🔴</span> Peor</span>
+                    <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
+                    <span class="flex items-center gap-1 font-bold text-purple-600 dark:text-purple-400"><span>🐷</span> PIG</span>
+                </div>
+            </div>
+
+            <div id="matrix-container" class="w-full overflow-auto max-h-[72vh] custom-scroll rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
+                <table id="matrix-table">
+                    <!-- Generado dinámicamente -->
                 </table>
             </div>
         </section>
@@ -1117,7 +1117,7 @@
                 this.pronosticos = [];
                 this.memberStats = {};
                 this.sortedRanking = [];
-                this.currentView = 'matrix'; // MATRIZ HISTÓRICA POR DEFECTO
+                this.currentView = 'ranking'; // RANKING POR DEFECTO
                 this.activeCategoryFilter = 'all';
                 this.searchQuery = '';
                 this.chartSelectedMembers = new Set();
