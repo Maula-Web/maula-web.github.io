@@ -687,7 +687,7 @@ class BoteAppController {
             }
 
             tr.innerHTML = `
-                <td class="p-3 sm:px-4 whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 whitespace-nowrap">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/30 flex items-center justify-center font-bold text-xs text-orange-400 shrink-0">
                             ${initials}
@@ -698,19 +698,19 @@ class BoteAppController {
                         </div>
                     </div>
                 </td>
-                <td class="p-3 sm:px-4 text-right font-mono font-medium text-slate-300 text-xs sm:text-sm whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-medium text-slate-300 text-xs sm:text-sm whitespace-nowrap">
                     +${m.totIn.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-3 sm:px-4 text-right font-mono font-medium text-slate-400 text-xs sm:text-sm whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-medium text-slate-400 text-xs sm:text-sm whitespace-nowrap">
                     -${m.totOut.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-3 sm:px-4 text-right font-mono font-extrabold ${saldoColor} text-sm sm:text-base whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-extrabold ${saldoColor} text-sm sm:text-base whitespace-nowrap">
                     ${m.saldo.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-3 sm:px-4 text-center whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-center whitespace-nowrap">
                     ${statusBadge}
                 </td>
-                <td class="p-3 sm:px-4 text-center whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-center whitespace-nowrap">
                     <button onclick="window.BoteApp.openMemberExtract('${m.id}')" class="btn-extracto px-2.5 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-slate-950 font-bold text-xs border border-orange-500/40 hover:border-orange-400 shadow-sm transition-all flex items-center gap-1 mx-auto whitespace-nowrap" title="Ver extracto detallado jornada a jornada">
                         <span>📄</span> Extracto
                     </button>
@@ -718,6 +718,51 @@ class BoteAppController {
             `;
             tbody.appendChild(tr);
         });
+
+        // Fila de totales en la tabla de Flujo de Caja
+        const flujoTfoot = document.getElementById('flujo-table-foot');
+        if (flujoTfoot) {
+            const totCuotas = data.jornadaSummaries.reduce((s, j) => s + (j.numSocios * (j.costeColumna || 0.75)), 0);
+            const totPenalties = data.jornadaSummaries.reduce((s, j) => s + Math.max(0, j.recaudacion - (j.numSocios * 1.50)), 0);
+            const totPremios = data.jornadaSummaries.reduce((s, j) => s + (j.premios || 0), 0);
+            const totSellado = data.jornadaSummaries.reduce((s, j) => s + (j.gastoSellado || 0), 0);
+            const totNeto = data.jornadaSummaries.reduce((s, j) => s + (j.neto || 0), 0);
+            const boteFinalTotal = BOTE_INICIAL + totNeto;
+            const totNetoColor = totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400';
+
+            flujoTfoot.innerHTML = data.jornadaSummaries.length === 0 ? '' : `
+                <tr class="bg-slate-900/95 border-t-2 border-emerald-500/40 font-bold">
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 whitespace-nowrap">
+                        <strong class="text-emerald-400 font-extrabold text-xs sm:text-sm uppercase tracking-wider block">Σ Totales</strong>
+                        <span class="text-[11px] text-slate-500 font-normal block">${data.jornadaSummaries.length} jornadas</span>
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-slate-400 font-mono text-xs whitespace-nowrap">
+                        Temporada
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
+                        +${totCuotas.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-400 whitespace-nowrap">
+                        +${totPenalties.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold ${totPremios > 0 ? 'text-emerald-400' : 'text-slate-500'} whitespace-nowrap">
+                        ${totPremios > 0 ? '+' + totPremios.toFixed(2).replace('.', ',') + '&nbsp;€' : '-'}
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
+                        -${totSellado.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black ${totNetoColor} whitespace-nowrap">
+                        ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-slate-900/80 whitespace-nowrap">
+                        <div>${boteFinalTotal.toFixed(2).replace('.', ',')}&nbsp;€</div>
+                        <div class="text-[10px] ${totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-normal">
+                            (Crec: ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€)
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
 
         // Fila de totales (suma de los socios visibles según filtros/búsqueda)
         const tfoot = document.getElementById('members-table-foot');
@@ -730,25 +775,25 @@ class BoteAppController {
             const totSaldoColor = totSaldo >= 0 ? 'text-emerald-400' : 'text-rose-400';
             tfoot.innerHTML = members.length === 0 ? '' : `
                 <tr class="bg-slate-900/90 border-t-2 border-orange-500/40">
-                    <td class="p-3 sm:px-4 whitespace-nowrap">
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 whitespace-nowrap">
                         <strong class="text-orange-400 font-extrabold text-sm uppercase tracking-wider">Σ Totales</strong>
                         <span class="text-[11px] text-slate-500 block">${members.length} socio${members.length === 1 ? '' : 's'}</span>
                     </td>
-                    <td class="p-3 sm:px-4 text-right font-mono font-bold text-slate-200 text-xs sm:text-sm whitespace-nowrap">
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-slate-200 text-xs sm:text-sm whitespace-nowrap">
                         +${totIn.toFixed(2).replace('.', ',')}&nbsp;€
                     </td>
-                    <td class="p-3 sm:px-4 text-right font-mono font-bold text-slate-300 text-xs sm:text-sm whitespace-nowrap">
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-slate-300 text-xs sm:text-sm whitespace-nowrap">
                         -${totOut.toFixed(2).replace('.', ',')}&nbsp;€
                     </td>
-                    <td class="p-3 sm:px-4 text-right font-mono font-extrabold ${totSaldoColor} text-sm sm:text-base whitespace-nowrap">
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-extrabold ${totSaldoColor} text-sm sm:text-base whitespace-nowrap">
                         ${totSaldo.toFixed(2).replace('.', ',')}&nbsp;€
                     </td>
-                    <td class="p-3 sm:px-4 text-center whitespace-nowrap text-xs font-semibold">
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-center whitespace-nowrap text-xs font-semibold">
                         <span class="text-emerald-400">✅ ${numPos}</span>
                         <span class="text-slate-600 mx-1">|</span>
                         <span class="text-rose-400">⚠️ ${numNeg}</span>
                     </td>
-                    <td class="p-3 sm:px-4"></td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4"></td>
                 </tr>
             `;
         }
@@ -1865,15 +1910,15 @@ class BoteAppController {
         tr0.className = 'bg-amber-500/10 border-b border-amber-500/20 text-xs sm:text-sm font-semibold hover:bg-amber-500/15 transition-colors cursor-pointer';
         tr0.title = 'Clic en cualquier celda para ver el desglose del Bote Inicial';
         tr0.innerHTML = `
-            <td class="p-3 font-bold text-amber-300 flex items-center gap-1.5 cursor-pointer hover:underline" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 font-bold text-amber-300 flex items-center gap-1.5 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">
                 <span>🌱</span> Inicio Temporada
             </td>
-            <td class="p-3 text-slate-400 font-mono cursor-pointer" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Agosto 2026</td>
-            <td class="p-3 text-right font-mono text-emerald-400 font-bold cursor-pointer" colspan="2" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Aportaciones Iniciales Socios (Bote Inicial)</td>
-            <td class="p-3 text-right font-mono text-slate-500 cursor-pointer" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
-            <td class="p-3 text-right font-mono text-slate-500 cursor-pointer" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
-            <td class="p-3 text-right font-mono font-bold text-amber-300 cursor-pointer hover:underline" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">+${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
-            <td class="p-3 text-right font-mono font-black text-amber-400 bg-amber-500/15 cursor-pointer hover:underline" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-slate-400 font-mono cursor-pointer whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Agosto 2026</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-emerald-400 font-bold cursor-pointer" colspan="2" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Aportaciones Iniciales Socios (Bote Inicial)</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-slate-500 cursor-pointer whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-slate-500 cursor-pointer whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-300 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">+${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-amber-500/15 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
         `;
         tbody.appendChild(tr0);
 
@@ -1889,31 +1934,31 @@ class BoteAppController {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 text-xs sm:text-sm transition-colors border-b border-slate-800/40';
             tr.innerHTML = `
-                <td class="p-3 font-bold text-white cursor-pointer hover:text-orange-400 transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'jornada', ${j.number})" title="Clic para ver resumen de la Jornada ${j.number}">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 font-bold text-white cursor-pointer hover:text-orange-400 transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'jornada', ${j.number})" title="Clic para ver resumen de la Jornada ${j.number}">
                     Jornada ${j.number}
                 </td>
-                <td class="p-3 text-slate-400 cursor-pointer hover:text-slate-200 transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'jornada', ${j.number})" title="Clic para ver resumen">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-slate-400 cursor-pointer hover:text-slate-200 transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'jornada', ${j.number})" title="Clic para ver resumen">
                     ${j.date}
                 </td>
-                <td class="p-3 text-right font-mono text-emerald-400 cursor-pointer hover:bg-emerald-500/15 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'cuotas', ${j.number})" title="Clic para ver desglose de cuotas base">
-                    +${cuotasBase.toFixed(2).replace('.', ',')} €
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-emerald-400 cursor-pointer hover:bg-emerald-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'cuotas', ${j.number})" title="Clic para ver desglose de cuotas base">
+                    +${cuotasBase.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-3 text-right font-mono text-amber-400 cursor-pointer hover:bg-amber-500/15 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'penalizaciones', ${j.number})" title="Clic para ver desglose de penalizaciones">
-                    +${penalties.toFixed(2).replace('.', ',')} €
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-amber-400 cursor-pointer hover:bg-amber-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'penalizaciones', ${j.number})" title="Clic para ver desglose de penalizaciones">
+                    +${penalties.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-3 text-right font-mono cursor-pointer hover:bg-emerald-500/15 rounded transition-colors ${j.premios > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600'}" onclick="window.BoteApp.showFlujoPopover(event, 'premios', ${j.number})" title="Clic para ver desglose de premios">
-                    ${j.premios > 0 ? '+' + j.premios.toFixed(2).replace('.', ',') + ' €' : '-'}
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono cursor-pointer hover:bg-emerald-500/15 rounded transition-colors whitespace-nowrap ${j.premios > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600'}" onclick="window.BoteApp.showFlujoPopover(event, 'premios', ${j.number})" title="Clic para ver desglose de premios">
+                    ${j.premios > 0 ? '+' + j.premios.toFixed(2).replace('.', ',') + '&nbsp;€' : '-'}
                 </td>
-                <td class="p-3 text-right font-mono text-rose-400 cursor-pointer hover:bg-rose-500/15 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'sellado', ${j.number})" title="Clic para ver desglose del ticket de sellado">
-                    -${j.gastoSellado.toFixed(2).replace('.', ',')} €
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-rose-400 cursor-pointer hover:bg-rose-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'sellado', ${j.number})" title="Clic para ver desglose del ticket de sellado">
+                    -${j.gastoSellado.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-3 text-right font-mono font-bold cursor-pointer hover:bg-slate-800 rounded transition-colors ${j.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}" onclick="window.BoteApp.showFlujoPopover(event, 'neto', ${j.number})" title="Clic para ver la fórmula del superávit neto">
-                    ${j.neto >= 0 ? '+' : ''}${j.neto.toFixed(2).replace('.', ',')} €
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold cursor-pointer hover:bg-slate-800 rounded transition-colors whitespace-nowrap ${j.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}" onclick="window.BoteApp.showFlujoPopover(event, 'neto', ${j.number})" title="Clic para ver la fórmula del superávit neto">
+                    ${j.neto >= 0 ? '+' : ''}${j.neto.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40 cursor-pointer hover:bg-amber-500/20 rounded transition-colors" onclick="window.BoteApp.showFlujoPopover(event, 'acumulado', ${j.number}, ${currentCrecimiento})" title="Clic para ver el desglose del bote acumulado">
-                    <div>${boteTotalJornada.toFixed(2).replace('.', ',')} €</div>
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40 cursor-pointer hover:bg-amber-500/20 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'acumulado', ${j.number}, ${currentCrecimiento})" title="Clic para ver el desglose del bote acumulado">
+                    <div>${boteTotalJornada.toFixed(2).replace('.', ',')}&nbsp;€</div>
                     <div class="text-[10px] ${saldoAcumuladoPeña >= 0 ? 'text-emerald-400/80' : 'text-rose-400/80'} font-normal">
-                        (Crec: ${saldoAcumuladoPeña >= 0 ? '+' : ''}${saldoAcumuladoPeña.toFixed(2).replace('.', ',')} €)
+                        (Crec: ${saldoAcumuladoPeña >= 0 ? '+' : ''}${saldoAcumuladoPeña.toFixed(2).replace('.', ',')}&nbsp;€)
                     </div>
                 </td>
             `;
