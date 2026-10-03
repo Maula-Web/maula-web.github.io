@@ -708,6 +708,40 @@ class BoteAppController {
             `;
             tbody.appendChild(tr);
         });
+
+        // Fila de totales (suma de los socios visibles según filtros/búsqueda)
+        const tfoot = document.getElementById('members-table-foot');
+        if (tfoot) {
+            const totIn = members.reduce((s, m) => s + (m.totIn || 0), 0);
+            const totOut = members.reduce((s, m) => s + (m.totOut || 0), 0);
+            const totSaldo = members.reduce((s, m) => s + (m.saldo || 0), 0);
+            const numPos = members.filter(m => m.saldo >= 0).length;
+            const numNeg = members.length - numPos;
+            const totSaldoColor = totSaldo >= 0 ? 'text-emerald-400' : 'text-rose-400';
+            tfoot.innerHTML = members.length === 0 ? '' : `
+                <tr class="bg-slate-900/90 border-t-2 border-orange-500/40">
+                    <td class="p-3 sm:px-4 whitespace-nowrap">
+                        <strong class="text-orange-400 font-extrabold text-sm uppercase tracking-wider">Σ Totales</strong>
+                        <span class="text-[11px] text-slate-500 block">${members.length} socio${members.length === 1 ? '' : 's'}</span>
+                    </td>
+                    <td class="p-3 sm:px-4 text-right font-mono font-bold text-slate-200 text-xs sm:text-sm whitespace-nowrap">
+                        +${totIn.toFixed(2)}&nbsp;€
+                    </td>
+                    <td class="p-3 sm:px-4 text-right font-mono font-bold text-slate-300 text-xs sm:text-sm whitespace-nowrap">
+                        -${totOut.toFixed(2)}&nbsp;€
+                    </td>
+                    <td class="p-3 sm:px-4 text-right font-mono font-extrabold ${totSaldoColor} text-sm sm:text-base whitespace-nowrap">
+                        ${totSaldo.toFixed(2)}&nbsp;€
+                    </td>
+                    <td class="p-3 sm:px-4 text-center whitespace-nowrap text-xs font-semibold">
+                        <span class="text-emerald-400">✅ ${numPos}</span>
+                        <span class="text-slate-600 mx-1">|</span>
+                        <span class="text-rose-400">⚠️ ${numNeg}</span>
+                    </td>
+                    <td class="p-3 sm:px-4"></td>
+                </tr>
+            `;
+        }
     }
 
     filterMembers(type) {
