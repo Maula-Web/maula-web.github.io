@@ -1040,7 +1040,7 @@ class BoteAppController {
         // Mantener orden por ID de socio
         jMovements.sort((a, b) => parseInt(a.memberId) - parseInt(b.memberId)).forEach((m, rowIdx) => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-900/60 transition-colors text-xs sm:text-sm whitespace-nowrap';
+            tr.className = 'hover:bg-slate-900/60 transition-colors text-xs sm:text-sm';
 
             // Posicionamiento dinámico: mitad superior hacia abajo, mitad inferior hacia arriba
             const posClass = rowIdx < 10 ? 'left-1/2 -translate-x-1/2 top-full mt-1.5' : 'left-1/2 -translate-x-1/2 bottom-full mb-1.5';
@@ -1117,7 +1117,7 @@ class BoteAppController {
                 `);
             }
 
-            const penaltiesHtml = penaltyChips.length > 0 ? penaltyChips.join(' ') : '<span class="text-slate-600">-</span>';
+            const penaltiesHtml = penaltyChips.length > 0 ? `<div class="flex flex-wrap items-center justify-center gap-1 max-w-[170px] mx-auto">${penaltyChips.join('')}</div>` : '<span class="text-slate-600">-</span>';
 
             // REGLA CLAVE SOLICITADA POR EL USUARIO:
             // Reembolso sellado con opción de elegir entre Bote del socio o por Bizum con tarjeta explicativa
@@ -1128,7 +1128,7 @@ class BoteAppController {
                 selladoCol = `
                     <div class="group relative cursor-help inline-flex flex-col gap-1 items-end whitespace-nowrap">
                         <span class="font-bold font-mono text-xs text-purple-300 whitespace-nowrap">+${sellVal}&nbsp;€</span>
-                        <div class="flex items-center gap-1.5 text-[11px] bg-slate-900 border border-purple-500/40 hover:border-purple-400 rounded-lg px-2 py-1 shadow-inner transition-colors whitespace-nowrap">
+                        <div class="flex items-center gap-1 text-[10px] bg-slate-900 border border-purple-500/40 hover:border-purple-400 rounded-md px-1.5 py-0.5 shadow-inner transition-colors whitespace-nowrap">
                             <label class="cursor-pointer flex items-center gap-1 ${!m.isSelladoInCash ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-white'}">
                                 <input type="radio" name="reemb_${m.memberId}_${m.jornadaId || jSummary.number}" ${!m.isSelladoInCash ? 'checked' : ''} onchange="window.BoteApp.toggleSelladoCash('${m.memberId}', '${m.jornadaId || jSummary.number}', false)">
                                 <span>Bote</span>
@@ -1168,13 +1168,13 @@ class BoteAppController {
             }
 
             tr.innerHTML = `
-                <td class="p-2.5 sm:px-4 whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-2.5 xl:px-3 whitespace-nowrap">
                     <strong class="text-white">${m.memberName}</strong>${icons}
                 </td>
-                <td class="p-2.5 sm:px-4 text-center font-bold text-white whitespace-nowrap">
+                <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-center font-bold text-white whitespace-nowrap">
                     ${m.aciertos !== undefined ? m.aciertos : '-'}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-300 whitespace-nowrap">
+                <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono text-slate-300 whitespace-nowrap">
                     ${m.exento ? `
                         <div class="group relative cursor-help inline-block whitespace-nowrap">
                             <span class="text-amber-400 font-bold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 hover:brightness-125 transition-all whitespace-nowrap">GRATIS</span>
@@ -1189,13 +1189,13 @@ class BoteAppController {
                         </div>
                     ` : `<span class="whitespace-nowrap font-mono text-slate-300">${m.aportacion.toFixed(2).replace('.', ',')}&nbsp;€</span>`}
                 </td>
-                <td class="p-2.5 sm:px-4 text-center whitespace-nowrap">
+                <td class="py-2.5 px-1.5 sm:px-2 xl:px-2.5 text-center">
                     ${penaltiesHtml}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
+                <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
                     -${(m.totalGastos || 0).toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.premios > 0 ? 'text-emerald-400' : 'text-slate-600'} whitespace-nowrap">
+                <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold ${m.premios > 0 ? 'text-emerald-400' : 'text-slate-600'} whitespace-nowrap">
                     ${m.premios > 0 ? `
                         <div class="group relative cursor-help inline-flex flex-col items-end whitespace-nowrap">
                             <span class="whitespace-nowrap font-mono">+${m.premios.toFixed(2).replace('.', ',')}&nbsp;€</span>
@@ -1213,13 +1213,13 @@ class BoteAppController {
                         </div>
                     ` : '-'}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right whitespace-nowrap">
+                <td class="py-2.5 px-1.5 sm:px-2 xl:px-2.5 text-right whitespace-nowrap">
                     ${selladoCol}
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold ${m.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} whitespace-nowrap">
+                <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold ${m.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} whitespace-nowrap">
                     ${m.neto >= 0 ? '+' : ''}${m.neto.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-extrabold text-amber-400 bg-slate-900/60 whitespace-nowrap">
+                <td class="py-2.5 px-2 sm:px-2.5 xl:px-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/60 whitespace-nowrap">
                     ${m.boteAcumulado.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
             `;
