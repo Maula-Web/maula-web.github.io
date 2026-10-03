@@ -665,7 +665,7 @@
                                         <span>💰</span> Premios en Metálico
                                     </strong>
                                     <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                        <p>Total acumulado de premios ganados por los socios de la peña a través del escrutinio oficial de Loterías del Estado (10 a 15 aciertos).</p>
+                                        <p>Total acumulado de premios ganados tanto por los socios de la peña como por la quiniela de dobles a través del escrutinio oficial de Loterías del Estado (10 a 15 aciertos).</p>
                                     </div>
                                 </div>
                             </div>
@@ -1155,6 +1155,7 @@
                     this.members = data.members || [];
                     this.jornadas = (data.jornadas || []).sort((a, b) => b.number - a.number);
                     this.pronosticos = data.pronosticos || [];
+                    this.pronosticosExtra = data.pronosticosExtra || [];
 
                     // Calcular y organizar todas las estadísticas
                     this.calculateStats();
@@ -1186,6 +1187,75 @@
             }
 
             // --- FASE DE CÁLCULO DIRECTO SIN RECALCULAR REGLAS ---
+            // Calcular importe total acumulado en la quiniela de dobles
+            calculateDoublesPrizes() {
+                let totalDobles = 0;
+                let jornadasPremiadas = 0;
+                if (!this.pronosticosExtra || !Array.isArray(this.pronosticosExtra) || this.pronosticosExtra.length === 0) {
+                    return { total: 0, count: 0 };
+                }
+
+                (this.jornadas || []).forEach(jornada => {
+                    if (!jornada || !jornada.matches) return;
+                    const doublesForecasts = this.pronosticosExtra.filter(p => {
+                        const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+                        return pJ === String(jornada.id) || pJ === String(jornada.number);
+                    });
+
+                    if (doublesForecasts.length > 0) {
+                        const officialResults = jornada.matches.map(m => m.result);
+                        doublesForecasts.forEach(df => {
+                            const selection = df.selection || df.forecast || [];
+                            const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+                            const isReduced = df.isReduced || (doubleCount === 7);
+                            const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
+                            const ev = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced }) : null;
+                            const prizesMap = jornada.prizes || jornada.prizeRates || {};
+
+                            let extraPrizeAmount = 0;
+                            let hasPrize = false;
+
+                            if (ev && ev.breakdown) {
+                                Object.keys(ev.breakdown).forEach(h => {
+                                    const count = ev.breakdown[h];
+                                    let pVal = prizesMap[h] || prizesMap[String(h)] || 0;
+                                    if (typeof pVal === 'string') {
+                                        pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                                    }
+                                    if (count > 0 && pVal > 0) {
+                                        extraPrizeAmount += count * parseFloat(pVal);
+                                        hasPrize = true;
+                                    }
+                                });
+                            } else if (ev) {
+                                const cat = ev.officialHits !== undefined ? ev.officialHits : ev.hits;
+                                let actualMinHits = jornada.minHitsToWin || 10;
+                                if (prizesMap && Object.keys(prizesMap).length > 0) {
+                                    actualMinHits = Math.min(...Object.keys(prizesMap).map(Number));
+                                }
+                                if (cat >= actualMinHits) {
+                                    let pVal = prizesMap[cat] || prizesMap[String(cat)] || 0;
+                                    if (typeof pVal === 'string') {
+                                        pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                                    }
+                                    if (pVal > 0) {
+                                        extraPrizeAmount += parseFloat(pVal);
+                                        hasPrize = true;
+                                    }
+                                }
+                            }
+
+                            if (hasPrize && extraPrizeAmount > 0) {
+                                totalDobles += extraPrizeAmount;
+                                jornadasPremiadas++;
+                            }
+                        });
+                    }
+                });
+
+                return { total: totalDobles, count: jornadasPremiadas };
+            }
+
             calculateStats() {
                 const visibleJornadas = this.jornadas.filter(j => {
                     if (!j.active) {
@@ -1421,13 +1491,13 @@
                 document.getElementById('kpi-record-jornada').textContent = `Jornada ${recordJNum}`;
                 document.getElementById('kpi-record-hits').textContent = `${recordHits} aciertos`;
 
-                // KPI 3: Premios totales repartidos
-                let totalPremios = 0;
+                // KPI 3: Premios totales repartidos (Socios + Quiniela de Dobles)
+                let totalPremiosSocios = 0;
                 let sociosPremiados = 0;
                 let maxPremiado = { name: '', amount: 0 };
 
                 this.sortedRanking.forEach(s => {
-                    totalPremios += s.prizeTotal;
+                    totalPremiosSocios += s.prizeTotal;
                     if (s.prizeTotal > 0) {
                         sociosPremiados++;
                         if (s.prizeTotal > maxPremiado.amount) {
@@ -1436,12 +1506,26 @@
                     }
                 });
 
+                const doblesPrizesInfo = this.calculateDoublesPrizes();
+                const totalPremiosDobles = doblesPrizesInfo.total;
+                const totalPremios = totalPremiosSocios + totalPremiosDobles;
+
                 const formattedPremios = this.formatMoney(totalPremios);
                 document.getElementById('kpi-premios-total').textContent = formattedPremios;
                 const premComp = document.getElementById('kpi-premios-total-compact');
                 if (premComp) premComp.textContent = formattedPremios;
-                document.getElementById('kpi-premios-top-socio').textContent = maxPremiado.amount > 0 ? `Máx: ${maxPremiado.name} (${this.formatMoney(maxPremiado.amount)})` : 'Sin premios todavía';
-                document.getElementById('kpi-premios-count').textContent = `${sociosPremiados} socios`;
+
+                const topSocioText = maxPremiado.amount > 0 
+                    ? `Máx: ${maxPremiado.name} (${this.formatMoney(maxPremiado.amount)})` 
+                    : (totalPremiosDobles > 0 ? 'Sin premios individuales' : 'Sin premios todavía');
+                document.getElementById('kpi-premios-top-socio').textContent = topSocioText;
+
+                const countEl = document.getElementById('kpi-premios-count');
+                if (totalPremiosDobles > 0) {
+                    countEl.textContent = `${sociosPremiados} socios • Dobles: ${this.formatMoney(totalPremiosDobles)}`;
+                } else {
+                    countEl.textContent = `${sociosPremiados} socios`;
+                }
 
                 // KPI 4: Balance Bonus vs Penalizaciones
                 let totalPosBonus = 0;
