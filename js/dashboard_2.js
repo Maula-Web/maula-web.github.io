@@ -712,7 +712,7 @@ class Dashboard2AppController {
         const footRight = document.getElementById('pig-foot-right');
         if (!content) return;
 
-        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2);
+        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2).replace('.', ',');
         const nextPigInfo = this.findPigMatch(nextJ);
         const nextHasPig = nextPigInfo !== null;
         const nextMatchDesc = (nextPigInfo && nextPigInfo.match) ? `(P.${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
@@ -871,9 +871,9 @@ class Dashboard2AppController {
         let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 701.96) : 701.96;
         let superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
 
-        if (elTotal) elTotal.textContent = `${cajaReal.toFixed(2)} €`;
-        if (elNeto) elNeto.textContent = `${totalSaldos.toFixed(2)} €`;
-        if (elPremios) elPremios.textContent = `${superavit >= 0 ? '+' : ''}${superavit.toFixed(2)} €`;
+        if (elTotal) elTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace(".", ",")} €`;
+        if (elNeto) elNeto.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toFixed(2).replace(".", ",")} €`;
+        if (elPremios) elPremios.textContent = `${superavit >= 0 ? '+' : ''}${((typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace(".", ",")} €`)}`;
     }
 
     /**
@@ -886,8 +886,8 @@ class Dashboard2AppController {
         const elIndivCount = document.getElementById('season-indiv-count');
         const elDoblesCount = document.getElementById('season-dobles-count');
 
-        if (elWeeklyTotal) elWeeklyTotal.textContent = `${(outcome.totalMoney || 0).toFixed(2)} €`;
-        if (elSeasonTotal) elSeasonTotal.textContent = `${totalSeasonMoney.toFixed(2)} €`;
+        if (elWeeklyTotal) elWeeklyTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(outcome.totalMoney || 0) : `${(outcome.totalMoney || 0).toFixed(2).replace(".", ",")} €`;
+        if (elSeasonTotal) elSeasonTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSeasonMoney) : `${totalSeasonMoney.toFixed(2).replace(".", ",")} €`;
         if (elIndivCount) elIndivCount.textContent = indivCount;
         if (elDoblesCount) elDoblesCount.textContent = doblesCount;
 
@@ -895,14 +895,14 @@ class Dashboard2AppController {
             const indivs = (outcome.prizeWinners || []).map(pw => `
                 <div class="flex items-center justify-between py-0.5 border-b border-slate-900">
                     <span class="text-slate-200 font-semibold">${pw.name}</span>
-                    <span class="text-emerald-400 font-mono font-bold">${pw.hits} aciertos ${pw.prize ? `(+${pw.prize.toFixed(2)} €)` : ''}</span>
+                    <span class="text-emerald-400 font-mono font-bold">${pw.hits} aciertos ${pw.prize ? `(+${(typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(pw.prize) : pw.prize.toFixed(2).replace(".", ",") + " €"})` : ''}</span>
                 </div>
             `);
 
             const dobles = (outcome.doublesResults || []).filter(dr => dr.prize > 0).map(dw => `
                 <div class="flex items-center justify-between py-0.5 border-b border-slate-900 text-amber-300">
                     <span class="font-semibold">👑 Dobles (${dw.name})</span>
-                    <span class="font-mono font-bold text-emerald-400">${dw.hits} ac. (+${dw.prize.toFixed(2)} €)</span>
+                    <span class="font-mono font-bold text-emerald-400">${dw.hits} ac. (+${(typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(dw.prize) : dw.prize.toFixed(2).replace(".", ",") + " €"})</span>
                 </div>
             `);
 
@@ -1218,7 +1218,7 @@ class Dashboard2AppController {
 
         if (!modal || !bodyEl) return;
 
-        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2);
+        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2).replace(".", ",");
 
         const infoMap = {
             rana: {

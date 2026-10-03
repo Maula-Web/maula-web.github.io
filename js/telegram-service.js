@@ -185,7 +185,7 @@ window.TelegramService = {
                 else if (idx === 2) medal = '🥉 ';
                 else medal = '🔹 ';
 
-                msg += `${medal}${r.name}: *${r.hits}* ac. (${r.points} pts)${r.prize > 0 ? ` 💰 *${r.prize.toFixed(2)}€*` : ''}\n`;
+                msg += `${medal}${r.name}: *${r.hits}* ac. (${r.points} pts)${r.prize > 0 ? ` 💰 *${r.prize.toFixed(2).replace(".", ",")} €*` : ''}\n`;
             });
 
             msg += `\n🍺 Quiniela de dobles: *${eligibleNames}*`;

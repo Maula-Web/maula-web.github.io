@@ -187,7 +187,7 @@ class ResultsManager {
                         <td class="sticky-col label-prizes">Premios (€)</td>`;
         sortedMembers.forEach(m => {
             const val = memberStats[m.id].prizeTotal;
-            theadHtml += `<td style="color:var(--resultados-prize-text); font-weight:bold; background:var(--resultados-prize-bg); font-size:1.1rem;">${val.toFixed(2)}€</td>`;
+            theadHtml += `<td style="color:var(--resultados-prize-text); font-weight:bold; background:var(--resultados-prize-bg); font-size:1.1rem;">${val.toFixed(2).replace(".", ",")} €</td>`;
         });
         theadHtml += `</tr>`;
 
@@ -228,12 +228,12 @@ class ResultsManager {
                     }
 
                     if (data.prize > 0) {
-                        cellHtml += `<div style="font-size:0.85rem; font-weight:bold; color:var(--resultados-prize-text); margin-top:2px;">${data.prize.toFixed(2)}€</div>`;
+                        cellHtml += `<div style="font-size:0.85rem; font-weight:bold; color:var(--resultados-prize-text); margin-top:2px;">${data.prize.toFixed(2).replace(".", ",")} €</div>`;
                     }
 
                     // Details tooltip
                     const bonusText = data.bonus !== 0 ? (data.bonus > 0 ? `+${data.bonus}` : `${data.bonus}`) : '0';
-                    const prizeText = data.prize > 0 ? `\nPremio: ${data.prize.toFixed(2)}€` : '';
+                    const prizeText = data.prize > 0 ? `\nPremio: ${data.prize.toFixed(2).replace(".", ",")} €` : '';
                     const title = `Puntos Totales: ${data.points}\n(Aciertos: ${data.hits} + Bonus: ${bonusText})${prizeText}`;
 
                     // Add wrapper for tooltip

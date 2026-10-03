@@ -439,7 +439,7 @@ class Jornadas2AppController {
                 elPigBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/40 flex items-center gap-1';
                 elPigBadge.innerHTML = '<span>🐷</span> Alerta PIG';
             }
-            if (elPigPenalty) elPigPenalty.textContent = '1.00 €';
+            if (elPigPenalty) elPigPenalty.textContent = '1,00 €';
         } else {
             if (elPigTeams) elPigTeams.textContent = 'Sin enfrentamiento directo';
             if (elPigDetail) elPigDetail.textContent = 'No juegan entre sí Real Madrid, Barcelona ni Atleti';

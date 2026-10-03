@@ -350,7 +350,7 @@ class DashboardManager {
                     ? lastJornadaInfo.doublesResults.filter(dr => dr.prize > 0).map(dw => `
                         <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f5f5f5;">
                             <span style="font-weight:500; color:#7b1fa2;">🟣 Quiniela Dobles (${dw.name})</span>
-                            <span style="background:#9c27b0; color:white; padding:0 8px; border-radius:10px; font-weight:bold; font-size:0.85rem;">${dw.hits} ac. (${dw.prize.toFixed(2)}€)</span>
+                            <span style="background:#9c27b0; color:white; padding:0 8px; border-radius:10px; font-weight:bold; font-size:0.85rem;">${dw.hits} ac. (${dw.prize.toFixed(2).replace(".", ",")} €)</span>
                         </div>
                     `)
                     : [];
@@ -371,7 +371,7 @@ class DashboardManager {
                             <div style="font-size:0.85rem; color:#666; margin-bottom:0.8rem;">Pronósticos con ${lastJornadaInfo.minHitsToWin}+ aciertos:</div>
                             ${prizesList}
                             <div style="margin-top: 1rem; font-weight: bold; color: var(--primary-green); font-size: 1.1rem;">
-                                Total Semana: ${lastJornadaInfo.totalMoney.toFixed(2)}€
+                                Total Semana: ${lastJornadaInfo.totalMoney.toFixed(2).replace(".", ",")} €
                             </div>
                         </div>
                         
@@ -395,7 +395,7 @@ class DashboardManager {
                                 </div>
                                 <div>
                                     <div style="font-size: 0.85rem; color: #666;">Total Recaudado en Premios:</div>
-                                    <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-blue);">${totalSeasonMoney.toFixed(2)}€</div>
+                                    <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-blue);">${totalSeasonMoney.toFixed(2).replace(".", ",")} €</div>
                                 </div>
                             </div>
                         </div>
@@ -738,7 +738,7 @@ class DashboardManager {
 
         if (doublesResults.length > 0) {
             const items = doublesResults.map(r => {
-                const prizeText = r.prize > 0 ? ` <span style="color:var(--primary-green); font-weight:bold;">(${r.prize.toFixed(2)}€)</span>` : '';
+                const prizeText = r.prize > 0 ? ` <span style="color:var(--primary-green); font-weight:bold;">(${r.prize.toFixed(2).replace(".", ",")} €)</span>` : '';
                 return `${r.name}: <strong>${r.hits}</strong>${prizeText}`;
             }).join(', ');
             doublesHtml = `

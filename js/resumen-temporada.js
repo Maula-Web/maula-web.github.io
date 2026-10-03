@@ -634,7 +634,7 @@ class ResumenManager {
                                 <div style="font-size:0.6rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Jornadas</div>
                             </div>
                             <div style="background:var(--resumen-card-bg); color:var(--resumen-table-text); padding:0.8rem 0.4rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
-                                <div style="font-size:1.3rem; font-weight:bold; color:#8b0000;">${totalPrizesGlobal.toFixed(2)}€</div>
+                                <div style="font-size:1.3rem; font-weight:bold; color:#8b0000;">${totalPrizesGlobal.toFixed(2).replace(".", ",")} €</div>
                                 <div style="font-size:0.6rem; opacity:0.7; font-weight:bold; text-transform:uppercase;">Premios</div>
                             </div>
                         </div>
@@ -944,7 +944,7 @@ class ResumenManager {
                 <span style="font-weight:600; font-size:0.85rem;">Jornada ${p.jornadaNum}</span>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <span style="background:#e8f5e9; color:#2e7d32; font-weight:bold; padding:2px 8px; border-radius:10px; font-size:0.75rem;">${p.hits} aciertos</span>
-                    <span style="color:var(--primary-blue); font-weight:bold; font-size:0.85rem;">${p.money > 0 ? p.money.toFixed(2) + '€' : '-'}</span>
+                    <span style="color:var(--primary-blue); font-weight:bold; font-size:0.85rem;">${p.money > 0 ? p.money.toFixed(2).replace('.', ',') + ' €' : '-'}</span>
                 </div>
             </div>
         `).join('');
@@ -955,7 +955,7 @@ class ResumenManager {
             <div style="background:#e8f5e9; padding:0.8rem; border-radius:8px; border-left:4px solid #2e7d32;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h5 style="margin:0; font-size:0.8rem; color:#1b5e20; text-transform:uppercase;">🏆 PREMIOS OBTENIDOS</h5>
-                    <span style="font-size:0.85rem; font-weight:bold; color:var(--primary-blue);">Total: ${totalMoney.toFixed(2)}€</span>
+                    <span style="font-size:0.85rem; font-weight:bold; color:var(--primary-blue);">Total: ${totalMoney.toFixed(2).replace(".", ",")} €</span>
                 </div>
                 <div style="max-height:120px; overflow-y:auto; padding-right:5px;">
                     ${itemsHtml}
