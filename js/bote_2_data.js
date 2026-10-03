@@ -126,8 +126,8 @@ window.BOTE_FALLBACK_DATA = {
     },
     "summary": {
       "cajaReal": 829.48,
-      "totalSaldosVirtuales": 766.20,
-      "superavit": 63.28,
+      "totalSaldosVirtuales": 701.96,
+      "superavit": 127.52,
       "totalIngresos": 956.68,
       "totalGastos": 148.5,
       "totalPremios": 5.72,

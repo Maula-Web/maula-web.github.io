@@ -857,8 +857,8 @@ class Dashboard2AppController {
         }
 
         let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 829.48) : 829.48;
-        let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 767.70) : 767.70;
-        let superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : 61.78;
+        let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 701.96) : 701.96;
+        let superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
 
         if (elTotal) elTotal.textContent = `${cajaReal.toFixed(2)} €`;
         if (elNeto) elNeto.textContent = `${totalSaldos.toFixed(2)} €`;

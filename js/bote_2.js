@@ -569,7 +569,10 @@ class BoteAppController {
             const cComp = document.getElementById('card-caja-real-compact');
             if (cComp) cComp.textContent = val;
         }
-        if (cardSuma) cardSuma.textContent = (s.totalSaldosVirtuales || 0).toFixed(2) + ' €';
+        const actualSumaSaldos = (data.memberSummaries && data.memberSummaries.length > 0)
+            ? data.memberSummaries.reduce((sum, m) => sum + (m.saldo || 0), 0)
+            : (s.totalSaldosVirtuales || 0);
+        if (cardSuma) cardSuma.textContent = actualSumaSaldos.toFixed(2) + ' €';
         if (cardIn) {
             const val = (s.totalIngresos || 0).toFixed(2) + ' €';
             cardIn.textContent = val;
@@ -589,7 +592,7 @@ class BoteAppController {
             if (cComp) cComp.textContent = val;
         }
         if (cardSuperavit) {
-            const superavit = (s.cajaReal || 0) - (s.totalSaldosVirtuales || 0);
+            const superavit = (s.cajaReal || 0) - actualSumaSaldos;
             cardSuperavit.textContent = `${superavit >= 0 ? '+' : ''}${superavit.toFixed(2)} €`;
         }
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
