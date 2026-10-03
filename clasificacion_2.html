@@ -2066,17 +2066,24 @@
                     const maxRank = Math.min(19, totalMembersCount);
                     const yScale = (rank) => padding.top + ((rank - 1) / Math.max(1, maxRank - 1)) * plotHeight;
 
-                    // Franjas de fondo temáticas: Champions (1-3), Zona Media (4-10), Zona Maula (11-19)
-                    const y1 = yScale(1);
+                    // Franjas de fondo temáticas: Champions (#1-#3), Zona Media (#4-#10), Zona Maula (#11-#19)
+                    const yTop = padding.top - 14;
                     const y3 = yScale(3.5);
                     const y10 = yScale(10.5);
-                    const yLast = yScale(maxRank);
+                    const yBottom = height - padding.bottom + 12;
 
                     svgContent += `
-                        <!-- Franja Podio / Champions -->
-                        <rect x="${padding.left}" y="${padding.top - 12}" width="${plotWidth}" height="${y3 - (padding.top - 12)}" fill="${isLight ? 'rgba(245, 158, 11, 0.05)' : 'rgba(245, 158, 11, 0.08)'}" rx="6" />
-                        <!-- Franja Zona Maula -->
-                        <rect x="${padding.left}" y="${y10}" width="${plotWidth}" height="${height - padding.bottom - y10 + 12}" fill="${isLight ? 'rgba(239, 68, 68, 0.04)' : 'rgba(239, 68, 68, 0.06)'}" rx="6" />
+                        <!-- Franja Podio / Champions (#1-#3) -->
+                        <rect x="${padding.left}" y="${yTop}" width="${plotWidth}" height="${y3 - yTop}" fill="${isLight ? 'rgba(245, 158, 11, 0.16)' : 'rgba(245, 158, 11, 0.18)'}" stroke="${isLight ? 'rgba(245, 158, 11, 0.35)' : 'rgba(245, 158, 11, 0.30)'}" stroke-width="1.2" rx="8" />
+                        <text x="${width - padding.right - 8}" y="${yTop + 16}" text-anchor="end" fill="${isLight ? '#b45309' : '#fbbf24'}" font-size="10" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" opacity="0.9">👑 ZONA CHAMPIONS (#1-#3)</text>
+
+                        <!-- Franja Zona Media (#4-#10) -->
+                        <rect x="${padding.left}" y="${y3 + 3}" width="${plotWidth}" height="${y10 - y3 - 6}" fill="${isLight ? 'rgba(59, 130, 246, 0.09)' : 'rgba(59, 130, 246, 0.11)'}" stroke="${isLight ? 'rgba(59, 130, 246, 0.25)' : 'rgba(59, 130, 246, 0.22)'}" stroke-width="1.2" rx="8" />
+                        <text x="${width - padding.right - 8}" y="${y3 + 19}" text-anchor="end" fill="${isLight ? '#2563eb' : '#60a5fa'}" font-size="10" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" opacity="0.9">🛡️ ZONA MEDIA (#4-#10)</text>
+
+                        <!-- Franja Zona Maula (#11-#19) -->
+                        <rect x="${padding.left}" y="${y10}" width="${plotWidth}" height="${yBottom - y10}" fill="${isLight ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.17)'}" stroke="${isLight ? 'rgba(244, 63, 94, 0.35)' : 'rgba(244, 63, 94, 0.30)'}" stroke-width="1.2" rx="8" />
+                        <text x="${width - padding.right - 8}" y="${y10 + 17}" text-anchor="end" fill="${isLight ? '#e11d48' : '#fb7185'}" font-size="10" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" opacity="0.9">🐸 ZONA MAULA (#11-#19)</text>
                     `;
 
                     // Líneas guía horizontales de puestos clave (1, 3, 5, 10, 15, 19)
