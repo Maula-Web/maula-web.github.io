@@ -1785,7 +1785,7 @@ class PronosticoManager {
             const BG_ROW_ODD      = isLightTheme ? '#f1f5f9'       : 'rgba(10,18,40,0.4)';
             const BG_RESULT_CELL  = isLightTheme ? '#1e293b'       : '#060b14';
             const BG_DOUBLES_COL  = isLightTheme ? 'rgba(139,92,246,0.08)' : 'rgba(139,92,246,0.12)';
-            const BG_HIT          = isLightTheme ? '#d1fae5'       : 'rgba(16,185,129,0.18)';
+            const BG_HIT          = isLightTheme ? '#a7f3d0'       : 'rgba(16,185,129,0.32)';
             const BG_PERFECT      = isLightTheme ? '#fef9c3'       : 'rgba(234,179,8,0.15)';
             const BG_FOOT         = isLightTheme ? '#1e293b'       : '#060b14';
             const C_TEXT          = isLightTheme ? '#e2e8f0'       : '#94a3b8';
@@ -1808,11 +1808,11 @@ class PronosticoManager {
             const padTeam    = isMobile ? '5px 6px' : '8px 14px';
             const padCell    = isMobile ? '4px 3px' : '7px 5px';
             const wNum       = isMobile ? '32px'    : '42px';
-            const wTeam      = isMobile ? '90px'    : '190px';
+            const wTeam      = isMobile ? '110px'   : '210px';
             const wMem       = isMobile ? '30px'    : '50px';
             const hMem       = isMobile ? '100px'   : '180px';
             const leftHome   = isMobile ? '32px'    : '42px';
-            const leftAway   = isMobile ? '122px'   : '232px';
+            const leftAway   = isMobile ? '142px'   : '252px';
             const leftNum    = '0px';
 
             const signColor = (s) => {
@@ -1884,10 +1884,25 @@ class PronosticoManager {
                 const bgRow = idx % 2 === 0 ? BG_ROW_EVEN : BG_ROW_ODD;
                 const officialResult = match.result || null;
 
+                const homeLogo = AppUtils.getTeamLogo(match.home);
+                const awayLogo = AppUtils.getTeamLogo(match.away);
+                const logoImgHome = homeLogo ? `<img src="${homeLogo}" class="team-logo" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; flex-shrink:0;" onerror="this.style.display='none'">` : '';
+                const logoImgAway = awayLogo ? `<img src="${awayLogo}" class="team-logo" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; flex-shrink:0;" onerror="this.style.display='none'">` : '';
+
                 html += `<tr>
                     <td style="${tdStickyBase} left:${leftNum}; background:${BG_STICKY}; ${blockBorderStyle} padding:${padCell}; text-align:center; color:${C_AMBER}; font-size:${fSizeBase}; min-width:${wNum}; max-width:${wNum};">${displayIdx}</td>
-                    <td style="${tdStickyBase} left:${leftHome}; background:${BG_STICKY}; ${blockBorderStyle} padding:${padTeam}; text-align:right; min-width:${wTeam}; max-width:${wTeam}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${C_TEAM}; font-size:${fSizeBase};">${match.home}</td>
-                    <td style="${tdStickyBase} left:${leftAway}; background:${BG_STICKY}; border-right:2px solid ${BORDER_BLOCK}; ${blockBorderStyle} padding:${padTeam}; text-align:left; min-width:${wTeam}; max-width:${wTeam}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${C_TEAM}; font-size:${fSizeBase};">${match.away}</td>
+                    <td style="${tdStickyBase} left:${leftHome}; background:${BG_STICKY}; ${blockBorderStyle} padding:${padTeam}; min-width:${wTeam}; max-width:${wTeam}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${C_TEAM}; font-size:${fSizeBase};">
+                        <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; overflow:hidden;">
+                            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${match.home}</span>
+                            ${logoImgHome}
+                        </div>
+                    </td>
+                    <td style="${tdStickyBase} left:${leftAway}; background:${BG_STICKY}; border-right:2px solid ${BORDER_BLOCK}; ${blockBorderStyle} padding:${padTeam}; min-width:${wTeam}; max-width:${wTeam}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${C_TEAM}; font-size:${fSizeBase};">
+                        <div style="display:flex; align-items:center; justify-content:flex-start; gap:6px; overflow:hidden;">
+                            ${logoImgAway}
+                            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${match.away}</span>
+                        </div>
+                    </td>
                 `;
 
                 sortedMembers.forEach(m => {
@@ -1903,7 +1918,7 @@ class PronosticoManager {
                         const isHit = officialResult && sign === officialResult;
                         if (isHit) {
                             bg = BG_HIT;
-                            borderExtra = `border:2px solid ${C_HIT_BORDER};`;
+                            borderExtra = '';
                             baseHitsCount[m.id]++;
                         } else if (f.late && !f.pardoned) {
                             bg = isLightTheme ? '#fef9c3' : 'rgba(245,158,11,0.08)';
@@ -1924,7 +1939,6 @@ class PronosticoManager {
                         const isHit = officialResult && sign.includes(officialResult);
                         if (isHit) {
                             bg = BG_HIT;
-                            borderExtra += `border-top:2px solid ${C_HIT_BORDER}; border-bottom:2px solid ${C_HIT_BORDER};`;
                             doublesHitsCount[dbIdx]++;
                         }
                     }
@@ -1939,7 +1953,6 @@ class PronosticoManager {
                     const isHit = officialResult && sign === officialResult;
                     if (isHit) {
                         bg = isLightTheme ? '#fef08a' : 'rgba(234,179,8,0.3)';
-                        borderExtra += `border-top:2px solid #f59e0b; border-bottom:2px solid #f59e0b;`;
                         perfectHits++;
                     }
                     html += `<td style="background:${bg}; ${borderExtra} border-right:1px solid rgba(234,179,8,0.3); ${blockBorderStyle} padding:${padCell}; text-align:center; min-width:${wMem}; font-weight:900; font-size:${fSizeSign}; color:${colorSign}; font-family:'JetBrains Mono',monospace;">${sign}</td>`;
