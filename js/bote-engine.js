@@ -448,12 +448,6 @@ class BoteEngine {
             }
         }
 
-        if (costs.exento) {
-            costs.penalizacionUnos = 0;
-            costs.penalizacionBajosAciertos = 0;
-            costs.penalizacionPIG = 0;
-            costs.penalizacionMaula = 0;
-        }
 
         if (jornada.noSellado) {
             costs.sellado = 0;
@@ -518,7 +512,7 @@ class BoteEngine {
         }
 
         if (isCurrentLoser) {
-            costs.penalizacionMaula = costs.exento ? 0 : this.calculateHistoricalPenalty('maula', null, jDate);
+            costs.penalizacionMaula = this.calculateHistoricalPenalty('maula', null, jDate);
         }
 
         return costs;
