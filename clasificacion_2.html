@@ -1015,7 +1015,7 @@
          DRAWER / MODAL LATERAL DE FICHA DEL SOCIO
          ===================================================================== -->
     <div id="member-drawer-modal" style="display: none;" onclick="if(event.target === this) window.ClasificacionApp.closeMemberDrawer()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] items-center justify-center p-3 sm:p-6">
-        <div class="glass-panel w-full max-w-2xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal bg-white dark:bg-slate-900">
+        <div class="glass-panel w-full max-w-3xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal bg-white dark:bg-slate-900">
             <!-- Cabecera de la Ficha -->
             <div class="bg-slate-100 dark:bg-slate-900/90 p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-3">
@@ -1073,15 +1073,15 @@
                         <span>📋</span> Historial Jornada a Jornada
                     </h4>
                     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40">
-                        <table class="w-full text-xs text-left">
+                        <table class="w-full text-xs text-left whitespace-nowrap">
                             <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
                                 <tr>
-                                    <th class="py-2 px-3">Jornada</th>
+                                    <th class="py-2 px-3.5 whitespace-nowrap">Jornada</th>
                                     <th class="py-2 px-3 text-center">Aciertos</th>
-                                    <th class="py-2 px-3 text-center">Bonus/Penal</th>
+                                    <th class="py-2 px-3 text-center whitespace-nowrap">Bonus/Penal</th>
                                     <th class="py-2 px-3 text-center">Puntos</th>
                                     <th class="py-2 px-3 text-center">Premios</th>
-                                    <th class="py-2 px-3 text-center">Estado</th>
+                                    <th class="py-2 px-3.5 text-center whitespace-nowrap">Estado</th>
                                 </tr>
                             </thead>
                             <tbody id="drawer-history-tbody" class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
@@ -2126,12 +2126,12 @@
 
                     hHtml += `
                         <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/50">
-                            <td class="py-1.5 px-3 font-bold text-slate-800 dark:text-slate-300">Jornada ${j.number}</td>
-                            <td class="py-1.5 px-3 text-center text-slate-900 dark:text-white font-bold">${data.hits}</td>
-                            <td class="py-1.5 px-3 text-center ${bonusClass} font-bold">${bonusStr}</td>
-                            <td class="py-1.5 px-3 text-center text-amber-600 dark:text-amber-400 font-black">${data.points}</td>
-                            <td class="py-1.5 px-3 text-center text-purple-600 dark:text-purple-400">${data.prize > 0 ? this.formatMoney(data.prize) : '-'}</td>
-                            <td class="py-1.5 px-3 text-center">${statusBadge}</td>
+                            <td class="py-2 px-3.5 font-bold text-slate-800 dark:text-slate-300 whitespace-nowrap">Jornada ${j.number}</td>
+                            <td class="py-2 px-3 text-center text-slate-900 dark:text-white font-bold whitespace-nowrap">${data.hits}</td>
+                            <td class="py-2 px-3 text-center ${bonusClass} font-bold whitespace-nowrap">${bonusStr}</td>
+                            <td class="py-2 px-3 text-center text-amber-600 dark:text-amber-400 font-black whitespace-nowrap">${data.points}</td>
+                            <td class="py-2 px-3 text-center text-purple-600 dark:text-purple-400 whitespace-nowrap">${data.prize > 0 ? this.formatMoney(data.prize) : '-'}</td>
+                            <td class="py-2 px-3.5 text-center whitespace-nowrap">${statusBadge}</td>
                         </tr>
                     `;
                 });
