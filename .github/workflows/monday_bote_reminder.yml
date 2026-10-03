@@ -1,0 +1,33 @@
+name: Recordatorio Saldo Bote Lunes
+run-name: 🪙 Recordatorio Saldo Bote Lunes 09:00
+
+on:
+  schedule:
+    # 07:00 UTC = 09:00 Madrid en horario de verano (CEST, UTC+2)
+    # 08:00 UTC = 09:00 Madrid en horario de invierno (CET, UTC+1)
+    # Se programa a las 07:00 y 08:00 UTC; el script verifica internamente que en Europe/Madrid sean las 9:xx.
+    - cron: '0 7,8 * * 1'
+  workflow_dispatch:
+    # Permite dispararlo manualmente en cualquier momento desde la pestaña "Actions" de GitHub
+
+jobs:
+  send-bote-reminder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar Recordatorio Push de Saldo de Bote
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: node scripts/monday_bote_reminder_cron.js

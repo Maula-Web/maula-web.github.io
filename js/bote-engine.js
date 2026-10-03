@@ -957,4 +957,9 @@ class BoteEngine {
     }
 }
 
-window.BoteEngine = BoteEngine;
+if (typeof window !== 'undefined') {
+    window.BoteEngine = BoteEngine;
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = BoteEngine;
+}
