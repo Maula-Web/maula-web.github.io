@@ -873,7 +873,7 @@
                     <span>📊</span> Matriz Histórica
                 </button>
                 <button type="button" id="tab-btn-chart" onclick="window.ClasificacionApp.switchView('chart')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                    <span>📈</span> Evolución
+                    <span>🚀</span> Escalada (Bump Chart)
                 </button>
             </div>
 
@@ -973,39 +973,63 @@
         </section>
 
         <!-- =====================================================================
-             VISTA 3: GRÁFICO DINÁMICO DE EVOLUCIÓN (TEXTO NÍTIDO SIN ESTIRAR)
+             VISTA 3: ESCALADA DE POSICIONES (BUMP CHART INTERACTIVO)
              ===================================================================== -->
         <section id="view-chart" class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 order-6" style="display: none;">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2">
-                <div class="flex items-center gap-2">
-                    <span class="p-1.5 rounded-xl bg-amber-500/20 text-amber-500 text-base">📈</span>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 border-b border-slate-200 dark:border-slate-800 gap-2.5">
+                <div class="flex items-center gap-2.5">
+                    <span class="p-2 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-500 text-lg border border-amber-500/30 shadow-inner">🚀</span>
                     <div>
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
-                            <span>Evolución de Puntos por Jornada</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">Gráfico Interactivo</span>
-                        </h3>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Compara la trayectoria de puntos acumulados jornada a jornada sin distorsión de escala.</p>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white">
+                                Escalada de Puestos &bull; Carrera por el Liderato
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">Bump Chart Interactivo</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            Sigue cómo ha cambiado la posición (#1 a #19) de cada socio tras cada jornada disputada. Pasa el ratón o toca una línea para resaltarla.
+                        </p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <!-- Selectores de Modo y Filtros de la Carrera -->
+                <div class="flex items-center gap-1.5 flex-wrap self-end sm:self-auto">
+                    <div class="flex items-center bg-slate-200 dark:bg-slate-900/80 p-0.5 rounded-xl border border-slate-300 dark:border-slate-800 text-[11px] font-bold mr-1">
+                        <button type="button" id="chart-mode-ranks" onclick="window.ClasificacionApp.setChartMode('ranks')" class="px-2.5 py-1 rounded-lg transition font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow">
+                            👑 Puestos (#1-#19)
+                        </button>
+                        <button type="button" id="chart-mode-gap" onclick="window.ClasificacionApp.setChartMode('gap')" class="px-2.5 py-1 rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                            📏 Distancia al Líder
+                        </button>
+                    </div>
                     <button type="button" onclick="window.ClasificacionApp.chartSelectTop(4)" class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/40 text-xs font-bold hover:bg-amber-500/30 transition">Top 4</button>
+                    <button type="button" onclick="window.ClasificacionApp.chartSelectPodium()" class="px-2.5 py-1 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 text-xs font-bold hover:bg-blue-500/25 transition">Podio</button>
                     <button type="button" onclick="window.ClasificacionApp.chartSelectAll()" class="px-2.5 py-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition">Todos</button>
                     <button type="button" onclick="window.ClasificacionApp.chartClearAll()" class="px-2.5 py-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition">Limpiar</button>
                 </div>
             </div>
 
-            <!-- Selector de Socios en Chips -->
-            <div id="chart-member-chips" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto custom-scroll p-2 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800">
+            <!-- Selector de Socios en Chips Interactivos -->
+            <div id="chart-member-chips" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto custom-scroll p-2 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800">
                 <!-- Inyectado por JS -->
             </div>
 
-            <!-- Lienzo del Gráfico SVG (Proporcional a píxeles reales) -->
-            <div id="chart-container-box" class="w-full h-80 sm:h-96 relative rounded-xl bg-slate-50 dark:bg-slate-950/80 p-2 sm:p-4 border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between">
-                <svg id="chart-svg" class="w-full h-full overflow-visible">
-                    <!-- Curvas inyectadas dinámicamente con medidas exactas en píxeles -->
+            <!-- Lienzo del Gráfico SVG Proporcional de Alta Definición -->
+            <div id="chart-container-box" class="w-full h-96 sm:h-[450px] relative rounded-2xl bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900/90 p-2 sm:p-4 border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between shadow-inner">
+                <svg id="chart-svg" class="w-full h-full overflow-visible select-none">
+                    <!-- Bump Chart dinámico inyectado por JS -->
                 </svg>
-                <div id="chart-tooltip" class="absolute hidden px-3 py-1.5 rounded-xl bg-slate-900 border border-amber-500 text-white text-xs shadow-2xl pointer-events-none z-30 font-mono"></div>
+                <div id="chart-tooltip" class="absolute hidden px-3.5 py-2 rounded-xl bg-slate-950/95 border border-amber-500/80 text-white text-xs shadow-2xl pointer-events-none z-30 font-mono transition-opacity duration-150"></div>
+            </div>
+            
+            <!-- Pie informativo con leyenda de zonas -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-slate-500 dark:text-slate-400 font-mono border-t border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> 👑 Zona Champions (#1-#3)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> 🛡️ Zona Media (#4-#10)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> 🐸 Zona Maula (#11-#19)</span>
+                </div>
+                <span>Toca o pasa el cursor sobre los nodos para ver el desglose</span>
             </div>
         </section>
 
@@ -1121,6 +1145,8 @@
                 this.activeCategoryFilter = 'all';
                 this.searchQuery = '';
                 this.chartSelectedMembers = new Set();
+                this.chartMode = 'ranks'; // 'ranks' (Puesto #1-#19) o 'gap' (Distancia en pts al líder)
+                this.hoveredMemberId = null;
                 this.chartColors = [
                     '#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#8b5cf6',
                     '#06b6d4', '#f97316', '#84cc16', '#6366f1', '#14b8a6',
@@ -1826,9 +1852,25 @@
                 });
             }
 
-            // --- GRÁFICO DINÁMICO DE EVOLUCIÓN (PROPORCIONAL EN PÍXELES REALES, FUENTE NATIVA) ---
+            // --- ESCALADA DE POSICIONES (BUMP CHART INTERACTIVO) ---
             initChart() {
                 this.chartSelectTop(4);
+            }
+
+            setChartMode(mode) {
+                this.chartMode = mode;
+                const btnRanks = document.getElementById('chart-mode-ranks');
+                const btnGap = document.getElementById('chart-mode-gap');
+                if (btnRanks && btnGap) {
+                    if (mode === 'ranks') {
+                        btnRanks.className = 'px-2.5 py-1 rounded-lg transition font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                        btnGap.className = 'px-2.5 py-1 rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+                    } else {
+                        btnGap.className = 'px-2.5 py-1 rounded-lg transition font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow';
+                        btnRanks.className = 'px-2.5 py-1 rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+                    }
+                }
+                this.renderChartSVG();
             }
 
             chartSelectTop(count = 4) {
@@ -1838,6 +1880,10 @@
                 });
                 this.renderChartChips();
                 this.renderChartSVG();
+            }
+
+            chartSelectPodium() {
+                this.chartSelectTop(3);
             }
 
             chartSelectAll() {
@@ -1862,6 +1908,54 @@
                 this.renderChartSVG();
             }
 
+            highlightMemberLine(memberId) {
+                this.hoveredMemberId = memberId;
+                const paths = document.querySelectorAll('.bump-path');
+                const nodes = document.querySelectorAll('.bump-node');
+                paths.forEach(p => {
+                    const pMid = p.getAttribute('data-member-id');
+                    if (memberId === null) {
+                        p.style.opacity = '0.9';
+                        p.style.strokeWidth = '3';
+                    } else if (pMid === String(memberId)) {
+                        p.style.opacity = '1';
+                        p.style.strokeWidth = '5';
+                    } else {
+                        p.style.opacity = '0.15';
+                        p.style.strokeWidth = '2';
+                    }
+                });
+                nodes.forEach(n => {
+                    const nMid = n.getAttribute('data-member-id');
+                    if (memberId === null) {
+                        n.style.opacity = '1';
+                    } else if (nMid === String(memberId)) {
+                        n.style.opacity = '1';
+                    } else {
+                        n.style.opacity = '0.15';
+                    }
+                });
+            }
+
+            showBumpTooltip(e, text) {
+                const tt = document.getElementById('chart-tooltip');
+                const box = document.getElementById('chart-container-box');
+                if (!tt || !box) return;
+                const boxRect = box.getBoundingClientRect();
+                const x = e.clientX - boxRect.left + 12;
+                const y = e.clientY - boxRect.top - 20;
+
+                tt.innerHTML = text;
+                tt.style.left = Math.min(x, boxRect.width - 200) + 'px';
+                tt.style.top = Math.max(10, Math.min(y, boxRect.height - 60)) + 'px';
+                tt.classList.remove('hidden');
+            }
+
+            hideBumpTooltip() {
+                const tt = document.getElementById('chart-tooltip');
+                if (tt) tt.classList.add('hidden');
+            }
+
             renderChartChips() {
                 const container = document.getElementById('chart-member-chips');
                 if (!container) return;
@@ -1876,9 +1970,15 @@
                         : 'bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white font-medium';
 
                     html += `
-                        <button type="button" onclick="window.ClasificacionApp.toggleChartMember(${s.member.id})" class="px-2 py-0.5 rounded-lg text-xs flex items-center gap-1.5 transition ${activeClass}" style="${isSelected ? `border-color: ${color}; color: ${color};` : ''}">
-                            <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
-                            <span>${s.name}</span>
+                        <button type="button" 
+                                onclick="window.ClasificacionApp.toggleChartMember(${s.member.id})" 
+                                onmouseenter="window.ClasificacionApp.highlightMemberLine(${s.member.id})"
+                                onmouseleave="window.ClasificacionApp.highlightMemberLine(null)"
+                                class="px-2.5 py-1 rounded-lg text-xs flex items-center gap-1.5 transition ${activeClass}" 
+                                style="${isSelected ? `border-color: ${color}; color: ${color};` : ''}">
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm" style="background-color: ${color};"></span>
+                            <span class="truncate max-w-[120px]">${s.name}</span>
+                            <span class="text-[10px] font-mono opacity-80">#${idx + 1}</span>
                         </button>
                     `;
                 });
@@ -1893,14 +1993,14 @@
 
                 const jornadasAsc = [...this.visibleJornadas].sort((a, b) => a.number - b.number);
                 if (jornadasAsc.length === 0 || this.chartSelectedMembers.size === 0) {
-                    svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#64748b" font-size="12" font-family="'Plus Jakarta Sans', sans-serif">Selecciona socios arriba para ver su evolución</text>`;
+                    svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#64748b" font-size="13" font-family="'Plus Jakarta Sans', sans-serif">Selecciona al menos un socio en los filtros superiores para ver la escalada</text>`;
                     return;
                 }
 
-                // Medición exacta en píxeles para evitar cualquier estiramiento o distorsión de texto
+                // Medición exacta en píxeles para evitar cualquier distorsión
                 const rect = box.getBoundingClientRect();
                 const width = Math.max(500, Math.floor(rect.width - 32));
-                const height = Math.max(260, Math.floor(rect.height - 32));
+                const height = Math.max(340, Math.floor(rect.height - 32));
 
                 svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
                 svg.removeAttribute('preserveAspectRatio');
@@ -1909,84 +2009,271 @@
                 const gridColor = isLight ? '#e2e8f0' : '#1e293b';
                 const labelColor = isLight ? '#475569' : '#94a3b8';
 
-                const padding = { top: 20, right: 30, bottom: 35, left: 45 };
+                const padding = { top: 35, right: 90, bottom: 40, left: 55 };
                 const plotWidth = width - padding.left - padding.right;
                 const plotHeight = height - padding.top - padding.bottom;
 
-                // Calcular trayectorias acumuladas
-                let maxPts = 0;
-                const series = [];
+                // 1. Calcular clasificación acumulada para cada jornada (historia de puestos)
+                // Para cada jornada jIdx: calcular acumulado de puntos de CADA socio de la peña hasta esa jornada
+                const totalMembersCount = this.sortedRanking.length || 19;
+                const standingsHistory = []; // [jIdx] -> Map(memberId -> { rank, points, gapToLeader })
 
-                this.sortedRanking.forEach((s, sIdx) => {
-                    if (!this.chartSelectedMembers.has(s.member.id)) return;
+                let leaderPointsHistory = [];
 
-                    let runningTotal = 0;
-                    const points = [];
-
-                    jornadasAsc.forEach((j) => {
-                        const cell = s.jornadaData[j.id];
-                        if (cell && cell.hits !== -1) {
-                            runningTotal += cell.points;
+                jornadasAsc.forEach((j, jIdx) => {
+                    const cumulativeList = [];
+                    this.members.forEach(m => {
+                        let totalPts = 0;
+                        let totalHits = 0;
+                        for (let k = 0; k <= jIdx; k++) {
+                            const pastJ = jornadasAsc[k];
+                            const cell = this.memberStats[m.id].jornadaData[pastJ.id];
+                            if (cell && cell.hits !== -1) {
+                                totalPts += cell.points;
+                                totalHits += cell.hits;
+                            }
                         }
-                        points.push({ jNum: j.number, pts: runningTotal });
-                        if (runningTotal > maxPts) maxPts = runningTotal;
+                        cumulativeList.push({ memberId: m.id, points: totalPts, hits: totalHits });
                     });
 
-                    series.push({
-                        member: s,
-                        color: this.chartColors[sIdx % this.chartColors.length],
-                        points
+                    // Ordenar como en la clasificación oficial
+                    cumulativeList.sort((a, b) => {
+                        if (b.points !== a.points) return b.points - a.points;
+                        return b.hits - a.hits;
                     });
+
+                    const leaderPts = cumulativeList[0] ? cumulativeList[0].points : 0;
+                    leaderPointsHistory.push(leaderPts);
+
+                    const rankMap = new Map();
+                    cumulativeList.forEach((entry, rIdx) => {
+                        rankMap.set(entry.memberId, {
+                            rank: rIdx + 1,
+                            points: entry.points,
+                            gapToLeader: leaderPts - entry.points
+                        });
+                    });
+                    standingsHistory.push(rankMap);
                 });
 
-                if (maxPts === 0) maxPts = 10;
-
-                const xScale = (idx) => padding.left + (idx / Math.max(1, jornadasAsc.length - 1)) * plotWidth;
-                const yScale = (val) => padding.top + plotHeight - (val / maxPts) * plotHeight;
+                const numJornadas = Math.max(1, jornadasAsc.length);
+                const xScale = (idx) => padding.left + (idx / Math.max(1, numJornadas - 1)) * plotWidth;
 
                 let svgContent = '';
 
-                // Líneas horizontales de cuadrícula (4 divisiones)
-                for (let i = 0; i <= 4; i++) {
-                    const val = Math.round((maxPts / 4) * i);
-                    const y = yScale(val);
-                    svgContent += `
-                        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridColor}" stroke-dasharray="3,3" stroke-width="1"/>
-                        <text x="${padding.left - 8}" y="${y + 4}" text-anchor="end" fill="${labelColor}" font-size="10" font-family="'JetBrains Mono', monospace">${val}</text>
-                    `;
-                }
+                if (this.chartMode === 'ranks') {
+                    // Modo BUMP CHART: Eje Y del puesto #1 (arriba) al puesto #totalMembersCount (abajo)
+                    const maxRank = Math.min(19, totalMembersCount);
+                    const yScale = (rank) => padding.top + ((rank - 1) / Math.max(1, maxRank - 1)) * plotHeight;
 
-                // Eje X (Jornadas)
-                jornadasAsc.forEach((j, idx) => {
-                    const x = xScale(idx);
-                    svgContent += `
-                        <line x1="${x}" y1="${padding.top}" x2="${x}" y2="${height - padding.bottom}" stroke="${gridColor}" stroke-width="0.5"/>
-                        <text x="${x}" y="${height - padding.bottom + 18}" text-anchor="middle" fill="${labelColor}" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="bold">J${j.number}</text>
-                    `;
-                });
-
-                // Líneas de cada serie
-                series.forEach(ser => {
-                    let d = '';
-                    ser.points.forEach((pt, idx) => {
-                        const x = xScale(idx);
-                        const y = yScale(pt.pts);
-                        d += (idx === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
-                    });
+                    // Franjas de fondo temáticas: Champions (1-3), Zona Media (4-10), Zona Maula (11-19)
+                    const y1 = yScale(1);
+                    const y3 = yScale(3.5);
+                    const y10 = yScale(10.5);
+                    const yLast = yScale(maxRank);
 
                     svgContent += `
-                        <path d="${d}" fill="none" stroke="${ser.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+                        <!-- Franja Podio / Champions -->
+                        <rect x="${padding.left}" y="${padding.top - 12}" width="${plotWidth}" height="${y3 - (padding.top - 12)}" fill="${isLight ? 'rgba(245, 158, 11, 0.05)' : 'rgba(245, 158, 11, 0.08)'}" rx="6" />
+                        <!-- Franja Zona Maula -->
+                        <rect x="${padding.left}" y="${y10}" width="${plotWidth}" height="${height - padding.bottom - y10 + 12}" fill="${isLight ? 'rgba(239, 68, 68, 0.04)' : 'rgba(239, 68, 68, 0.06)'}" rx="6" />
                     `;
 
-                    // Puntos
-                    ser.points.forEach((pt, idx) => {
-                        const x = xScale(idx);
-                        const y = yScale(pt.pts);
+                    // Líneas guía horizontales de puestos clave (1, 3, 5, 10, 15, 19)
+                    const keyRanks = [1, 3, 5, 10, 15, maxRank].filter((v, i, a) => a.indexOf(v) === i && v <= maxRank);
+                    keyRanks.forEach(r => {
+                        const y = yScale(r);
                         svgContent += `
-                            <circle cx="${x}" cy="${y}" r="3.5" fill="${ser.color}" stroke="${isLight ? '#ffffff' : '#0b0f19'}" stroke-width="1.5" />
+                            <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridColor}" stroke-dasharray="3,3" stroke-width="1"/>
+                            <text x="${padding.left - 10}" y="${y + 4}" text-anchor="end" fill="${labelColor}" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="bold">#${r}</text>
                         `;
                     });
-                });
+
+                    // Líneas verticales por cada jornada
+                    jornadasAsc.forEach((j, idx) => {
+                        const x = xScale(idx);
+                        svgContent += `
+                            <line x1="${x}" y1="${padding.top - 10}" x2="${x}" y2="${height - padding.bottom + 8}" stroke="${gridColor}" stroke-width="0.7"/>
+                            <text x="${x}" y="${height - padding.bottom + 22}" text-anchor="middle" fill="${labelColor}" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="bold">J${j.number}</text>
+                        `;
+                    });
+
+                    // Trazado de líneas Bump con curvas Bezier cúbicas suaves (S-curve)
+                    this.sortedRanking.forEach((s, sIdx) => {
+                        if (!this.chartSelectedMembers.has(s.member.id)) return;
+                        const color = this.chartColors[sIdx % this.chartColors.length];
+
+                        const pathPoints = [];
+                        jornadasAsc.forEach((j, idx) => {
+                            const standing = standingsHistory[idx].get(s.member.id);
+                            const rank = standing ? standing.rank : maxRank;
+                            pathPoints.push({
+                                x: xScale(idx),
+                                y: yScale(rank),
+                                rank: rank,
+                                points: standing ? standing.points : 0,
+                                jNum: j.number
+                            });
+                        });
+
+                        // Construcción de la curva Bezier cúbica suave
+                        let d = '';
+                        for (let i = 0; i < pathPoints.length; i++) {
+                            const curr = pathPoints[i];
+                            if (i === 0) {
+                                d += `M ${curr.x} ${curr.y}`;
+                            } else {
+                                const prev = pathPoints[i - 1];
+                                const cp1x = prev.x + (curr.x - prev.x) * 0.5;
+                                const cp1y = prev.y;
+                                const cp2x = prev.x + (curr.x - prev.x) * 0.5;
+                                const cp2y = curr.y;
+                                d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+                            }
+                        }
+
+                        // Path de la curva
+                        svgContent += `
+                            <path d="${d}" 
+                                  fill="none" 
+                                  stroke="${color}" 
+                                  stroke-width="3" 
+                                  stroke-linecap="round" 
+                                  stroke-linejoin="round" 
+                                  class="bump-path transition-all duration-200 cursor-pointer"
+                                  data-member-id="${s.member.id}"
+                                  onmouseenter="window.ClasificacionApp.highlightMemberLine(${s.member.id})"
+                                  onmouseleave="window.ClasificacionApp.highlightMemberLine(null)"
+                                  style="opacity: 0.9;" />
+                        `;
+
+                        // Nodos interactivos en cada jornada
+                        pathPoints.forEach(pt => {
+                            const ttContent = `<strong style="color: ${color};">${s.name}</strong><br/>Jornada ${pt.jNum} &bull; <strong>Puesto #${pt.rank}</strong><br/><span style="color:#94a3b8;">${pt.points} pts acumulados</span>`;
+                            svgContent += `
+                                <g class="bump-node transition-all cursor-pointer" 
+                                   data-member-id="${s.member.id}"
+                                   onmouseenter="window.ClasificacionApp.showBumpTooltip(event, '${ttContent}'); window.ClasificacionApp.highlightMemberLine(${s.member.id})"
+                                   onmouseleave="window.ClasificacionApp.hideBumpTooltip(); window.ClasificacionApp.highlightMemberLine(null)">
+                                    <circle cx="${pt.x}" cy="${pt.y}" r="6.5" fill="${color}" stroke="${isLight ? '#ffffff' : '#090d16'}" stroke-width="2" />
+                                    <text x="${pt.x}" y="${pt.y + 3}" text-anchor="middle" fill="#000000" font-size="8" font-family="'JetBrains Mono', monospace" font-weight="900" pointer-events="none">${pt.rank}</text>
+                                </g>
+                            `;
+                        });
+
+                        // Etiqueta del socio al final del trazado
+                        const lastPt = pathPoints[pathPoints.length - 1];
+                        if (lastPt) {
+                            svgContent += `
+                                <g class="cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${s.member.id})" onmouseenter="window.ClasificacionApp.highlightMemberLine(${s.member.id})" onmouseleave="window.ClasificacionApp.highlightMemberLine(null)">
+                                    <text x="${lastPt.x + 12}" y="${lastPt.y + 3.5}" fill="${color}" font-size="11" font-family="'Plus Jakarta Sans', sans-serif" font-weight="bold">${s.name}</text>
+                                </g>
+                            `;
+                        }
+                    });
+
+                } else {
+                    // Modo GAP TO LEADER (Distancia en puntos al primer clasificado: 0 = líder)
+                    let maxGap = 10;
+                    this.sortedRanking.forEach((s) => {
+                        if (!this.chartSelectedMembers.has(s.member.id)) return;
+                        jornadasAsc.forEach((j, idx) => {
+                            const st = standingsHistory[idx].get(s.member.id);
+                            if (st && st.gapToLeader > maxGap) maxGap = st.gapToLeader;
+                        });
+                    });
+                    maxGap = Math.ceil(maxGap / 5) * 5;
+
+                    const yScale = (gap) => padding.top + (gap / maxGap) * plotHeight;
+
+                    // Líneas guía horizontales de distancia
+                    const step = Math.max(5, Math.ceil(maxGap / 4));
+                    for (let g = 0; g <= maxGap; g += step) {
+                        const y = yScale(g);
+                        svgContent += `
+                            <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridColor}" stroke-dasharray="3,3" stroke-width="1"/>
+                            <text x="${padding.left - 10}" y="${y + 4}" text-anchor="end" fill="${labelColor}" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="bold">${g === 0 ? '👑 0' : '-' + g}</text>
+                        `;
+                    }
+
+                    // Líneas verticales por cada jornada
+                    jornadasAsc.forEach((j, idx) => {
+                        const x = xScale(idx);
+                        svgContent += `
+                            <line x1="${x}" y1="${padding.top - 10}" x2="${x}" y2="${height - padding.bottom + 8}" stroke="${gridColor}" stroke-width="0.7"/>
+                            <text x="${x}" y="${height - padding.bottom + 22}" text-anchor="middle" fill="${labelColor}" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="bold">J${j.number}</text>
+                        `;
+                    });
+
+                    // Trazados de distancia
+                    this.sortedRanking.forEach((s, sIdx) => {
+                        if (!this.chartSelectedMembers.has(s.member.id)) return;
+                        const color = this.chartColors[sIdx % this.chartColors.length];
+
+                        const pathPoints = [];
+                        jornadasAsc.forEach((j, idx) => {
+                            const standing = standingsHistory[idx].get(s.member.id);
+                            const gap = standing ? standing.gapToLeader : 0;
+                            pathPoints.push({
+                                x: xScale(idx),
+                                y: yScale(gap),
+                                gap: gap,
+                                rank: standing ? standing.rank : 1,
+                                points: standing ? standing.points : 0,
+                                jNum: j.number
+                            });
+                        });
+
+                        let d = '';
+                        for (let i = 0; i < pathPoints.length; i++) {
+                            const curr = pathPoints[i];
+                            if (i === 0) d += `M ${curr.x} ${curr.y}`;
+                            else {
+                                const prev = pathPoints[i - 1];
+                                const cp1x = prev.x + (curr.x - prev.x) * 0.5;
+                                const cp1y = prev.y;
+                                const cp2x = prev.x + (curr.x - prev.x) * 0.5;
+                                const cp2y = curr.y;
+                                d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+                            }
+                        }
+
+                        svgContent += `
+                            <path d="${d}" 
+                                  fill="none" 
+                                  stroke="${color}" 
+                                  stroke-width="3" 
+                                  stroke-linecap="round" 
+                                  stroke-linejoin="round" 
+                                  class="bump-path transition-all duration-200 cursor-pointer"
+                                  data-member-id="${s.member.id}"
+                                  onmouseenter="window.ClasificacionApp.highlightMemberLine(${s.member.id})"
+                                  onmouseleave="window.ClasificacionApp.highlightMemberLine(null)"
+                                  style="opacity: 0.9;" />
+                        `;
+
+                        pathPoints.forEach(pt => {
+                            const ttContent = `<strong style="color: ${color};">${s.name}</strong><br/>Jornada ${pt.jNum} &bull; ${pt.gap === 0 ? '<span style="color:#fbbf24;">👑 Líder</span>' : 'A -' + pt.gap + ' pts del líder'}<br/><span style="color:#94a3b8;">#${pt.rank} &bull; ${pt.points} pts acumulados</span>`;
+                            svgContent += `
+                                <g class="bump-node transition-all cursor-pointer" 
+                                   data-member-id="${s.member.id}"
+                                   onmouseenter="window.ClasificacionApp.showBumpTooltip(event, '${ttContent}'); window.ClasificacionApp.highlightMemberLine(${s.member.id})"
+                                   onmouseleave="window.ClasificacionApp.hideBumpTooltip(); window.ClasificacionApp.highlightMemberLine(null)">
+                                    <circle cx="${pt.x}" cy="${pt.y}" r="5.5" fill="${color}" stroke="${isLight ? '#ffffff' : '#090d16'}" stroke-width="2" />
+                                </g>
+                            `;
+                        });
+
+                        const lastPt = pathPoints[pathPoints.length - 1];
+                        if (lastPt) {
+                            svgContent += `
+                                <g class="cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${s.member.id})" onmouseenter="window.ClasificacionApp.highlightMemberLine(${s.member.id})" onmouseleave="window.ClasificacionApp.highlightMemberLine(null)">
+                                    <text x="${lastPt.x + 12}" y="${lastPt.y + 3.5}" fill="${color}" font-size="11" font-family="'Plus Jakarta Sans', sans-serif" font-weight="bold">${s.name} (${lastPt.gap === 0 ? '👑' : '-' + lastPt.gap})</text>
+                                </g>
+                            `;
+                        }
+                    });
+                }
 
                 svg.innerHTML = svgContent;
             }
