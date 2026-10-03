@@ -538,21 +538,33 @@ class BoteAppController {
     }
 
     renderAll() {
-        this.renderSummaryCards();
-        this.renderMembersTable();
-        this.renderJornadasCarousel();
-        this.renderJornadaDetail();
-        this.renderMatriz();
-        this.renderFlujoDeCaja();
-        this.renderPremiosDobles();
-        this.renderGestionIngresos();
-        this.renderModalGestionJornada();
+        const tasks = [
+            ['renderSummaryCards', () => this.renderSummaryCards()],
+            ['renderMembersTable', () => this.renderMembersTable()],
+            ['renderJornadasCarousel', () => this.renderJornadasCarousel()],
+            ['renderJornadaDetail', () => this.renderJornadaDetail()],
+            ['renderMatriz', () => this.renderMatriz()],
+            ['renderFlujoDeCaja', () => this.renderFlujoDeCaja()],
+            ['renderPremiosDobles', () => this.renderPremiosDobles()],
+            ['renderGestionIngresos', () => this.renderGestionIngresos()],
+            ['renderModalGestionJornada', () => this.renderModalGestionJornada()]
+        ];
+
+        for (const [name, fn] of tasks) {
+            try {
+                fn();
+            } catch (err) {
+                console.error(`Error executing ${name}:`, err);
+            }
+        }
 
         // Renderizar gráficos si los contenedores están disponibles
         setTimeout(() => {
-            this.renderFlujoChart();
-            this.renderJornadasChart();
-            if (this.sociosViewMode === 'chart') this.renderSociosChart();
+            try { this.renderFlujoChart(); } catch (e) { console.error('Error in renderFlujoChart:', e); }
+            try { this.renderJornadasChart(); } catch (e) { console.error('Error in renderJornadasChart:', e); }
+            if (this.sociosViewMode === 'chart') {
+                try { this.renderSociosChart(); } catch (e) { console.error('Error in renderSociosChart:', e); }
+            }
         }, 100);
     }
 
@@ -718,51 +730,6 @@ class BoteAppController {
             `;
             tbody.appendChild(tr);
         });
-
-        // Fila de totales en la tabla de Flujo de Caja
-        const flujoTfoot = document.getElementById('flujo-table-foot');
-        if (flujoTfoot) {
-            const totCuotas = data.jornadaSummaries.reduce((s, j) => s + (j.numSocios * (j.costeColumna || 0.75)), 0);
-            const totPenalties = data.jornadaSummaries.reduce((s, j) => s + Math.max(0, j.recaudacion - (j.numSocios * 1.50)), 0);
-            const totPremios = data.jornadaSummaries.reduce((s, j) => s + (j.premios || 0), 0);
-            const totSellado = data.jornadaSummaries.reduce((s, j) => s + (j.gastoSellado || 0), 0);
-            const totNeto = data.jornadaSummaries.reduce((s, j) => s + (j.neto || 0), 0);
-            const boteFinalTotal = BOTE_INICIAL + totNeto;
-            const totNetoColor = totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400';
-
-            flujoTfoot.innerHTML = data.jornadaSummaries.length === 0 ? '' : `
-                <tr class="bg-slate-900/95 border-t-2 border-emerald-500/40 font-bold">
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 whitespace-nowrap">
-                        <strong class="text-emerald-400 font-extrabold text-xs sm:text-sm uppercase tracking-wider block">Σ Totales</strong>
-                        <span class="text-[11px] text-slate-500 font-normal block">${data.jornadaSummaries.length} jornadas</span>
-                    </td>
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-slate-400 font-mono text-xs whitespace-nowrap">
-                        Temporada
-                    </td>
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
-                        +${totCuotas.toFixed(2).replace('.', ',')}&nbsp;€
-                    </td>
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-400 whitespace-nowrap">
-                        +${totPenalties.toFixed(2).replace('.', ',')}&nbsp;€
-                    </td>
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold ${totPremios > 0 ? 'text-emerald-400' : 'text-slate-500'} whitespace-nowrap">
-                        ${totPremios > 0 ? '+' + totPremios.toFixed(2).replace('.', ',') + '&nbsp;€' : '-'}
-                    </td>
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
-                        -${totSellado.toFixed(2).replace('.', ',')}&nbsp;€
-                    </td>
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black ${totNetoColor} whitespace-nowrap">
-                        ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€
-                    </td>
-                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-slate-900/80 whitespace-nowrap">
-                        <div>${boteFinalTotal.toFixed(2).replace('.', ',')}&nbsp;€</div>
-                        <div class="text-[10px] ${totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-normal">
-                            (Crec: ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€)
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }
 
         // Fila de totales (suma de los socios visibles según filtros/búsqueda)
         const tfoot = document.getElementById('members-table-foot');
@@ -1992,6 +1959,51 @@ class BoteAppController {
         if (cardSellado) cardSellado.textContent = `${totalSellado.toFixed(2).replace('.', ',')} € / jor`;
         if (cardSelladoSub) cardSelladoSub.textContent = `${numSocios} sencillas + 1 dobles`;
         if (cardSelladoTooltip) cardSelladoTooltip.textContent = `${numSocios} quinielas sencillas (${sencillasTotal.toFixed(2).replace('.', ',')} €) + 1 quiniela reducida de 7 dobles (${cDob.toFixed(2).replace('.', ',')} €) = ${totalSellado.toFixed(2).replace('.', ',')} € por jornada.`;
+
+        // Fila de totales en la tabla de Flujo de Caja
+        const flujoTfoot = document.getElementById('flujo-table-foot');
+        if (flujoTfoot) {
+            const totCuotas = data.jornadaSummaries.reduce((s, j) => s + (j.numSocios * (j.costeColumna || 0.75)), 0);
+            const totPenalties = data.jornadaSummaries.reduce((s, j) => s + Math.max(0, j.recaudacion - (j.numSocios * 1.50)), 0);
+            const totPremios = data.jornadaSummaries.reduce((s, j) => s + (j.premios || 0), 0);
+            const totSellado = data.jornadaSummaries.reduce((s, j) => s + (j.gastoSellado || 0), 0);
+            const totNeto = data.jornadaSummaries.reduce((s, j) => s + (j.neto || 0), 0);
+            const boteFinalTotal = BOTE_INICIAL + totNeto;
+            const totNetoColor = totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400';
+
+            flujoTfoot.innerHTML = data.jornadaSummaries.length === 0 ? '' : `
+                <tr class="bg-slate-900/95 border-t-2 border-emerald-500/40 font-bold">
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 whitespace-nowrap">
+                        <strong class="text-emerald-400 font-extrabold text-xs sm:text-sm uppercase tracking-wider block">Σ Totales</strong>
+                        <span class="text-[11px] text-slate-500 font-normal block">${data.jornadaSummaries.length} jornadas</span>
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-slate-400 font-mono text-xs whitespace-nowrap">
+                        Temporada
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
+                        +${totCuotas.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-400 whitespace-nowrap">
+                        +${totPenalties.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold ${totPremios > 0 ? 'text-emerald-400' : 'text-slate-500'} whitespace-nowrap">
+                        ${totPremios > 0 ? '+' + totPremios.toFixed(2).replace('.', ',') + '&nbsp;€' : '-'}
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
+                        -${totSellado.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black ${totNetoColor} whitespace-nowrap">
+                        ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€
+                    </td>
+                    <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-slate-900/80 whitespace-nowrap">
+                        <div>${boteFinalTotal.toFixed(2).replace('.', ',')}&nbsp;€</div>
+                        <div class="text-[10px] ${totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-normal">
+                            (Crec: ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€)
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
     }
 
     renderPremiosDobles() {
