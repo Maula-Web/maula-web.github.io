@@ -483,7 +483,8 @@ class ResumenManager {
                     if (isHit) stats.hitsByMatch[idx]++;
 
                     // Stats per team
-                    [m.home, m.away].forEach(team => {
+                    [m.home, m.away].forEach(rawTeam => {
+                        const team = (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(rawTeam) : (rawTeam || '').trim();
                         if (!stats.teamStats[team]) {
                             stats.teamStats[team] = { hits: 0, total: 0 };
                         }

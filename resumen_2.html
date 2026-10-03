@@ -1216,7 +1216,8 @@
                             });
 
                             // Registro de equipos
-                            [m.home, m.away].forEach(team => {
+                            [m.home, m.away].forEach(rawTeam => {
+                                const team = (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(rawTeam) : (rawTeam || '').trim();
                                 if (team && !this.teamStats[team]) {
                                     this.teamStats[team] = { name: team, totalMatches: 0, hits: 0, totalPicks: 0 };
                                 }
@@ -1280,7 +1281,8 @@
                                         }
 
                                         // Equipos
-                                        [match.home, match.away].forEach(team => {
+                                        [match.home, match.away].forEach(rawTeam => {
+                                            const team = (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(rawTeam) : (rawTeam || '').trim();
                                             if (team && this.teamStats[team]) {
                                                 this.teamStats[team].totalPicks++;
                                                 if (isHit) this.teamStats[team].hits++;

@@ -131,8 +131,43 @@ class Jornadas2AppController {
                     console.warn('[Jornadas 2.0] Error aplicando dado:', err);
                 }
             }
+            // Sincronizar jornadas ya jugadas en Firestore con nombres unificados y (f) minúscula
+            await this.normalizeAndSyncPlayedJornadas();
         } catch (e) {
             console.error('[Jornadas 2.0] Error cargando datos de Firebase:', e);
+        }
+    }
+
+    async normalizeAndSyncPlayedJornadas() {
+        if (!Array.isArray(this.jornadas) || !window.AppUtils || !window.AppUtils.normalizeTeamName) return;
+        const modifiedJornadas = [];
+
+        this.jornadas.forEach(j => {
+            let changed = false;
+            if (j.matches && Array.isArray(j.matches)) {
+                j.matches.forEach(m => {
+                    if (m.home) {
+                        const normH = window.AppUtils.normalizeTeamName(m.home);
+                        if (normH !== m.home) { m.home = normH; changed = true; }
+                    }
+                    if (m.away) {
+                        const normA = window.AppUtils.normalizeTeamName(m.away);
+                        if (normA !== m.away) { m.away = normA; changed = true; }
+                    }
+                });
+            }
+            if (changed) modifiedJornadas.push(j);
+        });
+
+        if (modifiedJornadas.length > 0 && window.DataService && typeof window.DataService.save === 'function') {
+            for (const j of modifiedJornadas) {
+                try {
+                    await window.DataService.save('jornadas', j);
+                } catch (e) {
+                    console.warn('[Jornadas 2.0] Error sincronizando normalización en Firestore:', e);
+                }
+            }
+            console.log(`[Jornadas 2.0] ✅ ${modifiedJornadas.length} jornadas sincronizadas en Firestore con nombres unificados y (f) minúscula.`);
         }
     }
 
@@ -142,15 +177,15 @@ class Jornadas2AppController {
     populateTeamsCache() {
         const teams = new Set();
         const commonTeams = [
-            'Real Madrid', 'FC Barcelona', 'Atlético de Madrid', 'Villarreal', 'Real Betis',
-            'Celta de Vigo', 'Real Sociedad', 'Getafe', 'Athletic Club', 'Valencia',
-            'Sevilla', 'Rayo Vallecano', 'Osasuna', 'Espanyol', 'Alavés', 'Levante',
-            'Elche', 'Racing de Santander', 'Deportivo de La Coruña', 'Málaga',
-            'Real Oviedo', 'RCD Mallorca', 'Girona FC', 'UD Almería', 'UD Las Palmas',
-            'CD Castellón', 'Burgos CF', 'SD Eibar', 'Córdoba CF', 'Sporting de Gijón',
-            'AD Ceuta', 'Albacete Balompié', 'FC Andorra', 'Granada CF', 'Real Sociedad B',
-            'CD Leganés', 'Real Valladolid', 'Cádiz CF', 'CD Tenerife', 'Eldense',
-            'Real Zaragoza', 'Mirandés', 'FC Cartagena', 'Racing de Ferrol', 'SD Huesca'
+            'Real Madrid', 'Barcelona', 'Atlético de Madrid', 'Villarreal', 'Betis',
+            'Celta', 'Real Sociedad', 'Getafe', 'Athletic Club', 'Valencia',
+            'Sevilla', 'Rayo Vallecano', 'Osasuna', 'RCD Espanyol', 'Alavés', 'Levante',
+            'Elche', 'Racing', 'Deportivo', 'Málaga',
+            'Oviedo', 'Mallorca', 'Girona', 'Almería', 'Las Palmas',
+            'Castellón', 'Burgos', 'Eibar', 'Córdoba', 'Sporting',
+            'Ceuta', 'Albacete', 'Andorra', 'Granada', 'Real Sociedad B',
+            'Leganés', 'Valladolid', 'Cádiz', 'Tenerife', 'Eldense',
+            'Zaragoza', 'Mirandés', 'Huesca', 'Cultural Leonesa'
         ];
 
         commonTeams.forEach(t => teams.add(t));
@@ -158,8 +193,8 @@ class Jornadas2AppController {
         this.jornadas.forEach(j => {
             if (j.matches) {
                 j.matches.forEach(m => {
-                    if (m.home) teams.add(m.home);
-                    if (m.away) teams.add(m.away);
+                    if (m.home) teams.add(window.AppUtils && window.AppUtils.normalizeTeamName ? window.AppUtils.normalizeTeamName(m.home) : m.home);
+                    if (m.away) teams.add(window.AppUtils && window.AppUtils.normalizeTeamName ? window.AppUtils.normalizeTeamName(m.away) : m.away);
                 });
             }
         });
@@ -669,8 +704,8 @@ class Jornadas2AppController {
             const isPleno = idx === 14;
             const isPig = pigInfo && pigInfo.index === idx;
 
-            const home = m ? (m.home || '') : '';
-            const away = m ? (m.away || '') : '';
+            const home = m ? (window.AppUtils && window.AppUtils.normalizeTeamName ? window.AppUtils.normalizeTeamName(m.home) : (m.home || '')) : '';
+            const away = m ? (window.AppUtils && window.AppUtils.normalizeTeamName ? window.AppUtils.normalizeTeamName(m.away) : (m.away || '')) : '';
             const result = m ? (m.result || '').trim().toUpperCase() : '';
 
             const homeLogo = window.AppUtils ? window.AppUtils.getTeamLogo(home) : '';
@@ -1074,6 +1109,9 @@ class Jornadas2AppController {
     }
 
     handleTeamInput(input) {
+        if (input && input.value && /\(\s*F\s*\)/.test(input.value)) {
+            input.value = input.value.replace(/\(\s*F\s*\)/g, '(f)');
+        }
         const row = input.closest('.match-form-row');
         if (!row) return;
 
@@ -1451,8 +1489,8 @@ class Jornadas2AppController {
             date: res.dateStr || 'Por definir',
             active: true,
             matches: res.matches.map(m => ({
-                home: m ? m.home : '',
-                away: m ? m.away : '',
+                home: (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(m ? m.home : '') : (m ? m.home : ''),
+                away: (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(m ? m.away : '') : (m ? m.away : ''),
                 result: ''
             })),
             prizes: {}

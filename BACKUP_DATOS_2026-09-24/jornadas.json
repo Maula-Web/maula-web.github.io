@@ -14,7 +14,7 @@
       },
       {
         "home": "Villarreal",
-        "away": "R. Oviedo",
+        "away": "Oviedo",
         "result": "1"
       },
       {
@@ -43,12 +43,12 @@
         "result": "1"
       },
       {
-        "home": "Espanyol",
-        "away": "At. Madrid",
+        "home": "RCD Espanyol",
+        "away": "Atlético de Madrid",
         "result": "1"
       },
       {
-        "home": "Racing Santander",
+        "home": "Racing",
         "away": "Castellón",
         "result": "1"
       },
@@ -103,7 +103,7 @@
     "number": 11,
     "matches": [
       {
-        "home": "R. Oviedo",
+        "home": "Oviedo",
         "away": "Levante",
         "result": "2"
       },
@@ -134,7 +134,7 @@
       },
       {
         "away": "Betis",
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "result": "2"
       },
       {
@@ -158,14 +158,14 @@
         "result": "1"
       },
       {
-        "home": "R. Zaragoza",
+        "home": "Zaragoza",
         "result": "2",
         "away": "Córdoba"
       },
       {
         "away": "Málaga",
         "result": "1",
-        "home": "Racing Santander"
+        "home": "Racing"
       },
       {
         "result": "1",
@@ -174,7 +174,7 @@
       },
       {
         "result": "1-1",
-        "away": "At. Madrid",
+        "away": "Atlético de Madrid",
         "home": "Celta"
       }
     ],
@@ -224,7 +224,7 @@
       },
       {
         "away": "Osasuna",
-        "home": "At. Madrid",
+        "home": "Atlético de Madrid",
         "result": "1"
       },
       {
@@ -248,7 +248,7 @@
         "away": "Real Madrid"
       },
       {
-        "home": "R. Zaragoza",
+        "home": "Zaragoza",
         "away": "Cultural Leonesa",
         "result": "2"
       },
@@ -268,7 +268,7 @@
         "result": "2"
       },
       {
-        "home": "Racing Santander",
+        "home": "Racing",
         "away": "Deportivo",
         "result": "1"
       },
@@ -300,7 +300,7 @@
         "away": "Oviedo"
       },
       {
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "away": "Elche",
         "result": "1"
       },
@@ -332,7 +332,7 @@
       {
         "result": "2",
         "home": "Betis",
-        "away": "At. Madrid"
+        "away": "Atlético de Madrid"
       },
       {
         "home": "Granada",
@@ -386,7 +386,7 @@
       {
         "away": "Sevilla",
         "result": "1",
-        "home": "At. Madrid"
+        "home": "Atlético de Madrid"
       },
       {
         "away": "Valencia",
@@ -399,7 +399,7 @@
         "result": "2"
       },
       {
-        "away": "Espanyol",
+        "away": "RCD Espanyol",
         "home": "Alavés",
         "result": "1"
       },
@@ -485,7 +485,7 @@
       {
         "result": "1",
         "away": "Valencia",
-        "home": "At. Madrid"
+        "home": "Atlético de Madrid"
       },
       {
         "result": "1",
@@ -499,7 +499,7 @@
       },
       {
         "result": "2",
-        "away": "Espanyol",
+        "away": "RCD Espanyol",
         "home": "Getafe"
       },
       {
@@ -554,7 +554,7 @@
       },
       {
         "away": "Betis",
-        "home": "Rayo V",
+        "home": "Rayo Vallecano",
         "result": "0-0"
       }
     ]
@@ -566,12 +566,12 @@
     "date": "25-01-2026",
     "matches": [
       {
-        "home": "Rayo V",
+        "home": "Rayo Vallecano",
         "result": "2",
         "away": "Osasuna"
       },
       {
-        "away": "Espanyol",
+        "away": "RCD Espanyol",
         "home": "Valencia",
         "result": "1"
       },
@@ -586,7 +586,7 @@
         "away": "Real Madrid"
       },
       {
-        "home": "At. Madrid",
+        "home": "Atlético de Madrid",
         "away": "Mallorca",
         "result": "1"
       },
@@ -685,7 +685,7 @@
       {
         "away": "Barcelona",
         "result": "2",
-        "home": "Espanyol"
+        "home": "RCD Espanyol"
       },
       {
         "away": "Levante",
@@ -739,7 +739,7 @@
       },
       {
         "home": "Real Sociedad",
-        "away": "At. Madrid",
+        "away": "Atlético de Madrid",
         "result": "1-1"
       }
     ],
@@ -766,7 +766,7 @@
       },
       {
         "result": "X",
-        "away": "At. Madrid",
+        "away": "Atlético de Madrid",
         "home": "Levante"
       },
       {
@@ -775,7 +775,7 @@
         "home": "Elche"
       },
       {
-        "away": "Rayo V",
+        "away": "Rayo Vallecano",
         "result": "1",
         "home": "Real Madrid"
       },
@@ -919,7 +919,7 @@
       },
       {
         "home": "Rayo Vallecano",
-        "away": "Atlético De Madrid",
+        "away": "Atlético de Madrid",
         "result": "M-0"
       }
     ],
@@ -975,7 +975,7 @@
       {
         "result": "2",
         "away": "Betis",
-        "home": "Atlético"
+        "home": "Atlético de Madrid"
       },
       {
         "home": "Villarreal",
@@ -1054,7 +1054,7 @@
       {
         "result": "1",
         "away": "RCD Espanyol",
-        "home": "Atlético"
+        "home": "Atlético de Madrid"
       },
       {
         "result": "2",
@@ -1142,7 +1142,7 @@
         "home": "Mallorca"
       },
       {
-        "away": "Atlético",
+        "away": "Atlético de Madrid",
         "home": "Oviedo",
         "result": "2"
       },
@@ -1232,7 +1232,7 @@
       },
       {
         "away": "Real Sociedad",
-        "home": "Atlético",
+        "home": "Atlético de Madrid",
         "result": "1"
       },
       {
@@ -1314,7 +1314,7 @@
       {
         "away": "Getafe",
         "result": "1",
-        "home": "Atlético"
+        "home": "Atlético de Madrid"
       },
       {
         "result": "1",
@@ -1475,7 +1475,7 @@
       {
         "result": "M-2",
         "home": "Real Madrid",
-        "away": "Atlético De Madrid"
+        "away": "Atlético de Madrid"
       }
     ],
     "prizes": {
@@ -1567,7 +1567,7 @@
       {
         "away": "Barcelona",
         "result": "1-2",
-        "home": "Atlético"
+        "home": "Atlético de Madrid"
       }
     ],
     "id": 1774371213758,
@@ -1625,7 +1625,7 @@
         "away": "RCD Espanyol"
       },
       {
-        "away": "Atlético",
+        "away": "Atlético de Madrid",
         "position": 5,
         "home": "Sevilla",
         "result": "1"
@@ -1732,7 +1732,7 @@
       },
       {
         "result": "1",
-        "home": "Atlético",
+        "home": "Atlético de Madrid",
         "away": "Athletic Club"
       },
       {
@@ -1816,7 +1816,7 @@
       },
       {
         "result": "2",
-        "home": "Atlético",
+        "home": "Atlético de Madrid",
         "away": "Celta"
       },
       {
@@ -1906,7 +1906,7 @@
       },
       {
         "result": "2",
-        "away": "Atlético",
+        "away": "Atlético de Madrid",
         "home": "Valencia"
       },
       {
@@ -2000,7 +2000,7 @@
       },
       {
         "away": "Girona",
-        "home": "Atlético",
+        "home": "Atlético de Madrid",
         "result": "1"
       },
       {
@@ -2117,7 +2117,7 @@
       },
       {
         "result": "1",
-        "away": "Atlético",
+        "away": "Atlético de Madrid",
         "home": "Villarreal"
       },
       {
@@ -2198,7 +2198,7 @@
       {
         "away": "Levante",
         "result": "1",
-        "home": "Espanyol"
+        "home": "RCD Espanyol"
       },
       {
         "home": "Celta",
@@ -2213,10 +2213,10 @@
       {
         "result": "X",
         "away": "Celta B",
-        "home": "Cádiz Cf"
+        "home": "Cádiz"
       },
       {
-        "away": "Granada Cf",
+        "away": "Granada",
         "result": "X",
         "home": "Oviedo"
       },
@@ -2233,27 +2233,27 @@
       {
         "result": "1",
         "home": "Burgos",
-        "away": "Córdoba Cf"
+        "away": "Córdoba"
       },
       {
         "result": "X",
-        "home": "Girona Fc",
-        "away": "Leganes"
+        "home": "Girona",
+        "away": "Leganés"
       },
       {
         "home": "Las Palmas",
-        "away": "Albacete Balompié",
+        "away": "Albacete",
         "result": "1"
       },
       {
         "away": "Sabadell",
         "result": "X",
-        "home": "Sporting De Gijón"
+        "home": "Sporting"
       },
       {
         "away": "Elche",
         "result": "1-1",
-        "home": "Deportivo De La Coruña"
+        "home": "Deportivo"
       }
     ],
     "id": 1785869755970,
@@ -2277,7 +2277,7 @@
       },
       {
         "away": "Real Madrid",
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "result": "2"
       },
       {
@@ -2296,12 +2296,12 @@
         "home": "Osasuna"
       },
       {
-        "away": "Deportivo De La Coruña",
-        "home": "Mala",
+        "away": "Deportivo",
+        "home": "Málaga",
         "result": "X"
       },
       {
-        "away": "Leganes",
+        "away": "Leganés",
         "home": "Oviedo",
         "result": "2"
       },
@@ -2312,7 +2312,7 @@
       },
       {
         "result": "X",
-        "away": "Cádiz Cf",
+        "away": "Cádiz",
         "home": "Eldense"
       },
       {
@@ -2328,7 +2328,7 @@
       {
         "result": "1",
         "away": "Burgos",
-        "home": "Sporting De Gijón"
+        "home": "Sporting"
       },
       {
         "result": "1",
@@ -2336,7 +2336,7 @@
         "away": "Almería"
       },
       {
-        "home": "Atlético De Madrid",
+        "home": "Atlético de Madrid",
         "away": "Villarreal",
         "result": "2-2"
       }
@@ -2362,13 +2362,13 @@
         "result": "1"
       },
       {
-        "away": "Espanyol",
+        "away": "RCD Espanyol",
         "home": "Real Sociedad",
         "result": "1"
       },
       {
         "result": "2",
-        "away": "Atlético De Madrid",
+        "away": "Atlético de Madrid",
         "home": "Sevilla"
       },
       {
@@ -2378,7 +2378,7 @@
       },
       {
         "away": "Valencia",
-        "home": "Deportivo De La Coruña",
+        "home": "Deportivo",
         "result": "1"
       },
       {
@@ -2392,19 +2392,19 @@
         "result": "1"
       },
       {
-        "home": "Albacete Balompié",
+        "home": "Albacete",
         "away": "Oviedo",
         "result": "2"
       },
       {
-        "home": "Cádiz Cf",
+        "home": "Cádiz",
         "result": "X",
         "away": "Valladolid"
       },
       {
-        "away": "Granada Cf",
+        "away": "Granada",
         "result": "2",
-        "home": "Córdoba Cf"
+        "home": "Córdoba"
       },
       {
         "result": "1",
@@ -2412,7 +2412,7 @@
         "home": "Athletic Club (f)"
       },
       {
-        "away": "Espanyol (F)",
+        "away": "RCD Espanyol (f)",
         "result": "1",
         "home": "Eibar (f)"
       },
@@ -2423,8 +2423,8 @@
       },
       {
         "result": "1",
-        "away": "Atlético De Madrid (F)",
-        "home": "Real Madrid (F)"
+        "away": "Atlético de Madrid (f)",
+        "home": "Real Madrid (f)"
       },
       {
         "away": "Rayo Vallecano",
@@ -2463,17 +2463,17 @@
     "matches": [
       {
         "result": "1",
-        "away": "Atlético De Madrid",
+        "away": "Atlético de Madrid",
         "home": "Athletic Club"
       },
       {
         "home": "Rayo Vallecano",
         "result": "1",
-        "away": "Racing Santander"
+        "away": "Racing"
       },
       {
         "home": "Villarreal",
-        "away": "Deportivo De La Coruña",
+        "away": "Deportivo",
         "result": "2"
       },
       {
@@ -2492,38 +2492,38 @@
         "result": "X"
       },
       {
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "away": "Sevilla",
         "result": "X"
       },
       {
         "result": "X",
         "away": "Tenerife",
-        "home": "Real Sociedad B."
+        "home": "Real Sociedad B"
       },
       {
-        "away": "Girona Fc",
+        "away": "Girona",
         "result": "2",
-        "home": "Sporting De Gijón"
+        "home": "Sporting"
       },
       {
-        "away": "Cádiz Cf",
+        "away": "Cádiz",
         "home": "Almería",
         "result": "1"
       },
       {
         "result": "2",
-        "away": "Barcelona (F)",
+        "away": "Barcelona (f)",
         "home": "Sevilla (f)"
       },
       {
-        "away": "Athletic (F)",
+        "away": "Athletic Club (f)",
         "result": "2",
         "home": "Logroño (f)"
       },
       {
         "result": "1",
-        "home": "Atlético De Madrid (f)",
+        "home": "Atlético de Madrid (f)",
         "away": "Alavés (f)"
       },
       {
@@ -2562,7 +2562,7 @@
         "result": "2"
       },
       {
-        "away": "Espanyol",
+        "away": "RCD Espanyol",
         "result": "2",
         "home": "Osasuna"
       },
@@ -2589,7 +2589,7 @@
       {
         "away": "Las Palmas",
         "result": "2",
-        "home": "Cádiz Cf"
+        "home": "Cádiz"
       },
       {
         "away": "Leganés",
@@ -2603,22 +2603,22 @@
       },
       {
         "result": "1",
-        "away": "Granada (F)",
-        "home": "Alavés (F)"
+        "away": "Granada (f)",
+        "home": "Alavés (f)"
       },
       {
         "home": "Logroño (f)",
         "result": "1",
-        "away": "Valencia (F)"
+        "away": "Valencia (f)"
       },
       {
-        "away": "Badalona (F)",
-        "home": "Eibar (F)",
+        "away": "Badalona (f)",
+        "home": "Eibar (f)",
         "result": "2"
       },
       {
-        "home": "Madrid CFF (F)",
-        "away": "Sevilla (F)",
+        "home": "Madrid CFF (f)",
+        "away": "Sevilla (f)",
         "result": "1"
       },
       {
@@ -2661,7 +2661,7 @@
         "away": "Betis",
         "score": "",
         "result": "X",
-        "home": "Deportivo De La Coruña"
+        "home": "Deportivo"
       },
       {
         "result": "1",
@@ -2679,7 +2679,7 @@
         "result": "2",
         "score": "",
         "home": "Andorra",
-        "away": "Sporting De Gijón"
+        "away": "Sporting"
       },
       {
         "result": "1",
@@ -2696,12 +2696,12 @@
       {
         "result": "1",
         "away": "Logroño (f)",
-        "home": "Atlético De Madrid (f)",
+        "home": "Atlético de Madrid (f)",
         "score": ""
       },
       {
         "result": "1",
-        "away": "Athletic Club (F)",
+        "away": "Athletic Club (f)",
         "home": "Eibar (f)",
         "score": ""
       },
@@ -2713,7 +2713,7 @@
       },
       {
         "result": "2",
-        "home": "Tenerife (F)",
+        "home": "Tenerife (f)",
         "away": "Sevilla (f)",
         "score": ""
       },
@@ -2765,11 +2765,11 @@
       },
       {
         "away": "Levante",
-        "home": "At. Madrid",
+        "home": "Atlético de Madrid",
         "result": "1"
       },
       {
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "result": "2",
         "away": "Villarreal"
       },
@@ -2824,7 +2824,7 @@
         "home": "Cádiz"
       },
       {
-        "home": "Rayo V",
+        "home": "Rayo Vallecano",
         "away": "Real Madrid",
         "result": "0-0"
       }
@@ -2852,7 +2852,7 @@
       },
       {
         "result": "X",
-        "home": "At. Madrid",
+        "home": "Atlético de Madrid",
         "away": "Elche"
       },
       {
@@ -2868,7 +2868,7 @@
       {
         "result": "X",
         "home": "Real Sociedad",
-        "away": "Espanyol"
+        "away": "RCD Espanyol"
       },
       {
         "result": "1",
@@ -2878,7 +2878,7 @@
       {
         "result": "2",
         "away": "Real Madrid",
-        "home": "R. Oviedo"
+        "home": "Oviedo"
       },
       {
         "result": "1",
@@ -2897,7 +2897,7 @@
       },
       {
         "away": "Andorra",
-        "home": "R. Zaragoza",
+        "home": "Zaragoza",
         "result": "2"
       },
       {
@@ -2912,7 +2912,7 @@
       },
       {
         "result": "2",
-        "away": "Racing Santander",
+        "away": "Racing",
         "home": "Albacete"
       },
       {
@@ -2951,7 +2951,7 @@
         "home": "Villarreal"
       },
       {
-        "away": "Rayo V",
+        "away": "Rayo Vallecano",
         "home": "Oviedo",
         "result": "X"
       },
@@ -2961,7 +2961,7 @@
         "result": "X"
       },
       {
-        "away": "At. Madrid",
+        "away": "Atlético de Madrid",
         "home": "Getafe",
         "result": "2"
       },
@@ -3001,7 +3001,7 @@
         "result": "1"
       },
       {
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "away": "Sevilla",
         "result": "2-1"
       }
@@ -3042,7 +3042,7 @@
       {
         "away": "Oviedo",
         "result": "1",
-        "home": "At. Madrid"
+        "home": "Atlético de Madrid"
       },
       {
         "result": "2",
@@ -3057,7 +3057,7 @@
       {
         "home": "Celta",
         "result": "2",
-        "away": "Espanyol"
+        "away": "RCD Espanyol"
       },
       {
         "home": "Girona",
@@ -3081,7 +3081,7 @@
       },
       {
         "home": "Zaragoza",
-        "away": "Leganes",
+        "away": "Leganés",
         "result": "1"
       },
       {
@@ -3096,7 +3096,7 @@
       },
       {
         "away": "Valencia",
-        "home": "Rayo V",
+        "home": "Rayo Vallecano",
         "result": "1-1"
       }
     ],
@@ -3141,9 +3141,9 @@
         "home": "Valencia"
       },
       {
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "result": "1",
-        "away": "Rayo V"
+        "away": "Rayo Vallecano"
       },
       {
         "result": "2",
@@ -3186,7 +3186,7 @@
         "result": "X"
       },
       {
-        "away": "At. Madrid",
+        "away": "Atlético de Madrid",
         "result": "1-0",
         "home": "Athletic Club"
       }
@@ -3209,12 +3209,12 @@
       {
         "result": "X",
         "home": "Alavés",
-        "away": "At. Madrid"
+        "away": "Atlético de Madrid"
       },
       {
         "result": "1",
         "away": "Real Sociedad",
-        "home": "R. Oviedo"
+        "home": "Oviedo"
       },
       {
         "result": "2",
@@ -3238,13 +3238,13 @@
       },
       {
         "away": "Osasuna",
-        "home": "Espanyol",
+        "home": "RCD Espanyol",
         "result": "1"
       },
       {
         "away": "Ceuta",
         "result": "1",
-        "home": "Racing Santander"
+        "home": "Racing"
       },
       {
         "result": "X",
@@ -3320,7 +3320,7 @@
       {
         "home": "Girona",
         "result": "2",
-        "away": "At. Madrid"
+        "away": "Atlético de Madrid"
       },
       {
         "away": "Barcelona",
@@ -3369,7 +3369,7 @@
       },
       {
         "home": "Athletic Club",
-        "away": "Espanyol",
+        "away": "RCD Espanyol",
         "result": "1-2"
       }
     ],
@@ -3425,7 +3425,7 @@
       {
         "result": "X",
         "home": "Levante",
-        "away": "Espanyol"
+        "away": "RCD Espanyol"
       },
       {
         "home": "Cádiz",
@@ -3465,7 +3465,7 @@
       {
         "result": "2-1",
         "away": "Mallorca",
-        "home": "Rayo V"
+        "home": "Rayo Vallecano"
       }
     ],
     "active": true,
@@ -3494,7 +3494,7 @@
         "result": "1"
       },
       {
-        "away": "Rayo V",
+        "away": "Rayo Vallecano",
         "home": "Celta",
         "result": "1"
       },
@@ -3514,7 +3514,7 @@
         "home": "Osasuna"
       },
       {
-        "home": "At. Madrid",
+        "home": "Atlético de Madrid",
         "result": "1",
         "away": "Alavés"
       },
@@ -3592,7 +3592,7 @@
       {
         "away": "Villarreal",
         "result": "1",
-        "home": "At. Madrid"
+        "home": "Atlético de Madrid"
       },
       {
         "result": "1",
@@ -3652,7 +3652,7 @@
       {
         "away": "Valencia",
         "result": "M-2",
-        "home": "Espanyol"
+        "home": "RCD Espanyol"
       }
     ],
     "active": true,
@@ -3693,7 +3693,7 @@
         "away": "Real Sociedad"
       },
       {
-        "away": "R. Oviedo",
+        "away": "Oviedo",
         "home": "Elche",
         "result": "1"
       },
@@ -3704,7 +3704,7 @@
       },
       {
         "home": "Mallorca",
-        "away": "At. Madrid",
+        "away": "Atlético de Madrid",
         "result": "X"
       },
       {
@@ -3714,7 +3714,7 @@
       },
       {
         "result": "1",
-        "away": "Espanyol",
+        "away": "RCD Espanyol",
         "home": "Real Madrid"
       },
       {
@@ -3811,7 +3811,7 @@
         "home": "Barcelona"
       },
       {
-        "away": "R. Oviedo",
+        "away": "Oviedo",
         "result": "1",
         "home": "Valencia"
       },
@@ -3822,7 +3822,7 @@
       },
       {
         "result": "2",
-        "home": "Racing Santander",
+        "home": "Racing",
         "away": "Andorra"
       },
       {
@@ -3846,7 +3846,7 @@
         "home": "Sporting"
       },
       {
-        "home": "At. Madrid",
+        "home": "Atlético de Madrid",
         "away": "Real Madrid",
         "result": "M-2"
       }

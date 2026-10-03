@@ -298,6 +298,17 @@ class DataService {
 
             // Filter jornadas by active season
             const seasonJornadas = (allJornadas || []).filter(j => j.season === activeSeason);
+            // Normalizar nombres de equipos y forzar (f) minúscula en todas las jornadas
+            if (window.AppUtils && window.AppUtils.normalizeTeamName) {
+                (allJornadas || []).forEach(j => {
+                    if (j.matches && Array.isArray(j.matches)) {
+                        j.matches.forEach(m => {
+                            if (m.home) m.home = window.AppUtils.normalizeTeamName(m.home);
+                            if (m.away) m.away = window.AppUtils.normalizeTeamName(m.away);
+                        });
+                    }
+                });
+            }
 
             return {
                 members: sortedMembers,

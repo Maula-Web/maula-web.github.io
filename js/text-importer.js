@@ -316,14 +316,14 @@ class TextImporterService {
                 if (l.includes(' - ') || l.includes(' vs ') || l.includes(' – ') || l.includes(' — ')) {
                     const delim = l.includes(' - ') ? ' - ' : (l.includes(' vs ') ? ' vs ' : (l.includes(' – ') ? ' – ' : ' — '));
                     const parts = l.split(delim);
-                    // Eliminar (m) masculino y normalizar (F) femenino
+                    // Eliminar (m) masculino y normalizar (f) femenino
                     home = parts[0]
                         .replace(/\s*\(\s*m\s*\)/gi, '')
-                        .replace(/\s*\(\s*f(?:em)?\s*\)/gi, ' (F)')
+                        .replace(/\s*\(\s*f(?:em)?\s*\)/gi, ' (f)')
                         .trim();
                     away = parts[1]
                         .replace(/\s*\(\s*m\s*\)/gi, '')
-                        .replace(/\s*\(\s*f(?:em)?\s*\)/gi, ' (F)')
+                        .replace(/\s*\(\s*f(?:em)?\s*\)/gi, ' (f)')
                         .trim();
                     break;
                 }

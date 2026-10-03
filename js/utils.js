@@ -368,7 +368,7 @@ var AppUtils = window.AppUtils || {
     /**
      * Unifies and standardizes a team name:
      * - Normalizes common abbreviations (R.Madrid -> Real Madrid, At.Madrid -> Atlético, etc.)
-     * - Standardizes female teams to always end with " (F)"
+     * - Standardizes female teams to always end with " (f)"
      */
     normalizeTeamName(name) {
         if (!name) return '';
@@ -394,29 +394,45 @@ var AppUtils = window.AppUtils || {
             'RSociedad': 'Real Sociedad',
             'R. Sociedad': 'Real Sociedad',
             'R.Sociedad': 'Real Sociedad',
-            'R Zaragoza': 'Real Zaragoza',
-            'RZaragoza': 'Real Zaragoza',
-            'R Oviedo': 'Real Oviedo',
-            'ROviedo': 'Real Oviedo',
+            'R Zaragoza': 'Zaragoza',
+            'RZaragoza': 'Zaragoza',
+            'R. Zaragoza': 'Zaragoza',
+            'R.Zaragoza': 'Zaragoza',
+            'Real Zaragoza': 'Zaragoza',
+            'R Oviedo': 'Oviedo',
+            'ROviedo': 'Oviedo',
+            'R. Oviedo': 'Oviedo',
+            'R.Oviedo': 'Oviedo',
+            'Real Oviedo': 'Oviedo',
             'R Racing': 'Racing',
+            'Racing Santander': 'Racing',
+            'Racing de Santander': 'Racing',
             'R Sporting': 'Sporting',
             'RSporting': 'Sporting',
             'R. Sporting': 'Sporting',
             'R.Sporting': 'Sporting',
-            'At Madrid': 'Atlético',
-            'AtMadrid': 'Atlético',
-            'At. Madrid': 'Atlético',
-            'At.Madrid': 'Atlético',
-            'Atlético de Madrid': 'Atlético',
-            'Atletico de Madrid': 'Atlético',
-            'Atlético Madrid': 'Atlético',
-            'Atletico Madrid': 'Atlético',
+            'Real Sporting': 'Sporting',
+            'Sporting De Gijón': 'Sporting',
+            'Sporting de Gijón': 'Sporting',
+            'Sporting Gijón': 'Sporting',
+            'At Madrid': 'Atlético de Madrid',
+            'AtMadrid': 'Atlético de Madrid',
+            'At. Madrid': 'Atlético de Madrid',
+            'At.Madrid': 'Atlético de Madrid',
+            'Atlético': 'Atlético de Madrid',
+            'Atletico': 'Atlético de Madrid',
+            'Atlético de Madrid': 'Atlético de Madrid',
+            'Atletico de Madrid': 'Atlético de Madrid',
+            'Atlético De Madrid': 'Atlético de Madrid',
+            'Atlético Madrid': 'Atlético de Madrid',
+            'Atletico Madrid': 'Atlético de Madrid',
             'FC Barcelona': 'Barcelona',
             'F.C. Barcelona': 'Barcelona',
             'Barça': 'Barcelona',
             'Barca': 'Barcelona',
             'Rayo V': 'Rayo Vallecano',
             'RayoV': 'Rayo Vallecano',
+            'Rayo': 'Rayo Vallecano',
             'Espanyol': 'RCD Espanyol',
             'Athletic': 'Athletic Club',
             'Ath Club': 'Athletic Club',
@@ -424,16 +440,38 @@ var AppUtils = window.AppUtils || {
             'Castellon': 'Castellón',
             'Alaves': 'Alavés',
             'Malaga': 'Málaga',
+            'Mala': 'Málaga',
             'Cadiz': 'Cádiz',
+            'Cadiz Cf': 'Cádiz',
+            'Cádiz Cf': 'Cádiz',
+            'Cádiz CF': 'Cádiz',
             'Cordoba': 'Córdoba',
+            'Cordoba Cf': 'Córdoba',
+            'Córdoba Cf': 'Córdoba',
+            'Córdoba CF': 'Córdoba',
+            'Albacete Balompié': 'Albacete',
+            'Girona Fc': 'Girona',
+            'Girona FC': 'Girona',
+            'Granada Cf': 'Granada',
+            'Granada CF': 'Granada',
+            'Leganes': 'Leganés',
             'La Coruña': 'Deportivo',
-            'Elda': 'Eldense'
+            'Deportivo De La Coruña': 'Deportivo',
+            'Deportivo de La Coruña': 'Deportivo',
+            'Elda': 'Eldense',
+            'Real Sociedad B.': 'Real Sociedad B',
+            'Celta Fortuna': 'Celta B',
+            'Badalona': 'Badalona',
+            'Levante Badalona': 'Badalona',
+            'Madrid Cff': 'Madrid CFF',
+            'Madrid C.F.F.': 'Madrid CFF',
+            'Dux Logroño': 'Logroño'
         };
 
         const cleanBase = base.replace(/\./g, ' ').replace(/\s+/g, ' ').trim();
         let mapped = map[base] || map[cleanBase] || base;
 
-        return female ? `${mapped} (F)` : mapped;
+        return female ? `${mapped} (f)` : mapped;
     },
 
     /**
