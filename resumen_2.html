@@ -894,7 +894,7 @@
              ===================================================================== -->
         <div id="view-container-dobles" class="space-y-3 hidden">
             <!-- Bento superior de impacto de dobles -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div class="glass-panel p-4 flex items-center gap-3">
                     <span class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-600 dark:text-purple-400 text-2xl flex items-center justify-center font-black">
                         🎲
@@ -922,6 +922,15 @@
                         <strong class="text-xl sm:text-2xl font-black font-mono text-amber-600 dark:text-amber-400" id="dobles-stat-ventaja">+-- aciertos</strong>
                     </div>
                 </div>
+                <div class="glass-panel p-4 flex items-center gap-3">
+                    <span class="w-12 h-12 rounded-2xl bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400 text-2xl flex items-center justify-center font-black">
+                        💰
+                    </span>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-500 block">Premios Dobles</span>
+                        <strong class="text-xl sm:text-2xl font-black font-mono text-fuchsia-600 dark:text-fuchsia-400" id="dobles-stat-premios">0,00 €</strong>
+                    </div>
+                </div>
             </div>
 
             <!-- Tabla de Quinielas de Dobles -->
@@ -945,6 +954,7 @@
                                 <th class="py-2.5 px-3">Socio Responsable</th>
                                 <th class="py-2.5 px-3 text-center">Aciertos Dobles</th>
                                 <th class="py-2.5 px-3 text-center">Ventaja vs Sencilla</th>
+                                <th class="py-2.5 px-3 text-center">Premio Bote</th>
                                 <th class="py-2.5 px-3">Pronósticos Reducidos</th>
                             </tr>
                         </thead>
@@ -1139,6 +1149,79 @@
             /**
              * Calcula las estadísticas completas de la temporada
              */
+            // Calcular importe total y detalle de premios conseguidos por quinielas de dobles
+            calculateDoublesPrizes() {
+                let totalDobles = 0;
+                let countPremios = 0;
+                const doblesMap = new Map(); // jId/jNum -> { amount, breakdown, ev }
+
+                if (!this.pronosticosExtra || !Array.isArray(this.pronosticosExtra) || this.pronosticosExtra.length === 0) {
+                    return { total: 0, count: 0, map: doblesMap };
+                }
+
+                (this.jornadas || []).forEach(jornada => {
+                    if (!jornada || !jornada.matches) return;
+                    const doublesForecasts = this.pronosticosExtra.filter(p => {
+                        const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+                        return pJ === String(jornada.id) || pJ === String(jornada.number);
+                    });
+
+                    if (doublesForecasts.length > 0) {
+                        const officialResults = jornada.matches.map(m => m.result);
+                        doublesForecasts.forEach(df => {
+                            const selection = df.selection || df.forecast || [];
+                            const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+                            const isReduced = df.isReduced || (doubleCount === 7);
+                            const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
+                            const ev = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced }) : null;
+                            const prizesMap = jornada.prizes || jornada.prizeRates || {};
+
+                            let extraPrizeAmount = 0;
+                            let hasPrize = false;
+
+                            if (ev && ev.breakdown) {
+                                Object.keys(ev.breakdown).forEach(h => {
+                                    const count = ev.breakdown[h];
+                                    let pVal = prizesMap[h] || prizesMap[String(h)] || 0;
+                                    if (typeof pVal === 'string') {
+                                        pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                                    }
+                                    if (count > 0 && pVal > 0) {
+                                        extraPrizeAmount += count * parseFloat(pVal);
+                                        hasPrize = true;
+                                    }
+                                });
+                            } else if (ev) {
+                                const cat = ev.officialHits !== undefined ? ev.officialHits : ev.hits;
+                                let actualMinHits = jornada.minHitsToWin || 10;
+                                if (prizesMap && Object.keys(prizesMap).length > 0) {
+                                    actualMinHits = Math.min(...Object.keys(prizesMap).map(Number));
+                                }
+                                if (cat >= actualMinHits) {
+                                    let pVal = prizesMap[cat] || prizesMap[String(cat)] || 0;
+                                    if (typeof pVal === 'string') {
+                                        pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                                    }
+                                    if (pVal > 0) {
+                                        extraPrizeAmount += parseFloat(pVal);
+                                        hasPrize = true;
+                                    }
+                                }
+                            }
+
+                            if (hasPrize && extraPrizeAmount > 0) {
+                                totalDobles += extraPrizeAmount;
+                                countPremios++;
+                                doblesMap.set(String(jornada.id), { amount: extraPrizeAmount, ev, df });
+                                doblesMap.set(String(jornada.number), { amount: extraPrizeAmount, ev, df });
+                            }
+                        });
+                    }
+                });
+
+                return { total: totalDobles, count: countPremios, map: doblesMap };
+            }
+
             calculateAllStats() {
                 // 1. Inicializar estructura de socios
                 this.memberStats = {};
@@ -1309,6 +1392,43 @@
                     const jPctAcierto = jPronosCount > 0 ? ((jHitsTotal / (jPronosCount * 14)) * 100) : 0;
                     const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
+                    // Incluir premios de dobles de esta jornada si los hubiere
+                    let jDoblesPrize = 0;
+                    if (this.pronosticosExtra && Array.isArray(this.pronosticosExtra)) {
+                        const dfList = this.pronosticosExtra.filter(p => {
+                            const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+                            return pJ === String(j.id) || pJ === String(j.number);
+                        });
+                        if (dfList.length > 0 && j.matches) {
+                            const offRes = j.matches.map(m => m.result);
+                            dfList.forEach(df => {
+                                const sel = df.selection || df.forecast || [];
+                                const dCount = sel.filter((s, i) => i < 14 && s && s.length > 1).length;
+                                const isRed = df.isReduced || (dCount === 7);
+                                const jD = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
+                                const evD = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(sel, offRes, jD, { isReduced: isRed }) : null;
+                                const pMap = j.prizes || j.prizeRates || {};
+                                if (evD && evD.breakdown) {
+                                    Object.keys(evD.breakdown).forEach(h => {
+                                        const cnt = evD.breakdown[h];
+                                        let pV = pMap[h] || pMap[String(h)] || 0;
+                                        if (typeof pV === 'string') pV = parseFloat(pV.replace(',', '.').replace('€', '').trim());
+                                        if (cnt > 0 && pV > 0) jDoblesPrize += cnt * parseFloat(pV);
+                                    });
+                                } else if (evD) {
+                                    const cat = evD.officialHits !== undefined ? evD.officialHits : evD.hits;
+                                    let minH = j.minHitsToWin || 10;
+                                    if (pMap && Object.keys(pMap).length > 0) minH = Math.min(...Object.keys(pMap).map(Number));
+                                    if (cat >= minH) {
+                                        let pV = pMap[cat] || pMap[String(cat)] || 0;
+                                        if (typeof pV === 'string') pV = parseFloat(pV.replace(',', '.').replace('€', '').trim());
+                                        if (pV > 0) jDoblesPrize += parseFloat(pV);
+                                    }
+                                }
+                            });
+                        }
+                    }
+
                     this.jornadaPerformance.push({
                         jornada: j,
                         number: j.number,
@@ -1317,7 +1437,7 @@
                         pronosCount: jPronosCount,
                         avgHits: jAvgHits,
                         pctAcierto: jPctAcierto,
-                        prizesTotal: jPrizesTotal,
+                        prizesTotal: jPrizesTotal + jDoblesPrize,
                         bestMember: jBestMember,
                         hasPig: hasPig
                     });
@@ -1378,13 +1498,25 @@
                 document.getElementById('kpi-jornada-bombazo').textContent = bestRecord.jNum > 0 ? `Jornada ${bestRecord.jNum}` : 'Récord histórico';
                 document.getElementById('kpi-puntos-bombazo').textContent = bestRecord.hits >= 14 ? '+30 bonus' : (bestRecord.hits === 13 ? '+15 bonus' : '+10 bonus');
 
-                // KPI 3: Bote Total en Metálico
-                const premMoney = this.formatMoney(totalPrizes);
+                // KPI 3: Bote Total en Metálico (Socios + Quiniela de Dobles)
+                const doblesPrizesInfo = this.calculateDoublesPrizes();
+                const totalDoblesPrize = doblesPrizesInfo.total;
+                const grandTotalPremios = totalPrizes + totalDoblesPrize;
+
+                document.getElementById('header-stat-premios').textContent = this.formatMoney(grandTotalPremios);
+
+                const premMoney = this.formatMoney(grandTotalPremios);
                 document.getElementById('kpi-val-premios').textContent = premMoney;
                 const kpiPremComp = document.getElementById('kpi-val-premios-compact');
                 if (kpiPremComp) kpiPremComp.textContent = premMoney;
-                document.getElementById('kpi-socio-premios').textContent = maxPrizeSocio.amount > 0 ? `Líder: ${maxPrizeSocio.name}` : 'Sin premios oficiales aún';
-                document.getElementById('kpi-max-premio').textContent = maxPrizeSocio.amount > 0 ? `Máx: ${this.formatMoney(maxPrizeSocio.amount)}` : '0,00 €';
+
+                const socioSubText = totalDoblesPrize > 0
+                    ? `Socios: ${this.formatMoney(totalPrizes)} • Dobles: ${this.formatMoney(totalDoblesPrize)}`
+                    : (maxPrizeSocio.amount > 0 ? `Líder: ${maxPrizeSocio.name}` : 'Sin premios oficiales aún');
+                document.getElementById('kpi-socio-premios').textContent = socioSubText;
+
+                const maxPremioText = maxPrizeSocio.amount > 0 ? `Máx: ${this.formatMoney(maxPrizeSocio.amount)}` : '0,00 €';
+                document.getElementById('kpi-max-premio').textContent = maxPremioText;
 
                 // KPI 4: Míster Fiabilidad
                 const fiableName = bestRegularidad.name || 'Sin datos';
@@ -2123,6 +2255,14 @@
                     }
                 });
 
+                const doblesPrizesInfo = this.calculateDoublesPrizes();
+                const doblesPrizesMap = doblesPrizesInfo.map;
+
+                doblesList.forEach(d => {
+                    const pInfo = doblesPrizesMap.get(String(d.jNum)) || doblesPrizesMap.get(String(d.jId));
+                    d.prize = pInfo ? pInfo.amount : 0;
+                });
+
                 doblesList.sort((a, b) => b.jNum - a.jNum);
 
                 const count = doblesList.length;
@@ -2131,15 +2271,18 @@
                 document.getElementById('dobles-stat-media').textContent = `${mediaDobles} / 14`;
                 const mediaVentaja = count > 0 ? (totalVentaja / count).toFixed(1) : '0.0';
                 document.getElementById('dobles-stat-ventaja').textContent = `+${mediaVentaja} aciertos`;
+                const doblesStatPremiosEl = document.getElementById('dobles-stat-premios');
+                if (doblesStatPremiosEl) doblesStatPremiosEl.textContent = this.formatMoney(doblesPrizesInfo.total);
 
                 if (count === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 font-sans">Aún no se han disputado quinielas de dobles esta temporada.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 font-sans">Aún no se han disputado quinielas de dobles esta temporada.</td></tr>`;
                     return;
                 }
 
                 tbody.innerHTML = doblesList.map(d => {
                     const badgeColor = d.hits >= 12 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : (d.hits >= 10 ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400');
                     const diffColor = d.diff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400';
+                    const prizeBadge = d.prize > 0 ? `<span class="px-2 py-0.5 rounded-full text-xs font-black bg-purple-500/20 text-purple-600 dark:text-purple-400">${this.formatMoney(d.prize)}</span>` : '<span class="text-slate-400">-</span>';
 
                     return `
                         <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40">
@@ -2154,6 +2297,9 @@
                             </td>
                             <td class="py-2.5 px-3 text-center font-bold ${diffColor}">
                                 ${d.diff >= 0 ? '+' : ''}${d.diff.toFixed(1)} vs sencilla
+                            </td>
+                            <td class="py-2.5 px-3 text-center font-mono font-bold">
+                                ${prizeBadge}
                             </td>
                             <td class="py-2.5 px-3 font-mono text-[11px] text-slate-500 dark:text-slate-400 max-w-xs truncate" title="${d.selection.join(', ')}">
                                 ${d.selection.slice(0, 14).join(', ')}
@@ -2483,7 +2629,7 @@
                                     <span class="text-xs font-mono font-black text-purple-600 dark:text-purple-400">Botes LAE</span>
                                 </div>
                                 <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed">
-                                    Dinero en metálico ganado en botes oficiales de Loterías y Apuestas del Estado y repartido a los socios.
+                                    Dinero en metálico acumulado en botes oficiales de Loterías y Apuestas del Estado (tanto por las quinielas individuales de los socios como por las quinielas de dobles).
                                 </p>
                                 <div class="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono">
                                     <span>Notación española estricta (puntos de millar y coma decimal).</span>
