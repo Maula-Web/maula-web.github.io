@@ -260,25 +260,27 @@ class Jornadas2AppController {
     renderHubControls() {
         const official = this.getOfficialJornadas();
         const dropdown = document.getElementById('jornada-select-dropdown');
+        const dropdownBottom = document.getElementById('jornada-select-dropdown-bottom');
         const carousel = document.getElementById('jornadas-pills-carousel');
 
-        if (dropdown) {
-            dropdown.innerHTML = official.map(j => {
-                const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
-                let statusLabel = 'Pendiente';
-                if (filled === 15) statusLabel = 'Finalizada (15/15)';
-                else if (filled > 0) statusLabel = `En Juego (${filled}/15)`;
+        const optionsHtml = official.map(j => {
+            const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
+            let statusLabel = 'Pendiente';
+            if (filled === 15) statusLabel = 'Finalizada (15/15)';
+            else if (filled > 0) statusLabel = `En Juego (${filled}/15)`;
 
-                const hasPig = j.matches && j.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
-                const pigIcon = hasPig ? ' 🐷' : '';
+            const hasPig = j.matches && j.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
+            const pigIcon = hasPig ? ' 🐷' : '';
 
-                return `
-                    <option value="${j.id}" ${j.id == this.selectedJornadaId ? 'selected' : ''}>
-                        Jornada ${j.number} - ${j.date || 'Sin fecha'} [${statusLabel}]${pigIcon}
-                    </option>
-                `;
-            }).join('');
-        }
+            return `
+                <option value="${j.id}" ${j.id == this.selectedJornadaId ? 'selected' : ''}>
+                    Jornada ${j.number} - ${j.date || 'Sin fecha'} [${statusLabel}]${pigIcon}
+                </option>
+            `;
+        }).join('');
+
+        if (dropdown) dropdown.innerHTML = optionsHtml;
+        if (dropdownBottom) dropdownBottom.innerHTML = optionsHtml;
 
         if (carousel) {
             carousel.innerHTML = official.map(j => {
@@ -319,12 +321,17 @@ class Jornadas2AppController {
             }
         }
 
-        // Actualizar estado de botones Anterior / Siguiente
+        // Actualizar estado de botones Anterior / Siguiente (superior e inferior)
         const currIdx = official.findIndex(j => j.id == this.selectedJornadaId);
         const btnPrev = document.getElementById('btn-prev-jornada');
         const btnNext = document.getElementById('btn-next-jornada');
         if (btnPrev) btnPrev.disabled = currIdx <= 0;
         if (btnNext) btnNext.disabled = currIdx === -1 || currIdx >= official.length - 1;
+
+        const btnPrevBottom = document.getElementById('btn-prev-jornada-bottom');
+        const btnNextBottom = document.getElementById('btn-next-jornada-bottom');
+        if (btnPrevBottom) btnPrevBottom.disabled = currIdx <= 0;
+        if (btnNextBottom) btnNextBottom.disabled = currIdx === -1 || currIdx >= official.length - 1;
     }
 
     handleSelectJornada(id) {

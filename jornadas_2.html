@@ -199,7 +199,7 @@
 </style>
 </head>
 
-<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black w-full max-w-full overflow-x-hidden">
+<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black w-full max-w-full overflow-x-clip">
 
     <!-- Firebase & Servicios de Dominio -->
     <script src="js/firebase-init.js"></script>
@@ -586,7 +586,7 @@
         <!-- =====================================================================
              HUB DE CONTROL Y SELECTOR DE JORNADAS 2.0 (DESPLEGABLE & PÍLDORAS)
              ===================================================================== -->
-        <section class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-4 min-w-0 max-w-full overflow-hidden">
+        <section id="jornadas-hub-section" class="glass-panel p-2.5 sm:p-4 border-amber-500/40 space-y-2.5 sm:space-y-3 order-4 min-w-0 max-w-full sticky top-1 sm:top-2 z-40 bg-slate-950/95 backdrop-blur-md shadow-2xl transition-all">
             <!-- Barra Superior del Hub: Selector desplegable moderno + Botones Admin -->
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto min-w-0">
@@ -705,6 +705,34 @@
                         <!-- Populated by JS -->
                     </tbody>
                 </table>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             BARRA INFERIOR DE NAVEGACIÓN RÁPIDA DE JORNADA (FINAL DE PÁGINA)
+             ===================================================================== -->
+        <section id="section-jornadas-bottom-nav" class="glass-panel p-3 sm:p-4 border-amber-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 order-7 bg-slate-950/90 shadow-2xl">
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                <button type="button" id="btn-prev-jornada-bottom" onclick="window.JornadasApp.navigateJornada(-1)" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center gap-1.5 font-bold text-xs sm:text-sm hover:border-amber-500/50 transition disabled:opacity-30 disabled:pointer-events-none shadow-sm" title="Jornada anterior">
+                    <span>◀</span> <span>Jornada Anterior</span>
+                </button>
+                <button type="button" id="btn-next-jornada-bottom" onclick="window.JornadasApp.navigateJornada(1)" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center gap-1.5 font-bold text-xs sm:text-sm hover:border-amber-500/50 transition disabled:opacity-30 disabled:pointer-events-none shadow-sm" title="Jornada siguiente">
+                    <span>Jornada Siguiente</span> <span>▶</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-1 sm:max-w-md">
+                <div class="relative flex-1 min-w-0">
+                    <label for="jornada-select-dropdown-bottom" class="sr-only">Seleccionar Jornada</label>
+                    <select id="jornada-select-dropdown-bottom" onchange="window.JornadasApp.handleSelectJornada(this.value)" class="w-full pl-3 pr-7 py-2 bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-inner truncate">
+                        <option value="">Cargando jornadas...</option>
+                    </select>
+                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
+                </div>
+
+                <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 transition shadow active:scale-95 shrink-0" title="Volver al inicio de la hoja">
+                    <span>⬆</span> <span>Subir</span>
+                </button>
             </div>
         </section>
 
@@ -962,6 +990,11 @@
         </div>
     </div>
 
+    <!-- Botón Flotante para Volver al Inicio con Scroll Suave -->
+    <button id="btn-scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-4 right-4 z-50 w-11 h-11 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-2xl flex items-center justify-center text-lg transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none active:scale-95 border-2 border-slate-950 cursor-pointer" title="Subir al inicio">
+        ⬆
+    </button>
+
     <!-- Script Controlador de Resultados 2.0 -->
     <script src="js/jornadas_2.js"></script>
     <script>
@@ -971,6 +1004,19 @@
         });
         window.addEventListener('load', () => {
             if (window.scrollX !== 0) window.scrollTo({ left: 0, top: window.scrollY });
+        });
+        // Listener para visibilidad del botón flotante Subir
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('btn-scroll-top');
+            if (btn) {
+                if (window.scrollY > 350) {
+                    btn.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
+                    btn.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                } else {
+                    btn.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
+                    btn.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                }
+            }
         });
     </script>
 </body>
