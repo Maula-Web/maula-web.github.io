@@ -1019,9 +1019,43 @@
                     </div>
                 </div>
 
-                <!-- Comparativa Métrica a Métrica -->
-                <div id="duelo-metrics-container" class="space-y-2.5 pt-2">
-                    <!-- Inyectado por JS -->
+                <!-- Gráfico de Radar Comparativo Hexagonal -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center pt-2">
+                    <!-- Radar Canvas -->
+                    <div class="lg:col-span-6 flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-100/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 relative">
+                        <div class="flex items-center justify-between w-full pb-2 mb-1 border-b border-slate-200 dark:border-slate-800 text-xs font-bold">
+                            <span class="flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
+                                <span>🎯</span> Perfil de Habilidades (Radar 6D)
+                            </span>
+                            <span class="text-[10px] font-mono text-slate-500 uppercase">Escala Normalizada</span>
+                        </div>
+                        <div class="relative w-full max-w-[340px] sm:max-w-[400px] h-[300px] sm:h-[340px] flex items-center justify-center">
+                            <canvas id="dueloRadarCanvas"></canvas>
+                        </div>
+                        <!-- Leyenda interactiva -->
+                        <div class="flex items-center justify-center gap-6 mt-2 text-xs font-mono font-bold">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></span>
+                                <span id="duelo-legend-name-a" class="text-amber-600 dark:text-amber-400">Socio A</span>
+                            </div>
+                            <span class="text-slate-400 font-sans">vs</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-sky-500 shadow-sm shadow-sky-500/50"></span>
+                                <span id="duelo-legend-name-b" class="text-sky-600 dark:text-sky-400">Socio B</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparativa Métrica a Métrica -->
+                    <div class="lg:col-span-6 space-y-2">
+                        <div class="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500">
+                            <span>Métricas Clave del Enfrentamiento</span>
+                            <span class="text-[10px] font-mono">Diferencial</span>
+                        </div>
+                        <div id="duelo-metrics-container" class="space-y-2">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1073,6 +1107,7 @@
                 this.selectedMembers = new Set();
                 this.activeView = 'evolucion';
                 this.chart = null;
+                this.dueloRadarChart = null;
 
                 // Zoom / Rango
                 this.viewJornadasCount = 0;
@@ -2345,6 +2380,10 @@
 
                 document.getElementById('duelo-name-a').textContent = sA.name;
                 document.getElementById('duelo-name-b').textContent = sB.name;
+                const legA = document.getElementById('duelo-legend-name-a');
+                const legB = document.getElementById('duelo-legend-name-b');
+                if (legA) legA.textContent = sA.name;
+                if (legB) legB.textContent = sB.name;
 
                 // Enfrentamiento jornada a jornada
                 let winsA = 0, winsB = 0, empates = 0, totalJ = 0;
@@ -2388,10 +2427,162 @@
                         <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
                             <span class="font-mono font-black ${winA ? 'text-amber-500 font-extrabold text-sm' : 'text-slate-600 dark:text-slate-400'}">${strA}</span>
                             <span class="font-sans font-bold text-slate-700 dark:text-slate-300 text-center uppercase text-[11px]">${m.label}</span>
-                            <span class="font-mono font-black ${winB ? 'text-blue-500 font-extrabold text-sm' : 'text-slate-600 dark:text-slate-400'}">${strB}</span>
+                            <span class="font-mono font-black ${winB ? 'text-sky-500 font-extrabold text-sm' : 'text-slate-600 dark:text-slate-400'}">${strB}</span>
                         </div>
                     `;
                 }).join('');
+
+                // Renderizar Gráfico de Radar
+                this.renderDueloRadar(sA, sB);
+            }
+
+            renderDueloRadar(sA, sB) {
+                const canvas = document.getElementById('dueloRadarCanvas');
+                if (!canvas || typeof Chart === 'undefined') return;
+
+                // Máximos de referencia de la peña para normalizar los ejes (0 a 100)
+                let maxPts = 1, maxHits = 1, maxBonus = 1, maxPrizes = 1, maxBestHits = 14, maxReg = 100;
+                Object.values(this.memberStats).forEach(s => {
+                    if (s.grandTotal > maxPts) maxPts = s.grandTotal;
+                    if (s.baseTotal > maxHits) maxHits = s.baseTotal;
+                    if (s.bonusTotal > maxBonus) maxBonus = s.bonusTotal;
+                    if (s.prizesTotal > maxPrizes) maxPrizes = s.prizesTotal;
+                    if (s.bestHits > maxBestHits) maxBestHits = s.bestHits;
+                });
+
+                const calcPct = (val, max) => Math.min(100, Math.max(0, Math.round((val / Math.max(1, max)) * 100)));
+
+                // 6 Dimensiones clave del perfil deportivo
+                // 1. Puntos (General)
+                // 2. Precisión (Aciertos Base)
+                // 3. Pegada / Plenos (Bonus Ganado)
+                // 4. Regularidad (% de jornadas en zona de puntos >=10)
+                // 5. Pico Máximo (Mejor jornada de la temporada)
+                // 6. Fortuna / Botes (Premios en metálico)
+                const regA = sA.jornadasPlayed > 0 ? ((sA.jornadasWithPoints / sA.jornadasPlayed) * 100) : 0;
+                const regB = sB.jornadasPlayed > 0 ? ((sB.jornadasWithPoints / sB.jornadasPlayed) * 100) : 0;
+
+                const dataA = [
+                    calcPct(sA.grandTotal, maxPts),
+                    calcPct(sA.baseTotal, maxHits),
+                    calcPct(Math.max(0, sA.bonusTotal), maxBonus),
+                    Math.round(regA),
+                    calcPct(sA.bestHits, maxBestHits),
+                    calcPct(sA.prizesTotal, maxPrizes)
+                ];
+
+                const dataB = [
+                    calcPct(sB.grandTotal, maxPts),
+                    calcPct(sB.baseTotal, maxHits),
+                    calcPct(Math.max(0, sB.bonusTotal), maxBonus),
+                    Math.round(regB),
+                    calcPct(sB.bestHits, maxBestHits),
+                    calcPct(sB.prizesTotal, maxPrizes)
+                ];
+
+                const labels = [
+                    'Puntos Totales',
+                    'Precisión (Aciertos)',
+                    'Pegada (Bonus)',
+                    'Regularidad',
+                    'Pico Máximo',
+                    'Fortuna (Premios)'
+                ];
+
+                const isLight = document.documentElement.classList.contains('light-theme');
+                const gridColor = isLight ? 'rgba(148, 163, 184, 0.35)' : 'rgba(51, 65, 85, 0.55)';
+                const labelColor = isLight ? '#334155' : '#cbd5e1';
+                const angleLineColor = isLight ? 'rgba(148, 163, 184, 0.4)' : 'rgba(71, 85, 105, 0.5)';
+
+                if (this.dueloRadarChart) {
+                    this.dueloRadarChart.destroy();
+                }
+
+                this.dueloRadarChart = new Chart(canvas, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: sA.name,
+                                data: dataA,
+                                backgroundColor: 'rgba(245, 158, 11, 0.25)',
+                                borderColor: '#f59e0b',
+                                borderWidth: 2.5,
+                                pointBackgroundColor: '#f59e0b',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 1.5,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            },
+                            {
+                                label: sB.name,
+                                data: dataB,
+                                backgroundColor: 'rgba(14, 165, 233, 0.25)',
+                                borderColor: '#0ea5e9',
+                                borderWidth: 2.5,
+                                pointBackgroundColor: '#0ea5e9',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 1.5,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500
+                        },
+                        scales: {
+                            r: {
+                                min: 0,
+                                max: 100,
+                                ticks: {
+                                    display: false,
+                                    stepSize: 25
+                                },
+                                grid: {
+                                    color: gridColor,
+                                    lineWidth: 1
+                                },
+                                angleLines: {
+                                    color: angleLineColor,
+                                    lineWidth: 1
+                                },
+                                pointLabels: {
+                                    color: labelColor,
+                                    font: {
+                                        family: "'Plus Jakarta Sans', sans-serif",
+                                        size: 10.5,
+                                        weight: '700'
+                                    },
+                                    padding: 10
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: isLight ? 'rgba(15, 23, 42, 0.95)' : 'rgba(3, 7, 18, 0.95)',
+                                titleColor: '#fbbf24',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(245, 158, 11, 0.4)',
+                                borderWidth: 1,
+                                padding: 10,
+                                cornerRadius: 10,
+                                callbacks: {
+                                    label: (context) => {
+                                        return ` ${context.dataset.label}: ${context.raw}% de índice relativo`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             }
 
             /**
