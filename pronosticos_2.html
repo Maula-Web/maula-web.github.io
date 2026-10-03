@@ -1763,6 +1763,9 @@
             } else {
                 if (viewBase) viewBase.classList.add('hidden');
                 if (viewDoubles) viewDoubles.classList.remove('hidden');
+                const doublesSection = document.getElementById('doubles-section');
+                if (doublesSection) doublesSection.classList.remove('hidden');
+
                 if (tabBtnBase) {
                     tabBtnBase.className = 'flex-1 py-2 px-3 rounded-xl font-bold text-xs transition bg-slate-900 text-slate-400 hover:text-white';
                 }
@@ -1770,14 +1773,17 @@
                     tabBtnDoubles.className = 'flex-1 py-2 px-3 rounded-xl font-black text-xs transition bg-purple-600 text-white shadow-md';
                 }
                 if (btnSaveBase) btnSaveBase.classList.add('hidden');
-                if (btnSaveDoubles) btnSaveDoubles.classList.remove('hidden');
 
                 // Asegurar que el formulario de dobles se renderice con los datos de la jornada seleccionada
                 if (window.app && window.app.renderDoublesForm) {
                     const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
                     if (j) {
                         const { isLockedRef } = window.app.isJornadaLocked(j);
-                        window.app.renderDoublesForm(j, isLockedRef && !window.app.correctionMode);
+                        const isLockedForEdit = isLockedRef && !window.app.correctionMode;
+                        window.app.renderDoublesForm(j, isLockedForEdit);
+                        if (btnSaveDoubles) {
+                            btnSaveDoubles.classList.toggle('hidden', isLockedForEdit);
+                        }
                     }
                 }
             }

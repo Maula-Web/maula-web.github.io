@@ -638,15 +638,20 @@ class PronosticoManager {
         }
 
         // DOUBLES LOGIC
-        if (!isLocked || this.correctionMode) {
-            if (typeof this.checkEligibility === 'function') {
-                const eligibility = this.checkEligibility(jornada.number, this.currentMemberId);
-                if (eligibility && eligibility.eligible) {
-                    if (this.renderDoublesForm) this.renderDoublesForm(jornada, isLocked);
-                    if (this.doublesSection) this.doublesSection.classList.remove('hidden');
-                    if (this.doublesInfoHeader) this.doublesInfoHeader.style.display = 'flex';
-                }
-            }
+        const hasExistingDoubles = (this.pronosticosExtra || []).some(p => 
+            String(p.jId || p.jornadaId) === String(jornada.id) &&
+            p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
+        );
+        let isEligibleForDoubles = false;
+        if (typeof this.checkEligibility === 'function') {
+            const eligibility = this.checkEligibility(jornada.number, this.currentMemberId);
+            isEligibleForDoubles = eligibility && eligibility.eligible;
+        }
+
+        if (isEligibleForDoubles || hasExistingDoubles || this.correctionMode) {
+            if (this.renderDoublesForm) this.renderDoublesForm(jornada, isLocked);
+            if (this.doublesSection) this.doublesSection.classList.remove('hidden');
+            if (this.doublesInfoHeader) this.doublesInfoHeader.style.display = 'flex';
         }
 
         // Initial cost update
