@@ -18,7 +18,7 @@ class BoteManager {
         this.ingresos = [];
         this.config = {
             costeColumna: 0.75,
-            costeDobles: 10.50,
+            costeDobles: 12.00,
             aportacionSemanal: 1.50,
             costeExtraExento: 0.20,
             penalizacionMaula: 1.00,
@@ -26,7 +26,7 @@ class BoteManager {
             temporadaActual: '2026-2027',
             history: {
                 costeColumna: [{ date: '2026-08-01', value: 0.75 }],
-                costeDobles: [{ date: '2026-08-01', value: 10.50 }],
+                costeDobles: [{ date: '2026-08-01', value: 12.00 }],
                 aportacionSemanal: [{ date: '2026-08-01', value: 1.50 }],
                 costeExtraExento: [{ date: '2026-08-01', value: 0.20 }]
             }
@@ -159,7 +159,7 @@ class BoteManager {
         if (!this.config.history) this.config.history = {};
         const basePrices = {
             costeColumna: 0.75,
-            costeDobles: 10.50,
+            costeDobles: 12.00,
             aportacionSemanal: 1.50,
             costeExtraExento: 0.20
         };

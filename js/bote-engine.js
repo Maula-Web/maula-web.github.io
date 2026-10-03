@@ -8,7 +8,7 @@ class BoteEngine {
     constructor(config = {}) {
         this.config = {
             costeColumna: 0.75,
-            costeDobles: 10.50,
+            costeDobles: 12.00,
             aportacionSemanal: 1.50,
             costeExtraExento: 0.20,
             boteInicial: 738.68,

@@ -855,6 +855,17 @@ class Dashboard2AppController {
                 summary = sd.summary;
             }
         }
+        if (!summary || window.BoteApp === undefined) {
+            const cached = localStorage.getItem('maulas_bote2_summary');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (parsed && typeof parsed.cajaReal === 'number') {
+                        summary = parsed;
+                    }
+                } catch (e) { }
+            }
+        }
 
         let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 829.48) : 829.48;
         let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 701.96) : 701.96;
