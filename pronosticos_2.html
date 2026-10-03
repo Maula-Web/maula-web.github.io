@@ -1647,17 +1647,23 @@
                 window.app.loadForecast();
             }
 
-            // Comprobar si este socio es el responsable de dobles para esta jornada
+            // Comprobar si este socio es el responsable de dobles para esta jornada o si ya existen dobles registrados
             const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
             const responsible = window.getEligibleDoublesMember(j);
+            const existingExtra = (window.app && window.app.pronosticosExtra)
+                ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
+                  || window.app.pronosticosExtra.find(p => String(p.jId || p.jornadaId) === String(window.app.currentJornadaId))
+                : null;
+            const hasDoublesForecast = !!(existingExtra && existingExtra.selection && existingExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'));
             const isDoublesEligible = (responsible && String(responsible.id) === String(window.app.currentMemberId)) || (window.app && window.app.correctionMode);
+            const canViewDoubles = isDoublesEligible || hasDoublesForecast || openDoublesTab;
 
             const tabBtnDoubles = document.getElementById('tab-btn-doubles');
             const tabBtnBase = document.getElementById('tab-btn-base');
 
-            // Si un socio NO tiene que rellenar la quiniela de dobles, no mostrar el control para ir a esa pantalla
+            // Mostrar el control de dobles si es elegible o si ya hay quiniela de dobles registrada para esta jornada
             if (tabBtnDoubles) {
-                if (isDoublesEligible) {
+                if (canViewDoubles) {
                     tabBtnDoubles.style.display = 'flex';
                     if (tabBtnBase) {
                         tabBtnBase.classList.remove('w-full');
@@ -1672,8 +1678,8 @@
                 }
             }
 
-            // Cambiar pestaña si se solicitó dobles y es elegible (nunca para un socio no elegible)
-            if (openDoublesTab && isDoublesEligible) {
+            // Cambiar pestaña si se solicitó dobles y se puede visualizar
+            if (openDoublesTab && canViewDoubles) {
                 window.switchEditorTab('doubles');
             } else {
                 window.switchEditorTab('base');
@@ -1725,8 +1731,13 @@
                 if (window.app.selJornada) window.app.selJornada.value = String(jornadaId);
             }
             const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+            const existingExtra = (window.app && window.app.pronosticosExtra)
+                ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
+                  || window.app.pronosticosExtra.find(p => String(p.jId || p.jornadaId) === String(window.app.currentJornadaId))
+                : null;
             const responsible = window.getEligibleDoublesMember(j);
-            const mId = responsible ? responsible.id : (window.app ? window.app.currentMemberId : null);
+            const extraMemberId = existingExtra ? (existingExtra.mId || existingExtra.memberId) : null;
+            const mId = extraMemberId || (responsible ? responsible.id : (window.app ? window.app.currentMemberId : null));
             window.openEditorModal(mId, true, j ? j.id : null);
         };
 
@@ -1761,15 +1772,12 @@
                 if (btnSaveBase) btnSaveBase.classList.add('hidden');
                 if (btnSaveDoubles) btnSaveDoubles.classList.remove('hidden');
 
-                // Asegurar que si el formulario de dobles no tiene filas, se renderice
+                // Asegurar que el formulario de dobles se renderice con los datos de la jornada seleccionada
                 if (window.app && window.app.renderDoublesForm) {
-                    const doublesBox = document.getElementById('doubles-container');
-                    if (doublesBox && doublesBox.children.length === 0) {
-                        const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
-                        if (j) {
-                            const { isLockedRef } = window.app.isJornadaLocked(j);
-                            window.app.renderDoublesForm(j, isLockedRef && !window.app.correctionMode);
-                        }
+                    const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+                    if (j) {
+                        const { isLockedRef } = window.app.isJornadaLocked(j);
+                        window.app.renderDoublesForm(j, isLockedRef && !window.app.correctionMode);
                     }
                 }
             }

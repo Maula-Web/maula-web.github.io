@@ -2251,9 +2251,14 @@ class PronosticoManager {
         this.doublesStatus.className = '';
         this.btnSaveDoubles.style.display = isLocked ? 'none' : 'block';
 
-        // Load existing doubles
-        const existingExtra = this.pronosticosExtra.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
-        const selections = existingExtra ? existingExtra.selection : Array(15).fill('');
+        // Load existing doubles: si no coincide el socio actual, buscar cualquier pronóstico de dobles guardado para esta jornada
+        const existingExtra = (this.pronosticosExtra || []).find(p => 
+            (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) && 
+            (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))
+        ) || (this.pronosticosExtra || []).find(p => 
+            String(p.jId || p.jornadaId) === String(this.currentJornadaId)
+        );
+        const selections = existingExtra && existingExtra.selection ? existingExtra.selection : Array(15).fill('');
 
         jornada.matches.forEach((match, idx) => {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
@@ -2347,6 +2352,11 @@ class PronosticoManager {
     }
 
     handleP15Toggle(btn, idx, team, val) {
+        const jornada = this.jornadas ? this.jornadas.find(j => String(j.id) === String(this.currentJornadaId)) : null;
+        if (jornada) {
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLockedRef && !this.correctionMode) return;
+        }
         // Find parent container for this team
         const wrapper = btn.parentElement;
         const all = wrapper.querySelectorAll('.p15-option');
@@ -2364,6 +2374,11 @@ class PronosticoManager {
     }
 
     handleDoubleToggle(btn, idx, sign, isP15) {
+        const jornada = this.jornadas ? this.jornadas.find(j => String(j.id) === String(this.currentJornadaId)) : null;
+        if (jornada) {
+            const { isLockedRef } = this.isJornadaLocked(jornada);
+            if (isLockedRef && !this.correctionMode) return;
+        }
         const parent = btn.parentElement;
         const allBtns = parent.querySelectorAll('.chk-option');
 
