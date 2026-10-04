@@ -1,9 +1,36 @@
-/**
- * BoteEngine - Lógica de cálculo financiero de la Peña Maulas
- * ==========================================================
- * Centraliza las matemáticas del bote para evitar duplicidades
- * y aligerar el archivo de interfaz de usuario.
- */
+// Polyfill safe window reference for Node.js / Server environments (CI / GitHub Actions)
+if (typeof window === 'undefined') {
+    global.window = global;
+}
+if (!window.AppUtils) {
+    try {
+        require('./utils.js');
+    } catch (e) {
+        // Fallback minimal helpers if utils.js cannot be loaded
+        window.AppUtils = {
+            parseDate: (d) => {
+                if (!d) return null;
+                if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
+                const s = String(d).trim();
+                const dmy = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+                if (dmy) return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10));
+                const iso = s.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+                if (iso) return new Date(parseInt(iso[1], 10), parseInt(iso[2], 10) - 1, parseInt(iso[3], 10));
+                const dt = new Date(s);
+                return isNaN(dt.getTime()) ? null : dt;
+            },
+            getMemberName: (m) => (m ? (m.name || m.phone || `Socio ${m.id || ''}`) : '')
+        };
+    }
+}
+if (!window.ScoringSystem) {
+    try {
+        require('./scoring.js');
+    } catch (e) {
+        // Scoring is optional or has fallback in BoteEngine
+    }
+}
+
 class BoteEngine {
     constructor(config = {}) {
         this.config = {
