@@ -912,6 +912,157 @@ window.AppTheme = {
     }
 };
 
+// =========================================================================
+// GESTOR DE TAMAÑO DE TEXTO (ACCESIBILIDAD 4 NIVELES)
+// normal (100% original) | medium (+12%) | large (+25%) | xlarge (+38%)
+// =========================================================================
+window.AppTextScale = {
+    SIZES: [
+        { id: 'normal', label: 'Normal (100%)', short: 'A', desc: 'Tamaño estándar original' },
+        { id: 'medium', label: 'Mediano (+12%)', short: 'A+', desc: 'Recomendado para lectura cómoda' },
+        { id: 'large', label: 'Grande (+25%)', short: 'A++', desc: 'Mayor legibilidad y nitidez' },
+        { id: 'xlarge', label: 'Muy Grande (+38%)', short: 'A+++', desc: 'Máximo aumento de textos' }
+    ],
+
+    getScale() {
+        const stored = localStorage.getItem('maulas_text_scale');
+        if (stored && ['normal', 'medium', 'large', 'xlarge'].includes(stored)) {
+            return stored;
+        }
+        return 'normal'; // Por defecto: versión original
+    },
+
+    setScale(scaleId) {
+        if (!['normal', 'medium', 'large', 'xlarge'].includes(scaleId)) scaleId = 'normal';
+        localStorage.setItem('maulas_text_scale', scaleId);
+        this.applyScale(scaleId);
+        this.updateUI(scaleId);
+    },
+
+    applyScale(scaleId) {
+        const root = document.documentElement;
+        root.classList.remove('text-size-normal', 'text-size-medium', 'text-size-large', 'text-size-xlarge');
+        if (scaleId !== 'normal') {
+            root.classList.add(`text-size-${scaleId}`);
+        }
+    },
+
+    toggleDropdown(e) {
+        if (e) e.stopPropagation();
+        const dropdown = document.getElementById('text-scale-dropdown-panel');
+        if (!dropdown) return;
+        const isHidden = dropdown.classList.contains('hidden');
+        if (isHidden) {
+            dropdown.classList.remove('hidden');
+            dropdown.classList.add('flex');
+        } else {
+            dropdown.classList.add('hidden');
+            dropdown.classList.remove('flex');
+        }
+    },
+
+    closeDropdown() {
+        const dropdown = document.getElementById('text-scale-dropdown-panel');
+        if (dropdown && !dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
+            dropdown.classList.remove('flex');
+        }
+    },
+
+    updateUI(scaleId) {
+        // Actualizar indicador en el botón trigger
+        const curr = this.SIZES.find(s => s.id === scaleId) || this.SIZES[0];
+        document.querySelectorAll('.text-scale-trigger-label').forEach(el => {
+            el.textContent = curr.short;
+        });
+
+        // Actualizar estados activos dentro del dropdown
+        document.querySelectorAll('[data-text-scale-opt]').forEach(btn => {
+            const optId = btn.getAttribute('data-text-scale-opt');
+            if (optId === scaleId) {
+                btn.className = 'w-full px-3 py-2 rounded-xl text-left text-xs font-bold transition flex items-center justify-between bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/40 shadow-sm';
+                const check = btn.querySelector('.check-indicator');
+                if (check) check.style.display = 'inline';
+            } else {
+                btn.className = 'w-full px-3 py-2 rounded-xl text-left text-xs font-semibold transition flex items-center justify-between text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-transparent';
+                const check = btn.querySelector('.check-indicator');
+                if (check) check.style.display = 'none';
+            }
+        });
+    },
+
+    injectControls() {
+        // Evitar inyección duplicada
+        if (document.getElementById('text-scale-control-wrapper')) return;
+
+        // Buscar contenedor de tema en escritorio (se coloca justo al lado)
+        const themeDesktop = document.getElementById('theme-switcher-container');
+        const themeMobile = document.getElementById('theme-switcher-container-mobile');
+
+        const currScale = this.getScale();
+        const currObj = this.SIZES.find(s => s.id === currScale) || this.SIZES[0];
+
+        // 1. Contenedor de Escritorio (Desplegable elegante)
+        if (themeDesktop && themeDesktop.parentElement) {
+            const wrapper = document.createElement('div');
+            wrapper.id = 'text-scale-control-wrapper';
+            wrapper.className = 'relative flex-shrink-0';
+            wrapper.innerHTML = `
+                <button type="button" id="btn-text-scale-trigger" onclick="window.AppTextScale && window.AppTextScale.toggleDropdown(event)"
+                        class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-inner cursor-pointer"
+                        title="Cambiar tamaño de texto (Accesibilidad)">
+                    <span class="text-sm">🔤</span>
+                    <span class="text-scale-trigger-label font-mono text-[11px] font-black text-amber-600 dark:text-amber-400">${currObj.short}</span>
+                    <span class="text-[9px] text-slate-400">▾</span>
+                </button>
+
+                <!-- Panel Flotante Desplegable -->
+                <div id="text-scale-dropdown-panel" class="hidden absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-amber-500/40 shadow-2xl z-[99999] flex-col gap-1 backdrop-blur-xl animate-in fade-in duration-200" onclick="event.stopPropagation()">
+                    <div class="px-2.5 py-1.5 border-b border-slate-100 dark:border-slate-800/80 mb-1">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Tamaño de Texto</span>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Adaptable a pantallas de PC, tablet y móvil.</p>
+                    </div>
+                    ${this.SIZES.map(s => `
+                        <button type="button" data-text-scale-opt="${s.id}" onclick="window.AppTextScale.setScale('${s.id}'); window.AppTextScale.closeDropdown();"
+                                class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold transition flex items-center justify-between text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-transparent">
+                            <div>
+                                <span class="font-bold block">${s.label}</span>
+                                <span class="text-[10px] text-slate-400 font-normal">${s.desc}</span>
+                            </div>
+                            <span class="check-indicator text-amber-500 font-black text-sm" style="display:${s.id === currScale ? 'inline' : 'none'};">✓</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            themeDesktop.parentElement.insertBefore(wrapper, themeDesktop.nextSibling);
+        }
+
+        // 2. Contenedor Compacto en Móvil
+        if (themeMobile && themeMobile.parentElement) {
+            const mobileBtn = document.createElement('button');
+            mobileBtn.id = 'btn-text-scale-trigger-mobile';
+            mobileBtn.type = 'button';
+            mobileBtn.onclick = (e) => this.toggleDropdown(e);
+            mobileBtn.className = 'w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-amber-500/40 text-[11px] font-black flex items-center justify-center shadow-inner cursor-pointer';
+            mobileBtn.title = 'Tamaño de texto';
+            mobileBtn.innerHTML = `🔤`;
+            themeMobile.parentElement.insertBefore(mobileBtn, themeMobile.nextSibling);
+        }
+
+        // Cerrar panel al pinchar fuera
+        document.addEventListener('click', () => {
+            this.closeDropdown();
+        });
+    },
+
+    init() {
+        const scale = this.getScale();
+        this.applyScale(scale);
+        this.injectControls();
+        this.updateUI(scale);
+    }
+};
+
 // Inicializar de inmediato para evitar parpadeos
 if (typeof window !== 'undefined') {
     if (window.AppVersion) {
@@ -921,6 +1072,9 @@ if (typeof window !== 'undefined') {
     if (window.AppTheme) {
         window.AppTheme.init();
     }
+    if (window.AppTextScale) {
+        window.AppTextScale.applyScale(window.AppTextScale.getScale());
+    }
 }
 
 // Inicializar al cargar el DOM
@@ -928,6 +1082,7 @@ if (typeof document !== 'undefined') {
     const onDomReady = () => {
         if (window.AppVersion) window.AppVersion.init();
         if (window.AppTheme) window.AppTheme.init();
+        if (window.AppTextScale) window.AppTextScale.init();
 
         // Auto-centrar la pestaña activa del menú en pantallas de móvil (solo el contenedor, nunca la ventana)
         try {
