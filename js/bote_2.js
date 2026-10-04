@@ -3907,16 +3907,9 @@ class BoteAppController {
         const saldos = members.map(m => m.saldo);
         const ctx = canvas.getContext('2d');
 
-        // Gradiente metálico efecto Lingote de Oro para barras horizontales
-        const goldGradient = ctx.createLinearGradient(0, 0, canvas.width || 400, 0);
-        goldGradient.addColorStop(0, '#bf953f');
-        goldGradient.addColorStop(0.25, '#fcf6ba');
-        goldGradient.addColorStop(0.5, '#b38728');
-        goldGradient.addColorStop(0.75, '#fbf5b7');
-        goldGradient.addColorStop(1, '#aa771c');
-
+        // Color de fallback para el dataset (las barras de oro >30€ se dibujan con acabado metálico adaptado en goldShimmerPlugin)
         const bgColors = members.map(m => {
-            if (m.saldo > 30) return goldGradient; // Lingote de Oro metálico
+            if (m.saldo > 30) return 'rgba(217, 160, 48, 0.2)'; // Base traslúcida sobre la que el plugin dibuja el lingote
             if (m.saldo >= 15) return 'rgba(16, 185, 129, 0.85)'; // Verde
             if (m.saldo >= 5) return 'rgba(245, 158, 11, 0.85)'; // Amarillo
             return 'rgba(244, 63, 94, 0.85)'; // Rojo (< 5 €)
@@ -3928,7 +3921,7 @@ class BoteAppController {
             return '#f43f5e';
         });
 
-        // Plugin para efecto de destello de oro metálico animado (shimmer) sobre las barras de Tío Gilito (>30€)
+        // Plugin para efecto de Lingote de Oro metálico adaptativo (idéntico a .badge-gold-ingot) + destello animado (shimmer)
         const goldShimmerPlugin = {
             id: 'goldShimmerPlugin',
             afterDatasetsDraw: (chart) => {
@@ -3936,7 +3929,7 @@ class BoteAppController {
                 const meta = chart.getDatasetMeta(0);
                 if (!meta || !meta.data) return;
 
-                // Fase de animación basada en tiempo real (ciclo de 3.5s idéntico al CSS)
+                // Fase de animación basada en tiempo real (ciclo de 3.5s sincronizado con CSS)
                 const now = performance.now();
                 const cycle = 3500;
                 const progress = (now % cycle) / cycle; // 0 a 1
@@ -3955,9 +3948,10 @@ class BoteAppController {
                         if (barWidth <= 0 || barHeight <= 0) return;
 
                         chartCtx.save();
-                        // Recorte exacto para no pintar fuera de la barra redondeada
+
+                        // 1. Definir trazado redondeado de la barra (Lingote)
                         chartCtx.beginPath();
-                        const radius = 6;
+                        const radius = Math.min(6, barHeight / 2);
                         if (chartCtx.roundRect) {
                             chartCtx.roundRect(barLeft, barTop, barWidth, barHeight, radius);
                         } else {
@@ -3965,21 +3959,52 @@ class BoteAppController {
                         }
                         chartCtx.clip();
 
-                        // Posición del haz de luz diagonal
-                        // Animación rápida de paso del 0 al 40% del ciclo
-                        const activeProgress = Math.min(progress / 0.45, 1);
+                        // 2. Gradiente metálico multicapa adaptado exactamente a las coordenadas individuales de esta barra (135 grados)
+                        // Coincide al 100% con la chapa .badge-gold-ingot: #bf953f 0%, #fcf6ba 28%, #b38728 55%, #fbf5b7 78%, #aa771c 100%
+                        const barGold = chartCtx.createLinearGradient(barLeft, barTop, barRight, barTop + barHeight);
+                        barGold.addColorStop(0, '#9c6f21');     // Base profunda dorada
+                        barGold.addColorStop(0.12, '#bf953f');  // Tono oro cepillado
+                        barGold.addColorStop(0.28, '#fcf6ba');  // Reflejo claro de luz oro
+                        barGold.addColorStop(0.52, '#b38728');  // Cuerpo oro macizo intenso
+                        barGold.addColorStop(0.78, '#fbf5b7');  // Segundo reflejo luminoso
+                        barGold.addColorStop(0.92, '#aa771c');  // Oro bronceado
+                        barGold.addColorStop(1, '#784e0e');     // Bisel sombra oscura
+
+                        chartCtx.fillStyle = barGold;
+                        chartCtx.fillRect(barLeft, barTop, barWidth, barHeight);
+
+                        // 3. Bisel superior e inferior 3D de relieve de lingote (inset highlight & shadow)
+                        const bevelHighlight = chartCtx.createLinearGradient(0, barTop, 0, barTop + barHeight);
+                        bevelHighlight.addColorStop(0, 'rgba(255, 255, 255, 0.85)'); // Brillo especular superior
+                        bevelHighlight.addColorStop(0.18, 'rgba(255, 255, 255, 0.25)');
+                        bevelHighlight.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+                        bevelHighlight.addColorStop(0.82, 'rgba(0, 0, 0, 0.15)');
+                        bevelHighlight.addColorStop(1, 'rgba(61, 35, 0, 0.6)');     // Sombra inferior de volumen
+                        chartCtx.fillStyle = bevelHighlight;
+                        chartCtx.fillRect(barLeft, barTop, barWidth, barHeight);
+
+                        // 4. Borde perimetral pulido de oro (#ffd700)
+                        chartCtx.strokeStyle = '#ffd700';
+                        chartCtx.lineWidth = 1.5;
+                        chartCtx.stroke();
+
+                        // 5. Haz de destello reflectante móvil diagonal (Shimmer animado idéntico a .badge-gold-ingot)
                         if (progress <= 0.45) {
-                            const beamWidth = Math.max(40, barWidth * 0.4);
-                            const beamCenter = barLeft - beamWidth + (barWidth + beamWidth * 2) * activeProgress;
+                            const activeProgress = progress / 0.45;
+                            const beamWidth = Math.max(35, barWidth * 0.35);
+                            const beamCenter = (barLeft - beamWidth) + (barWidth + beamWidth * 2) * activeProgress;
 
                             const shimmerGrad = chartCtx.createLinearGradient(beamCenter - beamWidth / 2, 0, beamCenter + beamWidth / 2, 0);
                             shimmerGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-                            shimmerGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.75)');
+                            shimmerGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.4)');
+                            shimmerGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.85)');
+                            shimmerGrad.addColorStop(0.7, 'rgba(255, 255, 255, 0.4)');
                             shimmerGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
                             chartCtx.fillStyle = shimmerGrad;
                             chartCtx.fillRect(barLeft, barTop, barWidth, barHeight);
                         }
+
                         chartCtx.restore();
                     }
                 });
