@@ -918,10 +918,10 @@ window.AppTheme = {
 // =========================================================================
 window.AppTextScale = {
     SIZES: [
-        { id: 'normal', label: 'Normal (100%)', short: 'A', desc: 'Tamaño estándar original' },
-        { id: 'medium', label: 'Mediano (+12%)', short: 'A+', desc: 'Recomendado para lectura cómoda' },
-        { id: 'large', label: 'Grande (+25%)', short: 'A++', desc: 'Mayor legibilidad y nitidez' },
-        { id: 'xlarge', label: 'Muy Grande (+38%)', short: 'A+++', desc: 'Máximo aumento de textos' }
+        { id: 'normal', label: 'Normal (Original)', short: 'A', desc: 'Tamaño estándar original (100%)' },
+        { id: 'medium', label: 'Mediano (+5%)', short: 'A+', desc: 'Ligero aumento de textos y tablas' },
+        { id: 'large', label: 'Grande (+10%)', short: 'A++', desc: 'Mayor legibilidad sin deformar títulos' },
+        { id: 'xlarge', label: 'Muy Grande (+15%)', short: 'A+++', desc: 'Máximo aumento recomendado (+15%)' }
     ],
 
     getScale() {
