@@ -655,7 +655,7 @@ class BoteAppController {
 
         members.forEach((m) => {
             // Tramos de color fijos:
-            // 🪙 Lingote de Oro (> 30,00 €): Saldo excelente
+            // 🦆 Tío Gilito (> 30,00 €): Saldo excelente
             // 🟢 Verde (15,00 € a 30,00 €): Saldo adecuado
             // 🟡 Amarillo (5,00 € a 15,00 €): Saldo regular
             // 🔴 Rojo (< 5,00 €): Saldo bajo o en deuda
@@ -667,14 +667,14 @@ class BoteAppController {
                 statusBadge = `
                     <div class="group/status relative cursor-help inline-block">
                         <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-gold-ingot flex items-center justify-center gap-1 hover:brightness-110 transition-all shadow-sm">
-                            <span>🪙</span> Lingote Oro
+                            <span>🦆</span> Tío Gilito
                         </span>
                         <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-400/60 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-amber-300 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>🪙</span> Lingote de Oro (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                                <span>🦆</span> Tío Gilito (+${m.saldo.toFixed(2).replace(".", ",")} €)
                             </strong>
                             <p class="leading-relaxed">
-                                Saldo excelente (> 30 €) en su hucha virtual. Máxima tranquilidad para la temporada.
+                                Saldo excelente (> 30 €) en su hucha virtual. Modo Tío Gilito activado: máxima solvencia para la temporada.
                             </p>
                         </div>
                     </div>
@@ -3682,6 +3682,11 @@ class BoteAppController {
         const canvas = document.getElementById('chart-socios-saldos');
         if (!canvas) return;
 
+        if (this.goldShimmerAnimId) {
+            cancelAnimationFrame(this.goldShimmerAnimId);
+            this.goldShimmerAnimId = null;
+        }
+
         if (this.chartSocios) {
             this.chartSocios.destroy();
             this.chartSocios = null;
@@ -3718,6 +3723,65 @@ class BoteAppController {
             return '#f43f5e';
         });
 
+        // Plugin para efecto de destello de oro metálico animado (shimmer) sobre las barras de Tío Gilito (>30€)
+        const goldShimmerPlugin = {
+            id: 'goldShimmerPlugin',
+            afterDatasetsDraw: (chart) => {
+                const chartCtx = chart.ctx;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta || !meta.data) return;
+
+                // Fase de animación basada en tiempo real (ciclo de 3.5s idéntico al CSS)
+                const now = performance.now();
+                const cycle = 3500;
+                const progress = (now % cycle) / cycle; // 0 a 1
+
+                chartCtx.save();
+                meta.data.forEach((bar, index) => {
+                    const m = members[index];
+                    if (m && m.saldo > 30) {
+                        const { x, y, base, height } = bar;
+                        const barLeft = Math.min(x, base);
+                        const barRight = Math.max(x, base);
+                        const barWidth = barRight - barLeft;
+                        const barTop = y - height / 2;
+                        const barHeight = height;
+
+                        if (barWidth <= 0 || barHeight <= 0) return;
+
+                        chartCtx.save();
+                        // Recorte exacto para no pintar fuera de la barra redondeada
+                        chartCtx.beginPath();
+                        const radius = 6;
+                        if (chartCtx.roundRect) {
+                            chartCtx.roundRect(barLeft, barTop, barWidth, barHeight, radius);
+                        } else {
+                            chartCtx.rect(barLeft, barTop, barWidth, barHeight);
+                        }
+                        chartCtx.clip();
+
+                        // Posición del haz de luz diagonal
+                        // Animación rápida de paso del 0 al 40% del ciclo
+                        const activeProgress = Math.min(progress / 0.45, 1);
+                        if (progress <= 0.45) {
+                            const beamWidth = Math.max(40, barWidth * 0.4);
+                            const beamCenter = barLeft - beamWidth + (barWidth + beamWidth * 2) * activeProgress;
+
+                            const shimmerGrad = chartCtx.createLinearGradient(beamCenter - beamWidth / 2, 0, beamCenter + beamWidth / 2, 0);
+                            shimmerGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                            shimmerGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.75)');
+                            shimmerGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                            chartCtx.fillStyle = shimmerGrad;
+                            chartCtx.fillRect(barLeft, barTop, barWidth, barHeight);
+                        }
+                        chartCtx.restore();
+                    }
+                });
+                chartCtx.restore();
+            }
+        };
+
         this.chartSocios = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -3732,6 +3796,7 @@ class BoteAppController {
                     maxBarThickness: 20
                 }]
             },
+            plugins: [goldShimmerPlugin],
             options: {
                 indexAxis: 'y',
                 responsive: true,
@@ -3784,6 +3849,25 @@ class BoteAppController {
                 }
             }
         });
+
+        // Bucle de animación suave para el destello continuo de las barras doradas
+        if (members.some(m => m.saldo > 30)) {
+            if (this.goldShimmerAnimId) {
+                cancelAnimationFrame(this.goldShimmerAnimId);
+            }
+            const animateShimmer = () => {
+                if (!this.chartSocios || !canvas.isConnected) {
+                    this.goldShimmerAnimId = null;
+                    return;
+                }
+                const container = document.getElementById('socios-chart-container');
+                if (container && !container.classList.contains('hidden')) {
+                    this.chartSocios.render();
+                }
+                this.goldShimmerAnimId = requestAnimationFrame(animateShimmer);
+            };
+            this.goldShimmerAnimId = requestAnimationFrame(animateShimmer);
+        }
     }
 
     toggleJornadasChart() {
