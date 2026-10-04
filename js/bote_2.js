@@ -64,6 +64,12 @@ class BoteAppController {
                 }]
             }
         };
+
+        // Estado de ordenación de tablas
+        this.sociosSort = { col: 'id', dir: 'asc' };
+        this.jornadaSort = { col: 'id', dir: 'asc' };
+        this.flujoSort = { col: 'number', dir: 'asc' };
+
         this.init();
     }
 
@@ -661,9 +667,33 @@ class BoteAppController {
         if (this.memberFilter === 'positive') members = members.filter(m => m.saldo >= 0);
         if (this.memberFilter === 'negative') members = members.filter(m => m.saldo < 0);
 
-        // REGLA CLAVE SOLICITADA POR EL USUARIO:
-        // Mantener siempre el orden que aparece en el resto de la web: por ID numérico ascendente (1 a 19)
-        members.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        // Ordenación por columna (por defecto: ID ascendente)
+        const sortCol = this.sociosSort.col || 'id';
+        const sortDir = this.sociosSort.dir || 'asc';
+        members.sort((a, b) => {
+            let valA, valB;
+            if (sortCol === 'name') {
+                valA = (a.name || '').toLowerCase();
+                valB = (b.name || '').toLowerCase();
+                return sortDir === 'asc' ? valA.localeCompare(valB, 'es') : valB.localeCompare(valA, 'es');
+            } else if (sortCol === 'totIn') {
+                valA = a.totIn || 0;
+                valB = b.totIn || 0;
+            } else if (sortCol === 'totOut') {
+                valA = a.totOut || 0;
+                valB = b.totOut || 0;
+            } else if (sortCol === 'saldo') {
+                valA = a.saldo || 0;
+                valB = b.saldo || 0;
+            } else if (sortCol === 'estado') {
+                valA = a.saldo || 0;
+                valB = b.saldo || 0;
+            } else {
+                valA = parseInt(a.id) || 0;
+                valB = parseInt(b.id) || 0;
+            }
+            return sortDir === 'asc' ? valA - valB : valB - valA;
+        });
 
         members.forEach((m) => {
             // Tramos de color fijos:
@@ -837,6 +867,30 @@ class BoteAppController {
 
     handleSearch(query) {
         this.searchQuery = query;
+        this.renderMembersTable();
+    }
+
+    sortSocios(column, thElement) {
+        if (this.sociosSort.col === column) {
+            this.sociosSort.dir = this.sociosSort.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sociosSort.col = column;
+            this.sociosSort.dir = 'asc';
+        }
+
+        // Actualizar indicadores visuales de las cabeceras
+        const container = document.getElementById('socios-table-container');
+        if (container) {
+            container.querySelectorAll('th[data-sortable="true"]').forEach(th => {
+                const ind = th.querySelector('.sort-indicator');
+                if (ind) ind.textContent = '↕';
+            });
+        }
+        if (thElement) {
+            const ind = thElement.querySelector('.sort-indicator');
+            if (ind) ind.textContent = this.sociosSort.dir === 'asc' ? '↑' : '↓';
+        }
+
         this.renderMembersTable();
     }
 
@@ -1106,8 +1160,45 @@ class BoteAppController {
         if (!tbody) return;
         tbody.innerHTML = '';
 
-        // Mantener orden por ID de socio
-        jMovements.sort((a, b) => parseInt(a.memberId) - parseInt(b.memberId)).forEach((m, rowIdx) => {
+        // Ordenación por columna (por defecto: ID ascendente)
+        const jSortCol = this.jornadaSort.col || 'id';
+        const jSortDir = this.jornadaSort.dir || 'asc';
+        jMovements.sort((a, b) => {
+            let valA, valB;
+            if (jSortCol === 'name') {
+                valA = (a.memberName || '').toLowerCase();
+                valB = (b.memberName || '').toLowerCase();
+                return jSortDir === 'asc' ? valA.localeCompare(valB, 'es') : valB.localeCompare(valA, 'es');
+            } else if (jSortCol === 'aciertos') {
+                valA = a.aciertos !== undefined ? a.aciertos : -1;
+                valB = b.aciertos !== undefined ? b.aciertos : -1;
+            } else if (jSortCol === 'aportacion') {
+                valA = a.exento ? 0 : (a.aportacion || 0);
+                valB = b.exento ? 0 : (b.aportacion || 0);
+            } else if (jSortCol === 'penalizaciones') {
+                valA = (a.penalizacionUnos || 0) + (a.penalizacionBajosAciertos || 0) + (a.penalizacionPIG || 0) + (a.penalizacionMaula || 0);
+                valB = (b.penalizacionUnos || 0) + (b.penalizacionBajosAciertos || 0) + (b.penalizacionPIG || 0) + (b.penalizacionMaula || 0);
+            } else if (jSortCol === 'totalPaga') {
+                valA = a.totalPaga || 0;
+                valB = b.totalPaga || 0;
+            } else if (jSortCol === 'premios') {
+                valA = a.premios || 0;
+                valB = b.premios || 0;
+            } else if (jSortCol === 'reembolsoSellado') {
+                valA = a.sellado < 0 ? Math.abs(a.sellado) : 0;
+                valB = b.sellado < 0 ? Math.abs(b.sellado) : 0;
+            } else if (jSortCol === 'neto') {
+                valA = a.neto || 0;
+                valB = b.neto || 0;
+            } else if (jSortCol === 'boteAcumulado') {
+                valA = a.boteAcumulado || 0;
+                valB = b.boteAcumulado || 0;
+            } else {
+                valA = parseInt(a.memberId) || 0;
+                valB = parseInt(b.memberId) || 0;
+            }
+            return jSortDir === 'asc' ? valA - valB : valB - valA;
+        }).forEach((m, rowIdx) => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 transition-colors text-xs sm:text-sm';
 
@@ -1333,6 +1424,30 @@ class BoteAppController {
             `;
             tbody.appendChild(trDobles);
         }
+    }
+
+    sortJornada(column, thElement) {
+        if (this.jornadaSort.col === column) {
+            this.jornadaSort.dir = this.jornadaSort.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.jornadaSort.col = column;
+            this.jornadaSort.dir = 'asc';
+        }
+
+        // Actualizar indicadores visuales de las cabeceras de jornada
+        const table = document.getElementById('jornada-table');
+        if (table) {
+            table.querySelectorAll('th[data-sortable="true"]').forEach(th => {
+                const ind = th.querySelector('.sort-indicator');
+                if (ind) ind.textContent = '↕';
+            });
+        }
+        if (thElement) {
+            const ind = thElement.querySelector('.sort-indicator');
+            if (ind) ind.textContent = this.jornadaSort.dir === 'asc' ? '↑' : '↓';
+        }
+
+        this.renderJornadaDetail();
     }
 
     /**
@@ -1946,14 +2061,56 @@ class BoteAppController {
         `;
         tbody.appendChild(tr0);
 
-        data.jornadaSummaries.forEach(j => {
+        // Ordenar jornadas según flujoSort (Fila 0 de Bote Inicial se mantiene arriba)
+        const fCol = this.flujoSort.col || 'number';
+        const fDir = this.flujoSort.dir || 'asc';
+        const sortedJornadas = [...data.jornadaSummaries].sort((a, b) => {
+            let valA, valB;
+            if (fCol === 'date') {
+                valA = a.date || '';
+                valB = b.date || '';
+                return fDir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            } else if (fCol === 'cuotas') {
+                valA = a.numSocios * (a.costeColumna || 0.75);
+                valB = b.numSocios * (b.costeColumna || 0.75);
+            } else if (fCol === 'penalties') {
+                valA = Math.max(0, a.recaudacion - (a.numSocios * 1.50));
+                valB = Math.max(0, b.recaudacion - (b.numSocios * 1.50));
+            } else if (fCol === 'premios') {
+                valA = a.premios || 0;
+                valB = b.premios || 0;
+            } else if (fCol === 'sellado') {
+                valA = a.gastoSellado || 0;
+                valB = b.gastoSellado || 0;
+            } else if (fCol === 'neto') {
+                valA = a.neto || 0;
+                valB = b.neto || 0;
+            } else if (fCol === 'boteTotal') {
+                valA = a.number || 0;
+                valB = b.number || 0;
+            } else {
+                valA = a.number || 0;
+                valB = b.number || 0;
+            }
+            return fDir === 'asc' ? valA - valB : valB - valA;
+        });
+
+        // Calcular saldos acumulados cronológicos reales primero
+        let cronoSaldos = {};
+        let cum = 0;
+        [...data.jornadaSummaries].sort((a, b) => a.number - b.number).forEach(j => {
+            cum += j.neto;
+            cronoSaldos[j.number] = { netoAcum: cum, total: BOTE_INICIAL + cum };
+        });
+
+        sortedJornadas.forEach(j => {
             const cuotasBase = j.numSocios * (j.costeColumna || 0.75);
             const penalties = Math.max(0, j.recaudacion - (j.numSocios * 1.50));
-            saldoAcumuladoPeña += j.neto;
             totalCrecimiento += j.neto;
 
-            const boteTotalJornada = BOTE_INICIAL + saldoAcumuladoPeña;
-            const currentCrecimiento = saldoAcumuladoPeña;
+            const cInfo = cronoSaldos[j.number] || { netoAcum: j.neto, total: BOTE_INICIAL + j.neto };
+            const boteTotalJornada = cInfo.total;
+            const currentCrecimiento = cInfo.netoAcum;
 
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 text-xs sm:text-sm transition-colors border-b border-slate-800/40';
@@ -2061,6 +2218,30 @@ class BoteAppController {
                 </tr>
             `;
         }
+    }
+
+    sortFlujo(column, thElement) {
+        if (this.flujoSort.col === column) {
+            this.flujoSort.dir = this.flujoSort.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.flujoSort.col = column;
+            this.flujoSort.dir = 'asc';
+        }
+
+        // Actualizar indicadores visuales de las cabeceras de flujo
+        const container = document.getElementById('view-flujo');
+        if (container) {
+            container.querySelectorAll('th[data-sortable="true"]').forEach(th => {
+                const ind = th.querySelector('.sort-indicator');
+                if (ind) ind.textContent = '↕';
+            });
+        }
+        if (thElement) {
+            const ind = thElement.querySelector('.sort-indicator');
+            if (ind) ind.textContent = this.flujoSort.dir === 'asc' ? '↑' : '↓';
+        }
+
+        this.renderFlujoDeCaja();
     }
 
     renderPremiosDobles() {
@@ -2747,12 +2928,24 @@ class BoteAppController {
                     <table class="w-full text-left text-xs sm:text-sm border-collapse">
                         <thead class="sticky top-0 bg-slate-900 shadow">
                             <tr class="text-xs font-bold uppercase text-slate-400 border-b border-slate-800">
-                                <th class="p-2.5 sm:p-3">Evento</th>
-                                <th class="p-2.5 sm:p-3">Fecha</th>
-                                <th class="p-2.5 sm:p-3 text-center">Ac.</th>
-                                <th class="p-2.5 sm:p-3 text-right text-emerald-400">Ingreso (+)</th>
-                                <th class="p-2.5 sm:p-3 text-right text-rose-400">Gasto (-)</th>
-                                <th class="p-2.5 sm:p-3 text-right text-amber-400 font-extrabold">Saldo Tras Evento</th>
+                                <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                    <span class="inline-flex items-center gap-1">Evento <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'date')">
+                                    <span class="inline-flex items-center gap-1">Fecha <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="p-2.5 sm:p-3 text-center cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span class="inline-flex items-center gap-1">Ac. <span class="sort-indicator text-cyan-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="p-2.5 sm:p-3 text-right text-emerald-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span class="inline-flex items-center gap-1">Ingreso (+) <span class="sort-indicator font-mono">↕</span></span>
+                                </th>
+                                <th class="p-2.5 sm:p-3 text-right text-rose-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span class="inline-flex items-center gap-1">Gasto (-) <span class="sort-indicator font-mono">↕</span></span>
+                                </th>
+                                <th class="p-2.5 sm:p-3 text-right text-amber-400 font-extrabold cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span class="inline-flex items-center gap-1">Saldo Tras Evento <span class="sort-indicator font-mono">↕</span></span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">

@@ -855,9 +855,14 @@
                     <table class="w-full text-left text-xs sm:text-sm border-collapse">
                         <thead>
                             <tr class="bg-slate-900/90 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                                <th class="py-3 px-2 sm:px-3 lg:px-4">Socio</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-1">Ingresos (In) <span class="text-[11px] text-emerald-400">ℹ️</span></span>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortSocios('name', this)">
+                                    <span class="inline-flex items-center gap-1">Socio <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-1 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortSocios('totIn', this.parentElement)">
+                                        Ingresos (In) <span class="sort-indicator text-emerald-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-emerald-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
                                              <span>📥</span> Total Ingresos (In)
@@ -867,33 +872,42 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-1">Gastos & Multas (Out) <span class="text-[11px] text-rose-400">ℹ️</span></span>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-1 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortSocios('totOut', this.parentElement)">
+                                        Gastos & Multas (Out) <span class="sort-indicator text-rose-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-rose-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
-                                            <span>📤</span> Gastos y Multas (Out)
+                                             <span>📤</span> Gastos y Multas (Out)
                                         </strong>
                                         <p class="leading-relaxed">
                                             Total acumulado descontado de la hucha: cuotas semanales de quiniela (1,50 € por jornada) más multas por exceso de unos, bajos aciertos o fallos en PIG.
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-1">Saldo Actual <span class="text-[11px] text-amber-400">ℹ️</span></span>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-1 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortSocios('saldo', this.parentElement)">
+                                        Saldo Actual <span class="sort-indicator text-amber-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-amber-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
-                                            <span>🏦</span> Saldo Actual en Hucha
+                                             <span>🏦</span> Saldo Actual en Hucha
                                         </strong>
                                         <p class="leading-relaxed">
                                             Dinero real disponible en la hucha personal del socio: (Ingresos) - (Gastos & Multas) + Premios. Si baja de 5,00 €, se recomienda recargar saldo por Bizum.
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-center group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-1">Estado <span class="text-[11px] text-slate-400">ℹ️</span></span>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-center group relative select-none">
+                                    <span class="inline-flex items-center gap-1 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortSocios('estado', this.parentElement)">
+                                        Estado <span class="sort-indicator text-slate-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-slate-700 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-white block mb-1 font-bold flex items-center gap-1.5">
-                                            <span>⚖️</span> Estado del Socio
+                                             <span>⚖️</span> Estado del Socio
                                         </strong>
                                         <p class="leading-relaxed">
                                             • <strong class="text-amber-300">💰 Tío Gilito:</strong> Saldo excelente (> 30 €).<br>
@@ -1035,9 +1049,14 @@
                     <table class="w-full text-left text-xs sm:text-sm border-collapse" id="jornada-table">
                         <thead>
                             <tr class="bg-slate-900/90 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                                <th class="py-2.5 px-2 sm:px-2.5 xl:px-3">Socio</th>
-                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-center group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Ac. <span class="text-[10px] text-cyan-400">ℹ️</span></span>
+                                <th class="py-2.5 px-2 sm:px-2.5 xl:px-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortJornada('name', this)">
+                                    <span class="inline-flex items-center gap-1">Socio <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-center group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('aciertos', this.parentElement)">
+                                        Ac. <span class="sort-indicator text-cyan-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[10px] text-cyan-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-cyan-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-cyan-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>🎯</span> Aciertos de la Jornada
@@ -1047,8 +1066,11 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Cuota <span class="text-[11px] text-emerald-400">ℹ️</span></span>
+                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('aportacion', this.parentElement)">
+                                        Cuota <span class="sort-indicator text-emerald-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-emerald-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>🎟️</span> Cuota de Participación (1,50 €)
@@ -1058,8 +1080,11 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-2.5 px-1.5 sm:px-2 xl:px-2.5 text-center group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Penalizaciones <span class="text-[11px] text-amber-400">ℹ️</span></span>
+                                <th class="py-2.5 px-1.5 sm:px-2 xl:px-2.5 text-center group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('penalizaciones', this.parentElement)">
+                                        Penalizaciones <span class="sort-indicator text-amber-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-amber-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>⚠️</span> Multas y Penalizaciones
@@ -1069,8 +1094,11 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Total Paga <span class="text-[11px] text-rose-400">ℹ️</span></span>
+                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('totalPaga', this.parentElement)">
+                                        Total Paga <span class="sort-indicator text-rose-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-rose-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>💳</span> Total a Pagar en la Jornada
@@ -1080,8 +1108,11 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Premios <span class="text-[11px] text-sky-400">ℹ️</span></span>
+                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('premios', this.parentElement)">
+                                        Premios <span class="sort-indicator text-sky-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-sky-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-sky-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-sky-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>🏆</span> Premios de la Jornada
@@ -1091,8 +1122,11 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-2.5 px-1.5 sm:px-2 xl:px-2.5 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Reembolso Sellado <span class="text-[11px] text-purple-400">ℹ️</span></span>
+                                <th class="py-2.5 px-1.5 sm:px-2 xl:px-2.5 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('reembolsoSellado', this.parentElement)">
+                                        Reembolso Sellado <span class="sort-indicator text-purple-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-purple-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>🔄</span> Reembolso de Sellado
@@ -1102,8 +1136,11 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Neto <span class="text-[11px] text-teal-400">ℹ️</span></span>
+                                <th class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('neto', this.parentElement)">
+                                        Neto <span class="sort-indicator text-teal-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-teal-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-teal-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-teal-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>📊</span> Variación Neta Semanal
@@ -1113,8 +1150,11 @@
                                         </p>
                                     </div>
                                 </th>
-                                <th class="py-2.5 px-2 sm:px-2.5 xl:px-3 text-right bg-slate-900 font-extrabold text-amber-400 group relative cursor-help select-none">
-                                    <span class="inline-flex items-center gap-0.5">Bote Final <span class="text-[11px] text-amber-400">ℹ️</span></span>
+                                <th class="py-2.5 px-2 sm:px-2.5 xl:px-3 text-right bg-slate-900 font-extrabold text-amber-400 group relative select-none">
+                                    <span class="inline-flex items-center gap-0.5 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortJornada('boteAcumulado', this.parentElement)">
+                                        Bote Final <span class="sort-indicator text-amber-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="text-[11px] text-amber-400 cursor-help ml-0.5">ℹ️</span>
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                         <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                                             <span>💰</span> Bote Final del Socio
@@ -1285,15 +1325,32 @@
                     <table class="w-full text-left text-xs sm:text-sm border-collapse">
                         <thead>
                             <tr class="bg-slate-900/90 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                                <th class="py-3 px-2 sm:px-3 lg:px-4">Jornada</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4">Fecha</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-emerald-400">Cuotas Ordinarias</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-amber-400">Penalizaciones</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-emerald-400">Premios</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-rose-400">Sellado</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right">Margen Neto</th>
-                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right font-extrabold text-amber-400 group relative cursor-help">
-                                    <span class="inline-flex items-center gap-1">Bote Acumulado Peña ℹ️</span>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortFlujo('number', this)">
+                                    <span class="inline-flex items-center gap-1">Jornada <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortFlujo('date', this)">
+                                    <span class="inline-flex items-center gap-1">Fecha <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-emerald-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortFlujo('cuotas', this)">
+                                    <span class="inline-flex items-center gap-1">Cuotas Ordinarias <span class="sort-indicator font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-amber-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortFlujo('penalties', this)">
+                                    <span class="inline-flex items-center gap-1">Penalizaciones <span class="sort-indicator font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-emerald-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortFlujo('premios', this)">
+                                    <span class="inline-flex items-center gap-1">Premios <span class="sort-indicator font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right text-rose-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortFlujo('sellado', this)">
+                                    <span class="inline-flex items-center gap-1">Sellado <span class="sort-indicator font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.BoteApp.sortFlujo('neto', this)">
+                                    <span class="inline-flex items-center gap-1">Margen Neto <span class="sort-indicator text-teal-400 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-3 px-2 sm:px-3 lg:px-4 text-right font-extrabold text-amber-400 group relative select-none">
+                                    <span class="inline-flex items-center gap-1 cursor-pointer hover:text-white" data-sortable="true" onclick="window.BoteApp.sortFlujo('boteTotal', this.parentElement)">
+                                        Bote Acumulado Peña <span class="sort-indicator text-amber-400 font-mono">↕</span>
+                                    </span>
+                                    <span class="cursor-help ml-0.5">ℹ️</span>
                                     <!-- Tooltip estilo enriquecido en cabecera -->
                                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-50 text-left normal-case font-normal pointer-events-none whitespace-normal">
                                         <strong class="text-amber-400 block mb-1">💰 ¿Cómo se calcula el Bote Acumulado?</strong>
@@ -1501,11 +1558,21 @@
                 <table class="w-full text-left text-xs sm:text-sm border-collapse">
                     <thead>
                         <tr class="bg-slate-900/90 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap">Fecha</th>
-                            <th class="p-2.5 sm:p-3">Socio</th>
-                            <th class="p-2.5 sm:p-3 text-right w-28 whitespace-nowrap">Cantidad</th>
-                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap">Método</th>
-                            <th class="p-2.5 sm:p-3">Concepto</th>
+                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'date')">
+                                <span class="inline-flex items-center gap-1">Fecha <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                <span class="inline-flex items-center gap-1">Socio <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 text-right w-28 whitespace-nowrap cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                <span class="inline-flex items-center gap-1">Cantidad <span class="sort-indicator text-emerald-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                <span class="inline-flex items-center gap-1">Método <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                <span class="inline-flex items-center gap-1">Concepto <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
                             <th class="p-2.5 sm:p-3 text-center w-48 whitespace-nowrap">Acciones</th>
                         </tr>
                     </thead>
@@ -1533,11 +1600,21 @@
                 <table class="w-full text-left text-xs sm:text-sm border-collapse">
                     <thead>
                         <tr class="bg-slate-900/90 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap">Jornada</th>
-                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap">Fecha</th>
-                            <th class="p-2.5 sm:p-3">Maula Oficial</th>
-                            <th class="p-2.5 sm:p-3">Socio que Selló Realmente</th>
-                            <th class="p-2.5 sm:p-3 text-right w-24 whitespace-nowrap">Coste</th>
+                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                <span class="inline-flex items-center gap-1">Jornada <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 w-28 whitespace-nowrap cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'date')">
+                                <span class="inline-flex items-center gap-1">Fecha <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                <span class="inline-flex items-center gap-1">Maula Oficial <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                <span class="inline-flex items-center gap-1">Socio que Selló Realmente <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
+                            </th>
+                            <th class="p-2.5 sm:p-3 text-right w-24 whitespace-nowrap cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                <span class="inline-flex items-center gap-1">Coste <span class="sort-indicator text-rose-400 font-mono">↕</span></span>
+                            </th>
                             <th class="p-2.5 sm:p-3 text-center w-52 whitespace-nowrap group relative cursor-help select-none">
                                 <span class="inline-flex items-center gap-1 justify-center">Reembolso Sellador <span class="text-[11px] text-purple-400">ℹ️</span></span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
@@ -1844,6 +1921,7 @@
     </div>
 
     <!-- Scripts de Datos y Controlador -->
+    <script src="js/app-table-sorter.js"></script>
     <script src="js/bote_2_data.js"></script>
     <script src="js/bote_2.js"></script>
     <!-- Seguridad: garantizar que el contenido principal siempre es visible -->

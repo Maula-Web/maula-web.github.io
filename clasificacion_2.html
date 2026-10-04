@@ -913,18 +913,32 @@
             <div class="w-full overflow-x-auto custom-scroll rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-inner">
                 <table class="w-full text-left text-xs">
                     <thead>
-                        <tr class="bg-slate-100 dark:bg-slate-950/90 text-slate-700 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase text-[10px] tracking-wider font-extrabold">
-                            <th class="py-2.5 px-3 text-center w-16">Pos</th>
-                            <th class="py-2.5 px-4">Socio</th>
-                            <th class="py-2.5 px-4 text-center">
-                                <span>Puntos Totales</span>
+                        <tr class="bg-slate-100 dark:bg-slate-950/90 text-slate-700 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase text-[10px] tracking-wider font-extrabold select-none">
+                            <th class="py-2.5 px-3 text-center w-16 cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('rank', this)">
+                                <span>Pos <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                            </th>
+                            <th class="py-2.5 px-4 cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('name', this)">
+                                <span>Socio <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                            </th>
+                            <th class="py-2.5 px-4 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('grandTotal', this)">
+                                <span>Puntos Totales <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
                                 <span class="block text-[8px] font-mono font-bold normal-case opacity-75 text-slate-500 dark:text-slate-400">Base · Bonus · Penal</span>
                             </th>
-                            <th class="py-2.5 px-3 text-center">Aciertos Base</th>
-                            <th class="py-2.5 px-3 text-center">Bonus (+)</th>
-                            <th class="py-2.5 px-3 text-center">Penal. (-)</th>
-                            <th class="py-2.5 px-3 text-center">Premios (€)</th>
-                            <th class="py-2.5 px-3 text-center">Media / J</th>
+                            <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('baseTotal', this)">
+                                <span>Aciertos Base <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                            </th>
+                            <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('positiveBonus', this)">
+                                <span>Bonus (+) <span class="sort-indicator text-emerald-500 font-mono">↕</span></span>
+                            </th>
+                            <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('negativePenalties', this)">
+                                <span>Penal. (-) <span class="sort-indicator text-rose-500 font-mono">↕</span></span>
+                            </th>
+                            <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('prizeTotal', this)">
+                                <span>Premios (€) <span class="sort-indicator text-purple-500 font-mono">↕</span></span>
+                            </th>
+                            <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.ClasificacionApp.sortRanking('media', this)">
+                                <span>Media / J <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                            </th>
                             <th class="py-2.5 px-3 text-center">Últimas 5</th>
                             <th class="py-2.5 px-3 text-center">Ficha</th>
                         </tr>
@@ -1098,14 +1112,26 @@
                     </h4>
                     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40">
                         <table class="w-full text-xs text-left whitespace-nowrap">
-                            <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
+                            <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold select-none">
                                 <tr>
-                                    <th class="py-2 px-3.5 whitespace-nowrap">Jornada</th>
-                                    <th class="py-2 px-3 text-center">Aciertos</th>
-                                    <th class="py-2 px-3 text-center whitespace-nowrap">Bonus/Penal</th>
-                                    <th class="py-2 px-3 text-center">Puntos</th>
-                                    <th class="py-2 px-3 text-center">Premios</th>
-                                    <th class="py-2 px-3.5 text-center whitespace-nowrap">Estado</th>
+                                    <th class="py-2 px-3.5 whitespace-nowrap cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                        <span>Jornada <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                                    </th>
+                                    <th class="py-2 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                        <span>Aciertos <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                                    </th>
+                                    <th class="py-2 px-3 text-center whitespace-nowrap cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                        <span>Bonus/Penal <span class="sort-indicator text-emerald-500 font-mono">↕</span></span>
+                                    </th>
+                                    <th class="py-2 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                        <span>Puntos <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                                    </th>
+                                    <th class="py-2 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                        <span>Premios <span class="sort-indicator text-purple-500 font-mono">↕</span></span>
+                                    </th>
+                                    <th class="py-2 px-3.5 text-center whitespace-nowrap cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                        <span>Estado <span class="sort-indicator text-slate-400 font-mono">↕</span></span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="drawer-history-tbody" class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
@@ -1133,6 +1159,7 @@
     <!-- =====================================================================
          MOTOR JS DE CLASIFICACIÓN 2.0 PRO
          ===================================================================== -->
+    <script src="js/app-table-sorter.js"></script>
     <script>
         class Clasificacion2App {
             constructor() {
@@ -1147,6 +1174,7 @@
                 this.chartSelectedMembers = new Set();
                 this.chartMode = 'ranks'; // 'ranks' (Puesto #1-#19) o 'gap' (Distancia en pts al líder)
                 this.hoveredMemberId = null;
+                this.rankingSort = { col: 'rank', dir: 'asc' };
                 this.chartColors = [
                     '#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#8b5cf6',
                     '#06b6d4', '#f97316', '#84cc16', '#6366f1', '#14b8a6',
@@ -1601,6 +1629,41 @@
                     return;
                 }
 
+                // Ordenación interactiva de la tabla
+                const rSortCol = this.rankingSort.col || 'rank';
+                const rSortDir = this.rankingSort.dir || 'asc';
+                list.sort((a, b) => {
+                    let valA, valB;
+                    if (rSortCol === 'name') {
+                        valA = (a.name || '').toLowerCase();
+                        valB = (b.name || '').toLowerCase();
+                        return rSortDir === 'asc' ? valA.localeCompare(valB, 'es') : valB.localeCompare(valA, 'es');
+                    } else if (rSortCol === 'grandTotal') {
+                        valA = a.grandTotal || 0;
+                        valB = b.grandTotal || 0;
+                    } else if (rSortCol === 'baseTotal') {
+                        valA = a.baseTotal || 0;
+                        valB = b.baseTotal || 0;
+                    } else if (rSortCol === 'positiveBonus') {
+                        valA = a.positiveBonus || 0;
+                        valB = b.positiveBonus || 0;
+                    } else if (rSortCol === 'negativePenalties') {
+                        valA = a.negativePenalties || 0;
+                        valB = b.negativePenalties || 0;
+                    } else if (rSortCol === 'prizeTotal') {
+                        valA = a.prizeTotal || 0;
+                        valB = b.prizeTotal || 0;
+                    } else if (rSortCol === 'media') {
+                        valA = a.jornadasPlayed > 0 ? (a.grandTotal / a.jornadasPlayed) : 0;
+                        valB = b.jornadasPlayed > 0 ? (b.grandTotal / b.jornadasPlayed) : 0;
+                    } else {
+                        // 'rank' (Posición oficial en la peña)
+                        valA = this.sortedRanking.findIndex(x => x.member.id === a.member.id) + 1;
+                        valB = this.sortedRanking.findIndex(x => x.member.id === b.member.id) + 1;
+                    }
+                    return rSortDir === 'asc' ? valA - valB : valB - valA;
+                });
+
                 const maxPts = this.sortedRanking[0] ? this.sortedRanking[0].grandTotal : 1;
                 const totalSocios = this.sortedRanking.length;
 
@@ -1704,6 +1767,31 @@
                 });
 
                 tbody.innerHTML = html;
+            }
+
+            sortRanking(column, thElement) {
+                if (this.rankingSort.col === column) {
+                    this.rankingSort.dir = this.rankingSort.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.rankingSort.col = column;
+                    // Para puntos, bonus, premios, base suele ser natural desc al principio si no es rank
+                    this.rankingSort.dir = (column === 'rank' || column === 'name') ? 'asc' : 'desc';
+                }
+
+                // Actualizar indicadores visuales en las cabeceras
+                const table = document.getElementById('view-ranking');
+                if (table) {
+                    table.querySelectorAll('th[data-sortable="true"]').forEach(th => {
+                        const ind = th.querySelector('.sort-indicator');
+                        if (ind) ind.textContent = '↕';
+                    });
+                }
+                if (thElement) {
+                    const ind = thElement.querySelector('.sort-indicator');
+                    if (ind) ind.textContent = this.rankingSort.dir === 'asc' ? '↑' : '↓';
+                }
+
+                this.renderRankingTable();
             }
 
             // --- RENDERIZADO DE LA MATRIZ GENERAL HISTÓRICA (VISTA 1) ---

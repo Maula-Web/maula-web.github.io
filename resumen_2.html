@@ -870,14 +870,26 @@
                 </h4>
                 <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
                     <table class="w-full text-xs text-left">
-                        <thead class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
+                        <thead class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold select-none">
                             <tr>
-                                <th class="py-2.5 px-3">Jornada</th>
-                                <th class="py-2.5 px-3">Fecha</th>
-                                <th class="py-2.5 px-3 text-center">% Acierto Peña</th>
-                                <th class="py-2.5 px-3 text-center">Media Aciertos</th>
-                                <th class="py-2.5 px-3 text-center">Mejor Socio</th>
-                                <th class="py-2.5 px-3 text-center">Premios Bote</th>
+                                <th class="py-2.5 px-3 cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span>Jornada <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-2.5 px-3 cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'date')">
+                                    <span>Fecha <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span>% Acierto Peña <span class="sort-indicator text-emerald-500 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span>Media Aciertos <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                    <span>Mejor Socio <span class="sort-indicator text-amber-500 font-mono">↕</span></span>
+                                </th>
+                                <th class="py-2.5 px-3 text-center cursor-pointer hover:text-amber-500" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <span>Premios Bote <span class="sort-indicator text-purple-500 font-mono">↕</span></span>
+                                </th>
                                 <th class="py-2.5 px-3 text-center">Pleno PIG</th>
                             </tr>
                         </thead>
@@ -950,11 +962,21 @@
                     <table class="w-full text-xs text-left">
                         <thead class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
                             <tr>
-                                <th class="py-2.5 px-3">Jornada</th>
-                                <th class="py-2.5 px-3">Socio Responsable</th>
-                                <th class="py-2.5 px-3 text-center">Aciertos Dobles</th>
-                                <th class="py-2.5 px-3 text-center">Ventaja vs Sencilla</th>
-                                <th class="py-2.5 px-3 text-center">Premio Bote</th>
+                                <th class="py-2.5 px-3 cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <div class="inline-flex items-center gap-1"><span>Jornada</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-2.5 px-3 cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                    <div class="inline-flex items-center gap-1"><span>Socio Responsable</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-2.5 px-3 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <div class="inline-flex items-center justify-center gap-1"><span>Aciertos Dobles</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-2.5 px-3 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <div class="inline-flex items-center justify-center gap-1"><span>Ventaja vs Sencilla</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-2.5 px-3 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'currency')">
+                                    <div class="inline-flex items-center justify-center gap-1"><span>Premio Bote</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
                                 <th class="py-2.5 px-3">Pronósticos Reducidos</th>
                             </tr>
                         </thead>
@@ -1096,6 +1118,7 @@
     <!-- =====================================================================
          CONTROLADOR PRINCIPAL JAVASCRIPT: RESUMEN 2.0 APP
          ===================================================================== -->
+    <script src="js/app-table-sorter.js"></script>
     <script>
         class Resumen2App {
             constructor() {
@@ -1817,11 +1840,21 @@
                     <table class="w-full text-xs text-left">
                         <thead class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
                             <tr>
-                                <th class="py-1.5 px-2.5 text-center">#</th>
-                                <th class="py-1.5 px-2.5">Partido</th>
-                                <th class="py-1.5 px-2.5 text-center">Pronóstico</th>
-                                <th class="py-1.5 px-2.5 text-center">Oficial</th>
-                                <th class="py-1.5 px-2.5 text-center">Estado</th>
+                                <th class="py-1.5 px-2.5 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                    <div class="inline-flex items-center justify-center gap-1"><span>#</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-1.5 px-2.5 cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                    <div class="inline-flex items-center gap-1"><span>Partido</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-1.5 px-2.5 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                    <div class="inline-flex items-center justify-center gap-1"><span>Pronóstico</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-1.5 px-2.5 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                    <div class="inline-flex items-center justify-center gap-1"><span>Oficial</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
+                                <th class="py-1.5 px-2.5 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                    <div class="inline-flex items-center justify-center gap-1"><span>Estado</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
@@ -1959,9 +1992,15 @@
                             <table class="w-full text-xs text-left">
                                 <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
                                     <tr>
-                                        <th class="py-2 px-3">Jornada</th>
-                                        <th class="py-2 px-3">Enfrentamiento</th>
-                                        <th class="py-2 px-3 text-center">Resultado</th>
+                                        <th class="py-2 px-3 cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                            <div class="inline-flex items-center gap-1"><span>Jornada</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                        </th>
+                                        <th class="py-2 px-3 cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                            <div class="inline-flex items-center gap-1"><span>Enfrentamiento</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                        </th>
+                                        <th class="py-2 px-3 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                            <div class="inline-flex items-center justify-center gap-1"><span>Resultado</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
@@ -2222,9 +2261,15 @@
                             <table class="w-full text-xs text-left">
                                 <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase text-[10px] font-bold">
                                     <tr>
-                                        <th class="py-1.5 px-3 text-center">#</th>
-                                        <th class="py-1.5 px-3">Partido</th>
-                                        <th class="py-1.5 px-3 text-center">Resultado</th>
+                                        <th class="py-1.5 px-3 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                            <div class="inline-flex items-center justify-center gap-1"><span>#</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                        </th>
+                                        <th class="py-1.5 px-3 cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                            <div class="inline-flex items-center gap-1"><span>Partido</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                        </th>
+                                        <th class="py-1.5 px-3 text-center cursor-pointer hover:text-white select-none transition-colors" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                            <div class="inline-flex items-center justify-center gap-1"><span>Resultado</span><span class="sort-icon text-[10px] opacity-70">↕</span></div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
