@@ -2571,10 +2571,15 @@ class BoteAppController {
                 <td class="p-3 text-right font-mono font-bold text-emerald-400">+${parseFloat(i.cantidad || 0).toFixed(2).replace('.', ',')} €</td>
                 <td class="p-3 capitalize text-slate-300">${i.metodo || 'bizum'}</td>
                 <td class="p-3 text-slate-400">${i.concepto || 'Aportación manual'}</td>
-                <td class="p-3 text-center">
-                    <button onclick="window.BoteApp.deleteIngreso('${i.id}')" class="px-2 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Eliminar este ingreso">
-                        <span>🗑️</span> Eliminar
-                    </button>
+                <td class="p-3 text-center whitespace-nowrap">
+                    <div class="inline-flex items-center gap-1.5">
+                        <button onclick="window.BoteApp.openEditIngreso('${i.id}')" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Modificar este ingreso">
+                            <span>✏️</span> Modificar
+                        </button>
+                        <button onclick="window.BoteApp.deleteIngreso('${i.id}')" class="px-2 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Eliminar este ingreso">
+                            <span>🗑️</span> Eliminar
+                        </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -2788,8 +2793,46 @@ class BoteAppController {
         });
     }
 
+    openEditIngreso(ingresoId) {
+        const data = this.getSeasonData();
+        const ingreso = (data.ingresos || []).find(i => String(i.id) === String(ingresoId));
+        if (!ingreso) {
+            alert('No se encontró el ingreso a modificar.');
+            return;
+        }
+
+        this.populateSocioSelect();
+
+        const inputId = document.getElementById('form-ingreso-id');
+        const inputSocio = document.getElementById('form-ingreso-socio');
+        const inputCantidad = document.getElementById('form-ingreso-cantidad');
+        const inputMetodo = document.getElementById('form-ingreso-metodo');
+        const inputFecha = document.getElementById('form-ingreso-fecha');
+        const inputConcepto = document.getElementById('form-ingreso-concepto');
+        const titleEl = document.getElementById('modal-ingreso-title');
+        const btnSubmit = document.getElementById('btn-ingreso-submit');
+
+        if (inputId) inputId.value = String(ingreso.id);
+        if (inputSocio) inputSocio.value = String(ingreso.memberId);
+        if (inputCantidad) inputCantidad.value = parseFloat(ingreso.cantidad || 0).toFixed(2);
+        if (inputMetodo) inputMetodo.value = ingreso.metodo || 'bizum';
+        if (inputFecha) inputFecha.value = ingreso.fecha || new Date().toISOString().split('T')[0];
+        if (inputConcepto) inputConcepto.value = ingreso.concepto || '';
+
+        if (titleEl) {
+            titleEl.innerHTML = '<span>✏️</span> Modificar Aportación / Ingreso';
+        }
+        if (btnSubmit) {
+            btnSubmit.textContent = 'Actualizar Ingreso';
+        }
+
+        this.openModal('modal-ingreso');
+    }
+
     async handleCreateIngreso(e) {
         e.preventDefault();
+        const idVal = document.getElementById('form-ingreso-id')?.value;
+        const isEditing = !!idVal;
         const mId = document.getElementById('form-ingreso-socio').value;
         const cant = parseFloat(document.getElementById('form-ingreso-cantidad').value);
         const met = document.getElementById('form-ingreso-metodo').value;
@@ -2801,8 +2844,9 @@ class BoteAppController {
             return;
         }
 
-        const newEntry = {
-            id: Date.now(),
+        const entryId = isEditing ? (isNaN(idVal) ? idVal : parseInt(idVal)) : Date.now();
+        const entry = {
+            id: entryId,
             memberId: parseInt(mId),
             cantidad: cant,
             metodo: met,
@@ -2813,36 +2857,48 @@ class BoteAppController {
 
         try {
             if (window.DataService) {
-                await window.DataService.save('ingresos', newEntry);
+                await window.DataService.save('ingresos', entry);
                 await this.loadLiveFirebaseData();
             } else {
                 // Modo fallback en memoria
                 const data = this.getSeasonData();
-                data.ingresos.unshift(newEntry);
-                const m = data.memberSummaries.find(mem => String(mem.id) === String(mId));
-                if (m) {
-                    m.totIn += cant;
-                    m.saldo += cant;
-                    m.movements.push({
-                        isIngresoLibre: true,
-                        description: con,
-                        date: fec,
-                        totalIngresos: cant,
-                        totalGastos: 0,
-                        boteAcumulado: m.saldo
-                    });
+                if (isEditing) {
+                    const idx = data.ingresos.findIndex(i => String(i.id) === String(entryId));
+                    if (idx !== -1) {
+                        data.ingresos[idx] = entry;
+                    } else {
+                        data.ingresos.unshift(entry);
+                    }
+                    this.recalculateCurrentModel();
+                } else {
+                    data.ingresos.unshift(entry);
+                    const m = data.memberSummaries.find(mem => String(mem.id) === String(mId));
+                    if (m) {
+                        m.totIn += cant;
+                        m.saldo += cant;
+                        m.movements.push({
+                            isIngresoLibre: true,
+                            description: con,
+                            date: fec,
+                            totalIngresos: cant,
+                            totalGastos: 0,
+                            boteAcumulado: m.saldo
+                        });
+                    }
+                    data.summary.totalIngresos += cant;
+                    data.summary.totalSaldosVirtuales += cant;
+                    data.summary.cajaReal += cant;
+                    this.saveOfficialSummaryToStorage();
                 }
-                data.summary.totalIngresos += cant;
-                data.summary.totalSaldosVirtuales += cant;
-                data.summary.cajaReal += cant;
-                this.saveOfficialSummaryToStorage();
             }
 
             this.closeModal('modal-ingreso');
             this.renderAll();
             // Refrescar explícitamente el modal de gestión de ingresos si estaba abierto
             this.renderGestionIngresos();
-            alert(`¡Ingreso de ${cant.toFixed(2).replace('.', ',')} € registrado con éxito!`);
+            alert(isEditing
+                ? `¡Ingreso actualizado con éxito!`
+                : `¡Ingreso de ${cant.toFixed(2).replace('.', ',')} € registrado con éxito!`);
         } catch (err) {
             console.error("Error guardando ingreso:", err);
             alert("Hubo un error al guardar el ingreso en la base de datos.");
@@ -3496,6 +3552,15 @@ class BoteAppController {
     openModal(modalId) {
         if (modalId === 'modal-config') {
             this.populateConfigModal();
+        } else if (modalId === 'modal-ingreso') {
+            const inputId = document.getElementById('form-ingreso-id');
+            const titleEl = document.getElementById('modal-ingreso-title');
+            const btnSubmit = document.getElementById('btn-ingreso-submit');
+            // Si no se abrió a través de openEditIngreso, restaurar modo creación
+            if (inputId && !inputId.value) {
+                if (titleEl) titleEl.innerHTML = '<span>➕</span> Registrar Aportación / Ingreso';
+                if (btnSubmit) btnSubmit.textContent = 'Guardar Ingreso';
+            }
         } else if (modalId === 'modal-gestion-ingresos') {
             this.renderGestionIngresos();
         } else if (modalId === 'modal-gestion-jornada') {
@@ -3519,6 +3584,26 @@ class BoteAppController {
     }
 
     closeModal(modalId) {
+        if (modalId === 'modal-ingreso') {
+            const inputId = document.getElementById('form-ingreso-id');
+            const inputSocio = document.getElementById('form-ingreso-socio');
+            const inputCantidad = document.getElementById('form-ingreso-cantidad');
+            const inputMetodo = document.getElementById('form-ingreso-metodo');
+            const inputFecha = document.getElementById('form-ingreso-fecha');
+            const inputConcepto = document.getElementById('form-ingreso-concepto');
+            const titleEl = document.getElementById('modal-ingreso-title');
+            const btnSubmit = document.getElementById('btn-ingreso-submit');
+
+            if (inputId) inputId.value = '';
+            if (inputSocio) inputSocio.value = '';
+            if (inputCantidad) inputCantidad.value = '';
+            if (inputMetodo) inputMetodo.value = 'bizum';
+            if (inputFecha) inputFecha.value = new Date().toISOString().split('T')[0];
+            if (inputConcepto) inputConcepto.value = '';
+            if (titleEl) titleEl.innerHTML = '<span>➕</span> Registrar Aportación / Ingreso';
+            if (btnSubmit) btnSubmit.textContent = 'Guardar Ingreso';
+        }
+
         const el = document.getElementById(modalId);
         if (el) {
             el.classList.add('hidden');

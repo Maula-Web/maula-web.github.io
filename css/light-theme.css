@@ -878,6 +878,60 @@ body.light-theme {
     font-weight: 600 !important;
 }
 
+/* B2. Lista de Socios: Botones de filtro y selector de vista (Tabla / Gráfico) */
+.light-theme #member-filters button:not(.bg-orange-500) {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #member-filters button:not(.bg-orange-500):hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+.light-theme #member-filters button[data-filter="negative"]:not(.bg-orange-500) {
+    color: #be123c !important;
+    border-color: #fecdd3 !important;
+    background-color: #fff1f2 !important;
+}
+.light-theme #member-filters button[data-filter="negative"]:not(.bg-orange-500):hover {
+    background-color: #ffe4e6 !important;
+    border-color: #fda4af !important;
+}
+.light-theme #view-socios .bg-slate-950,
+.light-theme .inline-flex.rounded-xl.bg-slate-950 {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #btn-socios-mode-table:not(.bg-orange-500),
+.light-theme #btn-socios-mode-chart:not(.bg-orange-500) {
+    background-color: #f8fafc !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #btn-socios-mode-table:not(.bg-orange-500):hover,
+.light-theme #btn-socios-mode-chart:not(.bg-orange-500):hover {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+/* B3. Botón "Extracto" en cada fila de socios */
+.light-theme .btn-extracto,
+.light-theme button.btn-extracto,
+.light-theme #members-table-body .btn-extracto {
+    background-color: #fff7ed !important;
+    color: #c2410c !important;
+    border-color: #fdba74 !important;
+}
+.light-theme .btn-extracto:hover,
+.light-theme button.btn-extracto:hover,
+.light-theme #members-table-body .btn-extracto:hover {
+    background-color: #ea580c !important;
+    color: #ffffff !important;
+    border-color: #ea580c !important;
+}
+
 /* C. Modal Extracto de Socio: Cabecera luminosa y texto explicativo resaltado */
 .light-theme #modal-extracto-socio div[class*="bg-gradient-to-r"] {
     background: linear-gradient(135deg, #ffffff 0%, #fffcf5 50%, #fef3c7 100%) !important;
