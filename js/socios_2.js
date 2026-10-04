@@ -239,50 +239,79 @@ class SociosAppController {
         const isTes = this.isTesorero(member);
         const isDeud = saldo < -0.009 && !isTes;
 
+        const saldoPrefix = saldo >= 0 ? "+" : "";
+        const saldoTxt = `${saldoPrefix}${saldo.toFixed(2).replace(".", ",")} €`;
+
         if (isTes) {
             return {
-                status: 'tesorero',
+                status: "tesorero",
                 isTesorero: true,
                 isDeudor: false,
                 isActivo: true,
                 saldo: saldo,
-                saldoFormatted: `${saldo.toFixed(2).replace('.', ',')} €`,
-                badgeText: `🟡 Tesorero (${saldo.toFixed(2).replace('.', ',')} €)`,
-                badgeTag: '🟡 Tesorero',
-                subtext: 'Regulariza en repartos de temporada',
-                color: 'amber',
-                badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                saldoFormatted: saldoTxt,
+                badgeText: `🟡 Tesorero (${saldoTxt})`,
+                badgeTag: "🟡 Tesorero",
+                subtext: "Regulariza en repartos de temporada",
+                color: "amber",
+                badgeClass: "bg-amber-500/20 text-amber-300 border border-amber-500/40"
             };
         }
 
-        if (isDeud) {
+        // Semáforo alineado con el gráfico de Bote:
+        // 🟢 Verde: Saldo holgado (>= 40,00 €)
+        // 🟡 Amarillo: Saldo normal (>= 10,00 € y < 40,00 €)
+        // 🔴 Rojo: Saldo bajo o deudor (< 10,00 €)
+        if (saldo >= 40) {
             return {
-                status: 'deudor',
+                status: "activo",
                 isTesorero: false,
-                isDeudor: true,
-                isActivo: false,
+                isDeudor: false,
+                isActivo: true,
                 saldo: saldo,
-                saldoFormatted: `${saldo.toFixed(2).replace('.', ',')} €`,
-                badgeText: `🔴 Deudor (${saldo.toFixed(2).replace('.', ',')} €) · No activo`,
-                badgeTag: '🔴 Saldo Deudor',
-                subtext: 'Excluido del Bote hasta regularizar',
-                color: 'rose',
-                badgeClass: 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                saldoFormatted: saldoTxt,
+                badgeText: `🟢 Al corriente (${saldoTxt})`,
+                badgeTag: "🟢 Activo en Bote",
+                subtext: "Saldo holgado (≥ 40 €)",
+                color: "emerald",
+                badgeClass: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
             };
         }
 
+        if (saldo >= 10) {
+            return {
+                status: "normal",
+                isTesorero: false,
+                isDeudor: false,
+                isActivo: true,
+                saldo: saldo,
+                saldoFormatted: saldoTxt,
+                badgeText: `🟡 Al corriente (${saldoTxt})`,
+                badgeTag: "🟡 Activo en Bote",
+                subtext: "Saldo normal (10 € - 40 €)",
+                color: "amber",
+                badgeClass: "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+            };
+        }
+
+        // Saldo < 10 € (Rojo: saldo bajo si >= 0, o saldo deudor si < 0)
+        const isDeudorReal = saldo < -0.009;
         return {
-            status: 'activo',
+            status: isDeudorReal ? "deudor" : "saldo_bajo",
             isTesorero: false,
-            isDeudor: false,
-            isActivo: true,
+            isDeudor: isDeudorReal,
+            isActivo: !isDeudorReal,
             saldo: saldo,
-            saldoFormatted: `+${saldo.toFixed(2).replace('.', ',')} €`,
-            badgeText: `🟢 Al corriente (+${saldo.toFixed(2).replace('.', ',')} €)`,
-            badgeTag: '🟢 Activo en Bote',
-            subtext: 'Activo con derecho pleno al Bote',
-            color: 'emerald',
-            badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+            saldoFormatted: saldoTxt,
+            badgeText: isDeudorReal
+                ? `🔴 Deudor (${saldoTxt}) · No activo`
+                : `🔴 Saldo bajo (${saldoTxt})`,
+            badgeTag: isDeudorReal ? "🔴 Saldo Deudor" : "🔴 Saldo Bajo",
+            subtext: isDeudorReal
+                ? "Excluido del Bote hasta regularizar"
+                : "Saldo bajo (< 10 €) · Conviene recargar",
+            color: "rose",
+            badgeClass: "bg-rose-500/20 text-rose-300 border border-rose-500/40"
         };
     }
 
