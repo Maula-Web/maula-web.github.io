@@ -948,11 +948,36 @@ window.AppTextScale = {
     },
 
     toggleDropdown(e) {
-        if (e) e.stopPropagation();
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         const dropdown = document.getElementById('text-scale-dropdown-panel');
         if (!dropdown) return;
+
         const isHidden = dropdown.classList.contains('hidden');
         if (isHidden) {
+            // Si el botón que lo invocó es el móvil, reposicionar el dropdown debajo del botón móvil o centrado arriba
+            const triggerMobile = document.getElementById('btn-text-scale-trigger-mobile');
+            const triggerDesktop = document.getElementById('btn-text-scale-trigger');
+            
+            // Si estamos en móvil o se pulsó el botón móvil
+            if (e && e.currentTarget && e.currentTarget.id === 'btn-text-scale-trigger-mobile') {
+                dropdown.style.position = 'fixed';
+                dropdown.style.top = '60px';
+                dropdown.style.right = '12px';
+                dropdown.style.left = 'auto';
+                dropdown.style.width = 'calc(100vw - 24px)';
+                dropdown.style.maxWidth = '300px';
+            } else {
+                dropdown.style.position = 'absolute';
+                dropdown.style.top = '100%';
+                dropdown.style.right = '0';
+                dropdown.style.left = 'auto';
+                dropdown.style.width = '16rem';
+                dropdown.style.maxWidth = 'none';
+            }
+
             dropdown.classList.remove('hidden');
             dropdown.classList.add('flex');
         } else {
@@ -970,22 +995,26 @@ window.AppTextScale = {
     },
 
     updateUI(scaleId) {
-        // Actualizar indicador en el botón trigger
+        // Actualizar indicador en los botones triggers
         const curr = this.SIZES.find(s => s.id === scaleId) || this.SIZES[0];
         document.querySelectorAll('.text-scale-trigger-label').forEach(el => {
             el.textContent = curr.short;
         });
 
+        const mobileTrigger = document.getElementById('btn-text-scale-trigger-mobile');
+        if (mobileTrigger) {
+            mobileTrigger.innerHTML = `🔤 <span class="text-[9px] font-mono text-amber-500 font-bold ml-0.5">${curr.short}</span>`;
+        }
+
         // Actualizar estados activos dentro del dropdown
         document.querySelectorAll('[data-text-scale-opt]').forEach(btn => {
             const optId = btn.getAttribute('data-text-scale-opt');
+            const check = btn.querySelector('.check-indicator');
             if (optId === scaleId) {
-                btn.className = 'w-full px-3 py-2 rounded-xl text-left text-xs font-bold transition flex items-center justify-between bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/40 shadow-sm';
-                const check = btn.querySelector('.check-indicator');
+                btn.classList.add('active-scale');
                 if (check) check.style.display = 'inline';
             } else {
-                btn.className = 'w-full px-3 py-2 rounded-xl text-left text-xs font-semibold transition flex items-center justify-between text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-transparent';
-                const check = btn.querySelector('.check-indicator');
+                btn.classList.remove('active-scale');
                 if (check) check.style.display = 'none';
             }
         });
@@ -1009,25 +1038,25 @@ window.AppTextScale = {
             wrapper.className = 'relative flex-shrink-0';
             wrapper.innerHTML = `
                 <button type="button" id="btn-text-scale-trigger" onclick="window.AppTextScale && window.AppTextScale.toggleDropdown(event)"
-                        class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-inner cursor-pointer"
+                        class="px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-inner cursor-pointer"
                         title="Cambiar tamaño de texto (Accesibilidad)">
                     <span class="text-sm">🔤</span>
-                    <span class="text-scale-trigger-label font-mono text-[11px] font-black text-amber-600 dark:text-amber-400">${currObj.short}</span>
-                    <span class="text-[9px] text-slate-400">▾</span>
+                    <span class="text-scale-trigger-label font-mono text-[11px] font-black text-amber-500">${currObj.short}</span>
+                    <span class="text-[9px] opacity-70">▾</span>
                 </button>
 
                 <!-- Panel Flotante Desplegable -->
-                <div id="text-scale-dropdown-panel" class="hidden absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-amber-500/40 shadow-2xl z-[99999] flex-col gap-1 backdrop-blur-xl animate-in fade-in duration-200" onclick="event.stopPropagation()">
-                    <div class="px-2.5 py-1.5 border-b border-slate-100 dark:border-slate-800/80 mb-1">
-                        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Tamaño de Texto</span>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Adaptable a pantallas de PC, tablet y móvil.</p>
+                <div id="text-scale-dropdown-panel" class="hidden absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl border shadow-2xl z-[99999] flex-col gap-1 backdrop-blur-xl animate-in fade-in duration-200" onclick="event.stopPropagation()">
+                    <div class="text-scale-header px-2.5 py-1.5 border-b mb-1">
+                        <span class="text-[10px] font-black uppercase tracking-wider block">Tamaño de Texto</span>
+                        <p class="text-[11px] leading-tight mt-0.5">Adaptable a pantallas de PC, tablet y móvil.</p>
                     </div>
                     ${this.SIZES.map(s => `
                         <button type="button" data-text-scale-opt="${s.id}" onclick="window.AppTextScale.setScale('${s.id}'); window.AppTextScale.closeDropdown();"
-                                class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold transition flex items-center justify-between text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-transparent">
+                                class="text-scale-item-btn w-full px-3 py-2 rounded-xl text-left text-xs font-semibold transition flex items-center justify-between border border-transparent cursor-pointer ${s.id === currScale ? 'active-scale' : ''}">
                             <div>
                                 <span class="font-bold block">${s.label}</span>
-                                <span class="text-[10px] text-slate-400 font-normal">${s.desc}</span>
+                                <span class="text-[10px] opacity-75 font-normal">${s.desc}</span>
                             </div>
                             <span class="check-indicator text-amber-500 font-black text-sm" style="display:${s.id === currScale ? 'inline' : 'none'};">✓</span>
                         </button>
@@ -1043,15 +1072,20 @@ window.AppTextScale = {
             mobileBtn.id = 'btn-text-scale-trigger-mobile';
             mobileBtn.type = 'button';
             mobileBtn.onclick = (e) => this.toggleDropdown(e);
-            mobileBtn.className = 'w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-amber-500/40 text-[11px] font-black flex items-center justify-center shadow-inner cursor-pointer';
+            mobileBtn.className = 'px-1.5 py-1 rounded-lg border text-[11px] font-black flex items-center justify-center gap-0.5 shadow-inner cursor-pointer';
             mobileBtn.title = 'Tamaño de texto';
-            mobileBtn.innerHTML = `🔤`;
+            mobileBtn.innerHTML = `🔤 <span class="text-[9px] font-mono text-amber-500 font-bold ml-0.5">${currObj.short}</span>`;
             themeMobile.parentElement.insertBefore(mobileBtn, themeMobile.nextSibling);
         }
 
-        // Cerrar panel al pinchar fuera
-        document.addEventListener('click', () => {
-            this.closeDropdown();
+        // Cerrar panel al pinchar fuera o al hacer scroll en móvil
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('text-scale-dropdown-panel');
+            const trigDesk = document.getElementById('btn-text-scale-trigger');
+            const trigMob = document.getElementById('btn-text-scale-trigger-mobile');
+            if (panel && !panel.contains(e.target) && (!trigDesk || !trigDesk.contains(e.target)) && (!trigMob || !trigMob.contains(e.target))) {
+                this.closeDropdown();
+            }
         });
     },
 
