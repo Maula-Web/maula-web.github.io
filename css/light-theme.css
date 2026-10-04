@@ -1418,5 +1418,19 @@ nav .overflow-x-auto,
     font-weight: 800 !important;
 }
 
+/* =========================================================================
+   MARCA DE AGUA EN MOSAICO DEL LOGO (SOLO PC / ESCRITORIO) - TEMA CLARO
+   ========================================================================= */
+@media (min-width: 1024px) {
+    html.light-theme body::before,
+    body.light-theme::before,
+    .light-theme body::before {
+        /* En Modo Claro: sutilmente más oscuro que el fondo cáscara de huevo (#f8f5ed),
+           tono sepia/tostado cálido para armonizar con los ribetes dorados sin ensuciar */
+        opacity: 0.045 !important;
+        filter: brightness(0.65) contrast(1.1) sepia(60%) hue-rotate(345deg) !important;
+    }
+}
+
 
 
