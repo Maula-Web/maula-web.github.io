@@ -924,12 +924,12 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la escala de solvencia y semáforos:
 - 🔴 **Rojo (< 5,00 €)**: Saldo bajo o deudor. Requiere Bizum de recarga inmediata a Marcelo para cubrir las cuotas de quiniela.
 - 🟡 **Amarillo (5,00 € a 15,00 €)**: Saldo regular / aviso.
-- 🟢 **Verde (15,00 € a 30,00 €)**: Saldo adecuado / al corriente.
-- 💰 **Modo Tío Gilito (> 30,00 €)**: Saldo excelente.
+- 🟢 **Verde (15,00 € a 50,00 €)**: Saldo adecuado / al corriente.
+- 💰 **Modo Tío Gilito (> 50,00 €)**: Saldo excelente.
   - **Identificador**: `💰 Tío Gilito`.
   - **Chapa Metálica (`.badge-gold-ingot`)**: Gradiente reflectante multicapa (`linear-gradient(135deg, #bf953f 0%, #fcf6ba 28%, #b38728 55%, #fbf5b7 78%, #aa771c 100%)`), borde dorado `#ffd700` y animación de destello móvil diagonal (*shimmer*).
   - **Texto Metálico (`.text-gold-ingot`)**: Recorte de degradado áureo de alto contraste en modo oscuro y tono bronce/ámbar enriquecido en modo claro.
-  - **Barras del Gráfico de Bote (`renderSociosChart`)**: Degradado canvas metálico dorado complementado con un plugin personalizado en Chart.js y bucle `requestAnimationFrame` que proyecta el mismo destello de luz dinámico cruzando sobre las barras de los socios con saldo `> 30 €`.
+  - **Barras del Gráfico de Bote (`renderSociosChart`)**: Acabado lingote de oro metalizado 3D adaptativo por longitud individual de barra (`barLeft` a `barRight`), con bisel superior especular (`rgba(255, 255, 255, 0.85)`), sombra profunda inferior (`rgba(61, 35, 0, 0.6)`), contorno `#ffd700` de 1.5px y haz animado continuo para saldos `> 50 €`.
 
 ### 31.2. Edición y Gestión de Ingresos Manuales
 - En `js/bote_2.js` y `bote_2.html` se añadió la capacidad de **modificar aportaciones manuales ya registradas** (`openEditIngreso(id)`):
@@ -950,6 +950,55 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 32. ENLACES INTERNOS DE DASHBOARD V2 Y NAVEGACIÓN PRO
+- **Ver Dobles**: Al pulsar la etiqueta "Ver Dobles" en el Dashboard v2, el sistema busca automáticamente la quiniela de dobles de la jornada activa (o la más reciente) y la despliega directamente en modal/pantalla sin desviar innecesariamente a la vista general de pronósticos.
+- **Ver Tabla Completa**: Redirigido a la versión 2.0 de Clasificación (`clasificacion_2.html`).
+- **Ver Reembolso**: Redirigido de forma directa al modal de Reembolso Sellado dentro de Bote 2 (`bote_2.html`).
+- **Ver Histórico**: Redirigido a la versión 2.0 de Resumen (`resumen_2.html`).
+- **Eliminación del Selector de Versión para Fernando Lozano**: 
+  - En `js/utils.js`, se configuró la aplicación para que por defecto arranque contra la versión Pro (2.0) sin mostrar el selector clásico 1.0 / Pro 2.0 en el menú.
+
+---
+
+## 33. SELECTORES UNIVERSALES DE ORDENACIÓN EN TABLAS Y MODALES
+- Se implementó ordenación interactiva ascendente/descendente en las cabeceras de todas las tablas de la aplicación y modales emergentes (excepto la Matriz Histórica por su naturaleza matricial fija de doble eje):
+  - Indicadores visuales de ordenación `↕`, `▲` y `▼`.
+  - Ordenación inteligente adaptativa: numérica, alfabética y por jornada (parseando textos compuestos como *"Jornada 12"* o fechas con emojis sin romper el orden numérico).
+  - Corregida la ordenación por jornada en las tablas de *Rendimiento por jornada* y *Quiniela de dobles* de la hoja Resumen (`js/resumen_2.js`).
+
+---
+
+## 34. EFECTO LINGOTE DE ORO METALIZADO 3D ADAPTATIVO EN GRÁFICO DE BOTE
+- **Problema previo**: El gradiente en canvas era global de 0 a canvas.width, provocando que las barras cortas de >30€/50€ se vieran amarillas planas sin brillo metálico.
+- **Solución implementada (`js/bote_2.js`)**:
+  - El plugin `goldShimmerPlugin` calcula dinámicamente las coordenadas individuales de cada barra (`barLeft`, `barRight`, `barTop`, `barHeight`).
+  - Proyecta un gradiente diagonal (135°) idéntico a la chapa `.badge-gold-ingot` (`#9c6f21` -> `#bf953f` -> `#fcf6ba` -> `#b38728` -> `#fbf5b7` -> `#aa771c` -> `#784e0e`).
+  - Aplica un bisel 3D de relieve de lingote (resplandor superior `rgba(255, 255, 255, 0.85)` y sombra inferior de volumen `rgba(61, 35, 0, 0.6)`).
+  - Contorno dorado pulido `#ffd700` (1.5px) y haz de destello animado (*shimmer*) sincronizado mediante `requestAnimationFrame`.
+
+---
+
+## 35. SISTEMA DE TAMAÑO DE TEXTO ADAPTABLE (ACCESIBILIDAD 4 NIVELES)
+- **Objetivo**: Facilitar la lectura a socios con dificultades visuales sin alterar la maquetación ni desbordar elementos en PC, tablets o móviles.
+- **Selector accesible (`AppTextScale` en `js/utils.js`)**:
+  - Botón integrado en cabecera junto al selector de tema con icono `🔤` y nivel actual (`A`, `A+`, etc.).
+  - En móviles: anclado con `position: fixed`, máxima z-index, soporte táctil (`touch-manipulation`, `touchend`) y desacoplado directamente a `document.body` para no ser ocultado por media queries de cabecera.
+  - Estilizado con reborde azul `border-blue` tanto en modo oscuro como en modo claro.
+- **Escala de 4 niveles con límite máximo estricto de +10%**:
+  - **Normal (A)**: 100% (tamaño original de diseño).
+  - **Ligero (A+)**: +4% en textos pequeños/etiquetas (`1.04em`), +2% en tablas/medianos.
+  - **Medio (A++)**: +7% en textos pequeños/etiquetas (`1.07em`), +4% en tablas/medianos.
+  - **Grande (A+++)**: +10% tope máximo (`1.10em`), +6% en tablas/medianos (`1.06em`).
+  - **Protección de títulos y encabezados**: `h1`, `h2`, `text-lg`, `text-xl`, `text-2xl`, marcadores y KPIs conservan su tamaño base (`1em`) para impedir que se vuelvan gigantescos.
+  - **Modo Oscuro y Claro**: Reglas integradas universalmente en `css/styles.css` y `css/light-theme.css`, con persistencia en `localStorage` (`maulas_text_scale`).
+
+---
+
+## 36. REFINAMIENTOS DE NAVEGACIÓN Y MENÚ SUPERIOR
+- **Icono de Votaciones (`🗳️`)**: Homogeneizado en modo oscuro retirando clases residuales `bg-white/10`, integrándose limpiamente con el fondo como el resto de accesos de la barra de navegación.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
@@ -959,7 +1008,5 @@ Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
 3. Indícale en qué vista de la web o qué archivo quieres que se enfoque y qué error concreto ocurre.
 
 *(Nota: Este archivo debe editarse y actualizarse cada vez que implementemos una regla de negocio nueva que sea compleja de entender para alguien externo).*
-
-
 
 
