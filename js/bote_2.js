@@ -2584,17 +2584,17 @@ class BoteAppController {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 text-xs';
             tr.innerHTML = `
-                <td class="p-3 text-slate-400">${i.fecha || 'N/A'}</td>
+                <td class="p-3 text-slate-400 whitespace-nowrap">${i.fecha || 'N/A'}</td>
                 <td class="p-3 font-bold text-white">${mem ? mem.name : `Socio #${i.memberId}`}</td>
-                <td class="p-3 text-right font-mono font-bold text-emerald-400">+${parseFloat(i.cantidad || 0).toFixed(2).replace('.', ',')} €</td>
-                <td class="p-3 capitalize text-slate-300">${i.metodo || 'bizum'}</td>
+                <td class="p-3 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">+${parseFloat(i.cantidad || 0).toFixed(2).replace('.', ',')} €</td>
+                <td class="p-3 capitalize text-slate-300 whitespace-nowrap">${i.metodo || 'bizum'}</td>
                 <td class="p-3 text-slate-400">${i.concepto || 'Aportación manual'}</td>
                 <td class="p-3 text-center whitespace-nowrap">
-                    <div class="inline-flex items-center gap-1.5">
-                        <button onclick="window.BoteApp.openEditIngreso('${i.id}')" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Modificar este ingreso">
+                    <div class="inline-flex items-center justify-center gap-1.5">
+                        <button onclick="window.BoteApp.openEditIngreso('${i.id}')" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Modificar este ingreso">
                             <span>✏️</span> Modificar
                         </button>
-                        <button onclick="window.BoteApp.deleteIngreso('${i.id}')" class="px-2 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Eliminar este ingreso">
+                        <button onclick="window.BoteApp.deleteIngreso('${i.id}')" class="px-2.5 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Eliminar este ingreso">
                             <span>🗑️</span> Eliminar
                         </button>
                     </div>
