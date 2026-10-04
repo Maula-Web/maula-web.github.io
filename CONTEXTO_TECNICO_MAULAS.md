@@ -925,8 +925,8 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 - 🔴 **Rojo (< 5,00 €)**: Saldo bajo o deudor. Requiere Bizum de recarga inmediata a Marcelo para cubrir las cuotas de quiniela.
 - 🟡 **Amarillo (5,00 € a 15,00 €)**: Saldo regular / aviso.
 - 🟢 **Verde (15,00 € a 30,00 €)**: Saldo adecuado / al corriente.
-- 💶 **Modo Tío Gilito (> 30,00 €)**: Saldo excelente.
-  - **Identificador**: `💶 Tío Gilito`.
+- 💰 **Modo Tío Gilito (> 30,00 €)**: Saldo excelente.
+  - **Identificador**: `💰 Tío Gilito`.
   - **Chapa Metálica (`.badge-gold-ingot`)**: Gradiente reflectante multicapa (`linear-gradient(135deg, #bf953f 0%, #fcf6ba 28%, #b38728 55%, #fbf5b7 78%, #aa771c 100%)`), borde dorado `#ffd700` y animación de destello móvil diagonal (*shimmer*).
   - **Texto Metálico (`.text-gold-ingot`)**: Recorte de degradado áureo de alto contraste en modo oscuro y tono bronce/ámbar enriquecido en modo claro.
   - **Barras del Gráfico de Bote (`renderSociosChart`)**: Degradado canvas metálico dorado complementado con un plugin personalizado en Chart.js y bucle `requestAnimationFrame` que proyecta el mismo destello de luz dinámico cruzando sobre las barras de los socios con saldo `> 30 €`.
