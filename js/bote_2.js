@@ -2612,7 +2612,7 @@ class BoteAppController {
                 const isSelected = hasSustituto && String(m.id) === String(currentSustitutoId);
                 const isOfficial = String(m.id) === String(officialMaulaId);
                 return `<option value="${m.id}" ${isSelected ? 'selected' : ''}>
-                    ${isOfficial ? `👤 ${m.name} (Maula oficial)` : `🔄 Sustituto: ${m.name}`}
+                    ${isOfficial ? `👤 ${m.name}` : `🔄 Sustituto: ${m.name}`}
                 </option>`;
             }).join('');
 
@@ -2629,7 +2629,7 @@ class BoteAppController {
                 <td class="p-3">
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <select onchange="window.BoteApp.changeSustitutoSellado('${j.id || j.number}', this.value)" class="bg-slate-900 border ${hasSustituto ? 'border-amber-500/60 text-amber-300 font-semibold' : 'border-slate-700 text-slate-300'} rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-amber-500 max-w-[210px] cursor-pointer">
-                            <option value="">👤 ${officialMaula ? officialMaula.name : 'Maula Oficial'} (Maula oficial)</option>
+                            <option value="">👤 ${officialMaula ? officialMaula.name : 'Maula Oficial'}</option>
                             ${optionsHtml}
                         </select>
                         ${hasSustituto ? '<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold border border-amber-500/30 whitespace-nowrap">🔄 Sustituto</span>' : ''}
