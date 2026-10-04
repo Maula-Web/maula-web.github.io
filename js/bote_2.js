@@ -654,8 +654,69 @@ class BoteAppController {
         members.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         members.forEach((m) => {
-            const isPositive = m.saldo >= 0;
-            const saldoColor = isPositive ? 'text-emerald-400' : 'text-rose-400';
+            // Semáforo de 3 colores alineado con el gráfico de Bote y la hoja de Socios:
+            // 🟢 Verde (>= 40,00 €): Saldo holgado
+            // 🟡 Amarillo (10,00 € a 40,00 €): Saldo normal
+            // 🔴 Rojo (< 10,00 €): Saldo bajo o en deuda
+            let saldoColor = "text-rose-400";
+            let statusBadge = "";
+
+            if (m.saldo >= 40) {
+                saldoColor = "text-emerald-400";
+                statusBadge = `
+                    <div class="group/status relative cursor-help inline-block">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm">
+                            <span>🟢</span> Al corriente
+                        </span>
+                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
+                            <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>🟢</span> Al Corriente (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                            </strong>
+                            <p class="leading-relaxed">
+                                Saldo holgado (≥ 40 €) en su hucha virtual para cubrir las cuotas de las próximas jornadas.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (m.saldo >= 10) {
+                saldoColor = "text-amber-400";
+                statusBadge = `
+                    <div class="group/status relative cursor-help inline-block">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm">
+                            <span>🟡</span> Al corriente
+                        </span>
+                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
+                            <strong class="text-amber-300 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>🟡</span> Al Corriente (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                            </strong>
+                            <p class="leading-relaxed">
+                                Saldo normal (10 € - 40 €) en su hucha virtual.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                saldoColor = "text-rose-400";
+                const isDeudaNegativa = m.saldo < 0;
+                const badgeLabel = isDeudaNegativa ? "En Deuda" : "Saldo Bajo";
+                const icon = "🔴";
+                statusBadge = `
+                    <div class="group/status relative cursor-help inline-block whitespace-nowrap">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm whitespace-nowrap">
+                            <span>${icon}</span> ${badgeLabel}
+                        </span>
+                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
+                            <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>${icon}</span> ${badgeLabel} (${m.saldo.toFixed(2).replace(".", ",")} €)
+                            </strong>
+                            <p class="leading-relaxed">
+                                ${isDeudaNegativa ? "El socio tiene saldo negativo en su hucha. Se requiere una recarga mediante Bizum a Marcelo para regularizar." : "Saldo bajo (< 10 €). Conviene hacer un Bizum a Marcelo para no quedarse en descubierto."}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 transition-colors group cursor-pointer';
             tr.onclick = (e) => {
@@ -664,40 +725,6 @@ class BoteAppController {
 
             const names = (m.name || 'Socio').trim().split(/\s+/);
             const initials = names.length > 1 ? (names[0][0] + names[1][0]).toUpperCase() : names[0].slice(0, 2).toUpperCase();
-
-            let statusBadge = `
-                <div class="group/status relative cursor-help inline-block">
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm">
-                        <span>✅</span> Al corriente
-                    </span>
-                    <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
-                        <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
-                            <span>✅</span> Al Corriente (+${m.saldo.toFixed(2).replace('.', ',')} €)
-                        </strong>
-                        <p class="leading-relaxed">
-                            El socio dispone de saldo positivo en su hucha virtual para cubrir las cuotas semanales de las próximas jornadas.
-                        </p>
-                    </div>
-                </div>
-            `;
-            if (m.saldo < 0) {
-                statusBadge = `
-                    <div class="group/status relative cursor-help inline-block whitespace-nowrap">
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center gap-1 hover:brightness-125 transition-all shadow-sm whitespace-nowrap">
-                            <span>⚠️</span> En Deuda
-                        </span>
-                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
-                            <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>⚠️</span> Saldo Deudor (${m.saldo.toFixed(2).replace('.', ',')} €)
-                            </strong>
-                            <p class="leading-relaxed">
-                                El socio tiene saldo negativo en su hucha. Se requiere una recarga mediante Bizum o transferencia bancaria para regularizar su cuenta.
-                            </p>
-                        </div>
-                    </div>
-                `;
-            }
-
             tr.innerHTML = `
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 whitespace-nowrap">
                     <div class="flex items-center gap-3">
