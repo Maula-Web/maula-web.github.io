@@ -456,7 +456,9 @@
 
                 <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between">
                     <span class="text-slate-500">Premio Colectivo</span>
-                    <a href="pronosticos_2.html" class="text-amber-400 font-bold hover:underline">Ver Dobles →</a>
+                    <button type="button" onclick="window.DashboardApp && window.DashboardApp.openDoblesModal()" class="text-amber-400 font-bold hover:underline cursor-pointer flex items-center gap-1">
+                        <span>Ver Dobles</span> <span>→</span>
+                    </button>
                 </div>
             </div>
 
@@ -499,7 +501,7 @@
 
                 <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between">
                     <span class="text-slate-500">Reembolso 100% Bote</span>
-                    <a href="bote_2.html" class="text-rose-400 font-bold hover:underline">Ver Reembolso →</a>
+                    <a href="bote_2.html?modal=gestion-jornada" class="text-rose-400 font-bold hover:underline">Ver Reembolso →</a>
                 </div>
             </div>
 
@@ -542,7 +544,7 @@
 
                 <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between">
                     <span class="text-slate-400 font-semibold" id="leader-jornadas-count">6 jornadas disputadas</span>
-                    <a href="resultados.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>
+                    <a href="clasificacion_2.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>
                 </div>
             </div>
 
@@ -582,7 +584,7 @@
                 <div class="pt-3 mt-3 border-t border-slate-800 text-xs flex items-center justify-between text-slate-500">
                     <span id="pig-foot-left" class="text-slate-400 font-semibold">6 jornadas disputadas</span>
                     <span id="pig-foot-right">
-                        <a href="resultados.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>
+                        <a href="clasificacion_2.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>
                     </span>
                 </div>
             </div>
@@ -799,6 +801,47 @@
             <div class="pt-3 border-t border-slate-800 flex justify-end">
                 <button type="button" onclick="window.DashboardApp && window.DashboardApp.closeInfoModal()" class="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition active:scale-95">
                     Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL QUINIELA DE DOBLES DE LA PEÑA (VISUALIZACIÓN COMPLETA)
+         ===================================================================== -->
+    <div id="modal-dobles-view" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100095] flex items-center justify-center p-3 sm:p-4">
+        <div class="max-w-xl w-full p-5 sm:p-6 rounded-2xl bg-[#0b0f19] border-2 border-amber-500/70 shadow-2xl shadow-amber-500/25 text-slate-100 space-y-4 animate-widget relative flex flex-col max-h-[90vh]">
+            <!-- Encabezado -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl p-2 rounded-xl bg-amber-500/20 border border-amber-500/40">👑</span>
+                    <div>
+                        <h3 id="modal-dobles-title" class="text-base sm:text-lg font-black text-amber-400">Quiniela de Dobles</h3>
+                        <span id="modal-dobles-author" class="text-xs text-slate-400 font-medium">Boleto colectivo de la peña</span>
+                    </div>
+                </div>
+                <button type="button" onclick="window.DashboardApp && window.DashboardApp.closeDoblesModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center font-bold text-sm transition" title="Cerrar">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Resumen superior: método, dobles activos, importe sellado -->
+            <div id="modal-dobles-meta" class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs flex flex-wrap items-center justify-between gap-2 shrink-0">
+                <!-- Inyectado dinámicamente -->
+            </div>
+
+            <!-- Lista de los 15 partidos con su pronóstico -->
+            <div id="modal-dobles-matches-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1 min-h-0 text-xs divide-y divide-slate-800/60">
+                <!-- Inyectado dinámicamente -->
+            </div>
+
+            <!-- Pie de modal -->
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between shrink-0">
+                <div id="modal-dobles-status" class="text-xs text-slate-400">
+                    <!-- Estado de sellado -->
+                </div>
+                <button type="button" onclick="window.DashboardApp && window.DashboardApp.closeDoblesModal()" class="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition active:scale-95">
+                    Cerrar
                 </button>
             </div>
         </div>

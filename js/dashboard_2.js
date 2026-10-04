@@ -391,6 +391,7 @@ class Dashboard2AppController {
 
             // C. Widget 2: Participación y envíos de la peña
             this.renderSubmissionProgress(this.nextJornada, pronosticosMap);
+            this.lastJornadaOutcome = lastJornadaOutcome;
 
             // D. Widget 3: 👑 Ganador Semanal (Rellena Dobles)
             const elWinnerName = document.getElementById('role-winner-name');
@@ -827,7 +828,7 @@ class Dashboard2AppController {
                 footLeft.textContent = `${playedCount || 0} jornadas disputadas`;
             }
             if (footRight) {
-                footRight.innerHTML = `<a href="resultados.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>`;
+                footRight.innerHTML = `<a href="clasificacion_2.html" class="text-amber-400 font-bold hover:underline">Ver Tabla Completa →</a>`;
             }
         }
     }
@@ -1399,6 +1400,186 @@ class Dashboard2AppController {
     }
 
     /**
+     * Modal para ver la Quiniela de Dobles en pantalla
+     */
+    openDoblesModal() {
+        const modal = document.getElementById('modal-dobles-view');
+        if (!modal) return;
+
+        const titleEl = document.getElementById('modal-dobles-title');
+        const authorEl = document.getElementById('modal-dobles-author');
+        const metaEl = document.getElementById('modal-dobles-meta');
+        const listEl = document.getElementById('modal-dobles-matches-list');
+        const statusEl = document.getElementById('modal-dobles-status');
+
+        // Determinar la jornada objetivo: primero la próxima si existe, o la última que tenga dobles
+        let targetJ = this.nextJornada;
+        let isForNext = true;
+        let targetJId = targetJ ? String(targetJ.id) : '';
+        let targetJNum = targetJ ? targetJ.number : null;
+
+        // Buscar pronóstico de dobles en this.pronosticosExtra
+        let extra = null;
+        if (Array.isArray(this.pronosticosExtra)) {
+            // Intentar buscar para targetJ
+            if (targetJId || targetJNum !== null) {
+                extra = this.pronosticosExtra.find(p => {
+                    if (!p) return false;
+                    const pj = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId !== undefined ? p.jornadaId : ''));
+                    const hasSigns = Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                    return (pj === targetJId || (targetJNum !== null && pj === String(targetJNum))) && hasSigns;
+                });
+            }
+
+            // Si no hay dobles rellenados aún para la próxima jornada, buscar la última jornada con dobles
+            if (!extra) {
+                const candidateJornadas = [...(this.jornadas || [])].sort((a, b) => (b.number || 0) - (a.number || 0));
+                for (const cj of candidateJornadas) {
+                    const cjId = String(cj.id);
+                    const cjNum = String(cj.number);
+                    const found = this.pronosticosExtra.find(p => {
+                        if (!p) return false;
+                        const pj = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId !== undefined ? p.jornadaId : ''));
+                        const hasSigns = Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                        return (pj === cjId || pj === cjNum) && hasSigns;
+                    });
+                    if (found) {
+                        extra = found;
+                        targetJ = cj;
+                        targetJId = cjId;
+                        targetJNum = cj.number;
+                        isForNext = (this.nextJornada && String(this.nextJornada.id) === cjId);
+                        break;
+                    }
+                }
+            }
+        }
+
+        const jNumDisplay = targetJ ? targetJ.number : (targetJNum || '?');
+        const winnerName = (this.lastJornadaOutcome && this.lastJornadaOutcome.winnerName) ? this.lastJornadaOutcome.winnerName : 'Ganador semanal';
+        const loserName = (this.lastJornadaOutcome && this.lastJornadaOutcome.loserName) ? this.lastJornadaOutcome.loserName : 'Sellador';
+
+        if (titleEl) {
+            titleEl.textContent = `Quiniela de Dobles - Jornada ${jNumDisplay}`;
+        }
+
+        if (!extra || !Array.isArray(extra.selection) || extra.selection.length === 0) {
+            if (authorEl) authorEl.textContent = `Pendiente de confección por ${winnerName}`;
+            if (metaEl) {
+                metaEl.innerHTML = `
+                    <div class="flex items-center gap-2 text-amber-300">
+                        <span>⏳</span>
+                        <span>La quiniela de dobles para la Jornada ${jNumDisplay} aún no ha sido registrada.</span>
+                    </div>
+                `;
+            }
+            if (listEl) {
+                if (targetJ && Array.isArray(targetJ.matches) && targetJ.matches.length > 0) {
+                    listEl.innerHTML = targetJ.matches.map((m, idx) => `
+                        <div class="py-2 px-1 flex items-center justify-between">
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="w-6 h-6 rounded bg-slate-800 text-slate-400 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">${idx + 1}</span>
+                                <span class="text-slate-300 truncate">${m.home || 'Local'} - ${m.away || 'Visitante'}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-500 font-mono font-bold text-xs">-</span>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = `<div class="p-6 text-center text-slate-500 italic">No hay partidos configurados para esta jornada.</div>`;
+                }
+            }
+            if (statusEl) {
+                statusEl.innerHTML = `<span class="text-amber-400 font-medium">Responsable de rellenar: <strong>${winnerName}</strong></span>`;
+            }
+            modal.classList.remove('hidden');
+            return;
+        }
+
+        let authorName = winnerName;
+        if (extra.mId !== undefined || extra.memberId !== undefined) {
+            const extraMid = String(extra.mId !== undefined ? extra.mId : extra.memberId);
+            const authorMember = (this.members || []).find(m => String(m.id) === extraMid);
+            if (authorMember && authorMember.name) {
+                authorName = authorMember.name;
+            }
+        }
+
+        if (authorEl) {
+            authorEl.textContent = `Rellenada por ${authorName} ${isForNext ? '(Próxima Jornada)' : '(Última disponible)'}`;
+        }
+
+        const sel = extra.selection;
+        const isReduced = extra.isReduced !== false;
+        let countDobles = 0;
+        sel.forEach((s, idx) => {
+            if (idx < 14 && s && String(s).length > 1) countDobles++;
+        });
+
+        if (metaEl) {
+            metaEl.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold uppercase text-[10px]">
+                        ${isReduced ? '⚙️ Reducida al 13' : '🎯 Directa'}
+                    </span>
+                    <span class="text-slate-300 font-medium">${countDobles} Dobles activos</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400">
+                    <span>Importe oficial: <strong class="text-emerald-400 font-mono">12,00 €</strong></span>
+                    <span>Sella: <strong class="text-rose-300">${loserName}</strong></span>
+                </div>
+            `;
+        }
+
+        const matches = (targetJ && Array.isArray(targetJ.matches)) ? targetJ.matches : [];
+        if (listEl) {
+            let html = '';
+            for (let i = 0; i < 15; i++) {
+                const m = matches[i] || { home: `Equipo Local ${i + 1}`, away: `Equipo Visitante ${i + 1}` };
+                const sign = sel[i] || '-';
+                const isDouble = i < 14 && String(sign).length > 1;
+                const isPleno = (i === 14);
+
+                let badgeClass = 'bg-slate-800 text-slate-200 border-slate-700';
+                if (isDouble) {
+                    badgeClass = 'bg-amber-500/25 text-amber-300 border-amber-500/50 font-black shadow-sm';
+                } else if (isPleno) {
+                    badgeClass = 'bg-purple-500/25 text-purple-300 border-purple-500/50 font-bold';
+                }
+
+                html += `
+                    <div class="py-1.5 px-2 flex items-center justify-between hover:bg-slate-900/50 rounded-lg transition">
+                        <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                            <span class="w-6 h-6 rounded bg-slate-800/80 text-slate-400 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">
+                                ${isPleno ? 'P15' : (i + 1)}
+                            </span>
+                            <span class="text-slate-200 truncate font-medium text-xs">
+                                ${m.home} <span class="text-slate-500">vs</span> ${m.away}
+                            </span>
+                        </div>
+                        <div class="shrink-0">
+                            <span class="px-2.5 py-0.5 rounded border font-mono text-xs ${badgeClass}">
+                                ${sign}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }
+            listEl.innerHTML = html;
+        }
+
+        if (statusEl) {
+            statusEl.innerHTML = `<span class="text-emerald-400 font-medium">✓ Boleto colectivo listo</span>`;
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    closeDoblesModal() {
+        const modal = document.getElementById('modal-dobles-view');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    /**
      * Listeners de interfaz
      */
     initUiListeners() {
@@ -1421,12 +1602,19 @@ class Dashboard2AppController {
             if (memModal && e.target === memModal) {
                 memModal.classList.add('hidden');
             }
+
+            // Cerrar modal de dobles al pulsar sobre el fondo oscuro
+            const doblesModal = document.getElementById('modal-dobles-view');
+            if (doblesModal && e.target === doblesModal) {
+                this.closeDoblesModal();
+            }
         });
 
         // Cerrar modales al presionar la tecla Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeInfoModal();
+                this.closeDoblesModal();
                 const memModal = document.getElementById('modal-pending-members');
                 if (memModal) memModal.classList.add('hidden');
                 const dropdown = document.getElementById('nav-section-dropdown');

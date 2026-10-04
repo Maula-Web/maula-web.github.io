@@ -84,6 +84,18 @@ class BoteAppController {
         this.renderAll();
         this.populateSocioSelect();
 
+        // Si se recibe el parámetro de apertura directa de Reembolso / Gestión Jornada
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('modal') === 'gestion-jornada' || window.location.hash === '#modal-gestion-jornada') {
+                setTimeout(() => {
+                    this.openModal('modal-gestion-jornada');
+                }, 200);
+            }
+        } catch (e) {
+            console.warn('[Bote 2.0] Error procesando modal en URL:', e);
+        }
+
         // Fecha por defecto para formulario de ingreso
         const fechaInput = document.getElementById('form-ingreso-fecha');
         if (fechaInput) fechaInput.value = new Date().toISOString().split('T')[0];
