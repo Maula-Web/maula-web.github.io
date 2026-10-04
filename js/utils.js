@@ -919,9 +919,9 @@ window.AppTheme = {
 window.AppTextScale = {
     SIZES: [
         { id: 'normal', label: 'Normal (Original)', short: 'A', desc: 'Tamaño estándar original (100%)' },
-        { id: 'medium', label: 'Mediano (+5%)', short: 'A+', desc: 'Ligero aumento de textos y tablas' },
-        { id: 'large', label: 'Grande (+10%)', short: 'A++', desc: 'Mayor legibilidad sin deformar títulos' },
-        { id: 'xlarge', label: 'Muy Grande (+15%)', short: 'A+++', desc: 'Máximo aumento recomendado (+15%)' }
+        { id: 'medium', label: 'Ligero (+4%)', short: 'A+', desc: 'Mínimo realce de textos y tablas' },
+        { id: 'large', label: 'Medio (+7%)', short: 'A++', desc: 'Lectura más cómoda y nítida' },
+        { id: 'xlarge', label: 'Grande (+10%)', short: 'A+++', desc: 'Máximo aumento configurado (+10%)' }
     ],
 
     getScale() {

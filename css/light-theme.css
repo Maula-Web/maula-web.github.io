@@ -1431,69 +1431,69 @@ span[data-card-type="form-capsule"].bg-rose-500 {
 /* =========================================================================
    SISTEMA DE TAMAÑO DE TEXTO ADAPTABLE (ACCESIBILIDAD 4 NIVELES)
    Nivel 1 (Normal / Original): 100%
-   Nivel 2 (Medio): +5% en pequeños / sin cambio en grandes
-   Nivel 3 (Grande): +10% en pequeños / +3% en medianos / sin cambio en grandes
-   Nivel 4 (Muy Grande): +15% en pequeños / +6% en medianos / sin cambio en grandes
+   Nivel 2 (Ligero): +4% en pequeños / sin cambio en grandes
+   Nivel 3 (Medio): +7% en pequeños / +2% en medianos / sin cambio en grandes
+   Nivel 4 (Grande): +10% en pequeños / +4% en medianos / sin cambio en grandes (Tope Máximo)
    ========================================================================= */
 
-/* Nivel 2: Medio (text-size-medium) */
+/* Nivel 2: Ligero (text-size-medium) */
 html.text-size-medium .text-xs,
 html.text-size-medium [class*="text-[10px]"],
 html.text-size-medium [class*="text-[11px]"] {
-    font-size: 1.05em !important;
-    line-height: 1.3 !important;
+    font-size: 1.04em !important;
+    line-height: 1.28 !important;
 }
 html.text-size-medium .text-sm {
-    font-size: 1.03em !important;
+    font-size: 1.02em !important;
 }
 html.text-size-medium td,
 html.text-size-medium th {
-    font-size: 1.04em !important;
+    font-size: 1.03em !important;
 }
 html.text-size-medium input,
 html.text-size-medium select,
 html.text-size-medium button {
-    font-size: 1.03em !important;
+    font-size: 1.02em !important;
 }
 
-/* Nivel 3: Grande (text-size-large) */
+/* Nivel 3: Medio (text-size-large) */
 html.text-size-large .text-xs,
 html.text-size-large [class*="text-[10px]"],
 html.text-size-large [class*="text-[11px]"] {
-    font-size: 1.10em !important;
-    line-height: 1.35 !important;
+    font-size: 1.07em !important;
+    line-height: 1.32 !important;
 }
 html.text-size-large .text-sm {
-    font-size: 1.06em !important;
+    font-size: 1.04em !important;
 }
 html.text-size-large td,
 html.text-size-large th {
-    font-size: 1.08em !important;
+    font-size: 1.05em !important;
 }
 html.text-size-large input,
 html.text-size-large select,
 html.text-size-large button {
-    font-size: 1.06em !important;
+    font-size: 1.04em !important;
 }
 
-/* Nivel 4: Muy Grande (text-size-xlarge) - Máximo +15% en textos pequeños */
+/* Nivel 4: Grande (text-size-xlarge) - Tope Máximo Estricto de +10% */
 html.text-size-xlarge .text-xs,
 html.text-size-xlarge [class*="text-[10px]"],
 html.text-size-xlarge [class*="text-[11px]"] {
-    font-size: 1.15em !important;
-    line-height: 1.4 !important;
+    font-size: 1.10em !important;
+    line-height: 1.35 !important;
 }
 html.text-size-xlarge .text-sm {
-    font-size: 1.09em !important;
+    font-size: 1.06em !important;
 }
 html.text-size-xlarge td,
 html.text-size-xlarge th {
-    font-size: 1.12em !important;
+    font-size: 1.08em !important;
 }
 html.text-size-xlarge input,
 html.text-size-xlarge select,
 html.text-size-xlarge button {
-    font-size: 1.08em !important;
+    font-size: 1.05em !important;
 }
 
 /* Los textos grandes (h1, h2, text-xl, text-2xl, etc.) NO crecen para no desbordar */
@@ -1516,7 +1516,7 @@ html.text-size-xlarge .overflow-x-auto {
 /* Escala suave de emojis pequeños sin tocar iconos grandes */
 html.text-size-large span:not([class*="text-lg"]):not([class*="text-xl"]):not([class*="text-2xl"]):not([class*="text-3xl"]):not([class*="text-4xl"]) > span,
 html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([class*="text-2xl"]):not([class*="text-3xl"]):not([class*="text-4xl"]) > span {
-    font-size: 1.05em;
+    font-size: 1.04em;
 }
 
 
