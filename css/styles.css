@@ -4162,30 +4162,3 @@ nav .overflow-x-auto,
     font-weight: 800 !important;
     filter: drop-shadow(0 1px 2px rgba(180, 83, 9, 0.4));
 }
-
-/* =========================================================================
-   MARCA DE AGUA EN MOSAICO DEL LOGO (SOLO PC / ESCRITORIO)
-   ========================================================================= */
-@media (min-width: 1024px) {
-    body::before {
-        content: '';
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background-image: url('../LOGO_MAULAS.png?v=2');
-        background-repeat: space;
-        background-size: 85px 85px;
-        background-position: 0 0;
-        /* En Modo Oscuro: sutilmente más claro que el fondo (#090d16 / #1a1a1a),
-           con filtro de brillo y opacidad muy suave para no distraer ni saturar */
-        opacity: 0.055;
-        filter: brightness(1.3) grayscale(20%);
-    }
-
-    /* Garantizar que el contenido interactivo y tarjetas queden por encima del mosaico */
-    body > * {
-        position: relative;
-        z-index: 1;
-    }
-}
