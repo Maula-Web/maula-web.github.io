@@ -906,6 +906,48 @@ En la vista de pronósticos ([pronosticos.html](file:///d:/PROYECTO_MAULAS/prono
 ### 29.5. Geometría Cuadrada del Icono de Socios 2 en Móviles
 - En `socios_2.html` (cabecera principal), se aplicaron las clases `shrink-0 flex-shrink-0 aspect-square min-w-[3rem] min-h-[3rem] sm:min-w-[3.5rem] sm:min-h-[3.5rem]` al contenedor del icono `👥` para evitar que el comportamiento flex en terminales móviles estrechos deforme o aplaste el contenedor, garantizando que se muestre siempre como un cuadrado perfecto.
 
+## 30. SISTEMA DE RECORDATORIOS PUSH Y CRON AUTOMATIZADO (v1.28)
+
+### 30.1. Notificación Push Semanal de Saldo Bajo en Bote (< 5,00 €)
+- **Script Cron**: `monday_bote_reminder_cron.js` ejecutado mediante GitHub Actions (`.github/workflows/monday_bote_reminder.yml`) todos los lunes a las 09:00 AM (hora peninsular española / 07:00 UTC).
+- **Destinatarios**: Socios activos con saldo en hucha virtual inferior a 5,00 € (`saldo < 5.00`) y con suscripción push Web/PWA activa registrada en Firebase Firestore (`push_subscriptions`).
+- **Mensaje**:
+  > *"Te queda poco saldo en el bote de los Maulas (X,XX €). Recuerda hacer un Bizum a Marcelo."*
+- **Compatibilidad Headless / CI**:
+  - En `js/bote-engine.js` se implementó soporte polyfill condicional (`window = global`, `AppUtils` con parseo e inversión monetaria `formatEuro`) para permitir instanciación limpia de `BoteEngine` en entornos puros de Node.js sin navegador.
+
+---
+
+## 31. TRAMOS FIJOS DE SOLVENCIA, MODO TÍO GILITO Y OPTIMIZACIONES DE UI (v1.29)
+
+### 31.1. Tramos Fijos Universales de Saldo del Bote (Socios 2 y Bote 2)
+Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la escala de solvencia y semáforos:
+- 🔴 **Rojo (< 5,00 €)**: Saldo bajo o deudor. Requiere Bizum de recarga inmediata a Marcelo para cubrir las cuotas de quiniela.
+- 🟡 **Amarillo (5,00 € a 15,00 €)**: Saldo regular / aviso.
+- 🟢 **Verde (15,00 € a 30,00 €)**: Saldo adecuado / al corriente.
+- 💶 **Modo Tío Gilito (> 30,00 €)**: Saldo excelente.
+  - **Identificador**: `💶 Tío Gilito`.
+  - **Chapa Metálica (`.badge-gold-ingot`)**: Gradiente reflectante multicapa (`linear-gradient(135deg, #bf953f 0%, #fcf6ba 28%, #b38728 55%, #fbf5b7 78%, #aa771c 100%)`), borde dorado `#ffd700` y animación de destello móvil diagonal (*shimmer*).
+  - **Texto Metálico (`.text-gold-ingot`)**: Recorte de degradado áureo de alto contraste en modo oscuro y tono bronce/ámbar enriquecido en modo claro.
+  - **Barras del Gráfico de Bote (`renderSociosChart`)**: Degradado canvas metálico dorado complementado con un plugin personalizado en Chart.js y bucle `requestAnimationFrame` que proyecta el mismo destello de luz dinámico cruzando sobre las barras de los socios con saldo `> 30 €`.
+
+### 31.2. Edición y Gestión de Ingresos Manuales
+- En `js/bote_2.js` y `bote_2.html` se añadió la capacidad de **modificar aportaciones manuales ya registradas** (`openEditIngreso(id)`):
+  - El modal de nuevo ingreso se reutiliza dinámicamente como editor cargando fecha, socio, importe, método y concepto.
+  - Al guardar en modo edición, se actualiza el documento en Firestore (`bote_movimientos`) recalculando el motor de saldos en tiempo real sin duplicar registros.
+  - El subtítulo *"Aportaciones registradas en la temporada activa"* se fijó en blanco negrita para contraste óptimo.
+
+### 31.3. Optimización de Ventanas Modales en PC (Eliminación de Scroll Horizontal)
+- En **Registro Histórico de Ingresos Manuales** y **Gestión de Sellado y Reembolsos**:
+  - Se amplió el ancho del contenedor modal a `max-w-5xl lg:max-w-6xl`.
+  - Se retiró la restricción `whitespace-nowrap` rígida en la tabla para permitir ancho fluido de columnas de texto (Socio y Concepto), eliminando las barras de desplazamiento horizontales en ordenadores y monitores de sobremesa.
+
+### 31.4. Sellado de Jornadas: Limpieza de Nombres
+- En el desplegable de asignación de sellador (`js/bote_2.js`), se eliminó el sufijo descriptivo `(Maula oficial)`, mostrando limpiamente el nombre del socio sellador con su icono correspondiente.
+
+### 31.5. Visualización de Rachas en Clasificación 2
+- En las cápsulas de racha de las últimas 5 jornadas de la tabla de clasificación (`clasificacion_2.html` y `css/light-theme.css`), las casillas **azules** (`bg-blue-500`, 9-10 aciertos) y **rojas** (`bg-rose-500`, < 6 aciertos) muestran sus números forzados en **blanco puro (`#ffffff`)**, evitando sobreescrituras en modo claro y garantizando legibilidad total.
+
 ---
 
 ## Recomendación de Flujo para la IA
