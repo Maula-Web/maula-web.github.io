@@ -4261,17 +4261,20 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
 #btn-text-scale-trigger,
 #btn-text-scale-trigger-mobile {
     background-color: rgba(2, 6, 23, 0.8) !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
+    border: 1px solid rgba(59, 130, 246, 0.55) !important;
     color: #e2e8f0 !important;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.15) !important;
 }
 #btn-text-scale-trigger:hover,
 #btn-text-scale-trigger-mobile:hover {
     background-color: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(96, 165, 250, 0.8) !important;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.3) !important;
 }
 #text-scale-dropdown-panel {
     background-color: #0f172a !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
-    box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(245, 158, 11, 0.15) !important;
+    border: 1px solid rgba(59, 130, 246, 0.5) !important;
+    box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(59, 130, 246, 0.2) !important;
 }
 #text-scale-dropdown-panel .text-scale-header {
     border-bottom-color: rgba(51, 65, 85, 0.6) !important;
@@ -4289,27 +4292,28 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
     background-color: rgba(30, 41, 59, 0.8) !important;
 }
 .text-scale-item-btn.active-scale {
-    background-color: rgba(245, 158, 11, 0.18) !important;
-    border-color: rgba(245, 158, 11, 0.5) !important;
-    color: #fbbf24 !important;
+    background-color: rgba(59, 130, 246, 0.18) !important;
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    color: #60a5fa !important;
 }
 
 /* Adaptación a Modo Claro (.light-theme) */
 .light-theme #btn-text-scale-trigger,
 .light-theme #btn-text-scale-trigger-mobile {
     background-color: #f5efe4 !important;
-    border-color: #e5decb !important;
-    color: #334155 !important;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(37, 99, 235, 0.45) !important;
+    color: #1e3a8a !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 6px rgba(37, 99, 235, 0.1) !important;
 }
 .light-theme #btn-text-scale-trigger:hover,
 .light-theme #btn-text-scale-trigger-mobile:hover {
     background-color: #ede5d5 !important;
+    border-color: rgba(37, 99, 235, 0.75) !important;
 }
 .light-theme #text-scale-dropdown-panel {
     background-color: #ffffff !important;
-    border-color: #e2e8f0 !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(37, 99, 235, 0.35) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 0 12px rgba(37, 99, 235, 0.1) !important;
 }
 .light-theme #text-scale-dropdown-panel .text-scale-header {
     border-bottom-color: #f1f5f9 !important;
