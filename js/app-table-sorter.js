@@ -32,12 +32,12 @@ window.AppTableSorter = {
         // Actualizar indicadores visuales en todas las cabeceras ordenables de esta fila
         trHeader.querySelectorAll('th[data-sortable="true"]').forEach(otherTh => {
             otherTh.removeAttribute('data-sort-dir');
-            const icon = otherTh.querySelector('.sort-indicator');
+            const icon = otherTh.querySelector('.sort-indicator, .sort-icon');
             if (icon) icon.textContent = '↕';
         });
 
         th.setAttribute('data-sort-dir', newDir);
-        const curIcon = th.querySelector('.sort-indicator');
+        const curIcon = th.querySelector('.sort-indicator, .sort-icon');
         if (curIcon) {
             curIcon.textContent = newDir === 'asc' ? '↑' : '↓';
         }
@@ -107,6 +107,15 @@ window.AppTableSorter = {
     parseNumber(str) {
         if (!str) return 0;
         let s = String(str).replace(/[€%+\s]/g, '').trim();
+
+        // Si empieza o contiene texto como "Jornada 12" o "J12", extraer el número
+        const jMatch = s.match(/(?:jornada|j)?\s*(\d+(?:[.,]\d+)?)/i);
+        if (jMatch && isNaN(parseFloat(s))) {
+            const extracted = jMatch[1].replace(',', '.');
+            const n = parseFloat(extracted);
+            if (!isNaN(n)) return n;
+        }
+
         // Si tiene formato español 1.234,56
         if (s.includes(',') && s.includes('.')) {
             s = s.replace(/\./g, '').replace(',', '.');
@@ -114,7 +123,11 @@ window.AppTableSorter = {
             s = s.replace(',', '.');
         }
         const n = parseFloat(s);
-        return isNaN(n) ? 0 : n;
+        if (!isNaN(n)) return n;
+
+        // Búsqueda genérica de primer número en la cadena
+        const anyNumMatch = s.match(/\d+(?:\.\d+)?/);
+        return anyNumMatch ? parseFloat(anyNumMatch[0]) : 0;
     },
 
     parseDate(str) {
