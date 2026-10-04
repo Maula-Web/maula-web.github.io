@@ -258,11 +258,28 @@ class SociosAppController {
             };
         }
 
-        // Semáforo alineado con el gráfico de Bote:
-        // 🟢 Verde: Saldo holgado (>= 40,00 €)
-        // 🟡 Amarillo: Saldo normal (>= 10,00 € y < 40,00 €)
-        // 🔴 Rojo: Saldo bajo o deudor (< 10,00 €)
-        if (saldo >= 40) {
+        // Tramos de color fijos:
+        // 🥇 Lingote de Oro: > 30,00 €
+        // 🟢 Verde: 15,00 € a 30,00 €
+        // 🟡 Amarillo: 5,00 € a 15,00 €
+        // 🔴 Rojo: < 5,00 €
+        if (saldo > 30) {
+            return {
+                status: "oro",
+                isTesorero: false,
+                isDeudor: false,
+                isActivo: true,
+                saldo: saldo,
+                saldoFormatted: saldoTxt,
+                badgeText: `🪙 Lingote Oro (${saldoTxt})`,
+                badgeTag: "🪙 Saldo Oro",
+                subtext: "Saldo excelente (> 30 €) · Lingote de Oro",
+                color: "gold",
+                badgeClass: "badge-gold-ingot"
+            };
+        }
+
+        if (saldo >= 15) {
             return {
                 status: "activo",
                 isTesorero: false,
@@ -272,13 +289,13 @@ class SociosAppController {
                 saldoFormatted: saldoTxt,
                 badgeText: `🟢 Al corriente (${saldoTxt})`,
                 badgeTag: "🟢 Activo en Bote",
-                subtext: "Saldo holgado (≥ 40 €)",
+                subtext: "Saldo adecuado (15 € - 30 €)",
                 color: "emerald",
                 badgeClass: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
             };
         }
 
-        if (saldo >= 10) {
+        if (saldo >= 5) {
             return {
                 status: "normal",
                 isTesorero: false,
@@ -288,13 +305,13 @@ class SociosAppController {
                 saldoFormatted: saldoTxt,
                 badgeText: `🟡 Al corriente (${saldoTxt})`,
                 badgeTag: "🟡 Activo en Bote",
-                subtext: "Saldo normal (10 € - 40 €)",
+                subtext: "Saldo regular (5 € - 15 €)",
                 color: "amber",
                 badgeClass: "bg-amber-500/20 text-amber-300 border border-amber-500/40"
             };
         }
 
-        // Saldo < 10 € (Rojo: saldo bajo si >= 0, o saldo deudor si < 0)
+        // Saldo < 5 € (Rojo: saldo bajo si >= 0, o saldo deudor si < 0)
         const isDeudorReal = saldo < -0.009;
         return {
             status: isDeudorReal ? "deudor" : "saldo_bajo",
@@ -309,7 +326,7 @@ class SociosAppController {
             badgeTag: isDeudorReal ? "🔴 Saldo Deudor" : "🔴 Saldo Bajo",
             subtext: isDeudorReal
                 ? "Excluido del Bote hasta regularizar"
-                : "Saldo bajo (< 10 €) · Conviene recargar",
+                : "Saldo bajo (< 5 €) · Conviene recargar",
             color: "rose",
             badgeClass: "bg-rose-500/20 text-rose-300 border border-rose-500/40"
         };

@@ -4121,3 +4121,44 @@ nav .overflow-x-auto,
 .non-fernando #btn-version-v2 {
     display: none !important;
 }
+
+/* =========================================================================
+   EFECTO LINGOTE DE ORO METALIZADO (> 30 € EN BOTE)
+   ========================================================================= */
+.badge-gold-ingot {
+    background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 28%, #b38728 55%, #fbf5b7 78%, #aa771c 100%) !important;
+    color: #3d2300 !important;
+    font-weight: 800 !important;
+    border: 1px solid #ffd700 !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-gold-ingot::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 40%;
+    height: 200%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0) 100%);
+    transform: rotate(25deg);
+    animation: goldShimmer 3.5s infinite ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes goldShimmer {
+    0% { left: -70%; }
+    30% { left: 140%; }
+    100% { left: 140%; }
+}
+
+.text-gold-ingot {
+    background: linear-gradient(135deg, #d4af37 0%, #fff3a8 30%, #b38728 60%, #ffd700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800 !important;
+    filter: drop-shadow(0 1px 2px rgba(180, 83, 9, 0.4));
+}

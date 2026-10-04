@@ -1399,5 +1399,24 @@ nav .overflow-x-auto,
     }
 }
 
+/* =========================================================================
+   EFECTO LINGOTE DE ORO METALIZADO (> 30 € EN BOTE) - TEMA CLARO
+   ========================================================================= */
+.light-theme .badge-gold-ingot {
+    background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 28%, #b38728 55%, #fbf5b7 78%, #aa771c 100%) !important;
+    color: #3d2300 !important;
+    font-weight: 800 !important;
+    border: 1px solid #ffd700 !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+
+.light-theme .text-gold-ingot {
+    background: linear-gradient(135deg, #b45309 0%, #d97706 40%, #b45309 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 800 !important;
+}
+
 
 

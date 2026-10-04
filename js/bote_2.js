@@ -654,14 +654,32 @@ class BoteAppController {
         members.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         members.forEach((m) => {
-            // Semáforo de 3 colores alineado con el gráfico de Bote y la hoja de Socios:
-            // 🟢 Verde (>= 40,00 €): Saldo holgado
-            // 🟡 Amarillo (10,00 € a 40,00 €): Saldo normal
-            // 🔴 Rojo (< 10,00 €): Saldo bajo o en deuda
+            // Tramos de color fijos:
+            // 🪙 Lingote de Oro (> 30,00 €): Saldo excelente
+            // 🟢 Verde (15,00 € a 30,00 €): Saldo adecuado
+            // 🟡 Amarillo (5,00 € a 15,00 €): Saldo regular
+            // 🔴 Rojo (< 5,00 €): Saldo bajo o en deuda
             let saldoColor = "text-rose-400";
             let statusBadge = "";
 
-            if (m.saldo >= 40) {
+            if (m.saldo > 30) {
+                saldoColor = "text-gold-ingot font-black";
+                statusBadge = `
+                    <div class="group/status relative cursor-help inline-block">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-gold-ingot flex items-center justify-center gap-1 hover:brightness-110 transition-all shadow-sm">
+                            <span>🪙</span> Lingote Oro
+                        </span>
+                        <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-400/60 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
+                            <strong class="text-amber-300 block mb-1 font-bold flex items-center gap-1.5">
+                                <span>🪙</span> Lingote de Oro (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                            </strong>
+                            <p class="leading-relaxed">
+                                Saldo excelente (> 30 €) en su hucha virtual. Máxima tranquilidad para la temporada.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (m.saldo >= 15) {
                 saldoColor = "text-emerald-400";
                 statusBadge = `
                     <div class="group/status relative cursor-help inline-block">
@@ -673,12 +691,12 @@ class BoteAppController {
                                 <span>🟢</span> Al Corriente (+${m.saldo.toFixed(2).replace(".", ",")} €)
                             </strong>
                             <p class="leading-relaxed">
-                                Saldo holgado (≥ 40 €) en su hucha virtual para cubrir las cuotas de las próximas jornadas.
+                                Saldo adecuado (15 € - 30 €) en su hucha virtual para cubrir las cuotas de las próximas jornadas.
                             </p>
                         </div>
                     </div>
                 `;
-            } else if (m.saldo >= 10) {
+            } else if (m.saldo >= 5) {
                 saldoColor = "text-amber-400";
                 statusBadge = `
                     <div class="group/status relative cursor-help inline-block">
@@ -690,7 +708,7 @@ class BoteAppController {
                                 <span>🟡</span> Al Corriente (+${m.saldo.toFixed(2).replace(".", ",")} €)
                             </strong>
                             <p class="leading-relaxed">
-                                Saldo normal (10 € - 40 €) en su hucha virtual.
+                                Saldo regular (5 € - 15 €) en su hucha virtual.
                             </p>
                         </div>
                     </div>
@@ -710,7 +728,7 @@ class BoteAppController {
                                 <span>${icon}</span> ${badgeLabel} (${m.saldo.toFixed(2).replace(".", ",")} €)
                             </strong>
                             <p class="leading-relaxed">
-                                ${isDeudaNegativa ? "El socio tiene saldo negativo en su hucha. Se requiere una recarga mediante Bizum a Marcelo para regularizar." : "Saldo bajo (< 10 €). Conviene hacer un Bizum a Marcelo para no quedarse en descubierto."}
+                                ${isDeudaNegativa ? "El socio tiene saldo negativo en su hucha. Se requiere una recarga mediante Bizum a Marcelo para regularizar." : "Saldo bajo (< 5 €). Conviene hacer un Bizum a Marcelo para no quedarse en descubierto."}
                             </p>
                         </div>
                     </div>
@@ -3677,18 +3695,29 @@ class BoteAppController {
 
         const labels = members.map(m => m.name);
         const saldos = members.map(m => m.saldo);
+        const ctx = canvas.getContext('2d');
+
+        // Gradiente metálico efecto Lingote de Oro para barras horizontales
+        const goldGradient = ctx.createLinearGradient(0, 0, canvas.width || 400, 0);
+        goldGradient.addColorStop(0, '#bf953f');
+        goldGradient.addColorStop(0.25, '#fcf6ba');
+        goldGradient.addColorStop(0.5, '#b38728');
+        goldGradient.addColorStop(0.75, '#fbf5b7');
+        goldGradient.addColorStop(1, '#aa771c');
+
         const bgColors = members.map(m => {
-            if (m.saldo >= 40) return 'rgba(16, 185, 129, 0.85)'; // Emerald
-            if (m.saldo >= 10) return 'rgba(245, 158, 11, 0.85)'; // Amber
-            return 'rgba(244, 63, 94, 0.85)'; // Rose
+            if (m.saldo > 30) return goldGradient; // Lingote de Oro metálico
+            if (m.saldo >= 15) return 'rgba(16, 185, 129, 0.85)'; // Verde
+            if (m.saldo >= 5) return 'rgba(245, 158, 11, 0.85)'; // Amarillo
+            return 'rgba(244, 63, 94, 0.85)'; // Rojo (< 5 €)
         });
         const borderColors = members.map(m => {
-            if (m.saldo >= 40) return '#10b981';
-            if (m.saldo >= 10) return '#f59e0b';
+            if (m.saldo > 30) return '#ffd700'; // Dorado puro
+            if (m.saldo >= 15) return '#10b981';
+            if (m.saldo >= 5) return '#f59e0b';
             return '#f43f5e';
         });
 
-        const ctx = canvas.getContext('2d');
         this.chartSocios = new Chart(ctx, {
             type: 'bar',
             data: {
