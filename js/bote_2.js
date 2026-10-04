@@ -655,7 +655,7 @@ class BoteAppController {
 
         members.forEach((m) => {
             // Tramos de color fijos:
-            // 🦆 Tío Gilito (> 30,00 €): Saldo excelente
+            // 💶 Tío Gilito (> 30,00 €): Saldo excelente
             // 🟢 Verde (15,00 € a 30,00 €): Saldo adecuado
             // 🟡 Amarillo (5,00 € a 15,00 €): Saldo regular
             // 🔴 Rojo (< 5,00 €): Saldo bajo o en deuda
@@ -667,11 +667,11 @@ class BoteAppController {
                 statusBadge = `
                     <div class="group/status relative cursor-help inline-block">
                         <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-gold-ingot flex items-center justify-center gap-1 hover:brightness-110 transition-all shadow-sm">
-                            <span>🦆</span> Tío Gilito
+                            <span>💶</span> Tío Gilito
                         </span>
                         <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-400/60 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-amber-300 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>🦆</span> Tío Gilito (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                                <span>💶</span> Tío Gilito (+${m.saldo.toFixed(2).replace(".", ",")} €)
                             </strong>
                             <p class="leading-relaxed">
                                 Saldo excelente (> 30 €) en su hucha virtual. Modo Tío Gilito activado: máxima solvencia para la temporada.

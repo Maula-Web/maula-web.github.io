@@ -259,7 +259,7 @@ class SociosAppController {
         }
 
         // Tramos de color fijos:
-        // 🦆 Tío Gilito: > 30,00 €
+        // 💶 Tío Gilito: > 30,00 €
         // 🟢 Verde: 15,00 € a 30,00 €
         // 🟡 Amarillo: 5,00 € a 15,00 €
         // 🔴 Rojo: < 5,00 €
@@ -271,8 +271,8 @@ class SociosAppController {
                 isActivo: true,
                 saldo: saldo,
                 saldoFormatted: saldoTxt,
-                badgeText: `🦆 Tío Gilito (${saldoTxt})`,
-                badgeTag: "🦆 Tío Gilito",
+                badgeText: `💶 Tío Gilito (${saldoTxt})`,
+                badgeTag: "💶 Tío Gilito",
                 subtext: "Saldo excelente (> 30 €) · Modo Tío Gilito",
                 color: "gold",
                 badgeClass: "badge-gold-ingot"
