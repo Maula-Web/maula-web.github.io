@@ -697,14 +697,14 @@ class BoteAppController {
 
         members.forEach((m) => {
             // Tramos de color fijos:
-            // 💰 Tío Gilito (> 30,00 €): Saldo excelente
-            // 🟢 Verde (15,00 € a 30,00 €): Saldo adecuado
+            // 💰 Tío Gilito (> 50,00 €): Saldo excelente
+            // 🟢 Verde (15,00 € a 50,00 €): Saldo adecuado
             // 🟡 Amarillo (5,00 € a 15,00 €): Saldo regular
             // 🔴 Rojo (< 5,00 €): Saldo bajo o en deuda
             let saldoColor = "text-rose-400";
             let statusBadge = "";
 
-            if (m.saldo > 30) {
+            if (m.saldo > 50) {
                 saldoColor = "text-gold-ingot font-black";
                 statusBadge = `
                     <div class="group/status relative cursor-help inline-block">
@@ -716,7 +716,7 @@ class BoteAppController {
                                 <span>💰</span> Tío Gilito (+${m.saldo.toFixed(2).replace(".", ",")} €)
                             </strong>
                             <p class="leading-relaxed">
-                                Saldo excelente (> 30 €) en su hucha virtual. Modo Tío Gilito activado: máxima solvencia para la temporada.
+                                Saldo excelente (> 50 €) en su hucha virtual. Modo Tío Gilito activado: máxima solvencia para la temporada.
                             </p>
                         </div>
                     </div>
@@ -733,7 +733,7 @@ class BoteAppController {
                                 <span>🟢</span> Al Corriente (+${m.saldo.toFixed(2).replace(".", ",")} €)
                             </strong>
                             <p class="leading-relaxed">
-                                Saldo adecuado (15 € - 30 €) en su hucha virtual para cubrir las cuotas de las próximas jornadas.
+                                Saldo adecuado (15 € - 50 €) en su hucha virtual para cubrir las cuotas de las próximas jornadas.
                             </p>
                         </div>
                     </div>
@@ -3907,15 +3907,15 @@ class BoteAppController {
         const saldos = members.map(m => m.saldo);
         const ctx = canvas.getContext('2d');
 
-        // Color de fallback para el dataset (las barras de oro >30€ se dibujan con acabado metálico adaptado en goldShimmerPlugin)
+        // Color de fallback para el dataset (las barras de oro >50€ se dibujan con acabado metálico adaptado en goldShimmerPlugin)
         const bgColors = members.map(m => {
-            if (m.saldo > 30) return 'rgba(217, 160, 48, 0.2)'; // Base traslúcida sobre la que el plugin dibuja el lingote
+            if (m.saldo > 50) return 'rgba(217, 160, 48, 0.2)'; // Base traslúcida sobre la que el plugin dibuja el lingote
             if (m.saldo >= 15) return 'rgba(16, 185, 129, 0.85)'; // Verde
             if (m.saldo >= 5) return 'rgba(245, 158, 11, 0.85)'; // Amarillo
             return 'rgba(244, 63, 94, 0.85)'; // Rojo (< 5 €)
         });
         const borderColors = members.map(m => {
-            if (m.saldo > 30) return '#ffd700'; // Dorado puro
+            if (m.saldo > 50) return '#ffd700'; // Dorado puro
             if (m.saldo >= 15) return '#10b981';
             if (m.saldo >= 5) return '#f59e0b';
             return '#f43f5e';
@@ -3937,7 +3937,7 @@ class BoteAppController {
                 chartCtx.save();
                 meta.data.forEach((bar, index) => {
                     const m = members[index];
-                    if (m && m.saldo > 30) {
+                    if (m && m.saldo > 50) {
                         const { x, y, base, height } = bar;
                         const barLeft = Math.min(x, base);
                         const barRight = Math.max(x, base);
@@ -4081,7 +4081,7 @@ class BoteAppController {
         });
 
         // Bucle de animación suave para el destello continuo de las barras doradas
-        if (members.some(m => m.saldo > 30)) {
+        if (members.some(m => m.saldo > 50)) {
             if (this.goldShimmerAnimId) {
                 cancelAnimationFrame(this.goldShimmerAnimId);
             }
