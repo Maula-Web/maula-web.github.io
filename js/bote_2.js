@@ -1480,7 +1480,7 @@ class BoteAppController {
             <th class="p-2.5 sm:p-3 text-left sticky-left-col bg-slate-950 min-w-[140px] border-r border-slate-800 text-xs sm:text-sm">Socio</th>
             <th class="p-2.5 sm:p-3 text-right bg-slate-900 min-w-[110px] border-r border-slate-800 text-amber-400 text-xs sm:text-sm group relative cursor-help select-none">
                 <span class="inline-flex items-center gap-1">Saldo Actual <span class="text-[11px] text-amber-400">ℹ️</span></span>
-                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                     <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                         <span>🏦</span> Saldo Disponible en Hucha
                     </strong>
@@ -2680,7 +2680,7 @@ class BoteAppController {
                             </label>
                         </div>
                         <span class="text-[10px] text-slate-400">${actualSealer ? actualSealer.name : ''}</span>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-1.5 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case">
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-1.5 w-72 sm:w-80 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>🔄</span> Reembolso de Sellado: Bote vs Bizum
                             </strong>
