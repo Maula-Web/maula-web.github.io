@@ -714,9 +714,11 @@ window.AppVersion = {
 
     checkAccessGuard() {
         const currFile = (window.location.pathname || '').split('/').pop() || 'index.html';
-        // Si es una hoja vieja y el usuario NO es Fernando Lozano, redirigir de inmediato a la hoja nueva
+        // Si se entra a una hoja vieja (como index.html), redirigir por defecto a la versión Pro
         if (this.OLD_TO_NEW[currFile]) {
-            if (!this.isFernandoLozano()) {
+            const mode = localStorage.getItem('maulas_version_mode');
+            // Si no hay modo explícito o es v2, redirigir siempre a la versión Pro
+            if (!mode || mode === 'v2' || !this.isFernandoLozano()) {
                 window.location.replace(this.OLD_TO_NEW[currFile]);
                 return true;
             }
@@ -725,12 +727,10 @@ window.AppVersion = {
     },
 
     getMode() {
-        if (!this.isFernandoLozano()) return 'v2';
+        // Por defecto arranca siempre contra la versión Pro (v2)
         const stored = localStorage.getItem('maulas_version_mode');
-        if (stored === 'v1' || stored === 'v2') return stored;
-        const file = window.location.pathname.split('/').pop() || '';
-        if (file.includes('_2') || file === 'dashboard_2.html') return 'v2';
-        return 'v1';
+        if (stored === 'v1' && this.isFernandoLozano()) return 'v1';
+        return 'v2';
     },
 
     setMode(mode) {
@@ -772,7 +772,7 @@ window.AppVersion = {
     },
 
     updateLinks(mode) {
-        const effectiveMode = this.isFernandoLozano() ? mode : 'v2';
+        const effectiveMode = (this.isFernandoLozano() && mode === 'v1') ? 'v1' : 'v2';
         document.querySelectorAll('[data-version-link]').forEach(el => {
             const key = el.getAttribute('data-version-link');
             if (this.PAGE_MAP[key]) {
@@ -782,29 +782,21 @@ window.AppVersion = {
     },
 
     updateVisibility() {
-        const isFernando = this.isFernandoLozano();
-        if (!isFernando) {
-            document.documentElement.classList.add('non-fernando');
-        } else {
-            document.documentElement.classList.remove('non-fernando');
-        }
+        // El selector de versión se quita de todos los menús de la aplicación (incluyendo Fernando Lozano)
+        document.documentElement.classList.add('hide-version-switcher');
 
         const switchers = document.querySelectorAll(
             '#version-switcher-container, #version-switcher-container-mobile, .version-switcher-wrapper, [data-version-btn], #btn-version-v1, #btn-version-v2'
         );
         switchers.forEach(el => {
-            if (isFernando) {
-                el.style.display = '';
-            } else {
-                el.style.setProperty('display', 'none', 'important');
-            }
+            el.style.setProperty('display', 'none', 'important');
         });
     },
 
     injectOldPageSwitcher() {
+        // Si Fernando está navegando directamente por una hoja original/clásica, ofrecerle acceso rápido a Pro
         if (!this.isFernandoLozano()) return;
         const currFile = (window.location.pathname || '').split('/').pop() || 'index.html';
-        // index.html ya tiene botón destacado inyectado por auth.js
         if (currFile === 'index.html') return;
         const counterpart = this.OLD_TO_NEW[currFile];
         if (!counterpart) return;

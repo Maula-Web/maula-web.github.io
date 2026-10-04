@@ -4,6 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Arranque por defecto contra la versión Pro (dashboard_2.html)
+        (function() {
+            var mode = localStorage.getItem('maulas_version_mode');
+            if (!mode || mode === 'v2') {
+                window.location.replace('dashboard_2.html');
+            }
+        })();
+    </script>
     <title>PEÑA MAULAS</title>
     <!-- Favicon & Mobile App Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
