@@ -1432,5 +1432,15 @@ nav .overflow-x-auto,
     }
 }
 
+/* =========================================================================
+   PÍLDORAS DE RACHA: TEXTO EN BLANCO EN RECUADROS AZULES Y ROJOS
+   ========================================================================= */
+.light-theme span[data-card-type="form-capsule"].bg-blue-500,
+.light-theme span[data-card-type="form-capsule"].bg-rose-500,
+span[data-card-type="form-capsule"].bg-blue-500,
+span[data-card-type="form-capsule"].bg-rose-500 {
+    color: #ffffff !important;
+}
+
 
 

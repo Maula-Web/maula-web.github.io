@@ -1634,9 +1634,9 @@
                     s.recentForm.slice(0, 5).slice().reverse().forEach(f => {
                         let colorClass = 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-300';
                         if (f.hits >= 11) colorClass = 'bg-emerald-500 text-slate-950 font-black shadow-sm';
-                        else if (f.hits >= 9) colorClass = 'bg-blue-500 text-white font-bold';
+                        else if (f.hits >= 9) colorClass = 'bg-blue-500 !text-white font-bold';
                         else if (f.hits >= 6) colorClass = 'bg-amber-500 text-slate-950 font-bold';
-                        else colorClass = 'bg-rose-500 text-white font-bold';
+                        else colorClass = 'bg-rose-500 !text-white font-bold';
 
                         formHtml += `<span class="w-5 h-5 rounded-md ${colorClass} text-[10px] font-mono flex items-center justify-center cursor-help transition hover:scale-110" data-card-type="form-capsule" data-card-id="${s.member.id}" data-card-extra='${JSON.stringify({ jNum: f.jNum, hits: f.hits, points: f.points })}'>${f.hits}</span>`;
                     });
