@@ -957,25 +957,29 @@ window.AppTextScale = {
 
         const isHidden = dropdown.classList.contains('hidden');
         if (isHidden) {
-            // Si el botón que lo invocó es el móvil, reposicionar el dropdown debajo del botón móvil o centrado arriba
-            const triggerMobile = document.getElementById('btn-text-scale-trigger-mobile');
-            const triggerDesktop = document.getElementById('btn-text-scale-trigger');
+            // Determinar si estamos en móvil por ancho de pantalla o por el disparador pulsado
+            const isMobileView = window.innerWidth < 768 || (e && e.currentTarget && e.currentTarget.id === 'btn-text-scale-trigger-mobile');
             
-            // Si estamos en móvil o se pulsó el botón móvil
-            if (e && e.currentTarget && e.currentTarget.id === 'btn-text-scale-trigger-mobile') {
+            if (isMobileView) {
+                // En móvil: modal/panel centrado o anclado arriba con fondo fijo y z-index máximo
                 dropdown.style.position = 'fixed';
-                dropdown.style.top = '60px';
-                dropdown.style.right = '12px';
+                dropdown.style.top = '62px';
+                dropdown.style.right = '10px';
                 dropdown.style.left = 'auto';
-                dropdown.style.width = 'calc(100vw - 24px)';
+                dropdown.style.width = 'min(300px, calc(100vw - 20px))';
                 dropdown.style.maxWidth = '300px';
             } else {
-                dropdown.style.position = 'absolute';
-                dropdown.style.top = '100%';
-                dropdown.style.right = '0';
-                dropdown.style.left = 'auto';
-                dropdown.style.width = '16rem';
-                dropdown.style.maxWidth = 'none';
+                // En escritorio: posicionado relativo al trigger de escritorio
+                const triggerDesktop = document.getElementById('btn-text-scale-trigger');
+                if (triggerDesktop) {
+                    const rect = triggerDesktop.getBoundingClientRect();
+                    dropdown.style.position = 'fixed';
+                    dropdown.style.top = (rect.bottom + 8) + 'px';
+                    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+                    dropdown.style.left = 'auto';
+                    dropdown.style.width = '16rem';
+                    dropdown.style.maxWidth = 'none';
+                }
             }
 
             dropdown.classList.remove('hidden');
@@ -1022,16 +1026,40 @@ window.AppTextScale = {
 
     injectControls() {
         // Evitar inyección duplicada
-        if (document.getElementById('text-scale-control-wrapper')) return;
+        if (document.getElementById('text-scale-control-wrapper') || document.getElementById('text-scale-dropdown-panel')) return;
 
-        // Buscar contenedor de tema en escritorio (se coloca justo al lado)
+        // Buscar contenedor de tema en escritorio y móvil
         const themeDesktop = document.getElementById('theme-switcher-container');
         const themeMobile = document.getElementById('theme-switcher-container-mobile');
 
         const currScale = this.getScale();
         const currObj = this.SIZES.find(s => s.id === currScale) || this.SIZES[0];
 
-        // 1. Contenedor de Escritorio (Desplegable elegante)
+        // 1. Panel Flotante Desplegable inyectado DIRECTAMENTE EN DOCUMENT.BODY
+        // (De este modo ningún contenedor ancestro con display:none o overflow:hidden puede bloquearlo)
+        const dropdown = document.createElement('div');
+        dropdown.id = 'text-scale-dropdown-panel';
+        dropdown.className = 'hidden fixed p-2 rounded-2xl border shadow-2xl z-[99999] flex-col gap-1 backdrop-blur-xl animate-in fade-in duration-200';
+        dropdown.onclick = (e) => e.stopPropagation();
+        dropdown.innerHTML = `
+            <div class="text-scale-header px-2.5 py-1.5 border-b mb-1">
+                <span class="text-[10px] font-black uppercase tracking-wider block">Tamaño de Texto</span>
+                <p class="text-[11px] leading-tight mt-0.5">Adaptable a pantallas de PC, tablet y móvil.</p>
+            </div>
+            ${this.SIZES.map(s => `
+                <button type="button" data-text-scale-opt="${s.id}" onclick="window.AppTextScale.setScale('${s.id}'); window.AppTextScale.closeDropdown();"
+                        class="text-scale-item-btn w-full px-3 py-2 rounded-xl text-left text-xs font-semibold transition flex items-center justify-between border border-transparent cursor-pointer ${s.id === currScale ? 'active-scale' : ''}">
+                    <div>
+                        <span class="font-bold block">${s.label}</span>
+                        <span class="text-[10px] opacity-75 font-normal">${s.desc}</span>
+                    </div>
+                    <span class="check-indicator text-amber-500 font-black text-sm" style="display:${s.id === currScale ? 'inline' : 'none'};">✓</span>
+                </button>
+            `).join('')}
+        `;
+        document.body.appendChild(dropdown);
+
+        // 2. Disparador en Escritorio
         if (themeDesktop && themeDesktop.parentElement) {
             const wrapper = document.createElement('div');
             wrapper.id = 'text-scale-control-wrapper';
@@ -1044,49 +1072,35 @@ window.AppTextScale = {
                     <span class="text-scale-trigger-label font-mono text-[11px] font-black text-amber-500">${currObj.short}</span>
                     <span class="text-[9px] opacity-70">▾</span>
                 </button>
-
-                <!-- Panel Flotante Desplegable -->
-                <div id="text-scale-dropdown-panel" class="hidden absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl border shadow-2xl z-[99999] flex-col gap-1 backdrop-blur-xl animate-in fade-in duration-200" onclick="event.stopPropagation()">
-                    <div class="text-scale-header px-2.5 py-1.5 border-b mb-1">
-                        <span class="text-[10px] font-black uppercase tracking-wider block">Tamaño de Texto</span>
-                        <p class="text-[11px] leading-tight mt-0.5">Adaptable a pantallas de PC, tablet y móvil.</p>
-                    </div>
-                    ${this.SIZES.map(s => `
-                        <button type="button" data-text-scale-opt="${s.id}" onclick="window.AppTextScale.setScale('${s.id}'); window.AppTextScale.closeDropdown();"
-                                class="text-scale-item-btn w-full px-3 py-2 rounded-xl text-left text-xs font-semibold transition flex items-center justify-between border border-transparent cursor-pointer ${s.id === currScale ? 'active-scale' : ''}">
-                            <div>
-                                <span class="font-bold block">${s.label}</span>
-                                <span class="text-[10px] opacity-75 font-normal">${s.desc}</span>
-                            </div>
-                            <span class="check-indicator text-amber-500 font-black text-sm" style="display:${s.id === currScale ? 'inline' : 'none'};">✓</span>
-                        </button>
-                    `).join('')}
-                </div>
             `;
             themeDesktop.parentElement.insertBefore(wrapper, themeDesktop.nextSibling);
         }
 
-        // 2. Contenedor Compacto en Móvil
+        // 3. Disparador en Móvil
         if (themeMobile && themeMobile.parentElement) {
             const mobileBtn = document.createElement('button');
             mobileBtn.id = 'btn-text-scale-trigger-mobile';
             mobileBtn.type = 'button';
             mobileBtn.onclick = (e) => this.toggleDropdown(e);
-            mobileBtn.className = 'px-1.5 py-1 rounded-lg border text-[11px] font-black flex items-center justify-center gap-0.5 shadow-inner cursor-pointer';
+            mobileBtn.className = 'px-1.5 py-1 rounded-lg border text-[11px] font-black flex items-center justify-center gap-0.5 shadow-inner cursor-pointer select-none touch-manipulation';
             mobileBtn.title = 'Tamaño de texto';
             mobileBtn.innerHTML = `🔤 <span class="text-[9px] font-mono text-amber-500 font-bold ml-0.5">${currObj.short}</span>`;
             themeMobile.parentElement.insertBefore(mobileBtn, themeMobile.nextSibling);
         }
 
-        // Cerrar panel al pinchar fuera o al hacer scroll en móvil
-        document.addEventListener('click', (e) => {
+        // Cerrar panel al pinchar o hacer scroll fuera
+        const outsideHandler = (e) => {
             const panel = document.getElementById('text-scale-dropdown-panel');
             const trigDesk = document.getElementById('btn-text-scale-trigger');
             const trigMob = document.getElementById('btn-text-scale-trigger-mobile');
-            if (panel && !panel.contains(e.target) && (!trigDesk || !trigDesk.contains(e.target)) && (!trigMob || !trigMob.contains(e.target))) {
-                this.closeDropdown();
+            if (panel && !panel.classList.contains('hidden')) {
+                if (!panel.contains(e.target) && (!trigDesk || !trigDesk.contains(e.target)) && (!trigMob || !trigMob.contains(e.target))) {
+                    this.closeDropdown();
+                }
             }
-        });
+        };
+        document.addEventListener('click', outsideHandler);
+        document.addEventListener('touchend', outsideHandler);
     },
 
     init() {
