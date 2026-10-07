@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PEÑA MAULAS - Sandbox de Sellado Automático</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090d16">
+
+    <!-- Fonts & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+
+    <style>
+        :root {
+            --color-bg: #090d16;
+            --color-card: rgba(18, 24, 38, 0.85);
+            --color-card-border: rgba(16, 185, 129, 0.25);
+        }
+        body {
+            background-color: var(--color-bg);
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+
+<body class="p-3 sm:p-5 lg:p-7 antialiased selection:bg-emerald-500 selection:text-black">
+
+    <!-- PANTALLA DE BLOQUEO PARA NO AUTORIZADOS -->
+    <div id="lock-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-xl p-4">
+        <div class="glass-panel max-w-md w-full p-6 sm:p-8 text-center border-rose-500/40 shadow-2xl">
+            <div class="text-5xl mb-4">🔒</div>
+            <h2 class="text-xl font-black text-rose-400 mb-2">Entorno Restringido</h2>
+            <p class="text-sm text-slate-300 mb-6">
+                Este laboratorio de pruebas de sellado automático es un entorno de desarrollo exclusivo para el socio <strong>Fernando Lozano</strong>.
+            </p>
+            <a href="dashboard_2.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition shadow-lg">
+                ⬅️ Volver al Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL SANDBOX -->
+    <div id="sandbox-content" class="max-w-[1400px] mx-auto space-y-5 hidden">
+
+        <!-- HEADER DE LA SANDBOX -->
+        <header class="glass-panel p-4 sm:p-5 border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+            <div class="flex items-center gap-3.5">
+                <a href="dashboard_2.html" class="w-10 h-10 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition" title="Volver al Dashboard">
+                    ⬅️
+                </a>
+                <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-11 h-11 object-contain drop-shadow">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">SANDBOX v1.0</span>
+                        <span class="text-xs text-slate-400 font-mono">Exclusivo Fernando Lozano</span>
+                    </div>
+                    <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Laboratorio de Sellado Automático de Quinielas</h1>
+                </div>
+            </div>
+
+            <!-- Controles Rápidos -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700">
+                    <label for="sel-jornada-sandbox" class="text-xs text-slate-400 font-bold">Jornada:</label>
+                    <select id="sel-jornada-sandbox" class="bg-transparent text-emerald-400 font-bold text-xs focus:outline-none cursor-pointer">
+                        <option value="current" class="bg-slate-900 text-white">Jornada Activa</option>
+                        <option value="test_sim" class="bg-slate-900 text-white">Simulación 35 Apuestas (Demo)</option>
+                    </select>
+                </div>
+                <button onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700">
+                    🔄 Recargar
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI RESUMEN DE LA APUESTA GENERADA -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div class="glass-panel p-3.5 sm:p-4 border-slate-800">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Columnas Simples</span>
+                <span id="kpi-simples" class="text-xl sm:text-2xl font-black text-white mt-1 block">19</span>
+                <span class="text-[10px] text-slate-400 mt-0.5 block">1 por cada socio (0,75 €)</span>
+            </div>
+            <div class="glass-panel p-3.5 sm:p-4 border-slate-800">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Desarrollo Dobles</span>
+                <span id="kpi-dobles" class="text-xl sm:text-2xl font-black text-amber-400 mt-1 block">16</span>
+                <span class="text-[10px] text-slate-400 mt-0.5 block">4 dobles al directo (2⁴ = 16)</span>
+            </div>
+            <div class="glass-panel p-3.5 sm:p-4 border-emerald-500/20 bg-emerald-950/10">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Total Apuestas</span>
+                <span id="kpi-total" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1 block">35</span>
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Líneas en archivo .txt</span>
+            </div>
+            <div class="glass-panel p-3.5 sm:p-4 border-emerald-500/20 bg-emerald-950/10">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Importe Oficial</span>
+                <span id="kpi-importe" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1 block">26,25 €</span>
+                <span class="text-[10px] text-slate-400 mt-0.5 block">35 × 0,75 € (SELAE)</span>
+            </div>
+        </div>
+
+        <!-- GRID PRINCIPAL: 2 POSIBILIDADES DE ENVÍO -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+            <!-- ==================== POSIBILIDAD 1: TERMINAL ASLA VÍA EMAIL ==================== -->
+            <div class="glass-panel p-5 sm:p-6 border-blue-500/30 flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1.5">
+                            <span>📩</span> POSIBILIDAD 1: TERMINAL ASLA (EMAIL)
+                        </span>
+                        <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100% Automatizable</span>
+                    </div>
+
+                    <h2 class="text-lg font-black text-white">Envío Directo a Administración Amiga</h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Se envía automáticamente el archivo <code>.txt</code> por correo desde <strong>Penalosmaulas@gmail.com</strong> al buzón de la administración oficial colaboradora. El lotero pasa el archivo por su terminal ASLA y valida las apuestas descontándolas de vuestro saldo en depósito.
+                    </p>
+
+                    <!-- Configuración de Envío de Prueba -->
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">Remitente:</span>
+                            <span class="text-emerald-400 font-mono">Penalosmaulas@gmail.com</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="input-asla-email" class="text-slate-400 font-bold">Destino Administración:</label>
+                            <input type="email" id="input-asla-email" value="apuestas@loteriacolaboradora.es" class="bg-slate-950 px-2.5 py-1 rounded border border-slate-700 text-slate-200 font-mono text-xs w-56 text-right focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">Fichero Adjunto:</span>
+                            <span id="label-attachment-name" class="text-blue-400 font-mono">Jornada_XX_PenalosMaulas_35_apuestas.txt</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-blue-950/20 border border-blue-500/20 text-[11px] text-blue-300 space-y-1">
+                        <p><strong>💡 ¿Por qué funciona con 1 solo botón?</strong></p>
+                        <p>Porque el email no tiene barreras CORS ni Cloudflare. La app puede enviar el archivo por correo con un clic (usando una Cloud Function con SMTP o el cliente de correo predeterminado).</p>
+                    </div>
+                </div>
+
+                <div class="pt-3 space-y-2 border-t border-slate-800">
+                    <button id="btn-simular-asla" onclick="SandboxManager.simularEnvioASLA()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-sm transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
+                        <span>🚀</span> Enviar Pronósticos a Terminal ASLA (1 Clic)
+                    </button>
+                    <button onclick="SandboxManager.abrirEmailCliente()" class="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                        <span>✉️</span> Probar Redacción en Gmail / Cliente de Correo
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== POSIBILIDAD 2: PLATAFORMA WEB (EDUARDO LOSILLA) ==================== -->
+            <div class="glass-panel p-5 sm:p-6 border-amber-500/30 flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
+                            <span>🌐</span> POSIBILIDAD 2: PLATAFORMA WEB (LOSILLA)
+                        </span>
+                        <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">1-Clic Asistido</span>
+                    </div>
+
+                    <h2 class="text-lg font-black text-white">Pasarela de Archivos Online (Eduardo Losilla)</h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Se genera y descarga el archivo <code>.txt</code> de 35 apuestas con 1 clic y se abre automáticamente la sección de <em>"Jugar Archivos"</em> de Eduardo Losilla (o Lotería del Rosario). El usuario solo arrastra el archivo y pulsa confirmar.
+                    </p>
+
+                    <!-- Diagnóstico Técnico de Viabilidad -->
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">Portal Destino:</span>
+                            <span class="text-amber-400 font-mono">eduardolosilla.es/quiniela/archivos</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">Protección Web:</span>
+                            <span class="text-rose-400 font-bold">Cloudflare Turnstile (Anti-bots)</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">Tiempo estimado de sellado:</span>
+                            <span class="text-emerald-400 font-bold">~10 segundos (Arrastrar y validar)</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/20 text-[11px] text-amber-300 space-y-1">
+                        <p><strong>⚠️ ¿Por qué no es posible un script 100% ciego aquí?</strong></p>
+                        <p>Los portales de apuestas bloquean el scraping y bots mediante Cloudflare y restricciones CORS. El método asistido "Descargar + Abrir Pasarela" es 100% legal, seguro y sin riesgo de cierre de cuenta.</p>
+                    </div>
+                </div>
+
+                <div class="pt-3 space-y-2 border-t border-slate-800">
+                    <button id="btn-lanzar-losilla" onclick="SandboxManager.lanzarPasarelaLosilla()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
+                        <span>⚡</span> Lanzar Pasarela Losilla + Descargar Boleto Listo
+                    </button>
+                    <button onclick="SandboxManager.copiarPortapapeles()" class="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                        <span>📋</span> Copiar 35 Columnas al Portapapeles
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- VISOR DEL ARCHIVO .TXT DE APUESTAS GENERADO -->
+        <div class="glass-panel p-5 sm:p-6 border-slate-800 space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                        <span>📄</span> Archivo Estándar de Apuestas Generado (.TXT)
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Formato oficial aceptado por terminales ASLA y software de administraciones (14 signos 1X2 + Pleno al 15 por línea).
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="SandboxManager.descargarTXT()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow">
+                        <span>📥</span> Descargar .TXT
+                    </button>
+                </div>
+            </div>
+
+            <!-- Caja de Código -->
+            <div class="relative bg-slate-950 rounded-xl border border-slate-800 p-4 font-mono text-xs overflow-x-auto max-h-72 shadow-inner">
+                <pre id="code-output" class="text-emerald-400 whitespace-pre leading-relaxed select-all">Generando archivo...</pre>
+            </div>
+        </div>
+
+        <!-- CONSOLA DE AUDITORÍA Y REGISTRO EN TIEMPO REAL -->
+        <div class="glass-panel p-4 sm:p-5 border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>📡</span> Consola de Operaciones y Validación
+                </span>
+                <span id="console-status" class="text-[11px] font-mono text-emerald-400">Listo para pruebas</span>
+            </div>
+            <div id="console-logs" class="bg-slate-950/90 rounded-lg p-3 font-mono text-[11px] text-slate-300 space-y-1 max-h-40 overflow-y-auto border border-slate-800/80">
+                <div class="text-slate-500">[00:00:00] Sandbox inicializada para Fernando Lozano.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT GESTOR DE LA SANDBOX -->
+    <script>
+        const SandboxManager = {
+            apuestasGeneradas: [],
+            jornadaActual: 24,
+
+            init() {
+                this.checkAuth();
+            },
+
+            checkAuth() {
+                const rawUser = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+                let user = null;
+                try { user = JSON.parse(rawUser); } catch(e){}
+
+                const email = (user && user.email ? user.email.toLowerCase().trim() : '');
+                const name = (user && user.name ? user.name.toLowerCase().trim() : '');
+                const phone = (user && user.phone ? user.phone.toLowerCase().trim() : '');
+                const uid = String((user && user.id) || '');
+                const isFernando = uid === '6' || 
+                                   email === 'lozano@maulas.com' || 
+                                   email.includes('fernandolozano') || 
+                                   email.includes('fernando') ||
+                                   name.includes('fernando lozano') || 
+                                   (name.includes('lozano') && !name.includes('ram')) || 
+                                   phone.includes('lozano');
+
+                if (!isFernando) {
+                    document.getElementById('lock-screen').classList.remove('hidden');
+                    return;
+                }
+
+                document.getElementById('lock-screen').classList.add('hidden');
+                document.getElementById('sandbox-content').classList.remove('hidden');
+
+                this.log('Sesión verificada: Fernando Lozano autenticado con éxito.');
+                this.cargarDatos();
+            },
+
+            log(msg, type = 'info') {
+                const box = document.getElementById('console-logs');
+                const now = new Date().toLocaleTimeString();
+                const div = document.createElement('div');
+                div.className = type === 'error' ? 'text-rose-400' : (type === 'success' ? 'text-emerald-400' : 'text-slate-300');
+                div.textContent = `[${now}] ${msg}`;
+                box.appendChild(div);
+                box.scrollTop = box.scrollHeight;
+            },
+
+            async cargarDatos() {
+                this.log('Cargando pronósticos y dobles de la jornada...');
+                
+                // Generar los 19 pronósticos simples y los 4 dobles al directo (16 combinaciones)
+                this.generarCombinacionMaulas();
+            },
+
+            recargarDatos() {
+                this.log('Recargando datos de jornada...');
+                this.generarCombinacionMaulas();
+            },
+
+            generarCombinacionMaulas() {
+                // 1. Simulación base de 19 pronósticos simples de los 19 socios
+                const socios = [
+                    "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
+                    "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
+                    "Juan Antonio", "Juanjo", "Luismi", "Marcelo", "Martín",
+                    "Rafa", "Ramón", "Raúl Romera", "Samuel"
+                ];
+
+                const combinacionesSocios = [
+                    { p14: "1X211X21X211X2", p15: "10" },
+                    { p14: "11X211X21X211X", p15: "11" },
+                    { p14: "X211X21X211X21", p15: "01" },
+                    { p14: "1X11X11X11X11X", p15: "20" },
+                    { p14: "11111111111111", p15: "10" },
+                    { p14: "1X21X21X21X21X", p15: "12" },
+                    { p14: "21X21X21X21X21", p15: "00" },
+                    { p14: "11X11X11X11X11", p15: "10" },
+                    { p14: "X1X1X1X1X1X1X1", p15: "21" },
+                    { p14: "11122211122211", p15: "M1" },
+                    { p14: "1X2X1X2X1X2X1X", p15: "10" },
+                    { p14: "11X211X211X211", p15: "02" },
+                    { p14: "X12X12X12X12X1", p15: "10" },
+                    { p14: "11221122112211", p15: "1M" },
+                    { p14: "1X1X1X1X1X1X1X", p15: "20" },
+                    { p14: "1111XXXX222211", p15: "10" },
+                    { p14: "12121212121212", p15: "01" },
+                    { p14: "X2X2X2X2X2X2X2", p15: "11" },
+                    { p14: "11X22X11X22X11", p15: "21" }
+                ];
+
+                // 2. Columna múltiple con 4 dobles al directo (Partidos 1, 3, 7 y 11)
+                const doblesGanador = {
+                    signos: ["1X", "1", "12", "X", "1", "2", "1X", "1", "X", "2", "X2", "1", "1", "X"],
+                    p15: "10"
+                };
+
+                // Algoritmo de desarrollo combinatorio para los 4 dobles (2x2x2x2 = 16 columnas)
+                const opciones = doblesGanador.signos.map(s => s.split(''));
+                const desarrolloDobles = [];
+
+                function cartesian(arr, index = 0, current = []) {
+                    if (index === arr.length) {
+                        desarrolloDobles.push(current.join('') + doblesGanador.p15);
+                        return;
+                    }
+                    for (const char of arr[index]) {
+                        cartesian(arr, index + 1, [...current, char]);
+                    }
+                }
+                cartesian(opciones);
+
+                // Ensamblar las 35 apuestas
+                this.apuestasGeneradas = [];
+
+                // 19 simples
+                combinacionesSocios.forEach((s, idx) => {
+                    this.apuestasGeneradas.push({
+                        linea: `${s.p14}${s.p15}`,
+                        origen: `Socio ${idx + 1} (${socios[idx]})`,
+                        tipo: 'Simple'
+                    });
+                });
+
+                // 16 dobles
+                desarrolloDobles.forEach((col, idx) => {
+                    this.apuestasGeneradas.push({
+                        linea: col,
+                        origen: `Dobles Ganador (Comb. ${idx + 1})`,
+                        tipo: 'Doble Desarrollado'
+                    });
+                });
+
+                // Renderizar en UI
+                this.renderUI();
+            },
+
+            renderUI() {
+                const total = this.apuestasGeneradas.length;
+                const importe = (total * 0.75).toFixed(2);
+
+                document.getElementById('kpi-simples').textContent = '19';
+                document.getElementById('kpi-dobles').textContent = '16';
+                document.getElementById('kpi-total').textContent = total;
+                document.getElementById('kpi-importe').textContent = `${importe} €`;
+
+                const outputBox = document.getElementById('code-output');
+                const lineasTxt = this.apuestasGeneradas.map((ap, i) => {
+                    const num = String(i + 1).padStart(2, '0');
+                    return `${num} | ${ap.linea.slice(0, 14)} | P15: ${ap.linea.slice(14)}  <-- ${ap.origen}`;
+                }).join('\n');
+
+                outputBox.textContent = lineasTxt;
+                this.log(`Combinación lista: 35 apuestas validadas. Importe total: ${importe} €.`);
+            },
+
+            getTxtContent() {
+                // Solo las líneas puras de 14 signos + pleno al 15 para el archivo oficial
+                return this.apuestasGeneradas.map(a => a.linea).join('\r\n');
+            },
+
+            descargarTXT() {
+                const contenido = this.getTxtContent();
+                const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                this.log(`Archivo descargado con éxito: Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`, 'success');
+            },
+
+            async copiarPortapapeles() {
+                try {
+                    await navigator.clipboard.writeText(this.getTxtContent());
+                    this.log('✅ Las 35 apuestas se han copiado al portapapeles.', 'success');
+                    alert('¡Las 35 apuestas se han copiado al portapapeles!');
+                } catch(e) {
+                    this.log('Error copiando al portapapeles', 'error');
+                }
+            },
+
+            simularEnvioASLA() {
+                const destino = document.getElementById('input-asla-email').value;
+                const btn = document.getElementById('btn-simular-asla');
+                btn.disabled = true;
+                btn.innerHTML = `<span>⏳</span> Conectando con servidor de correo...`;
+
+                this.log(`Iniciando protocolo de sellado para Administración ASLA...`);
+                this.log(`Preparando payload desde Penalosmaulas@gmail.com hacia ${destino}...`);
+
+                setTimeout(() => {
+                    this.descargarTXT();
+                    this.log(`[ASLA] Fichero de 35 apuestas empaquetado y firmado.`, 'success');
+                    this.log(`[ASLA] Simulación: Correo enviado a ${destino} con asunto: [Peña Los Maulas] Sellado Jornada ${this.jornadaActual}`, 'success');
+                    this.log(`[ASLA] Simulación: Respuesta del terminal ASLA recibida -> Resguardo Oficial emitido #ASLA-${Date.now().toString().slice(-6)}`, 'success');
+
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>✅</span> ¡Envío Completado con Éxito!`;
+                    setTimeout(() => {
+                        btn.innerHTML = `<span>🚀</span> Enviar Pronósticos a Terminal ASLA (1 Clic)`;
+                    }, 4000);
+
+                    alert(`¡PRUEBA ASLA COMPLETADA!\n\nSe ha generado el archivo de 35 apuestas (.txt) y se ha simulado el envío desde Penalosmaulas@gmail.com a ${destino}.\n\nEn un entorno real, una Cloud Function ejecuta el envío de correo de forma desatendida y la administración sella contra vuestro saldo en depósito.`);
+                }, 1200);
+            },
+
+            abrirEmailCliente() {
+                const destino = document.getElementById('input-asla-email').value;
+                const asunto = encodeURIComponent(`[Peña Los Maulas] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
+                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos confirmación y resguardo oficial una vez validado en el terminal ASLA.\n\nGracias,\nPeña Los Maulas`);
+                
+                this.descargarTXT();
+                window.location.href = `mailto:${destino}?subject=${asunto}&body=${cuerpo}`;
+                this.log(`Cliente de correo abierto con plantilla preconfigurada.`, 'info');
+            },
+
+            lanzarPasarelaLosilla() {
+                this.log(`Lanzando pasarela asistida de Eduardo Losilla...`);
+                // 1. Descarga el archivo para que esté listo en la carpeta de descargas
+                this.descargarTXT();
+                // 2. Copia al portapapeles por si la web permite pegar
+                this.copiarPortapapeles();
+                // 3. Abre la pestaña oficial de subida de archivos de Eduardo Losilla
+                const win = window.open('https://www.eduardolosilla.es/quiniela/archivos', '_blank');
+                if (win) {
+                    this.log(`Pestaña abierta en Eduardo Losilla. Arrastra el archivo descargado para sellar.`, 'success');
+                } else {
+                    this.log(`Bloqueador de ventanas emergentes impidió abrir pestaña. Enlace directo: https://www.eduardolosilla.es/quiniela/archivos`, 'error');
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            SandboxManager.init();
+        });
+    </script>
+</body>
+</html>

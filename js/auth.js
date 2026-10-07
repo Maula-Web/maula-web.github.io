@@ -42,6 +42,7 @@ const Auth = {
             const parsedUser = JSON.parse(user);
             this.checkPrankStatus(parsedUser);
             this.initPushIfTargetUser(parsedUser);
+            this.initFernandoSandbox(parsedUser);
         }
     },
 
@@ -70,6 +71,69 @@ const Auth = {
             document.addEventListener('DOMContentLoaded', loadPush);
         } else {
             loadPush();
+        }
+    },
+
+    initFernandoSandbox(user) {
+        if (!user) return;
+        const uid = String(user.id || '');
+        const umail = (user.email || '').toLowerCase().trim();
+        const uname = (user.name || '').toLowerCase().trim();
+        const uphone = (user.phone || '').toLowerCase().trim();
+        const isFernando = uid === '6' ||
+                           umail === 'lozano@maulas.com' ||
+                           umail.includes('fernandolozano') ||
+                           umail.includes('fernando') ||
+                           uname.includes('fernando lozano') ||
+                           (uname.includes('lozano') && !uname.includes('ram')) ||
+                           uphone.includes('lozano');
+
+        if (!isFernando) return;
+
+        const path = (window.location.pathname || '').toLowerCase();
+        if (path.includes('sandbox_sellado.html')) return;
+
+        const injectLink = () => {
+            // 1. En versión V2 (dashboard_2, socios_2, etc.)
+            const adminLinkV2 = document.querySelector('a[href*="admin_2.html"]');
+            if (adminLinkV2 && !document.getElementById('btn-sandbox-nav-v2')) {
+                const btnV2 = document.createElement('a');
+                btnV2.id = 'btn-sandbox-nav-v2';
+                btnV2.href = 'sandbox_sellado.html';
+                btnV2.className = 'flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold transition group flex-shrink-0';
+                btnV2.title = 'Laboratorio de Sellado Automático (Exclusivo Fernando)';
+                btnV2.innerHTML = `
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🧪</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Sandbox</span>
+                `;
+                adminLinkV2.insertAdjacentElement('afterend', btnV2);
+            }
+
+            // 2. En versión V1 (sidebar-menu)
+            const sidebar = document.querySelector('.sidebar-menu');
+            if (sidebar && !document.getElementById('btn-sandbox-sidebar')) {
+                const adminLinkV1 = sidebar.querySelector('a[href*="admin.html"]');
+                const btnV1 = document.createElement('a');
+                btnV1.id = 'btn-sandbox-sidebar';
+                btnV1.href = 'sandbox_sellado.html';
+                btnV1.className = 'btn-primary';
+                btnV1.style.border = '1px dashed #10b981';
+                btnV1.style.color = '#10b981';
+                btnV1.style.fontWeight = 'bold';
+                btnV1.textContent = '🧪 SANDBOX';
+                btnV1.title = 'Laboratorio de Sellado Automático (Exclusivo Fernando)';
+                if (adminLinkV1) {
+                    adminLinkV1.insertAdjacentElement('afterend', btnV1);
+                } else {
+                    sidebar.appendChild(btnV1);
+                }
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(injectLink, 80));
+        } else {
+            setTimeout(injectLink, 80);
         }
     },
 
