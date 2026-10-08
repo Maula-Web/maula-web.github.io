@@ -126,19 +126,19 @@
         <!-- GRID PRINCIPAL: 2 POSIBILIDADES DE ENVÍO -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-            <!-- ==================== POSIBILIDAD 1: TERMINAL ASLA VÍA EMAIL ==================== -->
+            <!-- ==================== POSIBILIDAD 1: SOPORTE DIGITAL SELAE VÍA EMAIL ==================== -->
             <div class="glass-panel p-5 sm:p-6 border-blue-500/30 flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
                         <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1.5">
-                            <span>📩</span> POSIBILIDAD 1: TERMINAL ASLA (EMAIL)
+                            <span>📩</span> POSIBILIDAD 1: SOPORTE DIGITAL SELAE (VÍA EMAIL)
                         </span>
                         <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100% Automatizable</span>
                     </div>
 
                     <h2 class="text-lg font-black text-white">Envío Directo a Administración Amiga</h2>
                     <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                        Se envía automáticamente el archivo <code>.txt</code> por correo desde <strong>Penalosmaulas@gmail.com</strong> al buzón de la administración oficial colaboradora. El lotero pasa el archivo por su terminal ASLA y valida las apuestas descontándolas de vuestro saldo en depósito.
+                        Se envía automáticamente el archivo <code>.txt</code> por correo desde <strong>Penalosmaulas@gmail.com</strong> a la administración colaboradora. El lotero carga el archivo en su software de gestión de ventanilla (<strong>LotoGestión de ASG Loterías</strong> u homólogo), lo valida oficialmente en el <strong>Terminal de Juego de SELAE por Soporte Digital</strong> y descuenta el importe de vuestro saldo en depósito.
                     </p>
 
                     <!-- Configuración de Envío de Prueba -->
@@ -165,7 +165,7 @@
 
                 <div class="pt-3 space-y-2 border-t border-slate-800">
                     <button id="btn-simular-asla" onclick="SandboxManager.simularEnvioASLA()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-sm transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
-                        <span>🚀</span> Enviar Pronósticos a Terminal ASLA (1 Clic)
+                        <span>🚀</span> Enviar Pronósticos por Soporte Digital (1 Clic)
                     </button>
                     <button onclick="SandboxManager.abrirEmailCliente()" class="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
                         <span>✉️</span> Probar Redacción en Gmail / Cliente de Correo
@@ -230,7 +230,7 @@
                         <span>📄</span> Archivo Estándar de Apuestas Generado (.TXT)
                     </h3>
                     <p class="text-xs text-slate-400 mt-0.5">
-                        Formato oficial aceptado por terminales ASLA y software de administraciones (14 signos 1X2 + Pleno al 15 por línea).
+                        Formato oficial regulado por SELAE para Soporte Digital (ASD) e importación en software de administración (LotoGestión de ASG Loterías, Tyche, etc.).
                     </p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -453,33 +453,33 @@
                 btn.disabled = true;
                 btn.innerHTML = `<span>⏳</span> Conectando con servidor de correo...`;
 
-                this.log(`Iniciando protocolo de sellado para Administración ASLA...`);
+                this.log(`Iniciando protocolo de sellado para Administración (Soporte Digital SELAE)...`);
                 this.log(`Preparando payload desde Penalosmaulas@gmail.com hacia ${destino}...`);
 
                 setTimeout(() => {
                     this.descargarTXT();
-                    this.log(`[ASLA] Fichero de 35 apuestas empaquetado y firmado.`, 'success');
-                    this.log(`[ASLA] Simulación: Correo enviado a ${destino} con asunto: [Peña Los Maulas] Sellado Jornada ${this.jornadaActual}`, 'success');
-                    this.log(`[ASLA] Simulación: Respuesta del terminal ASLA recibida -> Resguardo Oficial emitido #ASLA-${Date.now().toString().slice(-6)}`, 'success');
+                    this.log(`[Soporte Digital] Fichero de 35 apuestas empaquetado y listo.`, 'success');
+                    this.log(`[Soporte Digital] Simulación: Correo enviado a ${destino} con asunto: [Peña Los Maulas] Sellado Jornada ${this.jornadaActual}`, 'success');
+                    this.log(`[Soporte Digital] Simulación: Archivo volcado mediante software de gestión (LotoGestión/ASG) -> Resguardo emitido en Terminal Oficial SELAE #SELAE-${Date.now().toString().slice(-6)}`, 'success');
 
                     btn.disabled = false;
                     btn.innerHTML = `<span>✅</span> ¡Envío Completado con Éxito!`;
                     setTimeout(() => {
-                        btn.innerHTML = `<span>🚀</span> Enviar Pronósticos a Terminal ASLA (1 Clic)`;
+                        btn.innerHTML = `<span>🚀</span> Enviar Pronósticos por Soporte Digital (1 Clic)`;
                     }, 4000);
 
-                    alert(`¡PRUEBA ASLA COMPLETADA!\n\nSe ha generado el archivo de 35 apuestas (.txt) y se ha simulado el envío desde Penalosmaulas@gmail.com a ${destino}.\n\nEn un entorno real, una Cloud Function ejecuta el envío de correo de forma desatendida y la administración sella contra vuestro saldo en depósito.`);
+                    alert(`¡PRUEBA DE SOPORTE DIGITAL COMPLETADA!\n\nSe ha generado el archivo de 35 apuestas (.txt) y se ha simulado el envío desde Penalosmaulas@gmail.com a ${destino}.\n\nEn un entorno real, una Cloud Function ejecuta el envío de correo de forma desatendida, el lotero lo procesa con su software de gestión de ventanilla (LotoGestión de ASG Loterías u homólogo) y el Terminal Oficial de SELAE emite el resguardo contra vuestro saldo en depósito.`);
                 }, 1200);
             },
 
             abrirEmailCliente() {
                 const destino = document.getElementById('input-asla-email').value;
                 const asunto = encodeURIComponent(`[Peña Los Maulas] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
-                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos confirmación y resguardo oficial una vez validado en el terminal ASLA.\n\nGracias,\nPeña Los Maulas`);
+                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples (Soporte Digital / ASD)\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
                 
                 this.descargarTXT();
                 window.location.href = `mailto:${destino}?subject=${asunto}&body=${cuerpo}`;
-                this.log(`Cliente de correo abierto con plantilla preconfigurada.`, 'info');
+                this.log(`Cliente de correo abierto con plantilla preconfigurada para Soporte Digital.`, 'info');
             },
 
             lanzarPasarelaLosilla() {
