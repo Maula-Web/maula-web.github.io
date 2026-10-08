@@ -173,43 +173,121 @@
                         <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1.5">
                             <span>📩</span> POSIBILIDAD 1: SOPORTE DIGITAL SELAE (VÍA EMAIL)
                         </span>
-                        <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100% Automatizable</span>
+                        <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Envío Real 1-Clic</span>
                     </div>
 
-                    <h2 class="text-lg font-black text-white">Envío Directo a Administración Amiga</h2>
+                    <h2 class="text-lg font-black text-white">Envío Directo con Archivo Adjunto .TXT</h2>
                     <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                        Se envía automáticamente el archivo <code>.txt</code> por correo desde <strong>Penalosmaulas@gmail.com</strong> a la administración colaboradora. El lotero carga el archivo en su software de gestión de ventanilla (<strong>LotoGestión de ASG Loterías</strong> u homólogo), lo valida oficialmente en el <strong>Terminal de Juego de SELAE por Soporte Digital</strong> y descuenta el importe de vuestro saldo en depósito.
+                        Envía automáticamente el archivo <code>.txt</code> oficial adjunto desde <strong>Penalosmaulas@gmail.com</strong> al correo que indiques (tu cuenta de monitorización o la administración colaboradora).
                     </p>
 
-                    <!-- Configuración de Envío de Prueba -->
-                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs">
+                    <!-- Configuración de Envío Real -->
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2.5 text-xs">
                         <div class="flex items-center justify-between">
-                            <span class="text-slate-400 font-bold">Remitente:</span>
-                            <span class="text-emerald-400 font-mono">Penalosmaulas@gmail.com</span>
+                            <span class="text-slate-400 font-bold">Remitente oficial:</span>
+                            <span class="text-emerald-400 font-mono font-bold">Penalosmaulas@gmail.com</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <label for="input-asla-email" class="text-slate-400 font-bold">Destino Administración:</label>
-                            <input type="email" id="input-asla-email" value="apuestas@loteriacolaboradora.es" class="bg-slate-950 px-2.5 py-1 rounded border border-slate-700 text-slate-200 font-mono text-xs w-56 text-right focus:border-blue-500 focus:outline-none">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                            <label for="input-asla-email" class="text-slate-400 font-bold">Destino (Monitorización / Lotería):</label>
+                            <input type="email" id="input-asla-email" oninput="SandboxManager.guardarEmailDestino(this.value)" placeholder="tu-email@gmail.com" class="bg-slate-950 px-2.5 py-1 rounded border border-slate-700 text-slate-200 font-mono text-xs w-full sm:w-64 text-left sm:text-right focus:border-blue-500 focus:outline-none">
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-slate-400 font-bold">Fichero Adjunto:</span>
                             <span id="label-attachment-name" class="text-blue-400 font-mono">Jornada_XX_PenalosMaulas_35_apuestas.txt</span>
                         </div>
+                        
+                        <!-- Configuración del Webhook Google Apps Script -->
+                        <div class="pt-2 border-t border-slate-800 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <label for="input-webhook-url" class="text-slate-400 font-bold flex items-center gap-1.5">
+                                    <span>⚡ Webhook Google Apps Script:</span>
+                                    <span id="webhook-status-badge" class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">Sin configurar</span>
+                                </label>
+                            </div>
+                            <input type="url" id="input-webhook-url" oninput="SandboxManager.guardarWebhookUrl(this.value)" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 px-2.5 py-1.5 rounded border border-slate-700 text-slate-200 font-mono text-[11px] focus:border-blue-500 focus:outline-none">
+                        </div>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-blue-950/20 border border-blue-500/20 text-[11px] text-blue-300 space-y-1">
-                        <p><strong>💡 ¿Por qué funciona con 1 solo botón?</strong></p>
-                        <p>Porque el email no tiene barreras CORS ni Cloudflare. La app puede enviar el archivo por correo con un clic (usando una Cloud Function con SMTP o el cliente de correo predeterminado).</p>
-                    </div>
+                    <!-- Desplegable con Instrucciones y Código Listo para Pegar -->
+                    <details id="details-gas-guide" class="bg-slate-950/90 rounded-xl border border-blue-500/25 p-3 text-xs text-blue-300">
+                        <summary class="font-bold text-white cursor-pointer hover:text-blue-300 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-1.5">
+                                <span>🛠️</span> <strong>Guía Rápida: Cómo activar tu Webhook en Gmail (2 min)</strong>
+                            </span>
+                            <span class="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded font-mono">Ver pasos</span>
+                        </summary>
+                        <div class="mt-3 space-y-2.5 border-t border-slate-800 pt-2.5 text-[11px] text-slate-300 leading-relaxed">
+                            <ol class="list-decimal pl-4 space-y-1.5 text-slate-300">
+                                <li>Inicia sesión en Google con <strong>Penalosmaulas@gmail.com</strong> y abre <a href="https://script.google.com" target="_blank" class="text-emerald-400 underline font-bold">script.google.com</a>.</li>
+                                <li>Haz clic en <strong>Nuevo proyecto</strong> (arriba a la izquierda).</li>
+                                <li>Borra todo lo que aparezca en el editor y <strong>pega el código que tienes abajo</strong>.</li>
+                                <li>Pulsa el botón azul <strong>Implementar > Nueva implementación</strong> (arriba a la derecha).</li>
+                                <li>En el icono de engranaje (⚙️), selecciona <strong>Aplicación web</strong>.</li>
+                                <li>Configura exactamente esto:
+                                    <ul class="list-disc pl-4 mt-1 text-slate-400">
+                                        <li><strong>Ejecutar como:</strong> Yo (Penalosmaulas@gmail.com)</li>
+                                        <li><strong>Quién tiene acceso:</strong> Cualquier usuario (Anyone)</li>
+                                    </ul>
+                                </li>
+                                <li>Pulsa <strong>Implementar</strong> y autoriza el acceso a Gmail cuando te lo pida.</li>
+                                <li>Copia la <strong>URL de la aplicación web</strong> (termina en <code>/exec</code>) y pégala en el campo de arriba.</li>
+                            </ol>
+
+                            <div class="mt-3 pt-2 border-t border-slate-800">
+                                <div class="flex items-center justify-between pb-1.5">
+                                    <span class="font-bold text-slate-300 text-[10px]">CÓDIGO LISTO PARA PEGAR EN GOOGLE APPS SCRIPT:</span>
+                                    <button onclick="SandboxManager.copiarCodigoGAS()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-mono font-bold flex items-center gap-1">
+                                        <span>📋</span> Copiar Código
+                                    </button>
+                                </div>
+                                <pre id="code-gas-snippet" class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 font-mono text-[10px] text-emerald-400 overflow-x-auto select-all max-h-40 leading-relaxed">function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName);
+    
+    GmailApp.sendEmail(data.to, data.subject, data.body, {
+      name: 'Peña Los Maulas',
+      attachments: [blob]
+    });
+    
+    return ContentService.createTextOutput(JSON.stringify({ 
+      ok: true, 
+      sentAt: new Date().toISOString(),
+      to: data.to,
+      fileName: data.fileName
+    })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ 
+      ok: false, 
+      error: err.toString() 
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ 
+    status: 'online', 
+    service: 'Peña Los Maulas - Pasarela de Sellado Digital',
+    account: 'Penalosmaulas@gmail.com'
+  })).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+                            </div>
+                        </div>
+                    </details>
                 </div>
 
                 <div class="pt-3 space-y-2 border-t border-slate-800">
-                    <button id="btn-simular-asla" onclick="SandboxManager.simularEnvioASLA()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-sm transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
-                        <span>🚀</span> Enviar Pronósticos por Soporte Digital (1 Clic)
+                    <button id="btn-enviar-correo-real" onclick="SandboxManager.enviarCorreoReal()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-sm transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
+                        <span>🚀</span> Enviar Pronósticos por Correo Real con .TXT Adjunto
                     </button>
-                    <button onclick="SandboxManager.abrirEmailCliente()" class="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
-                        <span>✉️</span> Probar Redacción en Gmail / Cliente de Correo
-                    </button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="SandboxManager.abrirGmailWeb()" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                            <span>📧</span> Abrir en Gmail Web
+                        </button>
+                        <button onclick="SandboxManager.descargarTXT()" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
+                            <span>📥</span> Solo Descargar .TXT
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -419,6 +497,7 @@
                 document.getElementById('sandbox-content').classList.remove('hidden');
 
                 this.log('Sesión verificada: Fernando Lozano autenticado con éxito.');
+                this.cargarConfiguracionesLocales();
                 this.cargarDatos();
             },
 
@@ -1033,39 +1112,147 @@
                 }
             },
 
-            simularEnvioASLA() {
-                const destino = document.getElementById('input-asla-email').value;
-                const btn = document.getElementById('btn-simular-asla');
-                btn.disabled = true;
-                btn.innerHTML = `<span>⏳</span> Conectando con servidor de correo...`;
-
-                this.log(`Iniciando protocolo de sellado para Administración (Soporte Digital SELAE)...`);
-                this.log(`Preparando payload desde Penalosmaulas@gmail.com hacia ${destino}...`);
-
-                setTimeout(() => {
-                    this.descargarTXT();
-                    this.log(`[Soporte Digital] Fichero de 35 apuestas empaquetado y listo para Jornada ${this.jornadaActual}.`, 'success');
-                    this.log(`[Soporte Digital] Simulación: Correo enviado a ${destino} con asunto: [Peña Los Maulas] Sellado Jornada ${this.jornadaActual}`, 'success');
-                    this.log(`[Soporte Digital] Simulación: Archivo volcado mediante software de gestión (LotoGestión/ASG) -> Resguardo emitido en Terminal Oficial SELAE #SELAE-${Date.now().toString().slice(-6)}`, 'success');
-
-                    btn.disabled = false;
-                    btn.innerHTML = `<span>✅</span> ¡Envío Completado con Éxito!`;
-                    setTimeout(() => {
-                        btn.innerHTML = `<span>🚀</span> Enviar Pronósticos por Soporte Digital (1 Clic)`;
-                    }, 4000);
-
-                    alert(`¡PRUEBA DE SOPORTE DIGITAL COMPLETADA!\n\nSe ha generado el archivo de 35 apuestas (.txt) para la Jornada ${this.jornadaActual} y se ha simulado el envío desde Penalosmaulas@gmail.com a ${destino}.\n\nEn un entorno real, una Cloud Function ejecuta el envío de correo de forma desatendida, el lotero lo procesa con su software de gestión de ventanilla (LotoGestión de ASG Loterías u homólogo) y el Terminal Oficial de SELAE emite el resguardo contra vuestro saldo en depósito.`);
-                }, 1200);
+            guardarEmailDestino(val) {
+                localStorage.setItem('maulas_destino_email', val.trim());
             },
 
-            abrirEmailCliente() {
-                const destino = document.getElementById('input-asla-email').value;
+            guardarWebhookUrl(val) {
+                const clean = val.trim();
+                localStorage.setItem('maulas_gas_webhook', clean);
+                this.actualizarWebhookBadge(clean);
+            },
+
+            actualizarWebhookBadge(val) {
+                const badge = document.getElementById('webhook-status-badge');
+                if (!badge) return;
+                if (!val) {
+                    badge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700';
+                    badge.textContent = 'Sin configurar';
+                } else if (val.includes('script.google.com') && val.includes('/exec')) {
+                    badge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold';
+                    badge.textContent = '🟢 Webhook Conectado';
+                } else {
+                    badge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                    badge.textContent = '🟡 URL Incompleta';
+                }
+            },
+
+            cargarConfiguracionesLocales() {
+                const savedEmail = localStorage.getItem('maulas_destino_email') || '';
+                const inputEmail = document.getElementById('input-asla-email');
+                if (inputEmail && savedEmail) {
+                    inputEmail.value = savedEmail;
+                }
+
+                const savedWebhook = localStorage.getItem('maulas_gas_webhook') || '';
+                const inputWebhook = document.getElementById('input-webhook-url');
+                if (inputWebhook) {
+                    inputWebhook.value = savedWebhook;
+                    this.actualizarWebhookBadge(savedWebhook);
+                }
+            },
+
+            async copiarCodigoGAS() {
+                const code = document.getElementById('code-gas-snippet');
+                if (!code) return;
+                try {
+                    await navigator.clipboard.writeText(code.textContent);
+                    this.log('Código de Google Apps Script copiado al portapapeles.', 'success');
+                    alert('¡Código copiado al portapapeles!\n\nPégalo en tu proyecto de script.google.com con la cuenta Penalosmaulas@gmail.com.');
+                } catch(e) {
+                    this.log('Error copiando código de Google Apps Script', 'error');
+                }
+            },
+
+            abrirGmailWeb() {
+                const destino = (document.getElementById('input-asla-email').value || '').trim();
+                const p15 = this.p15Oficial || '10';
                 const asunto = encodeURIComponent(`[Peña Los Maulas] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
-                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples (Soporte Digital / ASD)\nPleno al 15 unificado: ${this.p15Oficial || '10'}\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
+                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos oficiales de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples (Soporte Digital / ASD)\nPleno al 15 unificado: ${p15}\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
                 
                 this.descargarTXT();
-                window.location.href = `mailto:${destino}?subject=${asunto}&body=${cuerpo}`;
-                this.log(`Cliente de correo abierto con plantilla preconfigurada para Soporte Digital.`, 'info');
+                const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(destino)}&su=${asunto}&body=${cuerpo}`;
+                window.open(url, '_blank');
+                this.log(`Descargado .txt y abierto compositor de Gmail Web para ${destino}. Solo arrastra el archivo.`, 'info');
+            },
+
+            async enviarCorreoReal() {
+                const destino = (document.getElementById('input-asla-email').value || '').trim();
+                const webhookUrl = (document.getElementById('input-webhook-url').value || '').trim();
+                const btn = document.getElementById('btn-enviar-correo-real');
+
+                if (!destino) {
+                    alert('Por favor, indica una dirección de correo de destino.');
+                    const inp = document.getElementById('input-asla-email');
+                    if (inp) inp.focus();
+                    return;
+                }
+
+                if (!webhookUrl) {
+                    this.log('Aviso: Falta la URL del Webhook de Google Apps Script.', 'error');
+                    const abrir = confirm(`Para enviar el correo real con el archivo adjunto en 1 clic, necesitas configurar la URL de tu Google Apps Script.\n\n¿Quieres abrir la guía paso a paso para activarlo en 2 minutos?`);
+                    if (abrir) {
+                        const details = document.getElementById('details-gas-guide');
+                        if (details) details.open = true;
+                        const wInp = document.getElementById('input-webhook-url');
+                        if (wInp) wInp.focus();
+                    }
+                    return;
+                }
+
+                const p15 = this.p15Oficial || '10';
+                const fileName = `Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`;
+                const fileContent = this.getTxtContent();
+                const subject = `[Peña Los Maulas] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (P15: ${p15})`;
+                const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15}\n- Importe oficial: 26,25 € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo.\n\nSaludos,\nPeña Los Maulas`;
+
+                btn.disabled = true;
+                btn.innerHTML = `<span>⏳</span> Conectando con Google Apps Script...`;
+                this.log(`Iniciando envío de correo real desde Penalosmaulas@gmail.com hacia ${destino}...`);
+
+                try {
+                    const payload = {
+                        to: destino,
+                        subject: subject,
+                        body: body,
+                        fileName: fileName,
+                        fileContent: fileContent
+                    };
+
+                    // Content-Type text/plain evita el preflight CORS OPTIONS que Google Apps Script no soporta
+                    const res = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    let data = null;
+                    try {
+                        data = await res.json();
+                    } catch(e) {
+                        if (res.ok) data = { ok: true };
+                    }
+
+                    if (data && data.ok) {
+                        this.log(`✅ ¡Correo REAL enviado con éxito a ${destino}!`, 'success');
+                        this.log(`[Google Apps Script] Adjunto "${fileName}" entregado vía Gmail.`, 'success');
+                        btn.innerHTML = `<span>✅</span> ¡Correo Enviado con Éxito!`;
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.innerHTML = `<span>🚀</span> Enviar Pronósticos por Correo Real con .TXT Adjunto`;
+                        }, 4000);
+
+                        alert(`¡CORREO REAL ENVIADO CON ÉXITO!\n\nSe ha enviado el archivo "${fileName}" con las 35 apuestas (P15: ${p15}) desde Penalosmaulas@gmail.com a:\n\n👉 ${destino}\n\nRevisa tu bandeja de entrada.`);
+                    } else {
+                        const errMsg = (data && data.error) ? data.error : `HTTP ${res.status}`;
+                        throw new Error(errMsg);
+                    }
+                } catch (err) {
+                    this.log(`Error al enviar correo: ${err.message}`, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>⚠️</span> Error - Reintentar Envío`;
+                    alert(`Hubo un problema al conectar con Google Apps Script:\n\n${err.message}\n\nAsegúrate de que la aplicación web esté desplegada con acceso para "Cualquiera" (Anyone) en script.google.com.`);
+                }
             },
 
             lanzarPasarelaLosilla() {
