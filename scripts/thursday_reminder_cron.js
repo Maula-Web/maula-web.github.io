@@ -52,13 +52,24 @@ async function main() {
     console.log('  ⚽ PEÑA MAULAS - RECORDATORIO AUTOMÁTICO DE QUINIELA JUEVES ');
     console.log('=============================================================\n');
 
-    // Comprobación de hora local en Madrid (para ajustar horario de verano/invierno si es automático)
+    // Comprobación de ventana de ejecución en horario de Madrid
     const isManualRun = process.env.GITHUB_EVENT_NAME === 'workflow_dispatch' || process.argv.includes('--force');
+    const madridDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+    const madridDay = madridDate.getDay(); // 4 = Jueves
+    const madridHour = madridDate.getHours();
+    const madridMin = madridDate.getMinutes();
+    const todayMadridStr = madridDate.toLocaleDateString('es-ES');
+
     if (!isManualRun) {
-        const madridDateStr = new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' });
-        const madridHour = new Date(madridDateStr).getHours();
-        if (madridHour !== 16) {
-            console.log(`ℹ️ Hora actual en Madrid: ${madridHour}:xx. El recordatorio solo se ejecuta a las 16:xx. Omitiendo.`);
+        // Debe ser jueves
+        if (madridDay !== 4) {
+            console.log(`ℹ️ Hoy no es jueves en Madrid (día de la semana: ${madridDay}). Omitiendo.`);
+            return;
+        }
+
+        // Ventana flexible: de 16:00 a 17:15 (permite compensar colas y retrasos de runners en GitHub Actions)
+        if (madridHour < 16 || (madridHour === 17 && madridMin > 15) || madridHour > 17) {
+            console.log(`ℹ️ Hora actual en Madrid: ${madridHour}:${String(madridMin).padStart(2, '0')}. Fuera de la ventana permitida (16:00 - 17:15). Omitiendo.`);
             return;
         }
     }
@@ -95,20 +106,46 @@ async function main() {
     const jornadaNum = targetJornada.number;
     console.log(`✅ Jornada activa seleccionada: Jornada ${jornadaNum} (Fecha: ${targetJornada.date || 'Sin fecha'})`);
 
-    // 3. Obtener socios que YA han enviado sus pronósticos
-    const pronosticosSnap = await db.collection('pronosticos')
-        .where('jornada', '==', jornadaNum)
-        .get();
+    // Comprobar si ya se envió hoy para esta jornada (evita envíos duplicados si hay reintentos programados)
+    if (!isManualRun) {
+        const alreadySentSnap = await db.collection('push_log')
+            .where('type', '==', 'thursday_reminder_cron')
+            .where('jornada', '==', jornadaNum)
+            .get();
 
+        const alreadySentToday = !alreadySentSnap.empty && alreadySentSnap.docs.some(d => {
+            const data = d.data();
+            const sentAt = data.sentAt ? new Date(data.sentAt).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' }) : null;
+            return sentAt === todayMadridStr || data.dateStr === todayMadridStr;
+        });
+
+        if (alreadySentToday) {
+            console.log(`ℹ️ El recordatorio push para la Jornada ${jornadaNum} ya se envió hoy (${todayMadridStr}). Omitiendo para no duplicar.`);
+            return;
+        }
+    }
+
+    // 3. Obtener socios que YA han enviado sus pronósticos válidos
+    // En Firestore los pronósticos se guardan con jId (ID único de jornada) o jornadaId, y mId o memberId
+    const jIdStr = String(targetJornada.id);
+    const jNumStr = String(jornadaNum);
+
+    const pronosticosSnap = await db.collection('pronosticos').get();
     const submittedMemberIds = new Set();
     pronosticosSnap.forEach(doc => {
-        const mid = doc.data().memberId;
-        if (mid !== undefined && mid !== null) {
-            submittedMemberIds.add(String(mid));
+        const data = doc.data();
+        const pJId = String(data.jId !== undefined && data.jId !== null ? data.jId : (data.jornadaId !== undefined && data.jornadaId !== null ? data.jornadaId : data.jornada || ''));
+        if (pJId === jIdStr || pJId === jNumStr) {
+            const pMId = String(data.mId !== undefined && data.mId !== null ? data.mId : (data.memberId !== undefined && data.memberId !== null ? data.memberId : ''));
+            const hasSelection = data.selection && Array.isArray(data.selection) &&
+                data.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+            if (pMId && hasSelection) {
+                submittedMemberIds.add(pMId);
+            }
         }
     });
 
-    console.log(`📋 Pronósticos ya recibidos para Jornada ${jornadaNum}: ${submittedMemberIds.size} socios.`);
+    console.log(`📋 Pronósticos válidos ya recibidos para Jornada ${jornadaNum}: ${submittedMemberIds.size} socios.`);
 
     // 4. Obtener todos los socios
     const membersSnap = await db.collection('members').get();
@@ -242,16 +279,17 @@ async function main() {
         console.log(`🧹 Marcado token caducado: ${docId}`);
     }
 
-    // 7. Registrar en push_log para auditoría
+    // 7. Registrar en push_log para auditoría y control de deduplicación
     await db.collection('push_log').add({
         type: 'thursday_reminder_cron',
         jornada: jornadaNum,
+        dateStr: todayMadridStr,
         pendingMembersCount: pendingMembers.length,
         tokensTargeted: targetTokens.length,
         sent: response.successCount,
         failed: response.failureCount,
         sentAt: new Date().toISOString(),
-        source: 'github-actions'
+        source: isManualRun ? 'manual-dispatch' : 'github-actions'
     });
 
     console.log('\n📝 Registro guardado en push_log de Firestore.');

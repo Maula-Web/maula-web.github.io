@@ -3,10 +3,13 @@ run-name: 🪙 Recordatorio Saldo Bote Lunes 09:00
 
 on:
   schedule:
-    # 07:00 UTC = 09:00 Madrid en horario de verano (CEST, UTC+2)
-    # 08:00 UTC = 09:00 Madrid en horario de invierno (CET, UTC+1)
-    # Se programa a las 07:00 y 08:00 UTC; el script verifica internamente que en Europe/Madrid sean las 9:xx.
-    - cron: '0 7,8 * * 1'
+    # Programado en minutos no congestionados (:15 y :45) con reintento automático
+    # Madrid Verano (CEST, UTC+2): 07:15 UTC (09:15 Madrid) y 07:45 UTC (09:45 Madrid)
+    - cron: '15 7 * * 1'
+    - cron: '45 7 * * 1'
+    # Madrid Invierno (CET, UTC+1): 08:15 UTC (09:15 Madrid) y 08:45 UTC (09:45 Madrid)
+    - cron: '15 8 * * 1'
+    - cron: '45 8 * * 1'
   workflow_dispatch:
     # Permite dispararlo manualmente en cualquier momento desde la pestaña "Actions" de GitHub
 

@@ -65,11 +65,19 @@ async function main() {
 
     // Comprobación de hora local en Madrid si se ejecuta de forma programada por cron
     const isManualRun = process.env.GITHUB_EVENT_NAME === 'workflow_dispatch' || process.argv.includes('--force');
+    const madridDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+    const madridDay = madridDate.getDay(); // 1 = Lunes
+    const madridHour = madridDate.getHours();
+    const todayMadridStr = madridDate.toLocaleDateString('es-ES');
+
     if (!isManualRun) {
-        const madridDateStr = new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' });
-        const madridHour = new Date(madridDateStr).getHours();
-        if (madridHour !== 9) {
-            console.log(`ℹ️ Hora actual en Madrid: ${madridHour}:xx. Este recordatorio solo se dispara a las 09:xx. Omitiendo.`);
+        if (madridDay !== 1) {
+            console.log(`ℹ️ Hoy no es lunes en Madrid (día ${madridDay}). Omitiendo.`);
+            return;
+        }
+        // Ventana flexible matinal entre 09:00 y 11:30 para compensar colas de GitHub Actions
+        if (madridHour < 9 || (madridHour === 11 && madridDate.getMinutes() > 30) || madridHour > 11) {
+            console.log(`ℹ️ Hora actual en Madrid: ${madridHour}:xx. Fuera de la ventana matinal (09:00 - 11:30). Omitiendo.`);
             return;
         }
     }

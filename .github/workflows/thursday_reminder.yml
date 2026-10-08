@@ -3,9 +3,17 @@ run-name: ⏰ Recordatorio Quiniela Jueves 16:30
 
 on:
   schedule:
-    # 14:30 UTC = 16:30 Madrid en horario de verano (CEST, UTC+2)
-    # 15:30 UTC = 16:30 Madrid en horario de invierno (CET, UTC+1)
-    - cron: '30 14,15 * * 4'
+    # Programado en minutos no congestionados (:15 y :35) con ventana de reintento.
+    # Madrid Verano (CEST, UTC+2):
+    # - 14:15 UTC = 16:15 Madrid
+    # - 14:35 UTC = 16:35 Madrid (reintento automático si hay cola de espera en runners)
+    - cron: '15 14 * * 4'
+    - cron: '35 14 * * 4'
+    # Madrid Invierno (CET, UTC+1):
+    # - 15:15 UTC = 16:15 Madrid
+    # - 15:35 UTC = 16:35 Madrid (reintento automático si hay cola de espera en runners)
+    - cron: '15 15 * * 4'
+    - cron: '35 15 * * 4'
   workflow_dispatch:
     # Permite ejecutarlo manualmente en cualquier momento desde la pestaña "Actions" de GitHub
 

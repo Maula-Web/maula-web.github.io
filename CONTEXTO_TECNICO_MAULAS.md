@@ -1029,6 +1029,20 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 39. ROBUSTEZ EN RECORDATORIOS AUTOMÁTICOS DE GITHUB ACTIONS (JUEVES Y LUNES)
+- **Problema previo**: El recordatorio de los jueves ("aún no has rellenado tu quiniela. ¡Te queda poco tiempo!") no se ejecutaba automáticamente a las 16:30h, teniendo que ser lanzado a mano desde GitHub Actions vía `workflow_dispatch`. Además, al ejecutarse a mano, enviaba notificación a los 19 socios en bloque sin discriminar a los que ya habían rellenado.
+- **Causas identificadas**:
+  1. **Cuello de botella en colas de GitHub Actions y cerrojo estricto de hora**: Las tareas cron en GitHub Actions (`schedule`) sufren retrasos habituales de entre 20 minutos y varias horas debido a congestión de runners compartidos, especialmente a las horas en punto (`:00`) y medias (`:30`). El script `thursday_reminder_cron.js` contenía una condición rígida: `if (madridHour !== 16) return;`. Si GitHub Actions demoraba la ejecución tan solo 31 minutos (iniciando a las 17:01h), el script abortaba de inmediato sin enviar nada.
+  2. **Consulta errónea de pronósticos en Firestore**: El script buscaba pronósticos con `.where('jornada', '==', jornadaNum)` y leía `doc.data().memberId`. Sin embargo, en Firestore los pronósticos se almacenan con `jId` (ID alfanumérico único de la jornada) y `mId`. Como la consulta devolvía 0 registros, el script asumía que ningún socio había rellenado su quiniela (`pendingMembers = 19`) y enviaba notificaciones a todos indiscriminadamente.
+  3. **Comportamiento idéntico en recordatorio del bote de los lunes**: `monday_bote_reminder_cron.js` abortaba si `madridHour !== 9`, fallando cada vez que la cola de runners de GitHub se dilataba más de 59 minutos.
+- **Solución implementada**:
+  - **Ventana de ejecución tolerante a colas**: Se amplió la ventana horaria en `scripts/thursday_reminder_cron.js` a 16:00 - 17:15 de Madrid (y de 09:00 a 11:30 en `scripts/monday_bote_reminder_cron.js`), permitiendo absorber demoras de cola sin abortar.
+  - **Programación en minutos no saturados con reintentos automáticos**: Se cambiaron los crons en `.github/workflows/thursday_reminder.yml` a los minutos `:15` y `:35` (tanto para horario de verano como de invierno), evitando los picos mundiales de `:00` y `:30`.
+  - **Prevención de envíos duplicados (Deduplicación diaria)**: Antes de enviar, el script comprueba en Firestore (`push_log`) si ya se envió el recordatorio de esa jornada en el día de hoy (`dateStr`). Si el reintento corre minutos después, detecta que ya se envió y omite el duplicado.
+  - **Corrección de la consulta de pronósticos en Firestore**: Se corrigió el mapeo para comprobar `jId === targetJornada.id || jId === targetJornada.number` y `mId`, validando además que la quiniela contenga signos rellenos (`selection.length >= 14`). Ahora solo se notifica a los socios que verdaderamente no han enviado su pronóstico.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
