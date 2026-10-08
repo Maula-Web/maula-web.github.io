@@ -1043,6 +1043,54 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 40. SISTEMA DE SELLADO AUTOMÁTICO DE QUINIELAS (SOPORTE DIGITAL SELAE Y GOOGLE APPS SCRIPT)
+- **Objetivo**: Permitir que el sellado de las 35 apuestas semanales de la peña (19 columnas simples individuales + 16 columnas desarrolladas de la quiniela de dobles) se realice en **1 solo clic** desde la aplicación web, de forma 100% desatendida, sin costes de servidores y sin fricción para el perdedor de la jornada.
+- **Canal Oficial de Validación (Soporte Digital SELAE / ASD / ASM)**:
+  - SELAE no dispone de una API pública de sellado directo para terceros, pero su Red Oficial de Puntos de Venta dispone de la operativa estándar de **Soporte Digital de Apuestas (ASD / ASM)**.
+  - Los terminales oficiales de venta de SELAE están conectados al sistema central del Estado. En las administraciones colaboradoras, el software de gestión de ventanilla (como **LotoGestión de ASG Loterías** u homólogos) permite importar ficheros en formato texto plano (`.txt` o `.ad243`) y validarlos masivamente contra un saldo en depósito de la peña, emitiendo el resguardo oficial en segundos.
+- **Formato Oficial del Fichero de Apuestas (`.txt`)**:
+  - Exactamente 35 líneas simples de 16 caracteres de longitud cada una:
+    - Primeros 14 caracteres: Signos del pronóstico (`1`, `X`, `2`).
+    - Caracteres 15 y 16: Pleno al 15 en formato de 2 caracteres (`10`, `00`, `21`, `M1`, `1M`, etc.).
+- **Regla Crítica de Unificación del Pleno al 15**:
+  - Para que un boleto múltiple o bloque de apuestas sea admitido por el terminal oficial de SELAE, **las 35 columnas deben compartir obligatoriamente el mismo Pleno al 15**.
+  - **Prioridad de la Quiniela de Dobles**: El Pleno al 15 canónico del fichero oficial a sellar se extrae de la **Quiniela de Dobles** (`pronosticosExtra`).
+  - **Preservación del PIG (Partido de Interés General)**: Si en la jornada el partido 15 es un PIG y los socios han introducido pronósticos dispares en la web para disputar sus puntos de liga y penalizaciones internas, dichos pronósticos personales se mantienen intactos en la base de datos para la clasificación interna. Únicamente al compilar el fichero oficial `.txt`, las 19 columnas de los socios y las 16 de dobles se ensamblan con el Pleno al 15 de los dobles.
+- **Arquitectura de Envío Autónomo en 1 Clic (Google Apps Script Webhook)**:
+  - Al ser la web de Los Maulas una aplicación estática alojada en GitHub Pages, los navegadores no pueden enviar correos SMTP directamente ni adjuntar archivos locales vía `mailto:` por motivos de seguridad del sistema operativo.
+  - **Solución implementada**: Un microservicio en la nube 100% gratuito utilizando **Google Apps Script** vinculado a la cuenta oficial **`Penalosmaulas@gmail.com`**.
+  - **Código del Webhook (`doPost`)**:
+    ```javascript
+    function doPost(e) {
+      try {
+        var data = JSON.parse(e.postData.contents);
+        var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName);
+        GmailApp.sendEmail(data.to, data.subject, data.body, {
+          name: 'Peña Los Maulas',
+          attachments: [blob]
+        });
+        return ContentService.createTextOutput(JSON.stringify({ 
+          ok: true, 
+          sentAt: new Date().toISOString(),
+          to: data.to,
+          fileName: data.fileName
+        })).setMimeType(ContentService.MimeType.JSON);
+      } catch (err) {
+        return ContentService.createTextOutput(JSON.stringify({ 
+          ok: false, 
+          error: err.toString() 
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    ```
+  - **Técnica de evasión de CORS preflight**: La llamada desde el navegador se realiza mediante `fetch` con `Content-Type: text/plain;charset=utf-8`. Esto evita la petición `OPTIONS` (preflight CORS) que Google Apps Script rechaza, garantizando la entrega inmediata del correo con el adjunto `.txt`.
+- **Entorno de Pruebas (Sandbox)**:
+  - Ubicación: `sandbox_sellado.html`.
+  - Acceso restringido exclusivamente al socio Fernando Lozano.
+  - Dispone de selector de jornada en tiempo real (datos de Firestore), desglose visual con badges de color para los 19 socios y las 16 apuestas de dobles, persistencia en `localStorage` del webhook y destino de correo, y botón de envío directo verificado con éxito.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
