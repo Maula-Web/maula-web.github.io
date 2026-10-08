@@ -15,11 +15,14 @@
     <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs & App Services -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/data_loader.js"></script>
 
     <style>
         :root {
@@ -46,6 +49,21 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1rem;
         }
+        .sign-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .sign-1 { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .sign-X { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .sign-2 { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .sign-empty { background: rgba(148, 163, 184, 0.1); color: #64748b; border: 1px dashed rgba(148, 163, 184, 0.3); }
     </style>
 </head>
 
@@ -77,23 +95,30 @@
                 <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-11 h-11 object-contain drop-shadow">
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">SANDBOX v1.0</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">SANDBOX v2.0</span>
                         <span class="text-xs text-slate-400 font-mono">Exclusivo Fernando Lozano</span>
                     </div>
                     <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Laboratorio de Sellado Automático de Quinielas</h1>
                 </div>
             </div>
 
-            <!-- Controles Rápidos -->
+            <!-- Controles Rápidos y Selector de Jornada -->
             <div class="flex items-center gap-2 flex-wrap">
-                <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700">
-                    <label for="sel-jornada-sandbox" class="text-xs text-slate-400 font-bold">Jornada:</label>
-                    <select id="sel-jornada-sandbox" class="bg-transparent text-emerald-400 font-bold text-xs focus:outline-none cursor-pointer">
-                        <option value="current" class="bg-slate-900 text-white">Jornada Activa</option>
-                        <option value="test_sim" class="bg-slate-900 text-white">Simulación 35 Apuestas (Demo)</option>
+                <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-700 shadow-inner">
+                    <label for="sel-jornada-sandbox" class="text-xs text-slate-300 font-bold whitespace-nowrap">⚽ Jornada:</label>
+                    <select id="sel-jornada-sandbox" onchange="SandboxManager.cambiarJornada(this.value)" class="bg-slate-950 text-emerald-400 font-extrabold text-xs py-1 px-2.5 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none cursor-pointer max-w-[270px] sm:max-w-[340px]">
+                        <option value="loading" class="bg-slate-900 text-slate-400">Cargando jornadas reales...</option>
                     </select>
                 </div>
-                <button onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700">
+                <div class="flex items-center gap-1.5">
+                    <span id="badge-jornada-status" class="px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
+                        19 Socios
+                    </span>
+                    <span id="badge-dobles-status" class="px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30 whitespace-nowrap">
+                        16 Dobles
+                    </span>
+                </div>
+                <button onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 shadow">
                     🔄 Recargar
                 </button>
             </div>
@@ -102,24 +127,36 @@
         <!-- KPI RESUMEN DE LA APUESTA GENERADA -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div class="glass-panel p-3.5 sm:p-4 border-slate-800">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Columnas Simples</span>
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Columnas Simples</span>
+                    <span id="kpi-simples-sub" class="text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">19 Reales</span>
+                </div>
                 <span id="kpi-simples" class="text-xl sm:text-2xl font-black text-white mt-1 block">19</span>
                 <span class="text-[10px] text-slate-400 mt-0.5 block">1 por cada socio (0,75 €)</span>
             </div>
             <div class="glass-panel p-3.5 sm:p-4 border-slate-800">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Desarrollo Dobles</span>
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Desarrollo Dobles</span>
+                    <span id="kpi-dobles-sub" class="text-[9px] font-mono font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">16 Apuestas</span>
+                </div>
                 <span id="kpi-dobles" class="text-xl sm:text-2xl font-black text-amber-400 mt-1 block">16</span>
                 <span class="text-[10px] text-slate-400 mt-0.5 block">4 dobles al directo (2⁴ = 16)</span>
             </div>
             <div class="glass-panel p-3.5 sm:p-4 border-emerald-500/20 bg-emerald-950/10">
-                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Total Apuestas</span>
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Total Apuestas</span>
+                    <span class="text-[9px] font-mono font-bold text-emerald-300 bg-emerald-500/20 px-1.5 py-0.5 rounded">100% Completo</span>
+                </div>
                 <span id="kpi-total" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1 block">35</span>
                 <span class="text-[10px] text-slate-400 mt-0.5 block">Líneas en archivo .txt</span>
             </div>
             <div class="glass-panel p-3.5 sm:p-4 border-emerald-500/20 bg-emerald-950/10">
-                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Importe Oficial</span>
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Importe Oficial</span>
+                    <span class="text-[9px] font-mono font-bold text-emerald-300 bg-emerald-500/20 px-1.5 py-0.5 rounded">SELAE</span>
+                </div>
                 <span id="kpi-importe" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1 block">26,25 €</span>
-                <span class="text-[10px] text-slate-400 mt-0.5 block">35 × 0,75 € (SELAE)</span>
+                <span class="text-[10px] text-slate-400 mt-0.5 block">35 × 0,75 € (Oficial)</span>
             </div>
         </div>
 
@@ -173,7 +210,7 @@
                 </div>
             </div>
 
-            <!-- ==================== POSIBILIDAD 2: PLATAFORMA WEB (EDUARDO LOSILLA) ==================== -->
+            <!-- ==================== POSIBILIDAD 2: PASARELA WEB LOSILLA ==================== -->
             <div class="glass-panel p-5 sm:p-6 border-amber-500/30 flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
@@ -222,35 +259,99 @@
 
         </div>
 
-        <!-- VISOR DEL ARCHIVO .TXT DE APUESTAS GENERADO -->
-        <div class="glass-panel p-5 sm:p-6 border-slate-800 space-y-4">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                    <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-                        <span>📄</span> Archivo Estándar de Apuestas Generado (.TXT)
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-0.5">
-                        Formato oficial regulado por SELAE para Soporte Digital (ASD) e importación en software de administración (LotoGestión de ASG Loterías, Tyche, etc.).
-                    </p>
+        <!-- VISOR AVANZADO: PESTAÑAS DE CONTENIDO -->
+        <div class="glass-panel p-4 sm:p-6 border-slate-800 space-y-4">
+            
+            <!-- Barra de Pestañas y Controles -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+                    <button id="tab-btn-txt" onclick="SandboxManager.switchTab('txt')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
+                        <span>📄</span> Archivo .TXT Oficial (35 Líneas)
+                    </button>
+                    <button id="tab-btn-socios" onclick="SandboxManager.switchTab('socios')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent whitespace-nowrap">
+                        <span>👥</span> Desglose 19 Socios (Reales)
+                    </button>
+                    <button id="tab-btn-dobles" onclick="SandboxManager.switchTab('dobles')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent whitespace-nowrap">
+                        <span>🎲</span> Desglose Dobles (16 Apuestas)
+                    </button>
                 </div>
-                <div class="flex items-center gap-2">
+
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button onclick="SandboxManager.copiarPortapapeles()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition flex items-center gap-1.5 border border-slate-700 shadow">
+                        <span>📋</span> Copiar
+                    </button>
                     <button onclick="SandboxManager.descargarTXT()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow">
                         <span>📥</span> Descargar .TXT
                     </button>
                 </div>
             </div>
 
-            <!-- Caja de Código -->
-            <div class="relative bg-slate-950 rounded-xl border border-slate-800 p-4 font-mono text-xs overflow-x-auto max-h-72 shadow-inner">
-                <pre id="code-output" class="text-emerald-400 whitespace-pre leading-relaxed select-all">Generando archivo...</pre>
+            <!-- VISTA 1: ARCHIVO .TXT OFICIAL -->
+            <div id="view-tab-txt" class="space-y-2">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span id="txt-file-stats">Mostrando 35 apuestas preparadas para terminal SELAE / LotoGestión:</span>
+                    <span class="font-mono text-[11px] text-emerald-400">14 signos 1X2 + Pleno al 15 (2 dígitos)</span>
+                </div>
+                <div class="relative bg-slate-950 rounded-xl border border-slate-800 p-4 font-mono text-xs overflow-x-auto max-h-80 shadow-inner">
+                    <pre id="code-output" class="text-emerald-400 whitespace-pre leading-relaxed select-all">Generando archivo...</pre>
+                </div>
             </div>
+
+            <!-- VISTA 2: DESGLOSE DE LOS 19 SOCIOS -->
+            <div id="view-tab-socios" class="hidden space-y-3">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span>Pronósticos individuales registrados en base de datos para cada uno de los 19 miembros:</span>
+                    <span id="socios-complete-count" class="font-mono text-emerald-400 font-bold">19/19 Completos</span>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80 max-h-80">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-900/90 text-slate-400 font-bold text-[11px] uppercase border-b border-slate-800 sticky top-0 z-10">
+                            <tr>
+                                <th class="p-2.5 sm:px-3">#</th>
+                                <th class="p-2.5 sm:px-3">Socio</th>
+                                <th class="p-2.5 sm:px-3 text-center">Pronóstico (14 Partidos)</th>
+                                <th class="p-2.5 sm:px-3 text-center">P15</th>
+                                <th class="p-2.5 sm:px-3 text-right">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-socios-body" class="divide-y divide-slate-850 font-mono text-slate-300">
+                            <!-- Filas generadas por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VISTA 3: DESGLOSE DE DOBLES -->
+            <div id="view-tab-dobles" class="hidden space-y-3">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span id="dobles-source-desc">Desarrollo matemático de la columna múltiple financiada por la peña:</span>
+                    <span id="dobles-comb-count" class="font-mono text-amber-400 font-bold">16 Apuestas Desarrolladas</span>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80 max-h-80">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-900/90 text-slate-400 font-bold text-[11px] uppercase border-b border-slate-800 sticky top-0 z-10">
+                            <tr>
+                                <th class="p-2.5 sm:px-3">Apuesta</th>
+                                <th class="p-2.5 sm:px-3">Origen</th>
+                                <th class="p-2.5 sm:px-3 text-center">Combinación Simple (14 Signos)</th>
+                                <th class="p-2.5 sm:px-3 text-center">P15</th>
+                                <th class="p-2.5 sm:px-3 text-right">Coste</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-dobles-body" class="divide-y divide-slate-850 font-mono text-slate-300">
+                            <!-- Filas generadas por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
         <!-- CONSOLA DE AUDITORÍA Y REGISTRO EN TIEMPO REAL -->
         <div class="glass-panel p-4 sm:p-5 border-slate-800 space-y-3">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>📡</span> Consola de Operaciones y Validación
+                    <span>📡</span> Consola de Operaciones y Validación en Vivo
                 </span>
                 <span id="console-status" class="text-[11px] font-mono text-emerald-400">Listo para pruebas</span>
             </div>
@@ -264,8 +365,16 @@
     <!-- SCRIPT GESTOR DE LA SANDBOX -->
     <script>
         const SandboxManager = {
+            members: [],
+            jornadas: [],
+            pronosticos: [],
+            pronosticosExtra: [],
+            jornadaActual: 1,
+            jornadaObj: null,
             apuestasGeneradas: [],
-            jornadaActual: 24,
+            sociosDetalle: [],
+            doblesDetalle: [],
+            currentTab: 'txt',
 
             init() {
                 this.checkAuth();
@@ -302,6 +411,7 @@
 
             log(msg, type = 'info') {
                 const box = document.getElementById('console-logs');
+                if (!box) return;
                 const now = new Date().toLocaleTimeString();
                 const div = document.createElement('div');
                 div.className = type === 'error' ? 'text-rose-400' : (type === 'success' ? 'text-emerald-400' : 'text-slate-300');
@@ -311,19 +421,346 @@
             },
 
             async cargarDatos() {
-                this.log('Cargando pronósticos y dobles de la jornada...');
-                
-                // Generar los 19 pronósticos simples y los 4 dobles al directo (16 combinaciones)
-                this.generarCombinacionMaulas();
+                this.log('Conectando con base de datos para cargar jornadas y pronósticos reales...');
+                try {
+                    if (window.DataService) {
+                        if (!window.DataService.db && window.db) window.DataService.db = window.db;
+                        await window.DataService.init();
+                        const seasonData = await window.DataService.loadSeasonData();
+                        this.members = seasonData.members || [];
+                        this.jornadas = seasonData.jornadas || [];
+                        this.pronosticos = seasonData.pronosticos || [];
+                        this.pronosticosExtra = seasonData.pronosticosExtra || [];
+                    }
+
+                    // Si no hubiese miembros, cargar plantilla estándar de 19 socios
+                    if (!this.members || this.members.length === 0) {
+                        this.members = this.obtenerSociosPlantilla();
+                    }
+
+                    this.log(`Datos reales listos: ${this.members.length} socios, ${this.jornadas.length} jornadas, ${this.pronosticos.length} pronósticos.`);
+                    this.poblarSelectorJornadas();
+
+                } catch(err) {
+                    this.log(`Aviso al conectar con base de datos: ${err.message}. Empleando histórico local.`, 'error');
+                    this.cargarDatosFallback();
+                }
             },
 
             recargarDatos() {
                 this.log('Recargando datos de jornada...');
-                this.generarCombinacionMaulas();
+                if (window.DataService && window.DataService.clearSeasonDataCache) {
+                    window.DataService.clearSeasonDataCache();
+                }
+                this.cargarDatos();
             },
 
-            generarCombinacionMaulas() {
-                // 1. Simulación base de 19 pronósticos simples de los 19 socios
+            obtenerSociosPlantilla() {
+                const nombres = [
+                    "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
+                    "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
+                    "Juan Antonio", "Juanjo", "Luismi", "Marcelo", "Martín",
+                    "Rafa", "Ramón", "Raúl Romera", "Samuel"
+                ];
+                return nombres.map((name, idx) => ({ id: idx + 1, name: name }));
+            },
+
+            cargarDatosFallback() {
+                this.members = this.obtenerSociosPlantilla();
+                // Si existe HISTORICAL_DATA de data_loader.js
+                if (window.HISTORICAL_DATA && Array.isArray(window.HISTORICAL_DATA)) {
+                    this.jornadas = window.HISTORICAL_DATA.map(h => ({
+                        id: h.jornada_num,
+                        number: h.jornada_num,
+                        date: `Jornada ${h.jornada_num}`
+                    }));
+                }
+                this.poblarSelectorJornadas();
+            },
+
+            poblarSelectorJornadas() {
+                const sel = document.getElementById('sel-jornada-sandbox');
+                if (!sel) return;
+                sel.innerHTML = '';
+
+                // Ordenar jornadas de mayor a menor número
+                const jornadasOrdenadas = [...this.jornadas].sort((a, b) => {
+                    const numA = parseInt(a.number || a.id) || 0;
+                    const numB = parseInt(b.number || b.id) || 0;
+                    return numB - numA;
+                });
+
+                if (jornadasOrdenadas.length > 0) {
+                    jornadasOrdenadas.forEach(j => {
+                        const jNum = j.number || j.id;
+                        // Contar cuántos pronósticos reales existen para esta jornada
+                        const count = this.contarPronosticosDeJornada(j);
+                        const hasDoubles = this.tieneDoblesRegistrados(j);
+                        const opt = document.createElement('option');
+                        opt.value = String(jNum);
+                        opt.className = 'bg-slate-900 text-white';
+                        const extraBadge = hasDoubles ? ' • Dobles ✓' : '';
+                        opt.textContent = `Jornada ${jNum} (${j.date || 'Liga'}) [${count}/19 socios${extraBadge}]`;
+                        sel.appendChild(opt);
+                    });
+                }
+
+                // Opción Demo siempre disponible
+                const optDemo = document.createElement('option');
+                optDemo.value = 'test_sim';
+                optDemo.className = 'bg-slate-900 text-amber-300 font-bold';
+                optDemo.textContent = '⚡ Simulación de Muestra (Demo 35 Apuestas)';
+                sel.appendChild(optDemo);
+
+                // Seleccionar por defecto la jornada más reciente que tenga pronósticos
+                let defaultVal = 'test_sim';
+                if (jornadasOrdenadas.length > 0) {
+                    const conPronos = jornadasOrdenadas.find(j => this.contarPronosticosDeJornada(j) > 0);
+                    defaultVal = conPronos ? String(conPronos.number || conPronos.id) : String(jornadasOrdenadas[0].number || jornadasOrdenadas[0].id);
+                }
+                sel.value = defaultVal;
+                this.cambiarJornada(defaultVal);
+            },
+
+            contarPronosticosDeJornada(jornada) {
+                const jNum = String(jornada.number || jornada.id);
+                const jId = String(jornada.id);
+                return (this.pronosticos || []).filter(p => {
+                    const pJ = String(p.jId || p.jornadaId || '');
+                    return pJ === jNum || pJ === jId;
+                }).length;
+            },
+
+            tieneDoblesRegistrados(jornada) {
+                const jNum = String(jornada.number || jornada.id);
+                const jId = String(jornada.id);
+                return (this.pronosticosExtra || []).some(p => {
+                    const pJ = String(p.jId || p.jornadaId || '');
+                    return (pJ === jNum || pJ === jId) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                });
+            },
+
+            cambiarJornada(val) {
+                this.apuestasGeneradas = [];
+                this.sociosDetalle = [];
+                this.doblesDetalle = [];
+
+                if (val === 'test_sim') {
+                    this.jornadaActual = 'Demo';
+                    this.jornadaObj = null;
+                    this.log('Cargando simulación estándar de muestra (35 apuestas)...');
+                    this.generarCombinacionMaulasDemo();
+                    return;
+                }
+
+                const jornada = this.jornadas.find(j => String(j.number || j.id) === String(val) || String(j.id) === String(val));
+                if (!jornada) {
+                    this.log(`No se encontró la jornada ${val}. Usando demo.`, 'error');
+                    this.generarCombinacionMaulasDemo();
+                    return;
+                }
+
+                this.jornadaActual = jornada.number || jornada.id;
+                this.jornadaObj = jornada;
+                this.log(`Procesando pronósticos reales para la Jornada ${this.jornadaActual}...`);
+                this.generarCombinacionReal(jornada);
+            },
+
+            formatP15(val) {
+                if (!val) return '10'; // Por defecto 1-0
+                const str = String(val).trim().toUpperCase();
+                // Limpiar caracteres extra
+                const clean = str.replace(/[^0-9M]/g, '');
+                if (clean.length === 2) return clean;
+                if (clean.length === 1) return clean + '0';
+                if (str === '1') return '10';
+                if (str === 'X') return '11';
+                if (str === '2') return '01';
+                return (clean.slice(0, 2)).padEnd(2, '0');
+            },
+
+            generarCombinacionReal(jornada) {
+                const jNum = String(jornada.number || jornada.id);
+                const jId = String(jornada.id);
+
+                // 1. Procesar los 19 Socios Reales
+                let sociosCompletos = 0;
+                let sociosIncompletos = 0;
+
+                this.members.forEach((member, idx) => {
+                    const mId = String(member.id);
+                    const mName = member.name || `Socio ${mId}`;
+
+                    // Buscar pronóstico en Firestore o en HISTORICAL_DATA
+                    let pronostico = (this.pronosticos || []).find(p => {
+                        const pJ = String(p.jId || p.jornadaId || '');
+                        const pM = String(p.mId || p.memberId || '');
+                        return (pJ === jNum || pJ === jId) && pM === mId;
+                    });
+
+                    // Fallback a window.HISTORICAL_DATA si existe
+                    if (!pronostico && window.HISTORICAL_DATA) {
+                        const hist = window.HISTORICAL_DATA.find(h => String(h.jornada_num) === jNum);
+                        if (hist && hist.predictions && hist.predictions[mId]) {
+                            pronostico = { selection: hist.predictions[mId] };
+                        }
+                    }
+
+                    let signos14 = [];
+                    let p15Raw = '10';
+                    let esValido = false;
+
+                    if (pronostico && Array.isArray(pronostico.selection) && pronostico.selection.length >= 14) {
+                        signos14 = pronostico.selection.slice(0, 14).map(s => {
+                            const c = String(s || '').trim().toUpperCase();
+                            return ['1', 'X', '2'].includes(c) ? c : null;
+                        });
+                        const aciertosConocidos = signos14.filter(s => s !== null).length;
+                        esValido = (aciertosConocidos === 14);
+                        p15Raw = pronostico.selection[14] || '10';
+                    }
+
+                    // Formatear Pleno al 15 (2 caracteres, ej: 10, M1, 00)
+                    const p15Final = this.formatP15(p15Raw);
+
+                    // Si faltan signos, rellenar con fallback '1' para el fichero oficial
+                    const signos14Final = signos14.map(s => s || '1').join('');
+
+                    if (esValido) {
+                        sociosCompletos++;
+                    } else {
+                        sociosIncompletos++;
+                    }
+
+                    const estado = esValido ? 'Completo' : (pronostico ? 'Incompleto' : 'Sin Pronóstico');
+
+                    // Registrar para desglose de socios
+                    this.sociosDetalle.push({
+                        idx: idx + 1,
+                        member: member,
+                        name: mName,
+                        signos14: signos14Final,
+                        signosRaw: signos14,
+                        p15: p15Final,
+                        estado: estado,
+                        esValido: esValido
+                    });
+
+                    // Añadir línea simple al archivo oficial
+                    this.apuestasGeneradas.push({
+                        linea: `${signos14Final}${p15Final}`,
+                        origen: `${mName} (Socio ${member.id})`,
+                        tipo: 'Simple Real',
+                        estado: estado
+                    });
+                });
+
+                this.log(`19 socios procesados: ${sociosCompletos} completos, ${sociosIncompletos} incompletos/rellenados.`);
+
+                // 2. Procesar Quiniela de Dobles
+                let extra = (this.pronosticosExtra || []).find(p => {
+                    const pJ = String(p.jId || p.jornadaId || '');
+                    return (pJ === jNum || pJ === jId) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                });
+
+                let doblesOrigenTipo = '';
+                let doblesCombinaciones = [];
+
+                if (extra && Array.isArray(extra.selection)) {
+                    doblesOrigenTipo = 'Dobles Reales (BD)';
+                    doblesCombinaciones = this.desarrollarDobles(extra.selection, Boolean(extra.isReduced));
+                    this.log(`Quiniela de dobles real cargada de base de datos: ${doblesCombinaciones.length} combinaciones.`);
+                } else {
+                    doblesOrigenTipo = 'Dobles Simulados (Estándar 4 Dobles)';
+                    this.log(`Sin quiniela de dobles guardada en BD para Jornada ${this.jornadaActual}. Generando 16 dobles estándar de muestra.`);
+                    doblesCombinaciones = this.generarDoblesDemoStandard(jornada);
+                }
+
+                doblesCombinaciones.forEach((doble, idx) => {
+                    this.doblesDetalle.push({
+                        num: idx + 1,
+                        linea: doble.linea,
+                        p14: doble.linea.slice(0, 14),
+                        p15: doble.linea.slice(14),
+                        origen: `${doblesOrigenTipo} (Comb. ${idx + 1}/16)`
+                    });
+
+                    this.apuestasGeneradas.push({
+                        linea: doble.linea,
+                        origen: `${doblesOrigenTipo} (Comb. ${idx + 1}/16)`,
+                        tipo: 'Doble Desarrollado',
+                        estado: 'OK'
+                    });
+                });
+
+                this.renderUI(sociosCompletos, sociosIncompletos, Boolean(extra));
+            },
+
+            desarrollarDobles(selection, isReduced = false) {
+                const p15 = this.formatP15(selection[14]);
+                const multiIndices = [];
+                selection.slice(0, 14).forEach((sel, idx) => {
+                    if (sel && String(sel).trim().length > 1) multiIndices.push(idx);
+                });
+
+                // Caso 1: Reducida Oficial 2 (7 Dobles = 16 Apuestas)
+                if (multiIndices.length === 7 && isReduced && window.ScoringSystem && window.ScoringSystem.reducciones && window.ScoringSystem.reducciones['R2']) {
+                    const matrix = window.ScoringSystem.reducciones['R2'];
+                    return matrix.map((betRow, bIdx) => {
+                        const betSigns = selection.slice(0, 14).map((sel, idx) => {
+                            const mPos = multiIndices.indexOf(idx);
+                            if (mPos !== -1) {
+                                const mSign = betRow[mPos];
+                                return (mSign === '1') ? sel[0] : (sel[1] || sel[0]);
+                            }
+                            return String(sel || '1')[0];
+                        });
+                        return { linea: betSigns.join('') + p15, origen: `Reducida R2 (Apuesta ${bIdx + 1})` };
+                    });
+                }
+
+                // Caso 2: Desarrollo al Directo (ej. 4 dobles al directo = 16 apuestas)
+                const opciones = selection.slice(0, 14).map(s => {
+                    const str = String(s || '1').trim();
+                    return str.length > 0 ? str.split('') : ['1'];
+                });
+
+                const resultado = [];
+                function cartesian(index = 0, current = []) {
+                    if (index === 14) {
+                        resultado.push({ linea: current.join('') + p15, origen: `Directo (Apuesta ${resultado.length + 1})` });
+                        return;
+                    }
+                    for (const char of opciones[index]) {
+                        cartesian(index + 1, [...current, char]);
+                        if (resultado.length >= 16 && multiIndices.length > 4) break;
+                    }
+                }
+                cartesian();
+                return resultado.slice(0, 16);
+            },
+
+            generarDoblesDemoStandard(jornada) {
+                // 4 dobles en partidos representativos al directo (2^4 = 16 apuestas)
+                const baseDobles = ["1X", "1", "12", "X", "1", "2", "1X", "1", "X", "2", "X2", "1", "1", "X"];
+                const p15 = "10";
+                const opciones = baseDobles.map(s => s.split(''));
+                const resultado = [];
+
+                function cartesian(index = 0, current = []) {
+                    if (index === 14) {
+                        resultado.push({ linea: current.join('') + p15 });
+                        return;
+                    }
+                    for (const char of opciones[index]) {
+                        cartesian(index + 1, [...current, char]);
+                    }
+                }
+                cartesian();
+                return resultado.slice(0, 16);
+            },
+
+            generarCombinacionMaulasDemo() {
                 const socios = [
                     "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
                     "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
@@ -353,69 +790,157 @@
                     { p14: "11X22X11X22X11", p15: "21" }
                 ];
 
-                // 2. Columna múltiple con 4 dobles al directo (Partidos 1, 3, 7 y 11)
-                const doblesGanador = {
-                    signos: ["1X", "1", "12", "X", "1", "2", "1X", "1", "X", "2", "X2", "1", "1", "X"],
-                    p15: "10"
-                };
-
-                // Algoritmo de desarrollo combinatorio para los 4 dobles (2x2x2x2 = 16 columnas)
-                const opciones = doblesGanador.signos.map(s => s.split(''));
-                const desarrolloDobles = [];
-
-                function cartesian(arr, index = 0, current = []) {
-                    if (index === arr.length) {
-                        desarrolloDobles.push(current.join('') + doblesGanador.p15);
-                        return;
-                    }
-                    for (const char of arr[index]) {
-                        cartesian(arr, index + 1, [...current, char]);
-                    }
-                }
-                cartesian(opciones);
-
-                // Ensamblar las 35 apuestas
-                this.apuestasGeneradas = [];
-
-                // 19 simples
                 combinacionesSocios.forEach((s, idx) => {
+                    this.sociosDetalle.push({
+                        idx: idx + 1,
+                        name: socios[idx],
+                        signos14: s.p14,
+                        signosRaw: s.p14.split(''),
+                        p15: s.p15,
+                        estado: 'Completo (Demo)',
+                        esValido: true
+                    });
+
                     this.apuestasGeneradas.push({
                         linea: `${s.p14}${s.p15}`,
                         origen: `Socio ${idx + 1} (${socios[idx]})`,
-                        tipo: 'Simple'
+                        tipo: 'Simple Demo',
+                        estado: 'Demo'
                     });
                 });
 
-                // 16 dobles
-                desarrolloDobles.forEach((col, idx) => {
+                const doblesDemo = this.generarDoblesDemoStandard();
+                doblesDemo.forEach((col, idx) => {
+                    this.doblesDetalle.push({
+                        num: idx + 1,
+                        linea: col.linea,
+                        p14: col.linea.slice(0, 14),
+                        p15: col.linea.slice(14),
+                        origen: `Dobles Demo (Comb. ${idx + 1}/16)`
+                    });
+
                     this.apuestasGeneradas.push({
-                        linea: col,
-                        origen: `Dobles Ganador (Comb. ${idx + 1})`,
-                        tipo: 'Doble Desarrollado'
+                        linea: col.linea,
+                        origen: `Dobles Demo (Comb. ${idx + 1})`,
+                        tipo: 'Doble Desarrollado',
+                        estado: 'Demo'
                     });
                 });
 
-                // Renderizar en UI
-                this.renderUI();
+                this.renderUI(19, 0, false);
             },
 
-            renderUI() {
+            renderUI(completos = 19, incompletos = 0, doblesReales = false) {
                 const total = this.apuestasGeneradas.length;
                 const importe = (total * 0.75).toFixed(2);
 
                 document.getElementById('kpi-simples').textContent = '19';
+                document.getElementById('kpi-simples-sub').textContent = `${completos}/19 Reales`;
                 document.getElementById('kpi-dobles').textContent = '16';
+                document.getElementById('kpi-dobles-sub').textContent = doblesReales ? 'Dobles Reales BD' : '16 Desarrollados';
                 document.getElementById('kpi-total').textContent = total;
                 document.getElementById('kpi-importe').textContent = `${importe} €`;
 
+                // Badges en el header
+                const badgeJornada = document.getElementById('badge-jornada-status');
+                if (badgeJornada) {
+                    if (incompletos === 0) {
+                        badgeJornada.className = 'px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap';
+                        badgeJornada.textContent = `🟢 19/19 Pronósticos OK`;
+                    } else {
+                        badgeJornada.className = 'px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-amber-500/20 text-amber-400 border border-amber-500/30 whitespace-nowrap';
+                        badgeJornada.textContent = `🟡 ${completos}/19 (${incompletos} Pendientes)`;
+                    }
+                }
+
+                const badgeDobles = document.getElementById('badge-dobles-status');
+                if (badgeDobles) {
+                    if (doblesReales) {
+                        badgeDobles.className = 'px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30 whitespace-nowrap';
+                        badgeDobles.textContent = `🟣 Dobles Reales BD`;
+                    } else {
+                        badgeDobles.className = 'px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-slate-800 text-slate-300 border border-slate-700 whitespace-nowrap';
+                        badgeDobles.textContent = `⚪ Dobles 16 Comb.`;
+                    }
+                }
+
+                // Actualizar nombre de adjunto
+                const labelAdjunto = document.getElementById('label-attachment-name');
+                if (labelAdjunto) {
+                    labelAdjunto.textContent = `Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`;
+                }
+
+                // 1. Render Tab TXT
                 const outputBox = document.getElementById('code-output');
                 const lineasTxt = this.apuestasGeneradas.map((ap, i) => {
                     const num = String(i + 1).padStart(2, '0');
                     return `${num} | ${ap.linea.slice(0, 14)} | P15: ${ap.linea.slice(14)}  <-- ${ap.origen}`;
                 }).join('\n');
-
                 outputBox.textContent = lineasTxt;
-                this.log(`Combinación lista: 35 apuestas validadas. Importe total: ${importe} €.`);
+
+                // 2. Render Tab Socios
+                const sociosTbody = document.getElementById('table-socios-body');
+                if (sociosTbody) {
+                    sociosTbody.innerHTML = this.sociosDetalle.map(s => {
+                        const pillsHtml = (s.signosRaw || s.signos14.split('')).map(sig => {
+                            const cls = sig === '1' ? 'sign-1' : (sig === 'X' ? 'sign-X' : (sig === '2' ? 'sign-2' : 'sign-empty'));
+                            return `<span class="sign-pill ${cls}">${sig || '?'}</span>`;
+                        }).join(' ');
+
+                        const badgeColor = s.esValido ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+
+                        return `
+                            <tr class="hover:bg-slate-900/60 transition">
+                                <td class="p-2.5 sm:px-3 text-slate-500 font-bold">${String(s.idx).padStart(2, '0')}</td>
+                                <td class="p-2.5 sm:px-3 font-sans font-bold text-white whitespace-nowrap">${s.name}</td>
+                                <td class="p-2.5 sm:px-3 text-center whitespace-nowrap">${pillsHtml}</td>
+                                <td class="p-2.5 sm:px-3 text-center font-bold text-amber-400 whitespace-nowrap">${s.p15}</td>
+                                <td class="p-2.5 sm:px-3 text-right whitespace-nowrap">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">
+                                        ${s.estado}
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+                // 3. Render Tab Dobles
+                const doblesTbody = document.getElementById('table-dobles-body');
+                if (doblesTbody) {
+                    doblesTbody.innerHTML = this.doblesDetalle.map(d => {
+                        return `
+                            <tr class="hover:bg-slate-900/60 transition">
+                                <td class="p-2.5 sm:px-3 text-amber-400 font-bold">${String(d.num).padStart(2, '0')}</td>
+                                <td class="p-2.5 sm:px-3 font-sans text-slate-300 whitespace-nowrap">${d.origen}</td>
+                                <td class="p-2.5 sm:px-3 text-center tracking-widest text-emerald-400 whitespace-nowrap font-bold">${d.p14}</td>
+                                <td class="p-2.5 sm:px-3 text-center font-bold text-amber-300 whitespace-nowrap">${d.p15}</td>
+                                <td class="p-2.5 sm:px-3 text-right text-slate-400 whitespace-nowrap">0,75 €</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+                const countEl = document.getElementById('socios-complete-count');
+                if (countEl) countEl.textContent = `${completos}/19 Completos`;
+
+                this.log(`Combinación lista para Jornada ${this.jornadaActual}: 35 apuestas (${importe} €).`, 'success');
+            },
+
+            switchTab(tabId) {
+                this.currentTab = tabId;
+                const tabs = ['txt', 'socios', 'dobles'];
+                tabs.forEach(t => {
+                    const btn = document.getElementById(`tab-btn-${t}`);
+                    const view = document.getElementById(`view-tab-${t}`);
+                    if (t === tabId) {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap';
+                        view.classList.remove('hidden');
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent whitespace-nowrap';
+                        view.classList.add('hidden');
+                    }
+                });
             },
 
             getTxtContent() {
@@ -440,8 +965,8 @@
             async copiarPortapapeles() {
                 try {
                     await navigator.clipboard.writeText(this.getTxtContent());
-                    this.log('✅ Las 35 apuestas se han copiado al portapapeles.', 'success');
-                    alert('¡Las 35 apuestas se han copiado al portapapeles!');
+                    this.log('✅ Las 35 apuestas oficiales se han copiado al portapapeles.', 'success');
+                    alert('¡Las 35 apuestas oficiales se han copiado al portapapeles!');
                 } catch(e) {
                     this.log('Error copiando al portapapeles', 'error');
                 }
@@ -458,7 +983,7 @@
 
                 setTimeout(() => {
                     this.descargarTXT();
-                    this.log(`[Soporte Digital] Fichero de 35 apuestas empaquetado y listo.`, 'success');
+                    this.log(`[Soporte Digital] Fichero de 35 apuestas empaquetado y listo para Jornada ${this.jornadaActual}.`, 'success');
                     this.log(`[Soporte Digital] Simulación: Correo enviado a ${destino} con asunto: [Peña Los Maulas] Sellado Jornada ${this.jornadaActual}`, 'success');
                     this.log(`[Soporte Digital] Simulación: Archivo volcado mediante software de gestión (LotoGestión/ASG) -> Resguardo emitido en Terminal Oficial SELAE #SELAE-${Date.now().toString().slice(-6)}`, 'success');
 
@@ -468,7 +993,7 @@
                         btn.innerHTML = `<span>🚀</span> Enviar Pronósticos por Soporte Digital (1 Clic)`;
                     }, 4000);
 
-                    alert(`¡PRUEBA DE SOPORTE DIGITAL COMPLETADA!\n\nSe ha generado el archivo de 35 apuestas (.txt) y se ha simulado el envío desde Penalosmaulas@gmail.com a ${destino}.\n\nEn un entorno real, una Cloud Function ejecuta el envío de correo de forma desatendida, el lotero lo procesa con su software de gestión de ventanilla (LotoGestión de ASG Loterías u homólogo) y el Terminal Oficial de SELAE emite el resguardo contra vuestro saldo en depósito.`);
+                    alert(`¡PRUEBA DE SOPORTE DIGITAL COMPLETADA!\n\nSe ha generado el archivo de 35 apuestas (.txt) para la Jornada ${this.jornadaActual} y se ha simulado el envío desde Penalosmaulas@gmail.com a ${destino}.\n\nEn un entorno real, una Cloud Function ejecuta el envío de correo de forma desatendida, el lotero lo procesa con su software de gestión de ventanilla (LotoGestión de ASG Loterías u homólogo) y el Terminal Oficial de SELAE emite el resguardo contra vuestro saldo en depósito.`);
                 }, 1200);
             },
 
@@ -483,7 +1008,7 @@
             },
 
             lanzarPasarelaLosilla() {
-                this.log(`Lanzando pasarela asistida de Eduardo Losilla...`);
+                this.log(`Lanzando pasarela asistida de Eduardo Losilla para Jornada ${this.jornadaActual}...`);
                 // 1. Descarga el archivo para que esté listo en la carpeta de descargas
                 this.descargarTXT();
                 // 2. Copia al portapapeles por si la web permite pegar
