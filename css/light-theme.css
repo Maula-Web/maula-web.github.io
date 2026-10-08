@@ -1267,14 +1267,31 @@ body.light-theme {
 }
 
 .light-theme #forecast-summary-table .summary-cell:hover,
-.light-theme #forecast-summary-table tbody tr:hover td {
+.light-theme #forecast-summary-table tbody tr:hover td:not(.summary-sticky-col) {
     background: #f1f5f9 !important;
 }
 
+.light-theme #forecast-summary-table td.summary-sticky-col,
+.light-theme #forecast-summary-table th.summary-sticky-col,
+.light-theme #forecast-summary-table tbody tr:hover td.summary-sticky-col,
+.light-theme #forecast-summary-table tbody tr:active td.summary-sticky-col,
+.light-theme #forecast-summary-table td.summary-sticky-col:hover,
+.light-theme #forecast-summary-table td.summary-sticky-col:active,
 .light-theme #forecast-summary-table .summary-sticky-col {
     background: #ffffff !important;
+    background-color: #ffffff !important;
+    opacity: 1 !important;
     border-right: 2px solid #d97706 !important;
     box-shadow: 4px 0 12px rgba(120, 90, 40, 0.08) !important;
+    cursor: default !important;
+}
+
+.light-theme #forecast-summary-table td.summary-sticky-col {
+    border-bottom: 3px solid #cbd5e1 !important;
+}
+
+.light-theme #forecast-summary-table th.summary-sticky-col {
+    border-bottom: 2px solid #cbd5e1 !important;
 }
 
 .light-theme .sign-v {

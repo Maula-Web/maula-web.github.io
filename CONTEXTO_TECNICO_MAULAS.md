@@ -999,6 +999,20 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 37. PROTECCIÓN Y OPACIDAD TOTAL DE COLUMNA STICKY EN PANEL DE PRONÓSTICOS
+- **Problema previo**: Al realizar desplazamiento o gesto táctil horizontal (*swipe*) sobre la tabla resumen de pronósticos (`#forecast-summary-table`) en dispositivos móviles, la primera columna fija ("Jornada # Partidos", `.summary-sticky-col`) se volvía translúcida (35%-50% de opacidad). Esto provocaba que los pronósticos de los socios que pasaban por debajo durante el desplazamiento se vieran a través de dicha columna, además de activarse un borde de foco naranja.
+- **Causas identificadas**:
+  1. En `pronosticos_2.html`, la celda fija `<td>` de la jornada incluía erróneamente la clase `.summary-cell`, heredando fondo transparente y `:hover` con translucidez (`rgba(30, 41, 59, 0.5)`).
+  2. La regla `#forecast-summary-table tbody tr:hover td` aplicaba fondo translúcido a todas las celdas de la fila (`rgba(30, 41, 59, 0.35) !important`), ganando por especificidad CSS sobre `.summary-sticky-col`.
+- **Solución implementada**:
+  - Reemplazo de la clase `.summary-cell` por `.summary-jornada-info` en la celda fija de la jornada (`pronosticos_2.html`).
+  - Exclusión explícita de la columna sticky en los hovers de fila: `tbody tr:hover td:not(.summary-sticky-col)`.
+  - Blindaje CSS de alta especificidad con opacidad 100% y fondo sólido tanto en Modo Oscuro (`#090d16 !important`) como en Modo Claro (`#ffffff !important`) para todos los estados (`:hover`, `:active`, `tr:hover`, `tr:active`).
+  - Sombra lateral pulida (`box-shadow: 4px 0 16px rgba(0, 0, 0, 0.6)`) y `z-index: 30` (y `40` en la cabecera `th`) para garantizar que las columnas deslizantes queden siempre ocultas por debajo.
+  - Actualización de versión de Service Worker a `maulas-pwa-v1.68` para forzar invalidación de caché en navegadores móviles.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
