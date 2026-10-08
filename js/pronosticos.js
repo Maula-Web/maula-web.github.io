@@ -212,6 +212,19 @@ class PronosticoManager {
             }
         }
 
+        // Auto-verificación de Habemus Quinielam en inicio: si la jornada activa está completa y no se ha enviado aún
+        if (window.TelegramService) {
+            try {
+                const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
+                const targetJornada = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
+                if (targetJornada && !targetJornada.habemusSent) {
+                    window.TelegramService.checkHabemusQuinielam(targetJornada.id, false, this.pronosticos);
+                }
+            } catch (errHabInit) {
+                console.error("Error comprobando Habemus en init:", errHabInit);
+            }
+        }
+
         this.populateDropdowns();
         if (!this.currentMemberId && this.selMember && this.selMember.value) {
             this.currentMemberId = this.selMember.value;
@@ -1214,11 +1227,9 @@ class PronosticoManager {
 
         this.renderSummaryTable(); // Refresh summary
 
-        // Check for Habemus Quinielam (Telegram)
+        // Check for Habemus Quinielam (Telegram) de inmediato y sin depender de temporizadores bloqueados por alertas
         if (window.TelegramService) {
-            setTimeout(() => {
-                window.TelegramService.checkHabemusQuinielam(this.currentJornadaId, false, this.pronosticos);
-            }, 500);
+            window.TelegramService.checkHabemusQuinielam(this.currentJornadaId, false, this.pronosticos);
         }
     }
 

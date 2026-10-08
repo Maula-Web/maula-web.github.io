@@ -2256,6 +2256,11 @@
                 });
                 const pct = totalSocios > 0 ? Math.round((recibidos / totalSocios) * 100) : 0;
 
+                // Auto-disparo de Habemus Quinielam si la jornada activa llega al 100% y aún no se envió
+                if (recibidos >= totalSocios && jornada && !jornada.habemusSent && window.TelegramService) {
+                    window.TelegramService.checkHabemusQuinielam(jornada.id, false, this.pronosticos);
+                }
+
                 const countEl = document.getElementById('kpi-recibidos-count');
                 const pctEl = document.getElementById('kpi-recibidos-pct');
                 const barEl = document.getElementById('kpi-recibidos-bar');

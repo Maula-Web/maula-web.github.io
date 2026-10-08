@@ -1013,6 +1013,22 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 38. ROBUSTEZ Y DISPARO AUTOMÁTICO DE «HABEMUS QUINIELAM» (JORNADA 12 Y FUTURAS)
+- **Problema previo**: A pesar de que el 100% de los socios (19/19) completaron sus pronósticos para la Jornada 12, el aviso de Telegram nunca se envió al canal oficial, quedando la jornada en estado "⏳ No enviado".
+- **Causas identificadas**:
+  1. **Memoria local obsoleta (*stale in-memory array*)**: Al guardar el último socio en `performFinalSave`, se pasaba `this.pronosticos` a `checkHabemusQuinielam`. Si el usuario había abierto la pestaña antes de que otros socios guardaran, su array en memoria no incluía esos pronósticos recientes. Al verificar con ese array desactualizado y no consultar Firestore, la función abortaba reportando falsos socios pendientes.
+  2. **Ausencia de recuperación en carga o renderizado**: `checkHabemusQuinielam` solo se ejecutaba en el momento exacto del clic en "Guardar". Si ese disparo fallaba (por la memoria obsoleta, cierre del navegador o alertas modales bloqueantes), ninguna recarga posterior comprobaba si la jornada estaba al 100%.
+  3. **Bloqueo de temporizadores por alerta**: La llamada se ejecutaba en un `setTimeout(..., 500)` tras el `alert()` de confirmación, el cual congela los hilos de ejecución en navegadores móviles.
+- **Solución implementada**:
+  - **Consulta de rescate a Firestore en tiempo real**: En `TelegramService.checkHabemusQuinielam`, si el array en memoria local indica que faltan socios, el sistema consulta **automáticamente Firestore en vivo** antes de abortar, descartando datos locales desfasados.
+  - **Auto-disparo en inicio y KPIs**: Al cargar `pronosticos.js` (`init()`) o actualizar los KPIs de `pronosticos_2.html` (`updateKPIsCustom`), si la jornada en curso tiene al 100% de los socios completados y `habemusSent` es falso, se dispara el aviso de inmediato.
+  - **Candado de concurrencia (`_isCheckingHabemus`)**: Previene envíos duplicados ante llamadas simultáneas.
+  - **Fallback robusto de configuración**: Si `getDoc('config', 'telegram')` no responde, recupera la configuración mediante `getAll('config')`.
+  - **Resolución Jornada 12**: El mensaje oficial `🐸 ¡¡HABEMUS QUINIELAM!! 🍻` fue despachado con éxito al grupo de Telegram (ID de mensaje 352) y la Jornada 12 quedó marcada con `habemusSent: true` en Firestore.
+  - **Caché actualizada**: Incremento a `maulas-pwa-v1.69` en `service-worker.js`.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

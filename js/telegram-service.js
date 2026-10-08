@@ -435,11 +435,21 @@ window.TelegramService = {
     },
     async checkHabemusQuinielam(jId, forceResend = false, inMemoryPronosticos = null) {
         if (!window.DataService) return { ok: false, reason: 'no_dataservice' };
+        if (this._isCheckingHabemus) {
+            console.log("Habemus: Ya hay una verificación en curso, ignorando concurrente.");
+            return { ok: false, reason: 'already_checking' };
+        }
+        this._isCheckingHabemus = true;
 
         try {
-            // 1. Get Config
-            const tg = await window.DataService.getDoc('config', 'telegram');
-            const hab = await window.DataService.getDoc('config', 'habemus');
+            // 1. Get Config (con fallback robusto a getAll('config'))
+            let tg = await window.DataService.getDoc('config', 'telegram').catch(() => null);
+            let hab = await window.DataService.getDoc('config', 'habemus').catch(() => null);
+            if (!tg || !hab) {
+                const allConfig = await window.DataService.getAll('config').catch(() => []);
+                if (!tg) tg = allConfig.find(c => c.id === 'telegram');
+                if (!hab) hab = allConfig.find(c => c.id === 'habemus');
+            }
 
             if (!tg || !tg.token || !tg.chatId) {
                 console.log("Habemus: No Telegram config found. Skipping.");
@@ -500,18 +510,36 @@ window.TelegramService = {
             const activeMembers = (members || []).filter(m => m && m.active !== false);
             console.log(`Habemus: Checking J${currentJ.number} (Season: ${currentJ.season || activeSeason})... Active Members: ${activeMembers.length}`);
 
-            const pending = [];
-            const allPlayed = activeMembers.length > 0 && activeMembers.every(m => {
-                const p = pronosticos.find(pred => {
-                    const pJId = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId || '');
-                    const pMId = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId || '');
-                    return pJId === String(currentJ.id) && pMId === String(m.id);
+            const evaluatePlayed = (list) => {
+                const pend = [];
+                const isAll = activeMembers.length > 0 && activeMembers.every(m => {
+                    const p = list.find(pred => {
+                        const pJId = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId || '');
+                        const pMId = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId || '');
+                        return pJId === String(currentJ.id) && pMId === String(m.id);
+                    });
+                    const played = p && p.selection && Array.isArray(p.selection) &&
+                        p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                    if (!played) pend.push(m.name || m.phone || `ID:${m.id}`);
+                    return played;
                 });
-                const played = p && p.selection && Array.isArray(p.selection) &&
-                    p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                if (!played) pending.push(m.name || m.phone || `ID:${m.id}`);
-                return played;
-            });
+                return { isAll, pend };
+            };
+
+            let { isAll: allPlayed, pend: pending } = evaluatePlayed(pronosticos);
+
+            // CORRECCIÓN CRÍTICA: Si según los pronósticos en memoria falta alguien, SIEMPRE consultar
+            // Firestore en tiempo real para descartar que otro socio haya guardado mientras esta pestaña estaba abierta
+            if (!allPlayed && inMemoryPronosticos) {
+                console.log("Habemus: Faltan socios en memoria local, consultando Firestore en tiempo real...");
+                const freshPronosticos = await window.DataService.getAll('pronosticos');
+                if (freshPronosticos && Array.isArray(freshPronosticos)) {
+                    pronosticos = freshPronosticos;
+                    const recheck = evaluatePlayed(pronosticos);
+                    allPlayed = recheck.isAll;
+                    pending = recheck.pend;
+                }
+            }
 
             if (allPlayed || forceResend) {
                 if (forceResend && !allPlayed) {
@@ -538,6 +566,8 @@ window.TelegramService = {
         } catch (e) {
             console.error("TelegramService (Habemus) Error:", e);
             return { ok: false, error: e };
+        } finally {
+            this._isCheckingHabemus = false;
         }
     },
     async sendPardonNotification(forgiverName, forgivenName, jornadaNumber) {
