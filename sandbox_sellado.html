@@ -117,6 +117,9 @@
                     <span id="badge-dobles-status" class="px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30 whitespace-nowrap">
                         16 Dobles
                     </span>
+                    <span id="badge-p15-status" class="px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap">
+                        🎯 P15: --
+                    </span>
                 </div>
                 <button onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 shadow">
                     🔄 Recargar
@@ -299,9 +302,17 @@
 
             <!-- VISTA 2: DESGLOSE DE LOS 19 SOCIOS -->
             <div id="view-tab-socios" class="hidden space-y-3">
-                <div class="flex items-center justify-between text-xs text-slate-400">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400">
                     <span>Pronósticos individuales registrados en base de datos para cada uno de los 19 miembros:</span>
                     <span id="socios-complete-count" class="font-mono text-emerald-400 font-bold">19/19 Completos</span>
+                </div>
+                <!-- Banner explicativo P15 Unificado -->
+                <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-start gap-2.5">
+                    <span class="text-base">ℹ️</span>
+                    <div class="leading-relaxed">
+                        <strong class="text-white">Unificación oficial del Pleno al 15:</strong> 
+                        En el archivo oficial a sellar, el Pleno al 15 de todos los socios se unifica automáticamente con el resultado elegido en la <strong>Quiniela de Dobles</strong> (<span id="banner-p15-val" class="font-mono font-bold text-amber-200">10</span>), incluso en las jornadas con <strong>PIG (Partido de Interés General)</strong> en el partido 15. Esto garantiza que las 35 columnas del boleto oficial compartan el mismo Pleno al 15 exigido por el terminal SELAE, preservando en la web el pronóstico personal para el cómputo de puntos de liga.
+                    </div>
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80 max-h-80">
                     <table class="w-full text-left text-xs border-collapse">
@@ -310,7 +321,8 @@
                                 <th class="p-2.5 sm:px-3">#</th>
                                 <th class="p-2.5 sm:px-3">Socio</th>
                                 <th class="p-2.5 sm:px-3 text-center">Pronóstico (14 Partidos)</th>
-                                <th class="p-2.5 sm:px-3 text-center">P15</th>
+                                <th class="p-2.5 sm:px-3 text-center">P15 Web (PIG)</th>
+                                <th class="p-2.5 sm:px-3 text-center">P15 Boleto (.TXT)</th>
                                 <th class="p-2.5 sm:px-3 text-right">Estado</th>
                             </tr>
                         </thead>
@@ -375,6 +387,7 @@
             sociosDetalle: [],
             doblesDetalle: [],
             currentTab: 'txt',
+            p15Oficial: '10',
 
             init() {
                 this.checkAuth();
@@ -583,7 +596,31 @@
                 const jNum = String(jornada.number || jornada.id);
                 const jId = String(jornada.id);
 
-                // 1. Procesar los 19 Socios Reales
+                // 1. Obtener primero la Quiniela de Dobles para determinar el Pleno al 15 Oficial de TODO el boleto
+                let extra = (this.pronosticosExtra || []).find(p => {
+                    const pJ = String(p.jId || p.jornadaId || '');
+                    return (pJ === jNum || pJ === jId) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                });
+
+                let p15Oficial = '10'; // Valor base por defecto
+                let doblesOrigenTipo = '';
+                let doblesCombinaciones = [];
+
+                if (extra && Array.isArray(extra.selection)) {
+                    doblesOrigenTipo = 'Dobles Reales (BD)';
+                    p15Oficial = this.formatP15(extra.selection[14]);
+                    doblesCombinaciones = this.desarrollarDobles(extra.selection, Boolean(extra.isReduced), p15Oficial);
+                    this.log(`Quiniela de dobles real cargada. Pleno al 15 oficial del boleto: ${p15Oficial}. ${doblesCombinaciones.length} combinaciones.`);
+                } else {
+                    doblesOrigenTipo = 'Dobles Simulados (Estándar 4 Dobles)';
+                    p15Oficial = '10';
+                    this.log(`Sin quiniela de dobles en BD para Jornada ${this.jornadaActual}. Usando Pleno al 15 estándar (${p15Oficial}) para las 35 apuestas.`);
+                    doblesCombinaciones = this.generarDoblesDemoStandard(jornada, p15Oficial);
+                }
+
+                this.p15Oficial = p15Oficial;
+
+                // 2. Procesar los 19 Socios Reales unificando el P15 al oficial de dobles
                 let sociosCompletos = 0;
                 let sociosIncompletos = 0;
 
@@ -607,7 +644,7 @@
                     }
 
                     let signos14 = [];
-                    let p15Raw = '10';
+                    let p15PersonalRaw = '10';
                     let esValido = false;
 
                     if (pronostico && Array.isArray(pronostico.selection) && pronostico.selection.length >= 14) {
@@ -617,11 +654,11 @@
                         });
                         const aciertosConocidos = signos14.filter(s => s !== null).length;
                         esValido = (aciertosConocidos === 14);
-                        p15Raw = pronostico.selection[14] || '10';
+                        p15PersonalRaw = pronostico.selection[14] || '10';
                     }
 
-                    // Formatear Pleno al 15 (2 caracteres, ej: 10, M1, 00)
-                    const p15Final = this.formatP15(p15Raw);
+                    // Pleno al 15 personal registrado en web (para cómputo interno de puntos PIG)
+                    const p15Personal = this.formatP15(p15PersonalRaw);
 
                     // Si faltan signos, rellenar con fallback '1' para el fichero oficial
                     const signos14Final = signos14.map(s => s || '1').join('');
@@ -634,48 +671,33 @@
 
                     const estado = esValido ? 'Completo' : (pronostico ? 'Incompleto' : 'Sin Pronóstico');
 
-                    // Registrar para desglose de socios
+                    // Registrar para desglose de socios (mostrando P15 web y P15 unificado del boleto)
                     this.sociosDetalle.push({
                         idx: idx + 1,
                         member: member,
                         name: mName,
                         signos14: signos14Final,
                         signosRaw: signos14,
-                        p15: p15Final,
+                        p15Personal: p15Personal,
+                        p15Oficial: p15Oficial,
                         estado: estado,
                         esValido: esValido
                     });
 
-                    // Añadir línea simple al archivo oficial
+                    // Añadir línea simple al archivo oficial (REGLA: El P15 de todas las apuestas es el de dobles)
                     this.apuestasGeneradas.push({
-                        linea: `${signos14Final}${p15Final}`,
+                        linea: `${signos14Final}${p15Oficial}`,
                         origen: `${mName} (Socio ${member.id})`,
                         tipo: 'Simple Real',
-                        estado: estado
+                        estado: estado,
+                        p15Personal: p15Personal,
+                        p15Oficial: p15Oficial
                     });
                 });
 
                 this.log(`19 socios procesados: ${sociosCompletos} completos, ${sociosIncompletos} incompletos/rellenados.`);
 
-                // 2. Procesar Quiniela de Dobles
-                let extra = (this.pronosticosExtra || []).find(p => {
-                    const pJ = String(p.jId || p.jornadaId || '');
-                    return (pJ === jNum || pJ === jId) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                });
-
-                let doblesOrigenTipo = '';
-                let doblesCombinaciones = [];
-
-                if (extra && Array.isArray(extra.selection)) {
-                    doblesOrigenTipo = 'Dobles Reales (BD)';
-                    doblesCombinaciones = this.desarrollarDobles(extra.selection, Boolean(extra.isReduced));
-                    this.log(`Quiniela de dobles real cargada de base de datos: ${doblesCombinaciones.length} combinaciones.`);
-                } else {
-                    doblesOrigenTipo = 'Dobles Simulados (Estándar 4 Dobles)';
-                    this.log(`Sin quiniela de dobles guardada en BD para Jornada ${this.jornadaActual}. Generando 16 dobles estándar de muestra.`);
-                    doblesCombinaciones = this.generarDoblesDemoStandard(jornada);
-                }
-
+                // 3. Añadir las apuestas de dobles desarrolladas a la combinación oficial
                 doblesCombinaciones.forEach((doble, idx) => {
                     this.doblesDetalle.push({
                         num: idx + 1,
@@ -689,15 +711,17 @@
                         linea: doble.linea,
                         origen: `${doblesOrigenTipo} (Comb. ${idx + 1}/16)`,
                         tipo: 'Doble Desarrollado',
-                        estado: 'OK'
+                        estado: 'OK',
+                        p15Personal: p15Oficial,
+                        p15Oficial: p15Oficial
                     });
                 });
 
                 this.renderUI(sociosCompletos, sociosIncompletos, Boolean(extra));
             },
 
-            desarrollarDobles(selection, isReduced = false) {
-                const p15 = this.formatP15(selection[14]);
+            desarrollarDobles(selection, isReduced = false, p15Param = null) {
+                const p15 = p15Param || this.formatP15(selection[14]);
                 const multiIndices = [];
                 selection.slice(0, 14).forEach((sel, idx) => {
                     if (sel && String(sel).trim().length > 1) multiIndices.push(idx);
@@ -740,10 +764,10 @@
                 return resultado.slice(0, 16);
             },
 
-            generarDoblesDemoStandard(jornada) {
+            generarDoblesDemoStandard(jornada = null, p15Param = '10') {
                 // 4 dobles en partidos representativos al directo (2^4 = 16 apuestas)
                 const baseDobles = ["1X", "1", "12", "X", "1", "2", "1X", "1", "X", "2", "X2", "1", "1", "X"];
-                const p15 = "10";
+                const p15 = p15Param || "10";
                 const opciones = baseDobles.map(s => s.split(''));
                 const resultado = [];
 
@@ -761,6 +785,9 @@
             },
 
             generarCombinacionMaulasDemo() {
+                const p15DoblesOficial = '10';
+                this.p15Oficial = p15DoblesOficial;
+
                 const socios = [
                     "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
                     "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
@@ -796,20 +823,24 @@
                         name: socios[idx],
                         signos14: s.p14,
                         signosRaw: s.p14.split(''),
-                        p15: s.p15,
+                        p15Personal: s.p15,
+                        p15Oficial: p15DoblesOficial,
                         estado: 'Completo (Demo)',
                         esValido: true
                     });
 
+                    // En el archivo oficial, se usa el Pleno al 15 unificado de Dobles
                     this.apuestasGeneradas.push({
-                        linea: `${s.p14}${s.p15}`,
+                        linea: `${s.p14}${p15DoblesOficial}`,
                         origen: `Socio ${idx + 1} (${socios[idx]})`,
                         tipo: 'Simple Demo',
-                        estado: 'Demo'
+                        estado: 'Demo',
+                        p15Personal: s.p15,
+                        p15Oficial: p15DoblesOficial
                     });
                 });
 
-                const doblesDemo = this.generarDoblesDemoStandard();
+                const doblesDemo = this.generarDoblesDemoStandard(null, p15DoblesOficial);
                 doblesDemo.forEach((col, idx) => {
                     this.doblesDetalle.push({
                         num: idx + 1,
@@ -823,7 +854,9 @@
                         linea: col.linea,
                         origen: `Dobles Demo (Comb. ${idx + 1})`,
                         tipo: 'Doble Desarrollado',
-                        estado: 'Demo'
+                        estado: 'Demo',
+                        p15Personal: p15DoblesOficial,
+                        p15Oficial: p15DoblesOficial
                     });
                 });
 
@@ -864,6 +897,22 @@
                     }
                 }
 
+                const badgeP15 = document.getElementById('badge-p15-status');
+                if (badgeP15) {
+                    badgeP15.className = 'px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap';
+                    badgeP15.textContent = `🎯 P15: ${this.p15Oficial || '10'}`;
+                }
+
+                const bannerP15 = document.getElementById('banner-p15-val');
+                if (bannerP15) {
+                    bannerP15.textContent = this.p15Oficial || '10';
+                }
+
+                const txtFileStats = document.getElementById('txt-file-stats');
+                if (txtFileStats) {
+                    txtFileStats.textContent = `Mostrando 35 apuestas preparadas para terminal SELAE / LotoGestión (P15 unificado: ${this.p15Oficial || '10'}):`;
+                }
+
                 // Actualizar nombre de adjunto
                 const labelAdjunto = document.getElementById('label-attachment-name');
                 if (labelAdjunto) {
@@ -878,7 +927,7 @@
                 }).join('\n');
                 outputBox.textContent = lineasTxt;
 
-                // 2. Render Tab Socios
+                // 2. Render Tab Socios (Con P15 Web vs P15 Boleto Unificado)
                 const sociosTbody = document.getElementById('table-socios-body');
                 if (sociosTbody) {
                     sociosTbody.innerHTML = this.sociosDetalle.map(s => {
@@ -888,13 +937,25 @@
                         }).join(' ');
 
                         const badgeColor = s.esValido ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+                        const isDiff = s.p15Personal !== s.p15Oficial;
+                        const diffNotice = isDiff 
+                            ? `<span class="text-[9px] text-amber-400 font-sans block font-medium">(PIG web: ${s.p15Personal})</span>`
+                            : `<span class="text-[9px] text-slate-500 font-sans block">Coincide</span>`;
 
                         return `
                             <tr class="hover:bg-slate-900/60 transition">
                                 <td class="p-2.5 sm:px-3 text-slate-500 font-bold">${String(s.idx).padStart(2, '0')}</td>
                                 <td class="p-2.5 sm:px-3 font-sans font-bold text-white whitespace-nowrap">${s.name}</td>
                                 <td class="p-2.5 sm:px-3 text-center whitespace-nowrap">${pillsHtml}</td>
-                                <td class="p-2.5 sm:px-3 text-center font-bold text-amber-400 whitespace-nowrap">${s.p15}</td>
+                                <td class="p-2.5 sm:px-3 text-center whitespace-nowrap font-mono">
+                                    <span class="text-slate-300 font-bold text-xs">${s.p15Personal}</span>
+                                    ${diffNotice}
+                                </td>
+                                <td class="p-2.5 sm:px-3 text-center whitespace-nowrap font-mono">
+                                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-xs">
+                                        ${s.p15Oficial}
+                                    </span>
+                                </td>
                                 <td class="p-2.5 sm:px-3 text-right whitespace-nowrap">
                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">
                                         ${s.estado}
@@ -924,7 +985,7 @@
                 const countEl = document.getElementById('socios-complete-count');
                 if (countEl) countEl.textContent = `${completos}/19 Completos`;
 
-                this.log(`Combinación lista para Jornada ${this.jornadaActual}: 35 apuestas (${importe} €).`, 'success');
+                this.log(`Combinación lista para Jornada ${this.jornadaActual}: 35 apuestas (${importe} €). Pleno al 15 oficial: ${this.p15Oficial}.`, 'success');
             },
 
             switchTab(tabId) {
@@ -1000,7 +1061,7 @@
             abrirEmailCliente() {
                 const destino = document.getElementById('input-asla-email').value;
                 const asunto = encodeURIComponent(`[Peña Los Maulas] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
-                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples (Soporte Digital / ASD)\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
+                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples (Soporte Digital / ASD)\nPleno al 15 unificado: ${this.p15Oficial || '10'}\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
                 
                 this.descargarTXT();
                 window.location.href = `mailto:${destino}?subject=${asunto}&body=${cuerpo}`;
