@@ -1077,12 +1077,12 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
         var data = JSON.parse(e.postData.contents);
         
         // CASO 1: CONSULTAR RESPUESTA DE LA ADMINISTRACIÓN EN GMAIL
-        if (data.action === 'check_reply') {
+        if (data.action === 'check_reply' || !data.fileContent) {
           return procesarConsultaRespuesta(data.ticketId, data.jornada);
         }
         
         // CASO 2: ENVIAR FICHERO .TXT DE 35 APUESTAS POR CORREO REAL
-        var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName);
+        var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName || 'apuestas.txt');
         GmailApp.sendEmail(data.to, data.subject, data.body, {
           name: 'Peña Los Maulas',
           attachments: [blob]
@@ -1105,54 +1105,92 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
     }
 
     function doGet(e) {
-      var action = e && e.parameter && e.parameter.action;
-      var ticketId = e && e.parameter && e.parameter.ticketId;
-      var jornada = e && e.parameter && e.parameter.jornada;
-      
-      if (action === 'check_reply') {
-        return procesarConsultaRespuesta(ticketId, jornada);
+      try {
+        var action = e && e.parameter && e.parameter.action;
+        var ticketId = e && e.parameter && e.parameter.ticketId;
+        var jornada = e && e.parameter && e.parameter.jornada;
+        
+        if (action === 'check_reply' || ticketId || jornada) {
+          return procesarConsultaRespuesta(ticketId, jornada);
+        }
+        
+        return ContentService.createTextOutput(JSON.stringify({ 
+          status: 'online', 
+          service: 'Peña Los Maulas - Pasarela de Sellado y Recepción Digital',
+          account: 'Penalosmaulas@gmail.com'
+        })).setMimeType(ContentService.MimeType.JSON);
+      } catch (err) {
+        return ContentService.createTextOutput(JSON.stringify({ 
+          ok: false, 
+          error: err.toString() 
+        })).setMimeType(ContentService.MimeType.JSON);
       }
-      
-      return ContentService.createTextOutput(JSON.stringify({ 
-        status: 'online', 
-        service: 'Peña Los Maulas - Pasarela de Sellado y Recepción Digital',
-        account: 'Penalosmaulas@gmail.com'
-      })).setMimeType(ContentService.MimeType.JSON);
     }
 
     function procesarConsultaRespuesta(ticketId, jornada) {
       try {
-        var query = '';
+        var threads = [];
+
+        // 1. Búsqueda por ticketId exacto si viene indicado
         if (ticketId) {
-          query = 'subject:"' + ticketId + '"';
-        } else if (jornada) {
-          var jPad = ('0' + jornada).slice(-2);
-          query = 'subject:"[MAULAS-" (subject:"-J' + jPad + '" OR subject:"Jornada ' + jornada + '") newer_than:7d';
-        } else {
-          query = 'subject:"[MAULAS-" newer_than:7d';
+          threads = GmailApp.search('"' + ticketId + '"', 0, 5);
+          if (!threads || threads.length === 0) {
+            threads = GmailApp.search('subject:"' + ticketId + '"', 0, 5);
+          }
         }
 
-        var threads = GmailApp.search(query, 0, 5);
+        // 2. Si no se encontró por ID exacto, buscar por el número de Jornada (J12 o Jornada 12)
+        if (!threads || threads.length === 0) {
+          var jNum = jornada;
+          if (!jNum && ticketId) {
+            var mJ = ticketId.match(/-J(\d+)/i);
+            if (mJ) jNum = mJ[1];
+          }
+          if (jNum) {
+            var jPad = ('0' + jNum).slice(-2);
+            var qJornada = 'subject:"[MAULAS-" (subject:"-J' + jPad + '" OR subject:"Jornada ' + parseInt(jNum, 10) + '") newer_than:7d';
+            threads = GmailApp.search(qJornada, 0, 5);
+          }
+        }
+
+        // 3. Fallback: El último correo de sellado de Los Maulas de los últimos 7 días
+        if (!threads || threads.length === 0) {
+          threads = GmailApp.search('subject:"[MAULAS-" newer_than:7d', 0, 5);
+        }
+
         if (!threads || threads.length === 0) {
           return ContentService.createTextOutput(JSON.stringify({
             ok: true,
             hasReply: false,
             foundThread: false,
             ticketId: ticketId,
-            message: 'No se encontró ningún correo con esta referencia en Gmail.'
+            message: 'No se encontró ningún correo con asunto [MAULAS- en Gmail en los últimos 7 días.'
           })).setMimeType(ContentService.MimeType.JSON);
         }
 
         var thread = threads[0];
         var messages = thread.getMessages();
+        var firstSubject = thread.getFirstMessageSubject();
+
+        // Intentar extraer el ticketId real del asunto del hilo encontrado
+        var foundTicketId = ticketId;
+        var matchRealId = firstSubject.match(/\[(MAULAS-[^\]]+)\]/);
+        if (matchRealId) {
+          foundTicketId = matchRealId[1];
+        }
+
+        // Comprobar si hay respuesta en el hilo de alguien que no sea penalosmaulas
         var replyMsg = null;
-        if (messages.length > 1) {
-          replyMsg = messages[messages.length - 1];
-        } else if (messages.length === 1) {
-          var fromSender = messages[0].getFrom().toLowerCase();
-          if (fromSender.indexOf('penalosmaulas@gmail.com') === -1) {
-            replyMsg = messages[0];
+        for (var m = messages.length - 1; m >= 0; m--) {
+          var sender = messages[m].getFrom().toLowerCase();
+          if (sender.indexOf('penalosmaulas@gmail.com') === -1) {
+            replyMsg = messages[m];
+            break;
           }
+        }
+
+        if (!replyMsg && messages.length > 1) {
+          replyMsg = messages[messages.length - 1];
         }
 
         if (!replyMsg) {
@@ -1160,8 +1198,8 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
             ok: true,
             hasReply: false,
             foundThread: true,
-            ticketId: ticketId,
-            subject: thread.getFirstMessageSubject(),
+            ticketId: foundTicketId,
+            subject: firstSubject,
             messagesCount: messages.length,
             sentDate: messages[0].getDate().toISOString(),
             message: 'El correo de sellado fue enviado, pero la administración aún no ha respondido.'
@@ -1171,26 +1209,36 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
         var attachments = replyMsg.getAttachments();
         var attList = [];
         for (var i = 0; i < attachments.length; i++) {
-          var att = attachments[i];
-          var cType = att.getContentType();
-          var size = att.getBytes().length;
-          var dataUri = null;
-          if (size < 3.5 * 1024 * 1024) {
-            dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(att.getBytes());
+          try {
+            var att = attachments[i];
+            var cType = att.getContentType() || 'application/octet-stream';
+            var bytes = att.getBytes();
+            var size = bytes ? bytes.length : 0;
+            var dataUri = null;
+            if (bytes && size < 4 * 1024 * 1024) {
+              dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(bytes);
+            }
+            attList.push({
+              name: att.getName() || ('adjunto_' + (i + 1)),
+              contentType: cType,
+              size: size,
+              dataUri: dataUri
+            });
+          } catch(attErr) {
+            attList.push({
+              name: 'Adjunto ' + (i + 1),
+              contentType: 'application/octet-stream',
+              size: 0,
+              dataUri: null
+            });
           }
-          attList.push({
-            name: att.getName(),
-            contentType: cType,
-            size: size,
-            dataUri: dataUri
-          });
         }
 
         return ContentService.createTextOutput(JSON.stringify({
           ok: true,
           hasReply: true,
           foundThread: true,
-          ticketId: ticketId,
+          ticketId: foundTicketId,
           subject: replyMsg.getSubject(),
           from: replyMsg.getFrom(),
           date: replyMsg.getDate().toISOString(),

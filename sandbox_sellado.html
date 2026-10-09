@@ -254,12 +254,13 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     
     // CASO 1: CONSULTAR RESPUESTA DE LA ADMINISTRACIÓN EN GMAIL
-    if (data.action === 'check_reply') {
+    // Si la acción es check_reply O no viene fileContent (evita cualquier fallo si no es envío)
+    if (data.action === 'check_reply' || !data.fileContent) {
       return procesarConsultaRespuesta(data.ticketId, data.jornada);
     }
     
     // CASO 2: ENVIAR FICHERO .TXT DE 35 APUESTAS POR CORREO REAL
-    var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName);
+    var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName || 'apuestas.txt');
     GmailApp.sendEmail(data.to, data.subject, data.body, {
       name: 'Peña Los Maulas',
       attachments: [blob]
@@ -282,19 +283,26 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  var action = e && e.parameter && e.parameter.action;
-  var ticketId = e && e.parameter && e.parameter.ticketId;
-  var jornada = e && e.parameter && e.parameter.jornada;
-  
-  if (action === 'check_reply') {
-    return procesarConsultaRespuesta(ticketId, jornada);
+  try {
+    var action = e && e.parameter && e.parameter.action;
+    var ticketId = e && e.parameter && e.parameter.ticketId;
+    var jornada = e && e.parameter && e.parameter.jornada;
+    
+    if (action === 'check_reply' || ticketId || jornada) {
+      return procesarConsultaRespuesta(ticketId, jornada);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({ 
+      status: 'online', 
+      service: 'Peña Los Maulas - Pasarela de Sellado y Recepción Digital',
+      account: 'Penalosmaulas@gmail.com'
+    })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ 
+      ok: false, 
+      error: err.toString() 
+    })).setMimeType(ContentService.MimeType.JSON);
   }
-  
-  return ContentService.createTextOutput(JSON.stringify({ 
-    status: 'online', 
-    service: 'Peña Los Maulas - Pasarela de Sellado y Recepción Digital',
-    account: 'Penalosmaulas@gmail.com'
-  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
@@ -303,25 +311,42 @@ function doGet(e) {
  */
 function procesarConsultaRespuesta(ticketId, jornada) {
   try {
-    var query = '';
+    var threads = [];
+
+    // 1. Búsqueda por ticketId exacto si viene indicado
     if (ticketId) {
-      query = 'subject:"' + ticketId + '"';
-    } else if (jornada) {
-      var jPad = ('0' + jornada).slice(-2);
-      query = 'subject:"[MAULAS-" (subject:"-J' + jPad + '" OR subject:"Jornada ' + jornada + '") newer_than:7d';
-    } else {
-      query = 'subject:"[MAULAS-" newer_than:7d';
+      threads = GmailApp.search('"' + ticketId + '"', 0, 5);
+      if (!threads || threads.length === 0) {
+        threads = GmailApp.search('subject:"' + ticketId + '"', 0, 5);
+      }
     }
 
-    var threads = GmailApp.search(query, 0, 5);
-    
+    // 2. Si no se encontró por ID exacto, buscar por el número de Jornada (J12 o Jornada 12)
+    if (!threads || threads.length === 0) {
+      var jNum = jornada;
+      if (!jNum && ticketId) {
+        var mJ = ticketId.match(/-J(\d+)/i);
+        if (mJ) jNum = mJ[1];
+      }
+      if (jNum) {
+        var jPad = ('0' + jNum).slice(-2);
+        var qJornada = 'subject:"[MAULAS-" (subject:"-J' + jPad + '" OR subject:"Jornada ' + parseInt(jNum, 10) + '") newer_than:7d';
+        threads = GmailApp.search(qJornada, 0, 5);
+      }
+    }
+
+    // 3. Fallback: El último correo de sellado de Los Maulas de los últimos 7 días
+    if (!threads || threads.length === 0) {
+      threads = GmailApp.search('subject:"[MAULAS-" newer_than:7d', 0, 5);
+    }
+
     if (!threads || threads.length === 0) {
       return ContentService.createTextOutput(JSON.stringify({
         ok: true,
         hasReply: false,
         foundThread: false,
         ticketId: ticketId,
-        message: 'No se encontró ningún correo con esta referencia en Gmail.'
+        message: 'No se encontró ningún correo con asunto [MAULAS- en Gmail en los últimos 7 días.'
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -329,15 +354,27 @@ function procesarConsultaRespuesta(ticketId, jornada) {
     var messages = thread.getMessages();
     var firstSubject = thread.getFirstMessageSubject();
 
-    // Comprobar si hay respuesta (más de 1 mensaje en el hilo o mensaje de otro remitente)
+    // Intentar extraer el ticketId real del asunto del hilo encontrado (ej: [MAULAS-2627-20261009_1913-J12])
+    var foundTicketId = ticketId;
+    var matchRealId = firstSubject.match(/\[(MAULAS-[^\]]+)\]/);
+    if (matchRealId) {
+      foundTicketId = matchRealId[1];
+    }
+
+    // Comprobar si hay respuesta en el hilo
+    // Buscamos hacia atrás el mensaje más reciente que NO sea de penalosmaulas@gmail.com
     var replyMsg = null;
-    if (messages.length > 1) {
-      replyMsg = messages[messages.length - 1];
-    } else if (messages.length === 1) {
-      var fromSender = messages[0].getFrom().toLowerCase();
-      if (fromSender.indexOf('penalosmaulas@gmail.com') === -1) {
-        replyMsg = messages[0];
+    for (var m = messages.length - 1; m >= 0; m--) {
+      var sender = messages[m].getFrom().toLowerCase();
+      if (sender.indexOf('penalosmaulas@gmail.com') === -1) {
+        replyMsg = messages[m];
+        break;
       }
+    }
+
+    // Si todos los mensajes son de penalosmaulas (pruebas entre misma cuenta) y hay más de 1 mensaje:
+    if (!replyMsg && messages.length > 1) {
+      replyMsg = messages[messages.length - 1];
     }
 
     if (!replyMsg) {
@@ -345,7 +382,7 @@ function procesarConsultaRespuesta(ticketId, jornada) {
         ok: true,
         hasReply: false,
         foundThread: true,
-        ticketId: ticketId,
+        ticketId: foundTicketId,
         subject: firstSubject,
         messagesCount: messages.length,
         sentDate: messages[0].getDate().toISOString(),
@@ -353,34 +390,44 @@ function procesarConsultaRespuesta(ticketId, jornada) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // Procesar adjuntos del resguardo (PDF, JPG, PNG...)
+    // Procesar adjuntos de forma segura
     var attachments = replyMsg.getAttachments();
     var attList = [];
     
     for (var i = 0; i < attachments.length; i++) {
-      var att = attachments[i];
-      var cType = att.getContentType();
-      var size = att.getBytes().length;
-      var dataUri = null;
-      
-      // Si pesa menos de 3.5 MB generamos data URI para preview visual inmediato
-      if (size < 3.5 * 1024 * 1024) {
-        dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(att.getBytes());
+      try {
+        var att = attachments[i];
+        var cType = att.getContentType() || 'application/octet-stream';
+        var bytes = att.getBytes();
+        var size = bytes ? bytes.length : 0;
+        var dataUri = null;
+        
+        // Si pesa menos de 4 MB generamos data URI para preview visual inmediato
+        if (bytes && size < 4 * 1024 * 1024) {
+          dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(bytes);
+        }
+        
+        attList.push({
+          name: att.getName() || ('adjunto_' + (i + 1)),
+          contentType: cType,
+          size: size,
+          dataUri: dataUri
+        });
+      } catch(attErr) {
+        attList.push({
+          name: 'Adjunto ' + (i + 1),
+          contentType: 'application/octet-stream',
+          size: 0,
+          dataUri: null
+        });
       }
-      
-      attList.push({
-        name: att.getName(),
-        contentType: cType,
-        size: size,
-        dataUri: dataUri
-      });
     }
 
     return ContentService.createTextOutput(JSON.stringify({
       ok: true,
       hasReply: true,
       foundThread: true,
-      ticketId: ticketId,
+      ticketId: foundTicketId,
       subject: replyMsg.getSubject(),
       from: replyMsg.getFrom(),
       date: replyMsg.getDate().toISOString(),
@@ -1684,18 +1731,28 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                     if (data && data.ok) {
                         if (data.hasReply) {
                             this.log(`✅ ¡Confirmación recibida de la administración! De: ${data.from}`, 'success');
+                            const realId = data.ticketId || ticketId;
                             if (!this.selladoRecord) {
                                 this.selladoRecord = {
-                                    ticketId: ticketId,
+                                    ticketId: realId,
                                     jornada: this.jornadaActual,
                                     enviadoEn: new Date().toISOString(),
                                     destino: data.from
                                 };
+                            } else {
+                                this.selladoRecord.ticketId = realId;
                             }
                             this.selladoRecord.status = 'CONFIRMADO';
                             this.selladoRecord.respuesta = data;
                             this.selladoRecord.confirmadoEn = new Date().toISOString();
                             localStorage.setItem(`maulas_sellado_j_${this.jornadaActual}`, JSON.stringify(this.selladoRecord));
+
+                            // Sincronizar identificador oficial real en la interfaz
+                            this.ticketIdActual = realId;
+                            const lblTicket = document.getElementById('label-ticket-id');
+                            if (lblTicket) lblTicket.textContent = realId;
+                            const lblAdjunto = document.getElementById('label-attachment-name');
+                            if (lblAdjunto) lblAdjunto.textContent = `${realId}.txt`;
 
                             this.actualizarMonitorRespuesta(this.selladoRecord);
                             this.toggleAutoPolling(false);
