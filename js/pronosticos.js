@@ -504,7 +504,15 @@ class PronosticoManager {
                     this.statusMsg.innerHTML = `<span class="badge-locked" style="background:#d32f2f; color:white; border: 1.5px solid #b71c1c; font-weight: bold; padding: 6px 14px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">🔒 JORNADA EN JUEGO (HAY RESULTADOS) - NO SE ADMITEN PRONÓSTICOS</span>`;
                 } else {
                     const label = isFinished ? 'JORNADA FINALIZADA' : 'JORNADA EN JUEGO';
-                    this.statusMsg.innerHTML = `<span class="badge-locked">🔒 ${label} - NO SE ADMITEN CAMBIOS</span>`;
+                    let lateBadgeHtml = '';
+                    if (existing && existing.late) {
+                        if (existing.pardoned) {
+                            lateBadgeHtml = `<div class="mt-2 flex items-center justify-center gap-2 flex-wrap"><span class="badge-late" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981;">🕊️ RETRASO INDULTADO / JUSTIFICADO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">Revocar Indulto</button></div>`;
+                        } else {
+                            lateBadgeHtml = `<div class="mt-2 flex items-center justify-center gap-2 flex-wrap"><span class="badge-late">⚠️ PRONÓSTICO ENVIADO CON RETRASO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition flex items-center gap-1 cursor-pointer"><span>🕊️</span> Perdonar Retraso</button></div>`;
+                        }
+                    }
+                    this.statusMsg.innerHTML = `<span class="badge-locked">🔒 ${label} - NO SE ADMITEN CAMBIOS</span>${lateBadgeHtml}`;
                 }
                 this.container.style.border = "none";
             }
@@ -515,7 +523,11 @@ class PronosticoManager {
             if (existing && existing.isDice) {
                 this.statusMsg.innerHTML = '<span class="badge-dice" style="background: rgba(103, 58, 183, 0.12); color: #673ab7; border: 1.5px solid #673ab7; font-weight: bold; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">🎲 PRONÓSTICO AUTORRELLENADO CON DADO</span>';
             } else if (existing && existing.late) {
-                this.statusMsg.innerHTML = '<span class="badge-late">⚠️ PRONÓSTICO ENVIADO CON RETRASO</span>';
+                if (existing.pardoned) {
+                    this.statusMsg.innerHTML = `<div class="flex items-center justify-center gap-2 flex-wrap"><span class="badge-late" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981;">🕊️ RETRASO INDULTADO / JUSTIFICADO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">Revocar Indulto</button></div>`;
+                } else {
+                    this.statusMsg.innerHTML = `<div class="flex items-center justify-center gap-2 flex-wrap"><span class="badge-late">⚠️ PRONÓSTICO ENVIADO CON RETRASO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition flex items-center gap-1 cursor-pointer"><span>🕊️</span> Perdonar Retraso</button></div>`;
+                }
             } else {
                 this.statusMsg.innerHTML = '';
             }
@@ -1269,6 +1281,57 @@ class PronosticoManager {
 
     calculateDeadline(dateStr) {
         return window.AppUtils ? window.AppUtils.calculateDeadline(dateStr) : null;
+    }
+
+    async togglePardon(jId, mId) {
+        if (!jId || !mId) {
+            jId = this.currentJornadaId;
+            mId = this.currentMemberId;
+        }
+        const p = this.pronosticos.find(item => 
+            (String(item.jId) === String(jId) || String(item.jornadaId) === String(jId)) &&
+            (String(item.mId) === String(mId) || String(item.memberId) === String(mId))
+        );
+        if (!p) {
+            alert('No se encontró el pronóstico correspondiente.');
+            return;
+        }
+
+        const willPardon = !p.pardoned;
+        const actionMsg = willPardon
+            ? '¿Deseas perdonar / indultar el retraso de este socio para anular su penalización?'
+            : '¿Deseas revocar el indulto y reactivar la penalización por retraso?';
+
+        if (!confirm(actionMsg)) return;
+
+        p.pardoned = willPardon;
+        try {
+            if (window.DataService) {
+                await window.DataService.save('pronosticos', p);
+            }
+
+            if (willPardon && window.TelegramService) {
+                try {
+                    const forgiverData = JSON.parse(sessionStorage.getItem('maulas_user') || '{}');
+                    const forgiverName = window.AppUtils ? window.AppUtils.getMemberName(forgiverData) : (forgiverData.name || 'Administración');
+                    const forgiven = this.members ? this.members.find(m => String(m.id) === String(mId)) : null;
+                    const forgivenName = forgiven && window.AppUtils ? window.AppUtils.getMemberName(forgiven) : (forgiven ? forgiven.name : 'Socio');
+                    const jornada = this.jornadas ? this.jornadas.find(j => String(j.id) === String(jId)) : null;
+                    const jNum = jornada ? jornada.number : '?';
+
+                    await window.TelegramService.sendPardonNotification(forgiverName, forgivenName, jNum);
+                } catch (te) {
+                    console.warn('Error enviando notificación Telegram de indulto:', te);
+                }
+            }
+
+            if (typeof this.loadForecast === 'function') this.loadForecast();
+            if (typeof this.renderSummaryTable === 'function') this.renderSummaryTable();
+            if (typeof this.updateKPIsCustom === 'function') this.updateKPIsCustom();
+        } catch (err) {
+            console.error('Error al guardar el indulto:', err);
+            alert('Error al guardar el indulto en la base de datos.');
+        }
     }
 
     /**

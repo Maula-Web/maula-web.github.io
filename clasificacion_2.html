@@ -2437,6 +2437,7 @@
             }
 
             openMemberDrawer(memberId) {
+                this.currentMemberDrawerId = memberId;
                 this.hideFloatingCard();
                 const s = this.memberStats[memberId];
                 if (!s) return;
@@ -2500,8 +2501,21 @@
                     if (!data || data.hits === -1) return;
 
                     let statusBadge = '<span class="text-emerald-600 dark:text-emerald-400 font-bold">A tiempo</span>';
-                    if (data.isLate && !data.isPardoned) statusBadge = '<span class="text-rose-600 dark:text-rose-400 font-bold">Retraso ⏱️</span>';
-                    else if (data.isPardoned) statusBadge = '<span class="text-amber-600 dark:text-amber-400 font-bold">Justificado</span>';
+                    if (data.isLate && !data.isPardoned) {
+                        statusBadge = `
+                            <div class="inline-flex items-center gap-1.5 justify-center">
+                                <span class="text-rose-600 dark:text-rose-400 font-bold">Retraso ⏱️</span>
+                                <button onclick="window.ClasificacionApp.togglePardon('${j.id}', '${s.id}')" class="px-1.5 py-0.5 text-[10px] rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition font-bold cursor-pointer" title="Perdonar / indultar retraso">Perdonar 🕊️</button>
+                            </div>
+                        `;
+                    } else if (data.isPardoned) {
+                        statusBadge = `
+                            <div class="inline-flex items-center gap-1.5 justify-center">
+                                <span class="text-amber-600 dark:text-amber-400 font-bold">Justificado 🕊️</span>
+                                <button onclick="window.ClasificacionApp.togglePardon('${j.id}', '${s.id}')" class="px-1.5 py-0.5 text-[10px] rounded bg-slate-500/20 text-slate-500 dark:text-slate-400 hover:bg-slate-500/30 transition font-bold cursor-pointer" title="Revocar justificación">Revocar</button>
+                            </div>
+                        `;
+                    }
 
                     const bonusStr = data.bonus > 0 ? `+${data.bonus}` : (data.bonus < 0 ? `${data.bonus}` : '-');
                     const bonusClass = data.bonus > 0 ? 'text-emerald-600 dark:text-emerald-400' : (data.bonus < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500');
@@ -2527,6 +2541,56 @@
             closeMemberDrawer() {
                 const modal = document.getElementById('member-drawer-modal');
                 if (modal) modal.style.display = 'none';
+            }
+
+            async togglePardon(jId, mId) {
+                const pronosticos = this.seasonData ? (this.seasonData.pronosticos || []) : [];
+                const p = pronosticos.find(item => 
+                    (String(item.jId) === String(jId) || String(item.jornadaId) === String(jId)) &&
+                    (String(item.mId) === String(mId) || String(item.memberId) === String(mId))
+                );
+                if (!p) {
+                    alert('No se encontró el pronóstico correspondiente.');
+                    return;
+                }
+
+                const willPardon = !p.pardoned;
+                const actionMsg = willPardon
+                    ? '¿Deseas perdonar / indultar el retraso de este socio para que no sufra penalización?'
+                    : '¿Deseas revocar el indulto y reactivar la penalización por retraso?';
+
+                if (!confirm(actionMsg)) return;
+
+                p.pardoned = willPardon;
+                try {
+                    if (window.DataService) {
+                        await window.DataService.save('pronosticos', p);
+                    }
+
+                    if (willPardon && window.TelegramService) {
+                        try {
+                            const forgiverData = JSON.parse(sessionStorage.getItem('maulas_user') || '{}');
+                            const forgiverName = window.AppUtils ? window.AppUtils.getMemberName(forgiverData) : (forgiverData.name || 'Administración');
+                            const forgiven = this.seasonData && this.seasonData.members ? this.seasonData.members.find(m => String(m.id) === String(mId)) : null;
+                            const forgivenName = forgiven && window.AppUtils ? window.AppUtils.getMemberName(forgiven) : (forgiven ? forgiven.name : 'Socio');
+                            const jornada = this.seasonData && this.seasonData.jornadas ? this.seasonData.jornadas.find(j => String(j.id) === String(jId)) : null;
+                            const jNum = jornada ? jornada.number : '?';
+
+                            await window.TelegramService.sendPardonNotification(forgiverName, forgivenName, jNum);
+                        } catch (te) {
+                            console.warn('Error enviando notificación Telegram de indulto:', te);
+                        }
+                    }
+
+                    // Recargar datos y refrescar clasificación manteniendo el drawer abierto
+                    await this.init();
+                    if (this.currentMemberDrawerId) {
+                        this.openMemberDrawer(this.currentMemberDrawerId);
+                    }
+                } catch (err) {
+                    console.error('Error al guardar el indulto:', err);
+                    alert('Error al guardar el indulto en la base de datos.');
+                }
             }
 
             // --- GESTIÓN DE TARJETA EXPLICATIVA GLOBAL FLOTANTE ---
