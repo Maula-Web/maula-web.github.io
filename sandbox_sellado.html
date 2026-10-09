@@ -192,8 +192,12 @@
                             <input type="email" id="input-asla-email" oninput="SandboxManager.guardarEmailDestino(this.value)" placeholder="tu-email@gmail.com" class="bg-slate-950 px-2.5 py-1 rounded border border-slate-700 text-slate-200 font-mono text-xs w-full sm:w-64 text-left sm:text-right focus:border-blue-500 focus:outline-none">
                         </div>
                         <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">ID Oficial Boleto:</span>
+                            <span id="label-ticket-id" class="text-amber-300 font-mono font-bold text-[11px]">MAULAS-2627-...</span>
+                        </div>
+                        <div class="flex items-center justify-between">
                             <span class="text-slate-400 font-bold">Fichero Adjunto:</span>
-                            <span id="label-attachment-name" class="text-blue-400 font-mono">Jornada_XX_PenalosMaulas_35_apuestas.txt</span>
+                            <span id="label-attachment-name" class="text-blue-400 font-mono text-[11px]">MAULAS-2627-...txt</span>
                         </div>
                         
                         <!-- Configuración del Webhook Google Apps Script -->
@@ -240,11 +244,22 @@
                                         <span>📋</span> Copiar Código
                                     </button>
                                 </div>
-                                <pre id="code-gas-snippet" class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 font-mono text-[10px] text-emerald-400 overflow-x-auto select-all max-h-40 leading-relaxed">function doPost(e) {
+                                <pre id="code-gas-snippet" class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 font-mono text-[10px] text-emerald-400 overflow-x-auto select-all max-h-48 leading-relaxed">/**
+ * PEÑA LOS MAULAS - PASARELA DE SELLADO Y RECEPCIÓN DE RESGUARDOS
+ * Google Apps Script desplegado como Web App en Penalosmaulas@gmail.com
+ */
+
+function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
-    var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName);
     
+    // CASO 1: CONSULTAR RESPUESTA DE LA ADMINISTRACIÓN EN GMAIL
+    if (data.action === 'check_reply') {
+      return procesarConsultaRespuesta(data.ticketId, data.jornada);
+    }
+    
+    // CASO 2: ENVIAR FICHERO .TXT DE 35 APUESTAS POR CORREO REAL
+    var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName);
     GmailApp.sendEmail(data.to, data.subject, data.body, {
       name: 'Peña Los Maulas',
       attachments: [blob]
@@ -254,8 +269,10 @@
       ok: true, 
       sentAt: new Date().toISOString(),
       to: data.to,
-      fileName: data.fileName
+      fileName: data.fileName,
+      ticketId: data.ticketId || null
     })).setMimeType(ContentService.MimeType.JSON);
+
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({ 
       ok: false, 
@@ -265,11 +282,119 @@
 }
 
 function doGet(e) {
+  var action = e && e.parameter && e.parameter.action;
+  var ticketId = e && e.parameter && e.parameter.ticketId;
+  var jornada = e && e.parameter && e.parameter.jornada;
+  
+  if (action === 'check_reply') {
+    return procesarConsultaRespuesta(ticketId, jornada);
+  }
+  
   return ContentService.createTextOutput(JSON.stringify({ 
     status: 'online', 
-    service: 'Peña Los Maulas - Pasarela de Sellado Digital',
+    service: 'Peña Los Maulas - Pasarela de Sellado y Recepción Digital',
     account: 'Penalosmaulas@gmail.com'
   })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Busca en la bandeja de Penalosmaulas@gmail.com el hilo de sellado
+ * y extrae la respuesta del lotero (texto y archivo resguardo adjunto).
+ */
+function procesarConsultaRespuesta(ticketId, jornada) {
+  try {
+    var query = '';
+    if (ticketId) {
+      query = 'subject:"' + ticketId + '"';
+    } else if (jornada) {
+      var jPad = ('0' + jornada).slice(-2);
+      query = 'subject:"[MAULAS-" (subject:"-J' + jPad + '" OR subject:"Jornada ' + jornada + '") newer_than:7d';
+    } else {
+      query = 'subject:"[MAULAS-" newer_than:7d';
+    }
+
+    var threads = GmailApp.search(query, 0, 5);
+    
+    if (!threads || threads.length === 0) {
+      return ContentService.createTextOutput(JSON.stringify({
+        ok: true,
+        hasReply: false,
+        foundThread: false,
+        ticketId: ticketId,
+        message: 'No se encontró ningún correo con esta referencia en Gmail.'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var thread = threads[0];
+    var messages = thread.getMessages();
+    var firstSubject = thread.getFirstMessageSubject();
+
+    // Comprobar si hay respuesta (más de 1 mensaje en el hilo o mensaje de otro remitente)
+    var replyMsg = null;
+    if (messages.length > 1) {
+      replyMsg = messages[messages.length - 1];
+    } else if (messages.length === 1) {
+      var fromSender = messages[0].getFrom().toLowerCase();
+      if (fromSender.indexOf('penalosmaulas@gmail.com') === -1) {
+        replyMsg = messages[0];
+      }
+    }
+
+    if (!replyMsg) {
+      return ContentService.createTextOutput(JSON.stringify({
+        ok: true,
+        hasReply: false,
+        foundThread: true,
+        ticketId: ticketId,
+        subject: firstSubject,
+        messagesCount: messages.length,
+        sentDate: messages[0].getDate().toISOString(),
+        message: 'El correo de sellado fue enviado, pero la administración aún no ha respondido.'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Procesar adjuntos del resguardo (PDF, JPG, PNG...)
+    var attachments = replyMsg.getAttachments();
+    var attList = [];
+    
+    for (var i = 0; i < attachments.length; i++) {
+      var att = attachments[i];
+      var cType = att.getContentType();
+      var size = att.getBytes().length;
+      var dataUri = null;
+      
+      // Si pesa menos de 3.5 MB generamos data URI para preview visual inmediato
+      if (size < 3.5 * 1024 * 1024) {
+        dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(att.getBytes());
+      }
+      
+      attList.push({
+        name: att.getName(),
+        contentType: cType,
+        size: size,
+        dataUri: dataUri
+      });
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({
+      ok: true,
+      hasReply: true,
+      foundThread: true,
+      ticketId: ticketId,
+      subject: replyMsg.getSubject(),
+      from: replyMsg.getFrom(),
+      date: replyMsg.getDate().toISOString(),
+      body: replyMsg.getPlainBody().substring(0, 1500),
+      attachmentsCount: attachments.length,
+      attachments: attList
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      ok: false,
+      error: 'Error consultando respuesta: ' + err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
 }</pre>
                             </div>
                         </div>
@@ -287,6 +412,76 @@ function doGet(e) {
                         <button onclick="SandboxManager.descargarTXT()" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-700">
                             <span>📥</span> Solo Descargar .TXT
                         </button>
+                    </div>
+                </div>
+
+                <!-- ==================== MONITOR DE RESPUESTA Y RECEPCIÓN DE RESGUARDO ==================== -->
+                <div class="mt-4 pt-4 border-t border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-sm">📬</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">Respuesta de la Administración</span>
+                        </div>
+                        <span id="badge-estado-sellado" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                            ⚪ Sin enviar
+                        </span>
+                    </div>
+
+                    <!-- Controles de Comprobación -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <button id="btn-comprobar-respuesta" onclick="SandboxManager.comprobarRespuestaLotero()" class="flex-1 py-2 px-3 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <span id="icon-spinner-respuesta">🔄</span> Comprobar Respuesta en Gmail
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <label class="flex items-center gap-1.5 text-[11px] text-slate-400 select-none cursor-pointer bg-slate-900/90 px-2.5 py-1.5 rounded-lg border border-slate-800 hover:text-slate-200">
+                                <input type="checkbox" id="check-auto-poll" onchange="SandboxManager.toggleAutoPolling(this.checked)" class="rounded bg-slate-950 border-slate-700 text-blue-500 focus:ring-0">
+                                <span class="font-mono">Auto 30s</span>
+                            </label>
+                            <button onclick="SandboxManager.simularRespuestaLoteroDemo()" title="Probar visualización de resguardo con datos de prueba" class="py-1.5 px-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-[10px] text-slate-400 hover:text-amber-300 border border-slate-700 font-mono">
+                                🧪 Demo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje informativo de estado / última comprobación -->
+                    <div id="box-status-info" class="text-[11px] text-slate-400 bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                        <span id="txt-status-info">No se ha enviado ningún correo para esta jornada aún.</span>
+                        <span id="txt-last-checked" class="font-mono text-[10px] text-slate-500"></span>
+                    </div>
+
+                    <!-- Panel de Respuesta Recibida y Resguardo Oficial -->
+                    <div id="panel-resguardo-recibido" class="hidden p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/40 text-xs space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-emerald-500/20">
+                            <div class="flex items-center gap-1.5 text-emerald-400 font-black">
+                                <span>🟢</span> SELLADO CONFIRMADO POR ADMINISTRACIÓN
+                            </div>
+                            <span id="lbl-reply-time" class="font-mono text-[10px] text-emerald-300/80"></span>
+                        </div>
+
+                        <div class="space-y-1.5 text-[11px]">
+                            <div class="flex items-start justify-between gap-2">
+                                <span class="text-slate-400 font-bold">De:</span>
+                                <span id="lbl-reply-from" class="text-slate-200 font-mono text-right truncate max-w-[200px]"></span>
+                            </div>
+                            <div class="flex items-start justify-between gap-2">
+                                <span class="text-slate-400 font-bold">Asunto:</span>
+                                <span id="lbl-reply-subject" class="text-slate-200 text-right font-medium"></span>
+                            </div>
+                            <div class="pt-1.5">
+                                <span class="text-slate-400 font-bold block mb-1">Mensaje del Lotero:</span>
+                                <div id="lbl-reply-body" class="p-2 rounded bg-slate-950/80 border border-slate-800 font-sans text-slate-200 text-xs whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto"></div>
+                            </div>
+                        </div>
+
+                        <!-- Sección de Resguardos Adjuntos -->
+                        <div id="sec-adjuntos-resguardo" class="pt-2 border-t border-emerald-500/20 space-y-2">
+                            <span class="text-[11px] font-bold text-emerald-300 flex items-center gap-1">
+                                <span>🧾</span> Resguardo Oficial Recibido:
+                            </span>
+                            <div id="list-adjuntos-resguardo" class="space-y-2">
+                                <!-- Render dinámico de imágenes/PDFs -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -466,9 +661,15 @@ function doGet(e) {
             doblesDetalle: [],
             currentTab: 'txt',
             p15Oficial: '10',
+            ticketIdActual: null,
+            selladoRecord: null,
+            pollingInterval: null,
 
             init() {
                 this.checkAuth();
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') this.cerrarModalResguardo();
+                });
             },
 
             checkAuth() {
@@ -633,6 +834,7 @@ function doGet(e) {
             },
 
             cambiarJornada(val) {
+                this.ticketIdActual = null;
                 this.apuestasGeneradas = [];
                 this.sociosDetalle = [];
                 this.doblesDetalle = [];
@@ -992,11 +1194,22 @@ function doGet(e) {
                     txtFileStats.textContent = `Mostrando 35 apuestas preparadas para terminal SELAE / LotoGestión (P15 unificado: ${this.p15Oficial || '10'}):`;
                 }
 
-                // Actualizar nombre de adjunto
+                // Actualizar identificador único oficial y nombre de adjunto
+                if (!this.ticketIdActual) {
+                    this.ticketIdActual = this.generarIdentificadorBoleto();
+                }
+                const ticketId = this.ticketIdActual;
+                const fileName = `${ticketId}.txt`;
+                const labelTicket = document.getElementById('label-ticket-id');
+                if (labelTicket) {
+                    labelTicket.textContent = ticketId;
+                }
                 const labelAdjunto = document.getElementById('label-attachment-name');
                 if (labelAdjunto) {
-                    labelAdjunto.textContent = `Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`;
+                    labelAdjunto.textContent = fileName;
                 }
+
+                this.cargarEstadoSelladoJornada();
 
                 // 1. Render Tab TXT
                 const outputBox = document.getElementById('code-output');
@@ -1088,18 +1301,50 @@ function doGet(e) {
                 return this.apuestasGeneradas.map(a => a.linea).join('\r\n');
             },
 
+            obtenerCodigoTemporada() {
+                let seasonStr = (this.jornadaObj && this.jornadaObj.season) || (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
+                const digits = seasonStr.replace(/\D/g, '');
+                if (digits.length === 8) {
+                    return digits.slice(2, 4) + digits.slice(6, 8); // "20262027" -> "2627"
+                }
+                if (digits.length === 4) {
+                    return digits;
+                }
+                return '2627';
+            },
+
+            generarIdentificadorBoleto(date = new Date()) {
+                const seasonCode = this.obtenerCodigoTemporada();
+                const jNum = parseInt(this.jornadaActual, 10);
+                const jPad = isNaN(jNum) ? String(this.jornadaActual) : String(jNum).padStart(2, '0');
+                
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                const hh = String(date.getHours()).padStart(2, '0');
+                const min = String(date.getMinutes()).padStart(2, '0');
+                
+                const timestamp = `${yyyy}${mm}${dd}_${hh}${min}`;
+                return `MAULAS-${seasonCode}-${timestamp}-J${jPad}`;
+            },
+
+            obtenerNombreFicheroBoleto(date = new Date()) {
+                return `${this.generarIdentificadorBoleto(date)}.txt`;
+            },
+
             descargarTXT() {
                 const contenido = this.getTxtContent();
                 const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
+                const fileName = this.obtenerNombreFicheroBoleto();
                 a.href = url;
-                a.download = `Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`;
+                a.download = fileName;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                this.log(`Archivo descargado con éxito: Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`, 'success');
+                this.log(`Archivo descargado con éxito: ${fileName}`, 'success');
             },
 
             async copiarPortapapeles() {
@@ -1167,13 +1412,15 @@ function doGet(e) {
             abrirGmailWeb() {
                 const destino = (document.getElementById('input-asla-email').value || '').trim();
                 const p15 = this.p15Oficial || '10';
-                const asunto = encodeURIComponent(`[Peña Los Maulas] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
-                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo con los pronósticos oficiales de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\nTotal apuestas: 35 columnas simples (Soporte Digital / ASD)\nPleno al 15 unificado: ${p15}\nImporte oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
+                const ticketId = this.generarIdentificadorBoleto();
+                const fileName = `${ticketId}.txt`;
+                const asunto = encodeURIComponent(`[${ticketId}] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
+                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia oficial: ${ticketId}\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 unificado: ${p15}\n- Importe oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
                 
                 this.descargarTXT();
                 const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(destino)}&su=${asunto}&body=${cuerpo}`;
                 window.open(url, '_blank');
-                this.log(`Descargado .txt y abierto compositor de Gmail Web para ${destino}. Solo arrastra el archivo.`, 'info');
+                this.log(`Descargado ${fileName} y abierto compositor de Gmail Web para ${destino}. Solo arrastra el archivo.`, 'info');
             },
 
             async enviarCorreoReal() {
@@ -1201,14 +1448,19 @@ function doGet(e) {
                 }
 
                 const p15 = this.p15Oficial || '10';
-                const fileName = `Jornada_${this.jornadaActual}_PenalosMaulas_35_apuestas.txt`;
+                if (!this.ticketIdActual) {
+                    this.ticketIdActual = this.generarIdentificadorBoleto();
+                }
+                const ticketId = this.ticketIdActual;
+                const fileName = `${ticketId}.txt`;
                 const fileContent = this.getTxtContent();
-                const subject = `[Peña Los Maulas] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (P15: ${p15})`;
-                const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15}\n- Importe oficial: 26,25 € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo.\n\nSaludos,\nPeña Los Maulas`;
+                const subject = `[${ticketId}] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (P15: ${p15})`;
+                const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia de sellado: ${ticketId}\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15}\n- Importe oficial: 26,25 € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo indicando esta misma referencia.\n\nSaludos,\nPeña Los Maulas`;
 
                 btn.disabled = true;
                 btn.innerHTML = `<span>⏳</span> Conectando con Google Apps Script...`;
                 this.log(`Iniciando envío de correo real desde Penalosmaulas@gmail.com hacia ${destino}...`);
+                this.log(`Referencia oficial de sellado generada: ${ticketId}`);
 
                 try {
                     const payload = {
@@ -1216,7 +1468,9 @@ function doGet(e) {
                         subject: subject,
                         body: body,
                         fileName: fileName,
-                        fileContent: fileContent
+                        fileContent: fileContent,
+                        ticketId: ticketId,
+                        jornada: this.jornadaActual
                     };
 
                     // Content-Type text/plain evita el preflight CORS OPTIONS que Google Apps Script no soporta
@@ -1242,7 +1496,20 @@ function doGet(e) {
                             btn.innerHTML = `<span>🚀</span> Enviar Pronósticos por Correo Real con .TXT Adjunto`;
                         }, 4000);
 
-                        alert(`¡CORREO REAL ENVIADO CON ÉXITO!\n\nSe ha enviado el archivo "${fileName}" con las 35 apuestas (P15: ${p15}) desde Penalosmaulas@gmail.com a:\n\n👉 ${destino}\n\nRevisa tu bandeja de entrada.`);
+                        // Guardar registro de sellado en localStorage
+                        this.selladoRecord = {
+                            ticketId: ticketId,
+                            jornada: this.jornadaActual,
+                            enviadoEn: new Date().toISOString(),
+                            destino: destino,
+                            p15: p15,
+                            status: 'ENVIADO',
+                            respuesta: null
+                        };
+                        localStorage.setItem(`maulas_sellado_j_${this.jornadaActual}`, JSON.stringify(this.selladoRecord));
+                        this.actualizarMonitorRespuesta(this.selladoRecord);
+
+                        alert(`¡CORREO REAL ENVIADO CON ÉXITO!\n\nSe ha enviado el archivo:\n"${fileName}"\n\nReferencia oficial: ${ticketId}\n\nCon las 35 apuestas (P15: ${p15}) desde Penalosmaulas@gmail.com a:\n\n👉 ${destino}\n\nPuedes pulsar 'Comprobar Respuesta' o activar el modo automático (30s) en el monitor de abajo para recibir el resguardo.`);
                     } else {
                         const errMsg = (data && data.error) ? data.error : `HTTP ${res.status}`;
                         throw new Error(errMsg);
@@ -1253,6 +1520,337 @@ function doGet(e) {
                     btn.innerHTML = `<span>⚠️</span> Error - Reintentar Envío`;
                     alert(`Hubo un problema al conectar con Google Apps Script:\n\n${err.message}\n\nAsegúrate de que la aplicación web esté desplegada con acceso para "Cualquiera" (Anyone) en script.google.com.`);
                 }
+            },
+
+            cargarEstadoSelladoJornada() {
+                const key = `maulas_sellado_j_${this.jornadaActual}`;
+                const raw = localStorage.getItem(key);
+                if (raw) {
+                    try {
+                        this.selladoRecord = JSON.parse(raw);
+                        if (this.selladoRecord && this.selladoRecord.ticketId) {
+                            this.ticketIdActual = this.selladoRecord.ticketId;
+                        }
+                    } catch(e) {
+                        this.selladoRecord = null;
+                    }
+                } else {
+                    this.selladoRecord = null;
+                }
+
+                this.actualizarMonitorRespuesta(this.selladoRecord);
+            },
+
+            actualizarMonitorRespuesta(record) {
+                const badge = document.getElementById('badge-estado-sellado');
+                const txtInfo = document.getElementById('txt-status-info');
+                const panelResguardo = document.getElementById('panel-resguardo-recibido');
+
+                if (!badge || !txtInfo || !panelResguardo) return;
+
+                if (!record) {
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700';
+                    badge.textContent = `⚪ Sin enviar (J${this.jornadaActual})`;
+                    txtInfo.textContent = `No se ha enviado ningún correo para esta jornada aún.`;
+                    panelResguardo.classList.add('hidden');
+                    return;
+                }
+
+                if (record.status === 'ENVIADO') {
+                    const hora = new Date(record.enviadoEn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-400 border border-blue-500/40 animate-pulse';
+                    badge.textContent = `🔵 Enviado (${hora}) - Esperando`;
+                    txtInfo.innerHTML = `Enviado a <strong class="text-slate-200">${record.destino}</strong> a las ${hora}. Esperando confirmación y resguardo del lotero.`;
+                    panelResguardo.classList.add('hidden');
+                } else if (record.status === 'CONFIRMADO') {
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+                    badge.textContent = `🟢 Confirmado por Administración`;
+                    txtInfo.innerHTML = `<span class="text-emerald-400 font-bold">¡Sellado confirmado oficialmente!</span> Resguardo recibido y verificado.`;
+                    
+                    this.renderizarPanelResguardo(record.respuesta || {});
+                    panelResguardo.classList.remove('hidden');
+                }
+            },
+
+            renderizarPanelResguardo(resp) {
+                const lblFrom = document.getElementById('lbl-reply-from');
+                const lblSubject = document.getElementById('lbl-reply-subject');
+                const lblTime = document.getElementById('lbl-reply-time');
+                const lblBody = document.getElementById('lbl-reply-body');
+                const listAdjuntos = document.getElementById('list-adjuntos-resguardo');
+
+                if (lblFrom) lblFrom.textContent = resp.from || 'Administración de Lotería';
+                if (lblSubject) lblSubject.textContent = resp.subject || `Sellado Jornada ${this.jornadaActual}`;
+                if (lblTime) {
+                    const dateStr = resp.date ? new Date(resp.date).toLocaleString() : new Date().toLocaleString();
+                    lblTime.textContent = dateStr;
+                }
+                if (lblBody) {
+                    lblBody.textContent = resp.body || 'Sin mensaje de texto adicional.';
+                }
+
+                if (listAdjuntos) {
+                    const atts = resp.attachments || [];
+                    if (atts.length === 0) {
+                        listAdjuntos.innerHTML = `<p class="text-slate-400 italic text-[11px]">No se detectaron archivos adjuntos en el mensaje de respuesta.</p>`;
+                    } else {
+                        listAdjuntos.innerHTML = atts.map((att, idx) => {
+                            const isImage = (att.contentType && att.contentType.startsWith('image/')) || /\.(jpe?g|png|webp|svg)/i.test(att.name);
+                            const isPdf = (att.contentType && att.contentType.includes('pdf')) || /\.pdf$/i.test(att.name);
+                            const sizeKb = att.size ? (att.size / 1024).toFixed(1) + ' KB' : '';
+
+                            if (isImage && att.dataUri) {
+                                return `
+                                    <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 flex flex-col sm:flex-row items-center gap-3">
+                                        <div class="relative group cursor-pointer overflow-hidden rounded-lg border border-slate-700 w-full sm:w-28 h-24 bg-black/60 flex items-center justify-center shrink-0" onclick="SandboxManager.abrirModalResguardo('${att.dataUri}', '${att.name}')">
+                                            <img src="${att.dataUri}" alt="${att.name}" class="object-cover w-full h-full group-hover:scale-105 transition duration-200">
+                                            <span class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
+                                                🔍 Ampliar
+                                            </span>
+                                        </div>
+                                        <div class="flex-1 text-center sm:text-left space-y-1 min-w-0">
+                                            <div class="text-slate-200 font-bold text-xs truncate">${att.name}</div>
+                                            <div class="text-slate-400 text-[10px] font-mono">${att.contentType || 'image'} • ${sizeKb}</div>
+                                            <div class="flex items-center gap-2 pt-1 justify-center sm:justify-start">
+                                                <button onclick="SandboxManager.abrirModalResguardo('${att.dataUri}', '${att.name}')" class="px-2 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-[11px] font-bold border border-emerald-500/40 flex items-center gap-1 transition">
+                                                    <span>🔍</span> Ver a Tamaño Completo
+                                                </button>
+                                                <a href="${att.dataUri}" download="${att.name}" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 flex items-center gap-1 transition">
+                                                    <span>📥</span> Descargar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                return `
+                                    <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2 overflow-hidden">
+                                            <span class="text-xl">${isPdf ? '📄' : '📎'}</span>
+                                            <div class="truncate">
+                                                <div class="text-slate-200 font-bold text-xs truncate">${att.name}</div>
+                                                <div class="text-slate-400 text-[10px] font-mono">${att.contentType || 'archivo'} • ${sizeKb}</div>
+                                            </div>
+                                        </div>
+                                        ${att.dataUri ? `<a href="${att.dataUri}" download="${att.name}" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 font-bold text-[11px] border border-blue-500/40 flex items-center gap-1 shrink-0 transition"><span>📥</span> Descargar</a>` : ''}
+                                    </div>
+                                `;
+                            }
+                        }).join('');
+                    }
+                }
+            },
+
+            async comprobarRespuestaLotero(silencioso = false) {
+                const webhookUrl = (document.getElementById('input-webhook-url').value || '').trim();
+                const btn = document.getElementById('btn-comprobar-respuesta');
+                const spinner = document.getElementById('icon-spinner-respuesta');
+                const txtLastChecked = document.getElementById('txt-last-checked');
+                const txtStatusInfo = document.getElementById('txt-status-info');
+
+                if (!webhookUrl) {
+                    if (!silencioso) {
+                        alert('Por favor, introduce primero la URL de tu Webhook de Google Apps Script arriba.');
+                        const inp = document.getElementById('input-webhook-url');
+                        if (inp) inp.focus();
+                    }
+                    return;
+                }
+
+                const ticketId = (this.selladoRecord && this.selladoRecord.ticketId) || this.ticketIdActual || this.generarIdentificadorBoleto();
+
+                if (btn) btn.disabled = true;
+                if (spinner) spinner.classList.add('animate-spin');
+
+                if (!silencioso) {
+                    this.log(`Consultando en Gmail si la administración respondió para ${ticketId}...`);
+                }
+
+                try {
+                    const res = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: 'check_reply',
+                            ticketId: ticketId,
+                            jornada: this.jornadaActual
+                        })
+                    });
+
+                    const data = await res.json();
+                    const now = new Date().toLocaleTimeString();
+                    if (txtLastChecked) txtLastChecked.textContent = `Comprobado: ${now}`;
+
+                    if (data && data.ok) {
+                        if (data.hasReply) {
+                            this.log(`✅ ¡Confirmación recibida de la administración! De: ${data.from}`, 'success');
+                            if (!this.selladoRecord) {
+                                this.selladoRecord = {
+                                    ticketId: ticketId,
+                                    jornada: this.jornadaActual,
+                                    enviadoEn: new Date().toISOString(),
+                                    destino: data.from
+                                };
+                            }
+                            this.selladoRecord.status = 'CONFIRMADO';
+                            this.selladoRecord.respuesta = data;
+                            this.selladoRecord.confirmadoEn = new Date().toISOString();
+                            localStorage.setItem(`maulas_sellado_j_${this.jornadaActual}`, JSON.stringify(this.selladoRecord));
+
+                            this.actualizarMonitorRespuesta(this.selladoRecord);
+                            this.toggleAutoPolling(false);
+
+                            if (!silencioso) {
+                                alert(`¡SELLADO CONFIRMADO POR LA ADMINISTRACIÓN!\n\nRemitente: ${data.from}\nAsunto: ${data.subject}\n\nAdjuntos recibidos: ${data.attachmentsCount || (data.attachments ? data.attachments.length : 0)}\n\nRevisa el panel de resguardo.`);
+                            }
+                        } else {
+                            if (data.foundThread) {
+                                if (!silencioso) {
+                                    this.log(`⏳ Correo de sellado localizado en Gmail (${data.messagesCount || 1} msg). La administración aún no ha contestado.`, 'info');
+                                }
+                                if (txtStatusInfo) {
+                                    txtStatusInfo.innerHTML = `Correo entregado en Gmail (${now}). Esperando que el lotero valide y responda con el resguardo.`;
+                                }
+                                const badge = document.getElementById('badge-estado-sellado');
+                                if (badge) {
+                                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40 animate-pulse';
+                                    badge.textContent = `⏳ Esperando Lotero (${now})`;
+                                }
+                            } else {
+                                if (!silencioso) {
+                                    this.log(`ℹ️ No se ha encontrado ningún correo con referencia ${ticketId} en Gmail todavía.`, 'warning');
+                                }
+                                if (txtStatusInfo) {
+                                    txtStatusInfo.innerHTML = `No se localizó ningún correo con referencia <strong class="text-slate-300 font-mono">${ticketId}</strong> en Gmail.`;
+                                }
+                            }
+                        }
+                    } else {
+                        const errMsg = (data && data.error) ? data.error : 'Respuesta no válida del webhook';
+                        throw new Error(errMsg);
+                    }
+                } catch(err) {
+                    this.log(`Error al consultar respuesta en Gmail: ${err.message}`, 'error');
+                    if (!silencioso) {
+                        alert(`Error al consultar respuesta:\n\n${err.message}\n\nAsegúrate de haber actualizado el código en Google Apps Script con la nueva versión y desplegado una Nueva Versión.`);
+                    }
+                } finally {
+                    if (btn) btn.disabled = false;
+                    if (spinner) spinner.classList.remove('animate-spin');
+                }
+            },
+
+            toggleAutoPolling(active) {
+                const chk = document.getElementById('check-auto-poll');
+                if (chk) chk.checked = active;
+
+                if (this.pollingInterval) {
+                    clearInterval(this.pollingInterval);
+                    this.pollingInterval = null;
+                }
+
+                if (active) {
+                    this.log('Comprobación automática cada 30 segundos ACTIVADA.', 'info');
+                    this.comprobarRespuestaLotero(true);
+                    this.pollingInterval = setInterval(() => {
+                        this.comprobarRespuestaLotero(true);
+                    }, 30000);
+                } else {
+                    this.log('Comprobación automática desactivada.', 'info');
+                }
+            },
+
+            simularRespuestaLoteroDemo() {
+                const jNum = parseInt(this.jornadaActual, 10);
+                const jPad = isNaN(jNum) ? '00' : String(jNum).padStart(2, '0');
+                const ticketId = this.ticketIdActual || this.generarIdentificadorBoleto();
+                
+                // Generar resguardo SVG oficial simulado
+                const svgTicket = `<svg xmlns="http://www.w3.org/2000/svg" width="440" height="620" viewBox="0 0 440 620">
+                    <rect width="440" height="620" fill="#fdfbf7" rx="12"/>
+                    <rect x="15" y="15" width="410" height="590" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="6,4"/>
+                    <circle cx="220" cy="55" r="22" fill="#2563eb"/>
+                    <text x="220" y="62" font-family="Arial, sans-serif" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle">1X2</text>
+                    <text x="220" y="95" font-family="'Courier New', monospace" font-size="16" font-weight="900" fill="#1e3a8a" text-anchor="middle">LOTERÍAS Y APUESTAS DEL ESTADO</text>
+                    <text x="220" y="115" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">LA QUINIELA - SOPORTE DIGITAL</text>
+                    <line x1="30" y1="130" x2="410" y2="130" stroke="#cbd5e1" stroke-width="1"/>
+                    <text x="35" y="150" font-family="'Courier New', monospace" font-size="12" fill="#334155">JORNADA: ${jPad} (TEMPORADA 2026-2027)</text>
+                    <text x="35" y="170" font-family="'Courier New', monospace" font-size="12" fill="#334155">REF: ${ticketId}</text>
+                    <text x="35" y="190" font-family="'Courier New', monospace" font-size="12" fill="#334155">APUESTAS: 35 COLUMNAS SIMPLES (ASD)</text>
+                    <text x="35" y="210" font-family="'Courier New', monospace" font-size="12" fill="#334155">PLENO AL 15: ${this.p15Oficial || '10'}</text>
+                    <line x1="30" y1="225" x2="410" y2="225" stroke="#cbd5e1" stroke-width="1"/>
+                    <text x="35" y="250" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a">IMPORTE TOTAL: 26,25 €</text>
+                    <text x="35" y="270" font-family="'Courier New', monospace" font-size="11" fill="#16a34a" font-weight="bold">PAGADO (SALDO EN DEPÓSITO PEÑA LOS MAULAS)</text>
+                    <rect x="35" y="285" width="370" height="180" fill="#f1f5f9" rx="6"/>
+                    <text x="50" y="310" font-family="'Courier New', monospace" font-size="11" fill="#475569">01: 1 X 2 1 1 X 1 2 1 X 2 1 1 X  P15: ${this.p15Oficial || '10'}</text>
+                    <text x="50" y="330" font-family="'Courier New', monospace" font-size="11" fill="#475569">02: 1 1 X 1 2 1 X 1 1 2 X 1 1 2  P15: ${this.p15Oficial || '10'}</text>
+                    <text x="50" y="350" font-family="'Courier New', monospace" font-size="11" fill="#475569">03: X 1 1 2 1 1 X 1 2 1 X 1 1 X  P15: ${this.p15Oficial || '10'}</text>
+                    <text x="50" y="370" font-family="'Courier New', monospace" font-size="11" fill="#475569">... [19 Columnas Individuales Socios]</text>
+                    <text x="50" y="390" font-family="'Courier New', monospace" font-size="11" fill="#2563eb">20-35: [16 Columnas Desarrolladas Dobles]</text>
+                    <text x="50" y="415" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#0f172a">CONTROL VALIDACIÓN: 84920-19402-99120-4491</text>
+                    <text x="50" y="440" font-family="'Courier New', monospace" font-size="10" fill="#64748b">TERMINAL: 41205 • ADMON 12 - LOTERÍA EL ROSARIO</text>
+                    <rect x="50" y="480" width="340" height="40" fill="#0f172a"/>
+                    <text x="220" y="540" font-family="'Courier New', monospace" font-size="12" font-weight="bold" fill="#0f172a" text-anchor="middle">VALIDACIÓN OFICIAL DE APUESTA SELAE</text>
+                    <text x="220" y="560" font-family="'Courier New', monospace" font-size="10" fill="#64748b" text-anchor="middle">Conserve este resguardo digital. Compruebe sus premios.</text>
+                    <rect x="250" y="145" width="150" height="65" fill="#fee2e2" stroke="#dc2626" stroke-width="2" rx="4" transform="rotate(-6 250 145)"/>
+                    <text x="325" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#dc2626" text-anchor="middle" transform="rotate(-6 250 145)">SELLADO OFICIAL</text>
+                    <text x="325" y="195" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#dc2626" text-anchor="middle" transform="rotate(-6 250 145)">TERMINAL SELAE</text>
+                </svg>`;
+                const svgBase64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgTicket)));
+
+                const mockResponse = {
+                    ok: true,
+                    hasReply: true,
+                    ticketId: ticketId,
+                    subject: `Re: [${ticketId}] Sellado Jornada ${this.jornadaActual} - 35 Apuestas`,
+                    from: 'Administración Lotería El Rosario <ventas@loteriaelrosario.es>',
+                    date: new Date().toISOString(),
+                    body: `Hola Peña Los Maulas,\n\nHemos procesado y sellado correctamente vuestro archivo digital para la Jornada ${this.jornadaActual} (${ticketId}).\n\n- Total: 35 apuestas validadas\n- Pleno al 15: ${this.p15Oficial || '10'}\n- Importe descontado: 26,25 €\n- Saldo restante en depósito: 128,50 €\n\nOs adjuntamos el resguardo emitido por el terminal SELAE. ¡Mucha suerte este fin de semana!\n\nLotería El Rosario`,
+                    attachmentsCount: 1,
+                    attachments: [
+                        {
+                            name: `resguardo_selae_j${jPad}_${ticketId}.png`,
+                            contentType: 'image/png',
+                            size: 142500,
+                            dataUri: svgBase64
+                        }
+                    ]
+                };
+
+                this.selladoRecord = {
+                    ticketId: ticketId,
+                    jornada: this.jornadaActual,
+                    enviadoEn: new Date(Date.now() - 300000).toISOString(),
+                    destino: 'ventas@loteriaelrosario.es',
+                    p15: this.p15Oficial || '10',
+                    status: 'CONFIRMADO',
+                    confirmadoEn: new Date().toISOString(),
+                    respuesta: mockResponse
+                };
+
+                localStorage.setItem(`maulas_sellado_j_${this.jornadaActual}`, JSON.stringify(this.selladoRecord));
+                this.actualizarMonitorRespuesta(this.selladoRecord);
+                this.log(`[Modo Demo] Simulación de respuesta de administración cargada con éxito para Jornada ${this.jornadaActual}.`, 'success');
+            },
+
+            abrirModalResguardo(dataUri, fileName) {
+                const modal = document.getElementById('modal-resguardo-visor');
+                const img = document.getElementById('modal-resguardo-img');
+                const tag = document.getElementById('modal-ticket-tag');
+                const dl = document.getElementById('modal-resguardo-download');
+
+                if (img) img.src = dataUri;
+                if (tag) tag.textContent = fileName || (this.selladoRecord && this.selladoRecord.ticketId) || '';
+                if (dl) {
+                    dl.href = dataUri;
+                    dl.download = fileName || 'resguardo_maulas.png';
+                }
+                if (modal) modal.classList.remove('hidden');
+            },
+
+            cerrarModalResguardo() {
+                const modal = document.getElementById('modal-resguardo-visor');
+                if (modal) modal.classList.add('hidden');
             },
 
             lanzarPasarelaLosilla() {
@@ -1275,5 +1873,26 @@ function doGet(e) {
             SandboxManager.init();
         });
     </script>
+    <!-- MODAL VISOR DE RESGUARDO OFICIAL A TAMAÑO COMPLETO -->
+    <div id="modal-resguardo-visor" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-3.5 px-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-emerald-400 font-bold">🧾 Resguardo Oficial SELAE</span>
+                    <span id="modal-ticket-tag" class="text-[11px] font-mono text-slate-400"></span>
+                </div>
+                <button onclick="SandboxManager.cerrarModalResguardo()" class="text-slate-400 hover:text-white p-1 px-2 rounded-lg hover:bg-slate-800 text-xs font-bold transition">✕ Cerrar (Esc)</button>
+            </div>
+            <div class="p-4 overflow-auto flex items-center justify-center bg-black/40 min-h-[300px]">
+                <img id="modal-resguardo-img" src="" alt="Resguardo Oficial" class="max-w-full max-h-[70vh] object-contain rounded-lg border border-slate-800 shadow-lg">
+            </div>
+            <div class="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs">
+                <span class="text-slate-400">Comprueba el código de validación y sello del terminal</span>
+                <a id="modal-resguardo-download" href="#" download="resguardo_maulas.png" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center gap-1.5 transition">
+                    <span>📥</span> Descargar Imagen
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

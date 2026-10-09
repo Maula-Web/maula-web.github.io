@@ -1056,25 +1056,46 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
   - Para que un boleto múltiple o bloque de apuestas sea admitido por el terminal oficial de SELAE, **las 35 columnas deben compartir obligatoriamente el mismo Pleno al 15**.
   - **Prioridad de la Quiniela de Dobles**: El Pleno al 15 canónico del fichero oficial a sellar se extrae de la **Quiniela de Dobles** (`pronosticosExtra`).
   - **Preservación del PIG (Partido de Interés General)**: Si en la jornada el partido 15 es un PIG y los socios han introducido pronósticos dispares en la web para disputar sus puntos de liga y penalizaciones internas, dichos pronósticos personales se mantienen intactos en la base de datos para la clasificación interna. Únicamente al compilar el fichero oficial `.txt`, las 19 columnas de los socios y las 16 de dobles se ensamblan con el Pleno al 15 de los dobles.
-- **Arquitectura de Envío Autónomo en 1 Clic (Google Apps Script Webhook)**:
-  - Al ser la web de Los Maulas una aplicación estática alojada en GitHub Pages, los navegadores no pueden enviar correos SMTP directamente ni adjuntar archivos locales vía `mailto:` por motivos de seguridad del sistema operativo.
-  - **Solución implementada**: Un microservicio en la nube 100% gratuito utilizando **Google Apps Script** vinculado a la cuenta oficial **`Penalosmaulas@gmail.com`**.
-  - **Código del Webhook (`doPost`)**:
+- **Identificador Único y Formato Oficial de Sellado (`ticketId`)**:
+  - Para garantizar trazabilidad absoluta, rápida identificación y ordenación cronológica natural sin ambigüedades entre temporadas, cada envío genera un identificador estandarizado:
+    - **Patrón oficial**: `MAULAS-[TEMPORADA]-[YYYYMMDD_HHMM]-J[XX]`
+    - **Ejemplo**: `MAULAS-2627-20261009_1840-J03`
+    - **Fichero adjunto**: `MAULAS-2627-20261009_1840-J03.txt`
+    - **Asunto del correo**: `[MAULAS-2627-20261009_1840-J03] Sellado Jornada 3 - 35 Apuestas (P15: 10)`
+    - **Razón del orden**: Al comenzar con `MAULAS-2627` seguido de la fecha ISO `YYYYMMDD_HHMM`, los archivos y correos se ordenan cronológicamente en Windows y Google Drive sin mezclar jornadas de distintas temporadas jugadas en el mismo año natural (ene-jun).
+- **Arquitectura Bidireccional de Envío y Recepción (Google Apps Script Webhook)**:
+  - Al ser la web de Los Maulas una aplicación estática alojada en GitHub Pages, los navegadores no pueden enviar correos SMTP directamente ni leer bandejas IMAP sin un backend.
+  - **Solución implementada**: Un microservicio en la nube 100% gratuito utilizando **Google Apps Script** vinculado a la cuenta oficial **`Penalosmaulas@gmail.com`**, que realiza tanto el **envío** como la **consulta de respuestas del lotero**.
+  - **Mecanismo de Recepción de la Administración**:
+    1. La administración de lotería valida el `.txt` en su terminal SELAE y responde al correo de `Penalosmaulas@gmail.com` adjuntando el resguardo oficial (PDF o fotografía/escaneo del ticket físico).
+    2. Google Apps Script busca en Gmail el hilo correspondiente al identificador `[MAULAS-...-JXX]`.
+    3. Si detecta la respuesta, extrae el remitente, fecha, mensaje del lotero y procesa los archivos adjuntos. Si el resguardo es una imagen o PDF menor a 3.5 MB, genera una URI `base64` para renderizar el resguardo directamente en el navegador con zoom a pantalla completa.
+  - **Código Completo del Webhook (`doPost` y `doGet`)**:
     ```javascript
     function doPost(e) {
       try {
         var data = JSON.parse(e.postData.contents);
+        
+        // CASO 1: CONSULTAR RESPUESTA DE LA ADMINISTRACIÓN EN GMAIL
+        if (data.action === 'check_reply') {
+          return procesarConsultaRespuesta(data.ticketId, data.jornada);
+        }
+        
+        // CASO 2: ENVIAR FICHERO .TXT DE 35 APUESTAS POR CORREO REAL
         var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName);
         GmailApp.sendEmail(data.to, data.subject, data.body, {
           name: 'Peña Los Maulas',
           attachments: [blob]
         });
+        
         return ContentService.createTextOutput(JSON.stringify({ 
           ok: true, 
           sentAt: new Date().toISOString(),
           to: data.to,
-          fileName: data.fileName
+          fileName: data.fileName,
+          ticketId: data.ticketId || null
         })).setMimeType(ContentService.MimeType.JSON);
+
       } catch (err) {
         return ContentService.createTextOutput(JSON.stringify({ 
           ok: false, 
@@ -1082,12 +1103,115 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
         })).setMimeType(ContentService.MimeType.JSON);
       }
     }
+
+    function doGet(e) {
+      var action = e && e.parameter && e.parameter.action;
+      var ticketId = e && e.parameter && e.parameter.ticketId;
+      var jornada = e && e.parameter && e.parameter.jornada;
+      
+      if (action === 'check_reply') {
+        return procesarConsultaRespuesta(ticketId, jornada);
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify({ 
+        status: 'online', 
+        service: 'Peña Los Maulas - Pasarela de Sellado y Recepción Digital',
+        account: 'Penalosmaulas@gmail.com'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    function procesarConsultaRespuesta(ticketId, jornada) {
+      try {
+        var query = '';
+        if (ticketId) {
+          query = 'subject:"' + ticketId + '"';
+        } else if (jornada) {
+          var jPad = ('0' + jornada).slice(-2);
+          query = 'subject:"[MAULAS-" (subject:"-J' + jPad + '" OR subject:"Jornada ' + jornada + '") newer_than:7d';
+        } else {
+          query = 'subject:"[MAULAS-" newer_than:7d';
+        }
+
+        var threads = GmailApp.search(query, 0, 5);
+        if (!threads || threads.length === 0) {
+          return ContentService.createTextOutput(JSON.stringify({
+            ok: true,
+            hasReply: false,
+            foundThread: false,
+            ticketId: ticketId,
+            message: 'No se encontró ningún correo con esta referencia en Gmail.'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        var thread = threads[0];
+        var messages = thread.getMessages();
+        var replyMsg = null;
+        if (messages.length > 1) {
+          replyMsg = messages[messages.length - 1];
+        } else if (messages.length === 1) {
+          var fromSender = messages[0].getFrom().toLowerCase();
+          if (fromSender.indexOf('penalosmaulas@gmail.com') === -1) {
+            replyMsg = messages[0];
+          }
+        }
+
+        if (!replyMsg) {
+          return ContentService.createTextOutput(JSON.stringify({
+            ok: true,
+            hasReply: false,
+            foundThread: true,
+            ticketId: ticketId,
+            subject: thread.getFirstMessageSubject(),
+            messagesCount: messages.length,
+            sentDate: messages[0].getDate().toISOString(),
+            message: 'El correo de sellado fue enviado, pero la administración aún no ha respondido.'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        var attachments = replyMsg.getAttachments();
+        var attList = [];
+        for (var i = 0; i < attachments.length; i++) {
+          var att = attachments[i];
+          var cType = att.getContentType();
+          var size = att.getBytes().length;
+          var dataUri = null;
+          if (size < 3.5 * 1024 * 1024) {
+            dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(att.getBytes());
+          }
+          attList.push({
+            name: att.getName(),
+            contentType: cType,
+            size: size,
+            dataUri: dataUri
+          });
+        }
+
+        return ContentService.createTextOutput(JSON.stringify({
+          ok: true,
+          hasReply: true,
+          foundThread: true,
+          ticketId: ticketId,
+          subject: replyMsg.getSubject(),
+          from: replyMsg.getFrom(),
+          date: replyMsg.getDate().toISOString(),
+          body: replyMsg.getPlainBody().substring(0, 1500),
+          attachmentsCount: attachments.length,
+          attachments: attList
+        })).setMimeType(ContentService.MimeType.JSON);
+
+      } catch (err) {
+        return ContentService.createTextOutput(JSON.stringify({
+          ok: false,
+          error: 'Error consultando respuesta: ' + err.toString()
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
     ```
-  - **Técnica de evasión de CORS preflight**: La llamada desde el navegador se realiza mediante `fetch` con `Content-Type: text/plain;charset=utf-8`. Esto evita la petición `OPTIONS` (preflight CORS) que Google Apps Script rechaza, garantizando la entrega inmediata del correo con el adjunto `.txt`.
+  - **Técnica de evasión de CORS preflight**: La llamada desde el navegador se realiza mediante `fetch` con `Content-Type: text/plain;charset=utf-8`. Esto evita la petición `OPTIONS` (preflight CORS) que Google Apps Script rechaza, garantizando la entrega inmediata y la consulta fluida.
 - **Entorno de Pruebas (Sandbox)**:
   - Ubicación: `sandbox_sellado.html`.
   - Acceso restringido exclusivamente al socio Fernando Lozano.
-  - Dispone de selector de jornada en tiempo real (datos de Firestore), desglose visual con badges de color para los 19 socios y las 16 apuestas de dobles, persistencia en `localStorage` del webhook y destino de correo, y botón de envío directo verificado con éxito.
+  - Dispone de selector de jornada en tiempo real (datos de Firestore), desglose visual con badges de color para los 19 socios y las 16 apuestas de dobles, persistencia en `localStorage` del webhook, destino de correo e historial de sellado por jornada, botón de comprobación en tiempo real, modo de sondeo automático (cada 30s) y visor interactivo de resguardos oficiales con modal de pantalla completa.
 
 ---
 
