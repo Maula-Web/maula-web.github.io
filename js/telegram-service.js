@@ -570,14 +570,20 @@ window.TelegramService = {
             this._isCheckingHabemus = false;
         }
     },
-    async sendPardonNotification(forgiverName, forgivenName, jornadaNumber) {
+    async sendPardonNotification(forgiverName, forgivenName, jornadaNumber, reason = '') {
         if (!window.DataService) return;
         try {
             const config = await window.DataService.getAll('config');
             const tg = config.find(c => c.id === 'telegram');
             if (!tg || !tg.token || !tg.chatId) return;
 
-            const msg = `ℹ️ El socio *${forgiverName}* ha perdonado la sanción por sellar tarde de la *Jornada ${jornadaNumber}* al socio *${forgivenName}*.`;
+            const motivoStr = reason ? `\n📝 *Motivo / Justificación:* ${reason}` : '';
+            const msg = `🕊️ *INDULTO MAULA - PENALIZACIÓN ANULADA*\n\n` +
+                `👤 *Socio Indultado:* ${forgivenName}\n` +
+                `⚖️ *Indultado por:* ${forgiverName}\n` +
+                `📅 *Jornada:* ${jornadaNumber}` +
+                `${motivoStr}\n\n` +
+                `✨ _La sanción por entrega fuera de plazo ha sido retirada oficialmente de los registros._`;
             return await this.sendRaw(tg.token, tg.chatId, msg);
         } catch (e) {
             console.error("TelegramService (Pardon) Error:", e);

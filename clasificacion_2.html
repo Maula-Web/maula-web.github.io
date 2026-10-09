@@ -1053,7 +1053,7 @@
          DRAWER / MODAL LATERAL DE FICHA DEL SOCIO
          ===================================================================== -->
     <div id="member-drawer-modal" style="display: none;" onclick="if(event.target === this) window.ClasificacionApp.closeMemberDrawer()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] items-center justify-center p-3 sm:p-6">
-        <div class="glass-panel w-full max-w-3xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal bg-white dark:bg-slate-900">
+        <div class="glass-panel w-full max-w-5xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal bg-white dark:bg-slate-900">
             <!-- Cabecera de la Ficha -->
             <div class="bg-slate-100 dark:bg-slate-900/90 p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-3">
@@ -1389,7 +1389,8 @@
                         }
 
                         this.memberStats[m.id].jornadaData[j.id] = {
-                            hits, points, bonus, prize, isLate, isPardoned, potentialHits, pigHit
+                            hits, points, bonus, prize, isLate, isPardoned, potentialHits, pigHit,
+                            pardonReason: (p ? p.pardonReason : '') || ''
                         };
 
                         if (hits !== -1) {
@@ -2510,9 +2511,12 @@
                         `;
                     } else if (data.isPardoned) {
                         statusBadge = `
-                            <div class="inline-flex items-center gap-1.5 justify-center">
-                                <span class="text-amber-600 dark:text-amber-400 font-bold">Justificado 🕊️</span>
-                                <button onclick="window.ClasificacionApp.togglePardon('${j.id}', '${s.id}')" class="px-1.5 py-0.5 text-[10px] rounded bg-slate-500/20 text-slate-500 dark:text-slate-400 hover:bg-slate-500/30 transition font-bold cursor-pointer" title="Revocar justificación">Revocar</button>
+                            <div class="flex flex-col items-center justify-center gap-0.5">
+                                <div class="inline-flex items-center gap-1.5 justify-center">
+                                    <span class="text-amber-600 dark:text-amber-400 font-bold" title="${data.pardonReason ? 'Justificación: ' + data.pardonReason : 'Justificado oficialmente'}">Justificado 🕊️</span>
+                                    <button onclick="window.ClasificacionApp.togglePardon('${j.id}', '${s.id}')" class="px-1.5 py-0.5 text-[10px] rounded bg-slate-500/20 text-slate-500 dark:text-slate-400 hover:bg-slate-500/30 transition font-bold cursor-pointer" title="Modificar o revocar justificación">Modificar / Revocar</button>
+                                </div>
+                                ${data.pardonReason ? `<span class="text-[9px] text-slate-400 dark:text-slate-500 italic max-w-[150px] truncate" title="${data.pardonReason}">"${data.pardonReason}"</span>` : ''}
                             </div>
                         `;
                     }
@@ -2555,28 +2559,48 @@
                 }
 
                 const willPardon = !p.pardoned;
-                const actionMsg = willPardon
-                    ? '¿Deseas perdonar / indultar el retraso de este socio para que no sufra penalización?'
-                    : '¿Deseas revocar el indulto y reactivar la penalización por retraso?';
+                let finalReason = '';
 
-                if (!confirm(actionMsg)) return;
+                if (willPardon) {
+                    const reason = prompt('Indica el motivo o justificación de perdonar la sanción por retraso:\n(Ej: "Avisó antes del cierre", "Fallo técnico", "Acuerdo de socios", etc.)', p.pardonReason || '');
+                    if (reason === null) return; // Cancelado por el usuario
+                    finalReason = reason.trim() || 'Acuerdo de socios';
+                    p.pardoned = true;
+                    p.pardonReason = finalReason;
+                } else {
+                    const choice = prompt('Este retraso ya está indultado.\n\n- Escribe un nuevo motivo para actualizar la justificación.\n- O escribe "REVOCAR" para retirar el perdón y reactivar la sanción por retraso:', p.pardonReason || '');
+                    if (choice === null) return; // Cancelado
+                    if (choice.trim().toUpperCase() === 'REVOCAR') {
+                        p.pardoned = false;
+                        p.pardonReason = '';
+                        p.pardonedBy = '';
+                        p.pardonedAt = '';
+                    } else {
+                        finalReason = choice.trim() || 'Acuerdo de socios';
+                        p.pardonReason = finalReason;
+                    }
+                }
 
-                p.pardoned = willPardon;
                 try {
+                    const forgiverData = JSON.parse(sessionStorage.getItem('maulas_user') || '{}');
+                    const forgiverName = window.AppUtils ? window.AppUtils.getMemberName(forgiverData) : (forgiverData.name || 'Administración');
+                    if (p.pardoned) {
+                        p.pardonedBy = forgiverName;
+                        p.pardonedAt = new Date().toISOString();
+                    }
+
                     if (window.DataService) {
                         await window.DataService.save('pronosticos', p);
                     }
 
-                    if (willPardon && window.TelegramService) {
+                    if (p.pardoned && window.TelegramService) {
                         try {
-                            const forgiverData = JSON.parse(sessionStorage.getItem('maulas_user') || '{}');
-                            const forgiverName = window.AppUtils ? window.AppUtils.getMemberName(forgiverData) : (forgiverData.name || 'Administración');
                             const forgiven = this.seasonData && this.seasonData.members ? this.seasonData.members.find(m => String(m.id) === String(mId)) : null;
                             const forgivenName = forgiven && window.AppUtils ? window.AppUtils.getMemberName(forgiven) : (forgiven ? forgiven.name : 'Socio');
                             const jornada = this.seasonData && this.seasonData.jornadas ? this.seasonData.jornadas.find(j => String(j.id) === String(jId)) : null;
                             const jNum = jornada ? jornada.number : '?';
 
-                            await window.TelegramService.sendPardonNotification(forgiverName, forgivenName, jNum);
+                            await window.TelegramService.sendPardonNotification(forgiverName, forgivenName, jNum, p.pardonReason);
                         } catch (te) {
                             console.warn('Error enviando notificación Telegram de indulto:', te);
                         }

@@ -251,6 +251,7 @@ const ScoringSystem = {
         result.played = true;
         result.isLate = pronostico.late || false;
         result.isPardoned = pronostico.pardoned || false;
+        result.pardonReason = pronostico.pardonReason || '';
 
         const officialResults = jornada.matches ? jornada.matches.map(m => m.result) : [];
         const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);

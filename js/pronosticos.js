@@ -507,7 +507,15 @@ class PronosticoManager {
                     let lateBadgeHtml = '';
                     if (existing && existing.late) {
                         if (existing.pardoned) {
-                            lateBadgeHtml = `<div class="mt-2 flex items-center justify-center gap-2 flex-wrap"><span class="badge-late" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981;">🕊️ RETRASO INDULTADO / JUSTIFICADO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">Revocar Indulto</button></div>`;
+                            lateBadgeHtml = `
+                                <div class="mt-2 flex flex-col items-center justify-center gap-1">
+                                    <div class="flex items-center justify-center gap-2 flex-wrap">
+                                        <span class="badge-late" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981;">🕊️ RETRASO INDULTADO / JUSTIFICADO</span>
+                                        <button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">Modificar / Revocar</button>
+                                    </div>
+                                    ${existing.pardonReason ? `<div class="text-[10px] text-emerald-400 font-medium italic">Justificación: "${existing.pardonReason}"</div>` : ''}
+                                </div>
+                            `;
                         } else {
                             lateBadgeHtml = `<div class="mt-2 flex items-center justify-center gap-2 flex-wrap"><span class="badge-late">⚠️ PRONÓSTICO ENVIADO CON RETRASO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition flex items-center gap-1 cursor-pointer"><span>🕊️</span> Perdonar Retraso</button></div>`;
                         }
@@ -524,7 +532,15 @@ class PronosticoManager {
                 this.statusMsg.innerHTML = '<span class="badge-dice" style="background: rgba(103, 58, 183, 0.12); color: #673ab7; border: 1.5px solid #673ab7; font-weight: bold; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">🎲 PRONÓSTICO AUTORRELLENADO CON DADO</span>';
             } else if (existing && existing.late) {
                 if (existing.pardoned) {
-                    this.statusMsg.innerHTML = `<div class="flex items-center justify-center gap-2 flex-wrap"><span class="badge-late" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981;">🕊️ RETRASO INDULTADO / JUSTIFICADO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">Revocar Indulto</button></div>`;
+                    this.statusMsg.innerHTML = `
+                        <div class="flex flex-col items-center justify-center gap-1">
+                            <div class="flex items-center justify-center gap-2 flex-wrap">
+                                <span class="badge-late" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981;">🕊️ RETRASO INDULTADO / JUSTIFICADO</span>
+                                <button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">Modificar / Revocar</button>
+                            </div>
+                            ${existing.pardonReason ? `<div class="text-[10px] text-emerald-400 font-medium italic">Justificación: "${existing.pardonReason}"</div>` : ''}
+                        </div>
+                    `;
                 } else {
                     this.statusMsg.innerHTML = `<div class="flex items-center justify-center gap-2 flex-wrap"><span class="badge-late">⚠️ PRONÓSTICO ENVIADO CON RETRASO</span><button type="button" onclick="window.app.togglePardon('${this.currentJornadaId}', '${this.currentMemberId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition flex items-center gap-1 cursor-pointer"><span>🕊️</span> Perdonar Retraso</button></div>`;
                 }
@@ -718,7 +734,11 @@ class PronosticoManager {
             const deadline = this.calculateDeadline(jornada.date);
             const isLate = deadline ? (new Date() > deadline) : false;
             const { isLockedRef } = this.isJornadaLocked(jornada);
-            if (isLate && (!isLockedRef || this.correctionMode)) {
+            const existing = this.pronosticos.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
+            const wasFilledOnTime = existing && !existing.late && Array.isArray(existing.selection) && 
+                existing.selection.slice(0, 14).filter(s => s && String(s).trim() !== '' && String(s) !== '-').length >= 14;
+
+            if (isLate && !wasFilledOnTime && (!isLockedRef || this.correctionMode)) {
                 this.statusMsg.innerHTML = '<span class="badge-late">⚠️ FUERA DE PLAZO - SE MARCARÁ COMO RETRASADO</span>';
             }
         }
@@ -814,6 +834,11 @@ class PronosticoManager {
                 const now = new Date();
                 const isLate = deadline ? (now > deadline) : false;
 
+                const existing = this.pronosticos.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
+                const wasFilledOnTime = existing && !existing.late && Array.isArray(existing.selection) && 
+                    existing.selection.slice(0, 14).filter(s => s && String(s).trim() !== '' && String(s) !== '-').length >= 14;
+                const recordLate = wasFilledOnTime ? false : isLate;
+
                 const isReduced = this.selMethod && this.selMethod.value === 'reducido';
                 const id = `${this.currentJornadaId}_${this.currentMemberId}`;
 
@@ -824,7 +849,12 @@ class PronosticoManager {
                     selection: selection,
                     isReduced: isReduced,
                     timestamp: new Date().toISOString(),
-                    late: isLate
+                    late: recordLate,
+                    pardoned: existing ? (existing.pardoned || false) : false,
+                    pardonReason: existing ? (existing.pardonReason || '') : '',
+                    pardonedBy: existing ? (existing.pardonedBy || '') : '',
+                    pardonedAt: existing ? (existing.pardonedAt || '') : '',
+                    isDice: existing ? (existing.isDice || false) : false
                 };
 
                 await window.DataService.save('pronosticos', record);
@@ -1086,6 +1116,11 @@ class PronosticoManager {
             const now = new Date();
             const isLate = deadline ? (now > deadline) : false;
 
+            const existing = this.pronosticos.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
+            const wasFilledOnTime = existing && !existing.late && Array.isArray(existing.selection) && 
+                existing.selection.slice(0, 14).filter(s => s && String(s).trim() !== '' && String(s) !== '-').length >= 14;
+            const finalLate = wasFilledOnTime ? false : isLate;
+
             const isReduced = this.selMethod && this.selMethod.value === 'reducido';
             if (isReduced) {
                 const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
@@ -1103,7 +1138,11 @@ class PronosticoManager {
                 selection: selection,
                 isReduced: isReduced,
                 timestamp: new Date().toISOString(),
-                late: isLate,
+                late: finalLate,
+                pardoned: existing ? (existing.pardoned || false) : false,
+                pardonReason: existing ? (existing.pardonReason || '') : '',
+                pardonedBy: existing ? (existing.pardonedBy || '') : '',
+                pardonedAt: existing ? (existing.pardonedAt || '') : '',
                 isDice: false
             };
 
@@ -1114,12 +1153,12 @@ class PronosticoManager {
             if (isLockedRef && this.correctionMode) {
                 console.log("🟢 ABRIENDO MODAL DE AUDITORÍA");
                 this.pendingSaveData = record;
-                this.openAuditModal(isLate);
+                this.openAuditModal(finalLate);
                 return;
             }
 
             console.log("🔵 PASO 8: Guardado normal (sin auditoría)");
-            await this.performFinalSave(record, isLate);
+            await this.performFinalSave(record, finalLate);
 
         } catch (error) {
             console.error("❌ ERROR CAPTURADO:", error);
@@ -1298,28 +1337,48 @@ class PronosticoManager {
         }
 
         const willPardon = !p.pardoned;
-        const actionMsg = willPardon
-            ? '¿Deseas perdonar / indultar el retraso de este socio para anular su penalización?'
-            : '¿Deseas revocar el indulto y reactivar la penalización por retraso?';
+        let finalReason = '';
 
-        if (!confirm(actionMsg)) return;
+        if (willPardon) {
+            const reason = prompt('Indica el motivo o justificación de perdonar la sanción por retraso:\n(Ej: "Avisó antes del cierre", "Fallo técnico", "Acuerdo de socios", etc.)', p.pardonReason || '');
+            if (reason === null) return; // Cancelado por el usuario
+            finalReason = reason.trim() || 'Acuerdo de socios';
+            p.pardoned = true;
+            p.pardonReason = finalReason;
+        } else {
+            const choice = prompt('Este retraso ya está indultado.\n\n- Escribe una nueva justificación para actualizarla.\n- O escribe "REVOCAR" para retirar el perdón y reactivar la sanción por retraso:', p.pardonReason || '');
+            if (choice === null) return; // Cancelado
+            if (choice.trim().toUpperCase() === 'REVOCAR') {
+                p.pardoned = false;
+                p.pardonReason = '';
+                p.pardonedBy = '';
+                p.pardonedAt = '';
+            } else {
+                finalReason = choice.trim() || 'Acuerdo de socios';
+                p.pardonReason = finalReason;
+            }
+        }
 
-        p.pardoned = willPardon;
         try {
+            const forgiverData = JSON.parse(sessionStorage.getItem('maulas_user') || '{}');
+            const forgiverName = window.AppUtils ? window.AppUtils.getMemberName(forgiverData) : (forgiverData.name || 'Administración');
+            if (p.pardoned) {
+                p.pardonedBy = forgiverName;
+                p.pardonedAt = new Date().toISOString();
+            }
+
             if (window.DataService) {
                 await window.DataService.save('pronosticos', p);
             }
 
-            if (willPardon && window.TelegramService) {
+            if (p.pardoned && window.TelegramService) {
                 try {
-                    const forgiverData = JSON.parse(sessionStorage.getItem('maulas_user') || '{}');
-                    const forgiverName = window.AppUtils ? window.AppUtils.getMemberName(forgiverData) : (forgiverData.name || 'Administración');
                     const forgiven = this.members ? this.members.find(m => String(m.id) === String(mId)) : null;
                     const forgivenName = forgiven && window.AppUtils ? window.AppUtils.getMemberName(forgiven) : (forgiven ? forgiven.name : 'Socio');
                     const jornada = this.jornadas ? this.jornadas.find(j => String(j.id) === String(jId)) : null;
                     const jNum = jornada ? jornada.number : '?';
 
-                    await window.TelegramService.sendPardonNotification(forgiverName, forgivenName, jNum);
+                    await window.TelegramService.sendPardonNotification(forgiverName, forgivenName, jNum, p.pardonReason);
                 } catch (te) {
                     console.warn('Error enviando notificación Telegram de indulto:', te);
                 }
