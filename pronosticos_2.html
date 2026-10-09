@@ -2174,17 +2174,6 @@
                     }) || jornada;
 
                 const countdownJornada = upcomingJornada || jornada;
-                const { isLockedRef } = this.isJornadaLocked(jornada);
-                const kpiPlazoEstado = document.getElementById('kpi-plazo-estado');
-                const kpiCdBadge = document.getElementById('kpi-cd-badge');
-                if (kpiPlazoEstado) {
-                    kpiPlazoEstado.textContent = isLockedRef ? 'Plazo Cerrado' : 'Plazo Abierto';
-                    kpiPlazoEstado.className = `text-lg font-black font-mono ${isLockedRef ? 'text-rose-300 dark:text-rose-200' : 'text-emerald-300 dark:text-emerald-200'}`;
-                }
-                if (kpiCdBadge) {
-                    kpiCdBadge.textContent = isLockedRef ? 'Cerrado' : 'Abierto';
-                    kpiCdBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${isLockedRef ? 'bg-rose-500/20 text-rose-300 dark:text-rose-200 border border-rose-400/50' : 'bg-emerald-500/20 text-emerald-300 dark:text-emerald-200 border border-emerald-400/50'}`;
-                }
 
                 // Parsear fecha y calcular deadline oficial (Jueves 17:00h)
                 let matchDate = null;
@@ -2201,8 +2190,8 @@
                     }
                 }
 
+                let deadline = null;
                 if (matchDate && !isNaN(matchDate.getTime())) {
-                    let deadline = null;
                     if (window.AppUtils && typeof window.AppUtils.calculateDeadline === 'function') {
                         deadline = window.AppUtils.calculateDeadline(matchDate);
                     }
@@ -2210,7 +2199,47 @@
                         deadline = new Date(matchDate.getTime() - 3 * 24 * 3600 * 1000);
                         deadline.setHours(17, 0, 0, 0);
                     }
+                }
 
+                const nowMs = new Date().getTime();
+                const isPastDeadline = deadline ? (nowMs > deadline.getTime()) : false;
+                const { isLockedRef, hasStarted, isFinished } = this.isJornadaLocked(jornada);
+
+                const kpiPlazoEstado = document.getElementById('kpi-plazo-estado');
+                const kpiCdBadge = document.getElementById('kpi-cd-badge');
+
+                let estadoTexto = 'Plazo Abierto';
+                let estadoClase = 'text-lg font-black font-mono text-emerald-300 dark:text-emerald-200';
+                let badgeTexto = 'Abierto';
+                let badgeClase = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 dark:text-emerald-200 border border-emerald-400/50';
+
+                if (isFinished) {
+                    estadoTexto = 'Jornada Finalizada';
+                    estadoClase = 'text-lg font-black font-mono text-slate-300 dark:text-slate-200';
+                    badgeTexto = 'Finalizada';
+                    badgeClase = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/20 text-slate-300 dark:text-slate-200 border border-slate-400/50';
+                } else if (hasStarted) {
+                    estadoTexto = 'En Juego';
+                    estadoClase = 'text-lg font-black font-mono text-sky-300 dark:text-sky-200';
+                    badgeTexto = 'En Juego';
+                    badgeClase = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 dark:text-sky-200 border border-sky-400/50 animate-pulse';
+                } else if (isPastDeadline || isLockedRef) {
+                    estadoTexto = 'Plazo Cerrado • En espera';
+                    estadoClase = 'text-lg font-black font-mono text-rose-300 dark:text-rose-200';
+                    badgeTexto = 'Cerrado';
+                    badgeClase = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 dark:text-rose-200 border border-rose-400/50';
+                }
+
+                if (kpiPlazoEstado) {
+                    kpiPlazoEstado.textContent = estadoTexto;
+                    kpiPlazoEstado.className = estadoClase;
+                }
+                if (kpiCdBadge) {
+                    kpiCdBadge.textContent = badgeTexto;
+                    kpiCdBadge.className = badgeClase;
+                }
+
+                if (deadline && !isNaN(deadline.getTime())) {
                     const kpiDateEl = document.getElementById('kpi-deadline-date');
                     if (kpiDateEl) {
                         kpiDateEl.textContent = `Jueves ${deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })} a las 17:00h`;
@@ -2223,8 +2252,16 @@
                         const timerEl = document.getElementById('kpi-countdown-timer');
                         if (!timerEl) return;
                         if (diff <= 0) {
-                            timerEl.textContent = '00d 00h 00m 00s (Expirado)';
-                            timerEl.className = 'font-mono text-xs font-black text-rose-300 dark:text-rose-200';
+                            if (isFinished) {
+                                timerEl.textContent = 'Jornada Finalizada';
+                                timerEl.className = 'font-mono text-xs font-black text-slate-300 dark:text-slate-200';
+                            } else if (hasStarted) {
+                                timerEl.textContent = 'Partidos en juego';
+                                timerEl.className = 'font-mono text-xs font-black text-sky-300 dark:text-sky-200';
+                            } else {
+                                timerEl.textContent = '00d 00h 00m 00s (Sellado cerrado)';
+                                timerEl.className = 'font-mono text-xs font-black text-rose-300 dark:text-rose-200';
+                            }
                             return;
                         }
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
