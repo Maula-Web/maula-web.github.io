@@ -223,17 +223,15 @@
                         <div class="mt-3 space-y-2.5 border-t border-slate-800 pt-2.5 text-[11px] text-slate-300 leading-relaxed">
                             <ol class="list-decimal pl-4 space-y-1.5 text-slate-300">
                                 <li>Inicia sesión en Google con <strong>Penalosmaulas@gmail.com</strong> y abre <a href="https://script.google.com" target="_blank" class="text-emerald-400 underline font-bold">script.google.com</a>.</li>
-                                <li>Haz clic en <strong>Nuevo proyecto</strong> (arriba a la izquierda).</li>
-                                <li>Borra todo lo que aparezca en el editor y <strong>pega el código que tienes abajo</strong>.</li>
-                                <li>Pulsa el botón azul <strong>Implementar > Nueva implementación</strong> (arriba a la derecha).</li>
-                                <li>En el icono de engranaje (⚙️), selecciona <strong>Aplicación web</strong>.</li>
-                                <li>Configura exactamente esto:
+                                <li>Si ya tienes el proyecto creado, entra en él. Si no, haz clic en <strong>Nuevo proyecto</strong>.</li>
+                                <li>Borra todo lo que aparezca en el editor y <strong>pega el código que tienes abajo</strong> (pulsa Guardar / Ctrl+S).</li>
+                                <li><strong>Para actualizar un script ya existente:</strong> Ve a <strong>Implementar > Administrar implementaciones</strong>, pulsa el <strong>icono del lápiz (Editar)</strong>, en el desplegable <em>Versión</em> selecciona <strong>Nueva versión</strong> y pulsa <strong>Implementar</strong>.</li>
+                                <li><strong>Para un proyecto nuevo:</strong> Pulsa <strong>Implementar > Nueva implementación</strong> > Tipo: <strong>Aplicación web</strong>, con:
                                     <ul class="list-disc pl-4 mt-1 text-slate-400">
                                         <li><strong>Ejecutar como:</strong> Yo (Penalosmaulas@gmail.com)</li>
                                         <li><strong>Quién tiene acceso:</strong> Cualquier usuario (Anyone)</li>
                                     </ul>
                                 </li>
-                                <li>Pulsa <strong>Implementar</strong> y autoriza el acceso a Gmail cuando te lo pida.</li>
                                 <li>Copia la <strong>URL de la aplicación web</strong> (termina en <code>/exec</code>) y pégala en el campo de arriba.</li>
                             </ol>
 
@@ -251,7 +249,8 @@
 
 function doPost(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
+    var contents = (e && e.postData && e.postData.contents) ? e.postData.contents : '{}';
+    var data = JSON.parse(contents);
     
     // CASO 1: CONSULTAR RESPUESTA DE LA ADMINISTRACIÓN EN GMAIL
     // Si la acción es check_reply O no viene fileContent (evita cualquier fallo si no es envío)
@@ -260,7 +259,8 @@ function doPost(e) {
     }
     
     // CASO 2: ENVIAR FICHERO .TXT DE 35 APUESTAS POR CORREO REAL
-    var blob = Utilities.newBlob(data.fileContent, 'text/plain', data.fileName || 'apuestas.txt');
+    var fileName = data.fileName || 'apuestas.txt';
+    var blob = Utilities.newBlob(data.fileContent, 'text/plain', fileName);
     GmailApp.sendEmail(data.to, data.subject, data.body, {
       name: 'Peña Los Maulas',
       attachments: [blob]
@@ -270,7 +270,7 @@ function doPost(e) {
       ok: true, 
       sentAt: new Date().toISOString(),
       to: data.to,
-      fileName: data.fileName,
+      fileName: fileName,
       ticketId: data.ticketId || null
     })).setMimeType(ContentService.MimeType.JSON);
 
@@ -319,6 +319,10 @@ function procesarConsultaRespuesta(ticketId, jornada) {
       if (!threads || threads.length === 0) {
         threads = GmailApp.search('subject:"' + ticketId + '"', 0, 5);
       }
+      if (!threads || threads.length === 0) {
+        var cleanId = ticketId.replace(/[\[\]]/g, '');
+        threads = GmailApp.search(cleanId, 0, 5);
+      }
     }
 
     // 2. Si no se encontró por ID exacto, buscar por el número de Jornada (J12 o Jornada 12)
@@ -338,6 +342,9 @@ function procesarConsultaRespuesta(ticketId, jornada) {
     // 3. Fallback: El último correo de sellado de Los Maulas de los últimos 7 días
     if (!threads || threads.length === 0) {
       threads = GmailApp.search('subject:"[MAULAS-" newer_than:7d', 0, 5);
+    }
+    if (!threads || threads.length === 0) {
+      threads = GmailApp.search('subject:MAULAS newer_than:7d', 0, 5);
     }
 
     if (!threads || threads.length === 0) {
@@ -375,6 +382,11 @@ function procesarConsultaRespuesta(ticketId, jornada) {
     // Si todos los mensajes son de penalosmaulas (pruebas entre misma cuenta) y hay más de 1 mensaje:
     if (!replyMsg && messages.length > 1) {
       replyMsg = messages[messages.length - 1];
+    }
+
+    // Si es un mensaje único pero su asunto es una respuesta (Re: / RV:)
+    if (!replyMsg && messages.length === 1 && /^(re:|rv:)/i.test(messages[0].getSubject())) {
+      replyMsg = messages[0];
     }
 
     if (!replyMsg) {
@@ -1241,22 +1253,17 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                     txtFileStats.textContent = `Mostrando 35 apuestas preparadas para terminal SELAE / LotoGestión (P15 unificado: ${this.p15Oficial || '10'}):`;
                 }
 
-                // Actualizar identificador único oficial y nombre de adjunto
-                if (!this.ticketIdActual) {
-                    this.ticketIdActual = this.generarIdentificadorBoleto();
-                }
-                const ticketId = this.ticketIdActual;
-                const fileName = `${ticketId}.txt`;
-                const labelTicket = document.getElementById('label-ticket-id');
-                if (labelTicket) {
-                    labelTicket.textContent = ticketId;
-                }
-                const labelAdjunto = document.getElementById('label-attachment-name');
-                if (labelAdjunto) {
-                    labelAdjunto.textContent = fileName;
-                }
-
+                // Cargar estado de sellado previo si existe para esta jornada
                 this.cargarEstadoSelladoJornada();
+
+                // Si no hay sellado previo registrado, generar identificador oficial de vista previa con la fecha y hora actual
+                if (!this.ticketIdActual) {
+                    this.ticketIdActual = this.generarIdentificadorBoleto(new Date());
+                    const labelTicket = document.getElementById('label-ticket-id');
+                    if (labelTicket) labelTicket.textContent = this.ticketIdActual;
+                    const labelAdjunto = document.getElementById('label-attachment-name');
+                    if (labelAdjunto) labelAdjunto.textContent = `${this.ticketIdActual}.txt`;
+                }
 
                 // 1. Render Tab TXT
                 const outputBox = document.getElementById('code-output');
@@ -1380,11 +1387,19 @@ function procesarConsultaRespuesta(ticketId, jornada) {
             },
 
             descargarTXT() {
+                if (!this.ticketIdActual) {
+                    this.ticketIdActual = this.generarIdentificadorBoleto(new Date());
+                }
+                const fileName = `${this.ticketIdActual}.txt`;
+                const labelTicket = document.getElementById('label-ticket-id');
+                if (labelTicket) labelTicket.textContent = this.ticketIdActual;
+                const labelAdjunto = document.getElementById('label-attachment-name');
+                if (labelAdjunto) labelAdjunto.textContent = fileName;
+
                 const contenido = this.getTxtContent();
                 const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                const fileName = this.obtenerNombreFicheroBoleto();
                 a.href = url;
                 a.download = fileName;
                 document.body.appendChild(a);
@@ -1459,8 +1474,14 @@ function procesarConsultaRespuesta(ticketId, jornada) {
             abrirGmailWeb() {
                 const destino = (document.getElementById('input-asla-email').value || '').trim();
                 const p15 = this.p15Oficial || '10';
-                const ticketId = this.generarIdentificadorBoleto();
+                const ticketId = this.generarIdentificadorBoleto(new Date());
+                this.ticketIdActual = ticketId;
                 const fileName = `${ticketId}.txt`;
+                const labelTicket = document.getElementById('label-ticket-id');
+                if (labelTicket) labelTicket.textContent = ticketId;
+                const labelAdjunto = document.getElementById('label-attachment-name');
+                if (labelAdjunto) labelAdjunto.textContent = fileName;
+
                 const asunto = encodeURIComponent(`[${ticketId}] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
                 const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia oficial: ${ticketId}\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 unificado: ${p15}\n- Importe oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
                 
@@ -1495,11 +1516,17 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 }
 
                 const p15 = this.p15Oficial || '10';
-                if (!this.ticketIdActual) {
-                    this.ticketIdActual = this.generarIdentificadorBoleto();
-                }
-                const ticketId = this.ticketIdActual;
+                // Generar SIEMPRE un identificador nuevo y único en el instante exacto de este envío
+                const ticketId = this.generarIdentificadorBoleto(new Date());
+                this.ticketIdActual = ticketId;
                 const fileName = `${ticketId}.txt`;
+
+                // Sincronizar de inmediato la pantalla con el identificador real generado para este envío
+                const labelTicket = document.getElementById('label-ticket-id');
+                if (labelTicket) labelTicket.textContent = ticketId;
+                const labelAdjunto = document.getElementById('label-attachment-name');
+                if (labelAdjunto) labelAdjunto.textContent = fileName;
+
                 const fileContent = this.getTxtContent();
                 const subject = `[${ticketId}] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (P15: ${p15})`;
                 const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia de sellado: ${ticketId}\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15}\n- Importe oficial: 26,25 € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo indicando esta misma referencia.\n\nSaludos,\nPeña Los Maulas`;
@@ -1577,12 +1604,18 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                         this.selladoRecord = JSON.parse(raw);
                         if (this.selladoRecord && this.selladoRecord.ticketId) {
                             this.ticketIdActual = this.selladoRecord.ticketId;
+                            const labelTicket = document.getElementById('label-ticket-id');
+                            if (labelTicket) labelTicket.textContent = this.ticketIdActual;
+                            const labelAdjunto = document.getElementById('label-attachment-name');
+                            if (labelAdjunto) labelAdjunto.textContent = `${this.ticketIdActual}.txt`;
                         }
                     } catch(e) {
                         this.selladoRecord = null;
+                        this.ticketIdActual = null;
                     }
                 } else {
                     this.selladoRecord = null;
+                    this.ticketIdActual = null;
                 }
 
                 this.actualizarMonitorRespuesta(this.selladoRecord);
@@ -1789,7 +1822,13 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 } catch(err) {
                     this.log(`Error al consultar respuesta en Gmail: ${err.message}`, 'error');
                     if (!silencioso) {
-                        alert(`Error al consultar respuesta:\n\n${err.message}\n\nAsegúrate de haber actualizado el código en Google Apps Script con la nueva versión y desplegado una Nueva Versión.`);
+                        if (err.message.includes('argumento no puede ser nulo') || err.message.includes('fileContent')) {
+                            alert(`ATENCIÓN: Tu Google Apps Script todavía tiene desplegada la versión inicial que no soporta consultas.\n\nPara solucionarlo en 1 minuto:\n1. Pulsa "Copiar Código" en la sección de arriba.\n2. Abre script.google.com y pega el código.\n3. Guarda (Ctrl+S).\n4. Haz clic en "Implementar" > "Administrar implementaciones" > Edita con el lápiz > En Versión elige "Nueva versión" > Pulsa "Implementar".`);
+                        } else {
+                            alert(`Error al consultar respuesta:\n\n${err.message}\n\nAsegúrate de haber actualizado el código en Google Apps Script con la nueva versión y desplegado una Nueva Versión.`);
+                        }
+                    } else if (err.message.includes('argumento no puede ser nulo')) {
+                        this.log('Aviso: Tu Webhook de Google Apps Script requiere desplegar una "Nueva versión" con el código actualizado para poder consultar respuestas automáticamente.', 'warning');
                     }
                 } finally {
                     if (btn) btn.disabled = false;

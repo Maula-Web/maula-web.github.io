@@ -1256,9 +1256,14 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
     }
     ```
   - **Técnica de evasión de CORS preflight**: La llamada desde el navegador se realiza mediante `fetch` con `Content-Type: text/plain;charset=utf-8`. Esto evita la petición `OPTIONS` (preflight CORS) que Google Apps Script rechaza, garantizando la entrega inmediata y la consulta fluida.
+  - **Sincronización Estricta de Identificador (`ticketId`)**:
+    - Cada acción de envío genera de forma atómica un nuevo `ticketId` en el instante del clic (`new Date()`).
+    - Las etiquetas DOM (`#label-ticket-id`, `#label-attachment-name`), el nombre del adjunto `.txt`, el asunto del correo (`[MAULAS-...]`), el cuerpo del correo, el payload del Webhook, el modal de confirmación y el `localStorage` quedan sincronizados al 100% de manera determinista, evitando desajustes entre la vista previa y el boleto expedido.
+  - **Actualización de Despliegues en Google Apps Script**:
+    - Las Web Apps de Google Apps Script no recargan código modificado en tiempo real; requieren expresamente publicar una **"Nueva versión"** desde *Implementar > Administrar implementaciones > Editar > Versión: Nueva versión > Implementar*.
 - **Entorno de Pruebas (Sandbox)**:
   - Ubicación: `sandbox_sellado.html`.
-  - Acceso restringido exclusivamente al socio Fernando Lozano.
+  - Acceso restringido exclusivamente al socio Fernando Lozano (`id === '6'`).
   - Dispone de selector de jornada en tiempo real (datos de Firestore), desglose visual con badges de color para los 19 socios y las 16 apuestas de dobles, persistencia en `localStorage` del webhook, destino de correo e historial de sellado por jornada, botón de comprobación en tiempo real, modo de sondeo automático (cada 30s) y visor interactivo de resguardos oficiales con modal de pantalla completa.
 
 ---
