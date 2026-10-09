@@ -2925,25 +2925,25 @@ class BoteAppController {
             <div>
                 <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2.5">Historial Cronológico de Movimientos</h4>
                 <div class="overflow-x-auto rounded-xl border border-slate-800 max-h-[48vh]">
-                    <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                    <table class="w-full text-left text-xs border-collapse">
                         <thead class="sticky top-0 bg-slate-900 shadow">
                             <tr class="text-xs font-bold uppercase text-slate-400 border-b border-slate-800">
-                                <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
+                                <th class="px-2.5 sm:px-3 py-2 sm:py-2.5 cursor-pointer hover:text-white select-none whitespace-nowrap" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'text')">
                                     <span class="inline-flex items-center gap-1">Evento <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
                                 </th>
-                                <th class="p-2.5 sm:p-3 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'date')">
+                                <th class="px-2.5 sm:px-3 py-2 sm:py-2.5 cursor-pointer hover:text-white select-none whitespace-nowrap" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'date')">
                                     <span class="inline-flex items-center gap-1">Fecha <span class="sort-indicator text-amber-400 font-mono">↕</span></span>
                                 </th>
-                                <th class="p-2.5 sm:p-3 text-center cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                <th class="px-2 sm:px-2.5 py-2 sm:py-2.5 text-center cursor-pointer hover:text-white select-none whitespace-nowrap" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
                                     <span class="inline-flex items-center gap-1">Ac. <span class="sort-indicator text-cyan-400 font-mono">↕</span></span>
                                 </th>
-                                <th class="p-2.5 sm:p-3 text-right text-emerald-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                <th class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right text-emerald-400 cursor-pointer hover:text-white select-none whitespace-nowrap" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
                                     <span class="inline-flex items-center gap-1">Ingreso (+) <span class="sort-indicator font-mono">↕</span></span>
                                 </th>
-                                <th class="p-2.5 sm:p-3 text-right text-rose-400 cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                <th class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right text-rose-400 cursor-pointer hover:text-white select-none whitespace-nowrap" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
                                     <span class="inline-flex items-center gap-1">Gasto (-) <span class="sort-indicator font-mono">↕</span></span>
                                 </th>
-                                <th class="p-2.5 sm:p-3 text-right text-amber-400 font-extrabold cursor-pointer hover:text-white select-none" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
+                                <th class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right text-amber-400 font-extrabold cursor-pointer hover:text-white select-none whitespace-nowrap" data-sortable="true" onclick="window.AppTableSorter.sortColumn(this, 'number')">
                                     <span class="inline-flex items-center gap-1">Saldo Tras Evento <span class="sort-indicator font-mono">↕</span></span>
                                 </th>
                             </tr>
@@ -2973,16 +2973,16 @@ class BoteAppController {
 
             html += `
                 <tr class="hover:bg-slate-900/60 whitespace-nowrap ${isManual ? 'bg-emerald-950/20' : ''}">
-                    <td class="p-2.5 sm:p-3 font-semibold text-white whitespace-nowrap">${eventTitle}</td>
-                    <td class="p-2.5 sm:p-3 text-xs text-slate-400 whitespace-nowrap">${m.jornadaDate || m.date}</td>
-                    <td class="p-2.5 sm:p-3 text-center font-bold text-white whitespace-nowrap">${acText}</td>
-                    <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-emerald-400 whitespace-nowrap">
+                    <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 font-semibold text-white whitespace-nowrap">${eventTitle}</td>
+                    <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs text-slate-400 whitespace-nowrap">${m.jornadaDate || m.date}</td>
+                    <td class="px-2 sm:px-2.5 py-2 sm:py-2.5 text-center font-bold text-white whitespace-nowrap">${acText}</td>
+                    <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-medium text-emerald-400 whitespace-nowrap">
                         ${inVal > 0 ? `<div>+${inVal.toFixed(2).replace('.', ',')}&nbsp;€</div>${inSubHtml}` : '-'}
                     </td>
-                    <td class="p-2.5 sm:p-3 text-right font-mono font-medium text-rose-400 whitespace-nowrap">
+                    <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-medium text-rose-400 whitespace-nowrap">
                         ${outVal > 0 ? '-' + outVal.toFixed(2).replace('.', ',') + '&nbsp;€' : '0,00&nbsp;€'}
                     </td>
-                    <td class="p-2.5 sm:p-3 text-right font-mono font-extrabold ${m.boteAcumulado >= 0 ? 'text-emerald-400' : 'text-rose-400'} bg-slate-900/40 whitespace-nowrap">
+                    <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-extrabold ${m.boteAcumulado >= 0 ? 'text-emerald-400' : 'text-rose-400'} bg-slate-900/40 whitespace-nowrap">
                         ${m.boteAcumulado.toFixed(2).replace('.', ',')}&nbsp;€
                     </td>
                 </tr>
