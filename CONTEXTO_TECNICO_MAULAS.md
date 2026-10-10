@@ -1313,10 +1313,10 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 - **Módulo de Sellado Autónomo e Historial (`js/sellado-service.js`)**:
   - **Auto-Envío Condicional**: Escucha cada guardado en `pronosticos.js` (tanto pronósticos individuales como Quiniela de Dobles). Si y solo si los 19 socios están completos y los dobles guardados, compila automáticamente las 35 apuestas, genera el `ticketId` oficial y despacha el correo vía Webhook sin esperar intervención manual.
   - **Protección Antiduplicados**: Comprueba en Firestore la colección `sellados` y el flag `selladoEnviado` de la jornada antes de emitir cualquier petición.
-  - **Historial de Sellados y Enlace Directo a Drive**:
-    - Modal accesible mediante el botón **"🧾 Historial Sellados"**.
-    - Permite ver el estado de cada jornada, referencia oficial, importe, y ofrece botón con enlace directo a la carpeta en Google Drive (`RESGUARDOS QUINIELAS MAULAS`) o al visor de resguardo individual.
-    - **Control de Acceso Estricto**: Restringido **exclusivamente al socio Fernando Lozano** (`id === '6'` o nombre/email de Fernando Lozano). El botón de historial no se renderiza para ningún otro socio en la web.
+  - **Mecanismo de Rectificación y Sustitución Asistida**:
+    - **Re-consulta de Rectificaciones en Gmail (`reconsultarRectificacion`)**: Si la administración envía un correo posterior corrigiendo un resguardo anterior erróneo, Fernando puede pulsar **"🔄 Re-consultar Gmail"** en esa jornada. El sistema abre un **modal comparativo en dos columnas** (Resguardo Anterior vs Nuevo Recibido) con el mensaje explicativo del lotero y un botón explícito de confirmación: `✅ Confirmar y Sustituir por el Nuevo Resguardo`.
+    - **Sustitución Manual Asistida (`abrirModalSubidaManual`)**: Botón **"📤 Sustituir"** que permite cargar directamente un archivo (imagen o PDF) recibido por canales alternativos (ej. WhatsApp).
+    - **Auditoría y Preservación**: El resguardo previo no se pierde; se conserva en el campo `resguardoAnteriorUrl` de Firestore, marcando la jornada con la etiqueta `✏️ Rectificado` y la fecha y hora exacta de la subsanación.
 - **Entorno de Pruebas (Sandbox)**:
   - Ubicación: `sandbox_sellado.html`.
   - Acceso restringido exclusivamente al socio Fernando Lozano (`id === '6'`).

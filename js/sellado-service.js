@@ -452,6 +452,7 @@
                     const badgeClass = isConfirmado ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-blue-500/20 text-blue-400 border-blue-500/40';
                     const fechaTxt = r.enviadoEn ? new Date(r.enviadoEn).toLocaleString() : 'Fecha no disp.';
                     const driveUrl = r.resguardoDriveUrl || r.driveFolderUrl || 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS';
+                    const rectificadoTag = r.rectificadoEn ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">✏️ Rectificado</span>` : '';
 
                     return `
                         <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -461,6 +462,7 @@
                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">
                                         ${isConfirmado ? '🟢 Resguardo Confirmado' : '🔵 Enviado (Esperando)'}
                                     </span>
+                                    ${rectificadoTag}
                                     <span class="text-[11px] font-mono text-slate-400">${r.ticketId}</span>
                                 </div>
                                 <div class="text-[11px] text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -470,19 +472,282 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
-                                <a href="${driveUrl}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 transition">
-                                    <span>📁</span> Ver en Drive
+                            <div class="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+                                <a href="${driveUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 flex items-center gap-1 transition">
+                                    <span>📁</span> Drive
                                 </a>
                                 ${r.resguardoDriveUrl ? `
-                                <a href="${r.resguardoDriveUrl}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-xs font-bold border border-emerald-500/40 flex items-center gap-1.5 transition">
+                                <a href="${r.resguardoDriveUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-xs font-bold border border-emerald-500/40 flex items-center gap-1 transition">
                                     <span>🧾</span> Ver Resguardo
                                 </a>` : ''}
+                                <button onclick="SelladoService.reconsultarRectificacion('${r.ticketId}', ${r.jornada})" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 text-xs font-bold border border-blue-500/40 flex items-center gap-1 transition" title="Consultar si la administración ha enviado un correo con resguardo corregido">
+                                    <span>🔄</span> Re-consultar Gmail
+                                </button>
+                                <button onclick="SelladoService.abrirModalSubidaManual('${r.ticketId}', ${r.jornada})" class="px-2.5 py-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/40 text-purple-300 text-xs font-bold border border-purple-500/40 flex items-center gap-1 transition" title="Subir manualmente una foto/PDF de corrección">
+                                    <span>📤</span> Sustituir
+                                </button>
                             </div>
                         </div>
                     `;
                 }).join('');
             }
+        },
+
+        /**
+         * Re-consulta Gmail buscando correos posteriores (rectificaciones) y abre comparador
+         */
+        async reconsultarRectificacion(ticketId, jornadaNum) {
+            const cfg = await this.getConfig();
+            if (!cfg.webhookUrl) {
+                alert('No hay Webhook configurado. Configúralo en el Sandbox de Sellado.');
+                return;
+            }
+
+            const btnList = document.querySelectorAll(`button[onclick*="${ticketId}"]`);
+            btnList.forEach(b => { b.disabled = true; b.innerHTML = '<span>⏳</span> Consultando...'; });
+
+            try {
+                const res = await fetch(cfg.webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'check_reply',
+                        ticketId: ticketId,
+                        jornada: jornadaNum,
+                        isTest: false
+                    })
+                });
+
+                const data = await res.json();
+                if (!data || !data.ok) {
+                    throw new Error((data && data.error) ? data.error : 'Error en consulta');
+                }
+
+                if (!data.hasReply) {
+                    alert(`No se detectaron nuevas respuestas en el correo para la Jornada ${jornadaNum}.\n\nSi el lotero te lo envió por otro canal (ej. WhatsApp), puedes usar el botón "📤 Sustituir" para cargarlo manualmente.`);
+                    return;
+                }
+
+                const nuevoAdjunto = (data.attachments && data.attachments[0]) || null;
+                if (!nuevoAdjunto) {
+                    alert(`Se encontró respuesta en Gmail de: ${data.from},\npero no incluye ningún archivo adjunto nuevo.`);
+                    return;
+                }
+
+                // Cargar registro actual
+                const sellados = await this.obtenerHistorial();
+                const actual = sellados.find(s => s.ticketId === ticketId || String(s.jornada) === String(jornadaNum));
+
+                this.mostrarModalComparativaSustitucion(actual, data, nuevoAdjunto);
+
+            } catch (err) {
+                alert('Error al re-consultar Gmail: ' + err.message);
+            } finally {
+                btnList.forEach(b => { b.disabled = false; b.innerHTML = '<span>🔄</span> Re-consultar Gmail'; });
+            }
+        },
+
+        /**
+         * Modal de Previsualización Comparativa (Anterior vs Nuevo)
+         */
+        mostrarModalComparativaSustitucion(registroActual, respuestaGmail, nuevoAdjunto) {
+            let modalComp = document.getElementById('modal-comparativa-resguardo');
+            if (modalComp) modalComp.remove();
+
+            const imgActual = (registroActual && registroActual.resguardoDriveUrl) || '';
+            const imgNueva = nuevoAdjunto.dataUri || nuevoAdjunto.driveUrl || '';
+
+            modalComp = document.createElement('div');
+            modalComp.id = 'modal-comparativa-resguardo';
+            modalComp.className = 'fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-5';
+            modalComp.innerHTML = `
+                <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col overflow-hidden shadow-2xl text-slate-200">
+                    <!-- Header -->
+                    <div class="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">⚖️</span>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white">Revisión de Corrección de Resguardo</h3>
+                                <p class="text-[11px] text-slate-400">Jornada ${registroActual ? registroActual.jornada : ''} • Compara antes de sustituir</p>
+                            </div>
+                        </div>
+                        <button onclick="document.getElementById('modal-comparativa-resguardo').remove()" class="text-slate-400 hover:text-white p-1 px-2.5 rounded-lg hover:bg-slate-800 text-sm font-bold transition">✕ Cancelar</button>
+                    </div>
+
+                    <!-- Mensaje del Lotero -->
+                    <div class="p-3 bg-blue-950/20 border-b border-blue-500/20 text-xs space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">Remitente: <strong class="text-slate-200">${respuestaGmail.from || ''}</strong></span>
+                            <span class="text-[11px] text-slate-400 font-mono">${respuestaGmail.date ? new Date(respuestaGmail.date).toLocaleString() : ''}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-300 italic max-h-16 overflow-y-auto bg-slate-950/50 p-2 rounded border border-slate-800">
+                            "${respuestaGmail.body || 'Nuevo correo recibido sin texto adicional.'}"
+                        </div>
+                    </div>
+
+                    <!-- Comparador 2 Columnas -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 overflow-y-auto flex-1 text-xs">
+                        <!-- Columna Izquierda: Anterior -->
+                        <div class="space-y-2 flex flex-col">
+                            <div class="flex items-center justify-between pb-1 border-b border-slate-800">
+                                <span class="font-bold text-rose-400 flex items-center gap-1"><span>❌</span> Resguardo Anterior</span>
+                                <span class="text-[10px] text-slate-500 font-mono">Actual en sistema</span>
+                            </div>
+                            <div class="flex-1 bg-black/40 rounded-xl border border-slate-800 p-2 flex items-center justify-center min-h-[220px]">
+                                ${imgActual ? `<img src="${imgActual}" class="max-h-[300px] object-contain rounded" onerror="this.outerHTML='<p class=\\'text-slate-500 italic text-center\\'>Vista previa no disponible.<br><a href=\\'${imgActual}\\' target=\\'_blank\\' class=\\'text-blue-400 underline\\'>Abrir enlace anterior</a></p>'">` : `<p class="text-slate-500 italic">No había resguardo previo registrado.</p>`}
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha: Nuevo recibido -->
+                        <div class="space-y-2 flex flex-col">
+                            <div class="flex items-center justify-between pb-1 border-b border-emerald-500/30">
+                                <span class="font-bold text-emerald-400 flex items-center gap-1"><span>✅</span> Nuevo Resguardo Recibido</span>
+                                <span class="text-[10px] text-emerald-300 font-mono">${nuevoAdjunto.name || ''}</span>
+                            </div>
+                            <div class="flex-1 bg-black/40 rounded-xl border border-emerald-500/30 p-2 flex items-center justify-center min-h-[220px]">
+                                ${imgNueva ? `<img src="${imgNueva}" class="max-h-[300px] object-contain rounded">` : `<p class="text-slate-500 italic">Adjunto no visualizable directamente.<br><a href="${nuevoAdjunto.driveUrl}" target="_blank" class="text-emerald-400 underline">Abrir en Google Drive</a></p>`}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer con Botón de Sustitución -->
+                    <div class="p-3.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-3">
+                        <button onclick="document.getElementById('modal-comparativa-resguardo').remove()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">
+                            Descartar y Mantener Anterior
+                        </button>
+                        <button id="btn-confirmar-sustitucion-resguardo" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center gap-2">
+                            <span>✅</span> Confirmar y Sustituir por el Nuevo Resguardo
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalComp);
+
+            document.getElementById('btn-confirmar-sustitucion-resguardo').onclick = async () => {
+                await SelladoService.aplicarSustitucionResguardo(registroActual, respuestaGmail, nuevoAdjunto);
+            };
+        },
+
+        /**
+         * Aplica la sustitución en Firestore y actualiza el modal
+         */
+        async aplicarSustitucionResguardo(registroActual, respuestaGmail, nuevoAdjunto) {
+            const btn = document.getElementById('btn-confirmar-sustitucion-resguardo');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳</span> Guardando sustitución...';
+            }
+
+            try {
+                const nowIso = new Date().toISOString();
+                const nuevoRegistro = {
+                    ...registroActual,
+                    estado: 'CONFIRMADO',
+                    rectificadoEn: nowIso,
+                    resguardoAnteriorUrl: registroActual.resguardoDriveUrl || null,
+                    resguardoDriveUrl: nuevoAdjunto.driveUrl || nuevoAdjunto.dataUri || registroActual.resguardoDriveUrl,
+                    respuestaLotero: {
+                        from: respuestaGmail.from,
+                        date: respuestaGmail.date,
+                        body: respuestaGmail.body,
+                        attachmentsCount: respuestaGmail.attachmentsCount,
+                        rectificado: true
+                    }
+                };
+
+                await window.DataService.save('sellados', nuevoRegistro);
+
+                const modalComp = document.getElementById('modal-comparativa-resguardo');
+                if (modalComp) modalComp.remove();
+
+                alert(`✅ RESGUARDO SUSTITUIDO CON ÉXITO\n\nSe ha actualizado el resguardo oficial para la Jornada ${registroActual.jornada}.\nEl enlace anterior ha quedado archivado en el histórico.`);
+
+                // Recargar lista del historial
+                this.mostrarModalHistorial();
+            } catch (err) {
+                alert('Error al aplicar la sustitución: ' + err.message);
+                if (btn) btn.disabled = false;
+            }
+        },
+
+        /**
+         * Modal de Subida Manual para sustituir el resguardo (ej. si llega por WhatsApp)
+         */
+        abrirModalSubidaManual(ticketId, jornadaNum) {
+            let modalManual = document.getElementById('modal-subida-manual-resguardo');
+            if (modalManual) modalManual.remove();
+
+            modalManual = document.createElement('div');
+            modalManual.id = 'modal-subida-manual-resguardo';
+            modalManual.className = 'fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4';
+            modalManual.innerHTML = `
+                <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl text-slate-200">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">📤</span>
+                            <h3 class="text-sm font-extrabold text-white">Sustituir Resguardo Manualmente</h3>
+                        </div>
+                        <button onclick="document.getElementById('modal-subida-manual-resguardo').remove()" class="text-slate-400 hover:text-white text-xs font-bold">✕</button>
+                    </div>
+
+                    <p class="text-xs text-slate-300">Selecciona el nuevo archivo de resguardo (imagen o PDF) recibido como corrección para la <strong>Jornada ${jornadaNum}</strong>.</p>
+
+                    <div class="space-y-3">
+                        <input type="file" id="input-archivo-resguardo-manual" accept="image/*,application/pdf" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600/30 file:text-blue-300 hover:file:bg-blue-600/40 cursor-pointer">
+                        <div id="preview-subida-manual" class="hidden p-2 rounded-lg bg-black/40 border border-slate-800 flex items-center justify-center max-h-40 overflow-hidden"></div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800 text-xs">
+                        <button onclick="document.getElementById('modal-subida-manual-resguardo').remove()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition">Cancelar</button>
+                        <button id="btn-guardar-subida-manual" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition">Guardar Sustitución</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalManual);
+
+            const fileInp = document.getElementById('input-archivo-resguardo-manual');
+            const prevBox = document.getElementById('preview-subida-manual');
+
+            fileInp.onchange = () => {
+                const file = fileInp.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    prevBox.classList.remove('hidden');
+                    if (file.type.startsWith('image/')) {
+                        prevBox.innerHTML = `<img src="${e.target.result}" class="max-h-36 object-contain rounded">`;
+                    } else {
+                        prevBox.innerHTML = `<span class="text-slate-300 font-bold">📄 ${file.name}</span>`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            };
+
+            document.getElementById('btn-guardar-subida-manual').onclick = async () => {
+                const file = fileInp.files[0];
+                if (!file) {
+                    alert('Por favor selecciona un archivo primero.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const dataUri = e.target.result;
+                    const sellados = await SelladoService.obtenerHistorial();
+                    const actual = sellados.find(s => s.ticketId === ticketId || String(s.jornada) === String(jornadaNum));
+                    if (actual) {
+                        actual.resguardoAnteriorUrl = actual.resguardoDriveUrl || null;
+                        actual.resguardoDriveUrl = dataUri;
+                        actual.rectificadoEn = new Date().toISOString();
+                        actual.estado = 'CONFIRMADO';
+                        await window.DataService.save('sellados', actual);
+                    }
+                    modalManual.remove();
+                    alert(`✅ Resguardo de Jornada ${jornadaNum} sustituido con éxito.`);
+                    SelladoService.mostrarModalHistorial();
+                };
+                reader.readAsDataURL(file);
+            };
         },
 
         /**
