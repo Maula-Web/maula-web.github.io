@@ -735,20 +735,20 @@ class Jornadas2AppController {
             let signHtml = '';
             if (!isPleno) {
                 if (result === '1') {
-                    signHtml = `<span class="w-8 h-8 rounded-xl font-mono font-black text-sm flex items-center justify-center sign-pill-1 shadow">1</span>`;
+                    signHtml = `<span class="w-9 h-9 rounded-xl font-mono font-black text-sm flex items-center justify-center sign-pill-1 shadow-md">1</span>`;
                 } else if (result === 'X') {
-                    signHtml = `<span class="w-8 h-8 rounded-xl font-mono font-black text-sm flex items-center justify-center sign-pill-X shadow">X</span>`;
+                    signHtml = `<span class="w-9 h-9 rounded-xl font-mono font-black text-sm flex items-center justify-center sign-pill-X shadow-md">X</span>`;
                 } else if (result === '2') {
-                    signHtml = `<span class="w-8 h-8 rounded-xl font-mono font-black text-sm flex items-center justify-center sign-pill-2 shadow">2</span>`;
+                    signHtml = `<span class="w-9 h-9 rounded-xl font-mono font-black text-sm flex items-center justify-center sign-pill-2 shadow-md">2</span>`;
                 } else {
-                    signHtml = `<span class="w-8 h-8 rounded-xl font-mono font-bold text-xs flex items-center justify-center bg-slate-900 border border-slate-800 text-slate-500">-</span>`;
+                    signHtml = `<span class="w-9 h-9 rounded-xl font-mono font-bold text-xs flex items-center justify-center bg-slate-900 border border-slate-800 text-slate-500 shadow-inner" title="Resultado no asignado">-</span>`;
                 }
             } else {
                 // Pleno al 15: Marcador de goles
                 if (result) {
-                    signHtml = `<span class="px-3 py-1 rounded-xl font-mono font-black text-xs flex items-center justify-center bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow">${result}</span>`;
+                    signHtml = `<span class="px-3.5 py-1.5 rounded-xl font-mono font-black text-xs sm:text-sm flex items-center justify-center bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-md">${result}</span>`;
                 } else {
-                    signHtml = `<span class="px-2.5 py-1 rounded-xl font-mono font-bold text-xs flex items-center justify-center bg-slate-900 border border-slate-800 text-slate-500">- - -</span>`;
+                    signHtml = `<span class="px-3 py-1.5 rounded-xl font-mono font-bold text-xs flex items-center justify-center bg-slate-900 border border-slate-800 text-slate-500 shadow-inner">- - -</span>`;
                 }
             }
 
@@ -797,8 +797,8 @@ class Jornadas2AppController {
                         </div>
                     </div>
 
-                    <!-- Signo Oficial en Escritorio (>= sm) -->
-                    <div class="hidden sm:flex sm:w-28 shrink-0 items-center justify-end">
+                    <!-- Signo Oficial en Escritorio (>= sm): Garantizado visible -->
+                    <div class="sign-badge-desktop">
                         ${signHtml}
                     </div>
                 </div>

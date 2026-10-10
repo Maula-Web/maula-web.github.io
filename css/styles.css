@@ -1490,7 +1490,7 @@ body {
 
 /* Utilities */
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 @keyframes fadeIn {

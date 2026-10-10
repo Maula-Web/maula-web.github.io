@@ -135,6 +135,21 @@
             animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
+        /* Modales: Blindaje de opacidad total, capas y visibilidad en modo oscuro y claro */
+        .modal-dialog-panel {
+            background-color: #0d121f !important;
+            background: #0d121f !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+            opacity: 1 !important;
+        }
+        .light-theme .modal-dialog-panel {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
+        }
+
         /* Estilo visual para la fila del partido */
         .match-card-row {
             transition: all 0.2s ease;
@@ -159,6 +174,20 @@
             background: rgba(245, 158, 11, 0.2);
             color: #fbbf24;
             border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+
+        /* Badge del Signo Oficial en el Boleto de Partidos (Garantizado en Escritorio) */
+        .sign-badge-desktop {
+            display: flex !important;
+            align-items: center;
+            justify-content: flex-end;
+            width: 7rem;
+            flex-shrink: 0;
+        }
+        @media (max-width: 639px) {
+            .sign-badge-desktop {
+                display: none !important;
+            }
         }
 
         /* Botones táctiles de edición para signos */
@@ -752,8 +781,8 @@
          MODAL 1: FORMULARIO DE EDICIÓN / ALTA DE JORNADA 2.0
          (CON CALENDARIO DATEPICKER Y DROPDOWNS INTELIGENTES DE EQUIPOS)
          ===================================================================== -->
-    <div id="modal-jornada-form" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
-        <div class="glass-panel w-full max-w-4xl border-amber-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+    <div id="modal-jornada-form" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
+        <div class="glass-panel modal-dialog-panel w-full max-w-4xl border-amber-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
             <!-- Modal Header -->
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
@@ -856,8 +885,8 @@
     <!-- =====================================================================
          MODAL 2: IMPORTAR PARTIDOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
-    <div id="modal-import-matches" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
-        <div class="glass-panel w-full max-w-2xl border-orange-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+    <div id="modal-import-matches" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
+        <div class="glass-panel modal-dialog-panel w-full max-w-2xl border-orange-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl p-2 rounded-xl bg-orange-500/20 text-orange-400">📋</span>
@@ -900,8 +929,8 @@
     <!-- =====================================================================
          MODAL 3: IMPORTAR RESULTADOS Y PREMIOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
-    <div id="modal-import-results" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
-        <div class="glass-panel w-full max-w-2xl border-emerald-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+    <div id="modal-import-results" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
+        <div class="glass-panel modal-dialog-panel w-full max-w-2xl border-emerald-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl p-2 rounded-xl bg-emerald-500/20 text-emerald-400">📥</span>
