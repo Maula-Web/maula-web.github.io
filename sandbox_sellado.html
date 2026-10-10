@@ -23,6 +23,7 @@
     <script src="js/utils.js"></script>
     <script src="js/scoring.js"></script>
     <script src="js/data_loader.js"></script>
+    <script src="js/sellado-service.js"></script>
 
     <style>
         :root {
@@ -123,6 +124,9 @@
                 </div>
                 <button id="btn-recargar-sandbox" onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 shadow cursor-pointer active:scale-95">
                     🔄 Recargar
+                </button>
+                <button onclick="SelladoService.mostrarModalHistorial()" class="px-3 py-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-emerald-500/40 shadow cursor-pointer active:scale-95">
+                    🧾 Historial Sellados
                 </button>
             </div>
         </header>

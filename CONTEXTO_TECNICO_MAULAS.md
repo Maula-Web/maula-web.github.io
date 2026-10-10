@@ -1310,6 +1310,13 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
     - Las etiquetas DOM (`#label-ticket-id`, `#label-attachment-name`), el nombre del adjunto `.txt`, el asunto del correo (`[MAULAS-...]`), el cuerpo del correo, el payload del Webhook, el modal de confirmación y el `localStorage` quedan sincronizados al 100% de manera determinista, evitando desajustes entre la vista previa y el boleto expedido.
   - **Actualización de Despliegues en Google Apps Script**:
     - Las Web Apps de Google Apps Script no recargan código modificado en tiempo real; requieren expresamente publicar una **"Nueva versión"** desde *Implementar > Administrar implementaciones > Editar > Versión: Nueva versión > Implementar*.
+- **Módulo de Sellado Autónomo e Historial (`js/sellado-service.js`)**:
+  - **Auto-Envío Condicional**: Escucha cada guardado en `pronosticos.js` (tanto pronósticos individuales como Quiniela de Dobles). Si y solo si los 19 socios están completos y los dobles guardados, compila automáticamente las 35 apuestas, genera el `ticketId` oficial y despacha el correo vía Webhook sin esperar intervención manual.
+  - **Protección Antiduplicados**: Comprueba en Firestore la colección `sellados` y el flag `selladoEnviado` de la jornada antes de emitir cualquier petición.
+  - **Historial de Sellados y Enlace Directo a Drive**:
+    - Modal accesible mediante el botón **"🧾 Historial Sellados"**.
+    - Permite ver el estado de cada jornada, referencia oficial, importe, y ofrece botón con enlace directo a la carpeta en Google Drive (`RESGUARDOS QUINIELAS MAULAS`) o al visor de resguardo individual.
+    - **Control de Acceso Estricto**: Restringido **exclusivamente al socio Fernando Lozano** (`id === '6'` o nombre/email de Fernando Lozano). El botón de historial no se renderiza para ningún otro socio en la web.
 - **Entorno de Pruebas (Sandbox)**:
   - Ubicación: `sandbox_sellado.html`.
   - Acceso restringido exclusivamente al socio Fernando Lozano (`id === '6'`).

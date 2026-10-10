@@ -1282,6 +1282,11 @@ class PronosticoManager {
         if (window.TelegramService) {
             window.TelegramService.checkHabemusQuinielam(this.currentJornadaId, false, this.pronosticos);
         }
+
+        // Verificación y auto-envío desatendido del boleto oficial a la administración
+        if (window.SelladoService) {
+            window.SelladoService.verificarYAutoEnviar(this.currentJornadaId);
+        }
     }
 
     isJornadaLocked(jornada) {
@@ -2681,6 +2686,11 @@ class PronosticoManager {
 
             // Refresh summary table to show the new/updated doubles row
             this.renderSummaryTable();
+
+            // Verificación y auto-envío desatendido del boleto oficial a la administración
+            if (window.SelladoService) {
+                window.SelladoService.verificarYAutoEnviar(this.currentJornadaId);
+            }
 
             setTimeout(() => {
                 this.btnSaveDoubles.style.backgroundColor = '';
