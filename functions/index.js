@@ -15,11 +15,12 @@
  */
 
 const { onSchedule } = require('firebase-functions/v2/scheduler');
-const { onCall, HttpsError } = require('firebase-functions/v2/https');
+const { onCall, onRequest, HttpsError } = require('firebase-functions/v2/https');
 const { onDocumentUpdated, onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 const { getMessaging } = require('firebase-admin/messaging');
+const { fetchLatestQuiniela } = require('./quinielaScraper');
 
 initializeApp();
 const db = getFirestore();
@@ -468,3 +469,105 @@ exports.cleanOldTokens = onSchedule(
         console.log(`[cleanOldTokens] Eliminados ${deleted} tokens caducados.`);
     }
 );
+
+// ============================================================
+// 6. OBTENER ESCRUTINIO OFICIAL — HTTPS Request con CORS
+//    Endpoint para el botón "Importar resultados" de la web.
+// ============================================================
+exports.getQuinielaResults = onRequest(
+    { region: 'europe-west1', cors: true },
+    async (req, res) => {
+        try {
+            console.log('[getQuinielaResults] Petición recibida para consultar escrutinio oficial...');
+            const data = await fetchLatestQuiniela();
+            res.status(200).json(data);
+        } catch (err) {
+            console.error('[getQuinielaResults] Error:', err);
+            res.status(500).json({ success: false, error: err.message });
+        }
+    }
+);
+
+// ============================================================
+// 7. AUTO-IMPORTACIÓN CRON DESATENDIDA
+//    Se ejecuta automáticamente los domingos a las 23:30 y lunes 09:00.
+//    Si la jornada activa aún no tiene resultados y ya hay escrutinio,
+//    la actualiza en Firestore y dispara la notificación push.
+// ============================================================
+async function executeAutoImport(originLabel) {
+    console.log(`[autoImport] Iniciando importación automática (${originLabel})...`);
+    try {
+        const scraped = await fetchLatestQuiniela();
+        if (!scraped || !scraped.matches || scraped.matches.length !== 15) {
+            console.log('[autoImport] El escrutinio obtenido no está completo aún (menos de 15 partidos).');
+            return;
+        }
+
+        const snap = await db.collection('jornadas').where('active', '==', true).get();
+        if (snap.empty) {
+            console.log('[autoImport] No se encontraron jornadas activas en Firestore.');
+            return;
+        }
+
+        let targetDoc = null;
+        let targetData = null;
+
+        snap.forEach(doc => {
+            const j = doc.data();
+            const filled = (j.matches || []).filter(m => m.result && m.result !== '').length;
+            if (filled < 15 && !targetDoc) {
+                targetDoc = doc;
+                targetData = j;
+            }
+        });
+
+        if (!targetDoc) {
+            console.log('[autoImport] Todas las jornadas activas ya tienen resultados completos.');
+            return;
+        }
+
+        console.log(`[autoImport] Actualizando jornada ${targetData.number} (${targetDoc.id}) con datos de ${scraped.source}...`);
+        const updatedMatches = (targetData.matches || []).map((m, idx) => {
+            const sc = scraped.matches[idx];
+            return {
+                ...m,
+                result: (sc && sc.result) ? sc.result : (m.result || '')
+            };
+        });
+
+        await targetDoc.ref.update({
+            matches: updatedMatches,
+            prizes: scraped.prizes || {},
+            prizesDetails: scraped.prizesDetails || [],
+            autoImportedAt: new Date().toISOString(),
+            importedSource: scraped.source
+        });
+
+        console.log(`[autoImport] ✅ Jornada ${targetData.number} actualizada con éxito desde ${scraped.source}!`);
+    } catch (e) {
+        console.error('[autoImport] ❌ Error en auto-importación:', e);
+    }
+}
+
+exports.autoImportQuinielaSunday = onSchedule(
+    {
+        schedule: '30 23 * * 0', // Domingos 23:30 Madrid
+        timeZone: 'Europe/Madrid',
+        region: 'europe-west1'
+    },
+    async () => {
+        await executeAutoImport('Cron Domingo 23:30');
+    }
+);
+
+exports.autoImportQuinielaMonday = onSchedule(
+    {
+        schedule: '0 9 * * 1', // Lunes 09:00 Madrid
+        timeZone: 'Europe/Madrid',
+        region: 'europe-west1'
+    },
+    async () => {
+        await executeAutoImport('Cron Lunes 09:00');
+    }
+);
+

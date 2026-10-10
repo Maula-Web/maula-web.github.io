@@ -1543,6 +1543,92 @@ class Jornadas2AppController {
         }
     }
 
+    async handleAutoImportResults() {
+        const btn = document.getElementById('btn-auto-import-results');
+        const spinner = document.getElementById('btn-auto-import-spinner');
+        const icon = document.getElementById('btn-auto-import-icon');
+        const text = document.getElementById('btn-auto-import-text');
+        const statusBox = document.getElementById('auto-import-status');
+        const errorBox = document.getElementById('import-results-error-box');
+
+        if (errorBox) errorBox.classList.add('hidden');
+        if (statusBox) {
+            statusBox.textContent = 'Consultando escrutinio oficial en tiempo real...';
+            statusBox.classList.remove('hidden');
+        }
+        if (btn) btn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+        if (icon) icon.classList.add('hidden');
+        if (text) text.textContent = 'Importando...';
+
+        try {
+            if (!window.QuinielaService) {
+                throw new Error('El servicio QuinielaService no está cargado.');
+            }
+
+            const res = await window.QuinielaService.fetchLatestResults();
+
+            // Identificar qué jornada estamos visualizando
+            let currentJornada = this.jornadas.find(j => j.id == this.selectedJornadaId);
+            res.jNum = currentJornada ? currentJornada.number : (res.jNum || 'Actual');
+
+            this.pendingImportResults = res;
+
+            document.getElementById('import-results-step-1').classList.add('hidden');
+            document.getElementById('import-results-step-2').classList.remove('hidden');
+
+            const headerBox = document.getElementById('import-results-preview-header');
+            const matchesBox = document.getElementById('import-results-preview-matches');
+            const prizesBox = document.getElementById('import-results-preview-prizes');
+
+            if (headerBox) {
+                headerBox.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="font-bold text-emerald-400">Jornada ${res.jNum} &bull; ${res.source || 'Loterías del Estado'}</div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">Auto-Detectado ✅</span>
+                    </div>
+                    <div class="text-slate-300">Fecha oficial: <strong>${res.dateStr}</strong></div>
+                `;
+            }
+
+            if (matchesBox) {
+                matchesBox.innerHTML = res.matches.map((m, idx) => `
+                    <div class="p-1.5 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="w-8 font-bold text-slate-400">${idx === 14 ? 'P15' : idx + 1}</span>
+                        <span class="text-white truncate">${m.home} vs ${m.away}</span>
+                        <span class="font-black text-amber-400 px-2">${m.result}</span>
+                    </div>
+                `).join('');
+            }
+
+            if (prizesBox) {
+                prizesBox.innerHTML = `
+                    <div class="text-[11px] font-bold text-amber-400 mb-1">Premios oficiales detectados:</div>
+                    <div class="grid grid-cols-3 gap-1 font-mono text-[11px]">
+                        ${Object.keys(res.prizes).map(k => `
+                            <div class="p-1 rounded bg-slate-900 text-slate-300 flex justify-between">
+                                <span>${k === '15' ? 'P15' : k + 'A'}:</span>
+                                <strong class="text-emerald-400">${this.formatMoney(res.prizes[k])}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        } catch (err) {
+            console.error('[Jornadas 2.0] Error en auto-importación:', err);
+            if (errorBox) {
+                errorBox.innerHTML = `<div>❌ Error al importar automáticamente: ${err.message}</div>`;
+                errorBox.classList.remove('hidden');
+            }
+        } finally {
+            if (btn) btn.disabled = false;
+            if (spinner) spinner.classList.add('hidden');
+            if (icon) icon.classList.remove('hidden');
+            if (text) text.textContent = 'Importar resultados';
+            if (statusBox) statusBox.classList.add('hidden');
+        }
+    }
+
     handleAnalyzeResultsText() {
         const textarea = document.getElementById('import-results-textarea');
         const errorBox = document.getElementById('import-results-error-box');

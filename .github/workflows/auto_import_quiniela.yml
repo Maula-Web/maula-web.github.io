@@ -1,0 +1,42 @@
+name: Auto-Importar Resultados Quiniela
+
+on:
+  schedule:
+    # Domingos a las 22:30 y 23:30 (hora peninsular: 20:30 y 21:30 UTC / 21:30 y 22:30 UTC en verano)
+    - cron: '30 21 * * 0'
+    - cron: '30 22 * * 0'
+    # Lunes por la mañana a las 09:00 (07:00 / 08:00 UTC)
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+    # Permite pulsar "Run workflow" manualmente desde GitHub con un clic
+
+jobs:
+  import-quiniela:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm ci || npm install
+
+      - name: Importar Resultados y Premios
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/auto_import_quiniela.js
+
+      - name: Commit y Guardar Escrutinio Cache
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Peña Maulas Bot"
+          git add datos_auxiliares/ || true
+          git commit -m "Auto-import: Resultados y Escrutinio Quiniela [skip ci]" || echo "Sin cambios locales que commitear"
+          git push || true
