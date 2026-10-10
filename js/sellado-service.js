@@ -368,16 +368,60 @@
         },
 
         /**
-         * Obtiene todos los registros del historial de sellados
+         * Obtiene todos los registros del historial de sellados (Firestore + localStorage sync)
          */
         async obtenerHistorial() {
-            if (!window.DataService) return [];
-            try {
-                const list = await window.DataService.getAll('sellados').catch(() => []);
-                return list.sort((a, b) => (parseInt(b.jornada, 10) || 0) - (parseInt(a.jornada, 10) || 0));
-            } catch (e) {
-                return [];
+            const map = new Map();
+
+            // 1. Leer de Firestore
+            if (window.DataService && window.DataService.getAll) {
+                try {
+                    const list = await window.DataService.getAll('sellados').catch(() => []);
+                    (list || []).forEach(item => {
+                        if (item && (item.ticketId || item.jornada)) {
+                            const key = String(item.ticketId || `j_${item.jornada}`);
+                            map.set(key, item);
+                        }
+                    });
+                } catch (e) {}
             }
+
+            // 2. Complementar con los registros de sellado guardados en localStorage
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith('maulas_sellado_j_')) {
+                        const raw = localStorage.getItem(k);
+                        if (raw) {
+                            try {
+                                const rec = JSON.parse(raw);
+                                if (rec && rec.ticketId) {
+                                    if (!map.has(rec.ticketId)) {
+                                        map.set(rec.ticketId, {
+                                            id: rec.ticketId,
+                                            ticketId: rec.ticketId,
+                                            jornada: rec.jornada,
+                                            p15Oficial: rec.p15 || '10',
+                                            apuestas: 35,
+                                            importe: 26.25,
+                                            destino: rec.destino,
+                                            enviadoEn: rec.enviadoEn,
+                                            estado: rec.status === 'CONFIRMADO' ? 'CONFIRMADO' : 'ENVIADO',
+                                            driveFolderUrl: 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS',
+                                            resguardoDriveUrl: (rec.respuesta && rec.respuesta.attachments && rec.respuesta.attachments[0] && (rec.respuesta.attachments[0].driveUrl || rec.respuesta.attachments[0].dataUri)) || null,
+                                            respuestaLotero: rec.respuesta || null,
+                                            rectificadoEn: rec.rectificadoEn || null
+                                        });
+                                    }
+                                }
+                            } catch (errJson) {}
+                        }
+                    }
+                }
+            } catch (errLs) {}
+
+            const merged = Array.from(map.values());
+            return merged.sort((a, b) => (parseInt(b.jornada, 10) || 0) - (parseInt(a.jornada, 10) || 0));
         },
 
         /**
@@ -756,6 +800,12 @@
         inyectarBotonSiEsFernando() {
             if (!this.isFernando()) return;
 
+            const existingBtn = document.getElementById('btn-historial-sellados-fl');
+            if (existingBtn) {
+                existingBtn.style.display = 'inline-flex';
+                return;
+            }
+
             const targetHeader = document.querySelector('.header-actions .action-buttons') || document.querySelector('.header-actions');
             if (targetHeader && !document.getElementById('btn-historial-sellados-fl')) {
                 const btn = document.createElement('button');
@@ -779,10 +829,20 @@
 
     window.SelladoService = SelladoService;
 
-    // Inyección condicional en carga de página
+    // Inyección condicional en carga de página con reintentos para asegurar render tras autenticación
+    function intentarInyeccion() {
+        SelladoService.inyectarBotonSiEsFernando();
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => setTimeout(() => SelladoService.inyectarBotonSiEsFernando(), 150));
+        document.addEventListener('DOMContentLoaded', () => {
+            intentarInyeccion();
+            setTimeout(intentarInyeccion, 300);
+            setTimeout(intentarInyeccion, 1000);
+        });
     } else {
-        setTimeout(() => SelladoService.inyectarBotonSiEsFernando(), 150);
+        intentarInyeccion();
+        setTimeout(intentarInyeccion, 300);
+        setTimeout(intentarInyeccion, 1000);
     }
 })();
