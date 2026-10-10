@@ -334,7 +334,7 @@ function deducirTemporada(ticketId) {
  * Busca en la bandeja de Penalosmaulas@gmail.com el hilo de sellado
  * y extrae la respuesta del lotero (texto y archivo resguardo adjunto).
  * Guarda el resguardo en Google Drive en:
- * REGUARDOS QUINIELAS MAULAS / TEMPORADA 2026-2027 / [RESGUARDOS DE PRUEBA]
+ * RESGUARDOS QUINIELAS MAULAS / TEMPORADA 2026-2027 / [RESGUARDOS DE PRUEBA]
  */
 function procesarConsultaRespuesta(ticketId, jornada, isTest) {
   try {
@@ -435,8 +435,8 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
     var folderDestino = null;
 
     try {
-      // 1. Carpeta Raíz: REGUARDOS QUINIELAS MAULAS
-      var folderRaiz = obtenerOCrearCarpeta("REGUARDOS QUINIELAS MAULAS", null);
+      // 1. Carpeta Raíz: RESGUARDOS QUINIELAS MAULAS
+      var folderRaiz = obtenerOCrearCarpeta("RESGUARDOS QUINIELAS MAULAS", null);
       
       // 2. Subcarpeta de Temporada inteligente (ej: TEMPORADA 2026-2027)
       var nombreTemporada = deducirTemporada(foundTicketId);

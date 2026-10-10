@@ -1211,9 +1211,9 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
         var folderDestino = null;
 
         // Guardado en jerarquía inteligente en Google Drive:
-        // REGUARDOS QUINIELAS MAULAS / TEMPORADA 2026-2027 / [RESGUARDOS DE PRUEBA]
+        // RESGUARDOS QUINIELAS MAULAS / TEMPORADA 2026-2027 / [RESGUARDOS DE PRUEBA]
         try {
-          var folderRaiz = obtenerOCrearCarpeta("REGUARDOS QUINIELAS MAULAS", null);
+          var folderRaiz = obtenerOCrearCarpeta("RESGUARDOS QUINIELAS MAULAS", null);
           var nombreTemporada = deducirTemporada(foundTicketId);
           var folderTemporada = obtenerOCrearCarpeta(nombreTemporada, folderRaiz);
           if (isTest) {
@@ -1300,7 +1300,7 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
   - **Estrategia de Almacenamiento Multinivel de Resguardos Oficiales**:
     1. **Nivel Legal (Gmail)**: Se conserva indefinidamente en `penalosmaulas@gmail.com` con cabeceras completas y firma criptográfica.
     2. **Nivel Archivo Digital (Google Drive)**: Se organiza automáticamente en:
-       `REGUARDOS QUINIELAS MAULAS \ TEMPORADA 2026-2027 \ [RESGUARDOS DE PRUEBA]`
+       `RESGUARDOS QUINIELAS MAULAS \ TEMPORADA 2026-2027 \ [RESGUARDOS DE PRUEBA]`
        - Clasificación inteligente: Extrae la temporada automáticamente de la clave del ticket (ej. `MAULAS-2627-...` -> `TEMPORADA 2026-2027`).
        - Fase de pruebas: Durante las pruebas desde el sandbox, los resguardos se depositan en la subcarpeta `RESGUARDOS DE PRUEBA`. En producción pasarán directamente a la carpeta de la temporada.
     3. **Nivel Comunitario (Web / Firestore)**: Metadatos del sellado (`ticketId`, `resguardoUrl`, fecha y terminal) para que los 19 socios puedan consultar el resguardo oficial desde su móvil.
