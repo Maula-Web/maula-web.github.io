@@ -1249,7 +1249,7 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
                   driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
                 }
                 driveFileId = driveFile.getId();
-                driveFileUrl = 'https://drive.google.com/uc?export=view&id=' + driveFileId;
+                driveFileUrl = 'https://drive.google.com/file/d/' + driveFileId + '/view';
               } catch (dErr) {}
             }
 
