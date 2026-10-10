@@ -121,7 +121,7 @@
                         🎯 P15: --
                     </span>
                 </div>
-                <button onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 shadow">
+                <button id="btn-recargar-sandbox" onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 shadow cursor-pointer active:scale-95">
                     🔄 Recargar
                 </button>
             </div>
@@ -492,10 +492,9 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                             <span id="icon-spinner-respuesta">🔄</span> Comprobar Respuesta en Gmail
                         </button>
                         <div class="flex items-center gap-2">
-                            <label class="flex items-center gap-1.5 text-[11px] text-slate-400 select-none cursor-pointer bg-slate-900/90 px-2.5 py-1.5 rounded-lg border border-slate-800 hover:text-slate-200">
-                                <input type="checkbox" id="check-auto-poll" onchange="SandboxManager.toggleAutoPolling(this.checked)" class="rounded bg-slate-950 border-slate-700 text-blue-500 focus:ring-0">
-                                <span class="font-mono">Auto 30s</span>
-                            </label>
+                            <button id="btn-auto-poll" onclick="SandboxManager.toggleAutoPolling()" title="Comprobar automáticamente en segundo plano cada 30 segundos si la administración ha respondido" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                                <span id="icon-auto-poll">⏱️</span> <span id="text-auto-poll" class="font-mono">Auto 30s</span>
+                            </button>
                             <button onclick="SandboxManager.simularRespuestaLoteroDemo()" title="Probar visualización de resguardo con datos de prueba" class="py-1.5 px-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-[10px] text-slate-400 hover:text-amber-300 border border-slate-700 font-mono">
                                 🧪 Demo
                             </button>
@@ -723,6 +722,7 @@ function procesarConsultaRespuesta(ticketId, jornada) {
             ticketIdActual: null,
             selladoRecord: null,
             pollingInterval: null,
+            isAutoPolling: false,
 
             init() {
                 this.checkAuth();
@@ -772,7 +772,7 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 box.scrollTop = box.scrollHeight;
             },
 
-            async cargarDatos() {
+            async cargarDatos(jornadaPreservar = null) {
                 this.log('Conectando con base de datos para cargar jornadas y pronósticos reales...');
                 try {
                     if (window.DataService) {
@@ -791,20 +791,48 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                     }
 
                     this.log(`Datos reales listos: ${this.members.length} socios, ${this.jornadas.length} jornadas, ${this.pronosticos.length} pronósticos.`);
-                    this.poblarSelectorJornadas();
+                    this.poblarSelectorJornadas(jornadaPreservar);
 
                 } catch(err) {
                     this.log(`Aviso al conectar con base de datos: ${err.message}. Empleando histórico local.`, 'error');
-                    this.cargarDatosFallback();
+                    this.cargarDatosFallback(jornadaPreservar);
                 }
             },
 
-            recargarDatos() {
-                this.log('Recargando datos de jornada...');
-                if (window.DataService && window.DataService.clearSeasonDataCache) {
-                    window.DataService.clearSeasonDataCache();
+            async recargarDatos() {
+                const btn = document.getElementById('btn-recargar-sandbox');
+                const originalHtml = btn ? btn.innerHTML : '🔄 Recargar';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = `<span class="inline-block animate-spin">🔄</span> Recargando...`;
                 }
-                this.cargarDatos();
+                this.log('Recargando jornadas y pronósticos desde la base de datos...');
+                const sel = document.getElementById('sel-jornada-sandbox');
+                const currentJornadaVal = sel ? sel.value : this.jornadaActual;
+
+                try {
+                    if (window.DataService && window.DataService.clearSeasonDataCache) {
+                        window.DataService.clearSeasonDataCache();
+                    }
+                    await this.cargarDatos(currentJornadaVal);
+                    this.log('✅ Datos recargados con éxito desde la base de datos.', 'success');
+                    if (btn) {
+                        btn.innerHTML = `✅ ¡Actualizado!`;
+                        setTimeout(() => {
+                            btn.innerHTML = originalHtml;
+                            btn.disabled = false;
+                        }, 1800);
+                    }
+                } catch(err) {
+                    this.log(`Error al recargar datos: ${err.message}`, 'error');
+                    if (btn) {
+                        btn.innerHTML = `⚠️ Error`;
+                        setTimeout(() => {
+                            btn.innerHTML = originalHtml;
+                            btn.disabled = false;
+                        }, 2500);
+                    }
+                }
             },
 
             obtenerSociosPlantilla() {
@@ -817,7 +845,7 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 return nombres.map((name, idx) => ({ id: idx + 1, name: name }));
             },
 
-            cargarDatosFallback() {
+            cargarDatosFallback(jornadaPreservar = null) {
                 this.members = this.obtenerSociosPlantilla();
                 // Si existe HISTORICAL_DATA de data_loader.js
                 if (window.HISTORICAL_DATA && Array.isArray(window.HISTORICAL_DATA)) {
@@ -827,10 +855,10 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                         date: `Jornada ${h.jornada_num}`
                     }));
                 }
-                this.poblarSelectorJornadas();
+                this.poblarSelectorJornadas(jornadaPreservar);
             },
 
-            poblarSelectorJornadas() {
+            poblarSelectorJornadas(jornadaPreservar = null) {
                 const sel = document.getElementById('sel-jornada-sandbox');
                 if (!sel) return;
                 sel.innerHTML = '';
@@ -864,9 +892,11 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 optDemo.textContent = '⚡ Simulación de Muestra (Demo 35 Apuestas)';
                 sel.appendChild(optDemo);
 
-                // Seleccionar por defecto la jornada más reciente que tenga pronósticos
+                // Determinar jornada a seleccionar: o la preservada o la más reciente con pronósticos
                 let defaultVal = 'test_sim';
-                if (jornadasOrdenadas.length > 0) {
+                if (jornadaPreservar && (jornadaPreservar === 'test_sim' || jornadasOrdenadas.some(j => String(j.number || j.id) === String(jornadaPreservar)))) {
+                    defaultVal = String(jornadaPreservar);
+                } else if (jornadasOrdenadas.length > 0) {
                     const conPronos = jornadasOrdenadas.find(j => this.contarPronosticosDeJornada(j) > 0);
                     defaultVal = conPronos ? String(conPronos.number || conPronos.id) : String(jornadasOrdenadas[0].number || jornadasOrdenadas[0].id);
                 }
@@ -1742,8 +1772,10 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 if (btn) btn.disabled = true;
                 if (spinner) spinner.classList.add('animate-spin');
 
-                if (!silencioso) {
-                    this.log(`Consultando en Gmail si la administración respondió para ${ticketId}...`);
+                if (silencioso) {
+                    this.log(`[Auto 30s] Consultando en Gmail si la administración respondió para ${ticketId}...`, 'info');
+                } else {
+                    this.log(`Consultando en Gmail si la administración respondió para ${ticketId}...`, 'info');
                 }
 
                 try {
@@ -1790,14 +1822,11 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                             this.actualizarMonitorRespuesta(this.selladoRecord);
                             this.toggleAutoPolling(false);
 
-                            if (!silencioso) {
-                                alert(`¡SELLADO CONFIRMADO POR LA ADMINISTRACIÓN!\n\nRemitente: ${data.from}\nAsunto: ${data.subject}\n\nAdjuntos recibidos: ${data.attachmentsCount || (data.attachments ? data.attachments.length : 0)}\n\nRevisa el panel de resguardo.`);
-                            }
+                            // Notificar SIEMPRE con alerta (incluso en sondeo automático) para avisar al usuario
+                            alert(`🎉 ¡SELLADO CONFIRMADO POR LA ADMINISTRACIÓN!\n\nRemitente: ${data.from}\nAsunto: ${data.subject}\n\nAdjuntos recibidos: ${data.attachmentsCount || (data.attachments ? data.attachments.length : 0)}\n\nEl resguardo oficial ha sido verificado y se muestra en el panel inferior.`);
                         } else {
                             if (data.foundThread) {
-                                if (!silencioso) {
-                                    this.log(`⏳ Correo de sellado localizado en Gmail (${data.messagesCount || 1} msg). La administración aún no ha contestado.`, 'info');
-                                }
+                                this.log(`⏳ [Gmail] Correo de sellado localizado (${data.messagesCount || 1} msg). Esperando respuesta del lotero...`, 'info');
                                 if (txtStatusInfo) {
                                     txtStatusInfo.innerHTML = `Correo entregado en Gmail (${now}). Esperando que el lotero valide y responda con el resguardo.`;
                                 }
@@ -1807,9 +1836,7 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                                     badge.textContent = `⏳ Esperando Lotero (${now})`;
                                 }
                             } else {
-                                if (!silencioso) {
-                                    this.log(`ℹ️ No se ha encontrado ningún correo con referencia ${ticketId} en Gmail todavía.`, 'warning');
-                                }
+                                this.log(`ℹ️ [Gmail] No se ha encontrado ningún correo con referencia ${ticketId} todavía.`, 'warning');
                                 if (txtStatusInfo) {
                                     txtStatusInfo.innerHTML = `No se localizó ningún correo con referencia <strong class="text-slate-300 font-mono">${ticketId}</strong> en Gmail.`;
                                 }
@@ -1821,14 +1848,17 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                     }
                 } catch(err) {
                     this.log(`Error al consultar respuesta en Gmail: ${err.message}`, 'error');
-                    if (!silencioso) {
-                        if (err.message.includes('argumento no puede ser nulo') || err.message.includes('fileContent')) {
-                            alert(`ATENCIÓN: Tu Google Apps Script todavía tiene desplegada la versión inicial que no soporta consultas.\n\nPara solucionarlo en 1 minuto:\n1. Pulsa "Copiar Código" en la sección de arriba.\n2. Abre script.google.com y pega el código.\n3. Guarda (Ctrl+S).\n4. Haz clic en "Implementar" > "Administrar implementaciones" > Edita con el lápiz > En Versión elige "Nueva versión" > Pulsa "Implementar".`);
-                        } else {
-                            alert(`Error al consultar respuesta:\n\n${err.message}\n\nAsegúrate de haber actualizado el código en Google Apps Script con la nueva versión y desplegado una Nueva Versión.`);
-                        }
-                    } else if (err.message.includes('argumento no puede ser nulo')) {
-                        this.log('Aviso: Tu Webhook de Google Apps Script requiere desplegar una "Nueva versión" con el código actualizado para poder consultar respuestas automáticamente.', 'warning');
+                    if (txtStatusInfo) {
+                        txtStatusInfo.innerHTML = `<span class="text-rose-400 font-bold">Error en consulta:</span> ${err.message}`;
+                    }
+
+                    if (err.message.includes('argumento no puede ser nulo') || err.message.includes('fileContent')) {
+                        this.toggleAutoPolling(false);
+                        alert(`ATENCIÓN: Tu Google Apps Script todavía tiene desplegada la versión inicial que no soporta consultas.\n\nPara solucionarlo en 1 minuto:\n1. Pulsa "Copiar Código" en la guía de arriba.\n2. Abre script.google.com y pega el código.\n3. Guarda (Ctrl+S).\n4. Ve a Implementar > Administrar implementaciones > Edita (lápiz) > Versión: "Nueva versión" > Implementar.`);
+                    } else if (!silencioso) {
+                        alert(`Error al consultar respuesta:\n\n${err.message}\n\nAsegúrate de haber actualizado el código en Google Apps Script con la nueva versión y desplegado una Nueva Versión.`);
+                    } else {
+                        this.log(`[Auto 30s] Aviso: ${err.message}`, 'warning');
                     }
                 } finally {
                     if (btn) btn.disabled = false;
@@ -1836,23 +1866,68 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 }
             },
 
-            toggleAutoPolling(active) {
-                const chk = document.getElementById('check-auto-poll');
-                if (chk) chk.checked = active;
-
-                if (this.pollingInterval) {
-                    clearInterval(this.pollingInterval);
-                    this.pollingInterval = null;
+            toggleAutoPolling(active = null) {
+                if (active === null) {
+                    active = !this.isAutoPolling;
+                } else {
+                    active = Boolean(active);
                 }
 
+                const webhookUrl = (document.getElementById('input-webhook-url')?.value || '').trim();
+
                 if (active) {
-                    this.log('Comprobación automática cada 30 segundos ACTIVADA.', 'info');
+                    if (!webhookUrl) {
+                        this.isAutoPolling = false;
+                        this.actualizarBotonAutoPoll(false);
+                        alert('⚠️ Debes configurar la URL de tu Webhook de Google Apps Script arriba antes de activar la comprobación automática.');
+                        const inp = document.getElementById('input-webhook-url');
+                        if (inp) inp.focus();
+                        return;
+                    }
+
+                    if (this.selladoRecord && this.selladoRecord.status === 'CONFIRMADO') {
+                        this.isAutoPolling = false;
+                        this.actualizarBotonAutoPoll(false);
+                        alert('ℹ️ ¡El sellado de esta jornada ya está confirmado por la administración!\n\nNo es necesario activar la comprobación automática porque el resguardo oficial ya ha sido recibido.');
+                        return;
+                    }
+
+                    this.isAutoPolling = true;
+                    this.actualizarBotonAutoPoll(true);
+                    this.log('🟢 Comprobación automática cada 30 segundos ACTIVADA.', 'info');
+
+                    // Primera comprobación inmediata
                     this.comprobarRespuestaLotero(true);
+
+                    if (this.pollingInterval) clearInterval(this.pollingInterval);
                     this.pollingInterval = setInterval(() => {
+                        if (!this.isAutoPolling) {
+                            clearInterval(this.pollingInterval);
+                            this.pollingInterval = null;
+                            return;
+                        }
                         this.comprobarRespuestaLotero(true);
                     }, 30000);
                 } else {
-                    this.log('Comprobación automática desactivada.', 'info');
+                    this.isAutoPolling = false;
+                    if (this.pollingInterval) {
+                        clearInterval(this.pollingInterval);
+                        this.pollingInterval = null;
+                    }
+                    this.actualizarBotonAutoPoll(false);
+                    this.log('⚪ Comprobación automática desactivada.', 'info');
+                }
+            },
+
+            actualizarBotonAutoPoll(activo) {
+                const btn = document.getElementById('btn-auto-poll');
+                if (!btn) return;
+                if (activo) {
+                    btn.className = 'py-2 px-3 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 border border-blue-500/50 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/20 animate-pulse cursor-pointer';
+                    btn.innerHTML = `<span class="animate-spin inline-block text-xs">⏳</span> <span class="font-mono">Auto 30s: ACTIVO</span>`;
+                } else {
+                    btn.className = 'py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer';
+                    btn.innerHTML = `<span>⏱️</span> <span class="font-mono">Auto 30s</span>`;
                 }
             },
 
@@ -1964,6 +2039,8 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                 }
             }
         };
+
+        window.SandboxManager = SandboxManager;
 
         document.addEventListener('DOMContentLoaded', () => {
             SandboxManager.init();
