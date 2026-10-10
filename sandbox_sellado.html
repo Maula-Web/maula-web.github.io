@@ -167,8 +167,8 @@
             </div>
         </div>
 
-        <!-- GRID PRINCIPAL: 2 POSIBILIDADES DE ENVÍO -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- GRID PRINCIPAL DE ENVÍO -->
+        <div class="grid grid-cols-1 gap-5">
 
             <!-- ==================== POSIBILIDAD 1: SOPORTE DIGITAL SELAE VÍA EMAIL ==================== -->
             <div class="glass-panel p-5 sm:p-6 border-blue-500/30 flex flex-col justify-between space-y-4">
@@ -621,8 +621,8 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 </div>
             </div>
 
-            <!-- ==================== POSIBILIDAD 2: PASARELA WEB LOSILLA ==================== -->
-            <div class="glass-panel p-5 sm:p-6 border-amber-500/30 flex flex-col justify-between space-y-4">
+            <!-- ==================== POSIBILIDAD 2: PASARELA WEB LOSILLA (OCULTA TEMPORALMENTE) ==================== -->
+            <div id="panel-posibilidad-losilla" class="hidden glass-panel p-5 sm:p-6 border-amber-500/30 flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
                         <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
