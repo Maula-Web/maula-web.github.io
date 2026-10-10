@@ -495,8 +495,8 @@
                     const isConfirmado = r.estado === 'CONFIRMADO';
                     const badgeClass = isConfirmado ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-blue-500/20 text-blue-400 border-blue-500/40';
                     const fechaTxt = r.enviadoEn ? new Date(r.enviadoEn).toLocaleString() : 'Fecha no disp.';
-                    const driveUrl = r.resguardoDriveUrl || r.driveFolderUrl || 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS';
-                    const rectificadoTag = r.rectificadoEn ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">✏️ Rectificado</span>` : '';
+                    const folderUrl = r.driveFolderUrl || (r.respuestaLotero && r.respuestaLotero.driveFolderUrl) || 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS';
+                    const resguardoUrl = r.resguardoDriveUrl || (r.respuestaLotero && r.respuestaLotero.attachments && r.respuestaLotero.attachments[0] && (r.respuestaLotero.attachments[0].driveUrl || r.respuestaLotero.attachments[0].dataUri)) || null;
 
                     return `
                         <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -517,18 +517,18 @@
                             </div>
 
                             <div class="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
-                                <a href="${driveUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 flex items-center gap-1 transition">
-                                    <span>📁</span> Drive
+                                <a href="${folderUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 flex items-center gap-1 transition" title="Abrir carpeta contenedora en Google Drive">
+                                    <span>📁</span> Carpeta Drive
                                 </a>
-                                ${r.resguardoDriveUrl ? `
-                                <a href="${r.resguardoDriveUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-xs font-bold border border-emerald-500/40 flex items-center gap-1 transition">
+                                ${resguardoUrl ? `
+                                <a href="${resguardoUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-xs font-bold border border-emerald-500/40 flex items-center gap-1 transition" title="Ver archivo de resguardo oficial">
                                     <span>🧾</span> Ver Resguardo
                                 </a>` : ''}
                                 <button onclick="SelladoService.reconsultarRectificacion('${r.ticketId}', ${r.jornada})" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 text-xs font-bold border border-blue-500/40 flex items-center gap-1 transition" title="Consultar si la administración ha enviado un correo con resguardo corregido">
                                     <span>🔄</span> Re-consultar Gmail
                                 </button>
-                                <button onclick="SelladoService.abrirModalSubidaManual('${r.ticketId}', ${r.jornada})" class="px-2.5 py-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/40 text-purple-300 text-xs font-bold border border-purple-500/40 flex items-center gap-1 transition" title="Subir manualmente una foto/PDF de corrección">
-                                    <span>📤</span> Sustituir
+                                <button onclick="SelladoService.abrirModalSubidaManual('${r.ticketId}', ${r.jornada})" class="px-2.5 py-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/40 text-purple-300 text-xs font-bold border border-purple-500/40 flex items-center gap-1 transition" title="Cargar resguardo o corrección desde otra fuente (WhatsApp, foto, PDF)">
+                                    <span>📥</span> Guardar desde otra fuente
                                 </button>
                             </div>
                         </div>
@@ -715,7 +715,7 @@
         },
 
         /**
-         * Modal de Subida Manual para sustituir el resguardo (ej. si llega por WhatsApp)
+         * Modal de Subida Manual para guardar resguardo/corrección desde otra fuente (WhatsApp, etc.)
          */
         abrirModalSubidaManual(ticketId, jornadaNum) {
             let modalManual = document.getElementById('modal-subida-manual-resguardo');
@@ -728,13 +728,13 @@
                 <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl text-slate-200">
                     <div class="flex items-center justify-between pb-2 border-b border-slate-800">
                         <div class="flex items-center gap-2">
-                            <span class="text-xl">📤</span>
-                            <h3 class="text-sm font-extrabold text-white">Sustituir Resguardo Manualmente</h3>
+                            <span class="text-xl">📥</span>
+                            <h3 class="text-sm font-extrabold text-white">Guardar Resguardo desde Otra Fuente</h3>
                         </div>
                         <button onclick="document.getElementById('modal-subida-manual-resguardo').remove()" class="text-slate-400 hover:text-white text-xs font-bold">✕</button>
                     </div>
 
-                    <p class="text-xs text-slate-300">Selecciona el nuevo archivo de resguardo (imagen o PDF) recibido como corrección para la <strong>Jornada ${jornadaNum}</strong>.</p>
+                    <p class="text-xs text-slate-300">Selecciona el archivo de resguardo (imagen o PDF) recibido desde otra fuente (WhatsApp, foto, descarga) para la <strong>Jornada ${jornadaNum}</strong>.</p>
 
                     <div class="space-y-3">
                         <input type="file" id="input-archivo-resguardo-manual" accept="image/*,application/pdf" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600/30 file:text-blue-300 hover:file:bg-blue-600/40 cursor-pointer">
@@ -743,7 +743,7 @@
 
                     <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800 text-xs">
                         <button onclick="document.getElementById('modal-subida-manual-resguardo').remove()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition">Cancelar</button>
-                        <button id="btn-guardar-subida-manual" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition">Guardar Sustitución</button>
+                        <button id="btn-guardar-subida-manual" class="px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold transition">Guardar en Sistema</button>
                     </div>
                 </div>
             `;

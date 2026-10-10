@@ -512,6 +512,8 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
       }
     }
 
+    var driveFolderUrl = folderDestino ? folderDestino.getUrl() : 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS';
+
     return ContentService.createTextOutput(JSON.stringify({
       ok: true,
       hasReply: true,
@@ -522,6 +524,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
       date: replyMsg.getDate().toISOString(),
       body: replyMsg.getPlainBody().substring(0, 1500),
       attachmentsCount: attachments.length,
+      driveFolderUrl: driveFolderUrl,
       attachments: attList
     })).setMimeType(ContentService.MimeType.JSON);
 
@@ -627,14 +630,14 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                                 <span class="text-[9px] text-slate-400 font-mono">Exclusivo Fernando</span>
                             </div>
                             <p class="text-[10px] text-slate-400">
-                                Si la administración te ha enviado una corrección por correo o WhatsApp, puedes contrastar el resguardo anterior con el nuevo o sustituirlo manualmente.
+                                Si la administración te ha enviado una corrección por correo o WhatsApp, puedes contrastar el resguardo anterior con el nuevo o guardarlo directamente en el sistema.
                             </p>
                             <div class="flex flex-wrap items-center gap-2 pt-1">
                                 <button type="button" onclick="SelladoService.reconsultarRectificacion(SandboxManager.ticketIdActual || SandboxManager.selladoRecord?.ticketId, SandboxManager.jornadaActual)" class="px-3 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 hover:text-white text-xs font-bold border border-blue-500/40 flex items-center gap-1.5 transition">
                                     <span>🔄</span> Re-consultar Gmail (Comparar y Sustituir)
                                 </button>
-                                <button type="button" onclick="SelladoService.abrirModalSubidaManual(SandboxManager.ticketIdActual || SandboxManager.selladoRecord?.ticketId, SandboxManager.jornadaActual)" class="px-3 py-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 hover:text-white text-xs font-bold border border-purple-500/40 flex items-center gap-1.5 transition">
-                                    <span>📤</span> Subir Rectificación Manual
+                                <button type="button" onclick="SelladoService.abrirModalSubidaManual(SandboxManager.ticketIdActual || SandboxManager.selladoRecord?.ticketId, SandboxManager.jornadaActual)" class="px-3 py-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 hover:text-white text-xs font-bold border border-purple-500/40 flex items-center gap-1.5 transition" title="Cargar resguardo o corrección desde otra fuente (WhatsApp, foto, PDF)">
+                                    <span>📥</span> Guardar desde otra fuente
                                 </button>
                             </div>
                         </div>
@@ -1820,13 +1823,12 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                                             <div class="text-slate-200 font-bold text-xs truncate">${att.name}</div>
                                             <div class="text-slate-400 text-[10px] font-mono">${att.contentType || 'image'} • ${sizeKb}</div>
                                             <div class="flex items-center gap-2 pt-1 justify-center sm:justify-start">
-                                                <button onclick="SandboxManager.abrirModalResguardo('${att.dataUri || att.driveUrl}', '${att.name}')" class="px-2 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-[11px] font-bold border border-emerald-500/40 flex items-center gap-1 transition">
-                                                    <span>🔍</span> Ver a Tamaño Completo
+                                                <button onclick="SandboxManager.abrirModalResguardo('${att.dataUri || att.driveUrl}', '${att.name}')" class="px-2 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-[11px] font-bold border border-emerald-500/40 flex items-center gap-1 transition" title="Ver resguardo oficial ampliado">
+                                                    <span>🔍</span> Ver Resguardo
                                                 </button>
-                                                ${att.driveUrl ? `
-                                                <a href="${att.driveUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-bold border border-amber-500/40 flex items-center gap-1 transition">
-                                                    <span>📁</span> Google Drive
-                                                </a>` : ''}
+                                                <a href="${resp.driveFolderUrl || 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS'}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-bold border border-amber-500/40 flex items-center gap-1 transition" title="Abrir carpeta contenedora en Google Drive">
+                                                    <span>📁</span> Carpeta Drive
+                                                </a>
                                                 <a href="${att.dataUri || att.driveUrl}" download="${att.name}" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 flex items-center gap-1 transition">
                                                     <span>📥</span> Descargar
                                                 </a>
@@ -1845,7 +1847,8 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5 shrink-0">
-                                            ${att.driveUrl ? `<a href="${att.driveUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-[11px] border border-amber-500/40 flex items-center gap-1 transition"><span>📁</span> Google Drive</a>` : ''}
+                                            <a href="${resp.driveFolderUrl || 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS'}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-[11px] border border-amber-500/40 flex items-center gap-1 transition" title="Abrir carpeta contenedora en Google Drive"><span>📁</span> Carpeta Drive</a>
+                                            ${att.driveUrl ? `<a href="${att.driveUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 font-bold text-[11px] border border-emerald-500/40 flex items-center gap-1 transition"><span>🧾</span> Ver Archivo</a>` : ''}
                                             ${(att.dataUri || att.driveUrl) ? `<a href="${att.dataUri || att.driveUrl}" download="${att.name}" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 font-bold text-[11px] border border-blue-500/40 flex items-center gap-1 transition"><span>📥</span> Descargar</a>` : ''}
                                         </div>
                                     </div>
@@ -2084,13 +2087,14 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     date: new Date().toISOString(),
                     body: `Hola Peña Los Maulas,\n\nHemos procesado y sellado correctamente vuestro archivo digital para la Jornada ${this.jornadaActual} (${ticketId}).\n\n- Total: 35 apuestas validadas\n- Pleno al 15: ${this.p15Oficial || '10'}\n- Importe descontado: 26,25 €\n- Saldo restante en depósito: 128,50 €\n\nOs adjuntamos el resguardo emitido por el terminal SELAE. ¡Mucha suerte este fin de semana!\n\nLotería El Rosario`,
                     attachmentsCount: 1,
+                    driveFolderUrl: 'https://drive.google.com/drive/search?q=RESGUARDOS%20QUINIELAS%20MAULAS',
                     attachments: [
                         {
                             name: `resguardo_selae_j${jPad}_${ticketId}.png`,
                             contentType: 'image/png',
                             size: 142500,
                             dataUri: svgBase64,
-                            driveUrl: 'https://drive.google.com/drive/folders/peña-los-maulas-resguardos'
+                            driveUrl: svgBase64
                         }
                     ]
                 };
