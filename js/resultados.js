@@ -199,9 +199,13 @@ class ResultsManager {
         // Jornada Rows
         finishedJornadas.forEach(j => {
             const hasPig = j.matches && j.matches.some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
-            tbodyHtml += `<tr>`;
+            const filledMatches = j.matches ? j.matches.filter(m => m.result && m.result.trim() !== '' && m.result.trim() !== '-').length : 0;
+            const isInPlay = (j.active !== false) && (filledMatches > 0 && filledMatches < 15);
+            const liveBadge = isInPlay ? `<span style="display:inline-block; margin-left:4px; font-size:0.75rem; background:#10b981; color:#fff; padding:1px 6px; border-radius:10px; font-weight:bold;">${filledMatches}/15</span>` : '';
+
+            tbodyHtml += `<tr style="${isInPlay ? 'background:rgba(16, 185, 129, 0.05);' : ''}">`;
             tbodyHtml += `<td style="font-size:0.9rem; border-right:2px solid #ddd;">
-                            <div style="font-weight:bold; color:var(--resultados-jornada-number);">Jornada ${j.number}${hasPig ? ' 🐷' : ''}</div>
+                            <div style="font-weight:bold; color:var(--resultados-jornada-number);">Jornada ${j.number}${hasPig ? ' 🐷' : ''}${liveBadge}</div>
                             <div style="color:var(--resultados-jornada-date); font-size:0.8rem;">${j.date}</div>
                           </td>`;
 
@@ -219,9 +223,13 @@ class ResultsManager {
                         // Penalty case: struck through in clear gray (visible on black)
                         valDisplay = `<span style="text-decoration: line-through double; color: #bbb; opacity: 1;">${data.potentialHits}</span>`;
                     }
-                    cellHtml = `<div style="font-size:1.3rem; font-weight:bold; color:var(--resultados-hits-number);">${valDisplay}</div>`;
+                    if (isInPlay) {
+                        cellHtml = `<div style="font-size:1.25rem; font-weight:bold; color:#10b981;">${valDisplay}</div><div style="font-size:0.75rem; color:#059669; font-weight:bold;">en juego</div>`;
+                    } else {
+                        cellHtml = `<div style="font-size:1.3rem; font-weight:bold; color:var(--resultados-hits-number);">${valDisplay}</div>`;
+                    }
 
-                    if (data.bonus !== 0) {
+                    if (data.bonus !== 0 && !isInPlay) {
                         const bColor = data.bonus > 0 ? 'var(--resultados-bonus-positive)' : 'var(--resultados-bonus-negative)';
                         const bSign = data.bonus > 0 ? '+' : '';
                         cellHtml += `<div style="font-size:0.8rem; font-weight:bold; color:${bColor};">${bSign}${data.bonus}</div>`;

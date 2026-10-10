@@ -278,8 +278,10 @@ const ScoringSystem = {
         // Determine if jornada is finished
         const filledMatches = jornada.matches ? jornada.matches.filter(m => m.result && m.result.trim() !== '' && m.result.trim() !== '-').length : 0;
         const now = new Date();
-        const isPastDate = jDate && (now.getTime() - jDate.getTime() > 2 * 24 * 60 * 60 * 1000);
-        const isFinished = (jornada.active === false) || (filledMatches === 15) || isPastDate || options.forceFinished;
+        const isExplicitInactive = jornada.active === false;
+        const isAllFilled = filledMatches === 15;
+        const isPastDate = jDate && (now.getTime() - jDate.getTime() > 5 * 24 * 60 * 60 * 1000);
+        const isFinished = isExplicitInactive || isAllFilled || (isPastDate && filledMatches === 15) || options.forceFinished;
 
         if (result.isLate && !result.isPardoned && isFinished) {
             result.hits = 0;
