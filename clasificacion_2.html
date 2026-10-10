@@ -373,11 +373,13 @@
         .matrix-row-total td { background: rgba(15, 23, 42, 0.98); }
         .matrix-row-hits td { background: rgba(15, 23, 42, 0.95); }
         .matrix-row-bonus td { background: rgba(15, 23, 42, 0.95); }
+        .matrix-row-rank td { background: rgba(15, 23, 42, 0.98); border-bottom: 2px solid rgba(245, 158, 11, 0.5) !important; }
         .matrix-row-prizes td { background: rgba(15, 23, 42, 0.98); border-bottom: 3px solid rgba(245, 158, 11, 0.7) !important; }
 
         .light-theme .matrix-row-total td { background: #e2e8f0 !important; color: #0f172a !important; }
         .light-theme .matrix-row-hits td { background: #f8fafc !important; color: #0f172a !important; }
         .light-theme .matrix-row-bonus td { background: #f8fafc !important; }
+        .light-theme .matrix-row-rank td { background: #f1f5f9 !important; border-bottom: 2px solid rgba(217, 119, 6, 0.5) !important; }
         .light-theme .matrix-row-prizes td { background: #e2e8f0 !important; border-bottom: 3px solid rgba(217, 119, 6, 0.7) !important; }
 
         @media (max-width: 767px) { .desktop-only-flex { display: none !important; } }
@@ -970,7 +972,9 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 text-[11px]">
+                <div class="flex items-center gap-2 text-[11px] flex-wrap">
+                    <span class="flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400"><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> En Juego</span>
+                    <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
                     <span class="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400"><span>👑</span> Mejor</span>
                     <span class="border-l border-slate-300 dark:border-slate-700 h-3 mx-1"></span>
                     <span class="flex items-center gap-1 font-bold text-rose-600 dark:text-rose-400"><span>🔴</span> Peor</span>
@@ -1363,6 +1367,18 @@
                     let maxScore = -Infinity;
                     let minScore = Infinity;
 
+                    // Evaluar si la jornada está finalizada o en juego
+                    const filledMatches = j.matches ? j.matches.filter(m => m.result && m.result.trim() !== '' && m.result.trim() !== '-').length : 0;
+                    const jDate = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
+                    const now = new Date();
+                    const isPastDate = jDate && (now.getTime() - jDate.getTime() > 2 * 24 * 60 * 60 * 1000);
+                    const isFinished = (j.active === false) || (filledMatches === 15) || isPastDate;
+                    const isInPlay = !isFinished && (filledMatches > 0);
+
+                    j.isFinished = isFinished;
+                    j.isInPlay = isInPlay;
+                    j.filledMatches = filledMatches;
+
                     this.members.forEach(m => {
                         const p = pronosticosMap.get(`${j.id}_${m.id}`);
                         let hits = -1;
@@ -1390,6 +1406,7 @@
 
                         this.memberStats[m.id].jornadaData[j.id] = {
                             hits, points, bonus, prize, isLate, isPardoned, potentialHits, pigHit,
+                            isFinished, isInPlay, filledMatches,
                             pardonReason: (p ? p.pardonReason : '') || ''
                         };
 
@@ -1402,6 +1419,14 @@
                             stats.baseTotal += hitsToSum;
                             stats.bonusTotal += bonus;
                             stats.prizeTotal += prize;
+
+                            // Acumulados oficiales cerrados (excluyendo jornadas en juego)
+                            if (isFinished) {
+                                stats.officialGrandTotal = (stats.officialGrandTotal || 0) + points;
+                                stats.officialBaseTotal = (stats.officialBaseTotal || 0) + hitsToSum;
+                                stats.officialBonusTotal = (stats.officialBonusTotal || 0) + bonus;
+                                stats.officialPrizeTotal = (stats.officialPrizeTotal || 0) + prize;
+                            }
 
                             if (prize > 0) {
                                 stats.prizesList.push({ jNum: j.number, amount: prize, hits });
@@ -1422,7 +1447,7 @@
                                 stats.penaltiesList.push({ jNum: j.number, penalty: Math.abs(bonus), reason: `Baja puntuación (${hits} aciertos)` });
                             }
 
-                            if (isLate && !isPardoned) {
+                            if (isLate && !isPardoned && isFinished) {
                                 stats.penaltyCounts.late++;
                                 stats.penaltiesList.push({ jNum: j.number, penalty: 2, reason: 'Envío fuera de plazo (⏱️)' });
                             }
@@ -1438,20 +1463,42 @@
 
                     j.stats = { maxScore, minScore };
 
-                    // Registrar ganadores de jornada
-                    this.members.forEach(m => {
-                        const cell = this.memberStats[m.id].jornadaData[j.id];
-                        if (cell && cell.hits !== -1 && cell.points === maxScore && maxScore > 0) {
-                            this.memberStats[m.id].winsList.push({ jNum: j.number, points: cell.points, hits: cell.hits, bonus: cell.bonus, prize: cell.prize });
-                        }
-                    });
+                    // Registrar ganadores de jornada finalizada
+                    if (isFinished) {
+                        this.members.forEach(m => {
+                            const cell = this.memberStats[m.id].jornadaData[j.id];
+                            if (cell && cell.hits !== -1 && cell.points === maxScore && maxScore > 0) {
+                                this.memberStats[m.id].winsList.push({ jNum: j.number, points: cell.points, hits: cell.hits, bonus: cell.bonus, prize: cell.prize });
+                            }
+                        });
+                    }
                 });
 
-                // Ordenar Ranking por Puntos Totales descendente (desempate: mayor baseTotal)
+                // Ordenar Ranking en Vivo por Puntos Totales descendente (incluyendo aciertos parciales en juego)
                 this.sortedRanking = Object.values(this.memberStats).sort((a, b) => {
                     if (b.grandTotal !== a.grandTotal) return b.grandTotal - a.grandTotal;
                     if (b.baseTotal !== a.baseTotal) return b.baseTotal - a.baseTotal;
                     return b.prizeTotal - a.prizeTotal;
+                });
+
+                // Calcular también el ranking oficial anterior (previo a los puntos en juego) para mostrar variaciones en vivo
+                const officialSorted = Object.values(this.memberStats).map(s => ({
+                    id: s.member.id,
+                    pts: s.officialGrandTotal !== undefined ? s.officialGrandTotal : s.grandTotal,
+                    base: s.officialBaseTotal !== undefined ? s.officialBaseTotal : s.baseTotal,
+                    prize: s.officialPrizeTotal !== undefined ? s.officialPrizeTotal : s.prizeTotal
+                })).sort((a, b) => {
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    if (b.base !== a.base) return b.base - a.base;
+                    return b.prize - a.prize;
+                });
+
+                // Asignar puestos a cada socio
+                this.sortedRanking.forEach((s, liveIdx) => {
+                    s.liveRank = liveIdx + 1;
+                    const prevIdx = officialSorted.findIndex(o => o.id === s.member.id);
+                    s.officialRank = prevIdx !== -1 ? prevIdx + 1 : (liveIdx + 1);
+                    s.rankChange = s.officialRank - s.liveRank; // Positivo = sube puestos, Negativo = baja
                 });
             }
 
@@ -1673,6 +1720,19 @@
                     const realRank = this.sortedRanking.findIndex(x => x.member.id === s.member.id) + 1;
                     const isLast = realRank === totalSocios;
                     
+                    const ch = s.rankChange || 0;
+                    let changeHtml = '';
+                    const hasAnyInPlay = this.visibleJornadas.some(j => j.isInPlay);
+                    if (hasAnyInPlay) {
+                        if (ch > 0) {
+                            changeHtml = `<span class="inline-flex items-center text-[10px] font-black text-emerald-500 font-mono ml-1" title="Sube ${ch} puestos provisionales">▲+${ch}</span>`;
+                        } else if (ch < 0) {
+                            changeHtml = `<span class="inline-flex items-center text-[10px] font-black text-rose-500 font-mono ml-1" title="Baja ${Math.abs(ch)} puestos provisionales">▼${ch}</span>`;
+                        } else {
+                            changeHtml = `<span class="inline-flex items-center text-[10px] text-slate-400 font-mono ml-1" title="Mantiene puesto">=</span>`;
+                        }
+                    }
+
                     let medalBadge = `<span class="font-mono font-bold text-slate-500 dark:text-slate-400 cursor-help" data-card-type="rank" data-card-id="${s.member.id}">#${realRank}</span>`;
                     let rowBg = '';
                     if (realRank === 1) {
@@ -1708,7 +1768,7 @@
 
                     html += `
                         <tr class="${rowBg} hover:bg-slate-100 dark:hover:bg-slate-800/40 transition cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${s.member.id})">
-                            <td class="py-2.5 px-3 text-center whitespace-nowrap">${medalBadge}</td>
+                            <td class="py-2.5 px-3 text-center whitespace-nowrap"><div class="inline-flex items-center justify-center">${medalBadge}${changeHtml}</div></td>
                             <td class="py-2.5 px-4">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-[10px] font-bold text-amber-600 dark:text-amber-400 font-mono shrink-0">
@@ -1822,8 +1882,32 @@
                 });
                 thead += `</tr>`;
 
+                const hasAnyInPlay = this.visibleJornadas.some(j => j.isInPlay);
+
                 // Filas Resumen Sticky
-                // A. PUNTOS GENERAL
+                // A. PUESTO RANKING (EN VIVO CON EFECTO DE JORNADA EN CURSO)
+                thead += `
+                    <tr class="matrix-summary-row matrix-row-rank text-xs font-mono font-bold">
+                        <td class="matrix-sticky-col py-1.5 px-3 text-amber-500 font-extrabold text-left border-b border-slate-200 dark:border-slate-700">
+                            PUESTO RANKING ${hasAnyInPlay ? '<span class="text-[9px] text-emerald-400 font-normal">🟢 VIVO</span>' : ''}
+                        </td>
+                `;
+                sortedMembers.forEach(m => {
+                    const stats = this.memberStats[m.id];
+                    const r = stats.liveRank;
+                    const ch = stats.rankChange || 0;
+                    let chHtml = '';
+                    if (hasAnyInPlay) {
+                        if (ch > 0) chHtml = `<span class="text-[9px] font-black text-emerald-500 dark:text-emerald-400 ml-1">▲+${ch}</span>`;
+                        else if (ch < 0) chHtml = `<span class="text-[9px] font-black text-rose-500 dark:text-rose-400 ml-1">▼${ch}</span>`;
+                        else chHtml = `<span class="text-[9px] text-slate-400 ml-1">=</span>`;
+                    }
+                    const badge = (r === 1) ? '🥇 1º' : (r === 2) ? '🥈 2º' : (r === 3) ? '🥉 3º' : (r === 19) ? '🐸 19º' : `#${r}`;
+                    thead += `<td class="py-1.5 px-2 text-center text-xs font-bold border-b border-slate-200 dark:border-slate-700/80 border-r border-slate-200 dark:border-slate-700/40 cursor-help" data-card-type="rank" data-card-id="${m.id}">${badge}${chHtml}</td>`;
+                });
+                thead += `</tr>`;
+
+                // B. PUNTOS GENERAL
                 thead += `
                     <tr class="matrix-summary-row matrix-row-total text-xs font-mono font-black">
                         <td class="matrix-sticky-col py-2 px-3 font-black text-amber-600 dark:text-amber-500 text-left border-b border-slate-200 dark:border-slate-700">PUNTOS GENERAL</td>
@@ -1834,7 +1918,7 @@
                 });
                 thead += `</tr>`;
 
-                // B. Puntos Semana (Aciertos Base)
+                // C. Puntos Semana (Aciertos Base)
                 thead += `
                     <tr class="matrix-summary-row matrix-row-hits text-xs font-mono font-bold">
                         <td class="matrix-sticky-col py-1.5 px-3 text-slate-700 dark:text-slate-300 text-left border-b border-slate-200 dark:border-slate-700">Puntos Semana</td>
@@ -1845,7 +1929,7 @@
                 });
                 thead += `</tr>`;
 
-                // C. Bonus / Penal
+                // D. Bonus / Penal
                 thead += `
                     <tr class="matrix-summary-row matrix-row-bonus text-xs font-mono font-bold">
                         <td class="matrix-sticky-col py-1.5 px-3 text-slate-700 dark:text-slate-300 text-left border-b border-slate-200 dark:border-slate-700">Bonus / Penal.</td>
@@ -1858,7 +1942,7 @@
                 });
                 thead += `</tr>`;
 
-                // D. Premios (€)
+                // E. Premios (€)
                 thead += `
                     <tr class="matrix-summary-row matrix-row-prizes text-xs font-mono font-black">
                         <td class="matrix-sticky-col py-2 px-3 text-purple-600 dark:text-purple-400 text-left">Premios (€)</td>
@@ -1880,11 +1964,18 @@
 
                     const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
-                    tbody += `<tr>
+                    const inPlayBadge = j.isInPlay 
+                        ? `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 animate-pulse ml-1">⚡ ${j.filledMatches}/15</span>` 
+                        : '';
+
+                    const rowClass = j.isInPlay ? 'bg-emerald-500/5 dark:bg-emerald-500/[0.03]' : '';
+
+                    tbody += `<tr class="${rowClass}">
                         <td class="matrix-sticky-col py-1.5 px-3 text-left border-b border-slate-200 dark:border-slate-800">
                             <div class="font-extrabold text-amber-600 dark:text-amber-500 text-xs flex items-center gap-1">
                                 <span>J${j.number}</span>
-                                ${hasPig ? '<span class="cursor-help" data-card-type="pig-header">🐷</span>' : ''}
+                                ${inPlayBadge}
+                                ${hasPig ? '<span class="cursor-help ml-0.5" data-card-type="pig-header">🐷</span>' : ''}
                             </div>
                             <div class="text-[9px] text-slate-500 dark:text-slate-400 font-mono">${dateFormatted}</div>
                         </td>
@@ -1896,18 +1987,25 @@
                         let cellBg = '';
 
                         if (cell && cell.hits !== -1) {
-                            const isMax = j.stats && cell.points === j.stats.maxScore && j.stats.maxScore > 0;
-                            const isMin = j.stats && cell.points === j.stats.minScore && j.stats.minScore !== j.stats.maxScore;
+                            if (j.isInPlay) {
+                                // JORNADA EN JUEGO: Mostrar aciertos parciales con estilo en vivo
+                                cellBg = 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-black';
+                                const pigIcon = cell.pigHit ? ' 🐷' : '';
+                                cellContent = `<span class="cursor-help inline-block px-1.5 py-0.5 rounded border border-emerald-500/30 transition hover:scale-105" data-card-type="matrix-cell" data-m-id="${m.id}" data-j-id="${j.id}">${cell.hits}⚡${pigIcon}</span>`;
+                            } else {
+                                const isMax = j.stats && cell.points === j.stats.maxScore && j.stats.maxScore > 0;
+                                const isMin = j.stats && cell.points === j.stats.minScore && j.stats.minScore !== j.stats.maxScore;
 
-                            if (isMax) cellBg = 'bg-amber-500/15 text-amber-800 dark:text-amber-300 font-black';
-                            else if (isMin) cellBg = 'bg-rose-500/10 text-rose-800 dark:text-rose-300';
-                            else cellBg = 'text-slate-800 dark:text-slate-200';
+                                if (isMax) cellBg = 'bg-amber-500/15 text-amber-800 dark:text-amber-300 font-black';
+                                else if (isMin) cellBg = 'bg-rose-500/10 text-rose-800 dark:text-rose-300';
+                                else cellBg = 'text-slate-800 dark:text-slate-200';
 
-                            const crown = isMax ? ' 👑' : '';
-                            const lateIcon = cell.isLate && !cell.isPardoned ? ' ⏱️' : '';
-                            const pigIcon = cell.pigHit ? ' 🐷' : '';
+                                const crown = isMax ? ' 👑' : '';
+                                const lateIcon = cell.isLate && !cell.isPardoned ? ' ⏱️' : '';
+                                const pigIcon = cell.pigHit ? ' 🐷' : '';
 
-                            cellContent = `<span class="cursor-help inline-block px-1 py-0.5 rounded transition" data-card-type="matrix-cell" data-m-id="${m.id}" data-j-id="${j.id}">${cell.points}${crown}${lateIcon}${pigIcon}</span>`;
+                                cellContent = `<span class="cursor-help inline-block px-1 py-0.5 rounded transition" data-card-type="matrix-cell" data-m-id="${m.id}" data-j-id="${j.id}">${cell.points}${crown}${lateIcon}${pigIcon}</span>`;
+                            }
                         }
 
                         tbody += `<td class="py-1.5 px-2.5 text-center ${cellBg} border-r border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/40 transition cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${m.id})">${cellContent}</td>`;
@@ -3016,7 +3114,51 @@
                     const isMin = j.stats && cell.points === j.stats.minScore && j.stats.minScore !== j.stats.maxScore;
                     const isLate = cell.isLate && !cell.isPardoned;
 
-                    if (isMax) {
+                    if (j.isInPlay) {
+                        const ch = s.rankChange || 0;
+                        let effectHtml = '';
+                        if (ch > 0) {
+                            effectHtml = `<span class="text-emerald-500 font-black">Sube ${ch} puestos (▲+${ch})</span>`;
+                        } else if (ch < 0) {
+                            effectHtml = `<span class="text-rose-500 font-black">Baja ${Math.abs(ch)} puestos (▼${ch})</span>`;
+                        } else {
+                            effectHtml = `<span class="text-slate-400">Mantiene puesto (=)</span>`;
+                        }
+
+                        return {
+                            theme: 'emerald',
+                            html: `
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between pb-1.5 border-b border-emerald-500/40">
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-sm">
+                                            <span>⚡</span> Jornada ${j.number} · En Juego
+                                        </span>
+                                        <span class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400">${cell.hits} aciertos prov.</span>
+                                    </div>
+                                    <div class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>🟢</span> <span>${s.name}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                        Puntuación provisional en directo con <strong>${j.filledMatches} de 15</strong> partidos finalizados.
+                                    </p>
+                                    <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-emerald-500/30 font-mono text-[11px] space-y-1">
+                                        <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                                            <span>Aciertos parciales:</span>
+                                            <strong class="text-emerald-600 dark:text-emerald-400 text-xs">${cell.hits} aciertos</strong>
+                                        </div>
+                                        <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                                            <span>Puesto provisional:</span>
+                                            <strong class="text-amber-500 font-black">#${s.liveRank}</strong>
+                                        </div>
+                                        <div class="flex justify-between items-center text-[10px] border-t border-slate-200 dark:border-slate-800 pt-1">
+                                            <span class="text-slate-500">Efecto en Ranking:</span>
+                                            ${effectHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        };
+                    } else if (isMax) {
                         return {
                             theme: 'amber',
                             html: `

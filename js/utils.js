@@ -52,8 +52,8 @@ var AppUtils = window.AppUtils || {
                 return this._cacheDate(trimmed, new Date(year, month, day));
             }
 
-            // 2. Try standard DD/MM/YYYY or DD-MM-YYYY (e.g. 16-08-2026, 23/08/2026)
-            const dmyMatch = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+            // 2. Try standard DD/MM/YYYY or DD-MM-YYYY (e.g. 16-08-2026, 23/08/2026, "domingo 04/10/2026")
+            const dmyMatch = trimmed.match(/(?:^|[^\d])(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(?:[^\d]|$)/);
             if (dmyMatch) {
                 const day = parseInt(dmyMatch[1], 10);
                 const month = parseInt(dmyMatch[2], 10) - 1;

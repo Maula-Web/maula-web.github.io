@@ -2203,7 +2203,7 @@
 
                 const nowMs = new Date().getTime();
                 const isPastDeadline = deadline ? (nowMs > deadline.getTime()) : false;
-                const { isLockedRef, hasStarted, isFinished } = this.isJornadaLocked(jornada);
+                const { isLockedRef, hasStarted, isFinished, areAllCompleted } = this.isJornadaLocked(jornada);
 
                 const kpiPlazoEstado = document.getElementById('kpi-plazo-estado');
                 const kpiCdBadge = document.getElementById('kpi-cd-badge');
@@ -2223,6 +2223,11 @@
                     estadoClase = 'text-lg font-black font-mono text-sky-300 dark:text-sky-200';
                     badgeTexto = 'En Juego';
                     badgeClase = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 dark:text-sky-200 border border-sky-400/50 animate-pulse';
+                } else if (areAllCompleted) {
+                    estadoTexto = 'Quiniela Sellada • Todos listos';
+                    estadoClase = 'text-lg font-black font-mono text-amber-300 dark:text-amber-200';
+                    badgeTexto = 'Sellada';
+                    badgeClase = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 dark:text-amber-200 border border-amber-400/50';
                 } else if (isPastDeadline || isLockedRef) {
                     estadoTexto = 'Plazo Cerrado • En espera';
                     estadoClase = 'text-lg font-black font-mono text-rose-300 dark:text-rose-200';

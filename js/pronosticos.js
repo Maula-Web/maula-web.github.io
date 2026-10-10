@@ -503,7 +503,7 @@ class PronosticoManager {
                 if (!hasExistingForecast && (hasStarted || isFinished)) {
                     this.statusMsg.innerHTML = `<span class="badge-locked" style="background:#d32f2f; color:white; border: 1.5px solid #b71c1c; font-weight: bold; padding: 6px 14px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">🔒 JORNADA EN JUEGO (HAY RESULTADOS) - NO SE ADMITEN PRONÓSTICOS</span>`;
                 } else {
-                    const label = isFinished ? 'JORNADA FINALIZADA' : 'JORNADA EN JUEGO';
+                    let label = isFinished ? 'JORNADA FINALIZADA' : (hasStarted ? 'JORNADA EN JUEGO' : 'JORNADA CERRADA (TODOS HAN RELLENADO)');
                     let lateBadgeHtml = '';
                     if (existing && existing.late) {
                         if (existing.pardoned) {
@@ -1099,13 +1099,17 @@ class PronosticoManager {
             console.log("Jornada encontrada:", jornada.number);
 
             console.log("🔵 PASO 5: Comprobando estado de bloqueo");
-            const { isLockedRef, hasStarted, isFinished } = this.isJornadaLocked(jornada);
+            const { isLockedRef, hasStarted, isFinished, areAllCompleted } = this.isJornadaLocked(jornada);
             if (isLockedRef && !this.correctionMode) {
                 const existing = this.pronosticos.find(p => (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) && (p.mId == this.currentMemberId || p.memberId == this.currentMemberId));
                 const hasExisting = existing && Array.isArray(existing.selection) && existing.selection.some(s => s && String(s).trim() !== '' && String(s).trim() !== '-');
 
                 if (!hasExisting && hasStarted) {
                     alert("No es posible rellenar la quiniela: la jornada ya cuenta con resultados de partidos registrados. Solo se admiten pronósticos con retraso antes de que comience la jornada.");
+                } else if (areAllCompleted && !hasStarted && !isFinished) {
+                    alert("No se pueden cambiar los signos: todos los socios han terminado de rellenar sus pronósticos y la jornada ha quedado sellada. Para realizar modificaciones se requiere activar el Modo Corrección.");
+                } else if (hasStarted) {
+                    alert("No se pueden cambiar los signos: la jornada ya ha comenzado (o cuenta con resultados en juego). Para realizar modificaciones se requiere activar el Modo Corrección.");
                 } else {
                     alert("Esta jornada está bloqueada y no admite cambios sin activar el Modo Corrección.");
                 }
@@ -1318,9 +1322,31 @@ class PronosticoManager {
             return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
         }));
 
-        const isLockedRef = isFinished || hasStarted;
+        // Comprobar si todos los socios activos han completado su pronóstico
+        let areAllCompleted = false;
+        try {
+            const activeMembers = (this.members || []).filter(m => m && m.active !== false);
+            if (activeMembers.length > 0 && Array.isArray(this.pronosticos)) {
+                const jIdStr = String(jornada.id);
+                areAllCompleted = activeMembers.every(m => {
+                    const mIdStr = String(m.id);
+                    const p = this.pronosticos.find(pred => {
+                        const pj = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : pred.jornadaId || '');
+                        const pm = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : pred.memberId || '');
+                        return pj === jIdStr && pm === mIdStr;
+                    });
+                    if (!p || !p.selection || !Array.isArray(p.selection)) return false;
+                    const filled14 = p.selection.slice(0, 14).filter(s => s && String(s).trim() !== '' && String(s) !== '-').length;
+                    return filled14 >= 14;
+                });
+            }
+        } catch (e) {
+            console.error("Error al comprobar si todos los socios han completado el pronóstico:", e);
+        }
 
-        return { isLockedRef, isFinished, hasStarted };
+        const isLockedRef = isFinished || hasStarted || areAllCompleted;
+
+        return { isLockedRef, isFinished, hasStarted, areAllCompleted };
     }
 
     calculateDeadline(dateStr) {

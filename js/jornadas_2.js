@@ -1543,6 +1543,91 @@ class Jornadas2AppController {
         }
     }
 
+    /**
+     * Busca la jornada correspondiente en la base de datos comparando prioritariamente por fecha
+     * y secundariamente por número de jornada.
+     */
+    findTargetJornadaForResults(res) {
+        if (!this.jornadas || this.jornadas.length === 0) return null;
+
+        // 1. Prioridad: Coincidencia de fecha
+        if (res && res.dateStr && window.AppUtils && typeof window.AppUtils.parseDate === 'function') {
+            const parsedTarget = window.AppUtils.parseDate(res.dateStr);
+            if (parsedTarget) {
+                const targetTime = new Date(parsedTarget.getFullYear(), parsedTarget.getMonth(), parsedTarget.getDate()).getTime();
+                const matchedByDate = this.jornadas.find(j => {
+                    if (!j.date) return false;
+                    const jDate = window.AppUtils.parseDate(j.date);
+                    if (!jDate) return false;
+                    return new Date(jDate.getFullYear(), jDate.getMonth(), jDate.getDate()).getTime() === targetTime;
+                });
+                if (matchedByDate) return matchedByDate;
+            }
+        }
+
+        // 2. Coincidencia por número de jornada si está definido
+        if (res && res.jNum && !isNaN(parseInt(res.jNum, 10))) {
+            const num = parseInt(res.jNum, 10);
+            const matchedByNum = this.jornadas.find(j => parseInt(j.number, 10) === num);
+            if (matchedByNum) return matchedByNum;
+        }
+
+        // 3. Fallback a la jornada actualmente seleccionada
+        return this.jornadas.find(j => j.id == this.selectedJornadaId) || this.jornadas[0] || null;
+    }
+
+    renderImportResultsPreviewHeader(res) {
+        const headerBox = document.getElementById('import-results-preview-header');
+        if (!headerBox) return;
+
+        const currentViewed = this.jornadas.find(j => j.id == this.selectedJornadaId);
+        const target = this.jornadas.find(j => j.id == res.targetJornadaId) || currentViewed;
+        const isMismatch = currentViewed && target && (currentViewed.id !== target.id);
+
+        let selectorOptions = this.jornadas.map(j => `
+            <option value="${j.id}" ${target && j.id == target.id ? 'selected' : ''}>
+                Jornada ${j.number} (${j.date || 'Sin fecha'})
+            </option>
+        `).join('');
+
+        headerBox.innerHTML = `
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                <div class="font-bold text-emerald-400 flex items-center gap-2">
+                    <span>${res.source || 'Loterías y Apuestas del Estado'}</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">Escrutinio Oficial</span>
+                </div>
+                <div class="text-xs text-slate-400">Fecha oficial: <strong class="text-white">${res.dateStr || 'Detectada'}</strong></div>
+            </div>
+
+            <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="text-xs text-slate-300">
+                    <span class="font-semibold text-slate-400">Asignar a la Jornada:</span>
+                </div>
+                <select id="import-results-target-select" onchange="window.JornadasApp.handleTargetJornadaChange(this.value)" class="bg-slate-950 border border-emerald-500/50 rounded-lg px-3 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-400">
+                    ${selectorOptions}
+                </select>
+            </div>
+
+            ${isMismatch ? `
+                <div class="mt-2 p-2 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] flex items-center gap-2">
+                    <span>⚠️</span>
+                    <span><strong>Atención:</strong> Estabas viendo la <em>Jornada ${currentViewed ? currentViewed.number : ''}</em>, pero los resultados coinciden con la fecha de la <strong>Jornada ${target ? target.number : ''} (${target ? target.date : ''})</strong>.</span>
+                </div>
+            ` : `
+                <div class="mt-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] flex items-center gap-2">
+                    <span>✅</span>
+                    <span>Los resultados corresponden exactamente a la fecha de la <strong>Jornada ${target ? target.number : ''} (${target ? target.date : ''})</strong>.</span>
+                </div>
+            `}
+        `;
+    }
+
+    handleTargetJornadaChange(newId) {
+        if (!this.pendingImportResults) return;
+        this.pendingImportResults.targetJornadaId = newId;
+        this.renderImportResultsPreviewHeader(this.pendingImportResults);
+    }
+
     async handleAutoImportResults() {
         const btn = document.getElementById('btn-auto-import-results');
         const spinner = document.getElementById('btn-auto-import-spinner');
@@ -1568,35 +1653,27 @@ class Jornadas2AppController {
 
             const res = await window.QuinielaService.fetchLatestResults();
 
-            // Identificar qué jornada estamos visualizando
-            let currentJornada = this.jornadas.find(j => j.id == this.selectedJornadaId);
-            res.jNum = currentJornada ? currentJornada.number : (res.jNum || 'Actual');
+            // Buscar la jornada que realmente coincide por fecha
+            const targetJornada = this.findTargetJornadaForResults(res);
+            res.targetJornadaId = targetJornada ? targetJornada.id : this.selectedJornadaId;
+            res.jNum = targetJornada ? targetJornada.number : (res.jNum || 'Actual');
 
             this.pendingImportResults = res;
 
             document.getElementById('import-results-step-1').classList.add('hidden');
             document.getElementById('import-results-step-2').classList.remove('hidden');
 
-            const headerBox = document.getElementById('import-results-preview-header');
+            this.renderImportResultsPreviewHeader(res);
+
             const matchesBox = document.getElementById('import-results-preview-matches');
             const prizesBox = document.getElementById('import-results-preview-prizes');
-
-            if (headerBox) {
-                headerBox.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="font-bold text-emerald-400">Jornada ${res.jNum} &bull; ${res.source || 'Loterías del Estado'}</div>
-                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">Auto-Detectado ✅</span>
-                    </div>
-                    <div class="text-slate-300">Fecha oficial: <strong>${res.dateStr}</strong></div>
-                `;
-            }
 
             if (matchesBox) {
                 matchesBox.innerHTML = res.matches.map((m, idx) => `
                     <div class="p-1.5 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
                         <span class="w-8 font-bold text-slate-400">${idx === 14 ? 'P15' : idx + 1}</span>
                         <span class="text-white truncate">${m.home} vs ${m.away}</span>
-                        <span class="font-black text-amber-400 px-2">${m.result}</span>
+                        <span class="font-black text-amber-400 px-2">${m.result || '-'}</span>
                     </div>
                 `).join('');
             }
@@ -1658,28 +1735,27 @@ class Jornadas2AppController {
             return;
         }
 
+        // Buscar la jornada que realmente coincide por fecha
+        const targetJornada = this.findTargetJornadaForResults(res);
+        res.targetJornadaId = targetJornada ? targetJornada.id : this.selectedJornadaId;
+        res.jNum = targetJornada ? targetJornada.number : (res.jNum || 'Manual');
+
         this.pendingImportResults = res;
 
         document.getElementById('import-results-step-1').classList.add('hidden');
         document.getElementById('import-results-step-2').classList.remove('hidden');
 
-        const headerBox = document.getElementById('import-results-preview-header');
+        this.renderImportResultsPreviewHeader(res);
+
         const matchesBox = document.getElementById('import-results-preview-matches');
         const prizesBox = document.getElementById('import-results-preview-prizes');
-
-        if (headerBox) {
-            headerBox.innerHTML = `
-                <div class="font-bold text-emerald-400">Jornada Oficial Loterías: ${res.jNum}</div>
-                <div class="text-slate-300">Fecha: <strong>${res.dateStr}</strong></div>
-            `;
-        }
 
         if (matchesBox) {
             matchesBox.innerHTML = res.matches.map((m, idx) => `
                 <div class="p-1.5 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
                     <span class="w-8 font-bold text-slate-400">${idx === 14 ? 'P15' : idx + 1}</span>
                     <span class="text-white truncate">${m.home} vs ${m.away}</span>
-                    <span class="font-black text-amber-400 px-2">${m.result}</span>
+                    <span class="font-black text-amber-400 px-2">${m.result || '-'}</span>
                 </div>
             `).join('');
         }
@@ -1708,14 +1784,14 @@ class Jornadas2AppController {
         if (!this.pendingImportResults) return;
         const res = this.pendingImportResults;
 
-        // Buscar jornada por número o ID seleccionado
-        let targetJornada = this.jornadas.find(j => parseInt(j.number, 10) === parseInt(res.jNum, 10));
+        // Obtener la jornada de destino según lo elegido/resuelto
+        let targetJornada = this.jornadas.find(j => j.id == res.targetJornadaId);
         if (!targetJornada) {
-            targetJornada = this.jornadas.find(j => j.id == this.selectedJornadaId);
+            targetJornada = this.findTargetJornadaForResults(res);
         }
 
         if (!targetJornada) {
-            alert(`No se encontró la jornada ${res.jNum} en la base de datos.`);
+            alert(`No se encontró una jornada válida para asignar los resultados.`);
             return;
         }
 

@@ -1053,10 +1053,38 @@ class JornadaManager {
         if (this.importResultsSummaryStep) this.importResultsSummaryStep.style.display = 'block';
     }
 
+    findTargetJornadaForResults(parsed) {
+        if (!this.jornadas || this.jornadas.length === 0) return null;
+
+        // 1. Coincidencia por fecha
+        if (parsed && parsed.dateStr && typeof AppUtils !== 'undefined' && typeof AppUtils.parseDate === 'function') {
+            const parsedTarget = AppUtils.parseDate(parsed.dateStr);
+            if (parsedTarget) {
+                const targetTime = new Date(parsedTarget.getFullYear(), parsedTarget.getMonth(), parsedTarget.getDate()).getTime();
+                const matchedByDate = this.jornadas.find(j => {
+                    if (!j.date) return false;
+                    const jDate = AppUtils.parseDate(j.date);
+                    if (!jDate) return false;
+                    return new Date(jDate.getFullYear(), jDate.getMonth(), jDate.getDate()).getTime() === targetTime;
+                });
+                if (matchedByDate) return matchedByDate;
+            }
+        }
+
+        // 2. Coincidencia por número
+        if (parsed && parsed.jNum) {
+            const matchedByNum = this.jornadas.find(j => j.number === parsed.jNum);
+            if (matchedByNum) return matchedByNum;
+        }
+
+        return null;
+    }
+
     renderResultsSummary(parsed) {
         if (!this.importResultsSummaryHeader || !this.importResultsMatchesList || !this.importResultsPrizesList) return;
 
-        const existing = this.jornadas.find(j => j.number === parsed.jNum);
+        const matchedJornada = this.findTargetJornadaForResults(parsed);
+        parsed.targetJornadaId = matchedJornada ? matchedJornada.id : null;
         const isSunday = parsed.isSunday;
 
         let dateBadge = '';
@@ -1069,16 +1097,16 @@ class JornadaManager {
         }
 
         let existingBanner = '';
-        if (existing) {
+        if (matchedJornada) {
             existingBanner = `
                 <div style="background:rgba(33,150,243,0.1); border:1px solid rgba(33,150,243,0.3); border-radius:6px; padding:0.6rem 0.8rem; margin-top:0.8rem; color:#1976d2; font-size:0.85rem;">
-                    ℹ️ <strong>Jornada encontrada:</strong> Ya existe la <strong>Jornada ${parsed.jNum}</strong> registrada. Al confirmar, se actualizarán los resultados de sus partidos y su desglose de premios.
+                    ℹ️ <strong>Jornada coincidente por fecha:</strong> Se asignará a la <strong>Jornada ${matchedJornada.number}</strong> (${matchedJornada.date || 'Sin fecha'}). Al confirmar, se actualizarán los resultados de sus 15 partidos y el desglose de premios oficiales.
                 </div>
             `;
         } else {
             existingBanner = `
                 <div style="background:rgba(76,175,80,0.1); border:1px solid rgba(76,175,80,0.3); border-radius:6px; padding:0.6rem 0.8rem; margin-top:0.8rem; color:#2e7d32; font-size:0.85rem;">
-                    ✨ <strong>Nueva Jornada:</strong> La <strong>Jornada ${parsed.jNum}</strong> no existe en el sistema. Al confirmar, se creará completa con estos resultados y premios.
+                    ✨ <strong>Nueva Jornada:</strong> No se encontró ninguna jornada para la fecha ${parsed.dateStr || ''}. Al confirmar, se creará completa como Jornada ${parsed.jNum}.
                 </div>
             `;
         }
@@ -1086,7 +1114,7 @@ class JornadaManager {
         this.importResultsSummaryHeader.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <div>
-                    <span style="font-size:1.2rem; font-weight:900; color:var(--primary-green, #2e7d32);">Jornada ${parsed.jNum}</span>
+                    <span style="font-size:1.2rem; font-weight:900; color:var(--primary-green, #2e7d32);">Jornada ${matchedJornada ? matchedJornada.number : parsed.jNum}</span>
                     <span style="font-size:0.85rem; color:var(--text-secondary, #666); margin-left:8px;">(Temporada 2026-2027)</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -1221,7 +1249,17 @@ class JornadaManager {
         if (!this.pendingResultsData) return;
 
         const parsed = this.pendingResultsData;
-        const existingIdx = this.jornadas.findIndex(j => j.number === parsed.jNum);
+        let existingIdx = -1;
+        if (parsed.targetJornadaId) {
+            existingIdx = this.jornadas.findIndex(j => j.id == parsed.targetJornadaId);
+        }
+        if (existingIdx === -1) {
+            const matched = this.findTargetJornadaForResults(parsed);
+            if (matched) existingIdx = this.jornadas.findIndex(j => j.id == matched.id);
+        }
+        if (existingIdx === -1 && parsed.jNum) {
+            existingIdx = this.jornadas.findIndex(j => j.number === parsed.jNum);
+        }
         const existing = existingIdx > -1 ? this.jornadas[existingIdx] : null;
 
         let matches;
