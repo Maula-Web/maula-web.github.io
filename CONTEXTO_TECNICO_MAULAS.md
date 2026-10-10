@@ -1208,6 +1208,21 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
         var attachments = replyMsg.getAttachments();
         var attList = [];
+        var folderResguardos = null;
+
+        // Guardado automático en Google Drive en carpeta 'Resguardos_Sellado'
+        try {
+          var folderName = "Resguardos_Sellado";
+          var folders = DriveApp.getFoldersByName(folderName);
+          if (folders.hasNext()) {
+            folderResguardos = folders.next();
+          } else {
+            folderResguardos = DriveApp.createFolder(folderName);
+          }
+        } catch (fErr) {
+          folderResguardos = null;
+        }
+
         for (var i = 0; i < attachments.length; i++) {
           try {
             var att = attachments[i];
@@ -1215,21 +1230,46 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
             var bytes = att.getBytes();
             var size = bytes ? bytes.length : 0;
             var dataUri = null;
+            var driveFileUrl = null;
+            var driveFileId = null;
+            var originalName = att.getName() || ('adjunto_' + (i + 1));
+            var ext = originalName.lastIndexOf('.') !== -1 ? originalName.substring(originalName.lastIndexOf('.')) : '';
+
+            if (folderResguardos) {
+              try {
+                var driveFileName = 'RESGUARDO_' + foundTicketId + (attachments.length > 1 ? ('_part' + (i + 1)) : '') + ext;
+                var existingFiles = folderResguardos.getFilesByName(driveFileName);
+                var driveFile = null;
+                if (existingFiles.hasNext()) {
+                  driveFile = existingFiles.next();
+                } else {
+                  driveFile = folderResguardos.createFile(att.copyBlob().setName(driveFileName));
+                  driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+                }
+                driveFileId = driveFile.getId();
+                driveFileUrl = 'https://drive.google.com/uc?export=view&id=' + driveFileId;
+              } catch (dErr) {}
+            }
+
             if (bytes && size < 4 * 1024 * 1024) {
               dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(bytes);
             }
             attList.push({
-              name: att.getName() || ('adjunto_' + (i + 1)),
+              name: originalName,
               contentType: cType,
               size: size,
-              dataUri: dataUri
+              dataUri: dataUri,
+              driveUrl: driveFileUrl,
+              driveId: driveFileId
             });
           } catch(attErr) {
             attList.push({
               name: 'Adjunto ' + (i + 1),
               contentType: 'application/octet-stream',
               size: 0,
-              dataUri: null
+              dataUri: null,
+              driveUrl: null,
+              driveId: null
             });
           }
         }
@@ -1255,6 +1295,10 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
       }
     }
     ```
+  - **Estrategia de Almacenamiento Multinivel de Resguardos Oficiales**:
+    1. **Nivel Legal (Gmail)**: Se conserva indefinidamente en `penalosmaulas@gmail.com` con cabeceras completas y firma criptográfica.
+    2. **Nivel Archivo Digital (Google Drive)**: Se guarda automáticamente en la carpeta `Resguardos_Sellado` con nombre estandarizado `RESGUARDO_[ticketId].ext` y enlace público de visualización.
+    3. **Nivel Comunitario (Web / Firestore)**: Metadatos del sellado (`ticketId`, `resguardoUrl`, fecha y terminal) para que los 19 socios puedan consultar el resguardo oficial desde su móvil.
   - **Técnica de evasión de CORS preflight**: La llamada desde el navegador se realiza mediante `fetch` con `Content-Type: text/plain;charset=utf-8`. Esto evita la petición `OPTIONS` (preflight CORS) que Google Apps Script rechaza, garantizando la entrega inmediata y la consulta fluida.
   - **Sincronización Estricta de Identificador (`ticketId`)**:
     - Cada acción de envío genera de forma atómica un nuevo `ticketId` en el instante del clic (`new Date()`).

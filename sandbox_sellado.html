@@ -402,9 +402,23 @@ function procesarConsultaRespuesta(ticketId, jornada) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // Procesar adjuntos de forma segura
+    // Procesar adjuntos de forma segura y guardarlos en Google Drive
     var attachments = replyMsg.getAttachments();
     var attList = [];
+    var folderResguardos = null;
+
+    // Intentar obtener o crear la carpeta "Resguardos_Sellado" en Google Drive
+    try {
+      var folderName = "Resguardos_Sellado";
+      var folders = DriveApp.getFoldersByName(folderName);
+      if (folders.hasNext()) {
+        folderResguardos = folders.next();
+      } else {
+        folderResguardos = DriveApp.createFolder(folderName);
+      }
+    } catch (fErr) {
+      folderResguardos = null;
+    }
     
     for (var i = 0; i < attachments.length; i++) {
       try {
@@ -413,24 +427,51 @@ function procesarConsultaRespuesta(ticketId, jornada) {
         var bytes = att.getBytes();
         var size = bytes ? bytes.length : 0;
         var dataUri = null;
+        var driveFileUrl = null;
+        var driveFileId = null;
+        var originalName = att.getName() || ('adjunto_' + (i + 1));
+        var ext = originalName.lastIndexOf('.') !== -1 ? originalName.substring(originalName.lastIndexOf('.')) : '';
         
-        // Si pesa menos de 4 MB generamos data URI para preview visual inmediato
+        // 1. Guardar copia en Google Drive con nombre estandarizado (si hay carpeta disponible)
+        if (folderResguardos) {
+          try {
+            var driveFileName = 'RESGUARDO_' + foundTicketId + (attachments.length > 1 ? ('_part' + (i + 1)) : '') + ext;
+            var existingFiles = folderResguardos.getFilesByName(driveFileName);
+            var driveFile = null;
+            if (existingFiles.hasNext()) {
+              driveFile = existingFiles.next();
+            } else {
+              driveFile = folderResguardos.createFile(att.copyBlob().setName(driveFileName));
+              driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+            }
+            driveFileId = driveFile.getId();
+            driveFileUrl = 'https://drive.google.com/uc?export=view&id=' + driveFileId;
+          } catch (dErr) {
+            // Si hay restricción en DriveApp, continúa con dataUri
+          }
+        }
+        
+        // 2. Si pesa menos de 4 MB generamos data URI para preview visual inmediato
         if (bytes && size < 4 * 1024 * 1024) {
           dataUri = 'data:' + cType + ';base64,' + Utilities.base64Encode(bytes);
         }
         
         attList.push({
-          name: att.getName() || ('adjunto_' + (i + 1)),
+          name: originalName,
           contentType: cType,
           size: size,
-          dataUri: dataUri
+          dataUri: dataUri,
+          driveUrl: driveFileUrl,
+          driveId: driveFileId
         });
       } catch(attErr) {
         attList.push({
           name: 'Adjunto ' + (i + 1),
           contentType: 'application/octet-stream',
           size: 0,
-          dataUri: null
+          dataUri: null,
+          driveUrl: null,
+          driveId: null
         });
       }
     }
@@ -1722,10 +1763,14 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                                             <div class="text-slate-200 font-bold text-xs truncate">${att.name}</div>
                                             <div class="text-slate-400 text-[10px] font-mono">${att.contentType || 'image'} • ${sizeKb}</div>
                                             <div class="flex items-center gap-2 pt-1 justify-center sm:justify-start">
-                                                <button onclick="SandboxManager.abrirModalResguardo('${att.dataUri}', '${att.name}')" class="px-2 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-[11px] font-bold border border-emerald-500/40 flex items-center gap-1 transition">
+                                                <button onclick="SandboxManager.abrirModalResguardo('${att.dataUri || att.driveUrl}', '${att.name}')" class="px-2 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 text-[11px] font-bold border border-emerald-500/40 flex items-center gap-1 transition">
                                                     <span>🔍</span> Ver a Tamaño Completo
                                                 </button>
-                                                <a href="${att.dataUri}" download="${att.name}" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 flex items-center gap-1 transition">
+                                                ${att.driveUrl ? `
+                                                <a href="${att.driveUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-bold border border-amber-500/40 flex items-center gap-1 transition">
+                                                    <span>📁</span> Google Drive
+                                                </a>` : ''}
+                                                <a href="${att.dataUri || att.driveUrl}" download="${att.name}" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 flex items-center gap-1 transition">
                                                     <span>📥</span> Descargar
                                                 </a>
                                             </div>
@@ -1742,7 +1787,10 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                                                 <div class="text-slate-400 text-[10px] font-mono">${att.contentType || 'archivo'} • ${sizeKb}</div>
                                             </div>
                                         </div>
-                                        ${att.dataUri ? `<a href="${att.dataUri}" download="${att.name}" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 font-bold text-[11px] border border-blue-500/40 flex items-center gap-1 shrink-0 transition"><span>📥</span> Descargar</a>` : ''}
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            ${att.driveUrl ? `<a href="${att.driveUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-[11px] border border-amber-500/40 flex items-center gap-1 transition"><span>📁</span> Google Drive</a>` : ''}
+                                            ${(att.dataUri || att.driveUrl) ? `<a href="${att.dataUri || att.driveUrl}" download="${att.name}" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 font-bold text-[11px] border border-blue-500/40 flex items-center gap-1 transition"><span>📥</span> Descargar</a>` : ''}
+                                        </div>
                                     </div>
                                 `;
                             }
@@ -1983,7 +2031,8 @@ function procesarConsultaRespuesta(ticketId, jornada) {
                             name: `resguardo_selae_j${jPad}_${ticketId}.png`,
                             contentType: 'image/png',
                             size: 142500,
-                            dataUri: svgBase64
+                            dataUri: svgBase64,
+                            driveUrl: 'https://drive.google.com/drive/folders/peña-los-maulas-resguardos'
                         }
                     ]
                 };
