@@ -718,13 +718,39 @@ class Dashboard2AppController {
         const nextHasPig = nextPigInfo !== null;
         const nextMatchDesc = (nextPigInfo && nextPigInfo.match) ? `(P.${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
 
-        // Determinar si en la última jornada disputada hubo PIG
-        const isPigMode = !!(outcome && outcome.isPig);
+        // Comprobar si se han sellado todos los pronósticos de la nueva jornada
+        const totalSocios = (this.members && this.members.length >= 19) ? this.members.length : (this.members ? this.members.length : 19);
+        const allForecastsSubmitted = (this.submittedMembers && this.submittedMembers.length >= totalSocios) ||
+            (this.pendingMembers && this.pendingMembers.length === 0 && this.submittedMembers && this.submittedMembers.length > 0);
+        const isNextSealed = !!(nextJ && (nextJ.selladoEnviado || nextJ.selladoTicketId || nextJ.isSealed || nextJ.sellada || nextJ.status === 'sealed' || nextJ.status === 'closed'));
+        const isNextInProgress = !!(nextJ && nextJ.matches && nextJ.matches.some(m => m.result && m.result !== '' && m.result !== '-'));
+
+        const areAllForecastsSealed = allForecastsSubmitted || isNextSealed || isNextInProgress;
+
+        // Regla:
+        // 1. Si la nueva jornada tiene PIG -> Alerta PIG de la nueva jornada.
+        // 2. Si la nueva jornada NO tiene PIG:
+        //    - Cuando ya se han sellado todos los pronósticos -> APUNTA A LA RANA 🐸.
+        //    - Mientras aún falten pronósticos por sellar y la J. anterior tuvo PIG -> Muestra temporalmente el PIG anterior.
+        //    - En cualquier otro caso -> APUNTA A LA RANA 🐸.
+        let isPigMode = false;
+        let isNextPigAlert = false;
+
+        if (nextHasPig) {
+            isPigMode = true;
+            isNextPigAlert = true;
+        } else if (!areAllForecastsSealed && outcome && outcome.isPig) {
+            isPigMode = true;
+            isNextPigAlert = false;
+        } else {
+            isPigMode = false;
+        }
+
         this.currentPigOrRanaMode = isPigMode ? 'pig' : 'rana';
 
         if (isPigMode) {
             // =================================================================
-            // MODO PIG: Hubo enfrentamiento entre los tres grandes en la última J.
+            // MODO PIG: Alerta PIG de la nueva jornada o resultados pendientes
             // =================================================================
             if (elBadge) elBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/40 flex items-center gap-1';
             if (elBadgeIcon) elBadgeIcon.textContent = '🐷';
@@ -742,32 +768,54 @@ class Dashboard2AppController {
                 `;
             }
 
-            if (statusLabel) {
-                statusLabel.className = 'text-xs text-amber-400 block font-bold';
-                statusLabel.textContent = 'Resultados del PIG de la última jornada:';
+            if (isNextPigAlert) {
+                if (statusLabel) {
+                    statusLabel.className = 'text-xs text-amber-400 block font-bold';
+                    statusLabel.textContent = `Partido PIG en Jornada ${nextJ ? nextJ.number : ''}:`;
+                }
+
+                content.innerHTML = `
+                    <div class="space-y-1.5 text-xs">
+                        <div class="text-[12px] text-pink-300 font-extrabold mb-1 flex items-center gap-1.5">
+                            <span>⚽</span> ${nextPigInfo.match.home} vs ${nextPigInfo.match.away} (P.${nextPigInfo.index + 1})
+                        </div>
+                        <p class="text-slate-300 text-[11px] leading-relaxed">
+                            ¡Partido de Interés General esta semana! Quien no acierte este partido pagará penalización al Bote.
+                        </p>
+                        <div class="text-[11px] text-amber-300/90 pt-1.5 border-t border-slate-800 flex items-center justify-between">
+                            <span>Penalización por fallo:</span>
+                            <span class="font-mono font-bold text-rose-400">-${penaltyVal} € / socio</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                if (statusLabel) {
+                    statusLabel.className = 'text-xs text-amber-400 block font-bold';
+                    statusLabel.textContent = 'Resultados del PIG de la última jornada:';
+                }
+
+                const acertantes = outcome.pigAcertantes || [];
+                const perdedores = outcome.pigFallantes || [];
+                const matchDesc = outcome.pigInfo && outcome.pigInfo.match ? `Partido ${outcome.pigInfo.index + 1}: ${outcome.pigInfo.match.home} vs ${outcome.pigInfo.match.away}` : '';
+
+                content.innerHTML = `
+                    <div class="space-y-1.5 text-xs">
+                        ${matchDesc ? `<div class="text-[11px] text-pink-300 font-semibold mb-1">⚽ ${matchDesc}</div>` : ''}
+                        <div>
+                            <span class="text-emerald-400 font-bold">✅ Acertantes:</span>
+                            <span class="text-slate-200 ml-1">${acertantes.length > 0 ? acertantes.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
+                        </div>
+                        <div>
+                            <span class="text-rose-400 font-bold">❌ Perdedores:</span>
+                            <span class="text-slate-300 ml-1">${perdedores.length > 0 ? perdedores.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
+                        </div>
+                        <div class="text-[11px] text-amber-300/90 pt-1.5 border-t border-slate-800 flex items-center justify-between">
+                            <span>Penalización:</span>
+                            <span class="font-mono font-bold text-rose-400">-${penaltyVal} € / socio</span>
+                        </div>
+                    </div>
+                `;
             }
-
-            const acertantes = outcome.pigAcertantes || [];
-            const perdedores = outcome.pigFallantes || [];
-            const matchDesc = outcome.pigInfo && outcome.pigInfo.match ? `Partido ${outcome.pigInfo.index + 1}: ${outcome.pigInfo.match.home} vs ${outcome.pigInfo.match.away}` : '';
-
-            content.innerHTML = `
-                <div class="space-y-1.5 text-xs">
-                    ${matchDesc ? `<div class="text-[11px] text-pink-300 font-semibold mb-1">⚽ ${matchDesc}</div>` : ''}
-                    <div>
-                        <span class="text-emerald-400 font-bold">✅ Acertantes:</span>
-                        <span class="text-slate-200 ml-1">${acertantes.length > 0 ? acertantes.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
-                    </div>
-                    <div>
-                        <span class="text-rose-400 font-bold">❌ Perdedores:</span>
-                        <span class="text-slate-300 ml-1">${perdedores.length > 0 ? perdedores.join(', ') : '<em class="text-slate-500">Ninguno</em>'}</span>
-                    </div>
-                    <div class="text-[11px] text-amber-300/90 pt-1.5 border-t border-slate-800 flex items-center justify-between">
-                        <span>Penalización:</span>
-                        <span class="font-mono font-bold text-rose-400">-${penaltyVal} € / socio</span>
-                    </div>
-                </div>
-            `;
 
             if (footLeft) {
                 footLeft.className = 'text-slate-500';
