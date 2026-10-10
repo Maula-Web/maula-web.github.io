@@ -1208,19 +1208,21 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
         var attachments = replyMsg.getAttachments();
         var attList = [];
-        var folderResguardos = null;
+        var folderDestino = null;
 
-        // Guardado automático en Google Drive en carpeta 'Resguardos_Sellado'
+        // Guardado en jerarquía inteligente en Google Drive:
+        // REGUARDOS QUINIELAS MAULAS / TEMPORADA 2026-2027 / [RESGUARDOS DE PRUEBA]
         try {
-          var folderName = "Resguardos_Sellado";
-          var folders = DriveApp.getFoldersByName(folderName);
-          if (folders.hasNext()) {
-            folderResguardos = folders.next();
+          var folderRaiz = obtenerOCrearCarpeta("REGUARDOS QUINIELAS MAULAS", null);
+          var nombreTemporada = deducirTemporada(foundTicketId);
+          var folderTemporada = obtenerOCrearCarpeta(nombreTemporada, folderRaiz);
+          if (isTest) {
+            folderDestino = obtenerOCrearCarpeta("RESGUARDOS DE PRUEBA", folderTemporada);
           } else {
-            folderResguardos = DriveApp.createFolder(folderName);
+            folderDestino = folderTemporada;
           }
         } catch (fErr) {
-          folderResguardos = null;
+          folderDestino = null;
         }
 
         for (var i = 0; i < attachments.length; i++) {
@@ -1235,15 +1237,15 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
             var originalName = att.getName() || ('adjunto_' + (i + 1));
             var ext = originalName.lastIndexOf('.') !== -1 ? originalName.substring(originalName.lastIndexOf('.')) : '';
 
-            if (folderResguardos) {
+            if (folderDestino) {
               try {
                 var driveFileName = 'RESGUARDO_' + foundTicketId + (attachments.length > 1 ? ('_part' + (i + 1)) : '') + ext;
-                var existingFiles = folderResguardos.getFilesByName(driveFileName);
+                var existingFiles = folderDestino.getFilesByName(driveFileName);
                 var driveFile = null;
                 if (existingFiles.hasNext()) {
                   driveFile = existingFiles.next();
                 } else {
-                  driveFile = folderResguardos.createFile(att.copyBlob().setName(driveFileName));
+                  driveFile = folderDestino.createFile(att.copyBlob().setName(driveFileName));
                   driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
                 }
                 driveFileId = driveFile.getId();
@@ -1297,7 +1299,10 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
     ```
   - **Estrategia de Almacenamiento Multinivel de Resguardos Oficiales**:
     1. **Nivel Legal (Gmail)**: Se conserva indefinidamente en `penalosmaulas@gmail.com` con cabeceras completas y firma criptográfica.
-    2. **Nivel Archivo Digital (Google Drive)**: Se guarda automáticamente en la carpeta `Resguardos_Sellado` con nombre estandarizado `RESGUARDO_[ticketId].ext` y enlace público de visualización.
+    2. **Nivel Archivo Digital (Google Drive)**: Se organiza automáticamente en:
+       `REGUARDOS QUINIELAS MAULAS \ TEMPORADA 2026-2027 \ [RESGUARDOS DE PRUEBA]`
+       - Clasificación inteligente: Extrae la temporada automáticamente de la clave del ticket (ej. `MAULAS-2627-...` -> `TEMPORADA 2026-2027`).
+       - Fase de pruebas: Durante las pruebas desde el sandbox, los resguardos se depositan en la subcarpeta `RESGUARDOS DE PRUEBA`. En producción pasarán directamente a la carpeta de la temporada.
     3. **Nivel Comunitario (Web / Firestore)**: Metadatos del sellado (`ticketId`, `resguardoUrl`, fecha y terminal) para que los 19 socios puedan consultar el resguardo oficial desde su móvil.
   - **Técnica de evasión de CORS preflight**: La llamada desde el navegador se realiza mediante `fetch` con `Content-Type: text/plain;charset=utf-8`. Esto evita la petición `OPTIONS` (preflight CORS) que Google Apps Script rechaza, garantizando la entrega inmediata y la consulta fluida.
   - **Sincronización Estricta de Identificador (`ticketId`)**:
