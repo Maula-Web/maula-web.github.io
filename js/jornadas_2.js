@@ -1419,6 +1419,97 @@ class Jornadas2AppController {
         }
     }
 
+    async handleAutoImportMatches() {
+        const btn = document.getElementById('btn-auto-import-matches');
+        const spinner = document.getElementById('btn-auto-import-matches-spinner');
+        const icon = document.getElementById('btn-auto-import-matches-icon');
+        const text = document.getElementById('btn-auto-import-matches-text');
+        const statusBox = document.getElementById('auto-import-matches-status');
+        const errorBox = document.getElementById('import-matches-error-box');
+
+        if (errorBox) errorBox.classList.add('hidden');
+        if (statusBox) {
+            statusBox.textContent = 'Buscando próximas jornadas de domingo con Primera División...';
+            statusBox.classList.remove('hidden');
+        }
+        if (btn) btn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+        if (icon) icon.classList.add('hidden');
+        if (text) text.textContent = 'Descargando...';
+
+        try {
+            if (!window.QuinielaService || typeof window.QuinielaService.fetchUpcomingJornadas !== 'function') {
+                throw new Error('El servicio QuinielaService no está disponible para consultar próximas jornadas.');
+            }
+
+            const upcoming = await window.QuinielaService.fetchUpcomingJornadas();
+
+            if (!upcoming || upcoming.length === 0) {
+                throw new Error('No se encontraron próximas jornadas oficiales que cumplan con la regla de domingo y Primera División.');
+            }
+
+            // Filtrar para previsualizar la jornada que sea más relevante (que no exista aún o la primera nueva)
+            const newCandidate = upcoming.find(cand => !this.jornadas.some(j => j.number === cand.number)) || upcoming[0];
+
+            this.pendingImportMatches = {
+                jNum: newCandidate.number,
+                dateStr: newCandidate.dateStr,
+                isSunday: true,
+                warnings: [],
+                matches: newCandidate.matches
+            };
+
+            // Mostrar vista previa (Paso 2)
+            document.getElementById('import-matches-step-1').classList.add('hidden');
+            document.getElementById('import-matches-step-2').classList.remove('hidden');
+
+            const headerBox = document.getElementById('import-matches-preview-header');
+            const listBox = document.getElementById('import-matches-preview-list');
+
+            if (headerBox) {
+                const alreadyExists = this.jornadas.some(j => j.number === newCandidate.number);
+                headerBox.innerHTML = `
+                    <div class="flex items-center justify-between pb-1.5 border-b border-slate-800">
+                        <div class="font-extrabold text-orange-400 flex items-center gap-2">
+                            <span>Jornada ${newCandidate.number}</span>
+                            <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 font-mono text-[10px]">Oficial</span>
+                        </div>
+                        <span class="text-xs text-white font-mono font-bold">${newCandidate.dateStr} (Domingo)</span>
+                    </div>
+                    <div class="text-[11px] text-slate-300 pt-1">
+                        ${alreadyExists ? '⚠️ <strong>Aviso:</strong> Ya existe una Jornada ' + newCandidate.number + '. Al confirmar, se actualizarán sus partidos.' : '✅ <strong>Todo listo:</strong> Se creará como nueva jornada oficial para la peña.'}
+                    </div>
+                `;
+            }
+
+            if (listBox) {
+                listBox.innerHTML = newCandidate.matches.map((m, idx) => {
+                    const isPleno = idx === 14;
+                    const home = m ? m.home : 'Sin definir';
+                    const away = m ? m.away : 'Sin definir';
+                    return `
+                        <div class="p-2 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
+                            <span class="w-8 font-bold text-slate-400">${isPleno ? 'P15' : idx + 1}</span>
+                            <span class="text-white font-semibold truncate">${home} vs ${away}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        } catch (err) {
+            console.error('[Jornadas 2.0] Error en auto-importación de partidos:', err);
+            if (errorBox) {
+                errorBox.innerHTML = `<div>❌ Error al importar partidos: ${err.message}</div>`;
+                errorBox.classList.remove('hidden');
+            }
+        } finally {
+            if (btn) btn.disabled = false;
+            if (spinner) spinner.classList.add('hidden');
+            if (icon) icon.classList.remove('hidden');
+            if (text) text.textContent = 'Descargar próximas jornadas';
+            if (statusBox) statusBox.classList.add('hidden');
+        }
+    }
+
     handleAnalyzeMatchesText() {
         const textarea = document.getElementById('import-matches-textarea');
         const errorBox = document.getElementById('import-matches-error-box');
@@ -1488,29 +1579,50 @@ class Jornadas2AppController {
     async confirmCreateJornadaFromImport() {
         if (!this.pendingImportMatches) return;
         const res = this.pendingImportMatches;
+        const targetNum = parseInt(res.jNum, 10);
 
-        const newJornada = {
-            id: Date.now(),
-            number: res.jNum || (this.jornadas.length + 1),
-            season: '2026-2027',
-            date: res.dateStr || 'Por definir',
-            active: true,
-            matches: res.matches.map(m => ({
-                home: (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(m ? m.home : '') : (m ? m.home : ''),
-                away: (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(m ? m.away : '') : (m ? m.away : ''),
-                result: ''
-            })),
-            prizes: {}
-        };
+        // Comprobar si ya existe una jornada con ese número
+        const existing = this.jornadas.find(j => parseInt(j.number, 10) === targetNum);
 
-        this.jornadas.push(newJornada);
-        this.selectedJornadaId = newJornada.id;
+        const cleanMatches = res.matches.map(m => ({
+            home: (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(m ? m.home : '') : (m ? m.home : ''),
+            away: (window.AppUtils && window.AppUtils.normalizeTeamName) ? window.AppUtils.normalizeTeamName(m ? m.away : '') : (m ? m.away : ''),
+            result: (m && m.result) ? m.result : ''
+        }));
 
-        if (window.DataService) {
-            try {
-                await window.DataService.save('jornadas', newJornada);
-            } catch (e) {
-                console.error('[Jornadas 2.0] Error creando jornada importada:', e);
+        if (existing) {
+            existing.matches = cleanMatches;
+            if (res.dateStr && (existing.date === 'Por definir' || !existing.date)) {
+                existing.date = res.dateStr;
+            }
+            this.selectedJornadaId = existing.id;
+            if (window.DataService) {
+                try {
+                    await window.DataService.save('jornadas', existing);
+                } catch (e) {
+                    console.error('[Jornadas 2.0] Error actualizando jornada existente:', e);
+                }
+            }
+        } else {
+            const newJornada = {
+                id: Date.now(),
+                number: targetNum || (this.jornadas.length + 1),
+                season: '2026-2027',
+                date: res.dateStr || 'Por definir',
+                active: true,
+                matches: cleanMatches,
+                prizes: {}
+            };
+
+            this.jornadas.push(newJornada);
+            this.selectedJornadaId = newJornada.id;
+
+            if (window.DataService) {
+                try {
+                    await window.DataService.save('jornadas', newJornada);
+                } catch (e) {
+                    console.error('[Jornadas 2.0] Error creando jornada importada:', e);
+                }
             }
         }
 

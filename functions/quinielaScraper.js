@@ -184,8 +184,106 @@ async function parseRTVE() {
     };
 }
 
+async function fetchUpcomingQuinielaJornadas() {
+    try {
+        const res = await fetch('https://www.elquinielista.com/Quinielista/calendario-quiniela', {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            }
+        });
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const html = await res.text();
+
+        function decodeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&#225;/g, 'á').replace(/&#233;/g, 'é').replace(/&#237;/g, 'í')
+                .replace(/&#243;/g, 'ó').replace(/&#250;/g, 'ú').replace(/&#241;/g, 'ñ')
+                .replace(/&#193;/g, 'Á').replace(/&#201;/g, 'É').replace(/&#205;/g, 'Í')
+                .replace(/&#211;/g, 'Ó').replace(/&#218;/g, 'Ú').replace(/&#209;/g, 'Ñ')
+                .replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+        }
+
+        const regexJ = /<span[^>]*id=['"]lbJornada['"][^>]*>([^<]+)<\/span>/gi;
+        const regexF = /<span[^>]*id=['"]lbFecha['"][^>]*>([^<]+)<\/span>/gi;
+        const regexCasa = /<span[^>]*id=['"]lbEquipoCasa['"][^>]*>([^<]+)<\/span>/gi;
+        const regexVisit = /<span[^>]*id=['"]lbEquipoVisitante['"][^>]*>([^<]+)<\/span>/gi;
+
+        let match;
+        const jornadas = [];
+        while ((match = regexJ.exec(html)) !== null) jornadas.push(parseInt(match[1].trim(), 10));
+
+        const fechas = [];
+        while ((match = regexF.exec(html)) !== null) fechas.push(match[1].trim());
+
+        const casas = [];
+        while ((match = regexCasa.exec(html)) !== null) casas.push(decodeHtml(match[1].trim()));
+
+        const visitas = [];
+        while ((match = regexVisit.exec(html)) !== null) visitas.push(decodeHtml(match[1].trim()));
+
+        const primeraKeywords = [
+            'alavés', 'athletic', 'atlético', 'at. madrid', 'barcelona', 'betis', 
+            'celta', 'espanyol', 'getafe', 'girona', 'las palmas', 'leganés', 'mallorca', 
+            'osasuna', 'rayo', 'real madrid', 'r. madrid', 'real sociedad', 'r. sociedad', 
+            'sevilla', 'valencia', 'valladolid', 'villarreal'
+        ];
+
+        const validJornadas = [];
+
+        for (let i = 0; i < jornadas.length; i++) {
+            const jNum = jornadas[i];
+            const fStr = fechas[i] || '';
+
+            const dMatch = fStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (!dMatch) continue;
+
+            let dateObj = new Date(parseInt(dMatch[3], 10), parseInt(dMatch[2], 10) - 1, parseInt(dMatch[1], 10));
+            const dayOfWeek = dateObj.getDay();
+
+            // Regla: si cae en fin de semana, computa en domingo
+            if (dayOfWeek === 6) dateObj.setDate(dateObj.getDate() + 1);
+            else if (dayOfWeek === 5) dateObj.setDate(dateObj.getDate() + 2);
+            else if (dayOfWeek !== 0) continue; // Descartar intersemanales
+
+            const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+
+            const matches = [];
+            let primeraCount = 0;
+
+            for (let m = 0; m < 15; m++) {
+                const idx = i * 15 + m;
+                if (casas[idx] && visitas[idx]) {
+                    const home = casas[idx];
+                    const away = visitas[idx];
+                    matches.push({ position: m + 1, home, away, result: '' });
+                    if (primeraKeywords.some(k => home.toLowerCase().includes(k))) primeraCount++;
+                    if (primeraKeywords.some(k => away.toLowerCase().includes(k))) primeraCount++;
+                }
+            }
+
+            if (matches.length >= 14 && primeraCount >= 5) {
+                validJornadas.push({
+                    number: jNum,
+                    dateStr: formattedDate,
+                    season: '2026-2027',
+                    isSunday: true,
+                    matches: matches.slice(0, 15)
+                });
+            }
+        }
+
+        return validJornadas;
+    } catch (e) {
+        console.warn('[quinielaScraper] Error obteniendo próximas jornadas:', e.message);
+        return [];
+    }
+}
+
 module.exports = {
     fetchLatestQuiniela,
+    fetchUpcomingQuinielaJornadas,
     parseElPais,
     parseRTVE
 };

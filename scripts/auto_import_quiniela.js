@@ -103,9 +103,63 @@ async function run() {
             console.log(`\n💾 Escrutinio guardado localmente en: ${outFile}`);
         }
 
-        console.log('\n✨ Proceso completado.');
+        console.log('\n✨ Proceso de resultados completado.');
+
+        // =========================================================================
+        // PASO 2: COMPROBAR E INCORPORAR PRÓXIMAS JORNADAS (REGLAS: DOMINGO + 1ª DIV)
+        // =========================================================================
+        console.log('\n----------------------------------------------------');
+        console.log('📅 COMPROBANDO PRÓXIMAS JORNADAS OFICIALES...');
+        console.log('----------------------------------------------------');
+
+        const { fetchUpcomingQuinielaJornadas } = require('../functions/quinielaScraper');
+        if (typeof fetchUpcomingQuinielaJornadas === 'function') {
+            const upcomingList = await fetchUpcomingQuinielaJornadas();
+            console.log(`ℹ️ Detectadas ${upcomingList.length} jornadas válidas en el calendario (domingo + 1ª división).`);
+
+            if (serviceAccount && upcomingList.length > 0) {
+                const { getFirestore } = require('firebase-admin/firestore');
+                const db = getFirestore();
+                const allSnap = await db.collection('jornadas').get();
+                const existingNumbers = new Set();
+                allSnap.forEach(doc => {
+                    const data = doc.data();
+                    if (data && data.number) existingNumbers.add(parseInt(data.number, 10));
+                });
+
+                for (const uJ of upcomingList) {
+                    if (!existingNumbers.has(uJ.number)) {
+                        console.log(`🆕 Incorporando automáticamente nueva Jornada ${uJ.number} (${uJ.dateStr})...`);
+                        const newDocRef = db.collection('jornadas').doc();
+                        await newDocRef.set({
+                            id: Date.now() + uJ.number,
+                            number: uJ.number,
+                            season: uJ.season || '2026-2027',
+                            date: uJ.dateStr,
+                            active: true,
+                            matches: uJ.matches,
+                            prizes: {},
+                            autoCreated: true,
+                            createdAt: new Date().toISOString()
+                        });
+                        console.log(`✅ Jornada ${uJ.number} guardada en Firestore.`);
+                    } else {
+                        console.log(`✓ Jornada ${uJ.number} ya existe en Firestore.`);
+                    }
+                }
+            }
+
+            // Guardar copia local en JSON
+            const outDir = path.join(__dirname, '../datos_auxiliares');
+            if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+            const outFile = path.join(outDir, 'proximas_jornadas_cache.json');
+            fs.writeFileSync(outFile, JSON.stringify(upcomingList, null, 2), 'utf-8');
+            console.log(`💾 Calendario de próximas jornadas guardado en: ${outFile}`);
+        }
+
+        console.log('\n✨ Auto-importación total completada con éxito.');
     } catch (err) {
-        console.error('\n❌ ERROR al obtener resultados:', err.message);
+        console.error('\n❌ ERROR durante la ejecución:', err.message);
         process.exit(1);
     }
 }
