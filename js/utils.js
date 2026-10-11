@@ -574,15 +574,71 @@ var AppUtils = window.AppUtils || {
         const clean = str.replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.');
         const val = parseFloat(clean);
         return isNaN(val) ? 0 : val;
+    },
+
+    /**
+     * Universal Toast Notification
+     */
+    showToast(message, type = 'info') {
+        if (typeof document === 'undefined') return;
+        let toast = document.getElementById('maulas-universal-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'maulas-universal-toast';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 50px;
+                left: 50%;
+                transform: translateX(-50%) translateY(12px);
+                padding: 8px 18px;
+                border-radius: 9999px;
+                font-size: 0.82rem;
+                font-weight: 700;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+                z-index: 100090;
+                pointer-events: none;
+                transition: opacity 0.25s ease, transform 0.25s ease;
+                opacity: 0;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                backdrop-filter: blur(12px);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            `;
+            document.body.appendChild(toast);
+        }
+
+        const isLight = document.documentElement.classList.contains('light-theme');
+        if (type === 'success') {
+            toast.style.background = isLight ? 'rgba(236, 253, 245, 0.96)' : 'rgba(6, 78, 59, 0.94)';
+            toast.style.color = isLight ? '#065f46' : '#6ee7b7';
+            toast.style.border = '1px solid rgba(16, 185, 129, 0.5)';
+        } else if (type === 'warn' || type === 'info') {
+            toast.style.background = isLight ? 'rgba(254, 243, 199, 0.96)' : 'rgba(120, 53, 15, 0.94)';
+            toast.style.color = isLight ? '#92400e' : '#fde68a';
+            toast.style.border = '1px solid rgba(245, 158, 11, 0.5)';
+        } else {
+            toast.style.background = isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(15, 23, 42, 0.94)';
+            toast.style.color = isLight ? '#0f172a' : '#f8fafc';
+            toast.style.border = '1px solid rgba(148, 163, 184, 0.3)';
+        }
+
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(-50%) translateY(0)';
+
+        if (this._toastTimer) clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(12px)';
+        }, 3200);
     }
 };
-
-
 
 window.AppUtils = AppUtils;
 
 /**
- * Global UI Features (Clock)
+ * Global UI Features (Clock & Connectivity Status)
  * Injected automatically since utils.js is present on all pages.
  */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -632,8 +688,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const isLight = document.documentElement.classList.contains('light-theme');
             const userColor = isLight ? '#b45309' : '#ffd54f';
-            clockDiv.innerHTML = `<span style="color:${userColor}; font-weight:bold; margin-right:10px;">👤 ${userName}</span> ${dateStr} ${timeStr}`;
+            const isOnline = typeof navigator !== 'undefined' ? (navigator.onLine !== false) : true;
+            const statusDot = isOnline
+                ? `<span title="Conectado a la nube" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; margin-right:6px; box-shadow:0 0 6px #10b981; vertical-align:middle;"></span>`
+                : `<span title="Modo sin conexión (datos locales)" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#f59e0b; margin-right:4px; box-shadow:0 0 6px #f59e0b; vertical-align:middle;"></span><span style="color:#f59e0b; font-weight:800; font-size:9px; margin-right:6px; text-transform:uppercase;">Offline</span>`;
+
+            clockDiv.innerHTML = `${statusDot}<span style="color:${userColor}; font-weight:bold; margin-right:8px;">👤 ${userName}</span><span>${dateStr} ${timeStr}</span>`;
         };
+
+        // Listen for online / offline events
+        window.addEventListener('online', () => {
+            updateClock();
+            if (window.AppUtils && typeof window.AppUtils.showToast === 'function') {
+                window.AppUtils.showToast('🟢 Conexión restablecida con la nube', 'success');
+            }
+        });
+        window.addEventListener('offline', () => {
+            updateClock();
+            if (window.AppUtils && typeof window.AppUtils.showToast === 'function') {
+                window.AppUtils.showToast('🟠 Modo sin conexión (utilizando caché local)', 'info');
+            }
+        });
 
         // Start
         updateClock();

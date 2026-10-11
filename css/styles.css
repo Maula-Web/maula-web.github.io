@@ -4458,3 +4458,45 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
     color: #b45309 !important;
 }
 
+/* =========================================================================
+   MICRO-INTERACCIONES TÁCTILES Y FEEDBACK HÁPTICO (MÓVIL Y ESCRITORIO)
+   ========================================================================= */
+.btn-press,
+.signo-btn,
+.forecast-cell,
+.tab-btn,
+nav a[href],
+button:not(:disabled) {
+    transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-press:active,
+.signo-btn:active,
+button:not(:disabled):active {
+    transform: scale(0.97);
+}
+
+/* =========================================================================
+   SKELETON LOADERS UNIVERSALES (CARGA SUAVE Y PREVENCIÓN DE SALTO DE DISEÑO CLS)
+   ========================================================================= */
+@keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-box {
+    display: inline-block;
+    height: 1em;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, rgba(30, 41, 59, 0.6) 25%, rgba(51, 65, 85, 0.85) 50%, rgba(30, 41, 59, 0.6) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.8s infinite ease-in-out;
+    border-radius: 8px;
+}
+
+.light-theme .skeleton-box {
+    background: linear-gradient(90deg, rgba(226, 232, 240, 0.75) 25%, rgba(241, 245, 249, 0.95) 50%, rgba(226, 232, 240, 0.75) 75%);
+    background-size: 200% 100%;
+}
+
