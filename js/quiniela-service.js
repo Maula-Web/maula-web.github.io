@@ -359,3 +359,10 @@ QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
     ]
   }
 ];
+
+if (typeof window !== 'undefined') {
+    window.QuinielaService = QuinielaService;
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { QuinielaService };
+}

@@ -1324,6 +1324,67 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+---
+
+## 41. IMPORTACIÓN OFICIAL DE RESULTADOS VINCULADA A FECHA Y ASIGNACIÓN AUTOMÁTICA
+- **Problema previo**: Al importar resultados oficiales desde Loterías y Apuestas del Estado o portales de escrutinio (El País, RTVE), el sistema aplicaba los resultados a la jornada actualmente abierta o seleccionada en la vista, sin verificar si la fecha del escrutinio correspondía a esa jornada o a una anterior.
+- **Solución implementada (`js/quiniela-service.js`, `js/jornadas_2.js`, `js/jornadas.js`)**:
+  - **Detección y emparejamiento por fecha exacta**: `findTargetJornadaForResults(res)` analiza la fecha del escrutinio importado y localiza automáticamente la jornada del sistema cuya fecha oficial coincide.
+  - **Selector dinámico en Vista Previa (Paso 2)**: La cabecera del modal de importación muestra a qué jornada corresponden los resultados e incluye un desplegable para reasignar la jornada de destino manualmente si el administrador lo requiere.
+  - **Aviso visual de discrepancia**: Si la jornada visualizada difiere de la detectada, el sistema emite una alerta destacada (⚠️ *"Estabas viendo la Jornada X, pero los resultados coinciden con la fecha de la Jornada Y"*).
+
+---
+
+## 42. VISUALIZACIÓN EN VIVO DE PUNTUACIONES PARCIALES Y EFECTOS EN EL RANKING EN JORNADAS EN JUEGO
+- **Regla de Negocio**: Durante el fin de semana, mientras una jornada está "En Juego" (partidos disputándose), la matriz histórica y la clasificación deben reflejar los **aciertos parciales** y el **impacto provisional** en el ranking general en tiempo real.
+- **Indicadores de tendencia en celdas de socios**:
+  - Se retiró el símbolo del rayo (⚡) por indicación del usuario.
+  - En la celda de cada socio se muestran de forma nítida los aciertos parciales junto al indicador de posición provisional:
+    - 🟢 **Flecha verde hacia arriba (▲)**: Si el socio sube puestos en la clasificación provisional.
+    - 🔴 **Flecha roja hacia abajo (▼)**: Si el socio desciende puestos en la clasificación provisional.
+    - 🔵 **Signo igual azul (=)**: Si el socio mantiene su posición en el ranking.
+  - Mismo criterio aplicado tanto en la tarjeta desplegable detallada como en la celda individual de la tabla general.
+
+---
+
+## 43. BLOQUEO INQUEBRANTABLE DE MODIFICACIÓN DE PRONÓSTICOS TRAS INICIO DE JORNADA
+- **Problema previo**: En una jornada en juego o una vez cerrada la recepción, era posible alterar signos de las quinielas desde el interfaz.
+- **Regla oficial y candado (`js/pronosticos.js`)**:
+  - Una vez que el último socio (19/19) ha rellenado su pronóstico, o la jornada pasa a estado "En Juego" / sellada, se activan los candados de edición:
+    - Las botoneras 1-X-2 quedan bloqueadas (`disabled = true`, cursor bloqueado).
+    - Los eventos táctiles y de clic quedan inhabilitados.
+    - Se muestra la insignia oficial de **"🔒 Pronósticos Bloqueados - Jornada Iniciada"**, impidiendo cualquier alteración extemporánea de signos.
+
+---
+
+## 44. DESCARGA AUTOMÁTICA DE PRÓXIMAS JORNADAS OFICIALES Y FILTRO DE CALENDARIO REAL
+- **Restricciones Oficiales de Calendario**:
+  - **Regla Maula**: Todas las jornadas oficiales se disputan y computan en **domingo**.
+  - **Estricto filtro de fechas futuras**: Solo se ofrecen jornadas cuya fecha oficial sea igual o posterior a la fecha actual (`candDate >= todayMidnight`). Se eliminaron completamente datos de jornadas pasadas (como la Jornada 9 del 27-09).
+  - **Exclusividad de Boletos Oficiales Publicados por SELAE**:
+    - Se prohíbe taxativamente inventar boletos o proyectar jornadas futuras basándose únicamente en el calendario de LaLiga, ya que Loterías y Apuestas del Estado es quien decide qué partidos entran en el boleto oficial y su orden exacto de casillas (1 al 15).
+    - Las próximas jornadas solo se descargan e incorporan a medida que SELAE publica las convocatorias oficiales del boleto.
+- **Automatización de Lunes por la Mañana**:
+  - El sistema incorpora la comprobación programada matinal (mediante cron / GitHub Actions) para chequear la publicación de nuevos boletos oficiales por SELAE e incorporarlos a la plataforma sin necesidad de mantener la web abierta.
+
+---
+
+## 45. REGLA ESTRICTA DE NORMALIZACIÓN DE EQUIPOS FEMENINOS `(f)`
+- **Problema previo**: Ciertos scrapers externos eliminaban la marca o letra "f" de equipos femeninos (ej. `Valencia F`, `Barcelona Fem`), convirtiéndolos erróneamente en masculinos y generando confusiones con las normas del PIG y la clasificación.
+- **Solución y unificación (`functions/quinielaScraper.js`, `js/quiniela-service.js`, `js/utils.js`)**:
+  - La importación aplica rigurosamente la regla oficial de la peña: **todo equipo femenino mantiene obligatoriamente el sufijo ` (f)`** (ej: `Valencia (f)`, `Real Madrid (f)`, `Barcelona (f)`, `Madrid CFF (f)`).
+  - No se descartan partidos de fútbol femenino si están presentes en el boleto oficial de SELAE, integrándolos de forma fidedigna.
+
+---
+
+## 46. RETIRADA DEL BOTÓN FLOTANTE PUSH HERADIO Y OPACIDAD DE MODALES
+- **Retirada de botón flotante**: A requerimiento del usuario, se eliminó el botón visual flotante `🔔 Push | Enviar a Heradio` (`.push-float-btn`) inyectado en `js/push-service.js`, preservando toda la infraestructura subyacente de Firebase Messaging y sincronización push en segundo plano.
+- **Opacidad absoluta en modales de importación**:
+  - Se eliminaron las clases translúcidas (`.glass-panel`) de `#modal-import-matches` y `#modal-import-results`.
+  - Se fijó fondo 100% opaco y sólido (`#0b0f19` en Modo Oscuro, `#ffffff` en Modo Claro) con prioridad `z-index: 100080`, garantizando lectura limpia sin transparencias ni interferencias del fondo.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

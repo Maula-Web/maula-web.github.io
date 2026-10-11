@@ -60,7 +60,7 @@ try {
     console.warn('[service-worker.js] Aviso cargando Firebase Messaging en SW:', e);
 }
 
-const CACHE_NAME = 'maulas-pwa-v1.74';
+const CACHE_NAME = 'maulas-pwa-v1.75';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -125,6 +125,8 @@ const CORE_ASSETS = [
     'js/resumen-temporada.js',
     'js/telegram-service.js',
     'js/push-service.js',
+    'js/quiniela-service.js',
+    'datos_auxiliares/proximas_jornadas_cache.json',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
     'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js',
