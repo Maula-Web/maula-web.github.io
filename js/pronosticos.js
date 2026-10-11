@@ -413,6 +413,14 @@ class PronosticoManager {
         this.statusMsg.textContent = '';
         this.deadlineInfo.textContent = '';
         if (this.costInfo) this.costInfo.textContent = '';
+        if (this.mdAnalysisSidebar) {
+            this.mdAnalysisSidebar.classList.add('hidden');
+            this.mdAnalysisSidebar.classList.remove('flex', 'lg:col-span-5', 'xl:col-span-4');
+        }
+        if (this.editorForecastCol) {
+            this.editorForecastCol.classList.remove('lg:col-span-7', 'xl:col-span-8');
+            this.editorForecastCol.classList.add('lg:col-span-12');
+        }
         if (this.summaryTable) {
             this.summaryTable.querySelectorAll('.summary-cell.active-cell').forEach(c => c.classList.remove('active-cell'));
         }
@@ -505,15 +513,15 @@ class PronosticoManager {
         if (this.mdAnalysisSidebar && this.editorForecastCol) {
             if (this.currentJornadaHasMDAnalysis) {
                 this.editorForecastCol.classList.remove('lg:col-span-12');
-                this.editorForecastCol.classList.add('lg:col-span-7');
+                this.editorForecastCol.classList.add('lg:col-span-7', 'xl:col-span-8');
                 this.mdAnalysisSidebar.classList.remove('hidden');
-                this.mdAnalysisSidebar.classList.add('flex');
+                this.mdAnalysisSidebar.classList.add('flex', 'lg:col-span-5', 'xl:col-span-4');
                 this.renderMDSidebar();
             } else {
-                this.editorForecastCol.classList.remove('lg:col-span-7');
+                this.editorForecastCol.classList.remove('lg:col-span-7', 'xl:col-span-8');
                 this.editorForecastCol.classList.add('lg:col-span-12');
                 this.mdAnalysisSidebar.classList.add('hidden');
-                this.mdAnalysisSidebar.classList.remove('flex');
+                this.mdAnalysisSidebar.classList.remove('flex', 'lg:col-span-5', 'xl:col-span-4');
             }
         }
 

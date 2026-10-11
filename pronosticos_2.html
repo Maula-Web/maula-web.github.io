@@ -591,25 +591,50 @@
         /* =========================================================================
            BOTONES TÁCTILES DEL BOLETO EN LA VENTANA MODAL (1 EN VERDE, X AZUL, 2 AMARILLO)
            ========================================================================= */
-        .chk-option, .p15-option {
+        .chk-option {
             background: rgba(15, 23, 42, 0.6);
             color: #94a3b8;
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 0.6rem;
-            padding: 0.45rem 0.9rem;
+            border-radius: 0.55rem;
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            padding: 0 !important;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.15s ease;
-            min-width: 2.5rem;
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
             user-select: none;
             font-family: 'JetBrains Mono', monospace;
+            box-sizing: border-box !important;
+            flex-shrink: 0 !important;
+        }
+        .p15-option {
+            background: rgba(15, 23, 42, 0.6);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 0.5rem;
+            width: 28px !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            padding: 0 !important;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            font-family: 'JetBrains Mono', monospace;
+            box-sizing: border-box !important;
         }
         .chk-option:hover, .p15-option:hover {
-            transform: scale(1.08);
+            transform: scale(1.05);
             border-color: rgba(245, 158, 11, 0.6);
         }
 
@@ -621,8 +646,9 @@
             color: #ffffff !important;
             border-color: #059669 !important;
             font-weight: 900 !important;
-            box-shadow: 0 0 14px rgba(16, 185, 129, 0.6) !important;
-            transform: scale(1.1) !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+            transform: scale(1.05) !important;
+            z-index: 2 !important;
         }
 
         /* X SELECCIONADO: AZUL CIELO */
@@ -633,8 +659,9 @@
             color: #ffffff !important;
             border-color: #0284c7 !important;
             font-weight: 900 !important;
-            box-shadow: 0 0 14px rgba(14, 165, 233, 0.6) !important;
-            transform: scale(1.1) !important;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.6) !important;
+            transform: scale(1.05) !important;
+            z-index: 2 !important;
         }
 
         /* 2 SELECCIONADO: AMARILLO / ÁMBAR */
@@ -645,8 +672,9 @@
             color: #ffffff !important;
             border-color: #d97706 !important;
             font-weight: 900 !important;
-            box-shadow: 0 0 14px rgba(245, 158, 11, 0.6) !important;
-            transform: scale(1.1) !important;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.6) !important;
+            transform: scale(1.05) !important;
+            z-index: 2 !important;
         }
 
         /* Pleno al 15 seleccionado */
@@ -655,25 +683,29 @@
             color: #ffffff !important;
             border-color: #d97706 !important;
             font-weight: 900 !important;
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.5) !important;
-            transform: scale(1.1) !important;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5) !important;
+            transform: scale(1.05) !important;
         }
 
         /* =========================================================================
-           FILAS DE PARTIDO EN EL MODAL FLOTANTE (SIN CORTES DE NOMBRES DE EQUIPOS)
+           FILAS DE PARTIDO EN EL MODAL FLOTANTE (AJUSTE EXACTO Y RESPONSIVE)
            ========================================================================= */
         #modal-editor-boleto .pronostico-row, 
         #modal-editor-boleto .doubles-row {
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            padding: 0.65rem 1.1rem !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            padding: 0.5rem 0.85rem !important;
             background: rgba(30, 41, 59, 0.45) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: 0.85rem !important;
             margin-bottom: 0.45rem !important;
             transition: all 0.15s ease !important;
-            gap: 1rem !important;
+            gap: 0.6rem !important;
+            overflow: hidden !important;
         }
         #modal-editor-boleto .pronostico-row:hover, 
         #modal-editor-boleto .doubles-row:hover {
@@ -692,19 +724,21 @@
             border-color: #cbd5e1 !important;
         }
 
-        /* Columna de información de partido: ancho generoso para que los equipos se lean completos */
+        /* Columna de información de partido: fluida y adaptable sin desbordar el contenedor */
         #modal-editor-boleto .p-match-info {
             display: flex !important;
             align-items: center !important;
             justify-content: flex-start !important;
-            gap: 0.65rem !important;
-            flex: 0 0 auto !important;
-            width: 440px !important;
-            max-width: 470px !important;
-            min-width: 380px !important;
+            gap: 0.45rem !important;
+            flex: 1 1 auto !important;
+            min-width: 180px !important;
+            max-width: 400px !important;
+            width: auto !important;
             border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-            padding-right: 0.85rem !important;
+            padding-right: 0.65rem !important;
             margin: 0 !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
         }
         .light-theme #modal-editor-boleto .p-match-info {
             border-right-color: rgba(0, 0, 0, 0.08) !important;
@@ -715,18 +749,18 @@
             font-size: 0.85rem !important;
             color: var(--primary-orange) !important;
             font-weight: 900 !important;
-            min-width: 1.8rem !important;
+            min-width: 1.6rem !important;
             flex-shrink: 0 !important;
         }
 
         #modal-editor-boleto .match-team {
             display: flex !important;
             align-items: center !important;
-            gap: 0.45rem !important;
+            gap: 0.35rem !important;
             flex: 1 1 0 !important;
-            min-width: 160px !important;
+            min-width: 60px !important;
             max-width: none !important;
-            overflow: visible !important;
+            overflow: hidden !important;
         }
         #modal-editor-boleto .home-team {
             justify-content: flex-end !important;
@@ -739,13 +773,12 @@
 
         #modal-editor-boleto .team-name {
             font-weight: 700 !important;
-            font-size: 0.85rem !important;
+            font-size: 0.82rem !important;
             color: var(--text-main) !important;
             white-space: nowrap !important;
-            overflow: visible !important;
-            text-overflow: clip !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
             max-width: none !important;
-            width: auto !important;
         }
         .light-theme #modal-editor-boleto .team-name {
             color: #0f172a !important;
@@ -760,32 +793,55 @@
         #modal-editor-boleto .match-vs-separator {
             color: #64748b !important;
             font-weight: 900 !important;
-            font-size: 0.85rem !important;
-            margin: 0 2px !important;
+            font-size: 0.8rem !important;
+            margin: 0 1px !important;
             flex-shrink: 0 !important;
         }
 
         #modal-editor-boleto .p-others {
-            flex: 1 1 auto !important;
+            flex: 0 0 auto !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 3px !important;
-            min-width: 60px !important;
+            gap: 2px !important;
+            min-width: 26px !important;
+            max-width: 80px !important;
             overflow-x: auto !important;
         }
 
         #modal-editor-boleto .p-options {
             flex: 0 0 auto !important;
             display: flex !important;
-            gap: 0.45rem !important;
+            gap: 4px !important;
             align-items: center !important;
             justify-content: center !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
         }
 
         #modal-editor-boleto .p-percentages {
-            flex: 0 0 65px !important;
-            min-width: 65px !important;
+            flex: 0 0 76px !important;
+            min-width: 76px !important;
+            max-width: 80px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            padding-left: 6px !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+            flex-shrink: 0 !important;
+            box-sizing: border-box !important;
+            user-select: none !important;
+        }
+        .light-theme #modal-editor-boleto .p-percentages {
+            border-left-color: rgba(0, 0, 0, 0.1) !important;
+        }
+        #modal-editor-boleto .perc-row {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            line-height: 1.15 !important;
+            font-size: 10.5px !important;
+            white-space: nowrap !important;
         }
 
         /* Estilos específicos para la pestaña de dobles */
@@ -1359,7 +1415,7 @@
          (SE ABRE AL PINCHAR EN EL PRONÓSTICO DE UN SOCIO O PULSAR EDITAR BOLETO)
          ===================================================================== -->
     <div id="modal-editor-boleto" style="display: none;" onclick="if(event.target === this) window.closeEditorModal()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99999] items-center justify-center p-2 sm:p-4">
-        <div class="glass-panel w-full max-w-5xl xl:max-w-6xl 2xl:max-w-7xl max-h-[92vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal">
+        <div class="glass-panel w-full max-w-6xl xl:max-w-7xl 2xl:max-w-[1620px] max-h-[94vh] flex flex-col border-amber-500/50 shadow-2xl overflow-hidden animate-modal transition-all duration-300">
             
             <!-- Cabecera del Modal -->
             <div class="bg-slate-900/90 p-4 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
@@ -1412,16 +1468,16 @@
 
                 <!-- CONTENIDO PESTAÑA 1: QUINIELA BASE -->
                 <div id="editor-view-base" class="w-full">
-                    <div id="editor-base-layout" class="flex flex-col lg:grid lg:grid-cols-12 gap-5 items-start">
+                    <div id="editor-base-layout" class="flex flex-col lg:grid lg:grid-cols-12 gap-5 items-start w-full">
                         <!-- COLUMNA IZQUIERDA: BOLETO DEL SOCIO -->
-                        <div id="editor-forecast-column" class="w-full lg:col-span-12 space-y-1 transition-all duration-300">
-                            <div id="forecast-container" class="space-y-1">
+                        <div id="editor-forecast-column" class="w-full lg:col-span-12 space-y-1 transition-all duration-300 min-w-0">
+                            <div id="forecast-container" class="space-y-1 w-full">
                                 <!-- 15 Filas de partidos generadas por pronosticos.js -->
                             </div>
                         </div>
 
                         <!-- COLUMNA DERECHA: ASISTENTE Y ANÁLISIS DE MUNDO DEPORTIVO -->
-                        <div id="md-analysis-sidebar" class="hidden w-full lg:col-span-5 flex-col gap-3 sticky top-2">
+                        <div id="md-analysis-sidebar" class="hidden w-full lg:col-span-5 xl:col-span-4 flex-col gap-3 sticky top-2 min-w-0">
                             <div class="rounded-2xl bg-slate-900/90 border border-sky-500/30 p-3.5 shadow-2xl flex flex-col gap-3">
                                 
                                 <!-- Cabecera del Asistente -->
