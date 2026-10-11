@@ -900,6 +900,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                             <thead class="bg-slate-950 text-slate-400 font-bold text-[11px] uppercase border-b border-slate-800 sticky top-0 z-10">
                                 <tr>
                                     <th class="p-2 sm:px-3">Apuesta</th>
+                                    <th class="p-2 sm:px-3">Origen / Optimización vs Socios</th>
                                     <th class="p-2 sm:px-3 text-center">Pronóstico (14 Signos)</th>
                                     <th class="p-2 sm:px-3 text-center">P15</th>
                                     <th class="p-2 sm:px-3 text-center">Aciertos Reales</th>
@@ -2553,32 +2554,109 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     this.log(`Atención: Hay ${tripleIndices.length} triples seleccionados (deben ser 9 exactamente para las 25 apuestas).`, 'error');
                 }
 
-                // Generar las 25 columnas combinando la matriz reducida con los 5 fijos
-                this.matriz25Calculada = this.MATRIZ_CANONICA_9T_25.map((row9, rowIndex) => {
+                // 1. Obtener las 19 columnas de los socios para esta jornada (TOTALMENTE SAGRADAS Y FIJAS)
+                const apuestasSocios = this.sociosDetalle || [];
+                const lineasSociosMap = new Map(); // linea14 -> nombreSocio
+                apuestasSocios.forEach(s => {
+                    if (s.signos14 && s.signos14.length === 14) {
+                        lineasSociosMap.set(s.signos14, s.name);
+                    }
+                });
+
+                // 2. Generar las 25 columnas base a partir de la matriz reducida
+                const columnasBase = this.MATRIZ_CANONICA_9T_25.map((row9, rowIndex) => {
                     const signos14 = [];
                     let tripleCounter = 0;
-
                     for (let matchIdx = 0; matchIdx < 14; matchIdx++) {
                         if (tripleIndices.includes(matchIdx)) {
-                            // Asignar el signo de la fila de la matriz para este triple
-                            const sMatriz = row9[tripleCounter] || '1';
-                            signos14.push(sMatriz);
+                            signos14.push(row9[tripleCounter] || '1');
                             tripleCounter++;
                         } else {
-                            // Asignar el fijo configurado
                             signos14.push(fijosMap[matchIdx] || '1');
                         }
                     }
-
-                    const linea14 = signos14.join('');
                     return {
-                        num: rowIndex + 1,
-                        linea14: linea14,
-                        p15: p15,
-                        lineaCompleta: linea14 + p15,
-                        origen: `9 Triples Reducidos (Columna ${rowIndex + 1}/25)`
+                        rowIndex: rowIndex,
+                        row9: row9,
+                        linea14: signos14.join('')
                     };
                 });
+
+                // 3. Conjunto de líneas ya usadas (para evitar duplicados tanto con socios como entre sí)
+                const setLineasOcupadas = new Set([...lineasSociosMap.keys()]);
+                let reemplazosDetectados = 0;
+
+                // 4. Algoritmo Antisolapamiento: si una columna coincide con la de un socio,
+                // buscar una variante en el espacio de 9 triples que no coincida con ningún socio
+                // ni con otra columna de la matriz, maximizando la cobertura.
+                this.matriz25Calculada = columnasBase.map((col, idx) => {
+                    let lineaFinal = col.linea14;
+                    let esReemplazada = false;
+                    let socioCoincidente = lineasSociosMap.get(lineaFinal);
+
+                    if (socioCoincidente) {
+                        // ¡COINCIDENCIA DETECTADA CON UN SOCIO!
+                        // Buscamos una columna alternativa en el espacio de los 9 triples
+                        // Generamos permutaciones válidas de los signos en triples
+                        const signosPosibles = ['1', 'X', '2'];
+                        let candidataEncontrada = null;
+
+                        // Estrategia de búsqueda: variar levemente los triples para mantener la densidad matemática
+                        // pero cubriendo un resultado no apostado por ningún socio
+                        for (let tPos = 0; tPos < 9; tPos++) {
+                            const arr9 = col.row9.split('');
+                            for (const nuevoSigno of signosPosibles) {
+                                if (nuevoSigno === arr9[tPos]) continue;
+                                arr9[tPos] = nuevoSigno;
+                                
+                                // Reconstruir línea 14 completa con fijos
+                                const testSignos14 = [];
+                                let tc = 0;
+                                for (let m = 0; m < 14; m++) {
+                                    if (tripleIndices.includes(m)) {
+                                        testSignos14.push(arr9[tc]);
+                                        tc++;
+                                    } else {
+                                        testSignos14.push(fijosMap[m] || '1');
+                                    }
+                                }
+                                const testLinea14 = testSignos14.join('');
+                                if (!setLineasOcupadas.has(testLinea14)) {
+                                    candidataEncontrada = testLinea14;
+                                    break;
+                                }
+                            }
+                            if (candidataEncontrada) break;
+                        }
+
+                        if (candidataEncontrada) {
+                            lineaFinal = candidataEncontrada;
+                            esReemplazada = true;
+                            reemplazosDetectados++;
+                            this.log(`⚡ [Antisolapamiento] Columna ${idx + 1} coincidía con ${socioCoincidente}. Reemplazada por variante óptima para no duplicar y cubrir más variables.`, 'success');
+                        }
+                    }
+
+                    // Registrar como ocupada
+                    setLineasOcupadas.add(lineaFinal);
+
+                    return {
+                        num: idx + 1,
+                        linea14: lineaFinal,
+                        lineaOriginal: col.linea14,
+                        p15: p15,
+                        lineaCompleta: lineaFinal + p15,
+                        esReemplazada: esReemplazada,
+                        socioCoincidente: socioCoincidente,
+                        origen: esReemplazada 
+                            ? `Optimizada (Reemplaza col. de ${socioCoincidente})`
+                            : `9 Triples Matriz (${idx + 1}/25)`
+                    };
+                });
+
+                if (reemplazosDetectados > 0) {
+                    this.log(`✨ Optimización completada: ${reemplazosDetectados} columna(s) optimizada(s) para no solaparse con las 19 apuestas de los socios.`, 'success');
+                }
 
                 // Escrutinio simulado contra resultados reales
                 this.escrutar25Columnas(matches);
@@ -2613,7 +2691,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     return { ...col, aciertos: aciertos };
                 });
 
-                // Renderizar tabla de 25 apuestas
+                // Renderizar tabla de 25 apuestas con indicación visual clara de reemplazo
                 const tbody = document.getElementById('table-sim-25-body');
                 if (tbody) {
                     tbody.innerHTML = filasEscrutadas.map(col => {
@@ -2627,9 +2705,23 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                             else if (col.aciertos === 10) { badgePremio = `<span class="px-2 py-0.5 rounded font-bold bg-slate-700 text-slate-300">PREMIO 10</span>`; aciertoColor = 'text-slate-200'; }
                         }
 
+                        // Badge visual para estado de optimización
+                        let estadoBadge = `<span class="text-[11px] text-slate-400 font-sans font-medium flex items-center gap-1"><span>✔️</span> Matriz 9T Estándar</span>`;
+                        if (col.esReemplazada) {
+                            estadoBadge = `
+                                <div class="space-y-0.5">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 inline-flex items-center gap-1">
+                                        <span>⚡</span> Reemplazada (Coincidía con ${col.socioCoincidente})
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 block font-sans">Ampliando cubrimiento sin duplicar apuesta</span>
+                                </div>
+                            `;
+                        }
+
                         return `
-                            <tr class="hover:bg-slate-800/50 transition">
+                            <tr class="${col.esReemplazada ? 'bg-amber-950/20 border-l-2 border-amber-500' : 'hover:bg-slate-800/50'} transition">
                                 <td class="p-2 sm:px-3 text-purple-400 font-bold">${String(col.num).padStart(2, '0')}</td>
+                                <td class="p-2 sm:px-3 whitespace-nowrap">${estadoBadge}</td>
                                 <td class="p-2 sm:px-3 text-center tracking-widest text-emerald-400 font-bold whitespace-nowrap">${col.linea14}</td>
                                 <td class="p-2 sm:px-3 text-center font-bold text-amber-300 whitespace-nowrap">${col.p15}</td>
                                 <td class="p-2 sm:px-3 text-center whitespace-nowrap ${aciertoColor}">
