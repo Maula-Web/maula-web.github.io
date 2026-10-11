@@ -1792,26 +1792,22 @@ class BoteAppController {
         const BOTE_INICIAL = this.getBoteInicial();
 
         if (type === 'inicial') {
-            title.textContent = '🌱 Bote Inicial Temporada';
+            title.textContent = '🌱 Saldo inicial de la Temporada';
             body.innerHTML = `
                 <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-2 text-amber-200">
                     <div class="text-[11px] font-semibold text-amber-300">Fondo de Apertura (Agosto 2026)</div>
                     <div class="text-base font-black font-mono mt-0.5 text-amber-400">+${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</div>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
-                    <span class="text-slate-400">Socios aportantes:</span>
-                    <strong class="text-slate-200">18 socios</strong>
+                    <span class="text-slate-400">Concepto:</span>
+                    <strong class="text-slate-200">Saldo inicial de la Temporada</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
-                    <span class="text-slate-400">Media aportada:</span>
-                    <strong class="text-slate-200">~41,04 € / socio</strong>
+                    <span class="text-slate-400">Origen de los fondos:</span>
+                    <strong class="text-slate-300 text-right">Remanente temporadas anteriores</strong>
                 </div>
-                <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
-                    <span class="text-slate-400">Origen:</span>
-                    <strong class="text-slate-300 text-right">Remanente anterior + Cuotas reapertura</strong>
-                </div>
-                <div class="pt-1.5 text-[11px] text-slate-400 leading-relaxed">
-                    💡 Fondo inicial que garantiza el sellado de las quinielas antes de recaudar cuotas semanales.
+                <div class="pt-2 text-[11px] text-slate-400 leading-relaxed">
+                    💡 Fondo acumulado con el que la Peña Maulas abre la temporada. Constituye el colchón de seguridad de la tesorería para garantizar el sellado de las quinielas antes de procesar las cuotas semanales.
                 </div>
             `;
             pop.classList.remove('hidden');
@@ -2056,18 +2052,18 @@ class BoteAppController {
         let saldoAcumuladoPeña = 0;
         let totalCrecimiento = 0;
 
-        // Fila 0: Bote Inicial de la Temporada
+        // Fila 0: Saldo inicial de la Temporada
         const tr0 = document.createElement('tr');
         tr0.className = 'bg-amber-500/10 border-b border-amber-500/20 text-xs sm:text-sm font-semibold hover:bg-amber-500/15 transition-colors cursor-pointer';
-        tr0.title = 'Clic en cualquier celda para ver el desglose del Bote Inicial';
+        tr0.title = 'Clic en cualquier celda para ver el desglose del Saldo inicial de la Temporada';
         tr0.innerHTML = `
             <td class="py-2.5 px-2 sm:px-3 lg:px-4 font-bold text-amber-300 flex items-center gap-1.5 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">
                 <span>🌱</span> Inicio Temporada
             </td>
             <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-slate-400 font-mono cursor-pointer whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Agosto 2026</td>
-            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-emerald-400 font-bold cursor-pointer" colspan="2" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">Aportaciones Iniciales Socios (Bote Inicial)</td>
-            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-slate-500 cursor-pointer whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
-            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-slate-500 cursor-pointer whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">-</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-slate-400 font-medium cursor-pointer" colspan="4" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">
+                <span class="text-amber-300 font-bold">Saldo inicial de la Temporada</span> <span class="text-slate-400 text-[11px]">(Remanente temporadas anteriores)</span>
+            </td>
             <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-300 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">+${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
             <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-amber-500/15 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
         `;
