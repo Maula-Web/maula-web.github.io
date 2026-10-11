@@ -24,6 +24,25 @@ const ScoringSystem = {
         }
     },
 
+    _cachedHistoryRef: null,
+    _parsedHistory: null,
+    _configCache: {},
+
+    _ensureParsedHistory: function () {
+        const history = this.getHistory();
+        if (this._parsedHistory && this._cachedHistoryRef === history) {
+            return this._parsedHistory;
+        }
+        this._cachedHistoryRef = history;
+        this._configCache = {};
+        // Clone and sort once, pre-computing timestamp
+        this._parsedHistory = (history || []).map(entry => ({
+            ...entry,
+            _time: new Date(entry.date).getTime()
+        })).sort((a, b) => b._time - a._time);
+        return this._parsedHistory;
+    },
+
     getHistory: function () {
         if (this.historyCache) return this.historyCache; // Use in-memory cache populated by db-service.js if available
 
@@ -36,21 +55,29 @@ const ScoringSystem = {
     // Get rules active for a specific date (Date object or ISO string)
     // If no date provided, returns currently active rules (latest)
     getConfig: function (targetDate) {
-        const history = this.getHistory();
-
-        // Sort history descending by date
-        history.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const history = this._ensureParsedHistory();
 
         if (!targetDate) {
-            return history[0].rules; // Latest
+            return history[0] ? history[0].rules : this.defaults; // Latest
         }
 
-        const t = new Date(targetDate).getTime();
+        const dateKey = (typeof targetDate === 'string' || typeof targetDate === 'number')
+            ? targetDate
+            : (targetDate.getTime ? targetDate.getTime() : String(targetDate));
+
+        if (this._configCache[dateKey]) {
+            return this._configCache[dateKey];
+        }
+
+        const t = (typeof targetDate === 'number')
+            ? targetDate
+            : (targetDate instanceof Date ? targetDate.getTime() : new Date(targetDate).getTime());
 
         // Find the first rule set where activeDate <= targetDate
-        const match = history.find(entry => new Date(entry.date).getTime() <= t);
-
-        return match ? match.rules : history[history.length - 1].rules; // Fallback to oldest if target is very old
+        const match = history.find(entry => entry._time <= t);
+        const result = match ? match.rules : (history[history.length - 1] ? history[history.length - 1].rules : this.defaults);
+        this._configCache[dateKey] = result;
+        return result;
     },
 
     saveConfig: async function (newRules) {
@@ -61,6 +88,11 @@ const ScoringSystem = {
             rules: newRules
         });
         
+        // Invalidate parsed history cache
+        this._cachedHistoryRef = null;
+        this._parsedHistory = null;
+        this._configCache = {};
+
         // Update memory cache
         this.historyCache = history;
         
