@@ -882,7 +882,7 @@ class JornadaManager {
         }
 
         // Matches list
-        let matchesHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+        let matchesHtml = '<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:6px;">';
         parsed.matches.forEach((m, idx) => {
             const num = idx + 1;
             const isP15 = idx === 14;
@@ -1144,7 +1144,7 @@ class JornadaManager {
         }
 
         // Matches list
-        let matchesHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+        let matchesHtml = '<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:6px;">';
         parsed.matches.forEach((m, idx) => {
             const num = idx + 1;
             const isP15 = idx === 14;

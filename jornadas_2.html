@@ -920,20 +920,20 @@
     <!-- =====================================================================
          MODAL 2: IMPORTAR PARTIDOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
-    <div id="modal-import-matches" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-3 sm:p-4 z-[100080]">
-        <div class="modal-dialog-panel w-full max-w-2xl border border-orange-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
+    <div id="modal-import-matches" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100080]">
+        <div class="modal-dialog-panel w-full max-w-5xl border border-orange-500/50 p-4 sm:p-6 animate-modal max-h-[96vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl p-2 rounded-xl bg-orange-500/20 text-orange-400">📋</span>
                     <div>
-                        <h2 class="text-lg font-black text-white">Importar Partidos desde Texto</h2>
-                        <p class="text-xs text-slate-400">Pega el texto copiado de Revista Quinielista o webs de quiniela</p>
+                        <h2 class="text-lg font-black text-white">Importar Partidos de Jornada</h2>
+                        <p class="text-xs text-slate-400">Detección oficial automática de boletos o importación de texto</p>
                     </div>
                 </div>
                 <button type="button" onclick="window.JornadasApp.closeImportMatchesModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold">✕</button>
             </div>
 
-            <div class="overflow-y-auto flex-1 py-4 space-y-4">
+            <div class="overflow-y-auto flex-1 py-3 space-y-3">
                 <div id="import-matches-step-1" class="space-y-4">
                     <!-- TARJETA 1: DESCARGA AUTOMÁTICA EN 1 CLIC -->
                     <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-950/80 via-slate-900 to-slate-950 border border-orange-500/50 space-y-3 shadow-xl">
@@ -978,7 +978,7 @@
                             <p class="text-slate-400 text-[11px]">
                                 Copia y pega el texto de la jornada desde Revista Quinielista o documentos PDF:
                             </p>
-                            <textarea id="import-matches-textarea" rows="6" placeholder="Ejemplo:&#10;Jornada: 8&#10;27/09/2026&#10;1º Osasuna - Rayo V.&#10;2º Athletic Club - Alavés&#10;...&#10;15º Real Madrid - Barcelona" class="w-full p-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                            <textarea id="import-matches-textarea" rows="5" placeholder="Ejemplo:&#10;Jornada: 8&#10;27/09/2026&#10;1º Osasuna - Rayo V.&#10;2º Athletic Club - Alavés&#10;...&#10;15º Real Madrid - Barcelona" class="w-full p-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
 
                             <div class="flex justify-end gap-2 pt-1">
                                 <button type="button" onclick="window.JornadasApp.handleAnalyzeMatchesText()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow">🔍 Analizar Texto Pegado</button>
@@ -995,7 +995,7 @@
 
                 <div id="import-matches-step-2" class="hidden space-y-3">
                     <div id="import-matches-preview-header" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1"></div>
-                    <div id="import-matches-preview-list" class="max-h-60 overflow-y-auto space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
+                    <div id="import-matches-preview-list" class="grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
 
                     <div class="flex items-center justify-between pt-2">
                         <button type="button" onclick="window.JornadasApp.backToMatchesTextInput()" class="px-3.5 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold transition">✏️ Volver a Editar</button>
@@ -1009,9 +1009,9 @@
     <!-- =====================================================================
          MODAL 3: IMPORTAR RESULTADOS Y PREMIOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
-    <div id="modal-import-results" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-3 sm:p-4 z-[100080]">
-        <div class="modal-dialog-panel w-full max-w-2xl border border-emerald-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
+    <div id="modal-import-results" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100080]">
+        <div class="modal-dialog-panel w-full max-w-5xl border border-emerald-500/50 p-4 sm:p-6 animate-modal max-h-[96vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl p-2 rounded-xl bg-emerald-500/20 text-emerald-400">📥</span>
                     <div>
@@ -1022,7 +1022,7 @@
                 <button type="button" onclick="window.JornadasApp.closeImportResultsModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold">✕</button>
             </div>
 
-            <div class="overflow-y-auto flex-1 py-4 space-y-4">
+            <div class="overflow-y-auto flex-1 py-3 space-y-3">
                 <div id="import-results-step-1" class="space-y-4">
                     <!-- TARJETA 1: OBTENCIÓN AUTOMÁTICA EN 1 CLIC -->
                     <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-950 border border-emerald-500/50 space-y-3 shadow-xl">
@@ -1067,7 +1067,7 @@
                             <p class="text-slate-400 text-[11px]">
                                 Si alguna vez no tienes conexión a internet, pega aquí el texto de resultados y premios copiado de la web:
                             </p>
-                            <textarea id="import-results-textarea" rows="6" placeholder="Pega aquí el texto oficial de Loterías..." class="w-full p-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                            <textarea id="import-results-textarea" rows="5" placeholder="Pega aquí el texto oficial de Loterías..." class="w-full p-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
 
                             <div class="flex justify-end gap-2 pt-1">
                                 <button type="button" onclick="window.JornadasApp.handleAnalyzeResultsText()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow">🔍 Analizar Texto Pegado</button>
@@ -1084,7 +1084,7 @@
 
                 <div id="import-results-step-2" class="hidden space-y-3">
                     <div id="import-results-preview-header" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1"></div>
-                    <div id="import-results-preview-matches" class="max-h-48 overflow-y-auto space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
+                    <div id="import-results-preview-matches" class="grid grid-cols-1 md:grid-cols-2 gap-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
                     <div id="import-results-preview-prizes" class="p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
 
                     <div class="flex items-center justify-between pt-2">

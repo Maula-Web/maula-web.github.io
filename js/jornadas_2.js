@@ -1544,6 +1544,7 @@ class Jornadas2AppController {
         }
 
         if (listBox) {
+            listBox.className = "grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
             listBox.innerHTML = candidate.matches.map((m, idx) => {
                 const isPleno = idx === 14;
                 const home = m ? m.home : 'Sin definir';
@@ -1551,8 +1552,8 @@ class Jornadas2AppController {
                 const homeLogo = (window.AppUtils && window.AppUtils.getTeamLogo) ? window.AppUtils.getTeamLogo(home) : '';
                 const awayLogo = (window.AppUtils && window.AppUtils.getTeamLogo) ? window.AppUtils.getTeamLogo(away) : '';
                 return `
-                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono shadow-sm">
-                        <span class="w-9 font-extrabold text-amber-400 text-center">${isPleno ? 'P15' : String(idx + 1).padStart(2, ' ')}</span>
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono shadow-sm ${isPleno ? 'md:col-span-2 bg-amber-950/20 border-amber-500/40' : ''}">
+                        <span class="w-9 font-extrabold ${isPleno ? 'text-amber-400' : 'text-slate-400'} text-center">${isPleno ? 'P15' : String(idx + 1).padStart(2, ' ')}</span>
                         <div class="flex-1 flex items-center justify-between px-3 min-w-0">
                             <span class="flex items-center gap-1.5 text-white font-semibold truncate justify-end text-right flex-1">
                                 <span class="truncate">${home}</span>
@@ -1621,14 +1622,15 @@ class Jornadas2AppController {
         }
 
         if (listBox) {
+            listBox.className = "grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
             listBox.innerHTML = res.matches.map((m, idx) => {
                 const isPleno = idx === 14;
                 const home = m ? m.home : 'Sin definir';
                 const away = m ? m.away : 'Sin definir';
                 return `
-                    <div class="p-2 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
-                        <span class="w-8 font-bold text-slate-400">${isPleno ? 'P15' : idx + 1}</span>
-                        <span class="text-white font-semibold truncate">${home} vs ${away}</span>
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isPleno ? 'md:col-span-2 bg-amber-950/20 border-amber-500/40' : ''}">
+                        <span class="w-8 font-bold ${isPleno ? 'text-amber-400' : 'text-slate-400'}">${isPleno ? 'P15' : idx + 1}</span>
+                        <span class="text-white font-semibold truncate flex-1 px-2">${home} vs ${away}</span>
                     </div>
                 `;
             }).join('');
@@ -1840,33 +1842,7 @@ class Jornadas2AppController {
             document.getElementById('import-results-step-2').classList.remove('hidden');
 
             this.renderImportResultsPreviewHeader(res);
-
-            const matchesBox = document.getElementById('import-results-preview-matches');
-            const prizesBox = document.getElementById('import-results-preview-prizes');
-
-            if (matchesBox) {
-                matchesBox.innerHTML = res.matches.map((m, idx) => `
-                    <div class="p-1.5 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
-                        <span class="w-8 font-bold text-slate-400">${idx === 14 ? 'P15' : idx + 1}</span>
-                        <span class="text-white truncate">${m.home} vs ${m.away}</span>
-                        <span class="font-black text-amber-400 px-2">${m.result || '-'}</span>
-                    </div>
-                `).join('');
-            }
-
-            if (prizesBox) {
-                prizesBox.innerHTML = `
-                    <div class="text-[11px] font-bold text-amber-400 mb-1">Premios oficiales detectados:</div>
-                    <div class="grid grid-cols-3 gap-1 font-mono text-[11px]">
-                        ${Object.keys(res.prizes).map(k => `
-                            <div class="p-1 rounded bg-slate-900 text-slate-300 flex justify-between">
-                                <span>${k === '15' ? 'P15' : k + 'A'}:</span>
-                                <strong class="text-emerald-400">${this.formatMoney(res.prizes[k])}</strong>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
+            this.renderResultsPreviewData(res);
         } catch (err) {
             console.error('[Jornadas 2.0] Error en auto-importación:', err);
             if (errorBox) {
@@ -1879,6 +1855,42 @@ class Jornadas2AppController {
             if (icon) icon.classList.remove('hidden');
             if (text) text.textContent = 'Importar resultados';
             if (statusBox) statusBox.classList.add('hidden');
+        }
+    }
+
+    renderResultsPreviewData(res) {
+        const matchesBox = document.getElementById('import-results-preview-matches');
+        const prizesBox = document.getElementById('import-results-preview-prizes');
+
+        if (matchesBox) {
+            matchesBox.className = "grid grid-cols-1 md:grid-cols-2 gap-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
+            matchesBox.innerHTML = res.matches.map((m, idx) => {
+                const isP15 = idx === 14;
+                return `
+                    <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isP15 ? 'md:col-span-2 bg-emerald-950/20 border-emerald-500/40' : ''}">
+                        <span class="w-8 font-bold ${isP15 ? 'text-amber-400 font-black' : 'text-slate-400'}">${isP15 ? 'P15' : idx + 1}</span>
+                        <span class="text-white truncate flex-1 px-2">${m.home} vs ${m.away}</span>
+                        <span class="font-black ${isP15 ? 'text-amber-400' : 'text-emerald-400'} px-2 text-sm">${m.result || '-'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        if (prizesBox) {
+            prizesBox.innerHTML = `
+                <div class="text-[11px] font-bold text-amber-400 mb-1 flex items-center justify-between">
+                    <span>Premios oficiales detectados:</span>
+                    <span class="text-slate-400 font-normal">Céntimos exactos incluidos</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1.5 font-mono text-[11px]">
+                    ${Object.keys(res.prizes).map(k => `
+                        <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 flex flex-col justify-between text-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">${k === '15' ? 'Pleno 15' : k + ' Aciertos'}</span>
+                            <strong class="text-emerald-400 text-xs mt-0.5">${this.formatMoney(res.prizes[k])}</strong>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
     }
 
@@ -1922,33 +1934,7 @@ class Jornadas2AppController {
         document.getElementById('import-results-step-2').classList.remove('hidden');
 
         this.renderImportResultsPreviewHeader(res);
-
-        const matchesBox = document.getElementById('import-results-preview-matches');
-        const prizesBox = document.getElementById('import-results-preview-prizes');
-
-        if (matchesBox) {
-            matchesBox.innerHTML = res.matches.map((m, idx) => `
-                <div class="p-1.5 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
-                    <span class="w-8 font-bold text-slate-400">${idx === 14 ? 'P15' : idx + 1}</span>
-                    <span class="text-white truncate">${m.home} vs ${m.away}</span>
-                    <span class="font-black text-amber-400 px-2">${m.result || '-'}</span>
-                </div>
-            `).join('');
-        }
-
-        if (prizesBox) {
-            prizesBox.innerHTML = `
-                <div class="text-[11px] font-bold text-amber-400 mb-1">Premios detectados:</div>
-                <div class="grid grid-cols-3 gap-1 font-mono text-[11px]">
-                    ${Object.keys(res.prizes).map(k => `
-                        <div class="p-1 rounded bg-slate-900 text-slate-300 flex justify-between">
-                            <span>${k === '15' ? 'P15' : k + 'A'}:</span>
-                            <strong class="text-emerald-400">${this.formatMoney(res.prizes[k])}</strong>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
+        this.renderResultsPreviewData(res);
     }
 
     backToResultsTextInput() {
