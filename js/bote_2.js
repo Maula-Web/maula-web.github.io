@@ -1833,34 +1833,46 @@ class BoteAppController {
 
         // Desglose de cuotas
         const numSocios = jSummary.numSocios || 19;
-        const cuotaBase = jSummary.costeColumna || 0.75;
-        const totCuotas = numSocios * cuotaBase;
+        const cuotaSemanal = jSummary.aportacionSemanal || 1.50;
+        const cColumna = jSummary.costeColumna || 0.75;
+        const cFondoComun = Math.max(0, cuotaSemanal - cColumna);
+        const totCuotas = numSocios * cuotaSemanal;
 
         // Desglose de premios
         const doblesPrize = jMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
         const indivPrizes = jMovements.filter(m => m.premios > 0);
 
         if (type === 'cuotas') {
-            title.textContent = `📊 Cuotas Base - Jornada ${jornadaNum}`;
+            title.textContent = `📊 Cuotas Semanales - Jornada ${jornadaNum}`;
             body.innerHTML = `
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Socios activos:</span>
                     <strong class="text-white">${numSocios} socios</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
-                    <span class="text-slate-400">Precio por columna:</span>
-                    <strong class="text-slate-300 font-mono">${cuotaBase.toFixed(2).replace('.', ',')} €</strong>
+                    <span class="text-slate-400">Cuota semanal por socio:</span>
+                    <strong class="text-emerald-400 font-mono">${cuotaSemanal.toFixed(2).replace('.', ',')} € / socio</strong>
+                </div>
+                <div class="p-2 my-1.5 rounded-lg bg-slate-900/60 border border-slate-800 text-[11px] space-y-1">
+                    <div class="flex justify-between text-slate-300">
+                        <span>• Columna individual:</span>
+                        <span class="font-mono">${cColumna.toFixed(2).replace('.', ',')} €</span>
+                    </div>
+                    <div class="flex justify-between text-slate-300">
+                        <span>• Quiniela dobles + bote:</span>
+                        <span class="font-mono">${cFondoComun.toFixed(2).replace('.', ',')} €</span>
+                    </div>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
-                    <span class="text-slate-400">Cálculo:</span>
-                    <strong class="text-slate-300 font-mono">${numSocios} × ${cuotaBase.toFixed(2).replace('.', ',')} €</strong>
+                    <span class="text-slate-400">Cálculo recaudación:</span>
+                    <strong class="text-slate-300 font-mono">${numSocios} × ${cuotaSemanal.toFixed(2).replace('.', ',')} €</strong>
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs">
-                    <span class="text-emerald-400 font-bold">Total Cuotas Base:</span>
+                    <span class="text-emerald-400 font-bold">Total Cuotas Semanales:</span>
                     <strong class="text-emerald-400 font-mono text-sm">+${totCuotas.toFixed(2).replace('.', ',')} €</strong>
                 </div>
-                <div class="pt-2 text-[11px] text-slate-400">
-                    Aportación estándar de los socios para pagar sus columnas individuales semanales.
+                <div class="pt-2 text-[11px] text-slate-400 leading-relaxed">
+                    Aportación íntegra de los socios para financiar el sellado de las columnas individuales (${(numSocios * cColumna).toFixed(2).replace('.', ',')} €), la quiniela de 7 dobles (${(jSummary.costeDobles || 12.00).toFixed(2).replace('.', ',')} €) y generar el superávit semanal del bote común.
                 </div>
             `;
         } else if (type === 'penalizaciones') {
@@ -2071,11 +2083,11 @@ class BoteAppController {
                 valB = b.date || '';
                 return fDir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
             } else if (fCol === 'cuotas') {
-                valA = a.numSocios * (a.costeColumna || 0.75);
-                valB = b.numSocios * (b.costeColumna || 0.75);
+                valA = a.numSocios * (a.aportacionSemanal || 1.50);
+                valB = b.numSocios * (b.aportacionSemanal || 1.50);
             } else if (fCol === 'penalties') {
-                valA = Math.max(0, a.recaudacion - (a.numSocios * 1.50));
-                valB = Math.max(0, b.recaudacion - (b.numSocios * 1.50));
+                valA = Math.max(0, a.recaudacion - (a.numSocios * (a.aportacionSemanal || 1.50)));
+                valB = Math.max(0, b.recaudacion - (b.numSocios * (b.aportacionSemanal || 1.50)));
             } else if (fCol === 'premios') {
                 valA = a.premios || 0;
                 valB = b.premios || 0;
@@ -2104,8 +2116,9 @@ class BoteAppController {
         });
 
         sortedJornadas.forEach(j => {
-            const cuotasBase = j.numSocios * (j.costeColumna || 0.75);
-            const penalties = Math.max(0, j.recaudacion - (j.numSocios * 1.50));
+            const aportacionSemanal = j.aportacionSemanal || 1.50;
+            const cuotasBase = j.numSocios * aportacionSemanal;
+            const penalties = Math.max(0, j.recaudacion - cuotasBase);
             totalCrecimiento += j.neto;
 
             const cInfo = cronoSaldos[j.number] || { netoAcum: j.neto, total: BOTE_INICIAL + j.neto };
@@ -2121,7 +2134,7 @@ class BoteAppController {
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-slate-400 cursor-pointer hover:text-slate-200 transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'jornada', ${j.number})" title="Clic para ver resumen">
                     ${j.date}
                 </td>
-                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-emerald-400 cursor-pointer hover:bg-emerald-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'cuotas', ${j.number})" title="Clic para ver desglose de cuotas base">
+                <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-emerald-400 cursor-pointer hover:bg-emerald-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'cuotas', ${j.number})" title="Clic para ver desglose de cuotas semanales">
                     +${cuotasBase.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-amber-400 cursor-pointer hover:bg-amber-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'penalizaciones', ${j.number})" title="Clic para ver desglose de penalizaciones">
@@ -2138,8 +2151,8 @@ class BoteAppController {
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40 cursor-pointer hover:bg-amber-500/20 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'acumulado', ${j.number}, ${currentCrecimiento})" title="Clic para ver el desglose del bote acumulado">
                     <div>${boteTotalJornada.toFixed(2).replace('.', ',')}&nbsp;€</div>
-                    <div class="text-[10px] ${saldoAcumuladoPeña >= 0 ? 'text-emerald-400/80' : 'text-rose-400/80'} font-normal">
-                        (Crec: ${saldoAcumuladoPeña >= 0 ? '+' : ''}${saldoAcumuladoPeña.toFixed(2).replace('.', ',')}&nbsp;€)
+                    <div class="text-[10px] ${currentCrecimiento >= 0 ? 'text-emerald-400/80' : 'text-rose-400/80'} font-normal">
+                        (Crec: ${currentCrecimiento >= 0 ? '+' : ''}${currentCrecimiento.toFixed(2).replace('.', ',')}&nbsp;€)
                     </div>
                 </td>
             `;
@@ -2177,8 +2190,8 @@ class BoteAppController {
         // Fila de totales en la tabla de Flujo de Caja
         const flujoTfoot = document.getElementById('flujo-table-foot');
         if (flujoTfoot) {
-            const totCuotas = data.jornadaSummaries.reduce((s, j) => s + (j.numSocios * (j.costeColumna || 0.75)), 0);
-            const totPenalties = data.jornadaSummaries.reduce((s, j) => s + Math.max(0, j.recaudacion - (j.numSocios * 1.50)), 0);
+            const totCuotas = data.jornadaSummaries.reduce((s, j) => s + (j.numSocios * (j.aportacionSemanal || 1.50)), 0);
+            const totPenalties = data.jornadaSummaries.reduce((s, j) => s + Math.max(0, j.recaudacion - (j.numSocios * (j.aportacionSemanal || 1.50))), 0);
             const totPremios = data.jornadaSummaries.reduce((s, j) => s + (j.premios || 0), 0);
             const totSellado = data.jornadaSummaries.reduce((s, j) => s + (j.gastoSellado || 0), 0);
             const totNeto = data.jornadaSummaries.reduce((s, j) => s + (j.neto || 0), 0);
