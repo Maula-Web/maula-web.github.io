@@ -143,9 +143,124 @@ class QuinielaService {
             console.warn('[QuinielaService] Archivo local o de red omitido:', e.message);
         }
 
-        // 2. Respuesta instantánea con datos base incorporados oficiales y garantizados
+        // 2. Consulta en vivo a la API oficial de Eduardo Losilla (con CORS abierto)
+        try {
+            const losillaJornadas = await QuinielaService.fetchUpcomingFromEduardoLosilla();
+            if (Array.isArray(losillaJornadas) && losillaJornadas.length > 0) {
+                console.log('[QuinielaService] Obtenidas jornadas oficiales en vivo desde Eduardo Losilla.');
+                return losillaJornadas;
+            }
+        } catch (e) {
+            console.warn('[QuinielaService] Fallo consultando API Eduardo Losilla:', e.message);
+        }
+
+        // 3. Respuesta instantánea con datos base incorporados oficiales y garantizados
         console.log('[QuinielaService] Usando catálogo oficial incorporado de próximas jornadas oficiales.');
         return (QuinielaService.BUILTIN_UPCOMING_JORNADAS || []).slice();
+    }
+
+    static async fetchUpcomingFromEduardoLosilla() {
+        const candidateNumbers = [14, 16]; // Domingos oficiales de liga (J15 es Champions intersemanal)
+        const results = [];
+
+        for (const jNum of candidateNumbers) {
+            try {
+                const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                const timer = ctrl ? setTimeout(() => ctrl.abort(), 2500) : null;
+                const res = await fetch(`https://api.eduardolosilla.es/v1/xml2/porcentajes_lae?jornada=${jNum}`, {
+                    signal: ctrl ? ctrl.signal : undefined
+                });
+                if (timer) clearTimeout(timer);
+
+                if (!res.ok) continue;
+                const xml = await res.text();
+                const regex = /<partido\s+num="(\d+)"\s+local="([^"]+)"\s+visitante="([^"]+)"/g;
+                let match;
+                const matches = [];
+
+                while ((match = regex.exec(xml)) !== null) {
+                    const pos = parseInt(match[1], 10);
+                    let rawHome = match[2].trim();
+                    let rawAway = match[3].trim();
+
+                    const home = (typeof window !== 'undefined' && window.AppUtils && window.AppUtils.normalizeTeamName)
+                        ? window.AppUtils.normalizeTeamName(rawHome)
+                        : QuinielaService.cleanTeamName(rawHome);
+
+                    const away = (typeof window !== 'undefined' && window.AppUtils && window.AppUtils.normalizeTeamName)
+                        ? window.AppUtils.normalizeTeamName(rawAway)
+                        : QuinielaService.cleanTeamName(rawAway);
+
+                    matches.push({ position: pos, home, away, result: '' });
+                }
+
+                if (matches.length === 15) {
+                    const dateStr = jNum === 14 ? '18/10/2026' : (jNum === 16 ? '25/10/2026' : '');
+                    results.push({
+                        number: jNum,
+                        dateStr: dateStr,
+                        season: '2026-2027',
+                        isSunday: true,
+                        source: 'Eduardo Losilla Oficial',
+                        matches: matches
+                    });
+                }
+            } catch (err) {
+                console.warn(`[QuinielaService] Error recuperando Jornada ${jNum} de Losilla:`, err.message);
+            }
+        }
+
+        return results;
+    }
+
+    static cleanTeamName(name) {
+        if (!name) return '';
+        let str = String(name).trim();
+        const isF = /\(F\)/i.test(str);
+        str = str.replace(/\(F\)/gi, '').trim();
+
+        const map = {
+            'ESPANYOL': 'Espanyol',
+            'AT.MADRID': 'Atlético de Madrid',
+            'VILLARREAL': 'Villarreal',
+            'ELCHE': 'Elche',
+            'BETIS': 'Betis',
+            'BARCELONA': 'Barcelona',
+            'VALENCIA': 'Valencia',
+            'ATH.CLUB': 'Athletic Club',
+            'CELTA': 'Celta',
+            'ALAVÉS': 'Alavés',
+            'ALAVES': 'Alavés',
+            'MÁLAGA': 'Málaga',
+            'MALAGA': 'Málaga',
+            'R.SOCIEDAD': 'Real Sociedad',
+            'R.MADRID': 'Real Madrid',
+            'SEVILLA': 'Sevilla',
+            'EIBAR': 'Eibar',
+            'MALLORCA': 'Mallorca',
+            'LAS PALMAS': 'Las Palmas',
+            'CASTELLÓN': 'Castellón',
+            'CASTELLON': 'Castellón',
+            'BURGOS': 'Burgos',
+            'SABADELL': 'Sabadell',
+            'MADRID CFF': 'Madrid CFF',
+            'GETAFE': 'Getafe',
+            'RAYO': 'Rayo Vallecano',
+            'DEPORTIVO': 'Deportivo',
+            'OSASUNA': 'Osasuna',
+            'LEGANÉS': 'Leganés',
+            'LEGANES': 'Leganés',
+            'ALMERÍA': 'Almería',
+            'ALMERIA': 'Almería',
+            'R.OVIEDO': 'Oviedo',
+            'TENERIFE': 'Tenerife',
+            'LEVANTE': 'Levante',
+            'LOGROÑO': 'Logroño',
+            'BADALONA W.': 'Badalona Women'
+        };
+
+        const res = map[str.toUpperCase()] || str;
+        return isF ? (res + ' (f)') : res;
     }
 
     static parseUpcomingJornadasFromHTML(html) {
@@ -259,7 +374,56 @@ class QuinielaService {
     }
 }
 
-QuinielaService.BUILTIN_UPCOMING_JORNADAS = [];
+QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
+    {
+        number: 14,
+        dateStr: "18/10/2026",
+        season: "2026-2027",
+        isSunday: true,
+        source: "Eduardo Losilla Oficial",
+        matches: [
+            { position: 1, home: "Espanyol", away: "Atlético de Madrid", result: "" },
+            { position: 2, home: "Villarreal", away: "Elche", result: "" },
+            { position: 3, home: "Betis", away: "Barcelona", result: "" },
+            { position: 4, home: "Valencia", away: "Athletic Club", result: "" },
+            { position: 5, home: "Celta", away: "Alavés", result: "" },
+            { position: 6, home: "Málaga", away: "Real Sociedad", result: "" },
+            { position: 7, home: "Real Madrid", away: "Sevilla", result: "" },
+            { position: 8, home: "Eibar", away: "Mallorca", result: "" },
+            { position: 9, home: "Las Palmas", away: "Castellón", result: "" },
+            { position: 10, home: "Burgos", away: "Sabadell", result: "" },
+            { position: 11, home: "Athletic Club (f)", away: "Valencia (f)", result: "" },
+            { position: 12, home: "Real Madrid (f)", away: "Espanyol (f)", result: "" },
+            { position: 13, home: "Eibar (f)", away: "Deportivo (f)", result: "" },
+            { position: 14, home: "Atlético de Madrid (f)", away: "Madrid CFF (f)", result: "" },
+            { position: 15, home: "Getafe", away: "Rayo Vallecano", result: "" }
+        ]
+    },
+    {
+        number: 16,
+        dateStr: "25/10/2026",
+        season: "2026-2027",
+        isSunday: true,
+        source: "Eduardo Losilla Oficial",
+        matches: [
+            { position: 1, home: "Rayo Vallecano", away: "Elche", result: "" },
+            { position: 2, home: "Valencia", away: "Villarreal", result: "" },
+            { position: 3, home: "Atlético de Madrid", away: "Deportivo", result: "" },
+            { position: 4, home: "Athletic Club", away: "Getafe", result: "" },
+            { position: 5, home: "Celta", away: "Betis", result: "" },
+            { position: 6, home: "Real Sociedad", away: "Levante", result: "" },
+            { position: 7, home: "Sevilla", away: "Osasuna", result: "" },
+            { position: 8, home: "Leganés", away: "Mallorca", result: "" },
+            { position: 9, home: "Almería", away: "Oviedo", result: "" },
+            { position: 10, home: "Sabadell", away: "Tenerife", result: "" },
+            { position: 11, home: "Logroño (f)", away: "Badalona Women (f)", result: "" },
+            { position: 12, home: "Deportivo (f)", away: "Alavés (f)", result: "" },
+            { position: 13, home: "Eibar (f)", away: "Madrid CFF (f)", result: "" },
+            { position: 14, home: "Real Madrid (f)", away: "Tenerife (f)", result: "" },
+            { position: 15, home: "Barcelona", away: "Real Madrid", result: "" }
+        ]
+    }
+];
 
 if (typeof window !== 'undefined') {
     window.QuinielaService = QuinielaService;
