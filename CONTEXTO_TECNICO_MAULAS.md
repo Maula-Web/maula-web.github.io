@@ -1385,6 +1385,41 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 47. ARQUITECTURA MULTIFUENTE RESILIENTE DE CONSULTA Y RESPALDO (SCRAPING EN CASCADA)
+- **Motivación y Principio de Resiliencia**:
+  - Ninguna fuente en Internet es 100% infalible en todo momento (posibles caídas de servidor, cambios de maquetación HTML, retrasos de actualización o bloqueos de red).
+  - Para garantizar máxima fiabilidad sin intervención manual, el sistema implementa un **mecanismo de iteración en cascada (fallback chain)**:
+    - Se consulta la fuente de mayor rango (Rango 1).
+    - Si falla (error HTTP, timeout, o datos incompletos con menos de 14-15 partidos), el error se captura limpiamente y se pasa de inmediato a la siguiente fuente (Rango 2), continuando hasta agotar la lista jerárquica.
+    - Se registra en consola y en el objeto retornado la fuente exacta (`source`) que proveyó con éxito la información.
+
+- **Jerarquía Oficial para RESULTADOS Y ESCRUTINIO (Ordenada de Mejor a Peor)**:
+  1. 🥇 **El País Sorteos** (`https://servicios.elpais.com/sorteos/quiniela/`):
+     - *Razón de rango 1*: Publica de forma casi instantánea al cierre de la jornada dominical los 15 signos oficiales y el desglose de premios con céntimos exactos (`€`), garantizando el escrutinio idéntico al oficial.
+  2. 🥈 **RTVE Loterías** (`https://www.rtve.es/loterias/quiniela/`):
+     - *Razón de rango 2*: Ente público estatal con alta disponibilidad, estructura HTML semántica limpia y nula presencia de bloqueos anti-scraping.
+  3. 🥉 **SELAE API Oficial** (`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=LAQU&celebrados=true`):
+     - *Razón de rango 3*: API oficial directa en formato JSON de Loterías y Apuestas del Estado. Ofrece los datos auditados definitivos con desglose de categorías de 15 a 10 aciertos.
+  4. 🏅 **CombinacionGanadora.com** (`https://www.combinacionganadora.com/quiniela/resultados/YYYY-MM-DD/`):
+     - *Razón de rango 4*: Histórico indexado por fecha exacta ISO (`YYYY-MM-DD`), con tabla de premios íntegra y marcadores de partidos.
+  5. 🎗️ **Eduardo Losilla / Quinielista** (`https://www.quinielista.es/`):
+     - *Razón de rango 5*: Referencia histórica especializada de La Quiniela para cotejo y validaciones adicionales.
+
+- **Jerarquía Oficial para PRÓXIMAS JORNADAS Y BOLETOS (Ordenada de Mejor a Peor)**:
+  1. 🥇 **SELAE API Oficial** (`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=LAQU&celebrados=false`):
+     - *Razón de rango 1*: Convocatorias oficiales directas del Estado. Garantiza al 100% los partidos que integran el boleto y su posición exacta del 1 al 15 sin suposiciones.
+  2. 🥈 **CombinacionGanadora.com** (`https://www.combinacionganadora.com/quiniela/resultados/YYYY-MM-DD/`):
+     - *Razón de rango 2*: Publica boletos de próximos domingos permitiendo consulta anticipada por fecha.
+  3. 🥉 **Eduardo Losilla / Quinielista** (`https://www.quinielista.es/`):
+     - *Razón de rango 3*: Portal de referencia que publica boletos con 2-3 semanas de antelación (jornadas 14, 15, 16...).
+
+- **Reglas Inmutables y Candados de Integridad de Datos**:
+  1. ⛔ **CERO ESTIMACIONES O DATOS FICTICIOS**: Está tajantemente prohibido proyectar partidos o pronósticos basados en conjeturas o calendarios genéricos. Solo se aceptan boletos formalmente publicados por las fuentes oficiales.
+  2. 📅 **REGLA DEL DOMINGO**: La Peña Maulas solo disputa jornadas de domingo (excluyendo sorteos exclusivamente intersemanales de Champions/Copa).
+  3. ♀️ **REGLA DE EQUIPOS FEMENINOS `(f)`**: Todo equipo femenino mantiene obligatoriamente el sufijo ` (f)` tanto en la importación de partidos como en los resultados oficiales.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

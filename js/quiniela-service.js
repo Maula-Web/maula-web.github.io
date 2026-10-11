@@ -265,11 +265,12 @@ QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
     "dateStr": "18/10/2026",
     "season": "2026-2027",
     "isSunday": true,
+    "source": "CombinacionGanadora & Eduardo Losilla",
     "matches": [
       {
         "position": 1,
         "home": "Espanyol",
-        "away": "At. Madrid",
+        "away": "Atlético de Madrid (f)",
         "result": ""
       },
       {
@@ -287,13 +288,13 @@ QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
       {
         "position": 4,
         "home": "Valencia",
-        "away": "Athletic Club",
+        "away": "Athletic Club (f)",
         "result": ""
       },
       {
         "position": 5,
         "home": "Celta",
-        "away": "Alavés",
+        "away": "Alavés (f)",
         "result": ""
       },
       {
@@ -310,7 +311,7 @@ QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
       },
       {
         "position": 8,
-        "home": "Eibar",
+        "home": "Eibar (f)",
         "away": "Mallorca",
         "result": ""
       },
@@ -346,7 +347,7 @@ QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
       },
       {
         "position": 14,
-        "home": "At. Madrid (f)",
+        "home": "Atlético de Madrid (f)",
         "away": "Madrid CFF (f)",
         "result": ""
       },
