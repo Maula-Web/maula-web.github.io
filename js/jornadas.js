@@ -145,6 +145,12 @@ class JornadaManager {
         if (this.btnBackToResultsText) this.btnBackToResultsText.addEventListener('click', () => this.handleBackToResultsText());
         if (this.btnConfirmImportResults) this.btnConfirmImportResults.addEventListener('click', () => this.handleConfirmImportResults());
 
+        const btnV1Matches = document.getElementById('btn-v1-auto-import-matches');
+        if (btnV1Matches) btnV1Matches.addEventListener('click', () => this.handleV1AutoImportMatches());
+
+        const btnV1Results = document.getElementById('btn-v1-auto-import-results');
+        if (btnV1Results) btnV1Results.addEventListener('click', () => this.handleV1AutoImportResults());
+
         window.addEventListener('click', (e) => {
             if (e.target === this.modal) this.closeModal();
             if (e.target === this.modalImport) this.closeImportTextModal();
@@ -1349,6 +1355,92 @@ class JornadaManager {
     handleBackToResultsText() {
         if (this.importResultsSummaryStep) this.importResultsSummaryStep.style.display = 'none';
         if (this.importResultsInputStep) this.importResultsInputStep.style.display = 'block';
+    }
+
+    async handleV1AutoImportMatches() {
+        const statusEl = document.getElementById('v1-auto-import-status');
+        const btn = document.getElementById('btn-v1-auto-import-matches');
+        if (statusEl) {
+            statusEl.textContent = 'Descargando próximas jornadas oficiales...';
+            statusEl.style.display = 'block';
+        }
+        if (btn) btn.disabled = true;
+
+        try {
+            if (!window.QuinielaService) throw new Error('Servicio QuinielaService no cargado.');
+            const upcoming = await window.QuinielaService.fetchUpcomingJornadas();
+            if (!upcoming || upcoming.length === 0) throw new Error('No se encontraron próximas jornadas oficiales.');
+
+            const todayV1 = new Date();
+            todayV1.setHours(0, 0, 0, 0);
+            const futureUpcoming = upcoming.filter(c => {
+                if (!c.dateStr) return false;
+                const p = c.dateStr.split('/');
+                if (p.length !== 3) return false;
+                const d = new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10));
+                return d.getTime() >= todayV1.getTime();
+            });
+            const validList = futureUpcoming.length > 0 ? futureUpcoming : upcoming;
+            const cand = validList.find(c => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(c.number, 10))) || validList[0];
+
+            this.pendingImportData = {
+                jNum: cand.number,
+                dateStr: cand.dateStr,
+                isSunday: true,
+                warnings: [],
+                matches: cand.matches
+            };
+
+            this.renderImportSummary(this.pendingImportData);
+            if (this.importInputStep) this.importInputStep.style.display = 'none';
+            if (this.importSummaryStep) this.importSummaryStep.style.display = 'block';
+            if (statusEl) statusEl.style.display = 'none';
+        } catch (err) {
+            console.error('[Jornadas 1.0] Error auto-importación partidos:', err);
+            if (statusEl) statusEl.textContent = '❌ Error: ' + err.message;
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    async handleV1AutoImportResults() {
+        const statusEl = document.getElementById('v1-auto-import-results-status');
+        const btn = document.getElementById('btn-v1-auto-import-results');
+        if (statusEl) {
+            statusEl.textContent = 'Consultando escrutinio oficial de Loterías...';
+            statusEl.style.display = 'block';
+        }
+        if (btn) btn.disabled = true;
+
+        try {
+            if (!window.QuinielaService) throw new Error('Servicio QuinielaService no cargado.');
+            const res = await window.QuinielaService.fetchLatestResults();
+            if (!res || !res.matches) throw new Error('No se pudo obtener el escrutinio.');
+
+            const parsed = {
+                success: true,
+                jNum: null,
+                dateStr: res.dateStr,
+                isSunday: true,
+                source: res.source,
+                matches: res.matches,
+                prizes: res.prizes,
+                prizesDetails: res.prizesDetails || [],
+                warnings: [],
+                errors: []
+            };
+
+            this.pendingResultsData = parsed;
+            this.renderResultsSummary(parsed);
+            if (this.importResultsInputStep) this.importResultsInputStep.style.display = 'none';
+            if (this.importResultsSummaryStep) this.importResultsSummaryStep.style.display = 'block';
+            if (statusEl) statusEl.style.display = 'none';
+        } catch (err) {
+            console.error('[Jornadas 1.0] Error auto-importación resultados:', err);
+            if (statusEl) statusEl.textContent = '❌ Error: ' + err.message;
+        } finally {
+            if (btn) btn.disabled = false;
+        }
     }
 
     refreshData(silent = false) {

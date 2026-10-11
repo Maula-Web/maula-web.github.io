@@ -247,23 +247,41 @@ async function fetchUpcomingQuinielaJornadas() {
             else if (dayOfWeek === 5) dateObj.setDate(dateObj.getDate() + 2);
             else if (dayOfWeek !== 0) continue; // Descartar intersemanales
 
+            // REGLA MAULA: La fecha debe ser igual o posterior a hoy (no jornadas pasadas)
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0, 0, 0, 0);
+            if (dateObj.getTime() < todayMidnight.getTime()) {
+                continue;
+            }
+
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
 
             const matches = [];
             let primeraCount = 0;
+            let hasCorruptOrInvalidTeam = false;
+
+            const invalidRegex = /\b(Fem|Femenino|Plzen|Sparta|Slavia|Ceuta|Tenerife F|Eibar F|Athletic F|Celta B)\b/i;
 
             for (let m = 0; m < 15; m++) {
                 const idx = i * 15 + m;
                 if (casas[idx] && visitas[idx]) {
                     const home = casas[idx];
                     const away = visitas[idx];
+
+                    if (invalidRegex.test(home) || invalidRegex.test(away)) {
+                        hasCorruptOrInvalidTeam = true;
+                        break;
+                    }
+
                     matches.push({ position: m + 1, home, away, result: '' });
                     if (primeraKeywords.some(k => home.toLowerCase().includes(k))) primeraCount++;
                     if (primeraKeywords.some(k => away.toLowerCase().includes(k))) primeraCount++;
                 }
             }
 
-            if (matches.length >= 14 && primeraCount >= 5) {
+            if (hasCorruptOrInvalidTeam) continue;
+
+            if (matches.length >= 14 && primeraCount >= 8) {
                 validJornadas.push({
                     number: jNum,
                     dateStr: formattedDate,

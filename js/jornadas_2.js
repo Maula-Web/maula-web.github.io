@@ -1448,53 +1448,31 @@ class Jornadas2AppController {
                 throw new Error('No se encontraron próximas jornadas oficiales que cumplan con la regla de domingo y Primera División.');
             }
 
-            // Filtrar para previsualizar la jornada que sea más relevante (que no exista aún o la primera nueva)
-            const newCandidate = upcoming.find(cand => !this.jornadas.some(j => j.number === cand.number)) || upcoming[0];
+            this.availableUpcomingJornadas = upcoming.sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
 
-            this.pendingImportMatches = {
-                jNum: newCandidate.number,
-                dateStr: newCandidate.dateStr,
-                isSunday: true,
-                warnings: [],
-                matches: newCandidate.matches
-            };
+            // REGLA MAULA: Filtrar jornadas que sean estrictamente futuras o de hoy en adelante
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const futureOnly = this.availableUpcomingJornadas.filter(cand => {
+                if (!cand.dateStr) return false;
+                const p = cand.dateStr.split('/');
+                if (p.length !== 3) return false;
+                const d = new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10));
+                return d.getTime() >= today.getTime();
+            });
+
+            const candidateList = futureOnly.length > 0 ? futureOnly : this.availableUpcomingJornadas;
+            this.availableUpcomingJornadas = candidateList;
+
+            // Seleccionar la primera jornada futura que aún no exista en el sistema
+            const newCandidate = candidateList.find(cand => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(cand.number, 10))) || candidateList[0];
 
             // Mostrar vista previa (Paso 2)
             document.getElementById('import-matches-step-1').classList.add('hidden');
             document.getElementById('import-matches-step-2').classList.remove('hidden');
 
-            const headerBox = document.getElementById('import-matches-preview-header');
-            const listBox = document.getElementById('import-matches-preview-list');
-
-            if (headerBox) {
-                const alreadyExists = this.jornadas.some(j => j.number === newCandidate.number);
-                headerBox.innerHTML = `
-                    <div class="flex items-center justify-between pb-1.5 border-b border-slate-800">
-                        <div class="font-extrabold text-orange-400 flex items-center gap-2">
-                            <span>Jornada ${newCandidate.number}</span>
-                            <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 font-mono text-[10px]">Oficial</span>
-                        </div>
-                        <span class="text-xs text-white font-mono font-bold">${newCandidate.dateStr} (Domingo)</span>
-                    </div>
-                    <div class="text-[11px] text-slate-300 pt-1">
-                        ${alreadyExists ? '⚠️ <strong>Aviso:</strong> Ya existe una Jornada ' + newCandidate.number + '. Al confirmar, se actualizarán sus partidos.' : '✅ <strong>Todo listo:</strong> Se creará como nueva jornada oficial para la peña.'}
-                    </div>
-                `;
-            }
-
-            if (listBox) {
-                listBox.innerHTML = newCandidate.matches.map((m, idx) => {
-                    const isPleno = idx === 14;
-                    const home = m ? m.home : 'Sin definir';
-                    const away = m ? m.away : 'Sin definir';
-                    return `
-                        <div class="p-2 rounded bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
-                            <span class="w-8 font-bold text-slate-400">${isPleno ? 'P15' : idx + 1}</span>
-                            <span class="text-white font-semibold truncate">${home} vs ${away}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
+            this.renderUpcomingJornadaPreview(newCandidate);
         } catch (err) {
             console.error('[Jornadas 2.0] Error en auto-importación de partidos:', err);
             if (errorBox) {
@@ -1507,6 +1485,92 @@ class Jornadas2AppController {
             if (icon) icon.classList.remove('hidden');
             if (text) text.textContent = 'Descargar próximas jornadas';
             if (statusBox) statusBox.classList.add('hidden');
+        }
+    }
+
+    onSelectUpcomingJornada(jNum) {
+        if (!this.availableUpcomingJornadas) return;
+        const candidate = this.availableUpcomingJornadas.find(c => parseInt(c.number, 10) === parseInt(jNum, 10));
+        if (candidate) {
+            this.renderUpcomingJornadaPreview(candidate);
+        }
+    }
+
+    renderUpcomingJornadaPreview(candidate) {
+        if (!candidate) return;
+
+        this.pendingImportMatches = {
+            jNum: candidate.number,
+            dateStr: candidate.dateStr,
+            isSunday: true,
+            warnings: [],
+            matches: candidate.matches
+        };
+
+        const headerBox = document.getElementById('import-matches-preview-header');
+        const listBox = document.getElementById('import-matches-preview-list');
+        const confirmBtn = document.getElementById('btn-confirm-import-matches');
+
+        if (headerBox) {
+            const alreadyExists = this.jornadas.some(j => parseInt(j.number, 10) === parseInt(candidate.number, 10));
+            const optionsHtml = (this.availableUpcomingJornadas || [candidate]).map(cand => {
+                const isSelected = parseInt(cand.number, 10) === parseInt(candidate.number, 10);
+                const exists = this.jornadas.some(j => parseInt(j.number, 10) === parseInt(cand.number, 10));
+                return `<option value="${cand.number}" ${isSelected ? 'selected' : ''}>Jornada ${cand.number} - ${cand.dateStr} (Domingo)${exists ? ' [Ya existe]' : ' [Nueva]'}</option>`;
+            }).join('');
+
+            headerBox.innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-700/80">
+                        <div class="font-black text-amber-400 text-sm flex items-center gap-2">
+                            <span>⚡ Jornada Oficial Detectada</span>
+                            <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold">Oficial LFP</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-300">Seleccionar Jornada:</label>
+                            <select onchange="window.JornadasApp.onSelectUpcomingJornada(this.value)" class="p-1.5 rounded-lg bg-slate-950 border border-amber-500/50 text-white font-mono text-xs font-bold focus:outline-none">
+                                ${optionsHtml}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs pt-0.5">
+                        <span class="text-slate-300 font-semibold">Fecha oficial de juego: <strong class="text-white font-mono">${candidate.dateStr}</strong> (Domingo)</span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold ${alreadyExists ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">
+                            ${alreadyExists ? '⚠️ Se actualizarán partidos' : '✅ Lista para crear'}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (listBox) {
+            listBox.innerHTML = candidate.matches.map((m, idx) => {
+                const isPleno = idx === 14;
+                const home = m ? m.home : 'Sin definir';
+                const away = m ? m.away : 'Sin definir';
+                const homeLogo = (window.AppUtils && window.AppUtils.getTeamLogo) ? window.AppUtils.getTeamLogo(home) : '';
+                const awayLogo = (window.AppUtils && window.AppUtils.getTeamLogo) ? window.AppUtils.getTeamLogo(away) : '';
+                return `
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono shadow-sm">
+                        <span class="w-9 font-extrabold text-amber-400 text-center">${isPleno ? 'P15' : String(idx + 1).padStart(2, ' ')}</span>
+                        <div class="flex-1 flex items-center justify-between px-3 min-w-0">
+                            <span class="flex items-center gap-1.5 text-white font-semibold truncate justify-end text-right flex-1">
+                                <span class="truncate">${home}</span>
+                                ${homeLogo ? `<img src="${homeLogo}" class="w-4 h-4 object-contain inline shrink-0" alt="">` : ''}
+                            </span>
+                            <span class="px-2 text-slate-500 font-bold shrink-0">vs</span>
+                            <span class="flex items-center gap-1.5 text-white font-semibold truncate justify-start text-left flex-1">
+                                ${awayLogo ? `<img src="${awayLogo}" class="w-4 h-4 object-contain inline shrink-0" alt="">` : ''}
+                                <span class="truncate">${away}</span>
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        if (confirmBtn) {
+            confirmBtn.textContent = `✅ Confirmar y Crear Jornada ${candidate.number}`;
         }
     }
 

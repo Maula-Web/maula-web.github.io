@@ -137,17 +137,52 @@
 
         /* Modales: Blindaje de opacidad total, capas y visibilidad en modo oscuro y claro */
         .modal-dialog-panel {
-            background-color: #0d121f !important;
-            background: #0d121f !important;
+            background-color: #0b0f19 !important;
+            background: #0b0f19 !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.98), 0 0 0 1px rgba(245, 158, 11, 0.4) !important;
             opacity: 1 !important;
+            color: #ffffff !important;
         }
         .light-theme .modal-dialog-panel {
             background-color: #ffffff !important;
             background: #ffffff !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
+            color: #0f172a !important;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.5) !important;
+            opacity: 1 !important;
+        }
+        .light-theme .modal-dialog-panel h2,
+        .light-theme .modal-dialog-panel h3 {
+            color: #0f172a !important;
+        }
+        .light-theme .modal-dialog-panel p {
+            color: #475569 !important;
+        }
+        .light-theme .modal-dialog-panel .border-slate-800 {
+            border-color: #e2e8f0 !important;
+        }
+        .light-theme .modal-dialog-panel .bg-slate-900,
+        .light-theme .modal-dialog-panel .bg-slate-950 {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        .light-theme .modal-dialog-panel .bg-slate-900\/50 {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+        .light-theme .modal-dialog-panel textarea {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        .light-theme .modal-dialog-panel .text-white {
+            color: #0f172a !important;
+        }
+        .light-theme .modal-dialog-panel .text-slate-300,
+        .light-theme .modal-dialog-panel .text-slate-400 {
+            color: #334155 !important;
         }
 
         /* Estilo visual para la fila del partido */
@@ -781,8 +816,8 @@
          MODAL 1: FORMULARIO DE EDICIÓN / ALTA DE JORNADA 2.0
          (CON CALENDARIO DATEPICKER Y DROPDOWNS INTELIGENTES DE EQUIPOS)
          ===================================================================== -->
-    <div id="modal-jornada-form" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
-        <div class="glass-panel modal-dialog-panel w-full max-w-4xl border-amber-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+    <div id="modal-jornada-form" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-3 sm:p-4 z-[100080]">
+        <div class="modal-dialog-panel w-full max-w-4xl border border-amber-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
             <!-- Modal Header -->
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
@@ -885,8 +920,8 @@
     <!-- =====================================================================
          MODAL 2: IMPORTAR PARTIDOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
-    <div id="modal-import-matches" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
-        <div class="glass-panel modal-dialog-panel w-full max-w-2xl border-orange-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+    <div id="modal-import-matches" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-3 sm:p-4 z-[100080]">
+        <div class="modal-dialog-panel w-full max-w-2xl border border-orange-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl p-2 rounded-xl bg-orange-500/20 text-orange-400">📋</span>
@@ -964,7 +999,7 @@
 
                     <div class="flex items-center justify-between pt-2">
                         <button type="button" onclick="window.JornadasApp.backToMatchesTextInput()" class="px-3.5 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold transition">✏️ Volver a Editar</button>
-                        <button type="button" onclick="window.JornadasApp.confirmCreateJornadaFromImport()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow">✅ Confirmar y Crear Jornada</button>
+                        <button type="button" id="btn-confirm-import-matches" onclick="window.JornadasApp.confirmCreateJornadaFromImport()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow">✅ Confirmar y Crear Jornada</button>
                     </div>
                 </div>
             </div>
@@ -974,8 +1009,8 @@
     <!-- =====================================================================
          MODAL 3: IMPORTAR RESULTADOS Y PREMIOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
-    <div id="modal-import-results" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-[99999]">
-        <div class="glass-panel modal-dialog-panel w-full max-w-2xl border-emerald-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+    <div id="modal-import-results" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-3 sm:p-4 z-[100080]">
+        <div class="modal-dialog-panel w-full max-w-2xl border border-emerald-500/50 p-5 sm:p-7 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl p-2 rounded-xl bg-emerald-500/20 text-emerald-400">📥</span>

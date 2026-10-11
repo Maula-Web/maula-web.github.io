@@ -1536,6 +1536,55 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
     font-size: 1.04em;
 }
 
+/* Modales de Jornadas e Importación en Modo Claro: Opacidad 100% y Alto Contraste */
+.light-theme .modal-dialog-panel,
+[data-theme="light"] .modal-dialog-panel,
+.light-theme .import-modal-content,
+[data-theme="light"] .import-modal-content {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    opacity: 1 !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35) !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.5) !important;
+}
 
+.light-theme .modal-dialog-panel h2,
+.light-theme .modal-dialog-panel h3,
+[data-theme="light"] .import-modal-content h2,
+[data-theme="light"] .import-modal-content h4 {
+    color: #0f172a !important;
+}
 
+.light-theme .modal-dialog-panel p,
+[data-theme="light"] .import-modal-content p {
+    color: #475569 !important;
+}
 
+.light-theme .modal-dialog-panel .bg-slate-900,
+.light-theme .modal-dialog-panel .bg-slate-950 {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+.light-theme .modal-dialog-panel .bg-slate-900\/50 {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.light-theme .modal-dialog-panel textarea,
+[data-theme="light"] .import-modal-content textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+.light-theme .modal-dialog-panel .text-white {
+    color: #0f172a !important;
+}
+
+.light-theme .modal-dialog-panel .text-slate-300,
+.light-theme .modal-dialog-panel .text-slate-400 {
+    color: #334155 !important;
+}

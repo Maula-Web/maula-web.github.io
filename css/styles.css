@@ -2178,6 +2178,25 @@ tbody tr:hover {
     overflow: visible;
 }
 
+/* Modales de importación: Fondo 100% opaco y contraste absoluto */
+.import-modal-content {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    opacity: 1 !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.5) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95) !important;
+}
+
+[data-theme="light"] .import-modal-content,
+.light-theme .import-modal-content {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
+}
+
 /* Sticky Header in Modal */
 .modal form>div:first-child {
     position: sticky;
