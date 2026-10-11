@@ -1746,102 +1746,121 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    line-height: 1.2;
-    padding: 0.5px 0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    line-height: 1.25;
+    padding: 1px 0;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 11px;
     transition: all 0.2s ease;
 }
 
-.perc-1 {
-    color: #059669;
+/* Modo Claro: Colores claros, nítidos y sin desenfoque */
+.perc-1, .perc-1 span, .perc-1 b {
+    color: #10b981 !important; /* Verde esmeralda claro */
     font-weight: 700;
+    text-shadow: none !important;
 }
 
-.perc-X {
-    color: #0284c7;
+.perc-X, .perc-X span, .perc-X b {
+    color: #0ea5e9 !important; /* Azul cielo claro */
     font-weight: 700;
+    text-shadow: none !important;
 }
 
-.perc-2 {
-    color: #d97706;
+.perc-2, .perc-2 span, .perc-2 b {
+    color: #f59e0b !important; /* Ámbar / amarillo dorado claro */
     font-weight: 700;
+    text-shadow: none !important;
 }
 
-/* Modo oscuro con mayor brillo y luminosidad (Glow) */
-.dark .perc-1,
-body.dark .perc-1 {
-    color: #34d399;
-    text-shadow: 0 0 8px rgba(52, 211, 153, 0.65);
+/* Modo Oscuro: Colores pastel más claros, alta luminosidad y contraste, CERO glow */
+.dark .perc-1, body.dark .perc-1,
+.dark .perc-1 span, body.dark .perc-1 span,
+.dark .perc-1 b, body.dark .perc-1 b {
+    color: #4ade80 !important; /* Verde pastel muy claro y nítido */
     font-weight: 800;
+    text-shadow: none !important;
+    filter: none !important;
 }
 
-.dark .perc-X,
-body.dark .perc-X {
-    color: #38bdf8;
-    text-shadow: 0 0 8px rgba(56, 189, 248, 0.65);
+.dark .perc-X, body.dark .perc-X,
+.dark .perc-X span, body.dark .perc-X span,
+.dark .perc-X b, body.dark .perc-X b {
+    color: #38bdf8 !important; /* Azul cielo pastel muy claro y nítido */
     font-weight: 800;
+    text-shadow: none !important;
+    filter: none !important;
 }
 
-.dark .perc-2,
-body.dark .perc-2 {
-    color: #fbbf24;
-    text-shadow: 0 0 8px rgba(251, 191, 36, 0.65);
+.dark .perc-2, body.dark .perc-2,
+.dark .perc-2 span, body.dark .perc-2 span,
+.dark .perc-2 b, body.dark .perc-2 b {
+    color: #fde047 !important; /* Amarillo pastel muy claro y nítido */
     font-weight: 800;
+    text-shadow: none !important;
+    filter: none !important;
 }
 
-/* Signo recomendado por Mundo Deportivo */
+/* Signo recomendado por Mundo Deportivo: estrella nítida sin resplandor borroso */
 .perc-row.rec-sign {
     font-weight: 900 !important;
 }
 
 .perc-row.rec-sign b {
     position: relative;
-    padding: 0 3px;
+    padding: 0 4px;
     border-radius: 4px;
-    background: rgba(2, 132, 199, 0.15);
-    box-shadow: 0 0 0 1px rgba(2, 132, 199, 0.35);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid currentColor;
+    box-shadow: none !important;
+    text-shadow: none !important;
 }
 
 .dark .perc-row.rec-sign b {
-    background: rgba(56, 189, 248, 0.2);
-    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5), 0 0 8px rgba(56, 189, 248, 0.35);
+    background: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.4);
+    box-shadow: none !important;
 }
 
 .perc-row.rec-sign::after {
     content: ' ★';
-    font-size: 8px;
+    font-size: 9px;
     margin-left: 2px;
-    opacity: 0.95;
-    color: #f59e0b;
+    color: #fde047;
+    text-shadow: none !important;
 }
 
-/* Píldora de activación móvil para análisis */
-.md-mobile-trigger {
+/* Botón de despliegue de análisis en móvil */
+.md-mobile-toggle-btn {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-size: 10px;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 11px;
     font-weight: 800;
-    background: rgba(2, 132, 199, 0.15);
-    border: 1px solid rgba(2, 132, 199, 0.4);
+    background: rgba(2, 132, 199, 0.12);
+    border: 1px solid rgba(2, 132, 199, 0.35);
     color: #0284c7;
     cursor: pointer;
     transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.dark .md-mobile-trigger {
+.dark .md-mobile-toggle-btn {
     background: rgba(56, 189, 248, 0.15);
     border-color: rgba(56, 189, 248, 0.4);
     color: #38bdf8;
-    box-shadow: 0 0 6px rgba(56, 189, 248, 0.25);
 }
 
-.md-mobile-trigger:hover {
-    transform: scale(1.05);
-    background: rgba(2, 132, 199, 0.25);
+.md-mobile-toggle-btn:hover {
+    background: rgba(56, 189, 248, 0.25);
+    transform: scale(1.03);
+}
+
+.md-mobile-toggle-btn .md-arrow {
+    font-size: 8px;
+    transition: transform 0.2s ease;
 }
 
 .doubles-row .p-match-info {

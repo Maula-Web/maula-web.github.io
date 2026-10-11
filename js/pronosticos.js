@@ -417,6 +417,11 @@ class PronosticoManager {
             this.mdAnalysisSidebar.classList.add('hidden');
             this.mdAnalysisSidebar.classList.remove('flex', 'lg:col-span-5', 'xl:col-span-4');
         }
+        const mobileTopBar = document.getElementById('md-mobile-top-bar');
+        if (mobileTopBar) {
+            mobileTopBar.classList.add('hidden');
+            mobileTopBar.classList.remove('flex');
+        }
         if (this.editorForecastCol) {
             this.editorForecastCol.classList.remove('lg:col-span-7', 'xl:col-span-8');
             this.editorForecastCol.classList.add('lg:col-span-12');
@@ -510,6 +515,20 @@ class PronosticoManager {
 
         // Determinar si hay análisis disponible de Mundo Deportivo para esta jornada
         this.currentJornadaHasMDAnalysis = this.checkIfJornadaHasMDAnalysis(jornada);
+        const mobileTopBar = document.getElementById('md-mobile-top-bar');
+        if (mobileTopBar) {
+            if (this.currentJornadaHasMDAnalysis) {
+                mobileTopBar.classList.remove('hidden');
+                mobileTopBar.classList.add('flex');
+                const label = document.getElementById('label-toggle-all-md');
+                const arrow = document.getElementById('arrow-toggle-all-md');
+                if (label) label.textContent = 'Ver todos';
+                if (arrow) arrow.textContent = '▼';
+            } else {
+                mobileTopBar.classList.add('hidden');
+                mobileTopBar.classList.remove('flex');
+            }
+        }
         if (this.mdAnalysisSidebar && this.editorForecastCol) {
             if (this.currentJornadaHasMDAnalysis) {
                 this.editorForecastCol.classList.remove('lg:col-span-12');
@@ -658,6 +677,7 @@ class PronosticoManager {
             // Porcentajes del análisis de Mundo Deportivo (si está disponible para esta jornada)
             let percHtml = '';
             let mobileBtnHtml = '';
+            let inlineAnalysisHtml = '';
             if (this.currentJornadaHasMDAnalysis) {
                 const mdMatch = this.getMDMatchFor(match, idx);
                 if (mdMatch && mdMatch.percentages) {
@@ -678,9 +698,49 @@ class PronosticoManager {
                         </div>
                     `;
                     mobileBtnHtml = `
-                        <button type="button" class="md-mobile-trigger lg:hidden" onclick="event.stopPropagation(); window.app.openMDMobileDetail(${idx});" title="Ver análisis de Mundo Deportivo">
-                            <span>💡</span><span>MD</span>
+                        <button type="button" class="md-mobile-toggle-btn lg:hidden" onclick="event.stopPropagation(); window.app.toggleMDInlineAnalysis(${idx});" title="Ver análisis de Mundo Deportivo">
+                            <span>💡 Análisis</span>
+                            <span class="md-arrow" id="md-arrow-${idx}">▼</span>
                         </button>
+                    `;
+
+                    // Desplegable de análisis táctico inline para móvil
+                    let homeRankStr = mdMatch.homeRank ? `${mdMatch.homeRank}º clasificado` : '';
+                    let awayRankStr = mdMatch.awayRank ? `${mdMatch.awayRank}º clasificado` : '';
+                    if (!homeRankStr && this.mdAnalysisData && this.mdAnalysisData.standings) {
+                        const allSt = [...(this.mdAnalysisData.standings.primera || []), ...(this.mdAnalysisData.standings.segunda || [])];
+                        const hFound = allSt.find(t => this.areTeamsSimilar(match.home, t.team));
+                        if (hFound) homeRankStr = `${hFound.pos}º (${hFound.pts} pts)`;
+                        const aFound = allSt.find(t => this.areTeamsSimilar(match.away, t.team));
+                        if (aFound) awayRankStr = `${aFound.pos}º (${aFound.pts} pts)`;
+                    }
+
+                    inlineAnalysisHtml = `
+                        <div id="md-inline-${idx}" class="md-inline-card hidden lg:hidden w-full mt-2 p-3 rounded-xl bg-slate-950/90 border border-sky-500/30 text-xs space-y-2.5 shadow-inner">
+                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 text-[11px]">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-sky-400 font-black uppercase tracking-wider">🎯 Recomendado:</span>
+                                    <span class="px-2 py-0.5 rounded-lg bg-sky-500 text-slate-950 font-black text-xs shadow">${mdMatch.recommended || '-'}</span>
+                                </div>
+                                <span class="text-slate-400 font-mono text-[10px]">⏰ ${mdMatch.schedule || 'Fin de semana'}</span>
+                            </div>
+                            ${(homeRankStr || awayRankStr) ? `
+                                <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono px-1">
+                                    <span>${match.home}: <b class="text-sky-400">${homeRankStr || '-'}</b></span>
+                                    <span>${match.away}: <b class="text-sky-400">${awayRankStr || '-'}</b></span>
+                                </div>
+                            ` : ''}
+                            ${mdMatch.comment ? `
+                                <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800/80 text-[11px] text-slate-300 leading-relaxed font-sans">
+                                    ${mdMatch.comment}
+                                </div>
+                            ` : '<div class="text-[10px] text-slate-500 italic">Sin comentario editorial disponible.</div>'}
+                            <div class="pt-0.5 flex items-center justify-end">
+                                <button type="button" onclick="event.stopPropagation(); window.app.openMDMobileDetail(${idx});" class="text-[10px] text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1">
+                                    <span>📊 Ver Ficha Completa & Clasificación →</span>
+                                </button>
+                            </div>
+                        </div>
                     `;
                 } else {
                     percHtml = `<div id="consensus-${idx}" class="p-percentages" style="display:none;"></div>`;
@@ -706,23 +766,27 @@ class PronosticoManager {
                     ${mobileBtnHtml}
                 </div>
 
-                <div class="p-others">
-                    ${othersHtml || '<span class="no-others">-</span>'}
+                <div class="p-row-actions">
+                    <div class="p-others">
+                        ${othersHtml || '<span class="no-others">-</span>'}
+                    </div>
+
+                    <div class="p-options" ${disabledStr} data-idx="${idx}">
+                        <div class="chk-option ${val === '1' ? 'selected' : ''}" onclick="window.app.selectOption(this, '1')">1</div>
+                        <div class="chk-option ${val === 'X' ? 'selected' : ''}" onclick="window.app.selectOption(this, 'X')">X</div>
+                        <div class="chk-option ${val === '2' ? 'selected' : ''}" onclick="window.app.selectOption(this, '2')">2</div>
+                    </div>
+
+                    ${percHtml}
                 </div>
 
-                <div class="p-options" ${disabledStr} data-idx="${idx}">
-                    <div class="chk-option ${val === '1' ? 'selected' : ''}" onclick="window.app.selectOption(this, '1')">1</div>
-                    <div class="chk-option ${val === 'X' ? 'selected' : ''}" onclick="window.app.selectOption(this, 'X')">X</div>
-                    <div class="chk-option ${val === '2' ? 'selected' : ''}" onclick="window.app.selectOption(this, '2')">2</div>
-                </div>
-
-                ${percHtml}
+                ${inlineAnalysisHtml}
             `;
 
             if (this.currentJornadaHasMDAnalysis) {
                 row.addEventListener('mouseenter', () => this.hoverMDMatch(idx));
                 row.addEventListener('click', (e) => {
-                    if (!e.target.closest('.chk-option') && !e.target.closest('.md-mobile-trigger')) {
+                    if (!e.target.closest('.chk-option') && !e.target.closest('.md-mobile-toggle-btn') && !e.target.closest('.md-inline-card')) {
                         this.hoverMDMatch(idx);
                     }
                 });
@@ -3487,11 +3551,70 @@ class PronosticoManager {
                         </div>
                     </div>
                 ` : ''}
+
+                <!-- Accesos rápidos a Clasificación -->
+                <div class="pt-2 flex items-center gap-2">
+                    <button type="button" onclick="window.app.showMobileStandings('primera')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold border border-slate-700 flex items-center justify-center gap-1 transition">
+                        <span>🏆</span> Ver 1ª División
+                    </button>
+                    <button type="button" onclick="window.app.showMobileStandings('segunda')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold border border-slate-700 flex items-center justify-center gap-1 transition">
+                        <span>🥈</span> Ver 2ª División
+                    </button>
+                </div>
             </div>
         `;
 
         sheet.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    }
+
+    toggleMDInlineAnalysis(idx) {
+        const card = document.getElementById(`md-inline-${idx}`);
+        const arrow = document.getElementById(`md-arrow-${idx}`);
+        if (!card) return;
+
+        const isHidden = card.classList.contains('hidden');
+        if (isHidden) {
+            card.classList.remove('hidden');
+            if (arrow) arrow.textContent = '▲';
+        } else {
+            card.classList.add('hidden');
+            if (arrow) arrow.textContent = '▼';
+        }
+    }
+
+    toggleAllMDInlineAnalysis() {
+        const allCards = this.container ? this.container.querySelectorAll('.md-inline-card') : [];
+        if (!allCards.length) return;
+
+        const hasHidden = Array.from(allCards).some(c => c.classList.contains('hidden'));
+        const label = document.getElementById('label-toggle-all-md');
+        const arrow = document.getElementById('arrow-toggle-all-md');
+
+        allCards.forEach(card => {
+            const idx = card.id.replace('md-inline-', '');
+            const cardArrow = document.getElementById(`md-arrow-${idx}`);
+            if (hasHidden) {
+                card.classList.remove('hidden');
+                if (cardArrow) cardArrow.textContent = '▲';
+            } else {
+                card.classList.add('hidden');
+                if (cardArrow) cardArrow.textContent = '▼';
+            }
+        });
+
+        if (label) label.textContent = hasHidden ? 'Ocultar todos' : 'Ver todos';
+        if (arrow) arrow.textContent = hasHidden ? '▲' : '▼';
+    }
+
+    showMobileStandings(divType) {
+        const content = document.getElementById('md-mobile-sheet-content');
+        if (!content) return;
+        this.renderMDStandings(divType, content);
+        const backBtn = content.querySelector('button[onclick*="switchMDView"]');
+        if (backBtn) {
+            backBtn.onclick = () => this.openMDMobileDetail(this.selectedMDMatchIdx !== undefined ? this.selectedMDMatchIdx : 0);
+        }
     }
 
     closeMDMobileSheet() {
