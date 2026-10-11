@@ -372,16 +372,8 @@ class PronosticoManager {
                     📅 <span>${jornadaText}</span>
                 </span>
                 ${diceBadgeHtml}
-                <button type="button" id="btn-close-forecast" style="background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3); border-radius: 20px; padding: 5px 12px; font-size: 0.85rem; color: #d32f2f; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: all 0.2s;" title="Cerrar pronóstico">
-                    ✖ Cerrar
-                </button>
             </div>
         `;
-
-        const btnClose = this.activeSelectionInfo.querySelector('#btn-close-forecast');
-        if (btnClose) {
-            btnClose.addEventListener('click', () => this.closeForecast());
-        }
     }
 
     closeForecast() {
