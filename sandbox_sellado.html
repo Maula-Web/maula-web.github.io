@@ -946,6 +946,18 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     </div>
                 </div>
 
+                <!-- ALERTA DE DISPONIBILIDAD DE DATOS REALES DE MUNDO DEPORTIVO -->
+                <div id="sim-md-status-alert" class="hidden p-3.5 rounded-xl border text-xs flex items-start gap-3">
+                    <span id="sim-md-status-icon" class="text-xl shrink-0">ℹ️</span>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span id="sim-md-status-tag" class="px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase">ESTADO FUENTE</span>
+                            <span id="sim-md-status-title" class="font-bold text-white"></span>
+                        </div>
+                        <p id="sim-md-status-desc" class="text-slate-300 leading-relaxed"></p>
+                    </div>
+                </div>
+
                 <!-- KPIs de la Combinación de 9 Triples -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
@@ -2495,15 +2507,15 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
 
             obtenerProbabilidadesMD(partido, index) {
                 if (!this.mdAnalysisData || !Array.isArray(this.mdAnalysisData.matches)) {
-                    // Distribución lógica por defecto basada en estadísticas históricas
-                    return { p1: 45, pX: 30, p2: 25, fuente: 'Histórico' };
+                    return null;
                 }
 
-                // Intentar casar por número de partido o nombres de equipos
+                // Casar por coincidencia de equipos (o num de partido si coincide la jornada de la peña)
                 const mdMatches = this.mdAnalysisData.matches;
-                let matchMD = mdMatches.find(m => m.num === (index + 1));
-                if (!matchMD && partido) {
-                    const clean = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+                const clean = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+                
+                let matchMD = null;
+                if (partido) {
                     const h1 = clean(partido.home);
                     const a1 = clean(partido.away);
                     matchMD = mdMatches.find(m => {
@@ -2513,19 +2525,26 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     });
                 }
 
+                // Solo si la jornada detectada en MD coincide con la jornada que estamos viendo permitimos fallback por índice
+                if (!matchMD && this.mdAnalysisData.detectedJornadaNum && String(this.mdAnalysisData.detectedJornadaNum) === String(this.jornadaActual)) {
+                    matchMD = mdMatches.find(m => m.num === (index + 1));
+                }
+
                 if (matchMD && matchMD.percentages) {
                     const pReal = matchMD.percentages.real || matchMD.percentages.quinielista;
-                    if (pReal) {
+                    if (pReal && (pReal['1'] || pReal['X'] || pReal['2'])) {
                         return {
-                            p1: parseInt(pReal['1']) || 0,
-                            pX: parseInt(pReal['X']) || 0,
-                            p2: parseInt(pReal['2']) || 0,
-                            fuente: 'Mundo Deportivo'
+                            p1: parseInt(pReal['1'], 10) || 0,
+                            pX: parseInt(pReal['X'], 10) || 0,
+                            p2: parseInt(pReal['2'], 10) || 0,
+                            fuente: 'Mundo Deportivo (Real)',
+                            isReal: true
                         };
                     }
                 }
 
-                return { p1: 42, pX: 31, p2: 27, fuente: 'Estimado' };
+                // Sin datos reales publicados aún: NADA de porcentajes ficticios o estimados
+                return null;
             },
 
             async renderSimulador9Triples() {
@@ -2534,6 +2553,14 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 if (labelJornada) labelJornada.textContent = this.jornadaActual;
 
                 const matches = this.obtenerPartidosJornadaActual();
+
+                // Comprobar si hay datos reales de MD para esta jornada
+                const hayDatosReales = matches.slice(0, 14).some((m, idx) => {
+                    const p = this.obtenerProbabilidadesMD(m, idx);
+                    return p && p.isReal;
+                });
+
+                this.actualizarBannerEstadoMD(hayDatosReales);
 
                 // Si no hay configuración previa para esta jornada, auto-asignar con Mundo Deportivo
                 if (!this.triplesConfig || this.triplesConfig.jornada !== this.jornadaActual) {
@@ -2544,17 +2571,48 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 this.desarrollarMatriz25Triples(matches);
             },
 
+            actualizarBannerEstadoMD(hayDatosReales) {
+                const alertBox = document.getElementById('sim-md-status-alert');
+                const alertIcon = document.getElementById('sim-md-status-icon');
+                const alertTag = document.getElementById('sim-md-status-tag');
+                const alertTitle = document.getElementById('sim-md-status-title');
+                const alertDesc = document.getElementById('sim-md-status-desc');
+                if (!alertBox) return;
+
+                alertBox.classList.remove('hidden');
+
+                if (hayDatosReales) {
+                    alertBox.className = 'p-3.5 rounded-xl border border-emerald-500/40 bg-emerald-950/20 text-xs flex items-start gap-3';
+                    if (alertIcon) alertIcon.textContent = '🟢';
+                    if (alertTag) {
+                        alertTag.textContent = 'DATOS REALES CONECTADOS';
+                        alertTag.className = 'px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+                    }
+                    if (alertTitle) alertTitle.textContent = `Probabilidades Reales Oficiales de Mundo Deportivo (Jornada ${this.jornadaActual})`;
+                    if (alertDesc) alertDesc.textContent = 'Los 14 partidos tienen vinculadas sus probabilidades reales calculadas por Eduardo Losilla / Mundo Deportivo a partir de las cuotas de mercado y apuestas de los jugadores.';
+                } else {
+                    const jDetectada = (this.mdAnalysisData && this.mdAnalysisData.detectedJornadaNum) ? `Jornada ${this.mdAnalysisData.detectedJornadaNum}` : 'una jornada intersemanal';
+                    alertBox.className = 'p-3.5 rounded-xl border border-amber-500/40 bg-amber-950/25 text-xs flex items-start gap-3';
+                    if (alertIcon) alertIcon.textContent = '⏳';
+                    if (alertTag) {
+                        alertTag.textContent = 'PENDIENTE DE PUBLICACIÓN EN MD';
+                        alertTag.className = 'px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                    }
+                    if (alertTitle) alertTitle.textContent = `Mundo Deportivo aún no ha publicado el desglose para la Jornada ${this.jornadaActual} de LaLiga`;
+                    if (alertDesc) alertDesc.textContent = `Actualmente Mundo Deportivo tiene en portada ${jDetectada} (Champions League). En cumplimiento estricto de tu instrucción, NO se muestran datos inventados ni estimados. Puedes asignar los 9 triples y 5 fijos manualmente abajo o esperar a la publicación oficial de MD.`;
+                }
+            },
+
             inicializarConfiguracionConMD(matches) {
-                // Calcular la "incertidumbre" de cada uno de los 14 partidos según Mundo Deportivo
-                // Los 5 partidos con mayor signo dominante (más seguros) serán FIJOS
-                // Los 9 partidos restantes más igualados serán TRIPLES
+                // Si hay datos reales de MD, los 5 con mayor probabilidad son fijos
                 const scoredMatches = matches.slice(0, 14).map((m, idx) => {
                     const probs = this.obtenerProbabilidadesMD(m, idx);
-                    // Máxima probabilidad de un único signo (ej. 77% Arsenal -> muy seguro -> Fijo)
-                    const maxProb = Math.max(probs.p1, probs.pX, probs.p2);
+                    const maxProb = probs ? Math.max(probs.p1, probs.pX, probs.p2) : 0;
                     let signoFavorito = '1';
-                    if (probs.pX === maxProb) signoFavorito = 'X';
-                    else if (probs.p2 === maxProb) signoFavorito = '2';
+                    if (probs) {
+                        if (probs.pX === maxProb) signoFavorito = 'X';
+                        else if (probs.p2 === maxProb) signoFavorito = '2';
+                    }
 
                     return {
                         idx: idx,
@@ -2564,7 +2622,6 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     };
                 });
 
-                // Ordenar por seguridad decreciente (los más seguros primero)
                 scoredMatches.sort((a, b) => b.maxProb - a.maxProb);
 
                 const fijosIndices = scoredMatches.slice(0, 5).map(s => s.idx);
@@ -2584,10 +2641,20 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
 
             aplicarCriterioMundoDeportivo() {
                 const matches = this.obtenerPartidosJornadaActual();
+                const hayDatosReales = matches.slice(0, 14).some((m, idx) => {
+                    const p = this.obtenerProbabilidadesMD(m, idx);
+                    return p && p.isReal;
+                });
+
+                if (!hayDatosReales) {
+                    alert(`Mundo Deportivo aún tiene activa la jornada de Champions y no ha publicado los porcentajes de la Jornada ${this.jornadaActual} de LaLiga. Por política de datos reales no se generan datos ficticios.`);
+                    return;
+                }
+
                 this.inicializarConfiguracionConMD(matches);
                 this.renderTablaPartidosSimulador(matches);
                 this.desarrollarMatriz25Triples(matches);
-                this.log(`[Simulador 9T] Asignación recalculada según probabilidades de Mundo Deportivo. 5 Fijos más probables y 9 Triples blindados.`, 'success');
+                this.log(`[Simulador 9T] Asignación recalculada según probabilidades reales de Mundo Deportivo.`, 'success');
             },
 
             renderTablaPartidosSimulador(matches) {
@@ -2621,18 +2688,23 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                             </div>
                         `;
 
+                    const probHtml = probs ? `
+                        <span class="text-emerald-400 font-bold text-[11px]">${probs.p1}%</span> · 
+                        <span class="text-amber-400 font-bold text-[11px]">${probs.pX}%</span> · 
+                        <span class="text-blue-400 font-bold text-[11px]">${probs.p2}%</span>
+                        <span class="text-[9px] text-emerald-400/80 block">(Mundo Deportivo Real)</span>
+                    ` : `
+                        <span class="text-[11px] text-slate-500 italic">Pendiente de publicación en MD</span>
+                        <span class="text-[9px] text-amber-400/80 block">(Sin datos ficticios)</span>
+                    `;
+
                     return `
                         <tr class="hover:bg-slate-800/50 transition">
                             <td class="p-2 sm:px-3 text-slate-500 font-bold">${idx + 1}</td>
                             <td class="p-2 sm:px-3 font-sans font-bold text-white whitespace-nowrap">
                                 ${m.home || 'Local'} <span class="text-slate-500 font-normal">vs</span> ${m.away || 'Visitante'}
                             </td>
-                            <td class="p-2 sm:px-3 text-center whitespace-nowrap">
-                                <span class="text-emerald-400 font-bold text-[11px]">${probs.p1}%</span> · 
-                                <span class="text-amber-400 font-bold text-[11px]">${probs.pX}%</span> · 
-                                <span class="text-blue-400 font-bold text-[11px]">${probs.p2}%</span>
-                                <span class="text-[9px] text-slate-500 block">(${probs.fuente})</span>
-                            </td>
+                            <td class="p-2 sm:px-3 text-center whitespace-nowrap">${probHtml}</td>
                             <td class="p-2 sm:px-3 text-center whitespace-nowrap">${badgeRes}</td>
                             <td class="p-2 sm:px-3 text-center whitespace-nowrap">${tipoBadge}</td>
                             <td class="p-2 sm:px-3 text-center whitespace-nowrap">${selectSignoFijo}</td>
