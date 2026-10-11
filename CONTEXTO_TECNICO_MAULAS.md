@@ -1400,18 +1400,20 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
      - *Razón de rango 2*: Ente público estatal con alta disponibilidad, estructura HTML semántica limpia y nula presencia de bloqueos anti-scraping.
   3. 🥉 **SELAE API Oficial** (`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=LAQU&celebrados=true`):
      - *Razón de rango 3*: API oficial directa en formato JSON de Loterías y Apuestas del Estado. Ofrece los datos auditados definitivos con desglose de categorías de 15 a 10 aciertos.
-  4. 🏅 **CombinacionGanadora.com** (`https://www.combinacionganadora.com/quiniela/resultados/YYYY-MM-DD/`):
-     - *Razón de rango 4*: Histórico indexado por fecha exacta ISO (`YYYY-MM-DD`), con tabla de premios íntegra y marcadores de partidos.
-  5. 🎗️ **Eduardo Losilla / Quinielista** (`https://www.quinielista.es/`):
-     - *Razón de rango 5*: Referencia histórica especializada de La Quiniela para cotejo y validaciones adicionales.
+  4. 🎗️ **Eduardo Losilla / Quinielista** (`https://www.quinielista.es/`):
+     - *Razón de rango 4*: Referencia histórica especializada de La Quiniela para cotejo y validaciones adicionales.
 
-- **Jerarquía Oficial para PRÓXIMAS JORNADAS Y BOLETOS (Ordenada de Mejor a Peor)**:
+- **Jerarquía Oficial para PRÓXIMAS JORNADAS Y BOLETOS**:
   1. 🥇 **SELAE API Oficial** (`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=LAQU&celebrados=false`):
      - *Razón de rango 1*: Convocatorias oficiales directas del Estado. Garantiza al 100% los partidos que integran el boleto y su posición exacta del 1 al 15 sin suposiciones.
-  2. 🥈 **CombinacionGanadora.com** (`https://www.combinacionganadora.com/quiniela/resultados/YYYY-MM-DD/`):
-     - *Razón de rango 2*: Publica boletos de próximos domingos permitiendo consulta anticipada por fecha.
-  3. 🥉 **Eduardo Losilla / Quinielista** (`https://www.quinielista.es/`):
-     - *Razón de rango 3*: Portal de referencia que publica boletos con 2-3 semanas de antelación (jornadas 14, 15, 16...).
+  2. 🥈 **Eduardo Losilla / Quinielista** (`https://www.quinielista.es/`):
+     - *Razón de rango 2*: Portal de referencia que publica convocatorias oficiales verificadas.
+
+- **Descarte de CombinacionGanadora.com**:
+  - Se descartó totalmente por no ser fiable: publica plantillas provisionales ficticias de filiales y categorías no oficiales para fechas futuras, lo que generaba errores deportivos graves.
+
+- **Diseño de Interfaz: Disposición Vertical de Partidos**:
+  - En las tarjetas y modales de importación (tanto de partidos como de resultados), los 15 partidos se visualizan estrictamente en **secuencia vertical continua (1 al 15 / P15)**, en una sola columna con desplazamiento vertical natural, facilitando la lectura secuencial del boleto.
 
 - **Reglas Inmutables y Candados de Integridad de Datos**:
   1. ⛔ **CERO ESTIMACIONES O DATOS FICTICIOS**: Está tajantemente prohibido proyectar partidos o pronósticos basados en conjeturas o calendarios genéricos. Solo se aceptan boletos formalmente publicados por las fuentes oficiales.

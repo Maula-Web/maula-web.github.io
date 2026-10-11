@@ -361,7 +361,7 @@
 
     <!-- Modal for Text Import (Matches) -->
     <div id="modal-import-matches" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); z-index:100080; justify-content:center; align-items:center;">
-        <div class="modal import-modal-content" style="border-radius:12px; max-width:1050px; width:95%; max-height:95vh; display:flex; flex-direction:column; overflow:hidden;">
+        <div class="modal import-modal-content" style="border-radius:12px; max-width:720px; width:95%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;">
             <!-- Modal Header -->
             <div style="display:flex; justify-content:space-between; align-items:center; padding:1.2rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.1);">
                 <h2 style="margin:0; font-size:1.3rem; display:flex; align-items:center; gap:8px;">
@@ -413,7 +413,7 @@
                     </div>
 
                     <h4 style="margin:0 0 0.8rem 0; color:var(--text-main, #333); font-size:1rem;">⚽ Resumen de Partidos a Crear (15)</h4>
-                    <div id="import-matches-list" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap:6px; border:1px solid var(--input-border, #eee); border-radius:8px; padding:0.5rem; background:var(--card-bg, #fff);">
+                    <div id="import-matches-list" style="display:flex; flex-direction:column; gap:6px; max-height:460px; overflow-y:auto; border:1px solid var(--input-border, #eee); border-radius:8px; padding:0.5rem; background:var(--card-bg, #fff);">
                         <!-- Injected by JS -->
                     </div>
 
@@ -431,7 +431,7 @@
 
     <!-- Modal for Text Import (Results & Prizes) -->
     <div id="modal-import-results" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); z-index:100080; justify-content:center; align-items:center;">
-        <div class="modal import-modal-content" style="border-radius:12px; max-width:1050px; width:95%; max-height:95vh; display:flex; flex-direction:column; overflow:hidden;">
+        <div class="modal import-modal-content" style="border-radius:12px; max-width:720px; width:95%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;">
             <!-- Modal Header -->
             <div style="display:flex; justify-content:space-between; align-items:center; padding:1.2rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.1);">
                 <h2 style="margin:0; font-size:1.3rem; display:flex; align-items:center; gap:8px;">
@@ -483,7 +483,7 @@
                     </div>
 
                     <h4 style="margin:0 0 0.8rem 0; color:var(--text-main, #333); font-size:1rem;">⚽ Resultados Oficiales de Partidos (15)</h4>
-                    <div id="import-results-matches-list" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap:6px; border:1px solid var(--input-border, #eee); border-radius:8px; padding:0.5rem; background:var(--card-bg, #fff); margin-bottom:1rem;">
+                    <div id="import-results-matches-list" style="display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto; border:1px solid var(--input-border, #eee); border-radius:8px; padding:0.5rem; background:var(--card-bg, #fff); margin-bottom:1rem;">
                         <!-- Injected by JS -->
                     </div>
 

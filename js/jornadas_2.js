@@ -1544,7 +1544,7 @@ class Jornadas2AppController {
         }
 
         if (listBox) {
-            listBox.className = "grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
+            listBox.className = "space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs overflow-y-auto max-h-[58vh]";
             listBox.innerHTML = candidate.matches.map((m, idx) => {
                 const isPleno = idx === 14;
                 const home = m ? m.home : 'Sin definir';
@@ -1552,14 +1552,14 @@ class Jornadas2AppController {
                 const homeLogo = (window.AppUtils && window.AppUtils.getTeamLogo) ? window.AppUtils.getTeamLogo(home) : '';
                 const awayLogo = (window.AppUtils && window.AppUtils.getTeamLogo) ? window.AppUtils.getTeamLogo(away) : '';
                 return `
-                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono shadow-sm ${isPleno ? 'md:col-span-2 bg-amber-950/20 border-amber-500/40' : ''}">
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono shadow-sm ${isPleno ? 'bg-amber-950/20 border-amber-500/40' : ''}">
                         <span class="w-9 font-extrabold ${isPleno ? 'text-amber-400' : 'text-slate-400'} text-center">${isPleno ? 'P15' : String(idx + 1).padStart(2, ' ')}</span>
                         <div class="flex-1 flex items-center justify-between px-3 min-w-0">
                             <span class="flex items-center gap-1.5 text-white font-semibold truncate justify-end text-right flex-1">
                                 <span class="truncate">${home}</span>
                                 ${homeLogo ? `<img src="${homeLogo}" class="w-4 h-4 object-contain inline shrink-0" alt="">` : ''}
                             </span>
-                            <span class="px-2 text-slate-500 font-bold shrink-0">vs</span>
+                            <span class="px-3 text-slate-500 font-bold shrink-0">vs</span>
                             <span class="flex items-center gap-1.5 text-white font-semibold truncate justify-start text-left flex-1">
                                 ${awayLogo ? `<img src="${awayLogo}" class="w-4 h-4 object-contain inline shrink-0" alt="">` : ''}
                                 <span class="truncate">${away}</span>
@@ -1622,15 +1622,15 @@ class Jornadas2AppController {
         }
 
         if (listBox) {
-            listBox.className = "grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
+            listBox.className = "space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs overflow-y-auto max-h-[58vh]";
             listBox.innerHTML = res.matches.map((m, idx) => {
                 const isPleno = idx === 14;
                 const home = m ? m.home : 'Sin definir';
                 const away = m ? m.away : 'Sin definir';
                 return `
-                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isPleno ? 'md:col-span-2 bg-amber-950/20 border-amber-500/40' : ''}">
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isPleno ? 'bg-amber-950/20 border-amber-500/40' : ''}">
                         <span class="w-8 font-bold ${isPleno ? 'text-amber-400' : 'text-slate-400'}">${isPleno ? 'P15' : idx + 1}</span>
-                        <span class="text-white font-semibold truncate flex-1 px-2">${home} vs ${away}</span>
+                        <span class="text-white font-semibold truncate flex-1 px-3">${home} vs ${away}</span>
                     </div>
                 `;
             }).join('');
@@ -1863,14 +1863,14 @@ class Jornadas2AppController {
         const prizesBox = document.getElementById('import-results-preview-prizes');
 
         if (matchesBox) {
-            matchesBox.className = "grid grid-cols-1 md:grid-cols-2 gap-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
+            matchesBox.className = "space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs overflow-y-auto max-h-[40vh]";
             matchesBox.innerHTML = res.matches.map((m, idx) => {
                 const isP15 = idx === 14;
                 return `
-                    <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isP15 ? 'md:col-span-2 bg-emerald-950/20 border-emerald-500/40' : ''}">
+                    <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isP15 ? 'bg-emerald-950/20 border-emerald-500/40' : ''}">
                         <span class="w-8 font-bold ${isP15 ? 'text-amber-400 font-black' : 'text-slate-400'}">${isP15 ? 'P15' : idx + 1}</span>
-                        <span class="text-white truncate flex-1 px-2">${m.home} vs ${m.away}</span>
-                        <span class="font-black ${isP15 ? 'text-amber-400' : 'text-emerald-400'} px-2 text-sm">${m.result || '-'}</span>
+                        <span class="text-white truncate flex-1 px-3">${m.home} vs ${m.away}</span>
+                        <span class="font-black ${isP15 ? 'text-amber-400' : 'text-emerald-400'} px-3 text-sm">${m.result || '-'}</span>
                     </div>
                 `;
             }).join('');

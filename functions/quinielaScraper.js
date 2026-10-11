@@ -79,8 +79,7 @@ async function fetchLatestQuiniela() {
     const sources = [
         { name: 'El País Sorteos', fn: parseElPais },
         { name: 'RTVE Loterías', fn: parseRTVE },
-        { name: 'SELAE API Oficial', fn: parseSELAEResults },
-        { name: 'CombinacionGanadora', fn: parseCombinacionGanadoraResults }
+        { name: 'SELAE API Oficial', fn: parseSELAEResults }
     ];
 
     let lastError = null;
@@ -296,66 +295,6 @@ async function parseSELAEResults() {
     return { jNum: target.jornada, dateStr, matches, prizes, prizesDetails };
 }
 
-// 4. COMBINACIONGANADORA.COM
-async function parseCombinacionGanadoraResults(targetDate = null) {
-    const url = targetDate 
-        ? `https://www.combinacionganadora.com/quiniela/resultados/${targetDate}/`
-        : 'https://www.combinacionganadora.com/quiniela/';
-
-    const res = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0.0.0 Safari/537.36' }
-    });
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const html = await res.text();
-
-    const dateMatch = html.match(/(?:domingo|sábado|miércoles|jueves|martes|viernes|lunes)?\s*(\d{1,2})\s+de\s+([a-z]+)\s+de\s+(\d{4})/i);
-    const dateStr = dateMatch ? `${dateMatch[1]}/${dateMatch[2]}/${dateMatch[3]}` : '';
-
-    const matches = [];
-    const rowRegex = /<tr[^>]*class=['"][^'"]*brdcQuiniela[^'"]*['"][^>]*>[\s\S]*?<td[^>]*data-match-num[^>]*>([^<]+)<\/td>[\s\S]*?<span[^>]*data-m1[^>]*>([^<]+)<\/span>[\s\S]*?<span[^>]*data-m2[^>]*>([^<]+)<\/span>([\s\S]*?)<\/tr>/gi;
-    let m;
-    while ((m = rowRegex.exec(html)) !== null) {
-        const num = parseInt(m[1].trim(), 10);
-        const home = normalizeTeamNameScraper(m[2]);
-        const away = normalizeTeamNameScraper(m[3]);
-        const rest = m[4];
-
-        let sign = '';
-        const matchRes = rest.match(/<td[^>]*data-matchres[^>]*>([\s\S]*?)<\/td>/i);
-        if (matchRes) {
-            const raw = matchRes[1].replace(/<[^>]+>/g, '').trim();
-            if (/^[1X2]$/i.test(raw)) sign = raw.toUpperCase();
-        }
-
-        matches.push({ num, home, away, result: sign });
-        if (matches.length === 15) break;
-    }
-
-    const prizes = { '15': 0, '14': 0, '13': 0, '12': 0, '11': 0, '10': 0 };
-    const prizesDetails = [];
-    const prizeRegex = /<tr>\s*<td>([^<]+(?:aciertos|Pleno al 15|P15|14|13|12|11|10)[^<]*)<\/td>\s*<td>([\d\.]+)<\/td>\s*<td>([\d\.,]+)\s*€?<\/td>\s*<\/tr>/gi;
-    let p;
-    while ((p = prizeRegex.exec(html)) !== null) {
-        const label = p[1].trim();
-        const winners = parseInt(p[2].replace(/\./g, ''), 10);
-        const amount = parseFloat(p[3].replace(/\./g, '').replace(',', '.'));
-        let cat = null;
-        if (/15|pleno/i.test(label)) cat = '15';
-        else if (/14/i.test(label)) cat = '14';
-        else if (/13/i.test(label)) cat = '13';
-        else if (/12/i.test(label)) cat = '12';
-        else if (/11/i.test(label)) cat = '11';
-        else if (/10/i.test(label)) cat = '10';
-
-        if (cat && !isNaN(amount)) {
-            prizes[cat] = amount;
-            prizesDetails.push({ category: cat, label, winners, amount });
-        }
-    }
-
-    return { dateStr, matches, prizes, prizesDetails };
-}
-
 /**
  * Consulta de próximas jornadas oficiales iterando fuentes de mejor a peor:
  *  1. SELAE API Oficial (BuscadorSorteos de Loterías del Estado)
@@ -414,45 +353,7 @@ async function fetchUpcomingQuinielaJornadas() {
         console.warn('[quinielaScraper] Fallo consultando SELAE buscadorSorteos:', e.message);
     }
 
-    // 2. Fuente Secundaria de Próximas: CombinacionGanadora.com (por próximo domingo)
-    try {
-        console.log('[quinielaScraper] Consultando próximas jornadas en CombinacionGanadora...');
-        const nextSunday = getNextSundayDate();
-        const yyyy = nextSunday.getFullYear();
-        const mm = String(nextSunday.getMonth() + 1).padStart(2, '0');
-        const dd = String(nextSunday.getDate()).padStart(2, '0');
-        const nextSundayStr = `${yyyy}-${mm}-${dd}`;
-        const nextSundayFormatted = `${dd}/${mm}/${yyyy}`;
-
-        const cgData = await parseCombinacionGanadoraResults(nextSundayStr);
-        if (cgData && cgData.matches && cgData.matches.length >= 14) {
-            console.log(`[quinielaScraper] ✅ CombinacionGanadora devolvió boleto para el ${nextSundayFormatted}.`);
-            return [{
-                number: 14,
-                dateStr: nextSundayFormatted,
-                season: '2026-2027',
-                isSunday: true,
-                matches: cgData.matches.slice(0, 15).map((m, idx) => ({
-                    position: m.num || idx + 1,
-                    home: m.home,
-                    away: m.away,
-                    result: ''
-                }))
-            }];
-        }
-    } catch (e) {
-        console.warn('[quinielaScraper] Fallo consultando CombinacionGanadora próximas:', e.message);
-    }
-
     return [];
-}
-
-function getNextSundayDate() {
-    const d = new Date();
-    const day = d.getDay();
-    const diff = (7 - day) % 7;
-    d.setDate(d.getDate() + (diff === 0 ? 7 : diff));
-    return d;
 }
 
 module.exports = {
@@ -461,6 +362,5 @@ module.exports = {
     parseElPais,
     parseRTVE,
     parseSELAEResults,
-    parseCombinacionGanadoraResults,
     normalizeTeamNameScraper
 };
