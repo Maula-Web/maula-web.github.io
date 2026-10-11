@@ -951,20 +951,20 @@
          MODAL 2: IMPORTAR PARTIDOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
     <div id="modal-import-matches" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100080]">
-        <div class="modal-dialog-panel w-full max-w-3xl border border-orange-500/50 p-3 sm:p-5 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
-            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-xl p-1.5 rounded-xl bg-orange-500/20 text-orange-400">📋</span>
+        <div class="modal-dialog-panel w-full max-w-2xl border border-orange-500/50 p-2.5 sm:p-3 animate-modal max-h-[96vh] flex flex-col shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-base p-1 rounded-lg bg-orange-500/20 text-orange-400">📋</span>
                     <div>
-                        <h2 class="text-base sm:text-lg font-black text-white">Importar Partidos de la Jornada</h2>
-                        <p class="text-[11px] text-slate-400">Detección oficial automática de boletos o importación de texto</p>
+                        <h2 class="text-sm sm:text-base font-black text-white">Importar Partidos de la Jornada</h2>
+                        <p class="text-[10px] text-slate-400">Detección oficial automática de boletos o importación de texto</p>
                     </div>
                 </div>
-                <button type="button" onclick="window.JornadasApp.closeImportMatchesModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs">✕</button>
+                <button type="button" onclick="window.JornadasApp.closeImportMatchesModal()" class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs">✕</button>
             </div>
 
-            <div class="overflow-y-auto flex-1 py-2 space-y-2.5">
-                <div id="import-matches-step-1" class="space-y-2.5">
+            <div class="flex-1 py-1 space-y-1.5">
+                <div id="import-matches-step-1" class="space-y-2">
                     <!-- TARJETA 1: DESCARGA AUTOMÁTICA EN 1 CLIC -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-orange-950/80 via-slate-900 to-slate-950 border border-orange-500/50 space-y-2 shadow-xl">
                         <div class="flex items-start justify-between gap-3">
@@ -1023,13 +1023,13 @@
                     </div>
                 </div>
 
-                <div id="import-matches-step-2" class="hidden space-y-3">
-                    <div id="import-matches-preview-header" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1"></div>
-                    <div id="import-matches-preview-list" class="space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs overflow-y-auto max-h-[58vh]"></div>
+                <div id="import-matches-step-2" class="hidden space-y-1.5">
+                    <div id="import-matches-preview-header" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs"></div>
+                    <div id="import-matches-preview-list" class="divide-y divide-slate-800/80 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
 
-                    <div class="flex items-center justify-between pt-2">
-                        <button type="button" onclick="window.JornadasApp.backToMatchesTextInput()" class="px-3.5 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold transition">✏️ Volver a Editar</button>
-                        <button type="button" id="btn-confirm-import-matches" onclick="window.JornadasApp.confirmCreateJornadaFromImport()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow">✅ Confirmar y Crear Jornada</button>
+                    <div class="flex items-center justify-between pt-1">
+                        <button type="button" onclick="window.JornadasApp.backToMatchesTextInput()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold transition hover:bg-slate-700">✏️ Volver a Editar</button>
+                        <button type="button" id="btn-confirm-import-matches" onclick="window.JornadasApp.confirmCreateJornadaFromImport()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow">✅ Confirmar y Crear Jornada</button>
                     </div>
                 </div>
             </div>
@@ -1040,20 +1040,20 @@
          MODAL 3: IMPORTAR RESULTADOS Y PREMIOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
     <div id="modal-import-results" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100080]">
-        <div class="modal-dialog-panel w-full max-w-3xl border border-emerald-500/50 p-3 sm:p-5 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
-            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-xl p-1.5 rounded-xl bg-emerald-500/20 text-emerald-400">📥</span>
+        <div class="modal-dialog-panel w-full max-w-2xl border border-emerald-500/50 p-2.5 sm:p-3 animate-modal max-h-[96vh] flex flex-col shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-base p-1 rounded-lg bg-emerald-500/20 text-emerald-400">📥</span>
                     <div>
-                        <h2 class="text-base sm:text-lg font-black text-white">Importar Resultados y Escrutinio</h2>
-                        <p class="text-[11px] text-slate-400">Obtención automática del escrutinio oficial en 1 clic o mediante texto</p>
+                        <h2 class="text-sm sm:text-base font-black text-white">Importar Resultados y Escrutinio</h2>
+                        <p class="text-[10px] text-slate-400">Obtención oficial automática en 1 clic o mediante texto</p>
                     </div>
                 </div>
-                <button type="button" onclick="window.JornadasApp.closeImportResultsModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs">✕</button>
+                <button type="button" onclick="window.JornadasApp.closeImportResultsModal()" class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs">✕</button>
             </div>
 
-            <div class="overflow-y-auto flex-1 py-2 space-y-2.5">
-                <div id="import-results-step-1" class="space-y-2.5">
+            <div class="flex-1 py-1 space-y-1.5">
+                <div id="import-results-step-1" class="space-y-2">
                     <!-- TARJETA 1: OBTENCIÓN AUTOMÁTICA EN 1 CLIC -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-950 border border-emerald-500/50 space-y-2 shadow-xl">
                         <div class="flex items-start justify-between gap-3">
@@ -1112,14 +1112,14 @@
                     </div>
                 </div>
 
-                <div id="import-results-step-2" class="hidden space-y-3">
-                    <div id="import-results-preview-header" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1"></div>
-                    <div id="import-results-preview-matches" class="space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs overflow-y-auto max-h-[40vh]"></div>
-                    <div id="import-results-preview-prizes" class="p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
+                <div id="import-results-step-2" class="hidden space-y-1.5">
+                    <div id="import-results-preview-header" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs"></div>
+                    <div id="import-results-preview-matches" class="divide-y divide-slate-800/80 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
+                    <div id="import-results-preview-prizes" class="p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs"></div>
 
-                    <div class="flex items-center justify-between pt-2">
-                        <button type="button" onclick="window.JornadasApp.backToResultsTextInput()" class="px-3.5 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold transition">✏️ Volver</button>
-                        <button type="button" onclick="window.JornadasApp.confirmImportResults()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow">✅ Aplicar Resultados Oficiales</button>
+                    <div class="flex items-center justify-between pt-1">
+                        <button type="button" onclick="window.JornadasApp.backToResultsTextInput()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold transition hover:bg-slate-700">✏️ Volver</button>
+                        <button type="button" onclick="window.JornadasApp.confirmImportResults()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow">✅ Aplicar Resultados Oficiales</button>
                     </div>
                 </div>
             </div>

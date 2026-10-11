@@ -1631,23 +1631,24 @@ class Jornadas2AppController {
         const listBox = document.getElementById('import-matches-preview-list');
 
         if (headerBox) {
+            headerBox.className = "px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs flex items-center justify-between";
             headerBox.innerHTML = `
-                <div class="font-bold text-amber-400">Jornada Detectada: ${res.jNum}</div>
-                <div class="text-slate-300">Fecha: <strong>${res.dateStr}</strong> ${res.isSunday ? '✅ (Domingo Oficial)' : '⚠️ (No es domingo)'}</div>
-                ${res.warnings.length > 0 ? `<div class="text-amber-300 text-[11px] pt-1">${res.warnings.join('<br>')}</div>` : ''}
+                <div class="font-bold text-amber-400 text-xs">Jornada Detectada: ${res.jNum}</div>
+                <div class="text-slate-300 text-[11px]">Fecha: <strong>${res.dateStr}</strong> ${res.isSunday ? '✅ (Domingo Oficial)' : '⚠️ (No es domingo)'}</div>
+                ${res.warnings.length > 0 ? `<div class="text-amber-300 text-[10px]">${res.warnings.join('<br>')}</div>` : ''}
             `;
         }
 
         if (listBox) {
-            listBox.className = "space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs overflow-y-auto max-h-[58vh]";
+            listBox.className = "divide-y divide-slate-800/80 bg-slate-950 rounded-xl border border-slate-800 text-xs";
             listBox.innerHTML = res.matches.map((m, idx) => {
                 const isPleno = idx === 14;
                 const home = m ? m.home : 'Sin definir';
                 const away = m ? m.away : 'Sin definir';
                 return `
-                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isPleno ? 'bg-amber-950/20 border-amber-500/40' : ''}">
-                        <span class="w-8 font-bold ${isPleno ? 'text-amber-400' : 'text-slate-400'}">${isPleno ? 'P15' : idx + 1}</span>
-                        <span class="text-white font-semibold truncate flex-1 px-3">${home} vs ${away}</span>
+                    <div class="px-2.5 py-0.5 flex items-center justify-between text-[11px] font-mono leading-tight ${isPleno ? 'bg-amber-950/20' : 'hover:bg-slate-900/40'}">
+                        <span class="w-6 font-bold ${isPleno ? 'text-amber-400' : 'text-slate-400'}">${isPleno ? 'P15' : idx + 1}</span>
+                        <span class="text-white font-medium truncate flex-1 px-2">${home} vs ${away}</span>
                     </div>
                 `;
             }).join('');
@@ -1785,35 +1786,27 @@ class Jornadas2AppController {
             </option>
         `).join('');
 
+        headerBox.className = "px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs space-y-0.5";
         headerBox.innerHTML = `
-            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                <div class="font-bold text-emerald-400 flex items-center gap-2">
-                    <span>${res.source || 'Loterías y Apuestas del Estado'}</span>
-                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">Escrutinio Oficial</span>
+            <div class="flex items-center justify-between">
+                <div class="font-bold text-emerald-400 flex items-center gap-1.5 text-[11px]">
+                    <span>${res.source || 'Loterías y Apuestas'}</span>
+                    <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[9px]">Oficial</span>
+                    <span class="text-slate-400 font-normal ml-1">Fecha: <strong class="text-white">${res.dateStr || 'Detectada'}</strong></span>
                 </div>
-                <div class="text-xs text-slate-400">Fecha oficial: <strong class="text-white">${res.dateStr || 'Detectada'}</strong></div>
-            </div>
-
-            <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div class="text-xs text-slate-300">
-                    <span class="font-semibold text-slate-400">Asignar a la Jornada:</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] text-slate-400">Asignar a:</span>
+                    <select id="import-results-target-select" onchange="window.JornadasApp.handleTargetJornadaChange(this.value)" class="bg-slate-950 border border-emerald-500/50 rounded-lg px-2 py-0.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-400">
+                        ${selectorOptions}
+                    </select>
                 </div>
-                <select id="import-results-target-select" onchange="window.JornadasApp.handleTargetJornadaChange(this.value)" class="bg-slate-950 border border-emerald-500/50 rounded-lg px-3 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-400">
-                    ${selectorOptions}
-                </select>
             </div>
-
             ${isMismatch ? `
-                <div class="mt-2 p-2 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] flex items-center gap-2">
+                <div class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] flex items-center gap-1.5">
                     <span>⚠️</span>
-                    <span><strong>Atención:</strong> Estabas viendo la <em>Jornada ${currentViewed ? currentViewed.number : ''}</em>, pero los resultados coinciden con la fecha de la <strong>Jornada ${target ? target.number : ''} (${target ? target.date : ''})</strong>.</span>
+                    <span>Estabas viendo <em>J${currentViewed ? currentViewed.number : ''}</em>, pero coincide con la fecha de <strong>J${target ? target.number : ''} (${target ? target.date : ''})</strong>.</span>
                 </div>
-            ` : `
-                <div class="mt-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] flex items-center gap-2">
-                    <span>✅</span>
-                    <span>Los resultados corresponden exactamente a la fecha de la <strong>Jornada ${target ? target.number : ''} (${target ? target.date : ''})</strong>.</span>
-                </div>
-            `}
+            ` : ''}
         `;
     }
 
@@ -1880,30 +1873,27 @@ class Jornadas2AppController {
         const prizesBox = document.getElementById('import-results-preview-prizes');
 
         if (matchesBox) {
-            matchesBox.className = "space-y-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs overflow-y-auto max-h-[40vh]";
+            matchesBox.className = "divide-y divide-slate-800/80 bg-slate-950 rounded-xl border border-slate-800 text-xs";
             matchesBox.innerHTML = res.matches.map((m, idx) => {
                 const isP15 = idx === 14;
                 return `
-                    <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono ${isP15 ? 'bg-emerald-950/20 border-emerald-500/40' : ''}">
-                        <span class="w-8 font-bold ${isP15 ? 'text-amber-400 font-black' : 'text-slate-400'}">${isP15 ? 'P15' : idx + 1}</span>
-                        <span class="text-white truncate flex-1 px-3">${m.home} vs ${m.away}</span>
-                        <span class="font-black ${isP15 ? 'text-amber-400' : 'text-emerald-400'} px-3 text-sm">${m.result || '-'}</span>
+                    <div class="px-2.5 py-0.5 flex items-center justify-between text-[11px] font-mono leading-tight ${isP15 ? 'bg-emerald-950/30' : 'hover:bg-slate-900/40'}">
+                        <span class="w-6 font-bold ${isP15 ? 'text-amber-400 font-black' : 'text-slate-400'}">${isP15 ? 'P15' : idx + 1}</span>
+                        <span class="text-white truncate flex-1 px-2 font-medium">${m.home} vs ${m.away}</span>
+                        <span class="font-black ${isP15 ? 'text-amber-400' : 'text-emerald-400'} px-2 text-xs">${m.result || '-'}</span>
                     </div>
                 `;
             }).join('');
         }
 
         if (prizesBox) {
+            prizesBox.className = "px-2 py-1 bg-slate-950 rounded-xl border border-slate-800 text-xs";
             prizesBox.innerHTML = `
-                <div class="text-[11px] font-bold text-amber-400 mb-1 flex items-center justify-between">
-                    <span>Premios oficiales detectados:</span>
-                    <span class="text-slate-400 font-normal">Céntimos exactos incluidos</span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1.5 font-mono text-[11px]">
+                <div class="grid grid-cols-6 gap-1 font-mono text-[10px]">
                     ${Object.keys(res.prizes).map(k => `
-                        <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 flex flex-col justify-between text-center">
-                            <span class="text-[10px] text-slate-400 uppercase font-bold">${k === '15' ? 'Pleno 15' : k + ' Aciertos'}</span>
-                            <strong class="text-emerald-400 text-xs mt-0.5">${this.formatMoney(res.prizes[k])}</strong>
+                        <div class="px-1 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 flex flex-col justify-between text-center leading-tight">
+                            <span class="text-[9px] text-slate-400 uppercase font-bold">${k === '15' ? 'P15' : k + ' Ac.'}</span>
+                            <strong class="text-emerald-400 text-[10px] sm:text-[11px] mt-0.5">${this.formatMoney(res.prizes[k])}</strong>
                         </div>
                     `).join('')}
                 </div>
