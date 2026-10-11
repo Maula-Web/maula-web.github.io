@@ -222,42 +222,51 @@ async function main() {
     }
 
     // 3. Verificación de Jornada Próxima de la Peña Maulas
-    let targetJornada = null;
+    let targetJornadas = [];
     const cacheJornadasPath = path.join(DATA_DIR, 'proximas_jornadas_cache.json');
     if (fs.existsSync(cacheJornadasPath)) {
         try {
             const raw = JSON.parse(fs.readFileSync(cacheJornadasPath, 'utf8'));
-            if (Array.isArray(raw) && raw.length > 0) {
-                targetJornada = raw[0]; // La primera próxima jornada disponible
+            if (Array.isArray(raw)) {
+                targetJornadas = raw;
             }
         } catch (e) {
             console.warn('⚠️ Error al leer proximas_jornadas_cache.json:', e.message);
         }
     }
 
+    // Comprobar si el cierre es entre semana (Martes / Miércoles / Jueves)
+    const isMidweek = mdData && mdData.closingSchedule && /martes|mi[eé]rcoles|jueves/i.test(mdData.closingSchedule);
+
     let isAvailableForTarget = false;
     let matchCount = 0;
+    let matchedJornadaNum = null;
 
-    if (mdData && mdData.matches.length >= 14 && targetJornada && targetJornada.matches) {
-        targetJornada.matches.forEach(tMatch => {
-            const found = mdData.matches.some(m =>
-                (areTeamsSimilar(m.home, tMatch.home) && areTeamsSimilar(m.away, tMatch.away)) ||
-                (areTeamsSimilar(m.home, tMatch.away) && areTeamsSimilar(m.away, tMatch.home))
-            );
-            if (found) matchCount++;
-        });
+    if (mdData && mdData.matches.length >= 14 && targetJornadas.length > 0) {
+        for (const tJornada of targetJornadas) {
+            if (!tJornada || !Array.isArray(tJornada.matches)) continue;
+            let currentMatchesMatched = 0;
+            tJornada.matches.forEach(tMatch => {
+                const found = mdData.matches.some(m =>
+                    (areTeamsSimilar(m.home, tMatch.home) && areTeamsSimilar(m.away, tMatch.away)) ||
+                    (areTeamsSimilar(m.home, tMatch.away) && areTeamsSimilar(m.away, tMatch.home))
+                );
+                if (found) currentMatchesMatched++;
+            });
 
-        // Consideramos coincidente si al menos 10 partidos coinciden
-        if (matchCount >= 10) {
-            isAvailableForTarget = true;
+            if (currentMatchesMatched >= 8) {
+                matchCount = currentMatchesMatched;
+                matchedJornadaNum = tJornada.number;
+                if (!isMidweek) {
+                    isAvailableForTarget = true;
+                }
+                break;
+            }
         }
     }
 
-    // Comprobar si el cierre es entre semana (Martes / Miércoles)
-    const isMidweek = mdData && mdData.closingSchedule && /martes|mi[eé]rcoles|jueves/i.test(mdData.closingSchedule);
-
     console.log(`\n🔍 Verificación de jornada:`);
-    console.log(`  • Partidos coincidentes con Peña Maulas: ${matchCount}/15`);
+    console.log(`  • Partidos coincidentes con Peña Maulas: ${matchCount}/15 ${matchedJornadaNum ? `(Jornada ${matchedJornadaNum})` : ''}`);
     console.log(`  • Detección de jornada entre semana en MD: ${isMidweek ? 'SÍ (Champions/Copa)' : 'NO (Fin de semana)'}`);
     console.log(`  • Disponible para mostrar en el pronóstico: ${isAvailableForTarget ? '✅ SÍ' : '❌ NO'}`);
 

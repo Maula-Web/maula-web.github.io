@@ -22,8 +22,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Fetch External Data
-        run: node scripts/fetch_external_data.js
+      - name: Fetch External Data and MD Analysis
+        run: |
+          node scripts/fetch_external_data.js
+          node scripts/fetch_md_analysis.js
 
       - name: Commit and Push changes
         run: |

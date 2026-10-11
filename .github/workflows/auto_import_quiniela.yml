@@ -31,7 +31,9 @@ jobs:
       - name: Importar Resultados y Próximas Jornadas
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: node scripts/auto_import_quiniela.js
+        run: |
+          node scripts/auto_import_quiniela.js
+          node scripts/fetch_md_analysis.js
 
       - name: Commit y Guardar Caché
         run: |

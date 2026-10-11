@@ -17,7 +17,6 @@ class PronosticoManager {
         this.currentJornadaHasMDAnalysis = false;
         this.selectedMDMatchIdx = 0;
         this.currentMDView = 'analysis';
-        this.mdDemoMode = false;
 
         this.cacheDOM(); // Capture DOM elements immediately
         this.init();
@@ -364,21 +363,6 @@ class PronosticoManager {
             </span>
         ` : '';
 
-        let mdDemoBadgeHtml = '';
-        if (this.mdDemoMode) {
-            mdDemoBadgeHtml = `
-                <button type="button" onclick="window.app.toggleMDDemoMode()" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid rgba(245, 158, 11, 0.4); display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Desactivar modo prueba">
-                    ✨ <span>Modo Demo MD (Salir)</span>
-                </button>
-            `;
-        } else if (this.mdAnalysisData && !this.currentJornadaHasMDAnalysis) {
-            mdDemoBadgeHtml = `
-                <button type="button" onclick="window.app.toggleMDDemoMode()" style="background: rgba(2, 132, 199, 0.12); color: #38bdf8; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid rgba(2, 132, 199, 0.3); display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Mundo Deportivo publicó una jornada intersemanal. Pulsa para previsualizar la columna de análisis con los datos guardados">
-                    💡 <span>Probar Asistente MD</span>
-                </button>
-            `;
-        }
-
         this.activeSelectionInfo.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <span style="background: var(--primary-color, #1976d2); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -388,7 +372,6 @@ class PronosticoManager {
                     📅 <span>${jornadaText}</span>
                 </span>
                 ${diceBadgeHtml}
-                ${mdDemoBadgeHtml}
                 <button type="button" id="btn-close-forecast" style="background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3); border-radius: 20px; padding: 5px 12px; font-size: 0.85rem; color: #d32f2f; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: all 0.2s;" title="Cerrar pronóstico">
                     ✖ Cerrar
                 </button>
@@ -743,11 +726,11 @@ class PronosticoManager {
                         </div>
                     `;
                 } else {
-                    percHtml = `<div id="consensus-${idx}" class="p-percentages" style="display:none;"></div>`;
+                    percHtml = `<div id="consensus-${idx}" class="p-percentages hidden" style="display:none !important;"></div>`;
                 }
             } else {
                 // Si la información no está disponible en el momento de rellenar el pronóstico, no mostrar nada
-                percHtml = `<div id="consensus-${idx}" class="p-percentages" style="display:none;"></div>`;
+                percHtml = `<div id="consensus-${idx}" class="p-percentages hidden" style="display:none !important;"></div>`;
             }
 
             row.innerHTML = `
@@ -3058,11 +3041,6 @@ class PronosticoManager {
         }
     }
 
-    toggleMDDemoMode() {
-        this.mdDemoMode = !this.mdDemoMode;
-        this.loadForecast();
-    }
-
     areTeamsSimilar(name1, name2) {
         if (!name1 || !name2) return false;
         const clean = s => s.toLowerCase()
@@ -3116,10 +3094,10 @@ class PronosticoManager {
 
     checkIfJornadaHasMDAnalysis(jornada) {
         if (!this.mdAnalysisData || !jornada || !Array.isArray(jornada.matches)) return false;
-        if (this.mdDemoMode) return true;
 
-        // Validación estricta: sólo jornada oficial correspondiente de fin de semana, descartando intersemanales
-        if (this.mdAnalysisData.available === false || this.mdAnalysisData.isMidweek === true) {
+        // Validación estricta con datos reales:
+        // Si no está disponible, o los análisis corresponden a una jornada entre semana (Champions/Copa): no mostrar nada
+        if (this.mdAnalysisData.available !== true || this.mdAnalysisData.isMidweek === true) {
             return false;
         }
 
@@ -3132,27 +3110,27 @@ class PronosticoManager {
         jornada.matches.forEach(jm => {
             if (!jm.home || !jm.away) return;
             const found = mdMatches.some(mdM => 
-                this.areTeamsSimilar(jm.home, mdM.home) && this.areTeamsSimilar(jm.away, mdM.away)
+                (this.areTeamsSimilar(jm.home, mdM.home) && this.areTeamsSimilar(jm.away, mdM.away)) ||
+                (this.areTeamsSimilar(jm.home, mdM.away) && this.areTeamsSimilar(jm.away, mdM.home))
             );
             if (found) matchCount++;
         });
 
-        return matchCount >= 5;
+        // Deben coincidir al menos 8 partidos con la jornada oficial de la peña
+        return matchCount >= 8;
     }
 
     getMDMatchFor(match, idx) {
-        if (!this.mdAnalysisData || !Array.isArray(this.mdAnalysisData.matches)) return null;
+        if (!this.currentJornadaHasMDAnalysis || !this.mdAnalysisData || !Array.isArray(this.mdAnalysisData.matches)) return null;
 
         if (match && match.home && match.away) {
             const found = this.mdAnalysisData.matches.find(mdM =>
-                this.areTeamsSimilar(match.home, mdM.home) && this.areTeamsSimilar(match.away, mdM.away)
+                (this.areTeamsSimilar(match.home, mdM.home) && this.areTeamsSimilar(match.away, mdM.away)) ||
+                (this.areTeamsSimilar(match.home, mdM.away) && this.areTeamsSimilar(match.away, mdM.home))
             );
             if (found) return found;
         }
 
-        if (this.mdAnalysisData.matches[idx]) {
-            return this.mdAnalysisData.matches[idx];
-        }
         return null;
     }
 
