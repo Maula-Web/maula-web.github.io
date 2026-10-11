@@ -1,0 +1,915 @@
+{
+  "updatedAt": "2026-10-11T12:09:08.610Z",
+  "available": false,
+  "matchCountWithTarget": 0,
+  "isMidweek": true,
+  "detectedJornadaNum": "13",
+  "closingSchedule": "Martes 13 (20:00)",
+  "reason": "Los análisis publicados en Mundo Deportivo corresponden a una jornada entre semana (Champions/Copa) y no a la jornada oficial de la Peña Maulas.",
+  "matches": [
+    {
+      "num": 1,
+      "home": "VILLARREAL",
+      "away": "NAPOLI",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "La Cerámica reclama una alegría europea. El Villarreal encadena cinco citas de Champions sin regalar un triunfo a su afición, cuatro de ellas durante el desastroso recorrido de la pasada temporada. La caída en Dortmund (3-2) añade urgencia al equipo de Íñigo Pérez, obligado a reaccionar para evitar que vuelvan las dudas y los temores continentales. Tampoco llega tranquilo el Nápoles, que se estrenó con un tropiezo por la mínima en su estadio frente al Arsenal, vigente subcampeón. Su paso en la Serie A alterna luces y sombras, mientras Massimiliano Allegri sigue buscando la fórmula para encajar las piezas. Eso sí, los italianos conservan argumentos para poner en aprietos al cuadro amarillo.",
+      "percentages": {
+        "quinielista": {
+          "1": 42,
+          "2": 22,
+          "X": 36
+        },
+        "lae": null,
+        "real": {
+          "1": 43,
+          "2": 31,
+          "X": 26
+        }
+      },
+      "recommended": "1X"
+    },
+    {
+      "num": 2,
+      "home": "AT.MADRID",
+      "away": "MAN.UNITED",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "El Metropolitano reclama una reacción del At. Madrid tras la derrota inicial en Anfield (2-1). Caer frente al Liverpool entraba en los planes, pero el mal momento invitaba a sacar algo más en el estreno de la Champions. Simeone se agarra al empuje de su estadio, pese a que los últimos duelos continentales dejaron dos avisos: no pudo vencer al Barça, al que terminó eliminando, ni al Arsenal, verdugo rojiblanco en el Emirates a las puertas de la final. Al otro lado aparece un Manchester United que goleó al Sabah Baku azerbaiyano (4-0). La alegría contrasta con sus dudas en la Premier, donde la renovación de Michael Carrick ya despierta críticas y cuestiona el rumbo del equipo en un futuro inmediato.",
+      "percentages": {
+        "quinielista": {
+          "1": 53,
+          "2": 15,
+          "X": 32
+        },
+        "lae": null,
+        "real": {
+          "1": 48,
+          "2": 27,
+          "X": 25
+        }
+      },
+      "recommended": "1X"
+    },
+    {
+      "num": 3,
+      "home": "ARSENAL",
+      "away": "LOSC LILLE",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "Un Emirates inexpugnable desde abril de 2017 en la Champions espera al Lille. El conjunto francés, derrotado por el Betis en casa en el estreno, afronta una prueba de máxima exigencia ante un Arsenal que parte con gran ventaja sobre el papel. Los ´gunners´ ganaron en Nápoles y alargan su trayectoria de la anterior campaña europea con quince encuentros, once triunfos y cuatro empates, sin caer en el tiempo reglamentario ni en las prórrogas. Su primera Copa de Europa se escapó en la final frente al PSG, cuando los penaltis echaron por tierra un recorrido impecable. Con esa herida abierta vuelven a apuntar alto y tienen argumentos de sobra para imponer su ley ante el conjunto visitante.",
+      "percentages": {
+        "quinielista": {
+          "1": 99,
+          "2": 0,
+          "X": 1
+        },
+        "lae": null,
+        "real": {
+          "1": 77,
+          "2": 8,
+          "X": 15
+        }
+      },
+      "recommended": "1"
+    },
+    {
+      "num": 4,
+      "home": "GALATASARAY",
+      "away": "BARCELONA",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "Estambul pone a prueba al Barça en un estadio que aprieta. El Galatasaray encadena once encuentros europeos invicto en casa, con siete triunfos y cuatro tablas al calor de una hinchada volcada. Los de Flick llegan tras arrollar al Feyenoord, mientras que su rival arrancó con una derrota frente al Sporting en Lisboa. Los precedentes sonríen a los azulgranas: su paso más reciente por el Rams Park, en noviembre de 2022, se saldó con un 1-2 en los octavos de la Europa League. Para encontrar la anterior visita en Champions hay que viajar hasta 2002, cuando conquistaron la ciudad turca, esta vez por 0-2. Ahora les espera un anfitrión que convierte cada noche continental en una batalla.",
+      "percentages": {
+        "quinielista": null,
+        "lae": null,
+        "real": {
+          "1": 11,
+          "2": 75,
+          "X": 14
+        }
+      },
+      "recommended": "2"
+    },
+    {
+      "num": 5,
+      "home": "INTER",
+      "away": "BRUJAS",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "La afición ´neroazzurri´ exige puntos para respaldar las sensaciones. El Inter cayó en el Bernabéu (2-1), castigado por sus errores y por un Courtois decisivo, aunque dejó motivos para creer en su candidatura a acabar entre los ocho mejores a finales de enero. Cristian Chivu quiere convertir esa impresión en resultados ante el Brujas en el Giuseppe Meazza. Los italianos buscan dejar atrás el golpe del curso anterior, cuando el Bodo/Glimt les apeó en el play-off de acceso a las eliminatorias. Tampoco arrancó con éxito el equipo belga: el Aston Villa le derrotó en su estadio por 2-3. Sus viajes europeos no le dan una victoria desde 2022, una sequía que añade dificultad a su misión en tierras italianas.",
+      "percentages": {
+        "quinielista": {
+          "1": 99,
+          "2": 1,
+          "X": 0
+        },
+        "lae": null,
+        "real": {
+          "1": 75,
+          "2": 9,
+          "X": 16
+        }
+      },
+      "recommended": "1"
+    },
+    {
+      "num": 6,
+      "home": "VIKING",
+      "away": "B.MUNICH",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 0,
+          "2": 98,
+          "X": 2
+        },
+        "lae": null,
+        "real": {
+          "1": 5,
+          "2": 87,
+          "X": 8
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 7,
+      "home": "FEYENOORD",
+      "away": "COMO 1907",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 18:45",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 40,
+          "2": 37,
+          "X": 23
+        },
+        "lae": null,
+        "real": {
+          "1": 27,
+          "2": 50,
+          "X": 23
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 8,
+      "home": "LASK LINZ",
+      "away": "LIVERPOOL",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 18:45",
+      "comment": "",
+      "percentages": {
+        "quinielista": null,
+        "lae": null,
+        "real": {
+          "1": 8,
+          "2": 76,
+          "X": 16
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 9,
+      "home": "BETIS",
+      "away": "OPORTO",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 48,
+          "2": 27,
+          "X": 25
+        },
+        "lae": null,
+        "real": {
+          "1": 44,
+          "2": 30,
+          "X": 26
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 10,
+      "home": "BODO GLIMT",
+      "away": "B.DORTMUND",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 10,
+          "2": 80,
+          "X": 10
+        },
+        "lae": null,
+        "real": {
+          "1": 30,
+          "2": 47,
+          "X": 23
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 11,
+      "home": "MAN.CITY",
+      "away": "PSG",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 42,
+          "2": 39,
+          "X": 19
+        },
+        "lae": null,
+        "real": {
+          "1": 42,
+          "2": 34,
+          "X": 24
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 12,
+      "home": "R. UNION SG",
+      "away": "R.SOCIEDAD",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 18:45",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 50,
+          "2": 19,
+          "X": 31
+        },
+        "lae": null,
+        "real": {
+          "1": 41,
+          "2": 33,
+          "X": 26
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 13,
+      "home": "CELTA",
+      "away": "JUVENTUS",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 20,
+          "2": 44,
+          "X": 36
+        },
+        "lae": null,
+        "real": {
+          "1": 27,
+          "2": 43,
+          "X": 30
+        }
+      },
+      "recommended": null
+    },
+    {
+      "num": 14,
+      "home": "U. CRAIOVA",
+      "away": "GETAFE",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 18:45",
+      "comment": "El Getafe hará el estreno en la fase liga de la Conference, donde se disputan solamente seis jornadas, así que cada mal resultado puede penalizar. El debut será en Craiova, ante el campeón vigente de la liga rumana, este curso es tercero con buenos números en casa: cinco triunfos y una derrota. El Universitatea, de hecho, jugó hasta cuatro previas, dos de Champions y dos de Europa League. Acabó eliminado en ambas, por ello cayó a la tercera competición europea donde topa con un Getafe que llega de perder en el Camp Nou. Una derrota lógica, pero que es la tercera en tres jornadas para sumar ya cuatro en un arranque liguero irregular donde, por el momento, está pagando la falta de gol.",
+      "percentages": {
+        "quinielista": {
+          "1": 18,
+          "2": 57,
+          "X": 25
+        },
+        "lae": null,
+        "real": {
+          "1": 30,
+          "2": 41,
+          "X": 29
+        }
+      },
+      "recommended": "X2"
+    },
+    {
+      "num": 15,
+      "home": "ROMA",
+      "away": "R.MADRID",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "El Madrid volverá a enfrentarse a rival italiano en la segunda jornada de la Champions. Esta vez será en Roma ante un equipo bien dirigido por el veterano Gasperini que fue tercero la liga pasada, con notables números en casa (sólo tres puntos por detrás del campeón Inter). Este curso, dos triunfos y un empate, precisamente ante el cuadro interista (2-2). El conjunto blanco, mientras, sigue firmando triunfos en el Bernabéu, pero cuando viaja baja prestaciones. Sobre todo, por la dificultad de cerrar la defensa y mostrarse consistente a lo largo de los partidos. Ninguna portería a cero en sus cuatro salidas, con dos derrotas y dos victorias, ambas en el descuento.",
+      "percentages": {
+        "quinielista": {
+          "1": 35,
+          "2": 9,
+          "X": 53
+        },
+        "lae": null,
+        "real": {
+          "1": 34,
+          "2": 20,
+          "X": 37
+        }
+      },
+      "recommended": "2-M"
+    },
+    {
+      "num": 16,
+      "home": "",
+      "away": "",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "",
+      "comment": "En Quinielista.es podrás encontrar los pronósticos de Eduardo Losilla para La Quiniela. Tanto para partidos de Primera División, como Segunda, o cualquier Liga internacional. Además, todo tipo de servicios y contenidos en quinielas, El Quinigol y La Primitiva:",
+      "percentages": {
+        "quinielista": null,
+        "lae": null,
+        "real": null
+      },
+      "recommended": null
+    }
+  ],
+  "standings": {
+    "primera": [
+      {
+        "pos": 1,
+        "team": "Barcelona",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/3.png?width=44&amp;height=44",
+        "pts": 24,
+        "pj": 8,
+        "pg": 8,
+        "pe": 0,
+        "pp": 0,
+        "gf": 34,
+        "gc": 7,
+        "dif": 27
+      },
+      {
+        "pos": 2,
+        "team": "Atlético",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/42.png?width=44&amp;height=44",
+        "pts": 19,
+        "pj": 8,
+        "pg": 6,
+        "pe": 1,
+        "pp": 1,
+        "gf": 18,
+        "gc": 8,
+        "dif": 10
+      },
+      {
+        "pos": 3,
+        "team": "Real Madrid",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/1.png?width=44&amp;height=44",
+        "pts": 18,
+        "pj": 8,
+        "pg": 6,
+        "pe": 0,
+        "pp": 2,
+        "gf": 19,
+        "gc": 8,
+        "dif": 11
+      },
+      {
+        "pos": 4,
+        "team": "Betis",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/171.png?width=44&amp;height=44",
+        "pts": 16,
+        "pj": 7,
+        "pg": 5,
+        "pe": 1,
+        "pp": 1,
+        "gf": 9,
+        "gc": 7,
+        "dif": 2
+      },
+      {
+        "pos": 5,
+        "team": "Sevilla",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/53.png?width=44&amp;height=44",
+        "pts": 13,
+        "pj": 7,
+        "pg": 4,
+        "pe": 1,
+        "pp": 2,
+        "gf": 10,
+        "gc": 9,
+        "dif": 1
+      },
+      {
+        "pos": 6,
+        "team": "Alavés",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/4.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 8,
+        "pg": 3,
+        "pe": 2,
+        "pp": 3,
+        "gf": 12,
+        "gc": 8,
+        "dif": 4
+      },
+      {
+        "pos": 7,
+        "team": "Deportivo",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/7.png?width=44&amp;height=44",
+        "pts": 10,
+        "pj": 7,
+        "pg": 2,
+        "pe": 4,
+        "pp": 1,
+        "gf": 10,
+        "gc": 8,
+        "dif": 2
+      },
+      {
+        "pos": 8,
+        "team": "R. Sociedad",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/16.png?width=44&amp;height=44",
+        "pts": 10,
+        "pj": 7,
+        "pg": 3,
+        "pe": 1,
+        "pp": 3,
+        "gf": 9,
+        "gc": 13,
+        "dif": -4
+      },
+      {
+        "pos": 9,
+        "team": "Celta",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/6.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 8,
+        "pg": 1,
+        "pe": 5,
+        "pp": 2,
+        "gf": 8,
+        "gc": 6,
+        "dif": 2
+      },
+      {
+        "pos": 10,
+        "team": "Athletic",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/5.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 6,
+        "pg": 2,
+        "pe": 2,
+        "pp": 2,
+        "gf": 7,
+        "gc": 6,
+        "dif": 1
+      },
+      {
+        "pos": 11,
+        "team": "Villarreal",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/19.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 8,
+        "pg": 2,
+        "pe": 2,
+        "pp": 4,
+        "gf": 13,
+        "gc": 13,
+        "dif": 0
+      },
+      {
+        "pos": 12,
+        "team": "Espanyol",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/8.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 8,
+        "pg": 2,
+        "pe": 2,
+        "pp": 4,
+        "gf": 11,
+        "gc": 11,
+        "dif": 0
+      },
+      {
+        "pos": 13,
+        "team": "Rayo",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/2.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 7,
+        "pg": 2,
+        "pe": 2,
+        "pp": 3,
+        "gf": 11,
+        "gc": 16,
+        "dif": -5
+      },
+      {
+        "pos": 14,
+        "team": "Getafe",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/172.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 8,
+        "pg": 2,
+        "pe": 2,
+        "pp": 4,
+        "gf": 4,
+        "gc": 10,
+        "dif": -6
+      },
+      {
+        "pos": 15,
+        "team": "Osasuna",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/13.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 7,
+        "pg": 2,
+        "pe": 2,
+        "pp": 3,
+        "gf": 6,
+        "gc": 13,
+        "dif": -7
+      },
+      {
+        "pos": 16,
+        "team": "Racing",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/15.png?width=44&amp;height=44",
+        "pts": 7,
+        "pj": 7,
+        "pg": 2,
+        "pe": 1,
+        "pp": 4,
+        "gf": 11,
+        "gc": 21,
+        "dif": -10
+      },
+      {
+        "pos": 17,
+        "team": "Elche",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/121.png?width=44&amp;height=44",
+        "pts": 6,
+        "pj": 8,
+        "pg": 1,
+        "pe": 3,
+        "pp": 4,
+        "gf": 11,
+        "gc": 17,
+        "dif": -6
+      },
+      {
+        "pos": 18,
+        "team": "Levante",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/136.png?width=44&amp;height=44",
+        "pts": 5,
+        "pj": 6,
+        "pg": 1,
+        "pe": 2,
+        "pp": 3,
+        "gf": 8,
+        "gc": 12,
+        "dif": -4
+      },
+      {
+        "pos": 19,
+        "team": "Valencia",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/17.png?width=44&amp;height=44",
+        "pts": 4,
+        "pj": 7,
+        "pg": 1,
+        "pe": 1,
+        "pp": 5,
+        "gf": 4,
+        "gc": 13,
+        "dif": -9
+      },
+      {
+        "pos": 20,
+        "team": "Málaga",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/10.png?width=44&amp;height=44",
+        "pts": 4,
+        "pj": 8,
+        "pg": 0,
+        "pe": 4,
+        "pp": 4,
+        "gf": 4,
+        "gc": 13,
+        "dif": -9
+      }
+    ],
+    "segunda": [
+      {
+        "pos": 1,
+        "team": "Castellón",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/122.png?width=44&amp;height=44",
+        "pts": 21,
+        "pj": 9,
+        "pg": 6,
+        "pe": 3,
+        "pp": 0,
+        "gf": 15,
+        "gc": 3,
+        "dif": 12
+      },
+      {
+        "pos": 2,
+        "team": "Eibar",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/108.png?width=44&amp;height=44",
+        "pts": 21,
+        "pj": 8,
+        "pg": 7,
+        "pe": 0,
+        "pp": 1,
+        "gf": 18,
+        "gc": 7,
+        "dif": 11
+      },
+      {
+        "pos": 3,
+        "team": "Almería",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/85.png?width=44&amp;height=44",
+        "pts": 18,
+        "pj": 8,
+        "pg": 6,
+        "pe": 0,
+        "pp": 2,
+        "gf": 13,
+        "gc": 5,
+        "dif": 8
+      },
+      {
+        "pos": 4,
+        "team": "Sabadell",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/163.png?width=44&amp;height=44",
+        "pts": 16,
+        "pj": 9,
+        "pg": 4,
+        "pe": 4,
+        "pp": 1,
+        "gf": 10,
+        "gc": 7,
+        "dif": 3
+      },
+      {
+        "pos": 5,
+        "team": "Girona",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/648.png?width=44&amp;height=44",
+        "pts": 14,
+        "pj": 8,
+        "pg": 4,
+        "pe": 2,
+        "pp": 2,
+        "gf": 14,
+        "gc": 8,
+        "dif": 6
+      },
+      {
+        "pos": 6,
+        "team": "Mallorca",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/11.png?width=44&amp;height=44",
+        "pts": 14,
+        "pj": 8,
+        "pg": 4,
+        "pe": 2,
+        "pp": 2,
+        "gf": 8,
+        "gc": 3,
+        "dif": 5
+      },
+      {
+        "pos": 7,
+        "team": "Burgos CF",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/261.png?width=44&amp;height=44",
+        "pts": 14,
+        "pj": 8,
+        "pg": 4,
+        "pe": 2,
+        "pp": 2,
+        "gf": 12,
+        "gc": 9,
+        "dif": 3
+      },
+      {
+        "pos": 8,
+        "team": "Sporting",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/76.png?width=44&amp;height=44",
+        "pts": 13,
+        "pj": 8,
+        "pg": 4,
+        "pe": 1,
+        "pp": 3,
+        "gf": 8,
+        "gc": 8,
+        "dif": 0
+      },
+      {
+        "pos": 9,
+        "team": "Granada",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/347.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 8,
+        "pg": 3,
+        "pe": 2,
+        "pp": 3,
+        "gf": 13,
+        "gc": 13,
+        "dif": 0
+      },
+      {
+        "pos": 10,
+        "team": "Oviedo",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/14.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 8,
+        "pg": 3,
+        "pe": 2,
+        "pp": 3,
+        "gf": 8,
+        "gc": 8,
+        "dif": 0
+      },
+      {
+        "pos": 11,
+        "team": "Celta Fortuna",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/688323abe51b982.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 9,
+        "pg": 3,
+        "pe": 2,
+        "pp": 4,
+        "gf": 14,
+        "gc": 15,
+        "dif": -1
+      },
+      {
+        "pos": 12,
+        "team": "Las Palmas",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/9.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 8,
+        "pg": 3,
+        "pe": 2,
+        "pp": 3,
+        "gf": 12,
+        "gc": 13,
+        "dif": -1
+      },
+      {
+        "pos": 13,
+        "team": "Eldense",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/672.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 9,
+        "pg": 3,
+        "pe": 2,
+        "pp": 4,
+        "gf": 10,
+        "gc": 11,
+        "dif": -1
+      },
+      {
+        "pos": 14,
+        "team": "Tenerife",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/162.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 8,
+        "pg": 3,
+        "pe": 2,
+        "pp": 3,
+        "gf": 10,
+        "gc": 12,
+        "dif": -2
+      },
+      {
+        "pos": 15,
+        "team": "Leganés",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/132.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 8,
+        "pg": 3,
+        "pe": 2,
+        "pp": 3,
+        "gf": 6,
+        "gc": 11,
+        "dif": -5
+      },
+      {
+        "pos": 16,
+        "team": "Real Valladolid",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/18.png?width=44&amp;height=44",
+        "pts": 9,
+        "pj": 8,
+        "pg": 2,
+        "pe": 3,
+        "pp": 3,
+        "gf": 8,
+        "gc": 11,
+        "dif": -3
+      },
+      {
+        "pos": 17,
+        "team": "Córdoba",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/342.png?width=44&amp;height=44",
+        "pts": 9,
+        "pj": 9,
+        "pg": 3,
+        "pe": 0,
+        "pp": 6,
+        "gf": 14,
+        "gc": 20,
+        "dif": -6
+      },
+      {
+        "pos": 18,
+        "team": "Andorra",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/5026.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 9,
+        "pg": 2,
+        "pe": 2,
+        "pp": 5,
+        "gf": 12,
+        "gc": 15,
+        "dif": -3
+      },
+      {
+        "pos": 19,
+        "team": "R. Sociedad B",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/318.png?width=44&amp;height=44",
+        "pts": 8,
+        "pj": 9,
+        "pg": 2,
+        "pe": 2,
+        "pp": 5,
+        "gf": 12,
+        "gc": 17,
+        "dif": -5
+      },
+      {
+        "pos": 20,
+        "team": "Cádiz",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/91.png?width=44&amp;height=44",
+        "pts": 7,
+        "pj": 8,
+        "pg": 1,
+        "pe": 4,
+        "pp": 3,
+        "gf": 11,
+        "gc": 10,
+        "dif": 1
+      },
+      {
+        "pos": 21,
+        "team": "A. D. Ceuta",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/4054.png?width=44&amp;height=44",
+        "pts": 5,
+        "pj": 9,
+        "pg": 1,
+        "pe": 2,
+        "pp": 6,
+        "gf": 8,
+        "gc": 20,
+        "dif": -12
+      },
+      {
+        "pos": 22,
+        "team": "Albacete",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/103.png?width=44&amp;height=44",
+        "pts": 1,
+        "pj": 8,
+        "pg": 0,
+        "pe": 1,
+        "pp": 7,
+        "gf": 5,
+        "gc": 15,
+        "dif": -10
+      }
+    ]
+  }
+}

@@ -1731,32 +1731,117 @@ body {
 }
 
 .p-percentages {
-    flex: 0.6;
-    min-width: 75px;
+    flex: 0.65;
+    min-width: 82px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 10px;
-    font-size: 0.7rem;
-    border-left: 1px solid #eee;
+    padding-left: 8px;
+    font-size: 0.72rem;
+    border-left: 1px solid rgba(148, 163, 184, 0.2);
+    user-select: none;
 }
 
 .perc-row {
     display: flex;
     justify-content: space-between;
-    line-height: 1;
+    align-items: center;
+    line-height: 1.2;
+    padding: 0.5px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    transition: all 0.2s ease;
 }
 
 .perc-1 {
-    color: #1976d2;
+    color: #059669;
+    font-weight: 700;
 }
 
 .perc-X {
-    color: #757575;
+    color: #0284c7;
+    font-weight: 700;
 }
 
 .perc-2 {
-    color: #d32f2f;
+    color: #d97706;
+    font-weight: 700;
+}
+
+/* Modo oscuro con mayor brillo y luminosidad (Glow) */
+.dark .perc-1,
+body.dark .perc-1 {
+    color: #34d399;
+    text-shadow: 0 0 8px rgba(52, 211, 153, 0.65);
+    font-weight: 800;
+}
+
+.dark .perc-X,
+body.dark .perc-X {
+    color: #38bdf8;
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.65);
+    font-weight: 800;
+}
+
+.dark .perc-2,
+body.dark .perc-2 {
+    color: #fbbf24;
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.65);
+    font-weight: 800;
+}
+
+/* Signo recomendado por Mundo Deportivo */
+.perc-row.rec-sign {
+    font-weight: 900 !important;
+}
+
+.perc-row.rec-sign b {
+    position: relative;
+    padding: 0 3px;
+    border-radius: 4px;
+    background: rgba(2, 132, 199, 0.15);
+    box-shadow: 0 0 0 1px rgba(2, 132, 199, 0.35);
+}
+
+.dark .perc-row.rec-sign b {
+    background: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5), 0 0 8px rgba(56, 189, 248, 0.35);
+}
+
+.perc-row.rec-sign::after {
+    content: ' ★';
+    font-size: 8px;
+    margin-left: 2px;
+    opacity: 0.95;
+    color: #f59e0b;
+}
+
+/* Píldora de activación móvil para análisis */
+.md-mobile-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    background: rgba(2, 132, 199, 0.15);
+    border: 1px solid rgba(2, 132, 199, 0.4);
+    color: #0284c7;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.dark .md-mobile-trigger {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+    box-shadow: 0 0 6px rgba(56, 189, 248, 0.25);
+}
+
+.md-mobile-trigger:hover {
+    transform: scale(1.05);
+    background: rgba(2, 132, 199, 0.25);
 }
 
 .doubles-row .p-match-info {

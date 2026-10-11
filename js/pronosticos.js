@@ -12,12 +12,16 @@ class PronosticoManager {
         this.correctionMode = false;
         this.pendingSaveData = null; // To store data while audit modal is open
 
+        // Mundo Deportivo Analysis & Standings State
+        this.mdAnalysisData = null;
+        this.currentJornadaHasMDAnalysis = false;
+        this.selectedMDMatchIdx = 0;
+        this.currentMDView = 'analysis';
+        this.mdDemoMode = false;
+
         this.cacheDOM(); // Capture DOM elements immediately
         this.init();
     }
-
-
-
 
     cacheDOM() {
         this.selMember = document.getElementById('sel-member');
@@ -29,6 +33,8 @@ class PronosticoManager {
         this.costInfo = document.getElementById('cost-info');
         this.deadlineInfo = document.getElementById('deadline-info');
         this.btnSave = document.getElementById('btn-save');
+        this.mdAnalysisSidebar = document.getElementById('md-analysis-sidebar');
+        this.editorForecastCol = document.getElementById('editor-forecast-column');
 
         // Doubles DOM
         this.doublesSection = document.getElementById('doubles-section');
@@ -197,6 +203,9 @@ class PronosticoManager {
         this.pronosticos = data.pronosticos;
         this.pronosticosExtra = data.pronosticosExtra;
 
+        // Cargar análisis y clasificaciones de Mundo Deportivo
+        await this.loadMDAnalysisData();
+
         if (window.DiceService) {
             try {
                 const diceApplied = await window.DiceService.checkAndApplyDice(this.members, this.jornadas, this.pronosticos);
@@ -355,6 +364,21 @@ class PronosticoManager {
             </span>
         ` : '';
 
+        let mdDemoBadgeHtml = '';
+        if (this.mdDemoMode) {
+            mdDemoBadgeHtml = `
+                <button type="button" onclick="window.app.toggleMDDemoMode()" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid rgba(245, 158, 11, 0.4); display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Desactivar modo prueba">
+                    ✨ <span>Modo Demo MD (Salir)</span>
+                </button>
+            `;
+        } else if (this.mdAnalysisData && !this.currentJornadaHasMDAnalysis) {
+            mdDemoBadgeHtml = `
+                <button type="button" onclick="window.app.toggleMDDemoMode()" style="background: rgba(2, 132, 199, 0.12); color: #38bdf8; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid rgba(2, 132, 199, 0.3); display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Mundo Deportivo publicó una jornada intersemanal. Pulsa para previsualizar la columna de análisis con los datos guardados">
+                    💡 <span>Probar Asistente MD</span>
+                </button>
+            `;
+        }
+
         this.activeSelectionInfo.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <span style="background: var(--primary-color, #1976d2); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -364,6 +388,7 @@ class PronosticoManager {
                     📅 <span>${jornadaText}</span>
                 </span>
                 ${diceBadgeHtml}
+                ${mdDemoBadgeHtml}
                 <button type="button" id="btn-close-forecast" style="background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3); border-radius: 20px; padding: 5px 12px; font-size: 0.85rem; color: #d32f2f; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: all 0.2s;" title="Cerrar pronóstico">
                     ✖ Cerrar
                 </button>
@@ -475,6 +500,23 @@ class PronosticoManager {
 
         this.updateActiveSelectionUI();
 
+        // Determinar si hay análisis disponible de Mundo Deportivo para esta jornada
+        this.currentJornadaHasMDAnalysis = this.checkIfJornadaHasMDAnalysis(jornada);
+        if (this.mdAnalysisSidebar && this.editorForecastCol) {
+            if (this.currentJornadaHasMDAnalysis) {
+                this.editorForecastCol.classList.remove('lg:col-span-12');
+                this.editorForecastCol.classList.add('lg:col-span-7');
+                this.mdAnalysisSidebar.classList.remove('hidden');
+                this.mdAnalysisSidebar.classList.add('flex');
+                this.renderMDSidebar();
+            } else {
+                this.editorForecastCol.classList.remove('lg:col-span-7');
+                this.editorForecastCol.classList.add('lg:col-span-12');
+                this.mdAnalysisSidebar.classList.add('hidden');
+                this.mdAnalysisSidebar.classList.remove('flex');
+            }
+        }
+
         const { isLockedRef, isFinished, hasStarted } = this.isJornadaLocked(jornada);
 
         // CORRECTION OVERRIDE: If Mode is Active, ignore lock
@@ -570,6 +612,7 @@ class PronosticoManager {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
             const row = document.createElement('div');
             row.className = 'pronostico-row';
+            row.dataset.idx = idx;
 
             let disabledStr = isLocked ? 'style="pointer-events:none; opacity:0.6;"' : '';
             if (disabledStr === '' && this.correctionMode && isLockedRef) {
@@ -604,15 +647,39 @@ class PronosticoManager {
                 `;
             }).join('');
 
-            // Calculate initial percentages
-            const allSigns = othersForecasts.map(of => of.selection[idx]).filter(s => s);
-            if (val) allSigns.push(val);
-            const total = allSigns.length;
-            let p1 = 0, pX = 0, p2 = 0;
-            if (total > 0) {
-                p1 = (allSigns.filter(s => s === '1').length / total * 100).toFixed(0);
-                pX = (allSigns.filter(s => s === 'X').length / total * 100).toFixed(0);
-                p2 = (allSigns.filter(s => s === '2').length / total * 100).toFixed(0);
+            // Porcentajes del análisis de Mundo Deportivo (si está disponible para esta jornada)
+            let percHtml = '';
+            let mobileBtnHtml = '';
+            if (this.currentJornadaHasMDAnalysis) {
+                const mdMatch = this.getMDMatchFor(match, idx);
+                if (mdMatch && mdMatch.percentages) {
+                    const pData = mdMatch.percentages.real || mdMatch.percentages.quinielista || {};
+                    const p1 = (pData['1'] !== undefined && pData['1'] !== null) ? pData['1'] : 0;
+                    const pX = (pData['X'] !== undefined && pData['X'] !== null) ? pData['X'] : 0;
+                    const p2 = (pData['2'] !== undefined && pData['2'] !== null) ? pData['2'] : 0;
+                    const rec = String(mdMatch.recommended || '').toUpperCase();
+                    const isRec1 = rec.includes('1');
+                    const isRecX = rec.includes('X');
+                    const isRec2 = rec.includes('2');
+
+                    percHtml = `
+                        <div id="consensus-${idx}" class="p-percentages" title="Probabilidad Mundo Deportivo: 1 (${p1}%), X (${pX}%), 2 (${p2}%)">
+                            <div class="perc-row perc-1 ${isRec1 ? 'rec-sign' : ''}"><span>1:</span> <b>${p1}%</b></div>
+                            <div class="perc-row perc-X ${isRecX ? 'rec-sign' : ''}"><span>X:</span> <b>${pX}%</b></div>
+                            <div class="perc-row perc-2 ${isRec2 ? 'rec-sign' : ''}"><span>2:</span> <b>${p2}%</b></div>
+                        </div>
+                    `;
+                    mobileBtnHtml = `
+                        <button type="button" class="md-mobile-trigger lg:hidden" onclick="event.stopPropagation(); window.app.openMDMobileDetail(${idx});" title="Ver análisis de Mundo Deportivo">
+                            <span>💡</span><span>MD</span>
+                        </button>
+                    `;
+                } else {
+                    percHtml = `<div id="consensus-${idx}" class="p-percentages" style="display:none;"></div>`;
+                }
+            } else {
+                // Si la información no está disponible en el momento de rellenar el pronóstico, no mostrar nada
+                percHtml = `<div id="consensus-${idx}" class="p-percentages" style="display:none;"></div>`;
             }
 
             row.innerHTML = `
@@ -628,6 +695,7 @@ class PronosticoManager {
                         <span class="team-name">${match.away}</span>
                     </div>
                     ${isPigMatch ? '<span style="font-size:0.75rem; background:#ffecb3; color:#e65100; border-radius:4px; padding:2px 6px; font-weight:bold; margin-left:6px;" title="Partido de Interés General">🐷 PIG</span>' : ''}
+                    ${mobileBtnHtml}
                 </div>
 
                 <div class="p-others">
@@ -640,12 +708,18 @@ class PronosticoManager {
                     <div class="chk-option ${val === '2' ? 'selected' : ''}" onclick="window.app.selectOption(this, '2')">2</div>
                 </div>
 
-                <div id="consensus-${idx}" class="p-percentages">
-                    <div class="perc-row perc-1"><span>1:</span> <b>${p1}%</b></div>
-                    <div class="perc-row perc-X"><span>X:</span> <b>${pX}%</b></div>
-                    <div class="perc-row perc-2"><span>2:</span> <b>${p2}%</b></div>
-                </div>
+                ${percHtml}
             `;
+
+            if (this.currentJornadaHasMDAnalysis) {
+                row.addEventListener('mouseenter', () => this.hoverMDMatch(idx));
+                row.addEventListener('click', (e) => {
+                    if (!e.target.closest('.chk-option') && !e.target.closest('.md-mobile-trigger')) {
+                        this.hoverMDMatch(idx);
+                    }
+                });
+            }
+
             this.container.appendChild(row);
 
             // Add Block Dividers: 4, 4, 3, 3 + Pleno al 15
@@ -748,27 +822,15 @@ class PronosticoManager {
     }
 
     updateRowConsensus(idx, myVal) {
-        const othersForecasts = this.pronosticos.filter(p =>
-            (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) &&
-            (p.mId != this.currentMemberId && p.memberId != this.currentMemberId)
-        );
-
-        const signs = othersForecasts.map(of => of.selection[idx]).filter(s => s);
-        if (myVal) signs.push(myVal);
-        const total = signs.length;
-        if (total === 0) return;
-
-        const s1 = (signs.filter(s => s === '1').length / total * 100).toFixed(0);
-        const sX = (signs.filter(s => s === 'X').length / total * 100).toFixed(0);
-        const s2 = (signs.filter(s => s === '2').length / total * 100).toFixed(0);
-
+        // En peña Maulas ya no se muestra el porcentaje de votos de otros socios
+        // para evitar confusiones. Se muestran las probabilidades del análisis de Mundo Deportivo.
+        if (this.currentJornadaHasMDAnalysis) {
+            return;
+        }
         const consensusBox = document.getElementById(`consensus-${idx}`);
         if (consensusBox) {
-            consensusBox.innerHTML = `
-                <div class="perc-row perc-1"><span>1:</span> <b>${s1}%</b></div>
-                <div class="perc-row perc-X"><span>X:</span> <b>${sX}%</b></div>
-                <div class="perc-row perc-2"><span>2:</span> <b>${s2}%</b></div>
-            `;
+            consensusBox.style.display = 'none';
+            consensusBox.innerHTML = '';
         }
     }
 
@@ -2906,6 +2968,528 @@ class PronosticoManager {
         }
 
         return perfectCol;
+    }
+
+    // =========================================================================
+    // MUNDO DEPORTIVO ANALYSIS, RECOMMENDATIONS & STANDINGS INTEGRATION
+    // =========================================================================
+
+    async loadMDAnalysisData() {
+        try {
+            const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?v=${Date.now()}`);
+            if (res.ok) {
+                this.mdAnalysisData = await res.json();
+            }
+        } catch (e) {
+            console.warn('No se pudo cargar el análisis de Mundo Deportivo:', e);
+            this.mdAnalysisData = null;
+        }
+    }
+
+    toggleMDDemoMode() {
+        this.mdDemoMode = !this.mdDemoMode;
+        this.loadForecast();
+    }
+
+    areTeamsSimilar(name1, name2) {
+        if (!name1 || !name2) return false;
+        const clean = s => s.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '');
+        const c1 = clean(name1);
+        const c2 = clean(name2);
+        if (!c1 || !c2) return false;
+        if (c1 === c2) return true;
+        if (c1.includes(c2) || c2.includes(c1)) return true;
+
+        const aliases = [
+            ['atletico', 'atmadrid', 'atm'],
+            ['realmadrid', 'rmadrid', 'madrid'],
+            ['barcelona', 'barca', 'fcb'],
+            ['athletic', 'athbilbao', 'bilbao'],
+            ['realsociedad', 'rsociedad', 'laerealsociedad'],
+            ['rayovallecano', 'rayo'],
+            ['celta', 'celtadevigo'],
+            ['espanyol', 'rcdespanyol'],
+            ['valladolid', 'realvalladolid'],
+            ['zaragoza', 'realzaragoza'],
+            ['racing', 'racingsantander'],
+            ['sporting', 'sportinggijon'],
+            ['deportivo', 'depor', 'deportivolacoruna'],
+            ['castellon', 'cdcastellon'],
+            ['albacete', 'albacitebp'],
+            ['cadiz', 'cadizcf'],
+            ['cordoba', 'cordobacf'],
+            ['granada', 'granadacf'],
+            ['almeria', 'udalmeria'],
+            ['huesca', 'sdhuesca'],
+            ['burgos', 'burgoscf'],
+            ['eibar', 'sdeibar'],
+            ['mirandes', 'cdmirandes'],
+            ['ferrol', 'racingferrol'],
+            ['levante', 'udlevante'],
+            ['elche', 'elchecf'],
+            ['malaga', 'malagacf'],
+            ['eldense', 'cdeldense'],
+            ['cartagena', 'fccartagena'],
+            ['tenerife', 'cdtenerife']
+        ];
+        for (const group of aliases) {
+            const m1 = group.some(alias => c1.includes(alias));
+            const m2 = group.some(alias => c2.includes(alias));
+            if (m1 && m2) return true;
+        }
+        return false;
+    }
+
+    checkIfJornadaHasMDAnalysis(jornada) {
+        if (!this.mdAnalysisData || !jornada || !Array.isArray(jornada.matches)) return false;
+        if (this.mdDemoMode) return true;
+
+        // Validación estricta: sólo jornada oficial correspondiente de fin de semana, descartando intersemanales
+        if (this.mdAnalysisData.available === false || this.mdAnalysisData.isMidweek === true) {
+            return false;
+        }
+
+        if (!Array.isArray(this.mdAnalysisData.matches) || this.mdAnalysisData.matches.length === 0) {
+            return false;
+        }
+
+        let matchCount = 0;
+        const mdMatches = this.mdAnalysisData.matches.filter(m => m.home && m.away);
+        jornada.matches.forEach(jm => {
+            if (!jm.home || !jm.away) return;
+            const found = mdMatches.some(mdM => 
+                this.areTeamsSimilar(jm.home, mdM.home) && this.areTeamsSimilar(jm.away, mdM.away)
+            );
+            if (found) matchCount++;
+        });
+
+        return matchCount >= 5;
+    }
+
+    getMDMatchFor(match, idx) {
+        if (!this.mdAnalysisData || !Array.isArray(this.mdAnalysisData.matches)) return null;
+
+        if (match && match.home && match.away) {
+            const found = this.mdAnalysisData.matches.find(mdM =>
+                this.areTeamsSimilar(match.home, mdM.home) && this.areTeamsSimilar(match.away, mdM.away)
+            );
+            if (found) return found;
+        }
+
+        if (this.mdAnalysisData.matches[idx]) {
+            return this.mdAnalysisData.matches[idx];
+        }
+        return null;
+    }
+
+    switchMDView(view) {
+        this.currentMDView = view;
+        const btnAnalysis = document.getElementById('md-tab-analysis');
+        const btnStandings1 = document.getElementById('md-tab-standings-1');
+        const btnStandings2 = document.getElementById('md-tab-standings-2');
+
+        const boxAnalysis = document.getElementById('md-view-analysis-box');
+        const boxStandings1 = document.getElementById('md-view-standings-1');
+        const boxStandings2 = document.getElementById('md-view-standings-2');
+
+        [btnAnalysis, btnStandings1, btnStandings2].forEach(btn => {
+            if (!btn) return;
+            btn.className = "px-2 py-1 rounded-lg text-slate-400 hover:text-white transition font-bold";
+        });
+
+        if (boxAnalysis) boxAnalysis.classList.add('hidden');
+        if (boxStandings1) boxStandings1.classList.add('hidden');
+        if (boxStandings2) boxStandings2.classList.add('hidden');
+
+        if (view === 'analysis') {
+            if (btnAnalysis) btnAnalysis.className = "px-2 py-1 rounded-lg bg-sky-500 text-slate-950 font-black shadow transition";
+            if (boxAnalysis) {
+                boxAnalysis.classList.remove('hidden');
+                this.renderMDMatchDetail(this.selectedMDMatchIdx);
+            }
+        } else if (view === 'standings-1') {
+            if (btnStandings1) btnStandings1.className = "px-2 py-1 rounded-lg bg-sky-500 text-slate-950 font-black shadow transition";
+            if (boxStandings1) {
+                boxStandings1.classList.remove('hidden');
+                this.renderMDStandings('primera', boxStandings1);
+            }
+        } else if (view === 'standings-2') {
+            if (btnStandings2) btnStandings2.className = "px-2 py-1 rounded-lg bg-sky-500 text-slate-950 font-black shadow transition";
+            if (boxStandings2) {
+                boxStandings2.classList.remove('hidden');
+                this.renderMDStandings('segunda', boxStandings2);
+            }
+        }
+    }
+
+    hoverMDMatch(idx) {
+        this.selectedMDMatchIdx = idx;
+
+        const allRows = this.container ? this.container.querySelectorAll('.pronostico-row') : [];
+        allRows.forEach((r) => {
+            const rIdx = parseInt(r.dataset.idx);
+            if (rIdx === idx) {
+                r.classList.add('border-sky-500/80', 'bg-sky-950/20');
+            } else {
+                r.classList.remove('border-sky-500/80', 'bg-sky-950/20');
+            }
+        });
+
+        if (this.currentMDView === 'analysis') {
+            this.renderMDMatchDetail(idx);
+        }
+    }
+
+    renderMDSidebar() {
+        if (!this.mdAnalysisSidebar) return;
+        this.switchMDView(this.currentMDView || 'analysis');
+    }
+
+    renderMDMatchDetail(idx) {
+        const box = document.getElementById('md-view-analysis-box');
+        if (!box) return;
+
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        const match = (jornada && jornada.matches) ? jornada.matches[idx] : null;
+        const mdMatch = this.getMDMatchFor(match, idx);
+
+        if (!mdMatch) {
+            box.innerHTML = `
+                <div class="p-6 text-center text-slate-400 text-xs">
+                    <p>No hay análisis disponible para este partido.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const matchNum = idx === 14 ? '15 (Pleno al 15)' : idx + 1;
+        const homeName = (match && match.home) || mdMatch.home || 'Local';
+        const awayName = (match && match.away) || mdMatch.away || 'Visitante';
+        const homeLogo = AppUtils.getTeamLogo(homeName);
+        const awayLogo = AppUtils.getTeamLogo(awayName);
+
+        const recSign = mdMatch.recommended || '-';
+        const pReal = (mdMatch.percentages && mdMatch.percentages.real) || {};
+        const pQuin = (mdMatch.percentages && mdMatch.percentages.quinielista) || {};
+
+        let homeRankStr = mdMatch.homeRank ? `${mdMatch.homeRank}º clasificado` : '';
+        let awayRankStr = mdMatch.awayRank ? `${mdMatch.awayRank}º clasificado` : '';
+
+        if (!homeRankStr && this.mdAnalysisData && this.mdAnalysisData.standings) {
+            const allSt = [...(this.mdAnalysisData.standings.primera || []), ...(this.mdAnalysisData.standings.segunda || [])];
+            const hFound = allSt.find(t => this.areTeamsSimilar(homeName, t.team));
+            if (hFound) homeRankStr = `${hFound.pos}º (${hFound.pts} pts)`;
+            const aFound = allSt.find(t => this.areTeamsSimilar(awayName, t.team));
+            if (aFound) awayRankStr = `${aFound.pos}º (${aFound.pts} pts)`;
+        }
+
+        // Barra de chips selectores rápidos 1 al 15
+        let chipsHtml = '';
+        for (let i = 0; i < 15; i++) {
+            const isSel = i === idx;
+            const chipLabel = i === 14 ? '15' : (i + 1);
+            chipsHtml += `
+                <button type="button" onclick="window.app.hoverMDMatch(${i})" class="w-6 h-6 rounded-md text-[10px] font-black transition shrink-0 ${isSel ? 'bg-sky-500 text-slate-950 shadow-md ring-1 ring-sky-300' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}">
+                    ${chipLabel}
+                </button>
+            `;
+        }
+
+        box.innerHTML = `
+            <!-- Barra selectora rápida de partidos -->
+            <div class="flex items-center gap-1 overflow-x-auto pb-1.5 custom-scroll">
+                ${chipsHtml}
+            </div>
+
+            <!-- Ficha del Partido -->
+            <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-inner space-y-3">
+                <div class="flex items-center justify-between text-[11px] text-slate-400 pb-1.5 border-b border-slate-800/80">
+                    <span class="font-black text-sky-400">PARTIDO ${matchNum}</span>
+                    <span class="text-slate-400 font-mono text-[10px]">⏰ ${mdMatch.schedule || 'Fin de semana'}</span>
+                </div>
+
+                <!-- Equipos y Escudos -->
+                <div class="grid grid-cols-2 gap-2 items-center text-center">
+                    <div class="flex flex-col items-center p-2 rounded-lg bg-slate-900/60 border border-slate-800">
+                        <img src="${homeLogo}" class="w-8 h-8 object-contain mb-1" onerror="this.style.display='none'">
+                        <span class="font-black text-white text-xs leading-tight">${homeName}</span>
+                        ${homeRankStr ? `<span class="text-[10px] text-sky-400 font-mono mt-0.5">${homeRankStr}</span>` : ''}
+                    </div>
+                    <div class="flex flex-col items-center p-2 rounded-lg bg-slate-900/60 border border-slate-800">
+                        <img src="${awayLogo}" class="w-8 h-8 object-contain mb-1" onerror="this.style.display='none'">
+                        <span class="font-black text-white text-xs leading-tight">${awayName}</span>
+                        ${awayRankStr ? `<span class="text-[10px] text-sky-400 font-mono mt-0.5">${awayRankStr}</span>` : ''}
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Sugerencia Oficial y Probabilidad Real -->
+                <div class="p-2.5 rounded-xl bg-gradient-to-r from-sky-950/50 to-indigo-950/40 border border-sky-500/30 flex items-center justify-between gap-2">
+                    <div>
+                        <div class="text-[9px] font-black uppercase text-sky-400 tracking-wider">🎯 Sugerencia Mundo Deportivo</div>
+                        <div class="text-xs text-slate-300">Signo recomendado: <strong class="text-white">${recSign}</strong></div>
+                    </div>
+                    <div class="px-3 py-1 rounded-xl bg-sky-500 text-slate-950 font-black text-sm tracking-wider shadow-md">
+                        ${recSign}
+                    </div>
+                </div>
+
+                <!-- Desglose de Probabilidades -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-[10px] text-slate-400 font-bold">
+                        <span>Probabilidad Estimada</span>
+                        <span class="text-slate-500">1 / X / 2</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5 text-center font-mono text-xs">
+                        <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">
+                            <div class="text-[10px] font-bold text-emerald-400">1 (Victoria)</div>
+                            <div class="font-black text-emerald-300 text-sm mt-0.5">${pReal['1'] ?? '-'}%</div>
+                            ${pQuin['1'] !== undefined ? `<div class="text-[9px] text-slate-500">Quin: ${pQuin['1']}%</div>` : ''}
+                        </div>
+                        <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">
+                            <div class="text-[10px] font-bold text-sky-400">X (Empate)</div>
+                            <div class="font-black text-sky-300 text-sm mt-0.5">${pReal['X'] ?? '-'}%</div>
+                            ${pQuin['X'] !== undefined ? `<div class="text-[9px] text-slate-500">Quin: ${pQuin['X']}%</div>` : ''}
+                        </div>
+                        <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">
+                            <div class="text-[10px] font-bold text-amber-400">2 (Visitante)</div>
+                            <div class="font-black text-amber-300 text-sm mt-0.5">${pReal['2'] ?? '-'}%</div>
+                            ${pQuin['2'] !== undefined ? `<div class="text-[9px] text-slate-500">Quin: ${pQuin['2']}%</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comentario Editorial -->
+                ${mdMatch.comment ? `
+                    <div class="space-y-1 pt-1">
+                        <div class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1">
+                            <span>📝</span> <span>Análisis del Partido</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800/80 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[140px] overflow-y-auto custom-scroll">
+                            ${mdMatch.comment}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Accesos rápidos a Clasificación -->
+                <div class="pt-1 flex items-center gap-2">
+                    <button type="button" onclick="window.app.switchMDView('standings-1')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold border border-slate-800 flex items-center justify-center gap-1 transition">
+                        <span>🏆</span> Ver 1ª División
+                    </button>
+                    <button type="button" onclick="window.app.switchMDView('standings-2')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold border border-slate-800 flex items-center justify-center gap-1 transition">
+                        <span>🥈</span> Ver 2ª División
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    renderMDStandings(divType, containerEl) {
+        if (!containerEl || !this.mdAnalysisData || !this.mdAnalysisData.standings) {
+            if (containerEl) {
+                containerEl.innerHTML = `
+                    <div class="p-6 text-center text-slate-400 text-xs">
+                        <p>No se encontraron datos de clasificación disponibles.</p>
+                    </div>
+                `;
+            }
+            return;
+        }
+
+        const list = divType === 'primera' ? this.mdAnalysisData.standings.primera : this.mdAnalysisData.standings.segunda;
+        if (!list || list.length === 0) {
+            containerEl.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">Sin datos para esta división.</div>`;
+            return;
+        }
+
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        const activeTeams = [];
+        if (jornada && Array.isArray(jornada.matches)) {
+            jornada.matches.forEach(m => {
+                if (m.home) activeTeams.push(m.home);
+                if (m.away) activeTeams.push(m.away);
+            });
+        }
+
+        const rowsHtml = list.map(item => {
+            const isPlayingThisJornada = activeTeams.some(t => this.areTeamsSimilar(t, item.team));
+            let zoneClass = 'border-l-2 border-transparent';
+            if (divType === 'primera') {
+                if (item.pos <= 4) zoneClass = 'border-l-2 border-sky-400 bg-sky-950/20'; // Champions
+                else if (item.pos <= 6) zoneClass = 'border-l-2 border-amber-400 bg-amber-950/20'; // Europa League
+                else if (item.pos >= 18) zoneClass = 'border-l-2 border-rose-500 bg-rose-950/20'; // Descenso
+            } else {
+                if (item.pos <= 2) zoneClass = 'border-l-2 border-emerald-400 bg-emerald-950/20'; // Ascenso directo
+                else if (item.pos <= 6) zoneClass = 'border-l-2 border-sky-400 bg-sky-950/20'; // Playoff
+                else if (item.pos >= 19) zoneClass = 'border-l-2 border-rose-500 bg-rose-950/20'; // Descenso
+            }
+
+            return `
+                <tr class="border-b border-slate-800/60 hover:bg-slate-800/50 transition ${zoneClass} ${isPlayingThisJornada ? 'font-bold text-white' : 'text-slate-300'}">
+                    <td class="py-1 px-1.5 text-center text-[10px] font-mono font-bold">${item.pos}</td>
+                    <td class="py-1 px-2 text-[11px] flex items-center gap-1.5">
+                        <img src="${item.logo}" class="w-4 h-4 object-contain" onerror="this.style.display='none'">
+                        <span class="truncate max-w-[110px]">${item.team}</span>
+                        ${isPlayingThisJornada ? '<span class="text-[8px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold" title="Juega en esta quiniela">⚽</span>' : ''}
+                    </td>
+                    <td class="py-1 px-1.5 text-center font-black text-amber-400 text-xs">${item.pts}</td>
+                    <td class="py-1 px-1 text-center text-[10px] text-slate-400">${item.pj}</td>
+                    <td class="py-1 px-1 text-center text-[10px] text-slate-400">${item.pg}</td>
+                    <td class="py-1 px-1 text-center text-[10px] text-slate-400">${item.pe}</td>
+                    <td class="py-1 px-1 text-center text-[10px] text-slate-400">${item.pp}</td>
+                    <td class="py-1 px-1 text-center text-[10px] text-slate-400 font-mono">${item.dif > 0 ? '+' + item.dif : item.dif}</td>
+                </tr>
+            `;
+        }).join('');
+
+        const titleText = divType === 'primera' ? 'Clasificación LaLiga EA Sports (1ª)' : 'Clasificación LaLiga Hypermotion (2ª)';
+
+        containerEl.innerHTML = `
+            <div class="space-y-2">
+                <div class="flex items-center justify-between pb-1 text-xs font-black text-white">
+                    <span>${titleText}</span>
+                    <button type="button" onclick="window.app.switchMDView('analysis')" class="text-[10px] text-sky-400 hover:underline">
+                        ← Volver a análisis
+                    </button>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/70 shadow-inner">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900 border-b border-slate-800 text-[9px] uppercase tracking-wider text-slate-400 font-black">
+                                <th class="py-1.5 px-1.5 text-center">#</th>
+                                <th class="py-1.5 px-2">Equipo</th>
+                                <th class="py-1.5 px-1.5 text-center text-amber-400">Pts</th>
+                                <th class="py-1.5 px-1 text-center">PJ</th>
+                                <th class="py-1.5 px-1 text-center">PG</th>
+                                <th class="py-1.5 px-1 text-center">PE</th>
+                                <th class="py-1.5 px-1 text-center">PP</th>
+                                <th class="py-1.5 px-1 text-center">Dif</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    openMDMobileDetail(idx) {
+        const sheet = document.getElementById('modal-md-mobile-sheet');
+        const content = document.getElementById('md-mobile-sheet-content');
+        if (!sheet || !content) return;
+
+        this.selectedMDMatchIdx = idx;
+        const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
+        const match = (jornada && jornada.matches) ? jornada.matches[idx] : null;
+        const mdMatch = this.getMDMatchFor(match, idx);
+
+        if (!mdMatch) {
+            content.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">No hay análisis disponible para este partido.</div>`;
+            sheet.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            return;
+        }
+
+        const matchNum = idx === 14 ? '15 (Pleno al 15)' : idx + 1;
+        const homeName = (match && match.home) || mdMatch.home || 'Local';
+        const awayName = (match && match.away) || mdMatch.away || 'Visitante';
+        const homeLogo = AppUtils.getTeamLogo(homeName);
+        const awayLogo = AppUtils.getTeamLogo(awayName);
+
+        const recSign = mdMatch.recommended || '-';
+        const pReal = (mdMatch.percentages && mdMatch.percentages.real) || {};
+        const pQuin = (mdMatch.percentages && mdMatch.percentages.quinielista) || {};
+
+        let homeRankStr = mdMatch.homeRank ? `${mdMatch.homeRank}º clasificado` : '';
+        let awayRankStr = mdMatch.awayRank ? `${mdMatch.awayRank}º clasificado` : '';
+
+        if (!homeRankStr && this.mdAnalysisData && this.mdAnalysisData.standings) {
+            const allSt = [...(this.mdAnalysisData.standings.primera || []), ...(this.mdAnalysisData.standings.segunda || [])];
+            const hFound = allSt.find(t => this.areTeamsSimilar(homeName, t.team));
+            if (hFound) homeRankStr = `${hFound.pos}º (${hFound.pts} pts)`;
+            const aFound = allSt.find(t => this.areTeamsSimilar(awayName, t.team));
+            if (aFound) awayRankStr = `${aFound.pos}º (${aFound.pts} pts)`;
+        }
+
+        content.innerHTML = `
+            <div class="space-y-3 p-1">
+                <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-800">
+                    <span class="font-black text-sky-400">PARTIDO ${matchNum}</span>
+                    <span class="text-slate-400 font-mono text-[11px]">⏰ ${mdMatch.schedule || 'Fin de semana'}</span>
+                </div>
+
+                <!-- Equipos -->
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center">
+                        <img src="${homeLogo}" class="w-10 h-10 object-contain mb-1" onerror="this.style.display='none'">
+                        <span class="font-black text-white text-xs">${homeName}</span>
+                        ${homeRankStr ? `<span class="text-[10px] text-sky-400 font-mono mt-0.5">${homeRankStr}</span>` : ''}
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center">
+                        <img src="${awayLogo}" class="w-10 h-10 object-contain mb-1" onerror="this.style.display='none'">
+                        <span class="font-black text-white text-xs">${awayName}</span>
+                        ${awayRankStr ? `<span class="text-[10px] text-sky-400 font-mono mt-0.5">${awayRankStr}</span>` : ''}
+                    </div>
+                </div>
+
+                <!-- Sugerencia -->
+                <div class="p-3 rounded-xl bg-gradient-to-r from-sky-950/60 to-indigo-950/50 border border-sky-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-black uppercase text-sky-400">🎯 Sugerencia Mundo Deportivo</div>
+                        <div class="text-xs text-slate-300">Signo recomendado: <strong class="text-white">${recSign}</strong></div>
+                    </div>
+                    <div class="px-3.5 py-1.5 rounded-xl bg-sky-500 text-slate-950 font-black text-base shadow-md">
+                        ${recSign}
+                    </div>
+                </div>
+
+                <!-- Probabilidades -->
+                <div class="space-y-1">
+                    <div class="text-[11px] font-bold text-slate-400">Probabilidad Estimada</div>
+                    <div class="grid grid-cols-3 gap-1.5 text-center font-mono text-xs">
+                        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800">
+                            <div class="text-[10px] font-bold text-emerald-400">1</div>
+                            <div class="font-black text-emerald-300 text-sm mt-0.5">${pReal['1'] ?? '-'}%</div>
+                            ${pQuin['1'] !== undefined ? `<div class="text-[9px] text-slate-500">Quin: ${pQuin['1']}%</div>` : ''}
+                        </div>
+                        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800">
+                            <div class="text-[10px] font-bold text-sky-400">X</div>
+                            <div class="font-black text-sky-300 text-sm mt-0.5">${pReal['X'] ?? '-'}%</div>
+                            ${pQuin['X'] !== undefined ? `<div class="text-[9px] text-slate-500">Quin: ${pQuin['X']}%</div>` : ''}
+                        </div>
+                        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800">
+                            <div class="text-[10px] font-bold text-amber-400">2</div>
+                            <div class="font-black text-amber-300 text-sm mt-0.5">${pReal['2'] ?? '-'}%</div>
+                            ${pQuin['2'] !== undefined ? `<div class="text-[9px] text-slate-500">Quin: ${pQuin['2']}%</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Análisis Texto -->
+                ${mdMatch.comment ? `
+                    <div class="space-y-1">
+                        <div class="text-[11px] font-black text-slate-400 flex items-center gap-1">
+                            <span>📝</span> <span>Análisis Editorial</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed max-h-[160px] overflow-y-auto custom-scroll">
+                            ${mdMatch.comment}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        sheet.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeMDMobileSheet() {
+        const sheet = document.getElementById('modal-md-mobile-sheet');
+        if (sheet) sheet.style.display = 'none';
+        document.body.style.overflow = '';
     }
 }
 

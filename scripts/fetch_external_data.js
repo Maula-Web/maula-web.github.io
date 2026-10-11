@@ -113,9 +113,20 @@ async function main() {
         }
     }
 
+    // 3. Ejecutar bot de análisis de Mundo Deportivo y clasificaciones
+    try {
+        console.log('\n📰 Ejecutando bot de análisis de Mundo Deportivo...');
+        const { execSync } = require('child_process');
+        execSync(`node "${path.join(__dirname, 'fetch_md_analysis.js')}"`, { stdio: 'inherit' });
+        results.mdAnalysis = true;
+    } catch (eMD) {
+        console.warn('⚠️ Error ejecutando bot de Mundo Deportivo:', eMD.message);
+        results.mdAnalysis = false;
+    }
+
     fs.writeFileSync(METADATA_PATH, JSON.stringify(results, null, 2));
 
-    if (results.rss || results.pdf) {
+    if (results.rss || results.pdf || results.mdAnalysis) {
         console.log('✅ Actualización completada.');
     } else {
         console.error('❌ Error crítico: Todas las fuentes han fallado.');
