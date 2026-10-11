@@ -261,99 +261,99 @@ class QuinielaService {
 
 QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
   {
-    "number": 12,
-    "dateStr": "11/10/2026",
+    "number": 14,
+    "dateStr": "18/10/2026",
     "season": "2026-2027",
     "isSunday": true,
     "matches": [
       {
         "position": 1,
-        "home": "Rayo Vallecano",
-        "away": "Athletic Club",
+        "home": "Espanyol",
+        "away": "At. Madrid",
         "result": ""
       },
       {
         "position": 2,
-        "home": "Alavés",
-        "away": "At. Madrid",
-        "result": "2"
+        "home": "Villarreal",
+        "away": "Elche",
+        "result": ""
       },
       {
         "position": 3,
-        "home": "Barcelona",
-        "away": "Getafe",
-        "result": "1"
+        "home": "Betis",
+        "away": "Barcelona",
+        "result": ""
       },
       {
         "position": 4,
-        "home": "Elche",
-        "away": "Celta",
+        "home": "Valencia",
+        "away": "Athletic Club",
         "result": ""
       },
       {
         "position": 5,
-        "home": "Real Sociedad",
-        "away": "Deportivo",
+        "home": "Celta",
+        "away": "Alavés",
         "result": ""
       },
       {
         "position": 6,
-        "home": "Betis",
-        "away": "Osasuna",
+        "home": "Málaga",
+        "away": "Real Sociedad",
         "result": ""
       },
       {
         "position": 7,
-        "home": "Racing Santander",
-        "away": "Valencia",
-        "result": ""
-      },
-      {
-        "position": 8,
-        "home": "Levante",
+        "home": "Real Madrid",
         "away": "Sevilla",
         "result": ""
       },
       {
-        "position": 9,
-        "home": "Eldense",
-        "away": "Córdoba",
-        "result": "1"
+        "position": 8,
+        "home": "Eibar",
+        "away": "Mallorca",
+        "result": ""
       },
       {
-        "position": 10,
-        "home": "Andorra",
+        "position": 9,
+        "home": "Las Palmas",
         "away": "Castellón",
         "result": ""
       },
       {
+        "position": 10,
+        "home": "Burgos",
+        "away": "Sabadell",
+        "result": ""
+      },
+      {
         "position": 11,
-        "home": "Almería",
-        "away": "Leganés",
+        "home": "Athletic Club (f)",
+        "away": "Valencia (f)",
         "result": ""
       },
       {
         "position": 12,
-        "home": "Mallorca",
-        "away": "Las Palmas",
+        "home": "Real Madrid (f)",
+        "away": "Espanyol (f)",
         "result": ""
       },
       {
         "position": 13,
-        "home": "Burgos",
-        "away": "Granada",
+        "home": "Eibar (f)",
+        "away": "Deportivo (f)",
         "result": ""
       },
       {
         "position": 14,
-        "home": "R. Oviedo",
-        "away": "Eibar",
+        "home": "At. Madrid (f)",
+        "away": "Madrid CFF (f)",
         "result": ""
       },
       {
         "position": 15,
-        "home": "Real Madrid",
-        "away": "Villarreal",
+        "home": "Getafe",
+        "away": "Rayo Vallecano",
         "result": ""
       }
     ]
