@@ -261,99 +261,99 @@ class QuinielaService {
 
 QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
   {
-    "number": 14,
-    "dateStr": "18/10/2026",
+    "number": 12,
+    "dateStr": "11/10/2026",
     "season": "2026-2027",
     "isSunday": true,
     "matches": [
       {
         "position": 1,
-        "home": "Real Madrid",
-        "away": "Sevilla",
-        "result": ""
-      },
-      {
-        "position": 2,
-        "home": "Barcelona",
-        "away": "Girona",
-        "result": ""
-      },
-      {
-        "position": 3,
-        "home": "At. Madrid",
-        "away": "Betis",
-        "result": ""
-      },
-      {
-        "position": 4,
-        "home": "Valencia",
+        "home": "Rayo Vallecano",
         "away": "Athletic Club",
         "result": ""
       },
       {
+        "position": 2,
+        "home": "Alavés",
+        "away": "At. Madrid",
+        "result": "2"
+      },
+      {
+        "position": 3,
+        "home": "Barcelona",
+        "away": "Getafe",
+        "result": "1"
+      },
+      {
+        "position": 4,
+        "home": "Elche",
+        "away": "Celta",
+        "result": ""
+      },
+      {
         "position": 5,
-        "home": "Celta",
-        "away": "Alavés",
+        "home": "Real Sociedad",
+        "away": "Deportivo",
         "result": ""
       },
       {
         "position": 6,
-        "home": "Getafe",
-        "away": "Rayo Vallecano",
+        "home": "Betis",
+        "away": "Osasuna",
         "result": ""
       },
       {
         "position": 7,
-        "home": "Villarreal",
-        "away": "Mallorca",
+        "home": "Racing Santander",
+        "away": "Valencia",
         "result": ""
       },
       {
         "position": 8,
-        "home": "Osasuna",
-        "away": "Las Palmas",
+        "home": "Levante",
+        "away": "Sevilla",
         "result": ""
       },
       {
         "position": 9,
-        "home": "Real Sociedad",
-        "away": "Espanyol",
-        "result": ""
+        "home": "Eldense",
+        "away": "Córdoba",
+        "result": "1"
       },
       {
         "position": 10,
-        "home": "Leganés",
-        "away": "Valladolid",
+        "home": "Andorra",
+        "away": "Castellón",
         "result": ""
       },
       {
         "position": 11,
-        "home": "Sporting",
-        "away": "R. Zaragoza",
+        "home": "Almería",
+        "away": "Leganés",
         "result": ""
       },
       {
         "position": 12,
-        "home": "R. Oviedo",
-        "away": "Málaga",
+        "home": "Mallorca",
+        "away": "Las Palmas",
         "result": ""
       },
       {
         "position": 13,
-        "home": "Cádiz",
-        "away": "Racing Santander",
+        "home": "Burgos",
+        "away": "Granada",
         "result": ""
       },
       {
         "position": 14,
-        "home": "Deportivo",
-        "away": "Levante",
+        "home": "R. Oviedo",
+        "away": "Eibar",
         "result": ""
       },
       {
         "position": 15,
         "home": "Real Madrid",
-        "away": "Sevilla",
+        "away": "Villarreal",
         "result": ""
       }
     ]
