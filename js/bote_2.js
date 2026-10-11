@@ -2159,13 +2159,21 @@ class BoteAppController {
         const cardBoteInicial = document.getElementById('flujo-bote-inicial');
         const cardCrecimiento = document.getElementById('flujo-crecimiento-neto');
         const cardBoteTotal = document.getElementById('flujo-bote-total-acumulado');
+        const cardCrecimientoSub = document.getElementById('flujo-crecimiento-sub');
+        const cardBoteTotalTooltip = document.getElementById('flujo-bote-total-tooltip-text');
 
         if (cardBoteInicial) cardBoteInicial.textContent = BOTE_INICIAL.toFixed(2).replace('.', ',') + ' €';
         if (cardCrecimiento) {
             cardCrecimiento.textContent = (totalCrecimiento >= 0 ? '+' : '') + totalCrecimiento.toFixed(2).replace('.', ',') + ' €';
             cardCrecimiento.className = `text-lg sm:text-xl font-extrabold ${totalCrecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono`;
         }
+        if (cardCrecimientoSub && data.jornadaSummaries) {
+            cardCrecimientoSub.textContent = `Margen ganado en ${data.jornadaSummaries.length} jornadas`;
+        }
         if (cardBoteTotal) cardBoteTotal.textContent = (BOTE_INICIAL + totalCrecimiento).toFixed(2).replace('.', ',') + ' €';
+        if (cardBoteTotalTooltip) {
+            cardBoteTotalTooltip.textContent = `Resultado exacto de sumar el Saldo Inicial (${BOTE_INICIAL.toFixed(2).replace('.', ',')} €) más el crecimiento neto acumulado (${totalCrecimiento >= 0 ? '+' : ''}${totalCrecimiento.toFixed(2).replace('.', ',')} €).`;
+        }
 
         // Tarjeta de Coste Sellado Semanal (dinámica según parámetros)
         const numSocios = (data.memberSummaries || []).length || 19;
@@ -3138,7 +3146,11 @@ class BoteAppController {
     }
 
     getBoteInicial() {
-        return (this.config && this.config.boteInicial !== undefined) ? parseFloat(this.config.boteInicial) : 738.68;
+        if (this.config && typeof this.config.boteInicial !== 'undefined') {
+            const val = parseFloat(this.config.boteInicial);
+            if (!isNaN(val) && val > 0) return val;
+        }
+        return 738.68;
     }
 
     normalizeDateStr(d) {
