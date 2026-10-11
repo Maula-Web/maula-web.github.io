@@ -4,6 +4,62 @@
  * Fuentes: El País Sorteos (primaria con céntimos exactos) + RTVE (secundaria de respaldo estatal).
  */
 
+
+function normalizeTeamNameScraper(name) {
+    if (!name) return '';
+    let raw = String(name).trim();
+
+    // Comprobar si es equipo femenino: (f), (F), Fem, Femenino, o sufijo F
+    const isFemale = /[\(\[\{]\s*f(?:em[a-z]*)?\.?\s*[\)\]\}]/i.test(raw) ||
+                     /(?:[\s\-_/]+)f\.?$/i.test(raw) ||
+                     /\b(?:femenin[oa]s?|femeni|feminas|fem)\b/i.test(raw);
+
+    // Limpiar marcadores para normalizar el nombre base
+    let base = raw
+        .replace(/[\(\[\{]\s*f(?:em[a-z]*)?\.?\s*[\)\]\}]/gi, '')
+        .replace(/(?:[\s\-_/]+)f\.?$/gi, '')
+        .replace(/(?:^|\s|[\-_/])(?:femenin[oa]s?|femen[íi]|f[ée]minas|fem)(?:$|\s|[\-_/])/gi, ' ')
+        .trim();
+
+    const aliases = {
+        'R Madrid': 'Real Madrid',
+        'R. Madrid': 'Real Madrid',
+        'R.Madrid': 'Real Madrid',
+        'At Madrid': 'Atlético de Madrid',
+        'At. Madrid': 'Atlético de Madrid',
+        'At.Madrid': 'Atlético de Madrid',
+        'Atlético': 'Atlético de Madrid',
+        'Atletico': 'Atlético de Madrid',
+        'FC Barcelona': 'Barcelona',
+        'F.C. Barcelona': 'Barcelona',
+        'Barça': 'Barcelona',
+        'Barca': 'Barcelona',
+        'R Sociedad': 'Real Sociedad',
+        'R. Sociedad': 'Real Sociedad',
+        'R.Sociedad': 'Real Sociedad',
+        'R Zaragoza': 'Zaragoza',
+        'Real Zaragoza': 'Zaragoza',
+        'R Oviedo': 'Oviedo',
+        'Real Oviedo': 'Oviedo',
+        'Racing Santander': 'Racing',
+        'R Sporting': 'Sporting',
+        'Sporting de Gijón': 'Sporting',
+        'Rayo': 'Rayo Vallecano',
+        'Rayo V': 'Rayo Vallecano',
+        'Espanyol': 'RCD Espanyol',
+        'Athletic': 'Athletic Club',
+        'Ath Club': 'Athletic Club',
+        'Madrid Cff': 'Madrid CFF',
+        'Madrid C.F.F.': 'Madrid CFF'
+    };
+
+    const cleanBase = base.replace(/\./g, ' ').replace(/\s+/g, ' ').trim();
+    let mapped = aliases[base] || aliases[cleanBase] || base;
+
+    // Regla oficial de unificación Peña Maulas: mantener la ' (f)' para equipos femeninos
+    return isFemale ? (mapped + ' (f)') : mapped;
+}
+
 async function fetchLatestQuiniela() {
     let lastError = null;
 
@@ -67,8 +123,8 @@ async function parseElPais() {
     let matchRow;
     while ((matchRow = rowRegex.exec(block)) !== null) {
         const num = parseInt(matchRow[1], 10);
-        const home = matchRow[2].replace(/\s*\([mf]\)/gi, '').trim();
-        const away = matchRow[3].replace(/\s*\([mf]\)/gi, '').trim();
+        const home = normalizeTeamNameScraper(matchRow[2]);
+        const away = normalizeTeamNameScraper(matchRow[3]);
         const col1 = matchRow[4].trim();
         const colX = matchRow[5].trim();
         const col2 = matchRow[6].trim();
@@ -146,8 +202,8 @@ async function parseRTVE() {
         matches.push({
             num: idx++,
             result: item[1].trim(),
-            home: item[2].replace(/\s*\([mf]\)/gi, '').trim(),
-            away: item[3].replace(/\s*\([mf]\)/gi, '').trim(),
+            home: normalizeTeamNameScraper(item[2]),
+            away: normalizeTeamNameScraper(item[3]),
             score: item[4] ? item[4].trim() : ''
         });
         if (matches.length === 15) break;
@@ -260,13 +316,13 @@ async function fetchUpcomingQuinielaJornadas() {
             let primeraCount = 0;
             let hasCorruptOrInvalidTeam = false;
 
-            const invalidRegex = /\b(Fem|Femenino|Plzen|Sparta|Slavia|Ceuta|Tenerife F|Eibar F|Athletic F|Celta B)\b/i;
+            const invalidRegex = /\b(Plzen|Sparta|Slavia)\b/i;
 
             for (let m = 0; m < 15; m++) {
                 const idx = i * 15 + m;
                 if (casas[idx] && visitas[idx]) {
-                    const home = casas[idx];
-                    const away = visitas[idx];
+                    const home = normalizeTeamNameScraper(casas[idx]);
+                    const away = normalizeTeamNameScraper(visitas[idx]);
 
                     if (invalidRegex.test(home) || invalidRegex.test(away)) {
                         hasCorruptOrInvalidTeam = true;

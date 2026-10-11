@@ -1516,16 +1516,7 @@ const PushService = {
     injectUI() {
         if (document.getElementById('modal-push-lab')) return;
 
-        // 1. Botón Flotante para Fernando
-        const floatBtn = document.createElement('div');
-        floatBtn.className = 'push-float-btn';
-        floatBtn.title = 'Laboratorio de Notificaciones Push (Fernando Lozano)';
-        floatBtn.onclick = () => this.openModal();
-        floatBtn.innerHTML = `
-            <span class="bell-icon">🔔</span>
-            <span class="label">Push | Enviar a Heradio</span>
-        `;
-        document.body.appendChild(floatBtn);
+        // Botón flotante retirado a petición del usuario
 
         // 2. Modal
         const modalBackdrop = document.createElement('div');
