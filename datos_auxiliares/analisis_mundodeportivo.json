@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-11T12:09:08.610Z",
+  "updatedAt": "2026-10-11T12:38:14.191Z",
   "available": false,
   "matchCountWithTarget": 0,
   "isMidweek": true,
@@ -17,15 +17,15 @@
       "comment": "La Cerámica reclama una alegría europea. El Villarreal encadena cinco citas de Champions sin regalar un triunfo a su afición, cuatro de ellas durante el desastroso recorrido de la pasada temporada. La caída en Dortmund (3-2) añade urgencia al equipo de Íñigo Pérez, obligado a reaccionar para evitar que vuelvan las dudas y los temores continentales. Tampoco llega tranquilo el Nápoles, que se estrenó con un tropiezo por la mínima en su estadio frente al Arsenal, vigente subcampeón. Su paso en la Serie A alterna luces y sombras, mientras Massimiliano Allegri sigue buscando la fórmula para encajar las piezas. Eso sí, los italianos conservan argumentos para poner en aprietos al cuadro amarillo.",
       "percentages": {
         "quinielista": {
-          "1": 42,
-          "2": 22,
-          "X": 36
+          "1": 44,
+          "2": 24,
+          "X": 32
         },
         "lae": null,
         "real": {
           "1": 43,
-          "2": 31,
-          "X": 26
+          "2": 30,
+          "X": 27
         }
       },
       "recommended": "1X"
@@ -40,15 +40,15 @@
       "comment": "El Metropolitano reclama una reacción del At. Madrid tras la derrota inicial en Anfield (2-1). Caer frente al Liverpool entraba en los planes, pero el mal momento invitaba a sacar algo más en el estreno de la Champions. Simeone se agarra al empuje de su estadio, pese a que los últimos duelos continentales dejaron dos avisos: no pudo vencer al Barça, al que terminó eliminando, ni al Arsenal, verdugo rojiblanco en el Emirates a las puertas de la final. Al otro lado aparece un Manchester United que goleó al Sabah Baku azerbaiyano (4-0). La alegría contrasta con sus dudas en la Premier, donde la renovación de Michael Carrick ya despierta críticas y cuestiona el rumbo del equipo en un futuro inmediato.",
       "percentages": {
         "quinielista": {
-          "1": 53,
-          "2": 15,
-          "X": 32
+          "1": 50,
+          "2": 22,
+          "X": 28
         },
         "lae": null,
         "real": {
-          "1": 48,
-          "2": 27,
-          "X": 25
+          "1": 45,
+          "2": 31,
+          "X": 24
         }
       },
       "recommended": "1X"
@@ -63,15 +63,15 @@
       "comment": "Un Emirates inexpugnable desde abril de 2017 en la Champions espera al Lille. El conjunto francés, derrotado por el Betis en casa en el estreno, afronta una prueba de máxima exigencia ante un Arsenal que parte con gran ventaja sobre el papel. Los ´gunners´ ganaron en Nápoles y alargan su trayectoria de la anterior campaña europea con quince encuentros, once triunfos y cuatro empates, sin caer en el tiempo reglamentario ni en las prórrogas. Su primera Copa de Europa se escapó en la final frente al PSG, cuando los penaltis echaron por tierra un recorrido impecable. Con esa herida abierta vuelven a apuntar alto y tienen argumentos de sobra para imponer su ley ante el conjunto visitante.",
       "percentages": {
         "quinielista": {
-          "1": 99,
+          "1": 100,
           "2": 0,
-          "X": 1
+          "X": 0
         },
         "lae": null,
         "real": {
           "1": 77,
-          "2": 8,
-          "X": 15
+          "2": 7,
+          "X": 16
         }
       },
       "recommended": "1"
@@ -85,12 +85,16 @@
       "schedule": "DOMINGO, 21:00",
       "comment": "Estambul pone a prueba al Barça en un estadio que aprieta. El Galatasaray encadena once encuentros europeos invicto en casa, con siete triunfos y cuatro tablas al calor de una hinchada volcada. Los de Flick llegan tras arrollar al Feyenoord, mientras que su rival arrancó con una derrota frente al Sporting en Lisboa. Los precedentes sonríen a los azulgranas: su paso más reciente por el Rams Park, en noviembre de 2022, se saldó con un 1-2 en los octavos de la Europa League. Para encontrar la anterior visita en Champions hay que viajar hasta 2002, cuando conquistaron la ciudad turca, esta vez por 0-2. Ahora les espera un anfitrión que convierte cada noche continental en una batalla.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 4,
+          "2": 92,
+          "X": 4
+        },
         "lae": null,
         "real": {
-          "1": 11,
-          "2": 75,
-          "X": 14
+          "1": 10,
+          "2": 74,
+          "X": 16
         }
       },
       "recommended": "2"
@@ -105,14 +109,14 @@
       "comment": "La afición ´neroazzurri´ exige puntos para respaldar las sensaciones. El Inter cayó en el Bernabéu (2-1), castigado por sus errores y por un Courtois decisivo, aunque dejó motivos para creer en su candidatura a acabar entre los ocho mejores a finales de enero. Cristian Chivu quiere convertir esa impresión en resultados ante el Brujas en el Giuseppe Meazza. Los italianos buscan dejar atrás el golpe del curso anterior, cuando el Bodo/Glimt les apeó en el play-off de acceso a las eliminatorias. Tampoco arrancó con éxito el equipo belga: el Aston Villa le derrotó en su estadio por 2-3. Sus viajes europeos no le dan una victoria desde 2022, una sequía que añade dificultad a su misión en tierras italianas.",
       "percentages": {
         "quinielista": {
-          "1": 99,
-          "2": 1,
-          "X": 0
+          "1": 84,
+          "2": 9,
+          "X": 7
         },
         "lae": null,
         "real": {
-          "1": 75,
-          "2": 9,
+          "1": 76,
+          "2": 8,
           "X": 16
         }
       },
@@ -128,18 +132,18 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 0,
-          "2": 98,
-          "X": 2
+          "1": 2,
+          "2": 95,
+          "X": 3
         },
         "lae": null,
         "real": {
-          "1": 5,
-          "2": 87,
-          "X": 8
+          "1": 4,
+          "2": 80,
+          "X": 16
         }
       },
-      "recommended": null
+      "recommended": "2"
     },
     {
       "num": 7,
@@ -151,18 +155,18 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 40,
-          "2": 37,
-          "X": 23
+          "1": 34,
+          "2": 42,
+          "X": 24
         },
         "lae": null,
         "real": {
-          "1": 27,
-          "2": 50,
+          "1": 26,
+          "2": 51,
           "X": 23
         }
       },
-      "recommended": null
+      "recommended": "2"
     },
     {
       "num": 8,
@@ -173,7 +177,11 @@
       "schedule": "DOMINGO, 18:45",
       "comment": "",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 1,
+          "2": 99,
+          "X": 0
+        },
         "lae": null,
         "real": {
           "1": 8,
@@ -181,7 +189,7 @@
           "X": 16
         }
       },
-      "recommended": null
+      "recommended": "2"
     },
     {
       "num": 9,
@@ -193,9 +201,9 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 48,
-          "2": 27,
-          "X": 25
+          "1": 44,
+          "2": 29,
+          "X": 27
         },
         "lae": null,
         "real": {
@@ -204,7 +212,7 @@
           "X": 26
         }
       },
-      "recommended": null
+      "recommended": "1"
     },
     {
       "num": 10,
@@ -216,18 +224,18 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 10,
-          "2": 80,
-          "X": 10
+          "1": 15,
+          "2": 65,
+          "X": 20
         },
         "lae": null,
         "real": {
           "1": 30,
-          "2": 47,
-          "X": 23
+          "2": 46,
+          "X": 24
         }
       },
-      "recommended": null
+      "recommended": "2"
     },
     {
       "num": 11,
@@ -239,9 +247,9 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 42,
+          "1": 39,
           "2": 39,
-          "X": 19
+          "X": 22
         },
         "lae": null,
         "real": {
@@ -250,7 +258,7 @@
           "X": 24
         }
       },
-      "recommended": null
+      "recommended": "1"
     },
     {
       "num": 12,
@@ -262,9 +270,9 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 50,
-          "2": 19,
-          "X": 31
+          "1": 53,
+          "2": 20,
+          "X": 27
         },
         "lae": null,
         "real": {
@@ -273,7 +281,7 @@
           "X": 26
         }
       },
-      "recommended": null
+      "recommended": "1"
     },
     {
       "num": 13,
@@ -285,9 +293,9 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 20,
-          "2": 44,
-          "X": 36
+          "1": 19,
+          "2": 47,
+          "X": 34
         },
         "lae": null,
         "real": {
@@ -296,7 +304,7 @@
           "X": 30
         }
       },
-      "recommended": null
+      "recommended": "2"
     },
     {
       "num": 14,
@@ -308,16 +316,12 @@
       "comment": "El Getafe hará el estreno en la fase liga de la Conference, donde se disputan solamente seis jornadas, así que cada mal resultado puede penalizar. El debut será en Craiova, ante el campeón vigente de la liga rumana, este curso es tercero con buenos números en casa: cinco triunfos y una derrota. El Universitatea, de hecho, jugó hasta cuatro previas, dos de Champions y dos de Europa League. Acabó eliminado en ambas, por ello cayó a la tercera competición europea donde topa con un Getafe que llega de perder en el Camp Nou. Una derrota lógica, pero que es la tercera en tres jornadas para sumar ya cuatro en un arranque liguero irregular donde, por el momento, está pagando la falta de gol.",
       "percentages": {
         "quinielista": {
-          "1": 18,
-          "2": 57,
-          "X": 25
+          "1": 26,
+          "2": 52,
+          "X": 22
         },
         "lae": null,
-        "real": {
-          "1": 30,
-          "2": 41,
-          "X": 29
-        }
+        "real": null
       },
       "recommended": "X2"
     },
@@ -331,9 +335,9 @@
       "comment": "El Madrid volverá a enfrentarse a rival italiano en la segunda jornada de la Champions. Esta vez será en Roma ante un equipo bien dirigido por el veterano Gasperini que fue tercero la liga pasada, con notables números en casa (sólo tres puntos por detrás del campeón Inter). Este curso, dos triunfos y un empate, precisamente ante el cuadro interista (2-2). El conjunto blanco, mientras, sigue firmando triunfos en el Bernabéu, pero cuando viaja baja prestaciones. Sobre todo, por la dificultad de cerrar la defensa y mostrarse consistente a lo largo de los partidos. Ninguna portería a cero en sus cuatro salidas, con dos derrotas y dos victorias, ambas en el descuento.",
       "percentages": {
         "quinielista": {
-          "1": 35,
-          "2": 9,
-          "X": 53
+          "1": 26,
+          "2": 11,
+          "X": 60
         },
         "lae": null,
         "real": {
@@ -626,19 +630,6 @@
     "segunda": [
       {
         "pos": 1,
-        "team": "Castellón",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/122.png?width=44&amp;height=44",
-        "pts": 21,
-        "pj": 9,
-        "pg": 6,
-        "pe": 3,
-        "pp": 0,
-        "gf": 15,
-        "gc": 3,
-        "dif": 12
-      },
-      {
-        "pos": 2,
         "team": "Eibar",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/108.png?width=44&amp;height=44",
         "pts": 21,
@@ -648,6 +639,19 @@
         "pp": 1,
         "gf": 18,
         "gc": 7,
+        "dif": 11
+      },
+      {
+        "pos": 2,
+        "team": "Castellón",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/122.png?width=44&amp;height=44",
+        "pts": 20,
+        "pj": 9,
+        "pg": 6,
+        "pe": 2,
+        "pp": 1,
+        "gf": 15,
+        "gc": 4,
         "dif": 11
       },
       {
@@ -821,6 +825,19 @@
       },
       {
         "pos": 16,
+        "team": "Andorra",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/5026.png?width=44&amp;height=44",
+        "pts": 10,
+        "pj": 9,
+        "pg": 3,
+        "pe": 1,
+        "pp": 5,
+        "gf": 13,
+        "gc": 15,
+        "dif": -2
+      },
+      {
+        "pos": 17,
         "team": "Real Valladolid",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/18.png?width=44&amp;height=44",
         "pts": 9,
@@ -833,7 +850,7 @@
         "dif": -3
       },
       {
-        "pos": 17,
+        "pos": 18,
         "team": "Córdoba",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/342.png?width=44&amp;height=44",
         "pts": 9,
@@ -844,19 +861,6 @@
         "gf": 14,
         "gc": 20,
         "dif": -6
-      },
-      {
-        "pos": 18,
-        "team": "Andorra",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/5026.png?width=44&amp;height=44",
-        "pts": 8,
-        "pj": 9,
-        "pg": 2,
-        "pe": 2,
-        "pp": 5,
-        "gf": 12,
-        "gc": 15,
-        "dif": -3
       },
       {
         "pos": 19,

@@ -681,14 +681,14 @@ class PronosticoManager {
             if (this.currentJornadaHasMDAnalysis) {
                 const mdMatch = this.getMDMatchFor(match, idx);
                 if (mdMatch && mdMatch.percentages) {
-                    const pData = mdMatch.percentages.real || mdMatch.percentages.quinielista || {};
-                    const p1 = (pData['1'] !== undefined && pData['1'] !== null) ? pData['1'] : 0;
-                    const pX = (pData['X'] !== undefined && pData['X'] !== null) ? pData['X'] : 0;
-                    const p2 = (pData['2'] !== undefined && pData['2'] !== null) ? pData['2'] : 0;
-                    const rec = String(mdMatch.recommended || '').toUpperCase();
-                    const isRec1 = rec.includes('1');
-                    const isRecX = rec.includes('X');
-                    const isRec2 = rec.includes('2');
+                    const mdRecInfo = this.getEffectiveMDRecommendation(mdMatch);
+                    const p1 = mdRecInfo.p1;
+                    const pX = mdRecInfo.pX;
+                    const p2 = mdRecInfo.p2;
+                    const isRec1 = mdRecInfo.isRec1;
+                    const isRecX = mdRecInfo.isRecX;
+                    const isRec2 = mdRecInfo.isRec2;
+                    const recSign = mdRecInfo.recSign;
 
                     percHtml = `
                         <div id="consensus-${idx}" class="p-percentages" title="Probabilidad Mundo Deportivo: 1 (${p1}%), X (${pX}%), 2 (${p2}%)">
@@ -720,7 +720,7 @@ class PronosticoManager {
                             <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 text-[11px]">
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-sky-400 font-black uppercase tracking-wider">🎯 Recomendado:</span>
-                                    <span class="px-2 py-0.5 rounded-lg bg-sky-500 text-slate-950 font-black text-xs shadow">${mdMatch.recommended || '-'}</span>
+                                    <span class="px-2 py-0.5 rounded-lg bg-sky-500 text-slate-950 font-black text-xs shadow">${recSign}</span>
                                 </div>
                                 <span class="text-slate-400 font-mono text-[10px]">⏰ ${mdMatch.schedule || 'Fin de semana'}</span>
                             </div>
@@ -3156,6 +3156,44 @@ class PronosticoManager {
         return null;
     }
 
+    getEffectiveMDRecommendation(mdMatch) {
+        if (!mdMatch) return { recSign: '-', isRec1: false, isRecX: false, isRec2: false, p1: 0, pX: 0, p2: 0 };
+
+        const pData = (mdMatch.percentages && (mdMatch.percentages.real || mdMatch.percentages.quinielista)) || {};
+        const p1 = (pData['1'] !== undefined && pData['1'] !== null) ? Number(pData['1']) : 0;
+        const pX = (pData['X'] !== undefined && pData['X'] !== null) ? Number(pData['X']) : 0;
+        const p2 = (pData['2'] !== undefined && pData['2'] !== null) ? Number(pData['2']) : 0;
+        const maxP = Math.max(p1, pX, p2);
+
+        let rec = String(mdMatch.recommended || '').toUpperCase().trim();
+        // Si no viene recomendación oficial de MD o viene vacía, inferir por mayor probabilidad
+        if (!rec || rec === '-' || rec === 'NULL') {
+            if (maxP > 0) {
+                if (p1 === maxP) rec = '1';
+                else if (p2 === maxP) rec = '2';
+                else if (pX === maxP) rec = 'X';
+            }
+        }
+
+        // Un signo recibe estrella (rec-sign) si:
+        // 1. Está incluido en el signo recomendado por MD (o inferido)
+        // 2. O tiene un porcentaje muy alto (>= 50%)
+        // 3. O es el favorito destacado del partido (>= 40% y mayor que los demás)
+        const isRec1 = rec.includes('1') || (p1 >= 50) || (maxP >= 40 && p1 === maxP);
+        const isRecX = rec.includes('X') || (pX >= 50) || (maxP >= 40 && pX === maxP);
+        const isRec2 = rec.includes('2') || (p2 >= 50) || (maxP >= 40 && p2 === maxP);
+
+        return {
+            recSign: rec || '-',
+            isRec1,
+            isRecX,
+            isRec2,
+            p1,
+            pX,
+            p2
+        };
+    }
+
     switchMDView(view) {
         this.currentMDView = view;
         const btnAnalysis = document.getElementById('md-tab-analysis');
@@ -3242,7 +3280,8 @@ class PronosticoManager {
         const homeLogo = AppUtils.getTeamLogo(homeName);
         const awayLogo = AppUtils.getTeamLogo(awayName);
 
-        const recSign = mdMatch.recommended || '-';
+        const mdRecInfo = this.getEffectiveMDRecommendation(mdMatch);
+        const recSign = mdRecInfo.recSign;
         const pReal = (mdMatch.percentages && mdMatch.percentages.real) || {};
         const pQuin = (mdMatch.percentages && mdMatch.percentages.quinielista) || {};
 
@@ -3471,7 +3510,8 @@ class PronosticoManager {
         const homeLogo = AppUtils.getTeamLogo(homeName);
         const awayLogo = AppUtils.getTeamLogo(awayName);
 
-        const recSign = mdMatch.recommended || '-';
+        const mdRecInfo = this.getEffectiveMDRecommendation(mdMatch);
+        const recSign = mdRecInfo.recSign;
         const pReal = (mdMatch.percentages && mdMatch.percentages.real) || {};
         const pQuin = (mdMatch.percentages && mdMatch.percentages.quinielista) || {};
 

@@ -110,6 +110,19 @@ async function scrapeMDAnalysis() {
                     if (val) recommended += val;
                 });
             }
+            if (!recommended && num < 15) {
+                const pReal = rMatch ? { '1': parseInt(rMatch[1], 10), 'X': parseInt(rMatch[2], 10), '2': parseInt(rMatch[3], 10) } : null;
+                const pQuin = qMatch ? { '1': parseInt(qMatch[1], 10), 'X': parseInt(qMatch[2], 10), '2': parseInt(qMatch[3], 10) } : null;
+                const p = pReal || pQuin;
+                if (p) {
+                    const maxVal = Math.max(p['1'] || 0, p['X'] || 0, p['2'] || 0);
+                    if (maxVal > 0) {
+                        if (p['1'] === maxVal) recommended = '1';
+                        else if (p['2'] === maxVal) recommended = '2';
+                        else if (p['X'] === maxVal) recommended = 'X';
+                    }
+                }
+            }
         }
 
         analysisList.push({
