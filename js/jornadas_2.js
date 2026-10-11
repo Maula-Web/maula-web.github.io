@@ -265,16 +265,26 @@ class Jornadas2AppController {
 
         const optionsHtml = official.map(j => {
             const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
-            let statusLabel = 'Pendiente';
-            if (filled === 15) statusLabel = 'Finalizada (15/15)';
-            else if (filled > 0) statusLabel = `En Juego (${filled}/15)`;
+            let statusLabel = 'Próxima';
+            let statusClass = 'opt-status-pending';
+            let statusDot = '🟢';
+
+            if (filled === 15) {
+                statusLabel = 'Jugada (15/15)';
+                statusClass = 'opt-status-finished';
+                statusDot = '🔵';
+            } else if (filled > 0) {
+                statusLabel = `En Juego (${filled}/15)`;
+                statusClass = 'opt-status-playing';
+                statusDot = '🟡';
+            }
 
             const hasPig = j.matches && j.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
             const pigIcon = hasPig ? ' 🐷' : '';
 
             return `
-                <option value="${j.id}" ${j.id == this.selectedJornadaId ? 'selected' : ''}>
-                    Jornada ${j.number} - ${j.date || 'Sin fecha'} [${statusLabel}]${pigIcon}
+                <option value="${j.id}" class="${statusClass}" ${j.id == this.selectedJornadaId ? 'selected' : ''}>
+                    ${statusDot} Jornada ${j.number} - ${j.date || 'Sin fecha'} [${statusLabel}]${pigIcon}
                 </option>
             `;
         }).join('');
@@ -288,20 +298,24 @@ class Jornadas2AppController {
                 const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
                 const hasPig = j.matches && j.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
 
-                let badgeColor = 'bg-slate-800 text-slate-400 border-slate-700';
-                let dotColor = 'bg-slate-500';
+                // REGLA USUARIO:
+                // Azul: ya jugadas (15/15)
+                // Amarillo: en juego (parciales)
+                // Verde: próximas jornadas a jugar (pendientes)
+                let badgeColor = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35 hover:bg-emerald-500/25';
+                let dotColor = 'bg-emerald-400';
 
                 if (filled === 15) {
-                    badgeColor = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
-                    dotColor = 'bg-emerald-400';
+                    badgeColor = 'bg-sky-500/15 text-sky-300 border-sky-500/35 hover:bg-sky-500/25';
+                    dotColor = 'bg-sky-400';
                 } else if (filled > 0) {
-                    badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+                    badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30';
                     dotColor = 'bg-amber-400 animate-ping';
                 }
 
                 const selectedClass = isSelected
-                    ? 'ring-2 ring-amber-400 bg-amber-500/25 text-white font-extrabold shadow-lg shadow-amber-500/20 scale-105'
-                    : 'hover:bg-slate-800 hover:text-white opacity-85 hover:opacity-100';
+                    ? 'ring-2 ring-white/80 font-black shadow-lg scale-105 opacity-100 brightness-125'
+                    : 'opacity-85 hover:opacity-100';
 
                 return `
                     <button type="button" onclick="window.JornadasApp.selectJornadaById('${j.id}')" 
@@ -379,14 +393,17 @@ class Jornadas2AppController {
         const statusText = document.getElementById('selected-jornada-status-text');
         if (statusChip && statusText) {
             if (isFinished) {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5';
-                statusText.textContent = 'Finalizada (15/15)';
+                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1.5 shadow-sm';
+                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-sky-400';
+                statusText.textContent = 'Jugada (15/15)';
             } else if (isInProgress) {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5';
+                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5 shadow-sm';
+                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
                 statusText.textContent = `En Juego (${filledMatches}/15)`;
             } else {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5';
-                statusText.textContent = 'Pendiente';
+                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 flex items-center gap-1.5 shadow-sm';
+                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-emerald-400';
+                statusText.textContent = 'Próxima a Jugar';
             }
         }
 

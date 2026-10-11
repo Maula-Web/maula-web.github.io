@@ -184,8 +184,15 @@ class JornadaManager {
             const hasTeams = j.matches.some(m => m.home !== '' || m.away !== '');
             const hasPig = j.matches && j.matches.some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
-            const statusColor = filledMatches === 15 ? '#2e7d32' : '#f57f17';
-            const statusText = filledMatches === 15 ? 'Finalizada' : (filledMatches > 0 ? 'En Juego' : 'Pendiente');
+            let statusColor = '#10b981'; // Verde (próxima)
+            let statusText = 'Próxima a Jugar';
+            if (filledMatches === 15) {
+                statusColor = '#0284c7'; // Azul (jugada)
+                statusText = 'Jugada (15/15)';
+            } else if (filledMatches > 0) {
+                statusColor = '#d97706'; // Amarillo (en juego)
+                statusText = `En Juego (${filledMatches}/15)`;
+            }
 
             if (!hasTeams) {
                 // Using class for configurable empty state opacity/bg/border
@@ -205,7 +212,7 @@ class JornadaManager {
                 </div>
                 <div style="font-size:0.9rem; color:#555;">
                     <div class="jornada-season">${j.season}</div>
-                    <div class="${filledMatches === 15 ? 'jornada-status-finished' : 'jornada-status-pending'}">${statusText}</div>
+                    <div style="color:${statusColor}; font-weight:bold; margin-top:3px;">${statusText}</div>
                     ${hasPig ? '<div style="font-size:0.8rem; color:#d81b60; font-weight:bold; margin-top:0.2rem;">🐷 Partido PIG</div>' : ''}
                     ${!hasTeams ? '<div style="font-size:0.8rem; color:#999; margin-top:0.2rem;">(Sin partidos definidos)</div>' : ''}
                 </div>

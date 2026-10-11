@@ -258,7 +258,37 @@
             font-weight: 800;
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
         }
-    
+
+        /* Colores de opciones en el selector de jornadas (Dropdown) */
+        select option.opt-status-finished {
+            background-color: #0f172a;
+            color: #38bdf8; /* Azul claro / Sky */
+            font-weight: 700;
+        }
+        select option.opt-status-playing {
+            background-color: #0f172a;
+            color: #fbbf24; /* Amarillo / Amber */
+            font-weight: 700;
+        }
+        select option.opt-status-pending {
+            background-color: #0f172a;
+            color: #34d399; /* Verde / Emerald */
+            font-weight: 700;
+        }
+
+        .light-theme select option.opt-status-finished {
+            background-color: #ffffff;
+            color: #0284c7; /* Azul / Sky */
+        }
+        .light-theme select option.opt-status-playing {
+            background-color: #ffffff;
+            color: #d97706; /* Amarillo / Ámbar */
+        }
+        .light-theme select option.opt-status-pending {
+            background-color: #ffffff;
+            color: #059669; /* Verde */
+        }
+
         @media (max-width: 767px) { .desktop-only-flex { display: none !important; } }
         @media (min-width: 768px) { .desktop-only-flex { display: flex !important; } }
 </style>
@@ -921,75 +951,75 @@
          MODAL 2: IMPORTAR PARTIDOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
     <div id="modal-import-matches" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100080]">
-        <div class="modal-dialog-panel w-full max-w-3xl border border-orange-500/50 p-4 sm:p-6 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl p-2 rounded-xl bg-orange-500/20 text-orange-400">📋</span>
+        <div class="modal-dialog-panel w-full max-w-3xl border border-orange-500/50 p-3 sm:p-5 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl p-1.5 rounded-xl bg-orange-500/20 text-orange-400">📋</span>
                     <div>
-                        <h2 class="text-lg font-black text-white">Importar Partidos de Jornada</h2>
-                        <p class="text-xs text-slate-400">Detección oficial automática de boletos o importación de texto</p>
+                        <h2 class="text-base sm:text-lg font-black text-white">Importar Partidos de la Jornada</h2>
+                        <p class="text-[11px] text-slate-400">Detección oficial automática de boletos o importación de texto</p>
                     </div>
                 </div>
-                <button type="button" onclick="window.JornadasApp.closeImportMatchesModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold">✕</button>
+                <button type="button" onclick="window.JornadasApp.closeImportMatchesModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs">✕</button>
             </div>
 
-            <div class="overflow-y-auto flex-1 py-3 space-y-3">
-                <div id="import-matches-step-1" class="space-y-4">
+            <div class="overflow-y-auto flex-1 py-2 space-y-2.5">
+                <div id="import-matches-step-1" class="space-y-2.5">
                     <!-- TARJETA 1: DESCARGA AUTOMÁTICA EN 1 CLIC -->
-                    <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-950/80 via-slate-900 to-slate-950 border border-orange-500/50 space-y-3 shadow-xl">
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-orange-950/80 via-slate-900 to-slate-950 border border-orange-500/50 space-y-2 shadow-xl">
                         <div class="flex items-start justify-between gap-3">
-                            <div class="space-y-1">
+                            <div class="space-y-0.5">
                                 <div class="flex items-center gap-2">
-                                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></span>
-                                    <h3 class="text-sm font-extrabold text-white">Detección Automática de Próximas Jornadas</h3>
+                                    <span class="inline-block w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
+                                    <h3 class="text-xs sm:text-sm font-extrabold text-white">Detección Automática de Próximas Jornadas</h3>
                                 </div>
-                                <p class="text-xs text-slate-300 leading-relaxed">
+                                <p class="text-[11px] sm:text-xs text-slate-300 leading-snug">
                                     Descarga el calendario oficial de boletos de quiniela, filtrando estrictamente los domingos y asegurando partidos de Primera División.
                                 </p>
                             </div>
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-500/20 text-orange-300 border border-orange-500/30">1 Clic</span>
                         </div>
 
-                        <div class="pt-1 flex items-center gap-2">
-                            <button type="button" id="btn-auto-import-matches" onclick="window.JornadasApp.handleAutoImportMatches()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white text-xs font-black transition shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                        <div class="pt-0.5 flex items-center gap-2">
+                            <button type="button" id="btn-auto-import-matches" onclick="window.JornadasApp.handleAutoImportMatches()" class="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white text-xs font-black transition shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                                 <span id="btn-auto-import-matches-spinner" class="hidden animate-spin text-sm">⏳</span>
                                 <span id="btn-auto-import-matches-icon" class="text-sm">⚡</span>
                                 <span id="btn-auto-import-matches-text">Descargar próximas jornadas</span>
                             </button>
                         </div>
 
-                        <div id="auto-import-matches-status" class="hidden text-xs font-semibold text-orange-400 text-center animate-pulse pt-1"></div>
+                        <div id="auto-import-matches-status" class="hidden text-xs font-semibold text-orange-400 text-center animate-pulse pt-0.5"></div>
                     </div>
 
                     <!-- DIVISOR ALTERNATIVO -->
-                    <div class="relative flex py-1 items-center">
+                    <div class="relative flex py-0.5 items-center">
                         <div class="flex-grow border-t border-slate-800"></div>
-                        <span class="flex-shrink mx-3 text-[11px] text-slate-500 font-semibold uppercase">o método manual de contingencia</span>
+                        <span class="flex-shrink mx-3 text-[10px] text-slate-500 font-semibold uppercase">o método manual de contingencia</span>
                         <div class="flex-grow border-t border-slate-800"></div>
                     </div>
 
                     <!-- SECCIÓN MANUAL -->
-                    <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-xs space-y-2 group">
-                        <summary class="font-bold text-slate-400 hover:text-white cursor-pointer select-none flex items-center justify-between">
+                    <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 text-xs space-y-2 group">
+                        <summary class="font-bold text-slate-400 hover:text-white cursor-pointer select-none flex items-center justify-between text-[11px]">
                             <span>✏️ Pegar texto oficial manualmente</span>
                             <span class="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
                         </summary>
-                        <div class="pt-2 space-y-3">
+                        <div class="pt-1.5 space-y-2">
                             <p class="text-slate-400 text-[11px]">
                                 Copia y pega el texto de la jornada desde Revista Quinielista o documentos PDF:
                             </p>
-                            <textarea id="import-matches-textarea" rows="5" placeholder="Ejemplo:&#10;Jornada: 8&#10;27/09/2026&#10;1º Osasuna - Rayo V.&#10;2º Athletic Club - Alavés&#10;...&#10;15º Real Madrid - Barcelona" class="w-full p-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                            <textarea id="import-matches-textarea" rows="4" placeholder="Ejemplo:&#10;Jornada: 8&#10;27/09/2026&#10;1º Osasuna - Rayo V.&#10;2º Athletic Club - Alavés&#10;...&#10;15º Real Madrid - Barcelona" class="w-full p-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
 
-                            <div class="flex justify-end gap-2 pt-1">
-                                <button type="button" onclick="window.JornadasApp.handleAnalyzeMatchesText()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow">🔍 Analizar Texto Pegado</button>
+                            <div class="flex justify-end gap-2 pt-0.5">
+                                <button type="button" onclick="window.JornadasApp.handleAnalyzeMatchesText()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow">🔍 Analizar Texto Pegado</button>
                             </div>
                         </div>
                     </details>
 
-                    <div id="import-matches-error-box" class="hidden p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs"></div>
+                    <div id="import-matches-error-box" class="hidden p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs"></div>
 
-                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-800/80">
-                        <button type="button" onclick="window.JornadasApp.closeImportMatchesModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">Cerrar</button>
+                    <div class="flex justify-end gap-2 pt-1 border-t border-slate-800/80">
+                        <button type="button" onclick="window.JornadasApp.closeImportMatchesModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">Cerrar</button>
                     </div>
                 </div>
 
@@ -1010,75 +1040,75 @@
          MODAL 3: IMPORTAR RESULTADOS Y PREMIOS DESDE TEXTO (VERSION 2.0)
          ===================================================================== -->
     <div id="modal-import-results" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100080]">
-        <div class="modal-dialog-panel w-full max-w-3xl border border-emerald-500/50 p-4 sm:p-6 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl p-2 rounded-xl bg-emerald-500/20 text-emerald-400">📥</span>
+        <div class="modal-dialog-panel w-full max-w-3xl border border-emerald-500/50 p-3 sm:p-5 animate-modal max-h-[92vh] flex flex-col overflow-hidden shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl p-1.5 rounded-xl bg-emerald-500/20 text-emerald-400">📥</span>
                     <div>
-                        <h2 class="text-lg font-black text-white">Importar Resultados y Escrutinio</h2>
-                        <p class="text-xs text-slate-400">Obtención automática del escrutinio oficial en 1 clic o mediante texto</p>
+                        <h2 class="text-base sm:text-lg font-black text-white">Importar Resultados y Escrutinio</h2>
+                        <p class="text-[11px] text-slate-400">Obtención automática del escrutinio oficial en 1 clic o mediante texto</p>
                     </div>
                 </div>
-                <button type="button" onclick="window.JornadasApp.closeImportResultsModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold">✕</button>
+                <button type="button" onclick="window.JornadasApp.closeImportResultsModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs">✕</button>
             </div>
 
-            <div class="overflow-y-auto flex-1 py-3 space-y-3">
-                <div id="import-results-step-1" class="space-y-4">
+            <div class="overflow-y-auto flex-1 py-2 space-y-2.5">
+                <div id="import-results-step-1" class="space-y-2.5">
                     <!-- TARJETA 1: OBTENCIÓN AUTOMÁTICA EN 1 CLIC -->
-                    <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-950 border border-emerald-500/50 space-y-3 shadow-xl">
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-950 border border-emerald-500/50 space-y-2 shadow-xl">
                         <div class="flex items-start justify-between gap-3">
-                            <div class="space-y-1">
+                            <div class="space-y-0.5">
                                 <div class="flex items-center gap-2">
-                                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                    <h3 class="text-sm font-extrabold text-white">Escrutinio Oficial Automático</h3>
+                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <h3 class="text-xs sm:text-sm font-extrabold text-white">Escrutinio Oficial Automático</h3>
                                 </div>
-                                <p class="text-xs text-slate-300 leading-relaxed">
+                                <p class="text-[11px] sm:text-xs text-slate-300 leading-snug">
                                     Conecta directamente con las fuentes oficiales y recopila los 15 resultados y todos los premios con sus céntimos exactos.
                                 </p>
                             </div>
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">1 Clic</span>
                         </div>
 
-                        <div class="pt-1 flex items-center gap-2">
-                            <button type="button" id="btn-auto-import-results" onclick="window.JornadasApp.handleAutoImportResults()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black transition shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                        <div class="pt-0.5 flex items-center gap-2">
+                            <button type="button" id="btn-auto-import-results" onclick="window.JornadasApp.handleAutoImportResults()" class="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black transition shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                                 <span id="btn-auto-import-spinner" class="hidden animate-spin text-sm">⏳</span>
                                 <span id="btn-auto-import-icon" class="text-sm">📥</span>
                                 <span id="btn-auto-import-text">Importar resultados</span>
                             </button>
                         </div>
 
-                        <div id="auto-import-status" class="hidden text-xs font-semibold text-emerald-400 text-center animate-pulse pt-1"></div>
+                        <div id="auto-import-status" class="hidden text-xs font-semibold text-emerald-400 text-center animate-pulse pt-0.5"></div>
                     </div>
 
                     <!-- DIVISOR ALTERNATIVO -->
-                    <div class="relative flex py-1 items-center">
+                    <div class="relative flex py-0.5 items-center">
                         <div class="flex-grow border-t border-slate-800"></div>
-                        <span class="flex-shrink mx-3 text-[11px] text-slate-500 font-semibold uppercase">o método manual de contingencia</span>
+                        <span class="flex-shrink mx-3 text-[10px] text-slate-500 font-semibold uppercase">o método manual de contingencia</span>
                         <div class="flex-grow border-t border-slate-800"></div>
                     </div>
 
                     <!-- SECCIÓN MANUAL -->
-                    <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-xs space-y-2 group">
-                        <summary class="font-bold text-slate-400 hover:text-white cursor-pointer select-none flex items-center justify-between">
+                    <details class="rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 text-xs space-y-2 group">
+                        <summary class="font-bold text-slate-400 hover:text-white cursor-pointer select-none flex items-center justify-between text-[11px]">
                             <span>✏️ Pegar texto oficial manualmente</span>
                             <span class="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
                         </summary>
-                        <div class="pt-2 space-y-3">
+                        <div class="pt-1.5 space-y-2">
                             <p class="text-slate-400 text-[11px]">
                                 Si alguna vez no tienes conexión a internet, pega aquí el texto de resultados y premios copiado de la web:
                             </p>
-                            <textarea id="import-results-textarea" rows="5" placeholder="Pega aquí el texto oficial de Loterías..." class="w-full p-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                            <textarea id="import-results-textarea" rows="4" placeholder="Pega aquí el texto oficial de Loterías..." class="w-full p-2.5 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl font-mono text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
 
-                            <div class="flex justify-end gap-2 pt-1">
-                                <button type="button" onclick="window.JornadasApp.handleAnalyzeResultsText()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow">🔍 Analizar Texto Pegado</button>
+                            <div class="flex justify-end gap-2 pt-0.5">
+                                <button type="button" onclick="window.JornadasApp.handleAnalyzeResultsText()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow">🔍 Analizar Texto Pegado</button>
                             </div>
                         </div>
                     </details>
 
-                    <div id="import-results-error-box" class="hidden p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs"></div>
+                    <div id="import-results-error-box" class="hidden p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs"></div>
 
-                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-800/80">
-                        <button type="button" onclick="window.JornadasApp.closeImportResultsModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">Cerrar</button>
+                    <div class="flex justify-end gap-2 pt-1 border-t border-slate-800/80">
+                        <button type="button" onclick="window.JornadasApp.closeImportResultsModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">Cerrar</button>
                     </div>
                 </div>
 
