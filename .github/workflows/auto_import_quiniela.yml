@@ -2,11 +2,11 @@ name: Auto-Importar Quiniela (Resultados y Próximas Jornadas)
 
 on:
   schedule:
-    # Domingos a las 22:30 y 23:30 (hora peninsular)
-    - cron: '30 21 * * 0'
-    - cron: '30 22 * * 0'
-    # Lunes por la mañana a las 09:00 (hora peninsular) para comprobar resultados y nuevas jornadas
-    - cron: '0 7 * * 1'
+    # Sábado, Domingo y Lunes a las 23:59 (hora peninsular española)
+    # Horario de Verano (CEST, UTC+2): 21:59 UTC
+    - cron: '59 21 * * 6,0,1'
+    # Horario de Invierno (CET, UTC+1): 22:59 UTC
+    - cron: '59 22 * * 6,0,1'
   workflow_dispatch:
     # Permite pulsar "Run workflow" manualmente desde GitHub con un clic
 

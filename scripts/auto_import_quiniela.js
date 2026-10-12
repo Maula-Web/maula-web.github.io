@@ -94,14 +94,14 @@ async function run() {
             } else {
                 console.log('ℹ️ No hay jornadas activas pendientes de resultados en Firestore.');
             }
-        } else {
-            // Guardar copia local en JSON por seguridad
-            const outDir = path.join(__dirname, '../datos_auxiliares');
-            if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
-            const outFile = path.join(outDir, 'ultimo_escrutinio_oficial.json');
-            fs.writeFileSync(outFile, JSON.stringify(scraped, null, 2), 'utf-8');
-            console.log(`\n💾 Escrutinio guardado localmente en: ${outFile}`);
         }
+
+        // Guardar copia local en JSON por seguridad y sincronización web en GitHub Pages
+        const outDir = path.join(__dirname, '../datos_auxiliares');
+        if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+        const outFile = path.join(outDir, 'ultimo_escrutinio_oficial.json');
+        fs.writeFileSync(outFile, JSON.stringify(scraped, null, 2), 'utf-8');
+        console.log(`\n💾 Escrutinio guardado localmente en: ${outFile}`);
 
         console.log('\n✨ Proceso de resultados completado.');
 
