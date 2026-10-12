@@ -688,6 +688,50 @@
         }
 
         /* =========================================================================
+           PARTIDOS ACERTADOS Y EN JUEGO (INDICADORES VISUALES EN VIVO)
+           ========================================================================= */
+        #modal-editor-boleto .pronostico-row.match-hit,
+        #modal-editor-boleto .doubles-row.match-hit {
+            background: rgba(16, 185, 129, 0.12) !important;
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.12) !important;
+        }
+        .light-theme #modal-editor-boleto .pronostico-row.match-hit,
+        .light-theme #modal-editor-boleto .doubles-row.match-hit {
+            background: #ecfdf5 !important;
+            border-color: #10b981 !important;
+        }
+
+        #modal-editor-boleto .pronostico-row.match-miss,
+        #modal-editor-boleto .doubles-row.match-miss {
+            opacity: 0.72;
+            background: rgba(239, 68, 68, 0.05) !important;
+            border-color: rgba(239, 68, 68, 0.25) !important;
+        }
+        .light-theme #modal-editor-boleto .pronostico-row.match-miss,
+        .light-theme #modal-editor-boleto .doubles-row.match-miss {
+            background: #fef2f2 !important;
+            border-color: #fca5a5 !important;
+        }
+
+        /* Resalte de la opción acertada */
+        .chk-option.opt-hit,
+        .p15-option.opt-hit {
+            background: #10b981 !important;
+            color: #ffffff !important;
+            border-color: #059669 !important;
+            font-weight: 900 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.8) !important;
+            transform: scale(1.08) !important;
+            z-index: 5 !important;
+        }
+        .chk-option.opt-miss {
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: #f87171 !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+        }
+
+        /* =========================================================================
            FILAS DE PARTIDO EN EL MODAL FLOTANTE (AJUSTE EXACTO Y RESPONSIVE)
            ========================================================================= */
         #modal-editor-boleto .pronostico-row, 

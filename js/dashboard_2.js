@@ -1635,22 +1635,61 @@ class Dashboard2AppController {
             if (idx < 14 && s && String(s).length > 1) countDobles++;
         });
 
+        const matches = (targetJ && Array.isArray(targetJ.matches)) ? targetJ.matches : [];
+        
+        // Evaluar aciertos para la Quiniela de Dobles
+        let doublesHits = 0;
+        let hasAnyResult = false;
+        const matchHitStatus = Array(15).fill(null);
+
+        for (let i = 0; i < 15; i++) {
+            const m = matches[i];
+            const res = m && m.result ? String(m.result).trim() : '';
+            if (!res || res === '-' || res.toLowerCase() === 'por definir') {
+                matchHitStatus[i] = null;
+                continue;
+            }
+            hasAnyResult = true;
+            const sign = sel[i] ? String(sel[i]).trim().toUpperCase() : '';
+            if (!sign) {
+                matchHitStatus[i] = false;
+                continue;
+            }
+            const rSign = window.ScoringSystem ? window.ScoringSystem.normalizeSign(res) : res.toUpperCase();
+            const rScore = res.toUpperCase();
+
+            if (i < 14) {
+                const isHit = sign.includes(rSign) || sign === rSign;
+                matchHitStatus[i] = isHit;
+                if (isHit) doublesHits++;
+            } else if (i === 14) {
+                const isHit = (sign === rScore) || (sign === rSign);
+                matchHitStatus[i] = isHit;
+            }
+        }
+
+        const isFinished = matches.length === 15 && matches.every(m => m && m.result && m.result !== '' && m.result !== '-');
+
         if (metaEl) {
             metaEl.innerHTML = `
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span class="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold uppercase text-[10px]">
                         ${isReduced ? '⚙️ Reducida al 13' : '🎯 Directa'}
                     </span>
                     <span class="text-slate-300 font-medium">${countDobles} Dobles activos</span>
+                    ${hasAnyResult ? `
+                        <span class="px-2.5 py-0.5 rounded font-mono font-bold text-xs ${!isFinished ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse' : 'bg-slate-800 text-slate-200 border border-slate-700'}">
+                            🎯 <strong>${doublesHits} / 14 aciertos</strong>${matchHitStatus[14] === true ? ' <span class="text-purple-300 font-bold">(+P15 ✅)</span>' : ''} ${!isFinished ? '<span class="text-[10px] text-emerald-400 font-sans uppercase font-bold tracking-wider ml-1">En Juego</span>' : ''}
+                        </span>
+                    ` : ''}
                 </div>
-                <div class="flex items-center gap-3 text-slate-400">
+                <div class="flex items-center gap-3 text-slate-400 text-xs mt-1">
                     <span>Importe oficial: <strong class="text-emerald-400 font-mono">12,00 €</strong></span>
                     <span>Sella: <strong class="text-rose-300">${loserName}</strong></span>
                 </div>
             `;
         }
 
-        const matches = (targetJ && Array.isArray(targetJ.matches)) ? targetJ.matches : [];
         if (listEl) {
             let html = '';
             for (let i = 0; i < 15; i++) {
@@ -1658,16 +1697,36 @@ class Dashboard2AppController {
                 const sign = sel[i] || '-';
                 const isDouble = i < 14 && String(sign).length > 1;
                 const isPleno = (i === 14);
+                const hit = matchHitStatus[i];
+                const res = m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-' && String(m.result).trim().toLowerCase() !== 'por definir' ? String(m.result).trim() : null;
 
                 let badgeClass = 'bg-slate-800 text-slate-200 border-slate-700';
-                if (isDouble) {
+                let rowBgClass = '';
+                if (hit === true) {
+                    badgeClass = 'bg-emerald-500/30 text-emerald-300 border-emerald-500/60 font-black shadow-sm';
+                    rowBgClass = 'bg-emerald-500/10 border-l-2 border-emerald-500';
+                } else if (hit === false) {
+                    badgeClass = 'bg-rose-500/25 text-rose-300 border-rose-500/50 line-through';
+                    rowBgClass = 'bg-rose-500/5 border-l-2 border-rose-500/50';
+                } else if (isDouble) {
                     badgeClass = 'bg-amber-500/25 text-amber-300 border-amber-500/50 font-black shadow-sm';
                 } else if (isPleno) {
                     badgeClass = 'bg-purple-500/25 text-purple-300 border-purple-500/50 font-bold';
                 }
 
+                let resBadge = '';
+                if (res) {
+                    if (hit === true) {
+                        resBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shrink-0">✅ ${res}</span>`;
+                    } else if (hit === false) {
+                        resBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-500/20 text-rose-400 border border-rose-500/40 shrink-0">❌ ${res}</span>`;
+                    } else {
+                        resBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 border border-slate-700 shrink-0">${res}</span>`;
+                    }
+                }
+
                 html += `
-                    <div class="py-1.5 px-2 flex items-center justify-between hover:bg-slate-900/50 rounded-lg transition">
+                    <div class="py-1.5 px-2 flex items-center justify-between hover:bg-slate-900/50 rounded-lg transition ${rowBgClass}">
                         <div class="flex items-center gap-2.5 min-w-0 pr-2">
                             <span class="w-6 h-6 rounded bg-slate-800/80 text-slate-400 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">
                                 ${isPleno ? 'P15' : (i + 1)}
@@ -1675,6 +1734,7 @@ class Dashboard2AppController {
                             <span class="text-slate-200 truncate font-medium text-xs">
                                 ${m.home} <span class="text-slate-500">vs</span> ${m.away}
                             </span>
+                            ${resBadge}
                         </div>
                         <div class="shrink-0">
                             <span class="px-2.5 py-0.5 rounded border font-mono text-xs ${badgeClass}">
@@ -1688,7 +1748,11 @@ class Dashboard2AppController {
         }
 
         if (statusEl) {
-            statusEl.innerHTML = `<span class="text-emerald-400 font-medium">✓ Boleto colectivo listo</span>`;
+            if (hasAnyResult) {
+                statusEl.innerHTML = `<span class="text-emerald-400 font-medium">🎯 En seguimiento: <strong>${doublesHits} / 14 aciertos</strong></span>`;
+            } else {
+                statusEl.innerHTML = `<span class="text-emerald-400 font-medium">✓ Boleto colectivo listo</span>`;
+            }
         }
 
         modal.classList.remove('hidden');

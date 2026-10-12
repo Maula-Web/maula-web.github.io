@@ -598,10 +598,63 @@ class PronosticoManager {
             this.selMethod.value = (existing && existing.isReduced) ? 'reducido' : 'directo';
         }
 
+        // Determinar si la jornada tiene resultados en juego o finalizados para evaluar aciertos
+        let hitsCount = 0;
+        let finishedHitsCount = 0;
+        let hasAnyMatchResult = false;
+        const officialResults = Array.isArray(jornada.matches) ? jornada.matches.map(m => m.result) : [];
+        if (Array.isArray(jornada.matches)) {
+            hasAnyMatchResult = jornada.matches.some(m => {
+                const r = m && m.result ? String(m.result).trim() : '';
+                return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+            });
+        }
+
         const currentSelections = existing ? existing.selection : Array(15).fill(null);
         // Only consider the first 14 signs for the "completed" notification
         if (currentSelections.slice(0, 14).filter(s => s !== null).length === 14) {
             this._fullForecastNotified = true;
+        }
+
+        // Si hay resultados y pronóstico, calcular aciertos
+        const matchHitStatus = Array(15).fill(null); // true = acertado, false = fallado, null = pendiente
+        if (hasAnyMatchResult && Array.isArray(currentSelections)) {
+            for (let i = 0; i < 15; i++) {
+                const res = officialResults[i];
+                if (!res || String(res).trim() === '' || String(res).trim() === '-' || String(res).trim().toLowerCase() === 'por definir') {
+                    matchHitStatus[i] = null;
+                    continue;
+                }
+                const sel = currentSelections[i];
+                if (!sel) {
+                    matchHitStatus[i] = false;
+                    continue;
+                }
+                const rSign = window.ScoringSystem ? window.ScoringSystem.normalizeSign(res) : String(res).trim().toUpperCase();
+                const rScore = String(res).trim().toUpperCase();
+                const pred = String(sel).trim().toUpperCase();
+
+                if (i < 14) {
+                    const isHit = pred.includes(rSign) || pred === rSign;
+                    matchHitStatus[i] = isHit;
+                    if (isHit) hitsCount++;
+                } else if (i === 14) {
+                    const isHit = (pred === rScore) || (pred === rSign);
+                    matchHitStatus[i] = isHit;
+                }
+            }
+
+            // Inyectar o actualizar insignia de aciertos en el statusMsg
+            const badgeHitsHtml = `
+                <div class="mt-2 flex items-center justify-center gap-2 flex-wrap">
+                    <span class="px-3 py-1 rounded-full text-xs font-mono font-black ${hasStarted && !isFinished ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 animate-pulse' : 'bg-amber-500/20 text-amber-300 border border-amber-500/50'} shadow-sm flex items-center gap-1.5">
+                        <span>🎯</span> <strong>${hitsCount} / 14 aciertos</strong>${matchHitStatus[14] === true ? ' <span class="text-purple-300 font-bold">(+P15 ✅)</span>' : ''} ${hasStarted && !isFinished ? '<span class="text-[10px] text-emerald-400 font-sans uppercase font-bold tracking-wider ml-1">En Juego</span>' : ''}
+                    </span>
+                </div>
+            `;
+            if (this.statusMsg) {
+                this.statusMsg.innerHTML += badgeHitsHtml;
+            }
         }
 
         // Fetch other members' forecasts for this jornada
@@ -725,6 +778,28 @@ class PronosticoManager {
                 percHtml = `<div id="consensus-${idx}" class="p-percentages hidden" style="display:none !important;"></div>`;
             }
 
+            // Evaluación de acierto para este partido
+            const hitStatus = matchHitStatus[idx];
+            if (hitStatus === true) {
+                row.classList.add('match-hit');
+            } else if (hitStatus === false) {
+                row.classList.add('match-miss');
+            }
+
+            const mResult = (match.result && String(match.result).trim() !== '' && String(match.result).trim() !== '-' && String(match.result).trim().toLowerCase() !== 'por definir') ? String(match.result).trim() : null;
+            const normMResult = mResult && window.ScoringSystem ? window.ScoringSystem.normalizeSign(mResult) : (mResult ? mResult.toUpperCase() : null);
+
+            let hitBadgeHtml = '';
+            if (mResult) {
+                if (hitStatus === true) {
+                    hitBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1 shrink-0" title="Resultado oficial: ${mResult}">✅ ${mResult}</span>`;
+                } else if (hitStatus === false) {
+                    hitBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-500/20 text-rose-400 border border-rose-500/40 flex items-center gap-1 shrink-0" title="Resultado oficial: ${mResult}">❌ ${mResult}</span>`;
+                } else {
+                    hitBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 border border-slate-700 shrink-0" title="Resultado oficial: ${mResult}">${mResult}</span>`;
+                }
+            }
+
             row.innerHTML = `
                 <div class="p-match-info">
                     <span class="p-match-num">${displayIdx}${isPigMatch ? ' 🐷' : ''}</span>
@@ -738,6 +813,7 @@ class PronosticoManager {
                         <span class="team-name">${match.away}</span>
                     </div>
                     ${isPigMatch ? '<span style="font-size:0.75rem; background:#ffecb3; color:#e65100; border-radius:4px; padding:2px 6px; font-weight:bold; margin-left:6px;" title="Partido de Interés General">🐷 PIG</span>' : ''}
+                    ${hitBadgeHtml}
                     ${mobileBtnHtml}
                 </div>
 
@@ -747,9 +823,9 @@ class PronosticoManager {
                     </div>
 
                     <div class="p-options" ${disabledStr} data-idx="${idx}">
-                        <div class="chk-option ${val === '1' ? 'selected' : ''}" onclick="window.app.selectOption(this, '1')">1</div>
-                        <div class="chk-option ${val === 'X' ? 'selected' : ''}" onclick="window.app.selectOption(this, 'X')">X</div>
-                        <div class="chk-option ${val === '2' ? 'selected' : ''}" onclick="window.app.selectOption(this, '2')">2</div>
+                        <div class="chk-option ${val === '1' ? 'selected' : ''} ${val === '1' && hitStatus === true ? 'opt-hit' : ''} ${val === '1' && hitStatus === false ? 'opt-miss' : ''}" onclick="window.app.selectOption(this, '1')">1</div>
+                        <div class="chk-option ${val === 'X' ? 'selected' : ''} ${val === 'X' && hitStatus === true ? 'opt-hit' : ''} ${val === 'X' && hitStatus === false ? 'opt-miss' : ''}" onclick="window.app.selectOption(this, 'X')">X</div>
+                        <div class="chk-option ${val === '2' ? 'selected' : ''} ${val === '2' && hitStatus === true ? 'opt-hit' : ''} ${val === '2' && hitStatus === false ? 'opt-miss' : ''}" onclick="window.app.selectOption(this, '2')">2</div>
                     </div>
 
                     ${percHtml}
@@ -2551,10 +2627,80 @@ class PronosticoManager {
         );
         const selections = existingExtra && existingExtra.selection ? existingExtra.selection : Array(15).fill('');
 
+        // Comprobar si la jornada tiene resultados para marcar aciertos en dobles
+        let doublesHitsCount = 0;
+        let hasAnyMatchResult = false;
+        const officialResults = Array.isArray(jornada.matches) ? jornada.matches.map(m => m.result) : [];
+        if (Array.isArray(jornada.matches)) {
+            hasAnyMatchResult = jornada.matches.some(m => {
+                const r = m && m.result ? String(m.result).trim() : '';
+                return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+            });
+        }
+
+        const doublesHitStatus = Array(15).fill(null);
+        if (hasAnyMatchResult && Array.isArray(selections)) {
+            for (let i = 0; i < 15; i++) {
+                const res = officialResults[i];
+                if (!res || String(res).trim() === '' || String(res).trim() === '-' || String(res).trim().toLowerCase() === 'por definir') {
+                    doublesHitStatus[i] = null;
+                    continue;
+                }
+                const sel = selections[i];
+                if (!sel) {
+                    doublesHitStatus[i] = false;
+                    continue;
+                }
+                const rSign = window.ScoringSystem ? window.ScoringSystem.normalizeSign(res) : String(res).trim().toUpperCase();
+                const rScore = String(res).trim().toUpperCase();
+                const pred = String(sel).trim().toUpperCase();
+
+                if (i < 14) {
+                    const isHit = pred.includes(rSign) || pred === rSign;
+                    doublesHitStatus[i] = isHit;
+                    if (isHit) doublesHitsCount++;
+                } else if (i === 14) {
+                    const isHit = (pred === rScore) || (pred === rSign);
+                    doublesHitStatus[i] = isHit;
+                }
+            }
+
+            if (this.doublesStatus) {
+                const isFinished = Array.isArray(jornada.matches) && jornada.matches.length === 15 && jornada.matches.every(m => m && m.result && m.result !== '' && m.result !== '-');
+                this.doublesStatus.innerHTML = `
+                    <div class="p-2 mb-2 rounded-xl bg-purple-950/40 border border-purple-500/40 flex items-center justify-center gap-2">
+                        <span class="text-xs font-mono font-bold text-purple-300">
+                            🎯 Quiniela Colectiva: <strong class="text-emerald-400 text-sm">${doublesHitsCount} / 14 aciertos</strong>${doublesHitStatus[14] === true ? ' (+P15 ✅)' : ''}
+                        </span>
+                        ${!isFinished ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">En Juego</span>' : ''}
+                    </div>
+                `;
+            }
+        }
+
         jornada.matches.forEach((match, idx) => {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
             const row = document.createElement('div');
             row.className = 'pronostico-row doubles-row';
+
+            const hitStatus = doublesHitStatus[idx];
+            if (hitStatus === true) {
+                row.classList.add('match-hit');
+            } else if (hitStatus === false) {
+                row.classList.add('match-miss');
+            }
+
+            const mResult = (match.result && String(match.result).trim() !== '' && String(match.result).trim() !== '-' && String(match.result).trim().toLowerCase() !== 'por definir') ? String(match.result).trim() : null;
+            let hitBadgeHtml = '';
+            if (mResult) {
+                if (hitStatus === true) {
+                    hitBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1 shrink-0 ml-1.5" title="Resultado oficial: ${mResult}">✅ ${mResult}</span>`;
+                } else if (hitStatus === false) {
+                    hitBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-500/20 text-rose-400 border border-rose-500/40 flex items-center gap-1 shrink-0 ml-1.5" title="Resultado oficial: ${mResult}">❌ ${mResult}</span>`;
+                } else {
+                    hitBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 border border-slate-700 shrink-0 ml-1.5" title="Resultado oficial: ${mResult}">${mResult}</span>`;
+                }
+            }
 
             const homeLogo = AppUtils.getTeamLogo(match.home);
             const awayLogo = AppUtils.getTeamLogo(match.away);
@@ -2575,11 +2721,12 @@ class PronosticoManager {
                                 <span class="team-name" style="font-size:0.8rem;">${match.away}</span>
                             </div>
                         </div>
+                        ${hitBadgeHtml}
                     </div>
                 </div>
 
                 <div class="prediction-inputs" data-idx="${idx}">
-                    ${isP15 ? this.renderP15Inputs(idx, selections[idx], isLocked) : this.renderMultiSelectButtons(idx, selections[idx], isLocked)}
+                    ${isP15 ? this.renderP15Inputs(idx, selections[idx], isLocked) : this.renderMultiSelectButtons(idx, selections[idx], isLocked, false, hitStatus, mResult)}
                 </div>
             `;
             this.doublesContainer.appendChild(row);
@@ -2601,16 +2748,28 @@ class PronosticoManager {
         this.updateDoublesCounters();
     }
 
-    renderMultiSelectButtons(idx, currentVal, disabled, isP15) {
+    renderMultiSelectButtons(idx, currentVal, disabled, isP15, hitStatus, mResult) {
         // currentVal is string "1", "1X", "1X2", etc.
         const options = ['1', 'X', '2'];
         let html = '';
+        const normResult = mResult && window.ScoringSystem ? window.ScoringSystem.normalizeSign(mResult) : (mResult ? String(mResult).trim().toUpperCase() : null);
+
         options.forEach(opt => {
             const isSelected = currentVal && currentVal.includes(opt);
+            // Si el partido tiene resultado oficial
+            let hitOptClass = '';
+            if (isSelected && normResult) {
+                if (opt === normResult) {
+                    hitOptClass = 'opt-hit';
+                } else if (hitStatus === false) {
+                    hitOptClass = 'opt-miss';
+                }
+            }
+
             // Use same styles as chk-option but slightly smaller for side panel
             const activeStyle = isSelected ? 'background-color:var(--primary-green); color:white; border-color:var(--primary-green);' : '';
 
-            html += `<div class="chk-option ${isSelected ? 'selected' : ''}"
+            html += `<div class="chk-option ${isSelected ? 'selected' : ''} ${hitOptClass}"
             style="width:30px; height:30px; font-size:0.9rem; ${activeStyle}"
             onclick="window.app.handleDoubleToggle(this, ${idx}, '${opt}', ${isP15})" 
                         ${disabled ? 'disabled' : ''}>${opt}</div>`;
