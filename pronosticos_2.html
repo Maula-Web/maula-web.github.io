@@ -404,9 +404,11 @@
         .forecast-h-badges {
             display: flex;
             align-items: center;
-            gap: 3px;
-            min-height: 12px;
+            width: 100%;
+            gap: 2px;
+            min-height: 13px;
             margin-bottom: 1px;
+            padding: 0 1px;
         }
         .forecast-h-block {
             font-family: 'JetBrains Mono', monospace;
@@ -441,6 +443,58 @@
             text-shadow: 0 0 8px rgba(167, 139, 250, 0.8);
             font-weight: 900;
             animation: doubles-star-pulse 2s ease-in-out infinite;
+        }
+        /* Badges de Aciertos y Bonus/Penalización en la esquina superior */
+        .forecast-h-stats {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .forecast-badge-hits {
+            font-size: 9px;
+            color: #38bdf8; /* Azul claro / Sky */
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 3px;
+            padding: 0.5px 2px;
+            letter-spacing: -0.5px;
+        }
+        .forecast-badge-bonus-pos {
+            font-size: 8.5px;
+            color: #34d399; /* Verde / Emerald */
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.45);
+            border-radius: 3px;
+            padding: 0.5px 2px;
+            letter-spacing: -0.5px;
+        }
+        .forecast-badge-bonus-neg {
+            font-size: 8.5px;
+            color: #f87171; /* Rojo / Rose */
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.45);
+            border-radius: 3px;
+            padding: 0.5px 2px;
+            letter-spacing: -0.5px;
+        }
+        .light-theme .forecast-badge-hits {
+            color: #0284c7;
+            background: rgba(2, 132, 199, 0.12);
+            border-color: rgba(2, 132, 199, 0.35);
+        }
+        .light-theme .forecast-badge-bonus-pos {
+            color: #059669;
+            background: rgba(5, 150, 105, 0.12);
+            border-color: rgba(5, 150, 105, 0.35);
+        }
+        .light-theme .forecast-badge-bonus-neg {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.12);
+            border-color: rgba(220, 38, 38, 0.35);
         }
         @keyframes doubles-star-pulse {
             0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(167, 139, 250, 0.8); }
@@ -2374,9 +2428,30 @@
                             // Solo LED no-verde (amarillo=falta dobles, rojo=pendiente)
                             const ledBadge = cellLed.status !== 'green' ? `<span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span>` : '';
 
+                            // Cálculo de Aciertos y Bonus/Penalización
+                            let statsBadgesHtml = '';
+                            const filledMatchesCount = (j.matches || []).filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length;
+                            if (filledMatchesCount > 0 && typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateMember) {
+                                try {
+                                    const evMember = ScoringSystem.evaluateMember(m, j, p);
+                                    if (evMember && evMember.hits >= 0) {
+                                        const hitsHtml = `<span class="forecast-badge-hits" title="${evMember.hits} aciertos en ${filledMatchesCount} partidos">${evMember.hits}</span>`;
+                                        let bonusHtml = '';
+                                        if (evMember.bonus > 0) {
+                                            bonusHtml = `<span class="forecast-badge-bonus-pos" title="+${evMember.bonus} pts bonificación">+${evMember.bonus}</span>`;
+                                        } else if (evMember.bonus < 0) {
+                                            bonusHtml = `<span class="forecast-badge-bonus-neg" title="${evMember.bonus} pts penalización">${evMember.bonus}</span>`;
+                                        }
+                                        statsBadgesHtml = `<span class="forecast-h-stats">${hitsHtml}${bonusHtml}</span>`;
+                                    }
+                                } catch (e) {
+                                    console.warn('Error calculando stats de sellado para socio', m.id, e);
+                                }
+                            }
+
                             cellContent = `
                                 <div class="forecast-h-cell">
-                                    <div class="forecast-h-badges">${diceBadge}${lateBadge}${doubleStar}${ledBadge}</div>
+                                    <div class="forecast-h-badges">${diceBadge}${lateBadge}${doubleStar}${ledBadge}${statsBadgesHtml}</div>
                                     <div class="forecast-h-block">${b1}</div>
                                     <div class="forecast-h-sep"></div>
                                     <div class="forecast-h-block">${b2}</div>
@@ -2439,9 +2514,26 @@
                             const s15d = dsel[14] ? String(dsel[14]).trim() : '-';
                             dp15 = `<div class="forecast-p15-block" title="Pleno al 15 (Dobles)">${colorSignD(s15d !== '-' ? s15d : null, 14)}</div>`;
                         }
+                        // Cálculo de Aciertos para Dobles (usando evaluateForecast con isReduced)
+                        let doublesStatsBadgesHtml = '';
+                        const filledMatchesCountD = (j.matches || []).filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length;
+                        if (filledMatchesCountD > 0 && typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateForecast) {
+                            try {
+                                const offRes = (j.matches || []).map(m => m.result);
+                                const jDate = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
+                                const isReduced = pExtra.isReduced || false;
+                                const evD = ScoringSystem.evaluateForecast(dsel, offRes, jDate, { isReduced });
+                                if (evD && evD.hits >= 0) {
+                                    doublesStatsBadgesHtml = `<span class="forecast-h-stats"><span class="forecast-badge-hits" title="${evD.hits} aciertos conseguidos">${evD.hits}</span></span>`;
+                                }
+                            } catch (e) {
+                                console.warn('Error calculando stats de dobles', e);
+                            }
+                        }
+
                         doublesContent = `
                             <div class="forecast-h-cell">
-                                <div class="forecast-h-badges"><span class="text-[9px] font-black text-purple-400">🎲</span></div>
+                                <div class="forecast-h-badges"><span class="text-[9px] font-black text-purple-400">🎲</span>${doublesStatsBadgesHtml}</div>
                                 <div class="forecast-h-block">${db1}</div>
                                 <div class="forecast-h-sep"></div>
                                 <div class="forecast-h-block">${db2}</div>
