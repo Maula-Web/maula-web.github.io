@@ -2109,7 +2109,7 @@ class PronosticoManager {
             // Sort members by ID (Member Number)
             const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-            this.viewJornadaTitle.textContent = `Ver Pronósticos — Jornada ${jornada.number}`;
+            this.viewJornadaTitle.textContent = `Ver Pronósticos`;
             this.viewJornadaContent.innerHTML = '<p style="padding:40px; font-size:1rem; font-weight:bold; color:#f59e0b; text-align:center;">⚙️ Generando tabla...</p>';
 
             // Critical fix: Ensure opacity is 1 and z-index is high
