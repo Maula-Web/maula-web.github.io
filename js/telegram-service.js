@@ -94,7 +94,16 @@ window.TelegramService = {
                     }
                 }
 
-                const prize = (hits >= minHits) ? ((currentJ.prizeRates && currentJ.prizeRates[hits]) || 0) : 0;
+                const prizesMap = currentJ.prizeRates || currentJ.prizes || {};
+                let prize = 0;
+                if (hits >= minHits) {
+                    const rawP = prizesMap[hits] !== undefined ? prizesMap[hits] : prizesMap[String(hits)];
+                    if (typeof rawP === 'number') {
+                        prize = rawP;
+                    } else if (typeof rawP === 'string') {
+                        prize = parseFloat(rawP.replace(/\./g, '').replace(',', '.').replace('€', '').trim()) || 0;
+                    }
+                }
                 return {
                     id: m.id,
                     name: AppUtils.getMemberName(m),
@@ -200,17 +209,82 @@ window.TelegramService = {
             }
 
             // Extras / Doubles
-            const extras = pronosticosExtra.filter(p => (p.jId == currentJ.id || p.jornadaId == currentJ.id));
+            const extras = pronosticosExtra.filter(p => (
+                (p.jId !== undefined && p.jId !== null ? String(p.jId) : String(p.jornadaId || '')) === String(currentJ.id) ||
+                (p.jId !== undefined && p.jId !== null ? String(p.jId) : String(p.jornadaId || '')) === String(currentJ.number)
+            ));
+            let totalDoblesPrize = 0;
             if (extras.length > 0) {
                 msg += `\n*✨ ACIERTOS QUINIELA DE DOBLES:*\n`;
                 extras.forEach(p => {
+                    const sel = p.selection || p.forecast || [];
+                    const doubleCount = sel.filter((s, i) => i < 14 && s && s.length > 1).length;
+                    const isReduced = p.isReduced || (doubleCount === 7);
+                    let ev = null;
+                    if (window.ScoringSystem && typeof window.ScoringSystem.evaluateForecast === 'function') {
+                        ev = window.ScoringSystem.evaluateForecast(sel, officialResults, jDate, { isReduced });
+                    }
+
                     let hCount = 0;
-                    const sel = p.selection || [];
                     sel.forEach((s, idx) => {
                         if (idx < 14 && officialResults[idx] && s && s.includes(officialResults[idx])) hCount++;
                     });
-                    msg += `🔹 Resultado: *${hCount}* aciertos\n`;
+
+                    let extraPrize = 0;
+                    const breakdownDetails = [];
+                    const jPrizes = currentJ.prizeRates || currentJ.prizes || {};
+
+                    if (ev && ev.breakdown) {
+                        [15, 14, 13, 12, 11, 10].forEach(cat => {
+                            const count = ev.breakdown[cat] || 0;
+                            let rate = jPrizes[cat] !== undefined ? jPrizes[cat] : jPrizes[String(cat)];
+                            if (typeof rate === 'string') {
+                                rate = parseFloat(rate.replace(/\./g, '').replace(',', '.').replace('€', '').trim()) || 0;
+                            }
+                            rate = Number(rate) || 0;
+                            if (count > 0 && rate > 0) {
+                                extraPrize += count * rate;
+                                breakdownDetails.push(`${count} de ${cat} (${(count * rate).toFixed(2).replace('.', ',')} €)`);
+                            }
+                        });
+                    } else if (hCount >= minHits) {
+                        let rate = jPrizes[hCount] !== undefined ? jPrizes[hCount] : jPrizes[String(hCount)];
+                        if (typeof rate === 'string') {
+                            rate = parseFloat(rate.replace(/\./g, '').replace(',', '.').replace('€', '').trim()) || 0;
+                        }
+                        rate = Number(rate) || 0;
+                        if (rate > 0) {
+                            extraPrize = rate;
+                            breakdownDetails.push(`1 de ${hCount} (${rate.toFixed(2).replace('.', ',')} €)`);
+                        }
+                    }
+
+                    totalDoblesPrize += extraPrize;
+                    let line = `🔹 Resultado: *${hCount}* aciertos`;
+                    if (extraPrize > 0) {
+                        line += ` 💰 *${extraPrize.toFixed(2).replace('.', ',')} €*`;
+                        if (breakdownDetails.length > 0) {
+                            line += ` _[${breakdownDetails.join(', ')}]_`;
+                        }
+                    }
+                    msg += `${line}\n`;
                 });
+            }
+
+            // Resumen de Premios Conseguidos en la Jornada
+            const sociosConPremio = currentResults.filter(r => r.prize > 0);
+            const totalSociosPrize = sociosConPremio.reduce((sum, r) => sum + r.prize, 0);
+            const totalJornadaPremios = totalSociosPrize + totalDoblesPrize;
+
+            if (totalJornadaPremios > 0) {
+                msg += `\n*💰 PREMIOS CONSEGUIDOS EN LA JORNADA:*\n`;
+                sociosConPremio.forEach(r => {
+                    msg += `💵 ${r.name}: *${r.prize.toFixed(2).replace('.', ',')} €* (${r.hits} aciertos)\n`;
+                });
+                if (totalDoblesPrize > 0) {
+                    msg += `🎰 Quiniela de dobles: *${totalDoblesPrize.toFixed(2).replace('.', ',')} €*\n`;
+                }
+                msg += `👉 *Total al bote de la peña:* *${totalJornadaPremios.toFixed(2).replace('.', ',')} €*\n`;
             }
 
 
