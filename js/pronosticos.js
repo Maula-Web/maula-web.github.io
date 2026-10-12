@@ -254,15 +254,19 @@ class PronosticoManager {
 
 
     updateCorrectionUI() {
-        const slider = this.chkCorrection.nextElementSibling;
-        if (this.correctionMode) {
-            slider.style.backgroundColor = 'var(--primary-orange)';
-            this.lblCorrection.style.color = 'var(--primary-orange)';
-            this.lblCorrection.textContent = "MODO CORRECCIÓN ACTIVO";
-        } else {
-            slider.style.backgroundColor = '#ccc';
-            this.lblCorrection.style.color = 'var(--text-secondary)';
-            this.lblCorrection.textContent = "Modo Corrección";
+        const chkMobile = document.getElementById('chk-correction-mode-mobile');
+        if (this.chkCorrection) this.chkCorrection.checked = !!this.correctionMode;
+        if (chkMobile) chkMobile.checked = !!this.correctionMode;
+
+        if (this.chkCorrection) {
+            const slider = this.chkCorrection.nextElementSibling;
+            if (slider) {
+                slider.style.backgroundColor = this.correctionMode ? 'var(--primary-orange)' : '';
+            }
+        }
+        if (this.lblCorrection) {
+            this.lblCorrection.style.color = this.correctionMode ? 'var(--primary-orange)' : '';
+            this.lblCorrection.textContent = this.correctionMode ? "MODO CORRECCIÓN ACTIVO" : "Modo Corrección";
         }
     }
 
