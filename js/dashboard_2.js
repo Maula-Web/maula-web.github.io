@@ -403,6 +403,7 @@ class Dashboard2AppController {
             let liveWinnerHits = null;
             let currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
             let liveLoserName = null;
+            let liveLoserPoints = null;
             const nextJornadaNum = targetJNum;
             const upcomingJornadaNum = targetJNum + 1; // La jornada posterior para la que sellarán/rellenarán si targetJNum está en juego
 
@@ -453,8 +454,23 @@ class Dashboard2AppController {
                 }
 
                 if (liveLosers.length > 0) {
-                    const loserNames = liveLosers.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
-                    liveLoserName = loserNames.slice(0, 2).join(', ') + (loserNames.length > 2 ? ` (+${loserNames.length - 2})` : '');
+                    // Si hay varios empatados a puntos mínimos, aplicar la regla de desempate oficial
+                    let maulaLiveCandidates = liveLosers.map(l => ({
+                        memberId: l.member.id,
+                        member: l.member,
+                        points: l.points,
+                        hits: l.hits
+                    }));
+
+                    if (maulaLiveCandidates.length > 1) {
+                        maulaLiveCandidates = this.resolveTie(maulaLiveCandidates, history, 'points', 'min');
+                    }
+                    // Si el empate persiste tras el historial, desempatar por ID descendente
+                    maulaLiveCandidates.sort((a, b) => b.memberId - a.memberId);
+
+                    const chosenLoser = maulaLiveCandidates[0];
+                    liveLoserName = window.AppUtils ? window.AppUtils.getMemberName(chosenLoser.member) : chosenLoser.member.name;
+                    liveLoserPoints = chosenLoser.points;
                 }
             }
 
@@ -504,7 +520,8 @@ class Dashboard2AppController {
                 if (elLoserName) elLoserName.textContent = liveLoserName;
                 if (elLoserBadge) {
                     elLoserBadge.classList.remove('hidden');
-                    elLoserBadge.textContent = 'Provisional';
+                    const ptsText = (liveLoserPoints !== null && liveLoserPoints !== undefined) ? `${liveLoserPoints} ${liveLoserPoints === 1 ? 'pto' : 'pts'} ` : '';
+                    elLoserBadge.textContent = `${ptsText}(Provisional)`;
                     elLoserBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-sm animate-pulse';
                 }
                 if (elLoserDetail) {
@@ -520,8 +537,14 @@ class Dashboard2AppController {
                 if (elLoserName) elLoserName.textContent = lastJornadaOutcome.loserName || 'Pendiente';
                 if (elLoserBadge) {
                     elLoserBadge.classList.remove('hidden');
-                    elLoserBadge.textContent = `Resultado final`;
-                    elLoserBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700 shadow-sm';
+                    const finalLoserPoints = (lastJornadaOutcome.loserPoints !== undefined && lastJornadaOutcome.loserPoints !== null) ? lastJornadaOutcome.loserPoints : null;
+                    if (finalLoserPoints !== null) {
+                        elLoserBadge.textContent = `${finalLoserPoints} ${finalLoserPoints === 1 ? 'pto' : 'pts'}`;
+                        elLoserBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm';
+                    } else {
+                        elLoserBadge.textContent = `Resultado final`;
+                        elLoserBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700 shadow-sm';
+                    }
                 }
                 if (elLoserDetail) {
                     elLoserDetail.innerHTML = `<span class="text-rose-300 font-medium">Sella la próxima Jornada ${nextSealJNum}</span> <span class="text-slate-400 text-[11px]">(Responsable de validar en loterías)</span>`;
@@ -1299,6 +1322,8 @@ class Dashboard2AppController {
             doblesEligibleNames: [...new Set(eligibleNextNames)].sort(),
             loserName: loser.name,
             loserMemberId: maulaCandidates[0] ? maulaCandidates[0].memberId : null,
+            loserPoints: maulaCandidates[0] && maulaCandidates[0].points !== undefined ? maulaCandidates[0].points : 0,
+            loserHits: maulaCandidates[0] && maulaCandidates[0].hits !== undefined ? maulaCandidates[0].hits : 0,
             isPig: isPig,
             pigInfo: pigInfo,
             pigAcertantes: pigAcertantes,
