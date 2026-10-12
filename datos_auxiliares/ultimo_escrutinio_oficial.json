@@ -7,7 +7,7 @@
       "num": 1,
       "home": "Rayo Vallecano",
       "away": "Athletic Club",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 2,
@@ -25,25 +25,25 @@
       "num": 4,
       "home": "Elche",
       "away": "Celta",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 5,
       "home": "Real Sociedad",
       "away": "Deportivo",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 6,
       "home": "Betis",
       "away": "Osasuna",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 7,
       "home": "Racing Santander",
       "away": "Valencia",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 8,
@@ -61,25 +61,25 @@
       "num": 10,
       "home": "Andorra",
       "away": "Castellón",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 11,
       "home": "Almería",
       "away": "Leganés",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 12,
       "home": "Mallorca",
       "away": "Las Palmas",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 13,
       "home": "Burgos",
       "away": "Granada",
-      "result": ""
+      "result": "2"
     },
     {
       "num": 14,
@@ -91,7 +91,7 @@
       "num": 15,
       "home": "Real Madrid",
       "away": "Villarreal",
-      "result": ""
+      "result": "1-0"
     }
   ],
   "prizes": {
