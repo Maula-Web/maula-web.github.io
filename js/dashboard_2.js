@@ -393,13 +393,81 @@ class Dashboard2AppController {
             this.renderSubmissionProgress(this.nextJornada, pronosticosMap);
             this.lastJornadaOutcome = lastJornadaOutcome;
 
-            // D. Widget 3: 👑 Ganador Semanal (Rellena Dobles)
+            // D. Widget 3: 👑 Ganador Semanal (Rellena Dobles) & Aciertos en Jornada en Juego
             const elWinnerName = document.getElementById('role-winner-name');
+            const elWinnerSubtitle = document.getElementById('role-winner-subtitle');
+            const elWinnerHitsBadge = document.getElementById('role-winner-hits-badge');
             const elWinnerDetail = document.getElementById('role-winner-detail');
-            if (elWinnerName) elWinnerName.textContent = lastJornadaOutcome.winnerName || 'Pendiente';
-            if (elWinnerDetail) {
-                const eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
-                elWinnerDetail.textContent = eligibles.length > 1 ? `Dobles: ${eligibles.join(', ')}` : 'Rellena la columna de signos dobles';
+
+            // Determinar si hay jornada en juego para evaluar aciertos del ganador en vivo
+            let liveWinnerHits = null;
+            let currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
+
+            if (isNextInProgress && this.nextJornada && this.members) {
+                // Si la jornada está en juego, buscar los aciertos actuales de todos los socios
+                let maxLiveHits = -1;
+                let liveLeaders = [];
+
+                this.members.forEach(m => {
+                    const p = pronosticosMap.get(`${this.nextJornada.id}_${m.id}`);
+                    if (p && window.ScoringSystem) {
+                        const ev = window.ScoringSystem.evaluateMember(m, this.nextJornada, p);
+                        if (ev && ev.played && ev.hits >= 0) {
+                            if (ev.hits > maxLiveHits) {
+                                maxLiveHits = ev.hits;
+                                liveLeaders = [{ member: m, hits: ev.hits }];
+                            } else if (ev.hits === maxLiveHits) {
+                                liveLeaders.push({ member: m, hits: ev.hits });
+                            }
+                        }
+                    }
+                });
+
+                if (maxLiveHits >= 0 && liveLeaders.length > 0) {
+                    liveWinnerHits = maxLiveHits;
+                    const leaderNames = liveLeaders.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
+                    currentWinnerName = leaderNames.slice(0, 2).join(', ') + (leaderNames.length > 2 ? ` (+${leaderNames.length - 2})` : '');
+                    
+                    if (elWinnerSubtitle) {
+                        elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Líder en Juego (J${targetJNum}):</span>`;
+                    }
+                    if (elWinnerDetail) {
+                        elWinnerDetail.textContent = liveLeaders.length > 1 
+                            ? `Empate a ${liveWinnerHits} aciertos en directo` 
+                            : `Liderando la jornada ${targetJNum} en vivo`;
+                    }
+                }
+            }
+
+            if (liveWinnerHits === null) {
+                // Jornada no en juego: mostrar ganador de la jornada anterior
+                if (elWinnerSubtitle) {
+                    elWinnerSubtitle.textContent = 'Ganador Jornada Anterior:';
+                }
+                currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
+                if (elWinnerDetail) {
+                    const eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
+                    elWinnerDetail.textContent = eligibles.length > 1 ? `Dobles: ${eligibles.join(', ')}` : 'Rellena la columna de signos dobles';
+                }
+            }
+
+            if (elWinnerName) elWinnerName.textContent = currentWinnerName;
+
+            // Mostrar el badge de aciertos
+            if (elWinnerHitsBadge) {
+                const hitsToShow = liveWinnerHits !== null ? liveWinnerHits : (lastJornadaOutcome.winnerHits !== undefined ? lastJornadaOutcome.winnerHits : null);
+                if (hitsToShow !== null && hitsToShow >= 0) {
+                    elWinnerHitsBadge.classList.remove('hidden');
+                    const isLive = liveWinnerHits !== null;
+                    elWinnerHitsBadge.textContent = `${hitsToShow} ${hitsToShow === 1 ? 'acierto' : 'aciertos'}${isLive ? ' en juego' : ''}`;
+                    if (isLive) {
+                        elWinnerHitsBadge.className = 'shrink-0 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm animate-pulse';
+                    } else {
+                        elWinnerHitsBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm';
+                    }
+                } else {
+                    elWinnerHitsBadge.classList.add('hidden');
+                }
             }
 
             // E. Widget 4: ✍️ SELLA: (Sellador Designado)
@@ -1173,8 +1241,12 @@ class Dashboard2AppController {
 
         return {
             winnerName: winner.name,
+            winnerMemberId: winnerCandidates[0].memberId,
+            winnerHits: winnerCandidates[0].hits !== undefined ? winnerCandidates[0].hits : 0,
+            winnerPoints: winnerCandidates[0].points !== undefined ? winnerCandidates[0].points : 0,
             doblesEligibleNames: [...new Set(eligibleNextNames)].sort(),
             loserName: loser.name,
+            loserMemberId: maulaCandidates[0] ? maulaCandidates[0].memberId : null,
             isPig: isPig,
             pigInfo: pigInfo,
             pigAcertantes: pigAcertantes,

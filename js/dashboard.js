@@ -812,6 +812,8 @@ class DashboardManager {
 
         return {
             winnerName: winner.name,
+            winnerHits: winnerCandidates[0].hits !== undefined ? winnerCandidates[0].hits : 0,
+            winnerPoints: winnerCandidates[0].points !== undefined ? winnerCandidates[0].points : 0,
             doblesEligibleNames: doblesEligibleNames,
             loserName: loser.name,
             isPig: isPig,

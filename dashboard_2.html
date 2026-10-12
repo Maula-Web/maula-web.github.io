@@ -549,10 +549,15 @@
                     </div>
 
                     <div class="space-y-1">
-                        <span class="text-xs text-slate-400 block font-medium">Ganador Jornada Anterior:</span>
-                        <h4 id="role-winner-name" class="text-xl sm:text-2xl font-black text-amber-400 tracking-tight truncate">
-                            Cargando...
-                        </h4>
+                        <span id="role-winner-subtitle" class="text-xs text-slate-400 block font-medium">Ganador Jornada Anterior:</span>
+                        <div class="flex items-center justify-between gap-2">
+                            <h4 id="role-winner-name" class="text-xl sm:text-2xl font-black text-amber-400 tracking-tight truncate">
+                                Cargando...
+                            </h4>
+                            <span id="role-winner-hits-badge" class="hidden shrink-0 px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm">
+                                0 aciertos
+                            </span>
+                        </div>
                         <p id="role-winner-detail" class="text-xs text-slate-400">
                             Pendiente de validación
                         </p>
