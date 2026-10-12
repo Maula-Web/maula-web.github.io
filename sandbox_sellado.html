@@ -156,105 +156,39 @@
         </div>
 
         <!-- =========================================================================
-             CALENDARIO DE CENAS OFICIALES DE LA PEÑA (PRIMERA VUELTA Y FIN DE LIGA)
+             CALENDARIO DE CENAS OFICIALES DE LA PEÑA (TARJETA ÚNICA ULTRA-COMPACTA)
              ========================================================================= -->
-        <div class="glass-panel p-3 sm:p-4 border-amber-500/40 bg-gradient-to-br from-slate-900/90 via-amber-950/20 to-slate-900/90 shadow-lg space-y-2.5">
-            <div class="flex items-center justify-between gap-2 border-b border-amber-500/20 pb-2">
+        <div class="glass-panel p-2.5 sm:p-3 border-amber-500/40 bg-gradient-to-r from-slate-900/90 via-amber-950/20 to-slate-900/90 shadow-md">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <!-- Título ultra-compacto -->
                 <div class="flex items-center gap-2">
-                    <span class="text-lg sm:text-xl">🍽️</span>
+                    <span class="text-base sm:text-lg">🍽️</span>
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">TRADICIÓN MAULAS</span>
-                            <span class="text-[11px] text-slate-300 font-bold hidden xs:inline">Calendario de Cenas 2026-2027</span>
+                            <span class="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">CENAS PEÑA</span>
+                            <h2 class="text-xs sm:text-sm font-extrabold text-white leading-none">Fechas Oficiales</h2>
                         </div>
-                        <h2 class="text-xs sm:text-sm font-extrabold text-white leading-tight">
-                            Cenas de Socios: Cierre de 1ª Vuelta y Fin de Temporada
-                        </h2>
                     </div>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 whitespace-nowrap">
-                        2 Citas al Año
-                    </span>
-                </div>
-            </div>
 
-            <!-- Grid de las 2 Cenas con Resalte de la Siguiente Cena -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
-                
-                <!-- CENA 1: SIGUIENTE CENA (DESTACADA Y COMPACTA) -->
-                <div class="relative overflow-hidden rounded-xl p-3 sm:p-3.5 bg-gradient-to-br from-amber-950/40 via-slate-900/90 to-amber-900/30 border border-amber-500 shadow-md shadow-amber-500/10 flex flex-col justify-between gap-2">
-                    <!-- Badge Flotante "PRÓXIMA CITA" -->
-                    <div class="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-[9px] font-black uppercase tracking-wider py-0.5 px-2 rounded-bl-lg shadow flex items-center gap-1">
-                        <span>🔥</span> PRÓXIMA CENA
-                    </div>
-
-                    <div class="space-y-0.5 pr-20">
+                <!-- Lista horizontal de ambas citas (resaltando la próxima) -->
+                <div class="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-2">
+                    <!-- Cena 1: Próxima (Resaltada) -->
+                    <div class="flex items-center justify-between sm:justify-start gap-2 px-2.5 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/60 shadow-sm">
                         <div class="flex items-center gap-1.5">
-                            <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">1ª VUELTA</span>
-                            <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Mitad de Temporada</span>
+                            <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500 text-slate-950 whitespace-nowrap">🔥 1ª VUELTA</span>
+                            <span class="text-xs sm:text-sm font-black text-amber-300 font-mono whitespace-nowrap">Vie 29 Ene 2027</span>
                         </div>
-                        <h3 class="text-xs sm:text-sm font-bold text-white">
-                            Cena de Mitad de Temporada
-                        </h3>
-                        <p class="text-[11px] text-slate-300 leading-snug line-clamp-1">
-                            Último viernes de Enero · Cierre 1ª vuelta
-                        </p>
                     </div>
 
-                    <!-- Fecha en Tamaño Compacto -->
-                    <div class="py-1.5 px-2.5 rounded-lg bg-slate-950/80 border border-amber-500/40 flex items-center justify-between gap-2 shadow-inner">
-                        <div>
-                            <span class="text-[8px] uppercase font-bold text-slate-400 block tracking-wider">Fecha Confirmada</span>
-                            <div class="text-base sm:text-lg font-black text-amber-400 font-mono tracking-tight flex items-center gap-1.5">
-                                <span>📅</span> Viernes 29 Ene 2027
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 whitespace-nowrap">
-                            Último Viernes
-                        </span>
-                    </div>
-
-                    <div class="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1.5">
-                        <span class="truncate">📍 Cierre de clasificaciones y bote</span>
-                        <span class="font-mono text-amber-400 font-bold shrink-0 ml-1">29/01/2027</span>
-                    </div>
-                </div>
-
-                <!-- CENA 2: FIN DE LIGA (COMPACTA) -->
-                <div class="rounded-xl p-3 sm:p-3.5 bg-slate-900/70 border border-slate-700/80 hover:border-slate-600 transition flex flex-col justify-between gap-2">
-                    <div class="space-y-0.5">
+                    <!-- Cena 2: Fin de Temporada -->
+                    <div class="flex items-center justify-between sm:justify-start gap-2 px-2.5 py-1.5 rounded-lg bg-slate-950/60 border border-slate-800 text-slate-300">
                         <div class="flex items-center gap-1.5">
-                            <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">2ª VUELTA</span>
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Fin de Temporada</span>
+                            <span class="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap">2ª VUELTA</span>
+                            <span class="text-xs sm:text-sm font-bold text-slate-300 font-mono whitespace-nowrap">Vie 04 Jun 2027</span>
                         </div>
-                        <h3 class="text-xs sm:text-sm font-bold text-white">
-                            Gran Cena de Clausura de LaLiga
-                        </h3>
-                        <p class="text-[11px] text-slate-400 leading-snug line-clamp-1">
-                            Viernes tras J38 · Reparto final y balance anual
-                        </p>
-                    </div>
-
-                    <!-- Fecha Formato Compacto -->
-                    <div class="py-1.5 px-2.5 rounded-lg bg-slate-950/70 border border-slate-800 flex items-center justify-between gap-2">
-                        <div>
-                            <span class="text-[8px] uppercase font-bold text-slate-400 block tracking-wider">Fecha Estimada</span>
-                            <div class="text-base sm:text-lg font-bold text-slate-200 font-mono flex items-center gap-1.5">
-                                <span>📅</span> Viernes 04 Jun 2027
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700 whitespace-nowrap">
-                            J38 LaLiga
-                        </span>
-                    </div>
-
-                    <div class="flex items-center justify-between text-[10px] text-slate-500 border-t border-slate-800/80 pt-1.5">
-                        <span class="truncate">🐸 Entrega de la Rana al último</span>
-                        <span class="font-mono text-slate-400 shrink-0 ml-1">04/06/2027</span>
                     </div>
                 </div>
-
             </div>
         </div>
 
