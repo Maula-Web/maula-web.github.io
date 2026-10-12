@@ -399,25 +399,41 @@ class Dashboard2AppController {
             const elWinnerHitsBadge = document.getElementById('role-winner-hits-badge');
             const elWinnerDetail = document.getElementById('role-winner-detail');
 
-            // Determinar si hay jornada en juego para evaluar aciertos del ganador en vivo
+            // Determinar si hay jornada en juego para evaluar aciertos del ganador en vivo y del sellador provisional
             let liveWinnerHits = null;
             let currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
+            let liveLoserName = null;
+            const nextJornadaNum = targetJNum;
+            const upcomingJornadaNum = targetJNum + 1; // La jornada posterior para la que sellarán/rellenarán si targetJNum está en juego
 
             if (isNextInProgress && this.nextJornada && this.members) {
-                // Si la jornada está en juego, buscar los aciertos actuales de todos los socios
+                // Si la jornada está en juego, buscar los aciertos y puntos actuales de todos los socios
                 let maxLiveHits = -1;
+                let minLiveHits = 999;
+                let minLivePoints = 9999;
                 let liveLeaders = [];
+                let liveLosers = [];
 
                 this.members.forEach(m => {
                     const p = pronosticosMap.get(`${this.nextJornada.id}_${m.id}`);
                     if (p && window.ScoringSystem) {
                         const ev = window.ScoringSystem.evaluateMember(m, this.nextJornada, p);
                         if (ev && ev.played && ev.hits >= 0) {
+                            // Evaluación para líder/ganador
                             if (ev.hits > maxLiveHits) {
                                 maxLiveHits = ev.hits;
-                                liveLeaders = [{ member: m, hits: ev.hits }];
+                                liveLeaders = [{ member: m, hits: ev.hits, points: ev.points }];
                             } else if (ev.hits === maxLiveHits) {
-                                liveLeaders.push({ member: m, hits: ev.hits });
+                                liveLeaders.push({ member: m, hits: ev.hits, points: ev.points });
+                            }
+
+                            // Evaluación para sellador / maula en juego (menor puntuación/aciertos)
+                            if (ev.points < minLivePoints) {
+                                minLivePoints = ev.points;
+                                minLiveHits = ev.hits;
+                                liveLosers = [{ member: m, hits: ev.hits, points: ev.points }];
+                            } else if (ev.points === minLivePoints) {
+                                liveLosers.push({ member: m, hits: ev.hits, points: ev.points });
                             }
                         }
                     }
@@ -429,25 +445,29 @@ class Dashboard2AppController {
                     currentWinnerName = leaderNames.slice(0, 2).join(', ') + (leaderNames.length > 2 ? ` (+${leaderNames.length - 2})` : '');
                     
                     if (elWinnerSubtitle) {
-                        elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Líder en Juego (J${targetJNum}):</span>`;
+                        elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Líder Provisional (J${nextJornadaNum}):</span>`;
                     }
                     if (elWinnerDetail) {
-                        elWinnerDetail.textContent = liveLeaders.length > 1 
-                            ? `Empate a ${liveWinnerHits} aciertos en directo` 
-                            : `Liderando la jornada ${targetJNum} en vivo`;
+                        elWinnerDetail.innerHTML = `<span class="text-amber-300 font-medium">Rellenará dobles en J${upcomingJornadaNum}</span> <span class="text-slate-400 text-[11px]">(${liveLeaders.length > 1 ? `Empate a ${liveWinnerHits} ac.` : 'Liderando en vivo'})</span>`;
                     }
+                }
+
+                if (liveLosers.length > 0) {
+                    const loserNames = liveLosers.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
+                    liveLoserName = loserNames.slice(0, 2).join(', ') + (loserNames.length > 2 ? ` (+${loserNames.length - 2})` : '');
                 }
             }
 
             if (liveWinnerHits === null) {
-                // Jornada no en juego: mostrar ganador de la jornada anterior
+                // Jornada cerrada / no en juego: mostrar ganador oficial de la última jornada cerrada
                 if (elWinnerSubtitle) {
-                    elWinnerSubtitle.textContent = 'Ganador Jornada Anterior:';
+                    elWinnerSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Ganador Oficial (J${lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1))}):</span>`;
                 }
                 currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
                 if (elWinnerDetail) {
                     const eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
-                    elWinnerDetail.textContent = eligibles.length > 1 ? `Dobles: ${eligibles.join(', ')}` : 'Rellena la columna de signos dobles';
+                    const destJNum = targetJNum; // Próxima jornada
+                    elWinnerDetail.innerHTML = `<span class="text-amber-300 font-semibold">Rellena los dobles de la Jornada ${destJNum}</span>${eligibles.length > 1 ? `<div class="text-[11px] text-slate-400 mt-0.5">Empate: ${eligibles.join(', ')}</div>` : ''}`;
                 }
             }
 
@@ -459,11 +479,11 @@ class Dashboard2AppController {
                 if (hitsToShow !== null && hitsToShow >= 0) {
                     elWinnerHitsBadge.classList.remove('hidden');
                     const isLive = liveWinnerHits !== null;
-                    elWinnerHitsBadge.textContent = `${hitsToShow} ${hitsToShow === 1 ? 'acierto' : 'aciertos'}${isLive ? ' en juego' : ''}`;
+                    elWinnerHitsBadge.textContent = `${hitsToShow} ${hitsToShow === 1 ? 'acierto' : 'aciertos'}${isLive ? ' (Provisional)' : ''}`;
                     if (isLive) {
-                        elWinnerHitsBadge.className = 'shrink-0 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm animate-pulse';
+                        elWinnerHitsBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm animate-pulse';
                     } else {
-                        elWinnerHitsBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm';
+                        elWinnerHitsBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm';
                     }
                 } else {
                     elWinnerHitsBadge.classList.add('hidden');
@@ -472,9 +492,41 @@ class Dashboard2AppController {
 
             // E. Widget 4: ✍️ SELLA: (Sellador Designado)
             const elLoserName = document.getElementById('role-loser-name');
+            const elLoserSubtitle = document.getElementById('role-loser-subtitle');
+            const elLoserBadge = document.getElementById('role-loser-badge');
             const elLoserDetail = document.getElementById('role-loser-detail');
-            if (elLoserName) elLoserName.textContent = lastJornadaOutcome.loserName || 'Pendiente';
-            if (elLoserDetail) elLoserDetail.textContent = 'Responsable de validar y sellar el boleto colectivo';
+
+            if (isNextInProgress && liveLoserName) {
+                // En juego: el sellador es provisional
+                if (elLoserSubtitle) {
+                    elLoserSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-rose-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Sellador Provisional (J${nextJornadaNum}):</span>`;
+                }
+                if (elLoserName) elLoserName.textContent = liveLoserName;
+                if (elLoserBadge) {
+                    elLoserBadge.classList.remove('hidden');
+                    elLoserBadge.textContent = 'Provisional';
+                    elLoserBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-sm animate-pulse';
+                }
+                if (elLoserDetail) {
+                    elLoserDetail.innerHTML = `<span class="text-rose-300 font-medium">Sella la próxima Jornada ${upcomingJornadaNum}</span> <span class="text-slate-400 text-[11px]">(en juego)</span>`;
+                }
+            } else {
+                // Cerrada: resultado final, sella la próxima jornada
+                const closedJNum = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
+                const nextSealJNum = targetJNum;
+                if (elLoserSubtitle) {
+                    elLoserSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Sellador Oficial (J${closedJNum}):</span>`;
+                }
+                if (elLoserName) elLoserName.textContent = lastJornadaOutcome.loserName || 'Pendiente';
+                if (elLoserBadge) {
+                    elLoserBadge.classList.remove('hidden');
+                    elLoserBadge.textContent = `Resultado final`;
+                    elLoserBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700 shadow-sm';
+                }
+                if (elLoserDetail) {
+                    elLoserDetail.innerHTML = `<span class="text-rose-300 font-medium">Sella la próxima Jornada ${nextSealJNum}</span> <span class="text-slate-400 text-[11px]">(Responsable de validar en loterías)</span>`;
+                }
+            }
 
             // F. Widget 5: 🏆 Líder de la General
             const elLeaderName = document.getElementById('leader-name');
