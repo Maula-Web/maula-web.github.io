@@ -1779,6 +1779,7 @@ class Jornadas2AppController {
         const currentViewed = this.jornadas.find(j => j.id == this.selectedJornadaId);
         const target = this.jornadas.find(j => j.id == res.targetJornadaId) || currentViewed;
         const isMismatch = currentViewed && target && (currentViewed.id !== target.id);
+        const isManual = !!res.isManual;
 
         let selectorOptions = this.jornadas.map(j => `
             <option value="${j.id}" ${target && j.id == target.id ? 'selected' : ''}>
@@ -1786,25 +1787,34 @@ class Jornadas2AppController {
             </option>
         `).join('');
 
-        headerBox.className = "px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs space-y-0.5";
+        headerBox.className = "px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1";
         headerBox.innerHTML = `
-            <div class="flex items-center justify-between">
-                <div class="font-bold text-emerald-400 flex items-center gap-1.5 text-[11px]">
-                    <span>${res.source || 'Loterías y Apuestas'}</span>
+            <div class="flex items-center justify-between gap-2">
+                <div class="font-bold text-emerald-400 flex items-center gap-1.5 text-[11px] truncate">
+                    <span>${res.source || 'El País Sorteos'}</span>
                     <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[9px]">Oficial</span>
-                    <span class="text-slate-400 font-normal ml-1">Fecha: <strong class="text-white">${res.dateStr || 'Detectada'}</strong></span>
+                    <span class="text-slate-400 font-normal ml-1">Fecha oficial: <strong class="text-white">${res.dateStr || 'Detectada'}</strong></span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="text-[11px] text-slate-400">Asignar a:</span>
-                    <select id="import-results-target-select" onchange="window.JornadasApp.handleTargetJornadaChange(this.value)" class="bg-slate-950 border border-emerald-500/50 rounded-lg px-2 py-0.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-400">
-                        ${selectorOptions}
-                    </select>
-                </div>
+                ${isManual ? `
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="text-[11px] text-slate-400">Asignar a:</span>
+                        <select id="import-results-target-select" onchange="window.JornadasApp.handleTargetJornadaChange(this.value)" class="bg-slate-950 border border-emerald-500/50 rounded-lg px-2 py-0.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-400 cursor-pointer">
+                            ${selectorOptions}
+                        </select>
+                    </div>
+                ` : `
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="text-[11px] text-slate-400">Destino:</span>
+                        <span class="px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs font-mono">
+                            Jornada ${target ? target.number : (res.jNum || '?')} (${target ? target.date : (res.dateStr || '')})
+                        </span>
+                    </div>
+                `}
             </div>
-            ${isMismatch ? `
+            ${isMismatch && !isManual ? `
                 <div class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] flex items-center gap-1.5">
-                    <span>⚠️</span>
-                    <span>Estabas viendo <em>J${currentViewed ? currentViewed.number : ''}</em>, pero coincide con la fecha de <strong>J${target ? target.number : ''} (${target ? target.date : ''})</strong>.</span>
+                    <span>ℹ️</span>
+                    <span>Importando a <strong>Jornada ${target ? target.number : ''} (${target ? target.date : ''})</strong> por coincidencia exacta de fecha de sorteo.</span>
                 </div>
             ` : ''}
         `;
@@ -1934,6 +1944,7 @@ class Jornadas2AppController {
         const targetJornada = this.findTargetJornadaForResults(res);
         res.targetJornadaId = targetJornada ? targetJornada.id : this.selectedJornadaId;
         res.jNum = targetJornada ? targetJornada.number : (res.jNum || 'Manual');
+        res.isManual = true;
 
         this.pendingImportResults = res;
 
@@ -2076,6 +2087,249 @@ class Jornadas2AppController {
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+    }
+
+    // =========================================================================
+    // VERIFICACIÓN TOTAL DE RESULTADOS (AUDITORÍA & CORRECCIÓN DE UN PLUMAZO)
+    // =========================================================================
+
+    openAuditModal() {
+        const modal = document.getElementById('modal-audit-results');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            this.runAuditCheck();
+        }
+    }
+
+    closeAuditModal() {
+        const modal = document.getElementById('modal-audit-results');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    async runAuditCheck() {
+        const listEl = document.getElementById('audit-results-list');
+        const statJornadas = document.getElementById('audit-stat-total-jornadas');
+        const statMatches = document.getElementById('audit-stat-missing-matches');
+        const statPrizes = document.getElementById('audit-stat-missing-prizes');
+        const statDisc = document.getElementById('audit-stat-discrepancies');
+        const fixBtn = document.getElementById('btn-fix-all-audit');
+        const statusEl = document.getElementById('audit-action-status');
+
+        if (listEl) {
+            listEl.innerHTML = `
+                <div class="text-center py-8 text-slate-500 text-xs">
+                    <span class="animate-spin inline-block text-lg mb-2">⏳</span>
+                    <p>Verificando datos de todas las jornadas e inspeccionando fuentes oficiales...</p>
+                </div>
+            `;
+        }
+
+        // 1. Obtener escrutinio oficial en vivo desde QuinielaService
+        let latestOfficial = null;
+        try {
+            if (window.QuinielaService) {
+                latestOfficial = await window.QuinielaService.fetchLatestResults();
+            }
+        } catch (e) {
+            console.warn('[Auditoría] No se pudo obtener escrutinio de El País:', e);
+        }
+
+        const sortedJornadas = (this.jornadas || []).slice().sort((a, b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
+
+        let totalMissingMatches = 0;
+        let totalMissingPrizes = 0;
+        let totalDiscrepancies = 0;
+        this.pendingAuditFixes = [];
+
+        const reports = [];
+
+        sortedJornadas.forEach(j => {
+            const matches = j.matches || [];
+            const isCompletedMatches = matches.length === 15 && matches.every(m => m.result && m.result.trim() !== '' && m.result !== '-');
+            const missingMatchesCount = matches.filter(m => !m.result || m.result.trim() === '' || m.result === '-').length;
+
+            const prizes = j.prizes || {};
+            const hasPrizes = Object.keys(prizes).length > 0 && Object.values(prizes).some(v => parseFloat(v) > 0);
+
+            // Comparar con El País si esta jornada coincide con la fecha del escrutinio oficial
+            let isCurrentLiveTarget = false;
+            let discrepancies = [];
+
+            if (latestOfficial && latestOfficial.matches && latestOfficial.matches.length === 15) {
+                const targetMatched = this.findTargetJornadaForResults(latestOfficial);
+                if (targetMatched && targetMatched.id === j.id) {
+                    isCurrentLiveTarget = true;
+                    // Comparar partido a partido
+                    matches.forEach((m, idx) => {
+                        const offM = latestOfficial.matches[idx];
+                        if (offM && offM.result && offM.result.trim()) {
+                            const curRes = (m.result || '').trim();
+                            if (curRes !== offM.result.trim()) {
+                                discrepancies.push({
+                                    idx,
+                                    num: idx === 14 ? 'P15' : (idx + 1),
+                                    home: m.home,
+                                    away: m.away,
+                                    current: curRes || '(pendiente)',
+                                    official: offM.result.trim()
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+            if (isCompletedMatches) {
+                // Jornada pasada disputada
+                if (!hasPrizes) totalMissingPrizes++;
+            } else {
+                totalMissingMatches += missingMatchesCount;
+            }
+
+            totalDiscrepancies += discrepancies.length;
+
+            if (discrepancies.length > 0 || (isCurrentLiveTarget && missingMatchesCount > 0)) {
+                this.pendingAuditFixes.push({
+                    jornada: j,
+                    latestOfficial: latestOfficial,
+                    discrepancies: discrepancies
+                });
+            }
+
+            reports.push({
+                jornada: j,
+                missingMatchesCount,
+                isCompletedMatches,
+                hasPrizes,
+                isCurrentLiveTarget,
+                discrepancies
+            });
+        });
+
+        // Actualizar contadores
+        if (statJornadas) statJornadas.textContent = sortedJornadas.length;
+        if (statMatches) statMatches.textContent = totalMissingMatches;
+        if (statPrizes) statPrizes.textContent = totalMissingPrizes;
+        if (statDisc) statDisc.textContent = totalDiscrepancies;
+
+        if (fixBtn) {
+            fixBtn.disabled = this.pendingAuditFixes.length === 0;
+        }
+
+        if (statusEl) {
+            if (this.pendingAuditFixes.length > 0) {
+                statusEl.innerHTML = `<span class="text-amber-400 font-bold">⚠️ Se detectaron ${totalDiscrepancies} discrepancias/actualizaciones oficiales en la Jornada en juego.</span>`;
+            } else {
+                statusEl.innerHTML = `<span class="text-emerald-400 font-bold">✅ Todas las jornadas revisadas están sincronizadas y coherentes.</span>`;
+            }
+        }
+
+        // Renderizar lista detallada
+        if (listEl) {
+            listEl.innerHTML = reports.map(r => {
+                const j = r.jornada;
+                let statusBadge = '';
+                if (r.discrepancies.length > 0) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">⚠️ ${r.discrepancies.length} discrepancias con El País</span>`;
+                } else if (r.isCurrentLiveTarget) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">🟢 Jornada en juego (El País Sincronizado)</span>`;
+                } else if (r.isCompletedMatches) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">✅ 15 resultados completos</span>`;
+                } else {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">⏳ ${15 - r.missingMatchesCount}/15 disputados</span>`;
+                }
+
+                return `
+                    <div class="p-3 rounded-xl bg-slate-900 border ${r.discrepancies.length > 0 ? 'border-amber-500/50 bg-amber-950/10' : 'border-slate-800'} space-y-1.5 text-xs">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-white text-sm">Jornada ${j.number}</span>
+                                <span class="text-slate-400 font-mono text-[11px]">${j.date || 'Sin fecha'}</span>
+                            </div>
+                            <div>${statusBadge}</div>
+                        </div>
+
+                        ${r.discrepancies.length > 0 ? `
+                            <div class="pt-1 border-t border-amber-500/20 space-y-1">
+                                <span class="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Discrepancias detectadas contra escrutinio en vivo:</span>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 font-mono text-[11px]">
+                                    ${r.discrepancies.map(d => `
+                                        <div class="p-1 rounded bg-slate-950 border border-amber-500/30 flex items-center justify-between text-slate-300">
+                                            <span class="font-bold text-amber-400 w-7">${d.num}</span>
+                                            <span class="truncate flex-1 px-1">${d.home} vs ${d.away}</span>
+                                            <div class="shrink-0 flex items-center gap-1.5 font-bold">
+                                                <span class="text-rose-400 line-through text-[10px]">${d.current}</span>
+                                                <span>→</span>
+                                                <span class="text-emerald-400">${d.official}</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
+                            <span>Partidos con signo: <strong class="text-white">${15 - r.missingMatchesCount}/15</strong></span>
+                            <span>Escrutinio premios: <strong class="${r.hasPrizes ? 'text-emerald-400' : 'text-slate-400'}">${r.hasPrizes ? 'Registrado' : (r.isCompletedMatches ? 'Pendiente' : 'En juego')}</strong></span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    async applyAuditFixes() {
+        if (!this.pendingAuditFixes || this.pendingAuditFixes.length === 0) {
+            alert('No hay discrepancias pendientes que corregir.');
+            return;
+        }
+
+        const fixBtn = document.getElementById('btn-fix-all-audit');
+        const statusEl = document.getElementById('audit-action-status');
+        if (fixBtn) fixBtn.disabled = true;
+        if (statusEl) statusEl.innerHTML = `<span class="text-amber-400 animate-pulse font-bold">⚡ Aplicando correcciones de un plumazo...</span>`;
+
+        let updatedCount = 0;
+
+        for (const item of this.pendingAuditFixes) {
+            const j = item.jornada;
+            const off = item.latestOfficial;
+            if (off && off.matches) {
+                if (j.matches) {
+                    j.matches.forEach((m, idx) => {
+                        const offM = off.matches[idx];
+                        if (offM && offM.result && offM.result.trim()) {
+                            m.result = offM.result.trim();
+                        }
+                    });
+                }
+                if (off.prizes && Object.keys(off.prizes).length > 0) {
+                    j.prizes = off.prizes;
+                }
+                if (window.DataService) {
+                    try {
+                        await window.DataService.save('jornadas', j);
+                        updatedCount++;
+                    } catch (err) {
+                        console.error('[Auditoría] Error guardando corrección de Jornada ' + j.number, err);
+                    }
+                }
+            }
+        }
+
+        this.renderHubControls();
+        this.renderCurrentJornadaView();
+
+        // Reinspeccionar para confirmar que quedó al 100% limpio
+        await this.runAuditCheck();
+
+        if (statusEl) {
+            statusEl.innerHTML = `<span class="text-emerald-400 font-bold">🎉 ¡Corregidas y sincronizadas ${updatedCount} jornada(s) con éxito!</span>`;
+        }
     }
 }
 

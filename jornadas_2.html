@@ -717,6 +717,9 @@
 
                 <!-- Botones de Acción / Herramientas de Administrador -->
                 <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-start lg:justify-end">
+                    <button type="button" onclick="window.JornadasApp.openAuditModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow" title="Auditar integridad y detectar discrepancias de toda la temporada">
+                        <span>🔍</span> Verificación Total de Resultados
+                    </button>
                     <button type="button" onclick="window.JornadasApp.openImportMatchesModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
                         <span>📋</span> Importar Partidos
                     </button>
@@ -1159,6 +1162,70 @@
             <p class="text-[11px] text-slate-400 text-center">
                 * Los domingos aparecen destacados en <strong class="text-amber-400">ámbar</strong> según la normativa maula.
             </p>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 4 BIS: VERIFICACIÓN TOTAL DE RESULTADOS (AUDITORÍA & CORRECCIÓN 1-CLIC)
+         ===================================================================== -->
+    <div id="modal-audit-results" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100085]">
+        <div class="modal-dialog-panel w-full max-w-3xl border border-sky-500/50 p-3 sm:p-4 animate-modal max-h-[96vh] flex flex-col shadow-2xl rounded-2xl bg-[#0b0f19]">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-lg p-1.5 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30">🔍</span>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">AUDITORÍA INTEGRAL</span>
+                            <h2 class="text-sm sm:text-base font-black text-white">Verificación Total de Resultados</h2>
+                        </div>
+                        <p class="text-[11px] text-slate-400">Inspecciona todas las jornadas de la BD, detecta datos faltantes o discrepancias con El País y corrige de un plumazo.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.JornadasApp.closeAuditModal()" class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs">✕</button>
+            </div>
+
+            <!-- Resumen de Auditoría -->
+            <div class="pt-2 pb-1 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs shrink-0">
+                <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">Jornadas BD</span>
+                    <strong id="audit-stat-total-jornadas" class="text-white font-mono text-base font-black">--</strong>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">Partidos Faltantes</span>
+                    <strong id="audit-stat-missing-matches" class="text-rose-400 font-mono text-base font-black">--</strong>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">Premios Faltantes</span>
+                    <strong id="audit-stat-missing-prizes" class="text-amber-400 font-mono text-base font-black">--</strong>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">Discrepancias El País</span>
+                    <strong id="audit-stat-discrepancies" class="text-sky-400 font-mono text-base font-black">--</strong>
+                </div>
+            </div>
+
+            <!-- Contenido scrollable con el desglose de cada jornada -->
+            <div id="audit-results-list" class="flex-1 overflow-y-auto space-y-2 py-2 pr-1 custom-scroll max-h-[55vh]">
+                <div class="text-center py-8 text-slate-500 text-xs">
+                    <span class="animate-spin inline-block text-lg mb-2">⏳</span>
+                    <p>Analizando integridad de todas las jornadas...</p>
+                </div>
+            </div>
+
+            <!-- Barra de Acciones Inferior -->
+            <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
+                <div id="audit-action-status" class="text-xs text-slate-400">
+                    Inspección completada.
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" onclick="window.JornadasApp.runAuditCheck()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                        <span>🔄</span> Reinspeccionar
+                    </button>
+                    <button type="button" id="btn-fix-all-audit" onclick="window.JornadasApp.applyAuditFixes()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black transition shadow-lg flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:pointer-events-none">
+                        <span>⚡</span> Corregir de un plumazo
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
