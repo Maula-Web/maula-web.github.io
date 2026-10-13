@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-12T16:22:38.107Z",
+  "updatedAt": "2026-10-13T00:07:31.168Z",
   "available": false,
   "matchCountWithTarget": 0,
   "isMidweek": true,
@@ -17,8 +17,8 @@
       "comment": "La Cerámica reclama una alegría europea. El Villarreal encadena cinco citas de Champions sin regalar un triunfo a su afición, cuatro de ellas durante el desastroso recorrido de la pasada temporada. La caída en Dortmund (3-2) añade urgencia al equipo de Íñigo Pérez, obligado a reaccionar para evitar que vuelvan las dudas y los temores continentales. Tampoco llega tranquilo el Nápoles, que se estrenó con un tropiezo por la mínima en su estadio frente al Arsenal, vigente subcampeón. Su paso en la Serie A alterna luces y sombras, mientras Massimiliano Allegri sigue buscando la fórmula para encajar las piezas. Eso sí, los italianos conservan argumentos para poner en aprietos al cuadro amarillo.",
       "percentages": {
         "quinielista": {
-          "1": 52,
-          "2": 22,
+          "1": 50,
+          "2": 24,
           "X": 26
         },
         "lae": {
@@ -27,8 +27,8 @@
           "X": 25
         },
         "real": {
-          "1": 44,
-          "2": 30,
+          "1": 45,
+          "2": 29,
           "X": 26
         }
       },
@@ -44,8 +44,8 @@
       "comment": "El Metropolitano reclama una reacción del At. Madrid tras la derrota inicial en Anfield (2-1). Caer frente al Liverpool entraba en los planes, pero el mal momento invitaba a sacar algo más en el estreno de la Champions. Simeone se agarra al empuje de su estadio, pese a que los últimos duelos continentales dejaron dos avisos: no pudo vencer al Barça, al que terminó eliminando, ni al Arsenal, verdugo rojiblanco en el Emirates a las puertas de la final. Al otro lado aparece un Manchester United que goleó al Sabah Baku azerbaiyano (4-0). La alegría contrasta con sus dudas en la Premier, donde la renovación de Michael Carrick ya despierta críticas y cuestiona el rumbo del equipo en un futuro inmediato.",
       "percentages": {
         "quinielista": {
-          "1": 58,
-          "2": 19,
+          "1": 59,
+          "2": 18,
           "X": 23
         },
         "lae": {
@@ -54,9 +54,9 @@
           "X": 23
         },
         "real": {
-          "1": 49,
+          "1": 50,
           "2": 26,
-          "X": 25
+          "X": 24
         }
       },
       "recommended": "1X"
@@ -125,9 +125,9 @@
       "comment": "La afición ´neroazzurri´ exige puntos para respaldar las sensaciones. El Inter cayó en el Bernabéu (2-1), castigado por sus errores y por un Courtois decisivo, aunque dejó motivos para creer en su candidatura a acabar entre los ocho mejores a finales de enero. Cristian Chivu quiere convertir esa impresión en resultados ante el Brujas en el Giuseppe Meazza. Los italianos buscan dejar atrás el golpe del curso anterior, cuando el Bodo/Glimt les apeó en el play-off de acceso a las eliminatorias. Tampoco arrancó con éxito el equipo belga: el Aston Villa le derrotó en su estadio por 2-3. Sus viajes europeos no le dan una victoria desde 2022, una sequía que añade dificultad a su misión en tierras italianas.",
       "percentages": {
         "quinielista": {
-          "1": 88,
-          "2": 4,
-          "X": 8
+          "1": 90,
+          "2": 3,
+          "X": 7
         },
         "lae": {
           "1": 74,
@@ -152,9 +152,9 @@
       "comment": "El Viking figura entre los clubes con menor bagaje en la historia de la Champions. El conjunto noruego se medirá de nuevo a un rival alemán, después de caer por 3-1 en el campo del Stuttgart en la jornada inaugural. En su liga doméstica comparte el liderato con el Bodo/Glimt. El Bayern, por su parte, aspira a sumar el segundo triunfo tras el 5-0 que, precisamente, endosó al Bodo/Glimt en el estreno en la competición. El equipo bávaro igualó el sábado en el campo del Augsburgo (2-2) y perdió el liderato de la Bundesliga, ahora en manos del Friburgo y el Dortmund.",
       "percentages": {
         "quinielista": {
-          "1": 3,
+          "1": 2,
           "2": 94,
-          "X": 3
+          "X": 4
         },
         "lae": {
           "1": 15,
@@ -179,8 +179,8 @@
       "comment": "La voracidad del Barça fue demasiado para el Feyenoord en la primera jornada de la Champions: derrota por 5-1 en el Spotify Camp Nou. Ahora, el conjunto holandés intentará reponerse en casa, arropado por su gente. Llega como líder de la Eredivisie, con cuatro triunfos seguidos en el campeonato doméstico, el último este sábado por 2-0 frente al AZ, tercer clasificado. Enfrente estará un Como que se estrenó por todo lo alto en la máxima competición continental: en el primer partido de su historia en el torneo, goleó al RB Leipzig por 4-1. En la Serie A el equipo de Cesc ocupa la sexta plaza, tras empatar sin goles el domingo en su estadio ante la Roma.",
       "percentages": {
         "quinielista": {
-          "1": 26,
-          "2": 47,
+          "1": 30,
+          "2": 43,
           "X": 27
         },
         "lae": {
@@ -233,8 +233,8 @@
       "comment": "El Betis quiere seguir escribiendo un espléndido comienzo de la temporada. Este domingo ganó a Osasuna por 5-2 en LaLiga para mantenerse tercero. El buen tono que está ofreciendo en el campeonato doméstico también lo trasladó a la Champions debutando con una victoria por 2-3 en el campo del Lille. Los de Pellegrini buscan otra alegría ante un Porto que perdió por 0-2 contra el Manchester City en un debut exigente. En la liga lusa los dragones van como un tiro, pues encabezan la tabla con solvencia gracias a ocho victorias en ocho partidos.",
       "percentages": {
         "quinielista": {
-          "1": 56,
-          "2": 20,
+          "1": 54,
+          "2": 22,
           "X": 24
         },
         "lae": {
@@ -243,8 +243,8 @@
           "X": 27
         },
         "real": {
-          "1": 46,
-          "2": 29,
+          "1": 47,
+          "2": 28,
           "X": 25
         }
       },
@@ -261,8 +261,8 @@
       "percentages": {
         "quinielista": {
           "1": 21,
-          "2": 58,
-          "X": 21
+          "2": 57,
+          "X": 22
         },
         "lae": {
           "1": 27,
@@ -287,9 +287,9 @@
       "comment": "Uno de los duelos más interesantes de esta fase liga de la Champions entre dos equipos en forma. El City de Maresca firma ocho victorias seguidas tras perder el debut de la temporada en la Supercopa ante el Arsenal. Desde entonces lo ha ganado todo y es líder invicto en la Premier. Este domingo, con triunfo en Anfield (0-3) tras quedarse con diez el Liverpool. El PSG, por su parte, ha reconducido su inicio errático en liga. Tres triunfos consecutivos le permiten escalar posiciones y acercarse al liderato. En la Champions, mientras, goleó en el estreno en París, donde el curso pasado se vieron las caras estos dos conjuntos en la séptima jornada, con triunfo francés (4-2).",
       "percentages": {
         "quinielista": {
-          "1": 35,
-          "2": 41,
-          "X": 24
+          "1": 41,
+          "2": 33,
+          "X": 26
         },
         "lae": {
           "1": 38,
@@ -314,9 +314,9 @@
       "comment": "La Real volvió a ganar en liga, su segundo triunfo seguido, en otro partido de llegadas y ocasiones que ratificó su indudable potencial ofensivo, pero que también dejó patente los problemas en defensa que fueron su condena en el debut europeo. Cayó en casa ante el Bournemouth y deberá mejorar atrás para la visita al Royale Union belga, subcampeón vigente de su liga que cayó en las previas de Champions. En Europa League, por tanto, se presume un aspirante a hacerlo bien. De momento, goleada en Plzen para empezar (0-3) y en casa, imbatido lo que va curso. Si se puede, conviene cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 46,
-          "2": 28,
-          "X": 26
+          "1": 45,
+          "2": 27,
+          "X": 28
         },
         "lae": {
           "1": 38,
@@ -368,9 +368,9 @@
       "comment": "El Getafe hará el estreno en la fase liga de la Conference, donde se disputan solamente seis jornadas, así que cada mal resultado puede penalizar. El debut será en Craiova, ante el campeón vigente de la liga rumana, este curso es tercero con buenos números en casa: cinco triunfos y una derrota. El Universitatea, de hecho, jugó hasta cuatro previas, dos de Champions y dos de Europa League. Acabó eliminado en ambas, por ello cayó a la tercera competición europea donde topa con un Getafe que llega de perder en el Camp Nou. Una derrota lógica, pero que es la tercera en tres jornadas para sumar ya cuatro en un arranque liguero irregular donde, por el momento, está pagando la falta de gol.",
       "percentages": {
         "quinielista": {
-          "1": 37,
-          "2": 38,
-          "X": 25
+          "1": 35,
+          "2": 36,
+          "X": 29
         },
         "lae": {
           "1": 33,
@@ -395,8 +395,8 @@
       "comment": "El Madrid volverá a enfrentarse a rival italiano en la segunda jornada de la Champions. Esta vez será en Roma ante un equipo bien dirigido por el veterano Gasperini que fue tercero la liga pasada, con notables números en casa (sólo tres puntos por detrás del campeón Inter). Este curso, dos triunfos y un empate, precisamente ante el cuadro interista (2-2). El conjunto blanco, mientras, sigue firmando triunfos en el Bernabéu, pero cuando viaja baja prestaciones. Sobre todo, por la dificultad de cerrar la defensa y mostrarse consistente a lo largo de los partidos. Ninguna portería a cero en sus cuatro salidas, con dos derrotas y dos victorias, ambas en el descuento.",
       "percentages": {
         "quinielista": {
-          "1": 18,
-          "2": 24,
+          "1": 15,
+          "2": 25,
           "X": 54
         },
         "lae": {
@@ -486,13 +486,13 @@
         "pos": 5,
         "team": "Sevilla",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/53.png?width=44&amp;height=44",
-        "pts": 13,
-        "pj": 7,
+        "pts": 14,
+        "pj": 8,
         "pg": 4,
-        "pe": 1,
+        "pe": 2,
         "pp": 2,
-        "gf": 10,
-        "gc": 9,
+        "gf": 13,
+        "gc": 12,
         "dif": 1
       },
       {
@@ -640,6 +640,19 @@
       },
       {
         "pos": 17,
+        "team": "Levante",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/136.png?width=44&amp;height=44",
+        "pts": 6,
+        "pj": 7,
+        "pg": 1,
+        "pe": 3,
+        "pp": 3,
+        "gf": 11,
+        "gc": 15,
+        "dif": -4
+      },
+      {
+        "pos": 18,
         "team": "Elche",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/121.png?width=44&amp;height=44",
         "pts": 6,
@@ -650,19 +663,6 @@
         "gf": 11,
         "gc": 17,
         "dif": -6
-      },
-      {
-        "pos": 18,
-        "team": "Levante",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/136.png?width=44&amp;height=44",
-        "pts": 5,
-        "pj": 6,
-        "pg": 1,
-        "pe": 2,
-        "pp": 3,
-        "gf": 8,
-        "gc": 12,
-        "dif": -4
       },
       {
         "pos": 19,
@@ -694,19 +694,6 @@
     "segunda": [
       {
         "pos": 1,
-        "team": "Eibar",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/108.png?width=44&amp;height=44",
-        "pts": 21,
-        "pj": 8,
-        "pg": 7,
-        "pe": 0,
-        "pp": 1,
-        "gf": 18,
-        "gc": 7,
-        "dif": 11
-      },
-      {
-        "pos": 2,
         "team": "Almería",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/85.png?width=44&amp;height=44",
         "pts": 21,
@@ -717,6 +704,19 @@
         "gf": 16,
         "gc": 5,
         "dif": 11
+      },
+      {
+        "pos": 2,
+        "team": "Eibar",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/108.png?width=44&amp;height=44",
+        "pts": 21,
+        "pj": 9,
+        "pg": 7,
+        "pe": 0,
+        "pp": 2,
+        "gf": 19,
+        "gc": 10,
+        "dif": 9
       },
       {
         "pos": 3,
@@ -774,13 +774,13 @@
         "pos": 7,
         "team": "Girona",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/648.png?width=44&amp;height=44",
-        "pts": 14,
-        "pj": 8,
+        "pts": 15,
+        "pj": 9,
         "pg": 4,
-        "pe": 2,
+        "pe": 3,
         "pp": 2,
-        "gf": 14,
-        "gc": 8,
+        "gf": 15,
+        "gc": 9,
         "dif": 6
       },
       {
@@ -798,6 +798,19 @@
       },
       {
         "pos": 9,
+        "team": "Oviedo",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/14.png?width=44&amp;height=44",
+        "pts": 14,
+        "pj": 9,
+        "pg": 4,
+        "pe": 2,
+        "pp": 3,
+        "gf": 11,
+        "gc": 9,
+        "dif": 2
+      },
+      {
+        "pos": 10,
         "team": "Granada",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/347.png?width=44&amp;height=44",
         "pts": 14,
@@ -810,7 +823,7 @@
         "dif": 1
       },
       {
-        "pos": 10,
+        "pos": 11,
         "team": "Real Valladolid",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/18.png?width=44&amp;height=44",
         "pts": 12,
@@ -823,20 +836,20 @@
         "dif": 2
       },
       {
-        "pos": 11,
-        "team": "Oviedo",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/14.png?width=44&amp;height=44",
-        "pts": 11,
-        "pj": 8,
+        "pos": 12,
+        "team": "Tenerife",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/162.png?width=44&amp;height=44",
+        "pts": 12,
+        "pj": 9,
         "pg": 3,
-        "pe": 2,
+        "pe": 3,
         "pp": 3,
-        "gf": 8,
-        "gc": 8,
-        "dif": 0
+        "gf": 11,
+        "gc": 13,
+        "dif": -2
       },
       {
-        "pos": 12,
+        "pos": 13,
         "team": "Celta Fortuna",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/688323abe51b982.png?width=44&amp;height=44",
         "pts": 11,
@@ -849,7 +862,7 @@
         "dif": -1
       },
       {
-        "pos": 13,
+        "pos": 14,
         "team": "Eldense",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/672.png?width=44&amp;height=44",
         "pts": 11,
@@ -860,19 +873,6 @@
         "gf": 10,
         "gc": 11,
         "dif": -1
-      },
-      {
-        "pos": 14,
-        "team": "Tenerife",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/162.png?width=44&amp;height=44",
-        "pts": 11,
-        "pj": 8,
-        "pg": 3,
-        "pe": 2,
-        "pp": 3,
-        "gf": 10,
-        "gc": 12,
-        "dif": -2
       },
       {
         "pos": 15,
