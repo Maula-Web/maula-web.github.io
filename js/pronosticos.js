@@ -1665,9 +1665,15 @@ class PronosticoManager {
         // Comprobar si este socio es el responsable/elegible para la Quiniela de Dobles en esta jornada.
         let isEligibleDoubles = false;
         try {
-            if (typeof this.checkEligibility === 'function') {
+            if (typeof window !== 'undefined' && typeof window.getEligibleDoublesMember === 'function') {
+                const dm = window.getEligibleDoublesMember(targetJornada);
+                if (dm && String(dm.id) === mIdStr) {
+                    isEligibleDoubles = true;
+                }
+            }
+            if (!isEligibleDoubles && typeof this.checkEligibility === 'function') {
                 const elig = this.checkEligibility(targetJornada.number, memberId, true);
-                if (elig && elig.eligible) {
+                if (elig && (elig.eligible || elig.isWinner)) {
                     isEligibleDoubles = true;
                 }
             }
@@ -1699,45 +1705,42 @@ class PronosticoManager {
     getNextJornadaToPlay() {
         if (!this.jornadas || !Array.isArray(this.jornadas) || this.jornadas.length === 0) return null;
 
-        const activeSeason = (typeof AppUtils !== 'undefined' && AppUtils.activeSeason) || '2026-2027';
-
-        // 1. Candidatas activas de la temporada con partidos informados ordenadas ascendentemente
+        // 1. Filtrar jornadas candidatas que tengan partidos informados o pronósticos registrados
         const candidates = this.jornadas
             .filter(j => {
-                if (!j || !j.active) return false;
-                if (j.season && j.season !== activeSeason) return false;
-                return j.matches && Array.isArray(j.matches) && j.matches.some(m => m && m.home && m.home.trim() !== '');
+                if (!j) return false;
+                const hasMatches = j.matches && Array.isArray(j.matches) && j.matches.some(m => m && m.home && String(m.home).trim() !== '');
+                const hasForecasts = (this.pronosticos || []).some(p => String(p.jId || p.jornadaId) === String(j.id));
+                const hasDobles = (this.pronosticosExtra || []).some(p => String(p.jId || p.jornadaId) === String(j.id));
+                return j.active !== false && (hasMatches || hasForecasts || hasDobles);
             })
             .sort((a, b) => (parseInt(a.number || a.id) || 0) - (parseInt(b.number || b.id) || 0));
 
-        const isJornadaPending = (j) => {
-            if (!j || !j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return true;
-            const filled = j.matches.filter(m => {
+        if (candidates.length === 0) {
+            return this.jornadas[0] || null;
+        }
+
+        // Helper para saber si una jornada ya está completamente finalizada/jugada
+        const isFinished = (j) => {
+            if (j.status === 'closed' || j.status === 'completed' || j.finalizada === true) return true;
+            if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return false;
+            const filledResults = j.matches.filter(m => {
                 if (!m || !m.result) return false;
-                const r = String(m.result).trim();
-                return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+                const r = String(m.result).trim().toLowerCase();
+                return r !== '' && r !== '-' && r !== 'por definir';
             }).length;
-            return filled < 15;
+            // Si al menos 14 partidos tienen resultado oficial, la jornada ya se disputó
+            return filledResults >= 14;
         };
 
-        // Preferir jornadas dominicales (calendario oficial de la peña)
-        const sundayPending = candidates.find(j => {
-            if (!isJornadaPending(j)) return false;
-            if (typeof AppUtils !== 'undefined' && AppUtils.parseDate && AppUtils.isSunday) {
-                const d = AppUtils.parseDate(j.date);
-                return d ? AppUtils.isSunday(d) : true;
-            }
-            return true;
-        });
+        // La siguiente jornada a jugar es la primera (menor número) que aún NO haya finalizado
+        const nextPending = candidates.find(j => !isFinished(j));
+        if (nextPending) {
+            return nextPending;
+        }
 
-        if (sundayPending) return sundayPending;
-
-        // Si no hay dominical pendiente, cualquier candidata pendiente
-        const anyPending = candidates.find(isJornadaPending);
-        if (anyPending) return anyPending;
-
-        // Fallback: la candidata más reciente o la primera activa
-        return candidates[candidates.length - 1] || candidates[0] || (this.jornadas && this.jornadas[0]) || null;
+        // Fallback: si todas han finalizado, la última de las candidatas
+        return candidates[candidates.length - 1] || candidates[0];
     }
 
     updateSummaryHeaderLeds() {

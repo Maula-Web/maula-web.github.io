@@ -2245,7 +2245,38 @@
                 window.openEditorModal(mId, false, jId);
             };
 
-            // A.1 Interceptar updateSummaryHeaderLeds para que los indicadores siempre muestren la siguiente jornada a jugar
+            // A.1 Obtener la siguiente jornada a jugar (la más próxima sin finalizar)
+            PM.prototype.getNextJornadaToPlay = function() {
+                if (!this.jornadas || !Array.isArray(this.jornadas) || this.jornadas.length === 0) return null;
+
+                const candidates = this.jornadas
+                    .filter(j => {
+                        if (!j) return false;
+                        const hasMatches = j.matches && Array.isArray(j.matches) && j.matches.some(m => m && m.home && String(m.home).trim() !== '');
+                        const hasForecasts = (this.pronosticos || []).some(p => String(p.jId || p.jornadaId) === String(j.id));
+                        const hasDobles = (this.pronosticosExtra || []).some(p => String(p.jId || p.jornadaId) === String(j.id));
+                        return j.active !== false && (hasMatches || hasForecasts || hasDobles);
+                    })
+                    .sort((a, b) => (parseInt(a.number || a.id) || 0) - (parseInt(b.number || b.id) || 0));
+
+                if (candidates.length === 0) return this.jornadas[0] || null;
+
+                const isFinished = (j) => {
+                    if (j.status === 'closed' || j.status === 'completed' || j.finalizada === true) return true;
+                    if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return false;
+                    const filledResults = j.matches.filter(m => {
+                        if (!m || !m.result) return false;
+                        const r = String(m.result).trim().toLowerCase();
+                        return r !== '' && r !== '-' && r !== 'por definir';
+                    }).length;
+                    return filledResults >= 14;
+                };
+
+                const nextPending = candidates.find(j => !isFinished(j));
+                return nextPending || candidates[candidates.length - 1] || candidates[0];
+            };
+
+            // A.2 Interceptar updateSummaryHeaderLeds para que los indicadores siempre muestren la siguiente jornada a jugar
             PM.prototype.updateSummaryHeaderLeds = function() {
                 if (!this.summaryTable) return;
                 const targetJornada = (typeof this.getNextJornadaToPlay === 'function') ? this.getNextJornadaToPlay() : null;
@@ -2955,14 +2986,16 @@
             let attempts = 0;
             const checkAppData = setInterval(() => {
                 attempts++;
-                if (window.app && window.app.members && window.app.members.length > 0) {
+                if (window.app && window.app.members && window.app.members.length > 0 && window.app.jornadas && window.app.jornadas.length > 0) {
                     clearInterval(checkAppData);
                     
-                    // Asegurar selección inicial de Jornada (la siguiente que se vaya a jugar)
-                    const nextJ = (window.app && window.app.getNextJornadaToPlay) ? window.app.getNextJornadaToPlay() : null;
+                    // Asegurar selección inicial de Jornada (SIEMPRE la siguiente que se vaya a jugar, e.g. J14)
+                    const nextJ = (typeof window.app.getNextJornadaToPlay === 'function') ? window.app.getNextJornadaToPlay() : null;
                     if (nextJ) {
                         window.app.currentJornadaId = String(nextJ.id);
-                        if (window.app.selJornada) window.app.selJornada.value = String(nextJ.id);
+                        if (window.app.selJornada) {
+                            window.app.selJornada.value = String(nextJ.id);
+                        }
                     } else if (!window.app.currentJornadaId && window.app.selJornada && window.app.selJornada.value) {
                         window.app.currentJornadaId = window.app.selJornada.value;
                     }
