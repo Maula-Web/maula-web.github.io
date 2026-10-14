@@ -99,13 +99,22 @@ class BoteEngine {
             'Samuel': 0
         };
 
+        // Ordenar jornadas de forma cronológica estricta (por número / fecha)
+        const sortedJornadas = [...(jornadas || [])].sort((a, b) => {
+            const numA = parseInt(a.number, 10) || 0;
+            const numB = parseInt(b.number, 10) || 0;
+            if (numA !== numB) return numA - numB;
+            const parseD = (d) => (window.AppUtils && window.AppUtils.parseDate ? window.AppUtils.parseDate(d) : new Date(d)) || new Date(0);
+            return parseD(a.date) - parseD(b.date);
+        });
+
         // Pre-cálculo de exenciones por jornada
-        const jornadaExemptions = jornadas.map((j, idx) => {
+        const jornadaExemptions = sortedJornadas.map((j, idx) => {
             const exemptIds = members.filter(m => {
                 if (idx === 0) return false;
-                const prev = jornadas[idx - 1];
+                const prev = sortedJornadas[idx - 1];
                 const hadPrize = this.getPrizesForMemberJornada(m.id, prev, pronosticos) > 0;
-                const wasWinner = this.wasWinnerOfJornada(m.id, prev, members, jornadas, pronosticos);
+                const wasWinner = this.wasWinnerOfJornada(m.id, prev, members, sortedJornadas, pronosticos);
                 return hadPrize || wasWinner;
             }).map(m => m.id);
             return {
@@ -134,7 +143,7 @@ class BoteEngine {
 
             // Línea de tiempo combinada
             const timeline = [
-                ...jornadas.map(j => ({ type: 'jornada', date: j.date, data: j })),
+                ...sortedJornadas.map(j => ({ type: 'jornada', date: j.date, data: j })),
                 ...repartos.map(r => ({ type: 'reparto', date: r.date, data: r })),
                 ...cierresVuelta.map(c => ({ type: 'cierre_vuelta', date: c.date, data: c })),
                 ...ingresosLibres.map(i => ({ type: 'ingreso_libre', date: i.fecha || i.date, data: i }))
@@ -153,21 +162,22 @@ class BoteEngine {
             timeline.forEach(event => {
                 if (event.type === 'jornada') {
                     const jornada = event.data;
-                    const jornadaIndex = jornadas.findIndex(j => j.id === jornada.id);
+                    const jornadaIndex = sortedJornadas.findIndex(j => String(j.id) === String(jornada.id));
 
                     const matchesWithResult = (jornada.matches || []).filter(m => {
-                        const r = String(m.result || '').trim().toLowerCase();
-                        return r !== '' && r !== 'por definir';
+                        const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+                        return r !== '' && r !== '-' && r !== 'por definir';
                     });
-                    if (matchesWithResult.length === 0) return;
+                    const isJornadaPlayed = matchesWithResult.length > 0 || jornada.status === 'completed' || jornada.status === 'closed' || jornada.finalizada === true;
+                    if (!isJornadaPlayed) return;
 
                     const infoRedist = jornadaExemptions[jornadaIndex];
                     const pronostico = this._pMap ? (this._pMap.get(`${jornada.id}_${mIdStr}`) || this._pMap.get(`${jornada.number}_${mIdStr}`)) : pronosticos.find(p =>
-                        (p.jId == jornada.id || p.jornadaId == jornada.id) &&
+                        (String(p.jId || p.jornadaId) === String(jornada.id) || parseInt(p.jId || p.jornadaId, 10) === parseInt(jornada.number, 10)) &&
                         (String(p.mId || p.memberId) === mIdStr)
                     );
 
-                    const costs = this.calculateJornadaCosts(member.id, members, jornadas, pronosticos, pronosticosExtra, cashPayments, jornada, pronostico, jornadaIndex, infoRedist);
+                    const costs = this.calculateJornadaCosts(member.id, members, sortedJornadas, pronosticos, pronosticosExtra, cashPayments, jornada, pronostico, jornadaIndex, infoRedist);
                     const prizes = this.getPrizesForMemberJornada(member.id, jornada, pronosticos);
                     const manualIngresos = this.getManualIngresosForJornada(member.id, jornada, ingresos);
                     const penalties = costs.penalizacionUnos + (costs.penalizacionBajosAciertos || 0) + (costs.penalizacionPIG || 0) + (costs.penalizacionMaula || 0);
@@ -341,10 +351,10 @@ class BoteEngine {
 
     calculateJornadaCosts(memberId, members, jornadas, pronosticos, pronosticosExtra, cashPayments, jornada, pronostico, jornadaIndex, infoRedist = null) {
         const matchesWithResult = (jornada.matches || []).filter(m => {
-            const r = String(m.result || '').trim().toLowerCase();
-            return r !== '' && r !== 'por definir';
+            const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+            return r !== '' && r !== '-' && r !== 'por definir';
         });
-        const jornadaPlayed = matchesWithResult.length > 0;
+        const jornadaPlayed = matchesWithResult.length > 0 || jornada.status === 'completed' || jornada.status === 'closed' || jornada.finalizada === true;
         const jDate = window.AppUtils.parseDate(jornada.date);
         const numMembers = members.length;
 
@@ -459,8 +469,9 @@ class BoteEngine {
 
             if (pigIdx !== -1) {
                 const pigMatch = jornada.matches[pigIdx];
-                if (pigMatch && pigMatch.result && pigMatch.result !== '' && pigMatch.result.toLowerCase() !== 'por definir') {
-                    const resultSign = this.normalizeSign(pigMatch.result);
+                const pigRes = pigMatch ? (pigMatch.result !== undefined ? pigMatch.result : pigMatch.r) : null;
+                if (pigMatch && pigRes && pigRes !== '' && pigRes !== '-' && String(pigRes).toLowerCase() !== 'por definir') {
+                    const resultSign = this.normalizeSign(pigRes);
                     const prediction = String(currentSelection[pigIdx] || '').trim().toUpperCase();
                     if (resultSign !== prediction) {
                         costs.penalizacionPIG = this.calculateHistoricalPenalty('pig', null, jDate);
@@ -680,7 +691,7 @@ class BoteEngine {
         });
 
         const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
-        const officialResults = (jornada.matches || []).map(m => m.result);
+        const officialResults = (jornada.matches || []).map(m => (m.result !== undefined ? m.result : (m.r || '')));
         const legacyPrizes = jornada.prizes || {};
 
         let totalExtraPrize = 0;
@@ -716,7 +727,14 @@ class BoteEngine {
     }
 
     getWinnerOfJornada(prevJornada, members, jornadas, pronosticos) {
-        if (!prevJornada || !prevJornada.matches || prevJornada.matches.length < 15 || prevJornada.matches.some(m => !m.result || m.result === '' || m.result === 'por definir')) {
+        if (!prevJornada || !prevJornada.matches || prevJornada.matches.length < 14) {
+            return null;
+        }
+        const filledMatches = (prevJornada.matches || []).filter(m => {
+            const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+            return r !== '' && r !== '-' && r !== 'por definir';
+        });
+        if (filledMatches.length < 14) {
             return null;
         }
         const cacheKey = String(prevJornada.id || prevJornada.number);
@@ -805,7 +823,14 @@ class BoteEngine {
     }
 
     getLoserOfJornada(prevJornada, members, jornadas, pronosticos) {
-        if (!prevJornada || !prevJornada.matches || prevJornada.matches.length < 15 || prevJornada.matches.some(m => !m.result || m.result === '' || m.result === 'por definir')) {
+        if (!prevJornada || !prevJornada.matches || prevJornada.matches.length < 14) {
+            return null;
+        }
+        const filledMatches = (prevJornada.matches || []).filter(m => {
+            const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+            return r !== '' && r !== '-' && r !== 'por definir';
+        });
+        if (filledMatches.length < 14) {
             return null;
         }
         const cacheKey = String(prevJornada.id || prevJornada.number);
@@ -949,10 +974,11 @@ class BoteEngine {
             const match = matches[i];
             const pred = String(forecast[i] || '').trim().toUpperCase();
 
-            if (!match.result || match.result === '' || match.result.toLowerCase() === 'por definir') continue;
+            const res = match.result !== undefined ? match.result : match.r;
+            if (!res || res === '' || res === '-' || String(res).toLowerCase() === 'por definir') continue;
             if (i === 14) continue; // El partido 15 no suma aciertos ordinarios
 
-            const rSign = this.normalizeSign(match.result);
+            const rSign = this.normalizeSign(res);
             if (pred.includes(rSign)) aciertos++;
         }
         return aciertos;

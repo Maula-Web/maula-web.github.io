@@ -54,6 +54,15 @@ class BoteManager {
         this.init();
     }
 
+    isJornadaPlayed(j) {
+        if (!j) return false;
+        if (j.status === 'completed' || j.status === 'closed' || j.finalizada === true) return true;
+        return Array.isArray(j.matches) && j.matches.some(m => {
+            const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+            return r !== '' && r !== '-' && r !== 'por definir';
+        });
+    }
+
     async init() {
         try {
             console.log('BoteManager: Starting initialization...');
@@ -131,8 +140,8 @@ class BoteManager {
         
         const filterBySeason = (item) => {
             if (item.season) return item.season === activeSeason;
-            // Legacy records without a season tag belong to 2025-2026
-            return activeSeason === '2025-2026';
+            if (item.jornadaId && activeJIds.has(String(item.jornadaId))) return true;
+            return (item.season || '2026-2027') === activeSeason;
         };
 
         this.boteData = (boteCollection || []).filter(filterBySeason);
@@ -365,9 +374,7 @@ class BoteManager {
         const totalPremios = movements.reduce((sum, m) => sum + (m.premios || 0) + (m.extraPrizes || 0), 0);
 
         // Get processed jornadas (those with results)
-        const playedJornadas = this.jornadas.filter(j =>
-            j.matches && j.matches.some(match => match.result && match.result !== '' && match.result.toLowerCase() !== 'por definir')
-        ).sort((a, b) => a.number - b.number);
+        const playedJornadas = this.jornadas.filter(j => this.isJornadaPlayed(j)).sort((a, b) => a.number - b.number);
 
         const uniqueJornadasCount = playedJornadas.length;
 
@@ -417,9 +424,7 @@ class BoteManager {
         });
 
         // Aggregated date range for the general view
-        const playedJornadas = this.jornadas.filter(j =>
-            j.matches && j.matches.some(match => match.result && match.result !== '' && match.result.toLowerCase() !== 'por definir')
-        ).sort((a, b) => a.number - b.number);
+        const playedJornadas = this.jornadas.filter(j => this.isJornadaPlayed(j)).sort((a, b) => a.number - b.number);
         let dateRangeHtml = '';
         if (playedJornadas.length > 0) {
             dateRangeHtml = `<p style="text-align:center; color: var(--primary-color); font-weight:bold; margin-bottom: 1rem; opacity:0.8; font-size:0.9rem;">
@@ -485,7 +490,7 @@ class BoteManager {
         const jornadaNums = Object.keys(jornadaGroups)
             .filter(num => {
                 const j = this.jornadas.find(jor => jor.number === parseInt(num));
-                return j && j.matches && j.matches.some(m => m.result && m.result !== '' && m.result.toLowerCase() !== 'por definir');
+                return j && this.isJornadaPlayed(j);
             })
             .sort((a, b) => parseInt(a) - parseInt(b));
 
@@ -644,7 +649,7 @@ class BoteManager {
         const jornadaNums = Object.keys(jornadaGroups)
             .filter(num => {
                 const j = this.jornadas.find(jor => jor.number === parseInt(num));
-                return j && j.matches && j.matches.some(m => m.result && m.result !== '' && m.result.toLowerCase() !== 'por definir');
+                return j && this.isJornadaPlayed(j);
             })
             .sort((a, b) => parseInt(a) - parseInt(b));
 
@@ -1273,9 +1278,7 @@ class BoteManager {
             }
         });
 
-        const jListPlayed = this.jornadas.filter(j =>
-            (j.matches || []).some(m => String(m.result || '').trim().toLowerCase() !== '' && String(m.result || '').trim().toLowerCase() !== 'por definir')
-        ).sort((a, b) => a.number - b.number);
+        const jListPlayed = this.jornadas.filter(j => this.isJornadaPlayed(j)).sort((a, b) => a.number - b.number);
 
         jListPlayed.forEach(j => {
             // Calculate winners and losers
@@ -1611,7 +1614,7 @@ class BoteManager {
 
         uniqueJornadas.forEach(num => {
             const j = this.jornadas.find(jor => jor.number === num);
-            if (j && j.matches && j.matches.some(m => m.result && m.result !== '' && m.result.toLowerCase() !== 'por definir')) {
+            if (j && this.isJornadaPlayed(j)) {
                 let pigIdx = j.pigMatchIndex !== undefined ? j.pigMatchIndex : 14;
                 if (j.matches && j.matches.length > 0) {
                     if (!checkIsPIG(j.matches[pigIdx])) {
@@ -2607,8 +2610,7 @@ class BoteManager {
         for (let i = 0; i <= jIdx; i++) {
             const j = this.jornadas[i];
 
-            const matchesWithResult = (j.matches || []).filter(match => match.result && String(match.result).trim() !== '' && String(match.result).toLowerCase() !== 'por definir');
-            if (matchesWithResult.length === 0) continue;
+            if (!this.isJornadaPlayed(j)) continue;
 
             stats.forEach(s => {
                 const isWin = this.wasWinnerOfJornada(s.id, j);

@@ -86,6 +86,12 @@ class BoteAppController {
         // 2. Cargar datos en vivo desde Firebase si está disponible
         await this.loadLiveFirebaseData();
 
+        // Seleccionar por defecto la última jornada jugada disponible
+        const seasonData = this.getSeasonData();
+        if (seasonData && seasonData.jornadaSummaries && seasonData.jornadaSummaries.length > 0) {
+            this.selectedJornadaNum = seasonData.jornadaSummaries[seasonData.jornadaSummaries.length - 1].number;
+        }
+
         // 3. Renderizar vista inicial
         this.renderAll();
         this.populateSocioSelect();
@@ -249,7 +255,7 @@ class BoteAppController {
                 }
             }
         } catch (err) {
-            console.warn("⚠️ Bote 2: Usando snapshot local de respaldo debido a:", err);
+            console.error("⚠️ Bote 2: Error calculando datos en vivo desde Firestore:", err);
             this.isLive = false;
         }
     }
@@ -299,11 +305,11 @@ class BoteAppController {
         });
 
         // Resumen por jornada
-        const sortedJornadas = [...jornadas].sort((a, b) => a.number - b.number);
+        const sortedJornadas = [...jornadas].sort((a, b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
         const jornadaSummaries = sortedJornadas.filter(j => {
-            return movements.some(m => String(m.jornadaId) === String(j.id));
+            return movements.some(m => String(m.jornadaId) === String(j.id) || Number(m.jornadaNum) === Number(j.number));
         }).map(j => {
-            const jMovements = movements.filter(m => String(m.jornadaId) === String(j.id));
+            const jMovements = movements.filter(m => String(m.jornadaId) === String(j.id) || Number(m.jornadaNum) === Number(j.number));
             const cCol = this.engine ? this.engine.getHistoricalPrice('costeColumna', j.date) : (config.costeColumna || 0.75);
             const cDob = this.engine ? this.engine.getHistoricalPrice('costeDobles', j.date) : (config.costeDobles || 12.00);
             const cAport = this.engine ? this.engine.getHistoricalPrice('aportacionSemanal', j.date) : (config.aportacionSemanal || 1.50);
@@ -2557,7 +2563,7 @@ class BoteAppController {
             betSelection.forEach((sel, idx) => {
                 if (idx >= 15) return;
                 const m = matches[idx];
-                const res = m ? (m.result || '') : '';
+                const res = m ? (m.result !== undefined ? m.result : (m.r || '')) : '';
                 if (!res) return;
                 const rSign = normalize(res);
                 const rScore = String(res).trim().toUpperCase();
@@ -2674,7 +2680,7 @@ class BoteAppController {
                                 const isP15 = idx === 14;
                                 const pronosticoSign = selection[idx] || '-';
                                 const isDouble = idx < 14 && pronosticoSign && pronosticoSign.length > 1;
-                                const res = m ? (m.result || '') : '';
+                                const res = m ? (m.result !== undefined ? m.result : (m.r || '')) : '';
                                 const rSign = normalize(res);
 
                                 return `

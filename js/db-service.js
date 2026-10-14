@@ -297,7 +297,7 @@ class DataService {
             const sortedMembers = (members || []).sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
             // Filter jornadas by active season
-            const seasonJornadas = (allJornadas || []).filter(j => j.season === activeSeason);
+            const seasonJornadas = (allJornadas || []).filter(j => (j.season || '2026-2027') === activeSeason);
             // Normalizar nombres de equipos y forzar (f) minúscula en todas las jornadas
             if (window.AppUtils && window.AppUtils.normalizeTeamName) {
                 (allJornadas || []).forEach(j => {
