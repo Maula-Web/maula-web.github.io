@@ -121,12 +121,43 @@ class DiceService {
 
                 if (hasExisting) continue;
 
+                // Helper seguro para parsear fecha DD/MM/YYYY o ISO
+                const parseDateSafe = (d) => {
+                    if (!d) return null;
+                    if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
+                    if (typeof AppUtils !== 'undefined' && AppUtils && typeof AppUtils.parseDate === 'function') {
+                        const parsed = AppUtils.parseDate(d);
+                        if (parsed && !isNaN(parsed.getTime())) return parsed;
+                    }
+                    if (typeof window !== 'undefined' && window.AppUtils && typeof window.AppUtils.parseDate === 'function') {
+                        const parsed = window.AppUtils.parseDate(d);
+                        if (parsed && !isNaN(parsed.getTime())) return parsed;
+                    }
+                    const s = String(d).trim();
+                    const dmy = s.match(/(?:^|[^\d])(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(?:[^\d]|$)/);
+                    if (dmy) {
+                        return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10));
+                    }
+                    const fallback = new Date(s);
+                    return isNaN(fallback.getTime()) ? null : fallback;
+                };
+
                 // Comprobar fechas de la jornada
-                const jDate = typeof AppUtils !== 'undefined' ? AppUtils.parseDate(j.date) : new Date(j.date);
-                const deadline = typeof AppUtils !== 'undefined' ? AppUtils.calculateDeadline(j.date) : null;
+                const jDate = parseDateSafe(j.date);
+                let deadline = null;
+                if (typeof AppUtils !== 'undefined' && AppUtils && typeof AppUtils.calculateDeadline === 'function') {
+                    deadline = AppUtils.calculateDeadline(j.date);
+                } else if (typeof window !== 'undefined' && window.AppUtils && typeof window.AppUtils.calculateDeadline === 'function') {
+                    deadline = window.AppUtils.calculateDeadline(j.date);
+                }
+                if ((!deadline || isNaN(deadline.getTime())) && jDate) {
+                    deadline = new Date(jDate.getTime());
+                    deadline.setDate(jDate.getDate() - 3); // Jueves
+                    deadline.setHours(17, 0, 0, 0);
+                }
 
                 // Verificar si la fecha de la jornada cae en el rango del dado
-                const inRange = this.isDateInRange(jDate, member.diceStartDate, member.diceEndDate) ||
+                const inRange = (jDate && this.isDateInRange(jDate, member.diceStartDate, member.diceEndDate)) ||
                                 (deadline && this.isDateInRange(deadline, member.diceStartDate, member.diceEndDate));
 
                 if (!inRange) continue;
@@ -140,7 +171,7 @@ class DiceService {
                 const deadlinePassed = deadline ? (now >= deadline) : false;
 
                 if (!deadlinePassed && !hasStarted) {
-                    // Aún no entra en juego; el socio todavía puede rellenarla si vuelve a tiempo
+                    // Aún no entra en juego ni ha vencido el plazo (Jueves 17:00h); el socio todavía puede rellenarla por sí mismo
                     continue;
                 }
 
