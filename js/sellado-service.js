@@ -173,18 +173,23 @@
             const jIdStr = String(jornada.id);
             const jNum = jornada.number;
 
-            // 1. Obtener quiniela de dobles y su P15 oficial
-            const pExtra = (pronosticosExtra || []).find(p =>
+            // 1. Obtener quinielas de dobles y su P15 oficial
+            const validExtras = (pronosticosExtra || []).filter(p =>
                 String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId) === jIdStr &&
                 p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
             );
 
-            if (!pExtra || !pExtra.selection) {
+            if (validExtras.length === 0) {
                 return { ok: false, reason: 'Falta rellenar la Quiniela de Dobles' };
             }
 
-            const p15Oficial = this.formatP15(pExtra.selection[14]);
-            const dobles16 = this.desarrollarDobles(pExtra.selection, pExtra.isReduced !== false, p15Oficial);
+            const p15Oficial = this.formatP15(validExtras[0].selection[14]);
+            const doblesDesarrollados = [];
+            validExtras.forEach(pe => {
+                const p15pe = this.formatP15(pe.selection[14]) || p15Oficial;
+                const d16 = this.desarrollarDobles(pe.selection, pe.isReduced !== false, p15pe);
+                doblesDesarrollados.push(...d16);
+            });
 
             // 2. Comprobar 19 socios
             const activeMembers = (members || []).filter(m => m && m.active !== false).slice(0, 19);
@@ -216,25 +221,25 @@
                 simples19.push(signos14.join('') + p15Oficial);
             }
 
-            if (simples19.length !== 19 || dobles16.length !== 16) {
-                return { ok: false, reason: `Conteo inválido: ${simples19.length} simples + ${dobles16.length} dobles` };
+            if (simples19.length !== 19 || doblesDesarrollados.length === 0) {
+                return { ok: false, reason: `Conteo inválido: ${simples19.length} simples + ${doblesDesarrollados.length} dobles` };
             }
 
-            const todasLas35 = [...simples19, ...dobles16];
-            const fileContent = todasLas35.join('\r\n');
+            const todasLasApuestas = [...simples19, ...doblesDesarrollados];
+            const fileContent = todasLasApuestas.join('\r\n');
 
             return {
                 ok: true,
                 p15Oficial: p15Oficial,
                 simples19: simples19,
-                dobles16: dobles16,
+                dobles16: doblesDesarrollados,
                 fileContent: fileContent,
-                totalApuestas: todasLas35.length
+                totalApuestas: todasLasApuestas.length
             };
         },
 
         /**
-         * Envía las 35 apuestas reales a través de Google Apps Script
+         * Envía las apuestas reales a través de Google Apps Script
          */
         async enviarSelladoReal(jornada, fileContent, p15Oficial, ticketId) {
             const cfg = await this.getConfig();
@@ -245,9 +250,11 @@
                 throw new Error('No se ha configurado el email de la administración de lotería');
             }
 
+            const totalBets = fileContent ? fileContent.split(/\r?\n/).filter(l => l.trim().length > 0).length : 35;
+            const costeSelladoStr = (totalBets * 0.75).toFixed(2).replace('.', ',');
             const fileName = `${ticketId}.txt`;
-            const subject = `[${ticketId}] Sellado Jornada ${jornada.number} - 35 Apuestas (P15: ${p15Oficial})`;
-            const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${jornada.number}.\n\n- Referencia de sellado: ${ticketId}\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15Oficial}\n- Importe oficial: 26,25 € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo indicando esta misma referencia.\n\nSaludos,\nPeña Los Maulas`;
+            const subject = `[${ticketId}] Sellado Jornada ${jornada.number} - ${totalBets} Apuestas (P15: ${p15Oficial})`;
+            const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${jornada.number}.\n\n- Referencia de sellado: ${ticketId}\n- Total apuestas: ${totalBets} columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15Oficial}\n- Importe oficial: ${costeSelladoStr} € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo indicando esta misma referencia.\n\nSaludos,\nPeña Los Maulas`;
 
             const payload = {
                 to: cfg.destinoEmail,

@@ -313,7 +313,8 @@ class BoteAppController {
 
             const sealerMov = jMovements.find(m => m.isSealer || m.sellado < 0);
             const numSociosJornada = jMovements.length || (members || []).length || 19;
-            const gastoSellado = j.noSellado ? 0 : ((numSociosJornada * cCol) + cDob);
+            const doblesCount = Math.max(1, jMovements.filter(m => m.jugaDobles).length);
+            const gastoSellado = j.noSellado ? 0 : ((numSociosJornada * cCol) + (doblesCount * cDob));
             if (sealerMov && !j.noSellado) {
                 sealerMov.sellado = -gastoSellado;
             }
@@ -351,8 +352,10 @@ class BoteAppController {
                 }
             }
 
-            // 2. Socio que juega los dobles en esta jornada (ganador de la jornada anterior)
-            const doblesPlayerMov = jMovements.find(m => m.jugaDobles);
+            // 2. Socios que juegan los dobles en esta jornada (ganador y/o premiados de la jornada previa)
+            const doblesPlayerMovs = jMovements.filter(m => m.jugaDobles);
+            const doblesPlayerMov = doblesPlayerMovs[0] || null;
+            const doblesPlayerNames = doblesPlayerMovs.map(m => m.memberName).join(', ');
             let maulaId = (this.engine && typeof this.engine.getLoserOfJornada === 'function') ? this.engine.getLoserOfJornada(j, members, jornadas, pronosticos) : null;
             const maulaMov = jMovements.find(m => m.isLoser || (maulaId && String(m.memberId) === String(maulaId)) || (m.penalizacionMaula && m.penalizacionMaula > 0));
             let maulaName = maulaMov ? maulaMov.memberName : (maulaId ? (members.find(m => String(m.id) === String(maulaId)) || {}).name : null);
@@ -400,8 +403,9 @@ class BoteAppController {
                 neto,
                 winnerId: winnerId,
                 winnerName: winnerName,
+                numDobles: Math.max(1, doblesPlayerMovs.length),
                 doblesPlayerId: doblesPlayerMov ? String(doblesPlayerMov.memberId) : null,
-                doblesPlayerName: doblesPlayerMov ? doblesPlayerMov.memberName : null,
+                doblesPlayerName: doblesPlayerNames || (doblesPlayerMov ? doblesPlayerMov.memberName : null),
                 maulaId: maulaId,
                 maulaName: maulaName,
                 loserId: maulaId,
@@ -1131,7 +1135,7 @@ class BoteAppController {
                             <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2).replace('.', ',')}&nbsp;€</span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-rose-400 block mb-1 font-bold">🎟️ Gasto Oficial de Sellado</strong>
-                                Coste total pagado en la administración de loterías: ${jSummary.numSocios} quinielas sencillas (${(jSummary.numSocios * jSummary.costeColumna).toFixed(2).replace('.', ',')} €) + 1 quiniela reducida de 7 dobles (${jSummary.costeDobles.toFixed(2).replace('.', ',')} €) = ${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €.
+                                Coste total pagado en la administración de loterías: ${jSummary.numSocios} quinielas sencillas (${(jSummary.numSocios * jSummary.costeColumna).toFixed(2).replace('.', ',')} €) + ${(jSummary.numDobles || 1) > 1 ? `${jSummary.numDobles} quinielas reducidas de 7 dobles` : '1 quiniela reducida de 7 dobles'} (${((jSummary.numDobles || 1) * jSummary.costeDobles).toFixed(2).replace('.', ',')} €) = ${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €.
                             </div>
                         </div>
                         <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 hover:z-50 transition-colors whitespace-nowrap">

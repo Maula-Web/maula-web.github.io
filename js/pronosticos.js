@@ -1665,7 +1665,12 @@ class PronosticoManager {
         // Comprobar si este socio es el responsable/elegible para la Quiniela de Dobles en esta jornada.
         let isEligibleDoubles = false;
         try {
-            if (typeof window !== 'undefined' && typeof window.getEligibleDoublesMember === 'function') {
+            if (typeof window !== 'undefined' && typeof window.getEligibleDoublesMembers === 'function') {
+                const dms = window.getEligibleDoublesMembers(targetJornada);
+                if (dms && dms.some(m => String(m.id) === mIdStr)) {
+                    isEligibleDoubles = true;
+                }
+            } else if (typeof window !== 'undefined' && typeof window.getEligibleDoublesMember === 'function') {
                 const dm = window.getEligibleDoublesMember(targetJornada);
                 if (dm && String(dm.id) === mIdStr) {
                     isEligibleDoubles = true;
@@ -1673,7 +1678,7 @@ class PronosticoManager {
             }
             if (!isEligibleDoubles && typeof this.checkEligibility === 'function') {
                 const elig = this.checkEligibility(targetJornada.number, memberId, true);
-                if (elig && (elig.eligible || elig.isWinner)) {
+                if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) {
                     isEligibleDoubles = true;
                 }
             }
@@ -1682,10 +1687,11 @@ class PronosticoManager {
         }
 
         if (isEligibleDoubles) {
-            // Comprobar si la quiniela de dobles de esta jornada está ya rellenada
+            // Comprobar si la quiniela de dobles de este socio en esta jornada está ya rellenada
             const pExtra = (this.pronosticosExtra || []).find(pe => {
                 const pj = String(pe.jId !== undefined && pe.jId !== null ? pe.jId : pe.jornadaId);
-                return pj === jIdStr;
+                const pm = String(pe.mId !== undefined && pe.mId !== null ? pe.mId : pe.memberId);
+                return pj === jIdStr && pm === mIdStr;
             });
 
             const hasDoublesFilled = pExtra && pExtra.selection && Array.isArray(pExtra.selection) &&
@@ -2718,8 +2724,15 @@ class PronosticoManager {
         this.doublesStatus.className = '';
         this.btnSaveDoubles.style.display = isLocked ? 'none' : 'block';
 
-        // Load existing doubles: si no coincide el socio actual, buscar cualquier pronóstico de dobles guardado para esta jornada
+        // Load existing doubles: buscar primero el del socio actual, y sólo como fallback el general si no tiene
         const existingExtra = (this.pronosticosExtra || []).find(p => 
+            (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) && 
+            (String(p.mId || p.memberId) === String(this.currentMemberId)) &&
+            (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))
+        ) || (this.pronosticosExtra || []).find(p => 
+            (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) && 
+            (String(p.mId || p.memberId) === String(this.currentMemberId))
+        ) || (this.pronosticosExtra || []).find(p => 
             (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) && 
             (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))
         ) || (this.pronosticosExtra || []).find(p => 

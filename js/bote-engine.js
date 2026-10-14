@@ -104,7 +104,9 @@ class BoteEngine {
             const exemptIds = members.filter(m => {
                 if (idx === 0) return false;
                 const prev = jornadas[idx - 1];
-                return this.getPrizesForMemberJornada(m.id, prev, pronosticos) > 0;
+                const hadPrize = this.getPrizesForMemberJornada(m.id, prev, pronosticos) > 0;
+                const wasWinner = this.wasWinnerOfJornada(m.id, prev, members, jornadas, pronosticos);
+                return hadPrize || wasWinner;
             }).map(m => m.id);
             return {
                 id: j.id,
@@ -384,7 +386,8 @@ class BoteEngine {
         if (jornadaIndex > 0) {
             const prevJornada = jornadas[jornadaIndex - 1];
             const hadPrize = this.getPrizesForMemberJornada(memberId, prevJornada, pronosticos) > 0;
-            if (hadPrize) {
+            const wasWinner = this.wasWinnerOfJornada(memberId, prevJornada, members, jornadas, pronosticos);
+            if (hadPrize || wasWinner) {
                 costs.exento = true;
             }
         }
@@ -424,20 +427,11 @@ class BoteEngine {
                 p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
             ) : [];
 
-            let officialDoubleOwnerId = null;
+            const isPrevWinner = prevWinnerId && String(memberId) === String(prevWinnerId);
+            const hadPrize = this.getPrizesForMemberJornada(memberId, prevJornada, pronosticos) > 0;
+            const hasFilledExtra = matchesExtra.some(p => String(p.mId || p.memberId) === String(memberId));
 
-            if (matchesExtra.length > 0) {
-                if (prevWinnerId && matchesExtra.some(p => String(p.mId || p.memberId) === prevWinnerId)) {
-                    officialDoubleOwnerId = prevWinnerId;
-                } else {
-                    const latestExtra = matchesExtra[matchesExtra.length - 1];
-                    officialDoubleOwnerId = latestExtra ? String(latestExtra.mId || latestExtra.memberId) : null;
-                }
-            } else {
-                officialDoubleOwnerId = prevWinnerId;
-            }
-
-            if (officialDoubleOwnerId && String(memberId) === officialDoubleOwnerId) {
+            if (isPrevWinner || hadPrize || hasFilledExtra) {
                 costs.jugaDobles = true;
             }
         }
@@ -515,13 +509,22 @@ class BoteEngine {
             const cCol = this.getHistoricalPrice('costeColumna', jDate);
             const cDob = this.getHistoricalPrice('costeDobles', jDate);
 
-            const extras = pronosticosExtra.filter(p => {
-                const pJ = String(p.jId || p.jornadaId || '');
-                return pJ === String(jornada.id) || pJ === String(jornada.number);
-            });
-            // FIX: Always charge exactly 1 double quiniela per jornada to the Peña
-            // (prevents duplicate DB entries from multiplying the cost)
-            const numExtras = 1;
+            // Contar cuántas quinielas de dobles distintas se juegan en esta jornada
+            let numExtras = 1;
+            if (jornadaIndex > 0) {
+                const prevJornada = jornadas[jornadaIndex - 1];
+                const prevWinnerId = this.getWinnerOfJornada(prevJornada, members, jornadas, pronosticos);
+                const extraMemberIds = new Set(
+                    (matchesExtra || []).map(p => String(p.mId || p.memberId || '')).filter(Boolean)
+                );
+                if (prevWinnerId) extraMemberIds.add(String(prevWinnerId));
+                members.forEach(m => {
+                    if (this.getPrizesForMemberJornada(m.id, prevJornada, pronosticos) > 0) {
+                        extraMemberIds.add(String(m.id));
+                    }
+                });
+                numExtras = Math.max(1, extraMemberIds.size);
+            }
             const totalCDob = numExtras * cDob;
 
             costs.sellado = -((numMembers * cCol) + totalCDob);

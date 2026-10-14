@@ -2041,26 +2041,42 @@
             }
         };
 
-        // 2. BUSCAR EL SOCIO RESPONSABLE DE LA QUINIELA DE DOBLES
-        window.getEligibleDoublesMember = function(jornada) {
-            if (!window.app || !window.app.members || window.app.members.length === 0) return null;
+        // 2. BUSCAR LOS SOCIOS RESPONSABLES DE LA QUINIELA DE DOBLES
+        window.getEligibleDoublesMembers = function(jornada) {
+            if (!window.app || !window.app.members || window.app.members.length === 0) return [];
             const j = jornada || (window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null);
-            if (!j) return null;
+            if (!j) return [];
             
+            const list = [];
             if (typeof window.app.checkEligibility === 'function') {
-                let firstPrizeMember = null;
                 for (const m of window.app.members) {
                     const elig = window.app.checkEligibility(j.number, m.id, true);
-                    if (elig && elig.isWinner) {
-                        return m; // El ganador de la jornada previa tiene máxima prioridad
-                    }
-                    if (elig && elig.eligible && !firstPrizeMember) {
-                        firstPrizeMember = m; // Socio con premio económico
+                    if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) {
+                        list.push(m);
                     }
                 }
-                if (firstPrizeMember) return firstPrizeMember;
             }
-            return null;
+            return list;
+        };
+
+        window.getEligibleDoublesMember = function(jornada) {
+            const list = window.getEligibleDoublesMembers(jornada);
+            if (list.length === 0) return null;
+            // Si el socio actual está en la lista de elegibles, devolverlo para favorecer su edición directa
+            if (window.app && window.app.currentMemberId) {
+                const current = list.find(m => String(m.id) === String(window.app.currentMemberId));
+                if (current) return current;
+            }
+            // De lo contrario, priorizar al ganador absoluto si existe
+            const j = jornada || (window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null);
+            if (j && window.app && typeof window.app.checkEligibility === 'function') {
+                const winner = list.find(m => {
+                    const elig = window.app.checkEligibility(j.number, m.id, true);
+                    return elig && elig.isWinner;
+                });
+                if (winner) return winner;
+            }
+            return list[0];
         };
 
         // 3. GESTIÓN DE LA VENTANA MODAL DEL EDITOR
@@ -2080,15 +2096,18 @@
                 window.app.loadForecast();
             }
 
-            // Comprobar si este socio es el responsable de dobles para esta jornada o si ya existen dobles registrados
+            // Comprobar si este socio es elegible para dobles en esta jornada o si ya existen dobles registrados
             const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
-            const responsible = window.getEligibleDoublesMember(j);
+            const eligibleMembers = window.getEligibleDoublesMembers(j);
+            const isDoublesEligible = eligibleMembers.some(m => String(m.id) === String(window.app.currentMemberId)) || (window.app && window.app.correctionMode);
+
+            // Buscar si este socio específico tiene pronóstico de dobles guardado, o en general para la jornada
             const existingExtra = (window.app && window.app.pronosticosExtra)
-                ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
-                  || window.app.pronosticosExtra.find(p => String(p.jId || p.jornadaId) === String(window.app.currentJornadaId))
+                ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
+                  || window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)))
+                  || (isDoublesEligible ? null : window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))))
                 : null;
             const hasDoublesForecast = !!(existingExtra && existingExtra.selection && existingExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'));
-            const isDoublesEligible = (responsible && String(responsible.id) === String(window.app.currentMemberId)) || (window.app && window.app.correctionMode);
             const canViewDoubles = isDoublesEligible || hasDoublesForecast || openDoublesTab;
 
             const tabBtnDoubles = document.getElementById('tab-btn-doubles');
@@ -2176,14 +2195,20 @@
                 if (window.app.selJornada) window.app.selJornada.value = String(jornadaId);
             }
             const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
-            const existingExtra = (window.app && window.app.pronosticosExtra)
-                ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
-                  || window.app.pronosticosExtra.find(p => String(p.jId || p.jornadaId) === String(window.app.currentJornadaId))
-                : null;
-            const responsible = window.getEligibleDoublesMember(j);
-            const extraMemberId = existingExtra ? (existingExtra.mId || existingExtra.memberId) : null;
-            const mId = extraMemberId || (responsible ? responsible.id : (window.app ? window.app.currentMemberId : null));
-            window.openEditorModal(mId, true, j ? j.id : null);
+            const eligibleMembers = window.getEligibleDoublesMembers(j);
+            const currentMid = window.app ? String(window.app.currentMemberId) : null;
+            
+            // Si el socio actual en el selector o sesión es uno de los elegibles, abrir directamente el suyo
+            let targetMid = null;
+            if (currentMid && eligibleMembers.some(m => String(m.id) === currentMid)) {
+                targetMid = currentMid;
+            } else if (eligibleMembers.length > 0) {
+                targetMid = eligibleMembers[0].id;
+            } else {
+                const responsible = window.getEligibleDoublesMember(j);
+                targetMid = responsible ? responsible.id : currentMid;
+            }
+            window.openEditorModal(targetMid, true, j ? j.id : null);
         };
 
         window.switchEditorTab = function(tab) {
@@ -2352,7 +2377,7 @@
                     });
                     return open || candidates[candidates.length - 1] || (this.jornadas && this.jornadas[0]);
                 })();
-                const responsibleMember = window.getEligibleDoublesMember(nextJornada);
+                const eligibleDoublesMembers = window.getEligibleDoublesMembers ? window.getEligibleDoublesMembers(nextJornada) : [];
 
                 // Mapas de Búsqueda Rápida O(1)
                 const pronosticosMap = new Map();
@@ -2411,7 +2436,7 @@
                     const nameParts = AppUtils.getMemberName(m).split(' ');
                     const shortName = nameParts[0].length > 7 ? nameParts[0].substring(0, 6) + '.' : nameParts[0];
 
-                    const isDoublesMember = responsibleMember && String(responsibleMember.id) === String(m.id);
+                    const isDoublesMember = eligibleDoublesMembers.some(em => String(em.id) === String(m.id));
 
                     if (isDoublesMember) {
                         th.classList.add('bg-purple-950/30', 'border-b-2', 'border-purple-500');
@@ -2464,7 +2489,10 @@
                         const hasValid = p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                         if (hasValid) {
                             jornadasConDobles.add(jId);
-                            pronosticosExtraMap.set(jId, p);
+                            if (!pronosticosExtraMap.has(jId)) {
+                                pronosticosExtraMap.set(jId, []);
+                            }
+                            pronosticosExtraMap.get(jId).push(p);
                         }
                     });
                 }
@@ -2509,7 +2537,7 @@
                     `;
 
                     // Celdas de Pronósticos HORIZONTALES por Bloque por cada Socio
-                    const jDoublesMember = window.getEligibleDoublesMember(j);
+                    const jEligibleMembers = window.getEligibleDoublesMembers ? window.getEligibleDoublesMembers(j) : [];
 
                     sortedMembers.forEach((m) => {
                         const jIdStr = String(j.id);
@@ -2522,7 +2550,7 @@
                         }
 
                         const cellLed = this.getMemberStatusLed(m.id, j);
-                        const isCellDoubles = jDoublesMember && String(jDoublesMember.id) === String(m.id);
+                        const isCellDoubles = jEligibleMembers.some(em => String(em.id) === String(m.id));
                         let cellContent = '';
 
                         // Helper para colorear un signo individual con span
@@ -2613,12 +2641,7 @@
 
                     // Columna de Dobles para esta Jornada
                     const jIdStr = String(j.id);
-                    const pExtra = pronosticosExtraMap.get(jIdStr);
-                    let isDoublesPlayed = false;
-                    if (pExtra && pExtra.selection && Array.isArray(pExtra.selection)) {
-                        isDoublesPlayed = pExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                    }
-
+                    const pExtras = pronosticosExtraMap.get(jIdStr) || [];
                     const colorSignD = (s, idx) => {
                         if (!s || s === '-') return `<span class="sign-h-empty">-</span>`;
                         if (s === '1') return `<span class="sign-h-1" title="Doble ${idx+1}: Local">1</span>`;
@@ -2628,48 +2651,52 @@
                     };
 
                     let doublesContent = '';
-                    if (isDoublesPlayed) {
-                        const dsel = pExtra.selection || [];
-                        const db1 = [0,1,2,3].map(i => colorSignD(dsel[i], i)).join('');
-                        const db2 = [4,5,6,7].map(i => colorSignD(dsel[i], i)).join('');
-                        const db3 = [8,9,10].map(i => colorSignD(dsel[i], i)).join('');
-                        const db4 = [11,12,13].map(i => colorSignD(dsel[i], i)).join('');
-                        // Los dobles SIEMPRE incluyen P15 si hay partido PIG en la jornada
-                        let dp15 = '';
-                        if (hasPigAnywhere) {
-                            const s15d = dsel[14] ? String(dsel[14]).trim() : '-';
-                            dp15 = `<div class="forecast-p15-block" title="Pleno al 15 (Dobles)">${colorSignD(s15d !== '-' ? s15d : null, 14)}</div>`;
-                        }
-                        // Cálculo de Aciertos para Dobles (usando evaluateForecast con isReduced)
-                        let doublesStatsBadgesHtml = '';
-                        const filledMatchesCountD = (j.matches || []).filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length;
-                        if (filledMatchesCountD > 0 && typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateForecast) {
-                            try {
-                                const offRes = (j.matches || []).map(m => m.result);
-                                const jDate = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
-                                const isReduced = pExtra.isReduced || false;
-                                const evD = ScoringSystem.evaluateForecast(dsel, offRes, jDate, { isReduced });
-                                if (evD && evD.hits >= 0) {
-                                    doublesStatsBadgesHtml = `<span class="forecast-h-stats"><span class="forecast-badge-hits" title="${evD.hits} aciertos conseguidos">${evD.hits}</span></span>`;
-                                }
-                            } catch (e) {
-                                console.warn('Error calculando stats de dobles', e);
+                    if (pExtras.length > 0) {
+                        doublesContent = pExtras.map(pExtra => {
+                            const dsel = pExtra.selection || [];
+                            const authorMem = this.members ? this.members.find(m => String(m.id) === String(pExtra.mId || pExtra.memberId)) : null;
+                            const authorTag = (pExtras.length > 1 && authorMem) ? `<div class="text-[9px] font-black text-amber-400 mb-0.5">${AppUtils.getMemberName(authorMem).split(' ')[0]}</div>` : '';
+                            const db1 = [0,1,2,3].map(i => colorSignD(dsel[i], i)).join('');
+                            const db2 = [4,5,6,7].map(i => colorSignD(dsel[i], i)).join('');
+                            const db3 = [8,9,10].map(i => colorSignD(dsel[i], i)).join('');
+                            const db4 = [11,12,13].map(i => colorSignD(dsel[i], i)).join('');
+                            // Los dobles SIEMPRE incluyen P15 si hay partido PIG en la jornada
+                            let dp15 = '';
+                            if (hasPigAnywhere) {
+                                const s15d = dsel[14] ? String(dsel[14]).trim() : '-';
+                                dp15 = `<div class="forecast-p15-block" title="Pleno al 15 (Dobles)">${colorSignD(s15d !== '-' ? s15d : null, 14)}</div>`;
                             }
-                        }
+                            // Cálculo de Aciertos para Dobles (usando evaluateForecast con isReduced)
+                            let doublesStatsBadgesHtml = '';
+                            const filledMatchesCountD = (j.matches || []).filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length;
+                            if (filledMatchesCountD > 0 && typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateForecast) {
+                                try {
+                                    const offRes = (j.matches || []).map(m => m.result);
+                                    const jDate = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
+                                    const isReduced = pExtra.isReduced || false;
+                                    const evD = ScoringSystem.evaluateForecast(dsel, offRes, jDate, { isReduced });
+                                    if (evD && evD.hits >= 0) {
+                                        doublesStatsBadgesHtml = `<span class="forecast-h-stats"><span class="forecast-badge-hits" title="${evD.hits} aciertos conseguidos">${evD.hits}</span></span>`;
+                                    }
+                                } catch (e) {
+                                    console.warn('Error calculando stats de dobles', e);
+                                }
+                            }
 
-                        doublesContent = `
-                            <div class="forecast-h-cell">
-                                <div class="forecast-h-badges"><span class="text-[9px] font-black text-purple-400">✌️</span>${doublesStatsBadgesHtml}</div>
-                                <div class="forecast-h-block">${db1}</div>
-                                <div class="forecast-h-sep"></div>
-                                <div class="forecast-h-block">${db2}</div>
-                                <div class="forecast-h-sep"></div>
-                                <div class="forecast-h-block">${db3}</div>
-                                <div class="forecast-h-sep"></div>
-                                <div class="forecast-h-block">${db4}</div>
-                                ${dp15}
-                            </div>
-                        `;
+                            return `
+                                <div class="forecast-h-cell ${pExtras.length > 1 ? 'mb-1 border-b border-purple-500/30 pb-1' : ''}">
+                                    <div class="forecast-h-badges">${authorTag}<span class="text-[9px] font-black text-purple-400">✌️</span>${doublesStatsBadgesHtml}</div>
+                                    <div class="forecast-h-block">${db1}</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block">${db2}</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block">${db3}</div>
+                                    <div class="forecast-h-sep"></div>
+                                    <div class="forecast-h-block">${db4}</div>
+                                    ${dp15}
+                                </div>
+                            `;
+                        }).join('');
                     } else {
                         // Estado vacío: mostrar también el hueco del P15 si aplica
                         const emptyP15 = hasPigAnywhere ? `<div class="forecast-p15-block"><span class="sign-h-empty">-</span></div>` : '';
@@ -2844,11 +2871,18 @@
                 if (barEl) barEl.style.width = `${pct}%`;
                 if (subEl) subEl.textContent = recibidos === totalSocios ? '100% Completo 🎉' : `${totalSocios - recibidos} pendientes`;
 
-                // 3. KPI Quiniela Dobles (Mostrar Nombre del Responsable)
-                const responsible = window.getEligibleDoublesMember(jornada);
+                // 3. KPI Quiniela Dobles (Mostrar Nombre del Responsable o Responsables)
+                const eligibleList = window.getEligibleDoublesMembers ? window.getEligibleDoublesMembers(jornada) : [];
                 const respEl = document.getElementById('kpi-dobles-responsable');
                 if (respEl) {
-                    respEl.textContent = responsible ? `Responsable: ${AppUtils.getMemberName(responsible)}` : 'Responsable: Por asignar';
+                    if (eligibleList.length > 1) {
+                        respEl.textContent = `Responsables: ${eligibleList.map(m => AppUtils.getMemberName(m)).join(' y ')}`;
+                    } else if (eligibleList.length === 1) {
+                        respEl.textContent = `Responsable: ${AppUtils.getMemberName(eligibleList[0])}`;
+                    } else {
+                        const resp = window.getEligibleDoublesMember(jornada);
+                        respEl.textContent = resp ? `Responsable: ${AppUtils.getMemberName(resp)}` : 'Responsable: Por asignar';
+                    }
                 }
 
                 // 4. KPI Socio Activo
