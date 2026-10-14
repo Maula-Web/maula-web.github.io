@@ -1191,16 +1191,40 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 optDemo.textContent = '⚡ Simulación de Muestra (Demo 35 Apuestas)';
                 sel.appendChild(optDemo);
 
-                // Determinar jornada a seleccionar: o la preservada o la más reciente con pronósticos
+                // Determinar jornada a seleccionar: o la preservada o la siguiente jornada que se vaya a jugar (no la última disponible)
                 let defaultVal = 'test_sim';
                 if (jornadaPreservar && (jornadaPreservar === 'test_sim' || jornadasOrdenadas.some(j => String(j.number || j.id) === String(jornadaPreservar)))) {
                     defaultVal = String(jornadaPreservar);
                 } else if (jornadasOrdenadas.length > 0) {
-                    const conPronos = jornadasOrdenadas.find(j => this.contarPronosticosDeJornada(j) > 0);
-                    defaultVal = conPronos ? String(conPronos.number || conPronos.id) : String(jornadasOrdenadas[0].number || jornadasOrdenadas[0].id);
+                    const proximaAJugar = this.obtenerSiguienteJornadaAJugar();
+                    if (proximaAJugar) {
+                        defaultVal = String(proximaAJugar.number || proximaAJugar.id);
+                    } else {
+                        const conPronos = jornadasOrdenadas.find(j => this.contarPronosticosDeJornada(j) > 0);
+                        defaultVal = conPronos ? String(conPronos.number || conPronos.id) : String(jornadasOrdenadas[0].number || jornadasOrdenadas[0].id);
+                    }
                 }
                 sel.value = defaultVal;
                 this.cambiarJornada(defaultVal);
+            },
+
+            obtenerSiguienteJornadaAJugar() {
+                if (!this.jornadas || !Array.isArray(this.jornadas) || this.jornadas.length === 0) return null;
+                const activas = this.jornadas
+                    .filter(j => j && (j.active === undefined || j.active))
+                    .sort((a, b) => (parseInt(a.number || a.id) || 0) - (parseInt(b.number || b.id) || 0));
+
+                const isJornadaPending = (j) => {
+                    if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return true;
+                    const filled = j.matches.filter(m => {
+                        if (!m || !m.result) return false;
+                        const r = String(m.result).trim();
+                        return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+                    }).length;
+                    return filled < 15;
+                };
+
+                return activas.find(isJornadaPending) || activas[activas.length - 1] || null;
             },
 
             contarPronosticosDeJornada(jornada) {

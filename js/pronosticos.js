@@ -244,8 +244,14 @@ class PronosticoManager {
         if (!this.currentMemberId && this.selMember && this.selMember.value) {
             this.currentMemberId = this.selMember.value;
         }
-        if (!this.currentJornadaId && this.selJornada && this.selJornada.value) {
-            this.currentJornadaId = this.selJornada.value;
+        if (!this.currentJornadaId) {
+            const nextJToPlay = this.getNextJornadaToPlay();
+            if (nextJToPlay) {
+                this.currentJornadaId = nextJToPlay.id;
+                if (this.selJornada) this.selJornada.value = nextJToPlay.id;
+            } else if (this.selJornada && this.selJornada.value) {
+                this.currentJornadaId = this.selJornada.value;
+            }
         }
         this.renderSummaryTable();
         this.bindEvents();
@@ -468,6 +474,13 @@ class PronosticoManager {
                 opt.textContent = `Jornada ${j.number} - ${j.date}`;
                 this.selJornada.appendChild(opt);
             });
+
+            // Preseleccionar por defecto la siguiente jornada que se vaya a jugar (no la última disponible)
+            const nextJToPlay = this.getNextJornadaToPlay();
+            if (nextJToPlay && this.selJornada.querySelector(`option[value="${nextJToPlay.id}"]`)) {
+                this.selJornada.value = String(nextJToPlay.id);
+                this.currentJornadaId = String(nextJToPlay.id);
+            }
         }
     }
 
@@ -1683,16 +1696,54 @@ class PronosticoManager {
         };
     }
 
+    getNextJornadaToPlay() {
+        if (!this.jornadas || !Array.isArray(this.jornadas) || this.jornadas.length === 0) return null;
+
+        const activeSeason = (typeof AppUtils !== 'undefined' && AppUtils.activeSeason) || '2026-2027';
+
+        // 1. Candidatas activas de la temporada con partidos informados ordenadas ascendentemente
+        const candidates = this.jornadas
+            .filter(j => {
+                if (!j || !j.active) return false;
+                if (j.season && j.season !== activeSeason) return false;
+                return j.matches && Array.isArray(j.matches) && j.matches.some(m => m && m.home && m.home.trim() !== '');
+            })
+            .sort((a, b) => (parseInt(a.number || a.id) || 0) - (parseInt(b.number || b.id) || 0));
+
+        const isJornadaPending = (j) => {
+            if (!j || !j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return true;
+            const filled = j.matches.filter(m => {
+                if (!m || !m.result) return false;
+                const r = String(m.result).trim();
+                return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+            }).length;
+            return filled < 15;
+        };
+
+        // Preferir jornadas dominicales (calendario oficial de la peña)
+        const sundayPending = candidates.find(j => {
+            if (!isJornadaPending(j)) return false;
+            if (typeof AppUtils !== 'undefined' && AppUtils.parseDate && AppUtils.isSunday) {
+                const d = AppUtils.parseDate(j.date);
+                return d ? AppUtils.isSunday(d) : true;
+            }
+            return true;
+        });
+
+        if (sundayPending) return sundayPending;
+
+        // Si no hay dominical pendiente, cualquier candidata pendiente
+        const anyPending = candidates.find(isJornadaPending);
+        if (anyPending) return anyPending;
+
+        // Fallback: la candidata más reciente o la primera activa
+        return candidates[candidates.length - 1] || candidates[0] || (this.jornadas && this.jornadas[0]) || null;
+    }
+
     updateSummaryHeaderLeds() {
         if (!this.summaryTable) return;
-        const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
-        let targetJornada = null;
-        if (this.currentJornadaId) {
-            targetJornada = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
-        }
-        if (!targetJornada) {
-            targetJornada = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
-        }
+        // Estado de indicadores SIEMPRE de la siguiente jornada que se vaya a jugar (no de la última disponible para sellar)
+        const targetJornada = this.getNextJornadaToPlay();
         if (!targetJornada) return;
 
         const ths = this.summaryTable.querySelectorAll('thead th[data-mid]');
@@ -1718,15 +1769,8 @@ class PronosticoManager {
         // 1. Sort Members alphabetically
         const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-        // Determine reference jornada for column headers
-        const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
-        let targetJornadaForHeader = null;
-        if (this.currentJornadaId) {
-            targetJornadaForHeader = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
-        }
-        if (!targetJornadaForHeader) {
-            targetJornadaForHeader = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
-        }
+        // Determine reference jornada for column headers: SIEMPRE la siguiente jornada que se vaya a jugar
+        const targetJornadaForHeader = this.getNextJornadaToPlay();
 
         // 2. Build Header
         const headerRow = document.createElement('tr');

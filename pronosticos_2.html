@@ -1569,6 +1569,7 @@
 
                 <!-- Leyenda solo de LEDs (los colores de signos son autoexplicativos) -->
                 <div class="flex items-center gap-3 text-xs font-bold flex-wrap justify-end">
+                    <span id="panel-sellado-jornada-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40">Indicadores: Siguiente Jornada</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-green"></span> Completo</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-yellow"></span> Falta Dobles</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-red"></span> Pendiente</span>
@@ -2244,6 +2245,30 @@
                 window.openEditorModal(mId, false, jId);
             };
 
+            // A.1 Interceptar updateSummaryHeaderLeds para que los indicadores siempre muestren la siguiente jornada a jugar
+            PM.prototype.updateSummaryHeaderLeds = function() {
+                if (!this.summaryTable) return;
+                const targetJornada = (typeof this.getNextJornadaToPlay === 'function') ? this.getNextJornadaToPlay() : null;
+                if (!targetJornada) return;
+
+                const ths = this.summaryTable.querySelectorAll('thead th[data-mid]');
+                ths.forEach(th => {
+                    const mId = th.getAttribute('data-mid');
+                    const ledSpan = th.querySelector('.led-status-indicator');
+                    if (ledSpan && mId) {
+                        const led = this.getMemberStatusLed(mId, targetJornada);
+                        ledSpan.className = `led-status-indicator led-${led.status}`;
+                        ledSpan.title = `J${targetJornada.number}: ${led.title}`;
+                    }
+                });
+
+                const badgePanel = document.getElementById('panel-sellado-jornada-badge');
+                if (badgePanel && targetJornada) {
+                    badgePanel.textContent = `Indicadores: Jornada ${targetJornada.number}`;
+                    badgePanel.title = `Estado de pronósticos para la Jornada ${targetJornada.number} (Siguiente a jugar)`;
+                }
+            };
+
             // B. Interceptar renderSummaryTable: vertical compacto, sin cajas/recuadros, estilo Bote y P15 condicional
             PM.prototype.renderSummaryTable = function() {
                 if (!this.summaryTable) return;
@@ -2256,14 +2281,16 @@
 
                 const sortedMembers = [...this.members].sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-                // Jornada de referencia para encabezados LED
-                const activeJornadas = (this.jornadas || []).filter(j => j && j.active).sort((a, b) => (parseInt(b.number) || 0) - (parseInt(a.number) || 0));
-                let targetJornadaForHeader = null;
-                if (this.currentJornadaId) {
-                    targetJornadaForHeader = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
-                }
-                if (!targetJornadaForHeader) {
-                    targetJornadaForHeader = activeJornadas[0] || (this.jornadas && this.jornadas[0]);
+                // Jornada de referencia para encabezados LED: SIEMPRE la siguiente jornada que se vaya a jugar (no la última disponible para sellar)
+                const targetJornadaForHeader = (typeof this.getNextJornadaToPlay === 'function') 
+                    ? this.getNextJornadaToPlay() 
+                    : null;
+
+                // Actualizar badge de jornada en la leyenda del panel
+                const badgePanel = document.getElementById('panel-sellado-jornada-badge');
+                if (badgePanel && targetJornadaForHeader) {
+                    badgePanel.textContent = `Indicadores: Jornada ${targetJornadaForHeader.number}`;
+                    badgePanel.title = `Estado de pronósticos para la Jornada ${targetJornadaForHeader.number} (Siguiente a jugar)`;
                 }
 
                 // CABECERA THEAD
@@ -2273,27 +2300,26 @@
                 const stickyTh = document.createElement('th');
                 stickyTh.className = 'summary-sticky-col summary-header-cell';
                 stickyTh.style.minWidth = '115px';
+                const jNumHdr = targetJornadaForHeader ? `J${targetJornadaForHeader.number}` : '';
                 stickyTh.innerHTML = `
                     <div class="flex items-center justify-between px-1">
                         <span class="font-black text-amber-500 text-xs">Jornada</span>
-                        <span class="text-[10px] font-mono text-slate-400 font-bold"># Partidos</span>
+                        <span class="text-[10px] font-mono text-amber-400 font-bold" title="Indicadores superiores: Jornada ${targetJornadaForHeader ? targetJornadaForHeader.number : ''} (Siguiente a jugar)">LEDs: ${jNumHdr}</span>
                     </div>
                 `;
                 headerRow.appendChild(stickyTh);
 
                 // Columnas de Cada Socio
-                // El responsable de dobles se calcula sobre la PRÓXIMA JORNADA, no la seleccionada.
-                // Buscamos la jornada activa más próxima que aún no tenga todos los resultados.
-                const nextJornada = (() => {
+                // El responsable de dobles se calcula sobre la PRÓXIMA JORNADA A JUGAR
+                const nextJornada = targetJornadaForHeader || (() => {
                     const candidates = (this.jornadas || [])
                         .filter(j => j && j.active && j.matches && j.matches.some(m => m.home && m.home.trim() !== ''))
                         .sort((a, b) => (parseInt(a.number) || 0) - (parseInt(b.number) || 0));
-                    // Preferir la jornada con menos resultados (próxima sin cerrar)
                     const open = candidates.find(j => {
                         const filled = (j.matches || []).filter(m => m.result && m.result !== '' && m.result !== '-').length;
-                        return filled < 14;
+                        return filled < 15;
                     });
-                    return open || candidates[candidates.length - 1] || targetJornadaForHeader;
+                    return open || candidates[candidates.length - 1] || (this.jornadas && this.jornadas[0]);
                 })();
                 const responsibleMember = window.getEligibleDoublesMember(nextJornada);
 
@@ -2932,8 +2958,12 @@
                 if (window.app && window.app.members && window.app.members.length > 0) {
                     clearInterval(checkAppData);
                     
-                    // Asegurar selección inicial de Jornada y Socio
-                    if (!window.app.currentJornadaId && window.app.selJornada && window.app.selJornada.value) {
+                    // Asegurar selección inicial de Jornada (la siguiente que se vaya a jugar)
+                    const nextJ = (window.app && window.app.getNextJornadaToPlay) ? window.app.getNextJornadaToPlay() : null;
+                    if (nextJ) {
+                        window.app.currentJornadaId = String(nextJ.id);
+                        if (window.app.selJornada) window.app.selJornada.value = String(nextJ.id);
+                    } else if (!window.app.currentJornadaId && window.app.selJornada && window.app.selJornada.value) {
                         window.app.currentJornadaId = window.app.selJornada.value;
                     }
                     const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
