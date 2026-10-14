@@ -141,7 +141,7 @@ class DashboardManager {
 
                     if (p) {
                         const ev = window.ScoringSystem.evaluateMember(member, jornada, p);
-                        if (ev.played) {
+                        if (ev.played && ev.hits !== -1) {
                             hasPronostico = true;
                             isLate = ev.isLate;
                             isPardoned = ev.isPardoned;

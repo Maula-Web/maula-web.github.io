@@ -205,7 +205,7 @@ class Dashboard2AppController {
 
                     if (p) {
                         const ev = window.ScoringSystem ? window.ScoringSystem.evaluateMember(member, jornada, p) : { played: true, hits: 0, points: 0 };
-                        if (ev.played) {
+                        if (ev.played && ev.hits !== -1) {
                             hasPronostico = true;
                             isLate = ev.isLate;
                             isPardoned = ev.isPardoned;

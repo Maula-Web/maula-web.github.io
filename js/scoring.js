@@ -307,7 +307,7 @@ const ScoringSystem = {
             }
         }
 
-        // Determine if jornada is finished
+        // Determine if jornada is finished or in play
         const filledMatches = jornada.matches ? jornada.matches.filter(m => m.result && m.result.trim() !== '' && m.result.trim() !== '-').length : 0;
         const now = new Date();
         const isExplicitInactive = jornada.active === false;
@@ -315,13 +315,22 @@ const ScoringSystem = {
         const isPastDate = jDate && (now.getTime() - jDate.getTime() > 5 * 24 * 60 * 60 * 1000);
         const isFinished = isExplicitInactive || isAllFilled || (isPastDate && filledMatches === 15) || options.forceFinished;
 
-        if (result.isLate && !result.isPardoned && isFinished) {
+        // If the jornada has not started yet (0 matches with result and not explicitly finished),
+        // forecast exists but matches have not been played yet: do not score as a 0-hit completed game.
+        if (filledMatches === 0 && !isFinished) {
+            result.hits = -1;
+            result.points = 0;
+            result.bonus = 0;
+            result.hasResults = false;
+        } else if (result.isLate && !result.isPardoned && isFinished) {
             result.hits = 0;
             result.points = this.calculateScore(0, jDate);
             result.bonus = result.points;
             result.potentialHits = ev.hits;
+            result.hasResults = true;
         } else {
             result.hits = ev.hits;
+            result.hasResults = true;
             if (isFinished) {
                 result.points = ev.points;
                 result.bonus = ev.bonus;

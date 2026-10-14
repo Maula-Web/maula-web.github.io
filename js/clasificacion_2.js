@@ -220,6 +220,7 @@
                     // Una jornada está en juego si tiene partidos con resultado pero aún no se han completado los 15
                     const isInPlay = !isExplicitInactive && (filledMatches > 0 && filledMatches < 15);
                     const isFinished = isExplicitInactive || isAllFilled || (isPastDate && filledMatches === 15);
+                    const hasStarted = isInPlay || isFinished || filledMatches > 0;
 
                     j.isFinished = isFinished;
                     j.isInPlay = isInPlay;
@@ -238,7 +239,7 @@
 
                         if (p && window.ScoringSystem) {
                             const ev = window.ScoringSystem.evaluateMember(m, j, p);
-                            if (ev.played) {
+                            if (ev.played && hasStarted) {
                                 hits = ev.hits;
                                 points = ev.points;
                                 bonus = ev.bonus;
@@ -256,7 +257,7 @@
                             pardonReason: (p ? p.pardonReason : '') || ''
                         };
 
-                        if (hits !== -1) {
+                        if (hasStarted && hits !== -1) {
                             const stats = this.memberStats[m.id];
                             stats.jornadasPlayed++;
                             stats.grandTotal += points;
@@ -1036,7 +1037,9 @@
                 const box = document.getElementById('chart-container-box');
                 if (!svg || !box) return;
 
-                const jornadasAsc = [...this.visibleJornadas].sort((a, b) => a.number - b.number);
+                const jornadasAsc = [...this.visibleJornadas]
+                    .filter(j => j.isFinished || j.isInPlay || (j.filledMatches && j.filledMatches > 0))
+                    .sort((a, b) => a.number - b.number);
                 if (jornadasAsc.length === 0 || this.chartSelectedMembers.size === 0) {
                     svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#64748b" font-size="13" font-family="'Plus Jakarta Sans', sans-serif">Selecciona al menos un socio en los filtros superiores para ver la escalada</text>`;
                     return;

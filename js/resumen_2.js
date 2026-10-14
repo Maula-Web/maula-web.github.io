@@ -263,7 +263,7 @@
 
                         if (p) {
                             const ev = ScoringSystem.evaluateMember(m, j, p);
-                            if (ev.played) {
+                            if (ev.played && ev.hits !== -1) {
                                 hits = ev.hits;
                                 points = ev.points;
                                 prize = ev.prize || 0;
