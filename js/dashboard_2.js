@@ -144,15 +144,13 @@ class Dashboard2AppController {
 
             const playedCount = playedJornadas.length;
 
-                        // 2. Mapa O(1) de pronósticos por jornada y socio
+            // 2. Mapa O(1) de pronósticos por jornada y socio
             const pronosticosMap = new Map();
             this.pronosticos.forEach(pr => {
                 if (!pr) return;
                 const jIds = [];
                 if (pr.jId !== undefined && pr.jId !== null) jIds.push(String(pr.jId));
                 if (pr.jornadaId !== undefined && pr.jornadaId !== null) jIds.push(String(pr.jornadaId));
-                if (pr.jornada_num !== undefined && pr.jornada_num !== null) jIds.push(String(pr.jornada_num));
-                if (pr.jNum !== undefined && pr.jNum !== null) jIds.push(String(pr.jNum));
 
                 const mIds = [];
                 if (pr.mId !== undefined && pr.mId !== null) mIds.push(String(pr.mId));
@@ -713,7 +711,6 @@ class Dashboard2AppController {
         if (!nextJ) return;
 
         const nextJId = String(nextJ.id);
-        const nextJNum = nextJ.number !== undefined ? String(nextJ.number) : '';
         const total = (this.members && this.members.length >= 19) ? this.members.length : 19;
 
         const elBadgeJ = document.getElementById('participation-jornada-badge');
@@ -726,13 +723,13 @@ class Dashboard2AppController {
 
         this.members.forEach(m => {
             const mId = String(m.id);
-            let p = pronosticosMap.get(`${nextJId}_${mId}`) || (nextJNum ? pronosticosMap.get(`${nextJNum}_${mId}`) : null);
+            let p = pronosticosMap.get(`${nextJId}_${mId}`);
             if (!p && Array.isArray(this.pronosticos)) {
                 p = this.pronosticos.find(pr => {
                     if (!pr) return false;
                     const pj = String(pr.jId !== undefined && pr.jId !== null ? pr.jId : (pr.jornadaId !== undefined ? pr.jornadaId : ''));
                     const pm = String(pr.mId !== undefined && pr.mId !== null ? pr.mId : (pr.memberId !== undefined ? pr.memberId : ''));
-                    return (pj === nextJId || (nextJNum && pj === nextJNum)) && pm === mId;
+                    return pj === nextJId && pm === mId;
                 });
             }
 
@@ -776,13 +773,13 @@ class Dashboard2AppController {
                 (user.phone && m.phone && m.phone.toLowerCase() === user.phone.toLowerCase())
             );
             const userMid = userMember ? String(userMember.id) : String(user.id);
-            let pUser = pronosticosMap.get(`${nextJId}_${userMid}`) || (nextJNum ? pronosticosMap.get(`${nextJNum}_${userMid}`) : null);
+            let pUser = pronosticosMap.get(`${nextJId}_${userMid}`);
             if (!pUser && Array.isArray(this.pronosticos)) {
                 pUser = this.pronosticos.find(pr => {
                     if (!pr) return false;
                     const pj = String(pr.jId !== undefined && pr.jId !== null ? pr.jId : (pr.jornadaId !== undefined ? pr.jornadaId : ''));
                     const pm = String(pr.mId !== undefined && pr.mId !== null ? pr.mId : (pr.memberId !== undefined ? pr.memberId : ''));
-                    return (pj === nextJId || (nextJNum && pj === nextJNum)) && pm === userMid;
+                    return pj === nextJId && pm === userMid;
                 });
             }
             const selUser = pUser ? (Array.isArray(pUser.selection) ? pUser.selection : (Array.isArray(pUser.forecast) ? pUser.forecast : [])) : [];

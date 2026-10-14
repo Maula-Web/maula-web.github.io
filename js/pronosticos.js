@@ -661,12 +661,6 @@ class PronosticoManager {
             }
         }
 
-        // Fetch other members' forecasts for this jornada
-        const othersForecasts = this.pronosticos.filter(p =>
-            (p.jId == this.currentJornadaId || p.jornadaId == this.currentJornadaId) &&
-            (p.mId != this.currentMemberId && p.memberId != this.currentMemberId)
-        );
-
         jornada.matches.forEach((match, idx) => {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
             const row = document.createElement('div');
@@ -690,21 +684,6 @@ class PronosticoManager {
             const val = currentSelections[idx];
             const homeLogo = AppUtils.getTeamLogo(match.home);
             const awayLogo = AppUtils.getTeamLogo(match.away);
-
-            // Generate "Others" HTML - COMPACT VERSION (No initials, just boxes)
-            let othersHtml = othersForecasts.map(of => {
-                const member = this.members.find(m => m.id === of.mId || m.id === of.memberId);
-                if (!member) return '';
-                const sign = of.selection[idx];
-                if (!sign) return '';
-
-                const displayName = AppUtils.getMemberName(member);
-                return `
-                    <div class="others-item" title="${displayName}: ${sign}" data-sign="${sign}">
-                         <span>${sign}</span>
-                    </div>
-                `;
-            }).join('');
 
             // Porcentajes del análisis de Mundo Deportivo (si está disponible para esta jornada)
             let percHtml = '';
@@ -822,10 +801,6 @@ class PronosticoManager {
                 </div>
 
                 <div class="p-row-actions">
-                    <div class="p-others">
-                        ${othersHtml || '<span class="no-others">-</span>'}
-                    </div>
-
                     <div class="p-options" ${disabledStr} data-idx="${idx}">
                         <div class="chk-option ${val === '1' ? 'selected' : ''} ${val === '1' && hitStatus === true ? 'opt-hit' : ''} ${val === '1' && hitStatus === false ? 'opt-miss' : ''}" onclick="window.app.selectOption(this, '1')">1</div>
                         <div class="chk-option ${val === 'X' ? 'selected' : ''} ${val === 'X' && hitStatus === true ? 'opt-hit' : ''} ${val === 'X' && hitStatus === false ? 'opt-miss' : ''}" onclick="window.app.selectOption(this, 'X')">X</div>
