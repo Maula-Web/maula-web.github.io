@@ -1742,8 +1742,9 @@ class Jornadas2AppController {
     /**
      * Busca la jornada correspondiente en la base de datos comparando prioritariamente por fecha
      * y secundariamente por número de jornada.
+     * Si isStrictDate es true (usado por auto-importación), solo devuelve coincidencia de fecha exacta.
      */
-    findTargetJornadaForResults(res) {
+    findTargetJornadaForResults(res, isStrictDate = false) {
         if (!this.jornadas || this.jornadas.length === 0) return null;
 
         // 1. Prioridad: Coincidencia de fecha
@@ -1761,7 +1762,12 @@ class Jornadas2AppController {
             }
         }
 
-        // 2. Coincidencia por número de jornada si está definido
+        // Si se requiere coincidencia estricta de fecha (ej. auto-importación automática), no usar fallbacks
+        if (isStrictDate) {
+            return null;
+        }
+
+        // 2. Coincidencia por número de jornada si está definido (solo para imports manuales)
         if (res && res.jNum && !isNaN(parseInt(res.jNum, 10))) {
             const num = parseInt(res.jNum, 10);
             const matchedByNum = this.jornadas.find(j => parseInt(j.number, 10) === num);
@@ -1851,10 +1857,14 @@ class Jornadas2AppController {
 
             const res = await window.QuinielaService.fetchLatestResults();
 
-            // Buscar la jornada que realmente coincide por fecha
-            const targetJornada = this.findTargetJornadaForResults(res);
-            res.targetJornadaId = targetJornada ? targetJornada.id : this.selectedJornadaId;
-            res.jNum = targetJornada ? targetJornada.number : (res.jNum || 'Actual');
+            // REGLA CRÍTICA: Buscar estricta y únicamente la jornada que coincida por fecha
+            const targetJornada = this.findTargetJornadaForResults(res, true);
+            if (!targetJornada) {
+                throw new Error(`Los resultados oficiales obtenidos son del '${res.dateStr || 'fecha desconocida'}', pero ninguna jornada activa de nuestra base de datos tiene esa misma fecha. Por seguridad, no se han asignado los resultados a ninguna otra jornada.`);
+            }
+
+            res.targetJornadaId = targetJornada.id;
+            res.jNum = targetJornada.number;
 
             this.pendingImportResults = res;
 

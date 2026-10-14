@@ -1422,11 +1422,15 @@ class JornadaManager {
         try {
             if (!window.QuinielaService) throw new Error('Servicio QuinielaService no cargado.');
             const res = await window.QuinielaService.fetchLatestResults();
-            if (!res || !res.matches) throw new Error('No se pudo obtener el escrutinio.');
+            const matchedJornada = this.findTargetJornadaForResults(res);
+            if (!matchedJornada) {
+                throw new Error(`Los resultados oficiales obtenidos son de '${res.dateStr || 'fecha desconocida'}', pero ninguna jornada de nuestra base de datos coincide con esa misma fecha. Por seguridad, no se han asignado los resultados.`);
+            }
 
             const parsed = {
                 success: true,
-                jNum: null,
+                jNum: matchedJornada.number,
+                targetJornadaId: matchedJornada.id,
                 dateStr: res.dateStr,
                 isSunday: true,
                 source: res.source,
@@ -1444,7 +1448,7 @@ class JornadaManager {
             if (statusEl) statusEl.style.display = 'none';
         } catch (err) {
             console.error('[Jornadas 1.0] Error auto-importación resultados:', err);
-            if (statusEl) statusEl.textContent = '❌ Error: ' + err.message;
+            if (statusEl) statusEl.textContent = '❌ ' + err.message;
         } finally {
             if (btn) btn.disabled = false;
         }

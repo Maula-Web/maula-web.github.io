@@ -503,30 +503,28 @@ async function executeAutoImport(originLabel) {
             return;
         }
 
+        const { findTargetJornadaByDate } = require('./quinielaScraper');
         const snap = await db.collection('jornadas').where('active', '==', true).get();
         if (snap.empty) {
             console.log('[autoImport] No se encontraron jornadas activas en Firestore.');
             return;
         }
 
-        let targetDoc = null;
-        let targetData = null;
+        const docsList = [];
+        snap.forEach(doc => docsList.push({ doc, data: doc.data() }));
 
-        snap.forEach(doc => {
-            const j = doc.data();
-            const filled = (j.matches || []).filter(m => m.result && m.result !== '').length;
-            if (filled < 15 && !targetDoc) {
-                targetDoc = doc;
-                targetData = j;
-            }
-        });
+        // REGLA CRÍTICA: Asignar SOLO a la jornada que coincida exactamente por fecha
+        const matchResult = findTargetJornadaByDate(docsList, scraped.dateStr);
 
-        if (!targetDoc) {
-            console.log('[autoImport] Todas las jornadas activas ya tienen resultados completos.');
+        if (!matchResult) {
+            console.log(`[autoImport] ℹ️ No se encontró ninguna jornada activa con fecha coincidente para '${scraped.dateStr}'. No se asignaron resultados a otras jornadas.`);
             return;
         }
 
-        console.log(`[autoImport] Actualizando jornada ${targetData.number} (${targetDoc.id}) con datos de ${scraped.source}...`);
+        const targetDoc = matchResult.doc;
+        const targetData = matchResult.data;
+
+        console.log(`[autoImport] Actualizando jornada ${targetData.number} (${targetDoc.id}) con fecha coincidente (${scraped.dateStr}) desde ${scraped.source}...`);
         const updatedMatches = (targetData.matches || []).map((m, idx) => {
             const sc = scraped.matches[idx];
             return {

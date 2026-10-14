@@ -356,11 +356,62 @@ async function fetchUpcomingQuinielaJornadas() {
     return [];
 }
 
+function parseDateHelper(dateStr) {
+    if (!dateStr) return null;
+    if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+    const trimmed = String(dateStr).trim();
+    if (trimmed.toLowerCase() === 'por definir') return null;
+
+    const isoMatch = trimmed.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+    if (isoMatch) {
+        return new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+    }
+    const dmyMatch = trimmed.match(/(?:^|[^\d])(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(?:[^\d]|$)/);
+    if (dmyMatch) {
+        return new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10));
+    }
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    let clean = trimmed.toLowerCase().replace(/\(.*\)/, '').replace(/\bde\b/g, '').replace(/,/g, '').replace(/\s+/g, ' ').trim();
+    const parts = clean.split(' ');
+    if (parts.length >= 2) {
+        const day = parseInt(parts.find(p => /^\d{1,2}$/.test(p)));
+        const year = parseInt(parts.find(p => /^\d{4}$/.test(p)) || new Date().getFullYear());
+        const monthIdx = months.findIndex(m => clean.includes(m));
+        if (!isNaN(day) && monthIdx !== -1) {
+            return new Date(year, monthIdx, day);
+        }
+    }
+    const fb = new Date(trimmed);
+    return isNaN(fb.getTime()) ? null : fb;
+}
+
+function findTargetJornadaByDate(jornadasList, targetDateStr) {
+    if (!jornadasList || !targetDateStr) return null;
+    const targetParsed = parseDateHelper(targetDateStr);
+    if (!targetParsed) return null;
+    const targetTime = new Date(targetParsed.getFullYear(), targetParsed.getMonth(), targetParsed.getDate()).getTime();
+
+    for (const item of jornadasList) {
+        const j = item.data ? item.data : item;
+        if (!j || !j.date) continue;
+        const jParsed = parseDateHelper(j.date);
+        if (!jParsed) continue;
+        const jTime = new Date(jParsed.getFullYear(), jParsed.getMonth(), jParsed.getDate()).getTime();
+        if (jTime === targetTime) {
+            return item;
+        }
+    }
+    return null;
+}
+
 module.exports = {
     fetchLatestQuiniela,
     fetchUpcomingQuinielaJornadas,
     parseElPais,
     parseRTVE,
     parseSELAEResults,
-    normalizeTeamNameScraper
+    normalizeTeamNameScraper,
+    parseDateHelper,
+    findTargetJornadaByDate
 };
+

@@ -58,23 +58,20 @@ async function run() {
             const app = initializeApp({ credential: cert(serviceAccount) });
             const db = getFirestore(app);
 
+            const { findTargetJornadaByDate } = require('../functions/quinielaScraper');
             console.log('\n📡 Conectando con Firestore...');
             const snap = await db.collection('jornadas').where('active', '==', true).get();
 
-            let targetDoc = null;
-            let targetData = null;
+            const docsList = [];
+            snap.forEach(doc => docsList.push({ doc, data: doc.data() }));
 
-            snap.forEach(doc => {
-                const j = doc.data();
-                const filled = (j.matches || []).filter(m => m.result && m.result !== '').length;
-                if (filled < 15 && !targetDoc) {
-                    targetDoc = doc;
-                    targetData = j;
-                }
-            });
+            // REGLA CRÍTICA: Asignar SOLO a la jornada que coincida exactamente por fecha
+            const matchResult = findTargetJornadaByDate(docsList, scraped.dateStr);
 
-            if (targetDoc) {
-                console.log(`📝 Actualizando Jornada ${targetData.number} (${targetDoc.id})...`);
+            if (matchResult) {
+                const targetDoc = matchResult.doc;
+                const targetData = matchResult.data;
+                console.log(`📝 Asignando resultados por fecha exacta (${scraped.dateStr}) a Jornada ${targetData.number} (${targetDoc.id})...`);
                 const updatedMatches = (targetData.matches || []).map((m, idx) => {
                     const sc = scraped.matches[idx];
                     return {
@@ -92,7 +89,7 @@ async function run() {
                 });
                 console.log(`🎉 ¡Jornada ${targetData.number} actualizada en Firestore con éxito!`);
             } else {
-                console.log('ℹ️ No hay jornadas activas pendientes de resultados en Firestore.');
+                console.log(`ℹ️ No se encontró ninguna jornada activa en Firestore con fecha coincidente para '${scraped.dateStr}'. No se asignaron resultados a otras jornadas.`);
             }
         }
 
