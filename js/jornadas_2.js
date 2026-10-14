@@ -299,18 +299,18 @@ class Jornadas2AppController {
                 const hasPig = j.matches && j.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
 
                 // REGLA USUARIO:
-                // Azul: ya jugadas (15/15)
+                // Azul: ya jugadas (15/15) - Azul eléctrico nítido y saturado para máxima diferenciación
                 // Amarillo: en juego (parciales)
-                // Verde: próximas jornadas a jugar (pendientes)
-                let badgeColor = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35 hover:bg-emerald-500/25';
-                let dotColor = 'bg-emerald-400';
+                // Verde: próximas jornadas a jugar (pendientes) - Verde esmeralda vivo y brillante
+                let badgeColor = 'bg-emerald-950/60 text-emerald-400 border-emerald-500/70 hover:bg-emerald-900/50 hover:border-emerald-400 shadow-xs';
+                let dotColor = 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]';
 
                 if (filled === 15) {
-                    badgeColor = 'bg-sky-500/15 text-sky-300 border-sky-500/35 hover:bg-sky-500/25';
-                    dotColor = 'bg-sky-400';
+                    badgeColor = 'bg-blue-950/70 text-blue-400 border-blue-500/70 hover:bg-blue-900/60 hover:border-blue-400 shadow-xs';
+                    dotColor = 'bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]';
                 } else if (filled > 0) {
-                    badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30';
-                    dotColor = 'bg-amber-400 animate-ping';
+                    badgeColor = 'bg-amber-950/60 text-amber-300 border-amber-500/70 hover:bg-amber-900/50 hover:border-amber-400 shadow-xs';
+                    dotColor = 'bg-amber-400 animate-ping shadow-[0_0_8px_rgba(251,191,36,0.8)]';
                 }
 
                 const selectedClass = isSelected
@@ -393,16 +393,16 @@ class Jornadas2AppController {
         const statusText = document.getElementById('selected-jornada-status-text');
         if (statusChip && statusText) {
             if (isFinished) {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1.5 shadow-sm';
-                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-sky-400';
+                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-blue-950/70 text-blue-400 border border-blue-500/70 flex items-center gap-1.5 shadow-sm';
+                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]';
                 statusText.textContent = 'Jugada (15/15)';
             } else if (isInProgress) {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5 shadow-sm';
-                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-950/70 text-amber-300 border border-amber-500/70 flex items-center gap-1.5 shadow-sm';
+                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping shadow-[0_0_8px_rgba(251,191,36,0.8)]';
                 statusText.textContent = `En Juego (${filledMatches}/15)`;
             } else {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 flex items-center gap-1.5 shadow-sm';
-                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-emerald-400';
+                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-950/70 text-emerald-400 border border-emerald-500/70 flex items-center gap-1.5 shadow-sm';
+                statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]';
                 statusText.textContent = 'Próxima a Jugar';
             }
         }
