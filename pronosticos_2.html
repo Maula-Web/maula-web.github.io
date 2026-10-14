@@ -2099,6 +2099,20 @@
                     }
                 }
             }
+            // Si ya existe una quiniela de dobles guardada para esta jornada, su autor es responsable legítimo
+            if (window.app && window.app.pronosticosExtra && Array.isArray(window.app.pronosticosExtra)) {
+                const jExtras = window.app.pronosticosExtra.filter(p =>
+                    (String(p.jId || p.jornadaId) === String(j.id) || String(p.jId || p.jornadaId) === String(j.number)) &&
+                    p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
+                );
+                jExtras.forEach(pe => {
+                    const mId = String(pe.mId !== undefined && pe.mId !== null ? pe.mId : pe.memberId);
+                    const mem = window.app.members.find(m => String(m.id) === mId);
+                    if (mem && !list.some(em => String(em.id) === String(mem.id))) {
+                        list.push(mem);
+                    }
+                });
+            }
             return list;
         };
 

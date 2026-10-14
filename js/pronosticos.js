@@ -2624,47 +2624,13 @@ class PronosticoManager {
             } catch (e) {}
         }
 
-        // B) Premio económico en la columna de dobles si este socio fue quien la rellenó en la jornada previa
-        let hasDoublesMoneyPrize = false;
-        const prevDoubles = (this.pronosticosExtra || []).find(pe => {
-            const pj = String(pe.jId !== undefined && pe.jId !== null ? pe.jId : pe.jornadaId);
-            return pj === String(prevJornada.id) || pj === String(prevJornada.number);
-        });
-
-        if (prevDoubles) {
-            const doublesAuthorId = String(prevDoubles.mId !== undefined && prevDoubles.mId !== null ? prevDoubles.mId : prevDoubles.memberId);
-            if (doublesAuthorId === String(memberId)) {
-                // Evaluar si la quiniela de dobles obtuvo premio económico
-                const dsel = prevDoubles.selection || prevDoubles.forecast || [];
-                if (Array.isArray(dsel) && dsel.some(s => s && String(s).trim() !== '' && String(s) !== '-')) {
-                    const isReduced = prevDoubles.isReduced !== false;
-                    try {
-                        const evD = ScoringSystem.evaluateForecast(dsel, officialResults, jDate, { isReduced });
-                        let dPrize = 0;
-                        if (evD && evD.breakdown) {
-                            Object.keys(evD.breakdown).forEach(h => {
-                                const cnt = evD.breakdown[h];
-                                let pV = prizeMap[h] || prizeMap[String(h)] || 0;
-                                if (typeof pV === 'string') pV = parseFloat(pV.replace(',', '.').replace('€', '').trim());
-                                if (cnt > 0 && pV > 0) dPrize += cnt * parseFloat(pV);
-                            });
-                        } else if (evD) {
-                            const cat = evD.officialHits !== undefined ? evD.officialHits : evD.hits;
-                            let pV = prizeMap[cat] || prizeMap[String(cat)] || 0;
-                            if (typeof pV === 'string') pV = parseFloat(pV.replace(',', '.').replace('€', '').trim());
-                            if (pV > 0) dPrize += parseFloat(pV);
-                        }
-                        if (dPrize > 0) {
-                            hasDoublesMoneyPrize = true;
-                        }
-                    } catch (e) {
-                        console.warn("Error evaluando premio económico de dobles previa:", e);
-                    }
-                }
-            }
-        }
-
-        const hasEconomicPrize = hasIndividualMoneyPrize || hasDoublesMoneyPrize;
+        // B) REGLA OFICIAL PEÑA MAULAS:
+        // El derecho a quiniela de dobles lo otorgan:
+        // 1) Ser el ganador absoluto de la jornada anterior (puntuación más alta tras desempates).
+        // 2) Haber obtenido premio económico en la columna INDIVIDUAL propia.
+        // Los premios obtenidos por la quiniela de dobles ingresan íntegros al bote común de la peña
+        // y NO otorgan derecho al socio a repetir la quiniela de dobles.
+        const hasEconomicPrize = hasIndividualMoneyPrize;
         const isEligible = isAbsoluteWinner || hasEconomicPrize;
 
         if (isEligible) {
