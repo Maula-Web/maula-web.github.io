@@ -192,6 +192,22 @@ async function main() {
 
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
+    // 0. Comprobar si ya tenemos los datos oficiales importados y válidos para la próxima jornada
+    // Si ya están disponibles y verificados (available: true y matchCountWithTarget >= 8), no es necesario volver a raspar
+    const forceRun = process.argv.includes('--force');
+    if (!forceRun && fs.existsSync(OUTPUT_FILE)) {
+        try {
+            const existing = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8'));
+            if (existing && existing.available === true && existing.matchCountWithTarget >= 8 && Array.isArray(existing.matches) && existing.matches.length >= 14) {
+                console.log(`ℹ️ [MD Bot] Los análisis para la jornada ${existing.detectedJornadaNum || ''} ya han sido importados y verificados con éxito.`);
+                console.log(`ℹ️ [MD Bot] Omitiendo descarga para evitar llamadas innecesarias (usa --force para forzar la actualización).`);
+                return;
+            }
+        } catch (eCheck) {
+            console.warn('⚠️ Error comprobando archivo existente de análisis:', eCheck.message);
+        }
+    }
+
     // 1. Extraer análisis de Mundo Deportivo
     let mdData = null;
     try {
@@ -227,11 +243,23 @@ async function main() {
     if (fs.existsSync(cacheJornadasPath)) {
         try {
             const raw = JSON.parse(fs.readFileSync(cacheJornadasPath, 'utf8'));
-            if (Array.isArray(raw)) {
+            if (Array.isArray(raw) && raw.length > 0) {
                 targetJornadas = raw;
             }
         } catch (e) {
             console.warn('⚠️ Error al leer proximas_jornadas_cache.json:', e.message);
+        }
+    }
+
+    // Si proximas_jornadas_cache.json está vacío, usar el catálogo de respaldo de QuinielaService
+    if (targetJornadas.length === 0) {
+        try {
+            const { QuinielaService } = require('../js/quiniela-service');
+            if (QuinielaService && Array.isArray(QuinielaService.BUILTIN_UPCOMING_JORNADAS)) {
+                targetJornadas = QuinielaService.BUILTIN_UPCOMING_JORNADAS;
+            }
+        } catch (e) {
+            console.warn('⚠️ Error al cargar QuinielaService.BUILTIN_UPCOMING_JORNADAS:', e.message);
         }
     }
 
