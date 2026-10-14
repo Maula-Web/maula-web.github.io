@@ -341,12 +341,16 @@ const ScoringSystem = {
         }
 
         // Calculate Prizes
-        const legacyPrizes = jornada.prizeRates || jornada.prizes || {};
+        const legacyPrizes = (jornada.prizes && typeof jornada.prizes === 'object' && Object.keys(jornada.prizes).length > 0) 
+            ? jornada.prizes 
+            : (jornada.prizeRates || {});
         if (result.tempBreakdown) {
             Object.keys(result.tempBreakdown).forEach(h => {
                 const count = result.tempBreakdown[h];
-                if (count > 0 && legacyPrizes[h]) {
-                    result.prize += count * legacyPrizes[h];
+                const rawP = legacyPrizes[h] || legacyPrizes[String(h)] || 0;
+                const parsedP = typeof rawP === 'number' ? rawP : (parseFloat(String(rawP).replace(',', '.').replace('€', '').trim()) || 0);
+                if (count > 0 && parsedP > 0) {
+                    result.prize += count * parsedP;
                 }
             });
         } else {
@@ -355,7 +359,8 @@ const ScoringSystem = {
                 actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
             }
             if (result.hits >= actualMinHits) {
-                result.prize = legacyPrizes[result.hits] || 0;
+                const rawP = legacyPrizes[result.hits] || legacyPrizes[String(result.hits)] || 0;
+                result.prize = typeof rawP === 'number' ? rawP : (parseFloat(String(rawP).replace(',', '.').replace('€', '').trim()) || 0);
             }
         }
 

@@ -881,13 +881,19 @@ class PronosticoManager {
 
         // DOUBLES LOGIC
         const hasExistingDoubles = (this.pronosticosExtra || []).some(p => 
-            String(p.jId || p.jornadaId) === String(jornada.id) &&
+            (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number)) &&
             p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
         );
         let isEligibleForDoubles = false;
         if (typeof this.checkEligibility === 'function') {
-            const eligibility = this.checkEligibility(jornada.number, this.currentMemberId);
-            isEligibleForDoubles = eligibility && eligibility.eligible;
+            const eligibility = this.checkEligibility(jornada.number, this.currentMemberId, true);
+            isEligibleForDoubles = eligibility && (eligibility.eligible || eligibility.isWinner || eligibility.hasPrize);
+        }
+        if (!isEligibleForDoubles && typeof window !== 'undefined' && typeof window.getEligibleDoublesMembers === 'function') {
+            const dms = window.getEligibleDoublesMembers(jornada);
+            if (dms && dms.some(m => String(m.id) === String(this.currentMemberId))) {
+                isEligibleForDoubles = true;
+            }
         }
 
         if (isEligibleForDoubles || hasExistingDoubles || this.correctionMode) {
@@ -2516,12 +2522,16 @@ class PronosticoManager {
         }
 
         // 3. CALCULAR DATOS DE TODOS LOS SOCIOS PARA LA JORNADA PREVIA
-        const prizeMap = prevJornada.prizes || prevJornada.prizeRates || {};
+        const prizeMap = (prevJornada.prizes && typeof prevJornada.prizes === 'object' && Object.keys(prevJornada.prizes).length > 0)
+            ? prevJornada.prizes 
+            : (prevJornada.prizeRates || {});
         const leaderboard = this.members.map(m => {
             const p = this.pronosticos.find(pred => {
-                const pJid = String(pred.jId || pred.jornadaId || '');
-                const pMid = String(pred.mId || pred.memberId || '');
-                return pJid === String(prevJornada.id) && pMid === String(m.id);
+                const pJid = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : (pred.jornadaId || ''));
+                const pMid = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : (pred.memberId || ''));
+                const matchJ = (pJid === String(prevJornada.id) || pJid === String(prevJornada.number));
+                const matchM = (pMid === String(m.id));
+                return matchJ && matchM;
             });
 
             if (!p || !p.selection) {
@@ -2539,17 +2549,29 @@ class PronosticoManager {
             let evPoints = 0;
             let evHits = 0;
             let evPrize = 0;
-            if (typeof ScoringSystem !== 'undefined' && typeof ScoringSystem.evaluateMember === 'function') {
-                const evMem = ScoringSystem.evaluateMember(m, prevJornada, p, { forceFinished: true });
-                evPoints = evMem.points;
-                evHits = evMem.hits;
-                evPrize = parseFloat(evMem.prize || 0);
-            } else {
+            if (p.selection && Array.isArray(p.selection)) {
                 const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
                 evPoints = ev.points;
                 evHits = ev.hits;
                 const pVal = prizeMap[ev.hits] || prizeMap[String(ev.hits)] || 0;
-                evPrize = parseFloat(pVal) || 0;
+                evPrize = typeof pVal === 'number' ? pVal : parseFloat(String(pVal).replace(',', '.').replace('€', '').trim() || 0);
+            }
+            if (typeof ScoringSystem !== 'undefined' && typeof ScoringSystem.evaluateMember === 'function') {
+                try {
+                    const evMem = ScoringSystem.evaluateMember(m, prevJornada, p, { forceFinished: true });
+                    if (evMem) {
+                        evPoints = evMem.points;
+                        evHits = evMem.hits;
+                        const pMemPrize = typeof evMem.prize === 'number' ? evMem.prize : parseFloat(String(evMem.prize || 0).replace(',', '.').replace('€', '').trim() || 0);
+                        if (pMemPrize > 0) evPrize = pMemPrize;
+                    }
+                } catch (e) {}
+            }
+            if (typeof BoteEngine !== 'undefined' && typeof BoteEngine.getPrizesForMemberJornada === 'function') {
+                try {
+                    const bPrize = BoteEngine.getPrizesForMemberJornada(m.id, prevJornada, this.pronosticos);
+                    if (bPrize > 0) evPrize = bPrize;
+                } catch (e) {}
             }
 
             return { id: String(m.id), name: m.name, points: evPoints, hits: evHits, prize: evPrize, isLate: p.late || false, isPardoned: isPardoned };
@@ -2594,7 +2616,13 @@ class PronosticoManager {
         const isAbsoluteWinner = absoluteWinnerId && String(memberId) === String(absoluteWinnerId);
 
         // A) Premio económico en columna individual del socio
-        const hasIndividualMoneyPrize = myStats && myStats.prize > 0;
+        let hasIndividualMoneyPrize = myStats && myStats.prize > 0;
+        if (!hasIndividualMoneyPrize && typeof BoteEngine !== 'undefined' && typeof BoteEngine.getPrizesForMemberJornada === 'function') {
+            try {
+                const bPrize = BoteEngine.getPrizesForMemberJornada(memberId, prevJornada, this.pronosticos);
+                if (bPrize > 0) hasIndividualMoneyPrize = true;
+            } catch (e) {}
+        }
 
         // B) Premio económico en la columna de dobles si este socio fue quien la rellenó en la jornada previa
         let hasDoublesMoneyPrize = false;

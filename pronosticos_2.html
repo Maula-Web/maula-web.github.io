@@ -1431,6 +1431,7 @@
                             <button type="button" onclick="window.openEditorForDoubles()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
                                 <span>✌️</span> Rellenar Quiniela de Dobles
                             </button>
+                            <div id="kpi-dobles-buttons-container" class="mt-2 flex flex-col gap-1.5"></div>
                         </div>
 
                         <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
@@ -1482,6 +1483,9 @@
                             <!-- Botón funcional para abrir ventana modal de edición -->
                             <button type="button" onclick="window.openEditorForCurrentMember()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
                                 <span>✏️</span> Editar Boleto de este Socio
+                            </button>
+                            <button type="button" id="btn-kpi-socio-doubles" onclick="window.openEditorForCurrentMemberDoubles()" class="hidden w-full mt-2 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition items-center justify-center gap-1.5 shadow-md">
+                                <span>✌️</span> Rellenar Dobles de este Socio
                             </button>
                         </div>
 
@@ -1673,6 +1677,20 @@
 
                 <!-- CONTENIDO PESTAÑA 1: QUINIELA BASE -->
                 <div id="editor-view-base" class="w-full">
+                    <!-- Banner destacado si el socio es elegible para Quiniela de Dobles -->
+                    <div id="modal-doubles-action-banner" class="hidden mb-3 p-3 rounded-2xl bg-gradient-to-r from-purple-950/80 via-purple-900/40 to-slate-900/80 border border-purple-500/60 shadow-lg items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="text-xl p-1.5 rounded-xl bg-purple-500/30 text-purple-300 shrink-0">✌️</span>
+                            <div class="min-w-0">
+                                <h4 class="text-xs sm:text-sm font-black text-purple-200 truncate">¡Este socio tiene derecho a Quiniela de Dobles!</h4>
+                                <p class="text-[11px] text-purple-300/80 truncate">Ganador o premiado en la jornada anterior • Combinación reducida colectiva autorizada</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.switchEditorTab('doubles')" class="shrink-0 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition shadow-md flex items-center gap-1.5 active:scale-95">
+                            <span>✌️</span> Ir a Rellenar Dobles →
+                        </button>
+                    </div>
+
                     <div id="editor-base-layout" class="flex flex-col lg:grid lg:grid-cols-12 gap-5 items-start w-full">
                         <!-- COLUMNA IZQUIERDA: BOLETO DEL SOCIO -->
                         <div id="editor-forecast-column" class="w-full lg:col-span-12 space-y-1 transition-all duration-300 min-w-0">
@@ -2044,7 +2062,7 @@
         // 2. BUSCAR LOS SOCIOS RESPONSABLES DE LA QUINIELA DE DOBLES
         window.getEligibleDoublesMembers = function(jornada) {
             if (!window.app || !window.app.members || window.app.members.length === 0) return [];
-            const j = jornada || (window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null);
+            const j = jornada || (window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null);
             if (!j) return [];
             
             const list = [];
@@ -2053,6 +2071,21 @@
                     const elig = window.app.checkEligibility(j.number, m.id, true);
                     if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) {
                         list.push(m);
+                    }
+                }
+            }
+            // Fallback con BoteEngine si list no contiene a un socio que haya tenido premio económico en la jornada previa
+            if (typeof BoteEngine !== 'undefined' && typeof BoteEngine.getPrizesForMemberJornada === 'function' && window.app.jornadas && window.app.pronosticos) {
+                const sorted = [...window.app.jornadas].sort((a, b) => a.number - b.number);
+                const prev = sorted.filter(jor => jor.number < j.number).pop();
+                if (prev) {
+                    for (const m of window.app.members) {
+                        if (!list.some(em => String(em.id) === String(m.id))) {
+                            const pz = BoteEngine.getPrizesForMemberJornada(m.id, prev, window.app.pronosticos);
+                            if (pz > 0) {
+                                list.push(m);
+                            }
+                        }
                     }
                 }
             }
@@ -2068,7 +2101,7 @@
                 if (current) return current;
             }
             // De lo contrario, priorizar al ganador absoluto si existe
-            const j = jornada || (window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null);
+            const j = jornada || (window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null);
             if (j && window.app && typeof window.app.checkEligibility === 'function') {
                 const winner = list.find(m => {
                     const elig = window.app.checkEligibility(j.number, m.id, true);
@@ -2097,15 +2130,15 @@
             }
 
             // Comprobar si este socio es elegible para dobles en esta jornada o si ya existen dobles registrados
-            const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+            const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null;
             const eligibleMembers = window.getEligibleDoublesMembers(j);
             const isDoublesEligible = eligibleMembers.some(m => String(m.id) === String(window.app.currentMemberId)) || (window.app && window.app.correctionMode);
 
             // Buscar si este socio específico tiene pronóstico de dobles guardado, o en general para la jornada
             const existingExtra = (window.app && window.app.pronosticosExtra)
-                ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
-                  || window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)))
-                  || (isDoublesEligible ? null : window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))))
+                ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
+                  || window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)))
+                  || (isDoublesEligible ? null : window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))))
                 : null;
             const hasDoublesForecast = !!(existingExtra && existingExtra.selection && existingExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'));
             const canViewDoubles = isDoublesEligible || hasDoublesForecast || openDoublesTab;
@@ -2128,6 +2161,13 @@
                         tabBtnBase.classList.add('w-full');
                     }
                 }
+            }
+
+            // Banner explicativo/directo para dobles dentro del modal
+            const doublesBanner = document.getElementById('modal-doubles-action-banner');
+            if (doublesBanner) {
+                doublesBanner.classList.toggle('hidden', !isDoublesEligible);
+                doublesBanner.classList.toggle('flex', !!isDoublesEligible);
             }
 
             // Cambiar pestaña si se solicitó dobles y se puede visualizar
@@ -2189,12 +2229,20 @@
             window.openEditorModal(mId, false, jId);
         };
 
+        window.openEditorForCurrentMemberDoubles = function() {
+            const selM = document.getElementById('sel-member');
+            const selJ = document.getElementById('sel-jornada');
+            const mId = selM ? selM.value : (window.app ? window.app.currentMemberId : null);
+            const jId = selJ ? selJ.value : (window.app ? window.app.currentJornadaId : null);
+            window.openEditorModal(mId, true, jId);
+        };
+
         window.openEditorForDoubles = function(jornadaId = null) {
             if (jornadaId && window.app) {
                 window.app.currentJornadaId = String(jornadaId);
                 if (window.app.selJornada) window.app.selJornada.value = String(jornadaId);
             }
-            const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+            const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null;
             const eligibleMembers = window.getEligibleDoublesMembers(j);
             const currentMid = window.app ? String(window.app.currentMemberId) : null;
             
@@ -2246,13 +2294,14 @@
 
                 // Asegurar que el formulario de dobles se renderice con los datos de la jornada seleccionada
                 if (window.app && window.app.renderDoublesForm) {
-                    const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+                    const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null;
                     if (j) {
                         const { isLockedRef } = window.app.isJornadaLocked(j);
                         const isLockedForEdit = isLockedRef && !window.app.correctionMode;
                         window.app.renderDoublesForm(j, isLockedForEdit);
                         if (btnSaveDoubles) {
-                            btnSaveDoubles.classList.toggle('hidden', isLockedForEdit);
+                            btnSaveDoubles.classList.remove('hidden');
+                            btnSaveDoubles.style.display = isLockedForEdit ? 'none' : 'block';
                         }
                     }
                 }
@@ -2885,6 +2934,23 @@
                     }
                 }
 
+                // Renderizar botones individuales si hay múltiples responsables de dobles
+                const doublesBtnsContainer = document.getElementById('kpi-dobles-buttons-container');
+                if (doublesBtnsContainer) {
+                    if (eligibleList.length > 1) {
+                        doublesBtnsContainer.innerHTML = eligibleList.map(em => `
+                            <button type="button" onclick="window.openEditorModal(${em.id}, true, '${jornada.id}')" class="w-full px-2.5 py-1.5 rounded-lg bg-purple-900/60 hover:bg-purple-800/70 border border-purple-500/50 text-purple-200 text-xs font-bold transition flex items-center justify-between shadow-sm active:scale-95">
+                                <span>✌️ Dobles: <strong class="text-amber-300">${AppUtils.getMemberName(em).split(' ')[0]}</strong></span>
+                                <span class="text-[10px] text-purple-300 font-mono">Rellenar →</span>
+                            </button>
+                        `).join('');
+                        doublesBtnsContainer.classList.remove('hidden');
+                    } else {
+                        doublesBtnsContainer.innerHTML = '';
+                        doublesBtnsContainer.classList.add('hidden');
+                    }
+                }
+
                 // 4. KPI Socio Activo
                 const mId = this.currentMemberId;
                 const member = this.members ? this.members.find(m => String(m.id) === String(mId)) : null;
@@ -2902,6 +2968,13 @@
                             <span class="led-status-indicator led-${led.status}"></span>
                             <span class="font-bold">${led.title}</span>
                         `;
+                    }
+                    // Botón de dobles específico para este socio si es elegible
+                    const btnSocioDoubles = document.getElementById('btn-kpi-socio-doubles');
+                    if (btnSocioDoubles) {
+                        const isMemberEligible = eligibleList.some(em => String(em.id) === String(member.id));
+                        btnSocioDoubles.classList.toggle('hidden', !isMemberEligible);
+                        btnSocioDoubles.classList.toggle('flex', !!isMemberEligible);
                     }
                 }
 
