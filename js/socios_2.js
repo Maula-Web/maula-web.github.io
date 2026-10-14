@@ -760,6 +760,103 @@ class SociosAppController {
     }
 
     /**
+     * Calcula los 3 segmentos del indicador de dado para un socio según el código de 3 colores:
+     * - Rojo: Jornadas ya jugadas con dado (pronóstico con isDice === true y jornada ya iniciada/disputada).
+     * - Amarillo: Jornadas afectadas por dado que aún no se han jugado (rango activo/programado sin pronóstico previo).
+     * - Verde: Jornadas disponibles (comodines libres, sin texto debajo).
+     * @param {Object} m - Socio
+     * @returns {Array<{ status: 'red'|'yellow'|'green', jNum: number|null }>}
+     */
+    getMemberDiceSegments(m) {
+        const segments = [];
+        const mStr = String(m.id);
+
+        // 1. Identificar jornadas con pronóstico de dado ya registrado
+        const diceForecasts = (this.pronosticos || []).filter(p => {
+            const pMid = String(p.mId !== undefined && p.mId !== null ? p.mId : p.memberId || '');
+            return pMid === mStr && p.isDice === true;
+        });
+
+        // Para cada pronóstico de dado, buscar la jornada asociada
+        const playedDiceJornadas = [];
+        diceForecasts.forEach(p => {
+            const pJid = String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId || '');
+            const j = (this.jornadas || []).find(item => String(item.id) === pJid);
+            const jNum = j && j.number !== undefined ? Number(j.number) : null;
+            playedDiceJornadas.push({ jNum, jornada: j });
+        });
+
+        // Ordenar jornadas jugadas por número
+        playedDiceJornadas.sort((a, b) => (a.jNum || 0) - (b.jNum || 0));
+
+        // Añadir a segmentos los jugados en ROJO (máximo 3)
+        playedDiceJornadas.slice(0, 3).forEach(item => {
+            segments.push({
+                status: 'red',
+                jNum: item.jNum
+            });
+        });
+
+        // 2. Si aún quedan huecos (hasta 3) y el dado está configurado (diceEnabled + fechas):
+        // Identificar jornadas afectadas por el rango que aún NO se han jugado ni tienen pronóstico del socio
+        if (segments.length < 3 && m.diceEnabled && m.diceStartDate && m.diceEndDate) {
+            const sortedJornadas = [...(this.jornadas || [])]
+                .filter(j => j && j.active !== false)
+                .sort((a, b) => (a.number || 0) - (b.number || 0));
+
+            for (const j of sortedJornadas) {
+                if (segments.length >= 3) break;
+
+                // Comprobar si ya tiene pronóstico
+                const hasForecast = (this.pronosticos || []).some(p => {
+                    const pJid = String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId || '');
+                    const pMid = String(p.mId !== undefined && p.mId !== null ? p.mId : p.memberId || '');
+                    if (pJid === String(j.id) && pMid === mStr) {
+                        return p.selection && Array.isArray(p.selection) && p.selection.some(s => s !== null && s !== '-');
+                    }
+                    return false;
+                });
+                if (hasForecast) continue;
+
+                // Verificar si la fecha de la jornada cae en el rango del dado
+                const jDate = typeof AppUtils !== 'undefined' ? AppUtils.parseDate(j.date) : new Date(j.date);
+                const deadline = typeof AppUtils !== 'undefined' ? AppUtils.calculateDeadline(j.date) : null;
+
+                const inRange = (window.DiceService && typeof window.DiceService.isDateInRange === 'function')
+                    ? (window.DiceService.isDateInRange(jDate, m.diceStartDate, m.diceEndDate) || (deadline && window.DiceService.isDateInRange(deadline, m.diceStartDate, m.diceEndDate)))
+                    : false;
+
+                if (!inRange) continue;
+
+                // Comprobar si ya se jugó / tiene resultados
+                const hasStarted = Array.isArray(j.matches) && j.matches.some(match => {
+                    if (!match || !match.result) return false;
+                    const r = String(match.result).trim();
+                    return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+                });
+
+                // Si no se ha jugado, es una jornada afectada pendiente -> AMARILLO
+                if (!hasStarted) {
+                    segments.push({
+                        status: 'yellow',
+                        jNum: j.number !== undefined ? Number(j.number) : null
+                    });
+                }
+            }
+        }
+
+        // 3. Rellenar los huecos restantes hasta 3 en VERDE (disponibles)
+        while (segments.length < 3) {
+            segments.push({
+                status: 'green',
+                jNum: null
+            });
+        }
+
+        return segments;
+    }
+
+    /**
      * VISTA 1: FICHAS DEPORTIVAS (GRID)
      */
     renderGridView() {
@@ -798,17 +895,34 @@ class SociosAppController {
             const names = (m.name || 'Socio').trim().split(' ');
             const initials = names.length > 1 ? (names[0][0] + names[1][0]).toUpperCase() : names[0].slice(0, 2).toUpperCase();
 
-            // Segmentos del dado (3 casillas)
-            let segmentsHtml = '';
-            for (let i = 1; i <= 3; i++) {
-                if (i <= diceUses) {
-                    segmentsHtml += `<div class="h-2 flex-1 rounded-full bg-rose-500 shadow-sm" title="Jornada ${i}: Usada"></div>`;
-                } else if (isActive && i === diceUses + 1) {
-                    segmentsHtml += `<div class="h-2 flex-1 rounded-full bg-amber-400 animate-pulse shadow-sm" title="Dado activo en curso"></div>`;
+            // Segmentos del dado (3 casillas con código de 3 colores y etiqueta de jornada afectada debajo)
+            const diceSegments = this.getMemberDiceSegments(m);
+            const segmentsHtml = diceSegments.map(seg => {
+                let barClass = '';
+                let labelClass = '';
+                let labelText = '';
+
+                if (seg.status === 'red') {
+                    barClass = 'bg-rose-500 shadow-sm';
+                    labelText = seg.jNum ? `J${seg.jNum}` : 'Usada';
+                    labelClass = 'text-rose-400 font-mono font-bold';
+                } else if (seg.status === 'yellow') {
+                    barClass = 'bg-amber-400 shadow-sm animate-pulse';
+                    labelText = seg.jNum ? `J${seg.jNum}` : 'Pend.';
+                    labelClass = 'text-amber-400 font-mono font-bold';
                 } else {
-                    segmentsHtml += `<div class="h-2 flex-1 rounded-full bg-slate-800 border border-slate-700" title="Comodín ${i}: Disponible"></div>`;
+                    barClass = 'bg-emerald-500 shadow-sm';
+                    labelText = '';
+                    labelClass = 'text-transparent select-none';
                 }
-            }
+
+                return `
+                    <div class="flex-1 flex flex-col items-center">
+                        <div class="h-2 w-full rounded-full ${barClass}"></div>
+                        <span class="text-[10px] min-h-[14px] leading-tight mt-1 ${labelClass}">${labelText}</span>
+                    </div>
+                `;
+            }).join('');
 
             // Badge de estado del dado
             let diceBadge = '';
