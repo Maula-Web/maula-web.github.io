@@ -2977,7 +2977,7 @@ class BoteAppController {
             let acText = m.aciertos !== undefined ? m.aciertos : '-';
             if (m.exento) acText += ' 🎁';
             if (m.isWinner) acText += ' 👑';
-            else if (m.jugaDobles) acText += ' 🎲';
+            else if (m.jugaDobles) acText += ' ✌️';
             if (m.isLoser) acText += ' 💀';
             else if (m.isSealer || m.sellado < 0) acText += ' 🎟️';
 

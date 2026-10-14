@@ -350,34 +350,19 @@ class PronosticoManager {
             return;
         }
 
-        const member = this.members.find(m => String(m.id) === String(this.currentMemberId));
-        const jornada = this.jornadas.find(j => String(j.id) === String(this.currentJornadaId));
         const existing = this.pronosticos.find(p => (String(p.jId) === String(this.currentJornadaId) || String(p.jornadaId) === String(this.currentJornadaId)) && (String(p.mId) === String(this.currentMemberId) || String(p.memberId) === String(this.currentMemberId)));
 
-        const memberName = member ? AppUtils.getMemberName(member) : `Socio #${this.currentMemberId}`;
-        const jornadaText = jornada ? `Jornada ${jornada.number} (${jornada.date})` : `Jornada #${this.currentJornadaId}`;
-        const memberLed = (member && jornada) ? this.getMemberStatusLed(member.id, jornada) : null;
-        const ledBadgeHtml = memberLed ? `
-            <span class="led-status-indicator led-${memberLed.status}" style="margin-right: 4px;" title="${memberLed.title}"></span>
-        ` : '';
-
         const diceBadgeHtml = (existing && existing.isDice) ? `
-            <span style="background: rgba(103, 58, 183, 0.12); color: #673ab7; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(103, 58, 183, 0.3); display: inline-flex; align-items: center; gap: 6px;" title="Rellenado automáticamente por El Dado de Quinielas">
+            <span style="background: rgba(103, 58, 183, 0.12); color: #a78bfa; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid rgba(167, 139, 250, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Rellenado automáticamente por El Dado de Quinielas">
                 🎲 <span>Relleno con Dado</span>
             </span>
         ` : '';
 
-        this.activeSelectionInfo.innerHTML = `
+        this.activeSelectionInfo.innerHTML = diceBadgeHtml ? `
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <span style="background: var(--primary-color, #1976d2); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    👤 ${ledBadgeHtml}<span>${memberName}</span>
-                </span>
-                <span style="background: rgba(25, 118, 210, 0.1); color: var(--primary-color, #1976d2); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(25, 118, 210, 0.25); display: inline-flex; align-items: center; gap: 6px;">
-                    📅 <span>${jornadaText}</span>
-                </span>
                 ${diceBadgeHtml}
             </div>
-        `;
+        ` : '';
     }
 
     closeForecast() {
@@ -400,6 +385,21 @@ class PronosticoManager {
         if (mobileTopBar) {
             mobileTopBar.classList.add('hidden');
             mobileTopBar.classList.remove('flex');
+        }
+        const sourceBarBase = document.getElementById('md-source-bar-base');
+        if (sourceBarBase) {
+            sourceBarBase.classList.add('hidden');
+            sourceBarBase.classList.remove('flex');
+        }
+        const mobileTopBarDoubles = document.getElementById('md-mobile-top-bar-doubles');
+        if (mobileTopBarDoubles) {
+            mobileTopBarDoubles.classList.add('hidden');
+            mobileTopBarDoubles.classList.remove('flex');
+        }
+        const sourceBarDoubles = document.getElementById('md-source-bar-doubles');
+        if (sourceBarDoubles) {
+            sourceBarDoubles.classList.add('hidden');
+            sourceBarDoubles.classList.remove('flex');
         }
         if (this.editorForecastCol) {
             this.editorForecastCol.classList.remove('lg:col-span-7', 'xl:col-span-8');
@@ -507,6 +507,11 @@ class PronosticoManager {
                 mobileTopBar.classList.add('hidden');
                 mobileTopBar.classList.remove('flex');
             }
+        }
+        const sourceBarBase = document.getElementById('md-source-bar-base');
+        if (sourceBarBase) {
+            sourceBarBase.classList.toggle('hidden', !this.currentJornadaHasMDAnalysis);
+            sourceBarBase.classList.toggle('flex', !!this.currentJornadaHasMDAnalysis);
         }
         if (this.mdAnalysisSidebar && this.editorForecastCol) {
             if (this.currentJornadaHasMDAnalysis) {
@@ -2657,10 +2662,28 @@ class PronosticoManager {
             }
         }
 
+        // Activar visibilidad de las barras de análisis de Mundo Deportivo para dobles
+        this.currentJornadaHasMDAnalysis = this.checkIfJornadaHasMDAnalysis(jornada);
+        const mobileTopBarDoubles = document.getElementById('md-mobile-top-bar-doubles');
+        if (mobileTopBarDoubles) {
+            mobileTopBarDoubles.classList.toggle('hidden', !this.currentJornadaHasMDAnalysis);
+            mobileTopBarDoubles.classList.toggle('flex', !!this.currentJornadaHasMDAnalysis);
+            const labelDoubles = document.getElementById('label-toggle-all-md-doubles');
+            const arrowDoubles = document.getElementById('arrow-toggle-all-md-doubles');
+            if (labelDoubles) labelDoubles.textContent = 'Ver todos';
+            if (arrowDoubles) arrowDoubles.textContent = '▼';
+        }
+        const sourceBarDoubles = document.getElementById('md-source-bar-doubles');
+        if (sourceBarDoubles) {
+            sourceBarDoubles.classList.toggle('hidden', !this.currentJornadaHasMDAnalysis);
+            sourceBarDoubles.classList.toggle('flex', !!this.currentJornadaHasMDAnalysis);
+        }
+
         jornada.matches.forEach((match, idx) => {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
             const row = document.createElement('div');
             row.className = 'pronostico-row doubles-row';
+            row.setAttribute('data-idx', idx);
 
             const hitStatus = doublesHitStatus[idx];
             if (hitStatus === true) {
@@ -2686,6 +2709,81 @@ class PronosticoManager {
 
             const isP15 = idx === 14;
 
+            // Porcentajes del análisis de Mundo Deportivo para Dobles
+            let percHtml = '';
+            let mobileBtnHtml = '';
+            let inlineAnalysisHtml = '';
+            if (this.currentJornadaHasMDAnalysis) {
+                const mdMatch = this.getMDMatchFor(match, idx);
+                if (mdMatch && mdMatch.percentages) {
+                    const mdRecInfo = this.getEffectiveMDRecommendation(mdMatch);
+                    const p1 = mdRecInfo.p1;
+                    const pX = mdRecInfo.pX;
+                    const p2 = mdRecInfo.p2;
+                    const isRec1 = mdRecInfo.isRec1;
+                    const isRecX = mdRecInfo.isRecX;
+                    const isRec2 = mdRecInfo.isRec2;
+                    const recSign = mdRecInfo.recSign;
+
+                    percHtml = `
+                        <div id="doubles-consensus-${idx}" class="p-percentages" title="Probabilidad Mundo Deportivo: 1 (${p1}%), X (${pX}%), 2 (${p2}%)">
+                            <div class="perc-row perc-1 ${isRec1 ? 'rec-sign' : ''}"><span>1:</span> <b>${p1}%</b></div>
+                            <div class="perc-row perc-X ${isRecX ? 'rec-sign' : ''}"><span>X:</span> <b>${pX}%</b></div>
+                            <div class="perc-row perc-2 ${isRec2 ? 'rec-sign' : ''}"><span>2:</span> <b>${p2}%</b></div>
+                        </div>
+                    `;
+                    mobileBtnHtml = `
+                        <button type="button" class="md-mobile-toggle-btn lg:hidden" onclick="event.stopPropagation(); window.app.toggleMDInlineAnalysis(${idx});" title="Ver análisis de Mundo Deportivo">
+                            <span>💡 Análisis</span>
+                            <span class="md-arrow" id="md-arrow-${idx}">▼</span>
+                        </button>
+                    `;
+
+                    // Desplegable de análisis táctico inline para móvil
+                    let homeRankStr = mdMatch.homeRank ? `${mdMatch.homeRank}º clasificado` : '';
+                    let awayRankStr = mdMatch.awayRank ? `${mdMatch.awayRank}º clasificado` : '';
+                    if (!homeRankStr && this.mdAnalysisData && this.mdAnalysisData.standings) {
+                        const allSt = [...(this.mdAnalysisData.standings.primera || []), ...(this.mdAnalysisData.standings.segunda || [])];
+                        const hFound = allSt.find(t => this.areTeamsSimilar(match.home, t.team));
+                        if (hFound) homeRankStr = `${hFound.pos}º (${hFound.pts} pts)`;
+                        const aFound = allSt.find(t => this.areTeamsSimilar(match.away, t.team));
+                        if (aFound) awayRankStr = `${aFound.pos}º (${aFound.pts} pts)`;
+                    }
+
+                    inlineAnalysisHtml = `
+                        <div id="md-inline-${idx}" class="md-inline-card hidden lg:hidden w-full mt-2 p-3 rounded-xl bg-slate-950/90 border border-sky-500/30 text-xs space-y-2.5 shadow-inner">
+                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 text-[11px]">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-sky-400 font-black uppercase tracking-wider">🎯 Recomendado:</span>
+                                    <span class="px-2 py-0.5 rounded-lg bg-sky-500 text-slate-950 font-black text-xs shadow">${recSign}</span>
+                                </div>
+                                <span class="text-slate-400 font-mono text-[10px]">⏰ ${mdMatch.schedule || 'Fin de semana'}</span>
+                            </div>
+                            ${(homeRankStr || awayRankStr) ? `
+                                <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono px-1">
+                                    <span>${match.home}: <b class="text-sky-400">${homeRankStr || '-'}</b></span>
+                                    <span>${match.away}: <b class="text-sky-400">${awayRankStr || '-'}</b></span>
+                                </div>
+                            ` : ''}
+                            ${mdMatch.comment ? `
+                                <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800/80 text-[11px] text-slate-300 leading-relaxed font-sans">
+                                    ${mdMatch.comment}
+                                </div>
+                            ` : '<div class="text-[10px] text-slate-500 italic">Sin comentario editorial disponible.</div>'}
+                            <div class="pt-0.5 flex items-center justify-end">
+                                <button type="button" onclick="event.stopPropagation(); window.app.openMDMobileDetail(${idx});" class="text-[10px] text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1">
+                                    <span>📊 Ver Ficha Completa & Clasificación →</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    percHtml = `<div id="doubles-consensus-${idx}" class="p-percentages hidden" style="display:none !important;"></div>`;
+                }
+            } else {
+                percHtml = `<div id="doubles-consensus-${idx}" class="p-percentages hidden" style="display:none !important;"></div>`;
+            }
+
             row.innerHTML = `
                 <div class="p-match-info">
                     <div class="match-team home-team">
@@ -2701,13 +2799,29 @@ class PronosticoManager {
                             </div>
                         </div>
                         ${hitBadgeHtml}
+                        ${mobileBtnHtml}
                     </div>
                 </div>
 
-                <div class="prediction-inputs" data-idx="${idx}">
-                    ${isP15 ? this.renderP15Inputs(idx, selections[idx], isLocked) : this.renderMultiSelectButtons(idx, selections[idx], isLocked, false, hitStatus, mResult)}
+                <div class="p-row-actions">
+                    <div class="prediction-inputs" data-idx="${idx}">
+                        ${isP15 ? this.renderP15Inputs(idx, selections[idx], isLocked) : this.renderMultiSelectButtons(idx, selections[idx], isLocked, false, hitStatus, mResult)}
+                    </div>
+                    ${percHtml}
                 </div>
+
+                ${inlineAnalysisHtml}
             `;
+
+            if (this.currentJornadaHasMDAnalysis) {
+                row.addEventListener('mouseenter', () => this.hoverMDMatch(idx));
+                row.addEventListener('click', (e) => {
+                    if (!e.target.closest('.chk-option') && !e.target.closest('.p15-option') && !e.target.closest('.md-mobile-toggle-btn') && !e.target.closest('.md-inline-card')) {
+                        this.hoverMDMatch(idx);
+                    }
+                });
+            }
+
             this.doublesContainer.appendChild(row);
 
             // Add Block Dividers: 4, 4, 3, 3 + Pleno al 15
@@ -3359,9 +3473,11 @@ class PronosticoManager {
     hoverMDMatch(idx) {
         this.selectedMDMatchIdx = idx;
 
-        const allRows = this.container ? this.container.querySelectorAll('.pronostico-row') : [];
+        const baseRows = this.container ? Array.from(this.container.querySelectorAll('.pronostico-row')) : [];
+        const doublesRows = this.doublesContainer ? Array.from(this.doublesContainer.querySelectorAll('.doubles-row')) : [];
+        const allRows = [...baseRows, ...doublesRows];
         allRows.forEach((r) => {
-            const rIdx = parseInt(r.dataset.idx);
+            const rIdx = parseInt(r.dataset.idx !== undefined ? r.dataset.idx : (r.getAttribute('data-idx') || -1));
             if (rIdx === idx) {
                 r.classList.add('border-sky-500/80', 'bg-sky-950/20');
             } else {
@@ -3746,12 +3862,16 @@ class PronosticoManager {
     }
 
     toggleAllMDInlineAnalysis() {
-        const allCards = this.container ? this.container.querySelectorAll('.md-inline-card') : [];
+        const baseCards = this.container ? Array.from(this.container.querySelectorAll('.md-inline-card')) : [];
+        const doublesCards = this.doublesContainer ? Array.from(this.doublesContainer.querySelectorAll('.md-inline-card')) : [];
+        const allCards = [...baseCards, ...doublesCards];
         if (!allCards.length) return;
 
-        const hasHidden = Array.from(allCards).some(c => c.classList.contains('hidden'));
+        const hasHidden = allCards.some(c => c.classList.contains('hidden'));
         const label = document.getElementById('label-toggle-all-md');
         const arrow = document.getElementById('arrow-toggle-all-md');
+        const labelDoubles = document.getElementById('label-toggle-all-md-doubles');
+        const arrowDoubles = document.getElementById('arrow-toggle-all-md-doubles');
 
         allCards.forEach(card => {
             const idx = card.id.replace('md-inline-', '');
@@ -3767,6 +3887,8 @@ class PronosticoManager {
 
         if (label) label.textContent = hasHidden ? 'Ocultar todos' : 'Ver todos';
         if (arrow) arrow.textContent = hasHidden ? '▲' : '▼';
+        if (labelDoubles) labelDoubles.textContent = hasHidden ? 'Ocultar todos' : 'Ver todos';
+        if (arrowDoubles) arrowDoubles.textContent = hasHidden ? '▲' : '▼';
     }
 
     showMobileStandings(divType) {
