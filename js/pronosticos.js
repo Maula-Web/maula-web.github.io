@@ -3615,7 +3615,7 @@ class PronosticoManager {
                         <div class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1">
                             <span>📝</span> <span>Análisis del Partido</span>
                         </div>
-                        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800/80 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[140px] overflow-y-auto custom-scroll">
+                        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800/80 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[160px] lg:max-h-none overflow-y-auto lg:overflow-visible custom-scroll">
                             ${mdMatch.comment}
                         </div>
                     </div>
