@@ -2836,6 +2836,21 @@ class PronosticoManager {
             sourceBarDoubles.classList.toggle('flex', !!this.currentJornadaHasMDAnalysis);
         }
 
+        if (this.mdAnalysisSidebar && this.editorForecastCol) {
+            if (this.currentJornadaHasMDAnalysis) {
+                this.editorForecastCol.classList.remove('lg:col-span-12');
+                this.editorForecastCol.classList.add('lg:col-span-7', 'xl:col-span-8');
+                this.mdAnalysisSidebar.classList.remove('hidden');
+                this.mdAnalysisSidebar.classList.add('flex', 'lg:col-span-5', 'xl:col-span-4');
+                this.renderMDSidebar();
+            } else {
+                this.editorForecastCol.classList.remove('lg:col-span-7', 'xl:col-span-8');
+                this.editorForecastCol.classList.add('lg:col-span-12');
+                this.mdAnalysisSidebar.classList.add('hidden');
+                this.mdAnalysisSidebar.classList.remove('flex', 'lg:col-span-5', 'xl:col-span-4');
+            }
+        }
+
         jornada.matches.forEach((match, idx) => {
             const displayIdx = idx === 14 ? 'P15' : idx + 1;
             const row = document.createElement('div');
@@ -2890,9 +2905,9 @@ class PronosticoManager {
                         </div>
                     `;
                     mobileBtnHtml = `
-                        <button type="button" class="md-mobile-toggle-btn lg:hidden" onclick="event.stopPropagation(); window.app.toggleMDInlineAnalysis(${idx});" title="Ver análisis de Mundo Deportivo">
+                        <button type="button" class="md-mobile-toggle-btn lg:hidden" onclick="event.stopPropagation(); window.app.toggleMDInlineAnalysis(${idx}, 'doubles');" title="Ver análisis de Mundo Deportivo">
                             <span>💡 Análisis</span>
-                            <span class="md-arrow" id="md-arrow-${idx}">▼</span>
+                            <span class="md-arrow" id="md-arrow-doubles-${idx}">▼</span>
                         </button>
                     `;
 
@@ -2908,7 +2923,7 @@ class PronosticoManager {
                     }
 
                     inlineAnalysisHtml = `
-                        <div id="md-inline-${idx}" class="md-inline-card hidden lg:hidden w-full mt-2 p-3 rounded-xl bg-slate-950/90 border border-sky-500/30 text-xs space-y-2.5 shadow-inner">
+                        <div id="md-inline-doubles-${idx}" class="md-inline-card hidden lg:hidden w-full mt-2 p-3 rounded-xl bg-slate-950/90 border border-sky-500/30 text-xs space-y-2.5 shadow-inner">
                             <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 text-[11px]">
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-sky-400 font-black uppercase tracking-wider">🎯 Recomendado:</span>
@@ -4003,9 +4018,15 @@ class PronosticoManager {
         document.body.style.overflow = 'hidden';
     }
 
-    toggleMDInlineAnalysis(idx) {
-        const card = document.getElementById(`md-inline-${idx}`);
-        const arrow = document.getElementById(`md-arrow-${idx}`);
+    toggleMDInlineAnalysis(idx, context = 'base') {
+        const cardId = context === 'doubles' ? `md-inline-doubles-${idx}` : `md-inline-${idx}`;
+        const arrowId = context === 'doubles' ? `md-arrow-doubles-${idx}` : `md-arrow-${idx}`;
+        let card = document.getElementById(cardId);
+        let arrow = document.getElementById(arrowId);
+        if (!card) {
+            card = document.getElementById(`md-inline-doubles-${idx}`) || document.getElementById(`md-inline-${idx}`);
+            arrow = document.getElementById(`md-arrow-doubles-${idx}`) || document.getElementById(`md-arrow-${idx}`);
+        }
         if (!card) return;
 
         const isHidden = card.classList.contains('hidden');
@@ -4019,20 +4040,20 @@ class PronosticoManager {
     }
 
     toggleAllMDInlineAnalysis() {
-        const baseCards = this.container ? Array.from(this.container.querySelectorAll('.md-inline-card')) : [];
-        const doublesCards = this.doublesContainer ? Array.from(this.doublesContainer.querySelectorAll('.md-inline-card')) : [];
-        const allCards = [...baseCards, ...doublesCards];
-        if (!allCards.length) return;
+        const viewDoubles = document.getElementById('editor-view-doubles');
+        const isDoublesActive = viewDoubles && !viewDoubles.classList.contains('hidden');
 
-        const hasHidden = allCards.some(c => c.classList.contains('hidden'));
-        const label = document.getElementById('label-toggle-all-md');
-        const arrow = document.getElementById('arrow-toggle-all-md');
-        const labelDoubles = document.getElementById('label-toggle-all-md-doubles');
-        const arrowDoubles = document.getElementById('arrow-toggle-all-md-doubles');
+        const activeContainer = isDoublesActive ? this.doublesContainer : this.container;
+        const targetCards = activeContainer ? Array.from(activeContainer.querySelectorAll('.md-inline-card')) : [];
+        if (!targetCards.length) return;
 
-        allCards.forEach(card => {
-            const idx = card.id.replace('md-inline-', '');
-            const cardArrow = document.getElementById(`md-arrow-${idx}`);
+        const hasHidden = targetCards.some(c => c.classList.contains('hidden'));
+        const label = document.getElementById(isDoublesActive ? 'label-toggle-all-md-doubles' : 'label-toggle-all-md');
+        const arrow = document.getElementById(isDoublesActive ? 'arrow-toggle-all-md-doubles' : 'arrow-toggle-all-md');
+
+        targetCards.forEach(card => {
+            const cardRow = card.closest('.pronostico-row');
+            const cardArrow = cardRow ? cardRow.querySelector('.md-arrow') : null;
             if (hasHidden) {
                 card.classList.remove('hidden');
                 if (cardArrow) cardArrow.textContent = '▲';
@@ -4044,8 +4065,6 @@ class PronosticoManager {
 
         if (label) label.textContent = hasHidden ? 'Ocultar todos' : 'Ver todos';
         if (arrow) arrow.textContent = hasHidden ? '▲' : '▼';
-        if (labelDoubles) labelDoubles.textContent = hasHidden ? 'Ocultar todos' : 'Ver todos';
-        if (arrowDoubles) arrowDoubles.textContent = hasHidden ? '▲' : '▼';
     }
 
     showMobileStandings(divType) {

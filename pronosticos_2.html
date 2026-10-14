@@ -1049,11 +1049,19 @@
             }
         }
 
-        .light-theme #md-mobile-top-bar {
+        @media (max-width: 1023px) {
+            #modal-editor-boleto #md-analysis-sidebar {
+                display: none !important;
+            }
+        }
+
+        .light-theme #md-mobile-top-bar,
+        .light-theme #md-mobile-top-bar-doubles {
             background: rgba(241, 245, 249, 0.95) !important;
             border-color: rgba(2, 132, 199, 0.3) !important;
         }
-        .light-theme #md-mobile-top-bar .text-slate-200 {
+        .light-theme #md-mobile-top-bar .text-slate-200,
+        .light-theme #md-mobile-top-bar-doubles .text-slate-200 {
             color: #0f172a !important;
         }
         .light-theme .md-inline-card {
@@ -1675,25 +1683,26 @@
 
                 <div id="status-message" class="text-center font-bold text-sm min-h-[20px]"></div>
 
-                <!-- CONTENIDO PESTAÑA 1: QUINIELA BASE -->
-                <div id="editor-view-base" class="w-full">
-                    <!-- Banner destacado si el socio es elegible para Quiniela de Dobles -->
-                    <div id="modal-doubles-action-banner" class="hidden mb-3 p-3 rounded-2xl bg-gradient-to-r from-purple-950/80 via-purple-900/40 to-slate-900/80 border border-purple-500/60 shadow-lg items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <span class="text-xl p-1.5 rounded-xl bg-purple-500/30 text-purple-300 shrink-0">✌️</span>
-                            <div class="min-w-0">
-                                <h4 class="text-xs sm:text-sm font-black text-purple-200 truncate">¡Este socio tiene derecho a Quiniela de Dobles!</h4>
-                                <p class="text-[11px] text-purple-300/80 truncate">Ganador o premiado en la jornada anterior • Combinación reducida colectiva autorizada</p>
+                <div id="editor-base-layout" class="flex flex-col lg:grid lg:grid-cols-12 gap-5 items-start w-full">
+                    <!-- COLUMNA IZQUIERDA: CONTENIDO DE BOLETO (BASE O DOBLES) -->
+                    <div id="editor-forecast-column" class="w-full lg:col-span-12 space-y-1 transition-all duration-300 min-w-0">
+                        
+                        <!-- CONTENIDO PESTAÑA 1: QUINIELA BASE -->
+                        <div id="editor-view-base" class="w-full space-y-2">
+                            <!-- Banner destacado si el socio es elegible para Quiniela de Dobles -->
+                            <div id="modal-doubles-action-banner" class="hidden mb-3 p-3 rounded-2xl bg-gradient-to-r from-purple-950/80 via-purple-900/40 to-slate-900/80 border border-purple-500/60 shadow-lg items-center justify-between gap-3">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="text-xl p-1.5 rounded-xl bg-purple-500/30 text-purple-300 shrink-0">✌️</span>
+                                    <div class="min-w-0">
+                                        <h4 class="text-xs sm:text-sm font-black text-purple-200 truncate">¡Este socio tiene derecho a Quiniela de Dobles!</h4>
+                                        <p class="text-[11px] text-purple-300/80 truncate">Ganador o premiado en la jornada anterior • Combinación reducida colectiva autorizada</p>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="window.switchEditorTab('doubles')" class="shrink-0 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition shadow-md flex items-center gap-1.5 active:scale-95">
+                                    <span>✌️</span> Ir a Rellenar Dobles →
+                                </button>
                             </div>
-                        </div>
-                        <button type="button" onclick="window.switchEditorTab('doubles')" class="shrink-0 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition shadow-md flex items-center gap-1.5 active:scale-95">
-                            <span>✌️</span> Ir a Rellenar Dobles →
-                        </button>
-                    </div>
 
-                    <div id="editor-base-layout" class="flex flex-col lg:grid lg:grid-cols-12 gap-5 items-start w-full">
-                        <!-- COLUMNA IZQUIERDA: BOLETO DEL SOCIO -->
-                        <div id="editor-forecast-column" class="w-full lg:col-span-12 space-y-1 transition-all duration-300 min-w-0">
                             <!-- Barra superior móvil: Desplegar/Ocultar todos los análisis de MD -->
                             <div id="md-mobile-top-bar" class="hidden lg:hidden mb-2 p-2.5 rounded-xl bg-slate-900/80 border border-sky-500/30 flex items-center justify-between gap-2 shadow-sm">
                                 <div class="flex items-center gap-2">
@@ -1720,119 +1729,120 @@
                             </div>
                         </div>
 
-                        <!-- COLUMNA DERECHA: ASISTENTE Y ANÁLISIS DE MUNDO DEPORTIVO -->
-                        <div id="md-analysis-sidebar" class="hidden w-full lg:col-span-5 xl:col-span-4 flex-col gap-3 sticky top-2 min-w-0">
-                            <div class="rounded-2xl bg-slate-900/90 border border-sky-500/30 p-3.5 shadow-2xl flex flex-col gap-3">
-                                
-                                <!-- Cabecera del Asistente -->
-                                <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800 shrink-0">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-base p-1.5 rounded-lg bg-sky-500/20 text-sky-400">💡</span>
+                        <!-- CONTENIDO PESTAÑA 2: QUINIELA DE DOBLES -->
+                        <div id="editor-view-doubles" class="hidden space-y-4">
+                            <div id="doubles-section" class="flex flex-col gap-3">
+                                <div class="p-4 rounded-xl bg-purple-950/30 border border-purple-500/40">
+                                    <div class="flex items-center justify-between mb-3">
                                         <div>
-                                            <h4 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-                                                <span>Análisis Mundo Deportivo</span>
-                                                <span class="px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 font-mono text-[9px]">Oficial</span>
-                                            </h4>
-                                            <p class="text-[10px] text-slate-400">Guía táctica externa para rellenar tu boleto</p>
+                                            <h4 class="font-black text-white text-base">Configuración de Dobles</h4>
+                                            <p class="text-xs text-purple-300">Elige el método de sellado de la peña</p>
+                                        </div>
+                                        <div id="doubles-counter" class="font-mono text-xs font-black px-3 py-1.5 rounded-lg bg-slate-950 text-amber-400 border border-purple-500/50">
+                                            0 Dobles, 0 Triples
                                         </div>
                                     </div>
-                                    
-                                    <!-- Selector de Vista: Análisis vs Clasificación 1ª vs Clasificación 2ª -->
-                                    <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px] font-bold">
-                                        <button type="button" id="md-tab-analysis" onclick="window.app.switchMDView('analysis')" class="px-2 py-1 rounded-lg bg-sky-500 text-slate-950 transition font-black">
-                                            🔍 Análisis
-                                        </button>
-                                        <button type="button" id="md-tab-standings-1" onclick="window.app.switchMDView('standings-1')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition">
-                                            🏆 1ª Div
-                                        </button>
-                                        <button type="button" id="md-tab-standings-2" onclick="window.app.switchMDView('standings-2')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition">
-                                            🥈 2ª Div
-                                        </button>
+
+                                    <select id="sel-method" class="w-full p-2.5 bg-slate-900 border border-purple-500/50 text-white rounded-xl font-bold text-xs focus:outline-none focus:border-purple-400">
+                                        <option value="directo">Apuestas Directas</option>
+                                        <option value="reducida-1">Reducida 1: 4 Triples (9 apuestas)</option>
+                                        <option value="reducida-2" selected>Reducida 2: 7 Dobles (16 apuestas)</option>
+                                        <option value="reducida-3">Reducida 3: 3 Dobles + 3 Triples (24 apuestas)</option>
+                                        <option value="reducida-4">Reducida 4: 2 Triples + 6 Dobles (64 apuestas)</option>
+                                        <option value="reducida-5">Reducida 5: 8 Triples (81 apuestas)</option>
+                                        <option value="reducida-6">Reducida 6: 11 Dobles (132 apuestas)</option>
+                                    </select>
+
+                                    <button type="button" id="btn-copy-forecast" class="w-full mt-2.5 px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/50 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5">
+                                        📋 Copiar Pronósticos de la Quiniela Base
+                                    </button>
+                                </div>
+
+                                <div id="doubles-status" class="text-center font-bold text-xs text-purple-400"></div>
+
+                                <!-- Barra superior móvil para dobles: Desplegar/Ocultar todos los análisis de MD -->
+                                <div id="md-mobile-top-bar-doubles" class="hidden lg:hidden p-2.5 rounded-xl bg-slate-900/80 border border-sky-500/30 flex items-center justify-between gap-2 shadow-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm p-1 rounded-md bg-sky-500/20 text-sky-400">💡</span>
+                                        <span class="text-xs font-bold text-slate-200">Análisis Mundo Deportivo</span>
+                                    </div>
+                                    <button type="button" id="btn-toggle-all-md-doubles" onclick="window.app.toggleAllMDInlineAnalysis()" class="px-2.5 py-1 text-[11px] font-black rounded-lg bg-sky-500/15 border border-sky-500/40 text-sky-400 hover:bg-sky-500/25 active:scale-95 transition flex items-center gap-1">
+                                        <span id="label-toggle-all-md-doubles">Ver todos</span>
+                                        <span id="arrow-toggle-all-md-doubles" class="text-[9px]">▼</span>
+                                    </button>
+                                </div>
+
+                                <!-- Barra de origen de análisis para dobles -->
+                                <div id="md-source-bar-doubles" class="hidden py-1 px-2 mb-1.5 rounded-lg bg-sky-950/40 border border-sky-500/20 flex items-center justify-between text-[11px]">
+                                    <div class="flex items-center gap-1.5 text-slate-300">
+                                        <span class="text-purple-400">✌️</span>
+                                        <span class="font-bold">Partidos y Combinación de Dobles</span>
+                                    </div>
+                                    <div class="flex items-center gap-1 text-[10px] text-sky-400 font-bold tracking-wide">
+                                        <span>Fuente análisis:</span>
+                                        <span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-extrabold uppercase">El Mundo Deportivo</span>
                                     </div>
                                 </div>
 
-                                <!-- SECCIÓN 1: VISTA DE ANÁLISIS DEL PARTIDO -->
-                                <div id="md-view-analysis-box" class="space-y-3 min-h-[350px]">
-                                    <!-- Contenido dinámico inyectado por JS -->
-                                </div>
-
-                                <!-- SECCIÓN 2: CLASIFICACIÓN DE PRIMERA DIVISIÓN -->
-                                <div id="md-view-standings-1" class="hidden space-y-2 min-h-[350px] max-h-[550px] overflow-y-auto custom-scroll pr-1">
-                                    <!-- Tabla inyectada por JS -->
-                                </div>
-
-                                <!-- SECCIÓN 3: CLASIFICACIÓN DE SEGUNDA DIVISIÓN -->
-                                <div id="md-view-standings-2" class="hidden space-y-2 min-h-[350px] max-h-[550px] overflow-y-auto custom-scroll pr-1">
-                                    <!-- Tabla inyectada por JS -->
-                                </div>
-
-                                <!-- Pie informativo del asistente -->
-                                <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-500">
-                                    <span>ℹ️ Tu pronóstico es independiente de esta guía</span>
-                                    <span class="text-sky-400 font-medium">Mundo Deportivo</span>
+                                <div id="doubles-container" class="space-y-1">
+                                    <!-- 15 Filas de dobles generadas por JS -->
                                 </div>
                             </div>
                         </div>
+
                     </div>
-                </div>
 
-                <!-- CONTENIDO PESTAÑA 2: QUINIELA DE DOBLES -->
-                <div id="editor-view-doubles" class="hidden space-y-4">
-                    <div id="doubles-section" class="flex flex-col gap-3">
-                        <div class="p-4 rounded-xl bg-purple-950/30 border border-purple-500/40">
-                            <div class="flex items-center justify-between mb-3">
-                                <div>
-                                    <h4 class="font-black text-white text-base">Configuración de Dobles</h4>
-                                    <p class="text-xs text-purple-300">Elige el método de sellado de la peña</p>
+                    <!-- COLUMNA DERECHA: ASISTENTE Y ANÁLISIS DE MUNDO DEPORTIVO -->
+                    <div id="md-analysis-sidebar" class="hidden w-full lg:col-span-5 xl:col-span-4 flex-col gap-3 sticky top-2 min-w-0">
+                        <div class="rounded-2xl bg-slate-900/90 border border-sky-500/30 p-3.5 shadow-2xl flex flex-col gap-3">
+                            
+                            <!-- Cabecera del Asistente -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800 shrink-0">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base p-1.5 rounded-lg bg-sky-500/20 text-sky-400">💡</span>
+                                    <div>
+                                        <h4 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                                            <span>Análisis Mundo Deportivo</span>
+                                            <span class="px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 font-mono text-[9px]">Oficial</span>
+                                        </h4>
+                                        <p class="text-[10px] text-slate-400">Guía táctica externa para rellenar tu boleto</p>
+                                    </div>
                                 </div>
-                                <div id="doubles-counter" class="font-mono text-xs font-black px-3 py-1.5 rounded-lg bg-slate-950 text-amber-400 border border-purple-500/50">
-                                    0 Dobles, 0 Triples
+                                
+                                <!-- Selector de Vista: Análisis vs Clasificación 1ª vs Clasificación 2ª -->
+                                <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px] font-bold">
+                                    <button type="button" id="md-tab-analysis" onclick="window.app.switchMDView('analysis')" class="px-2 py-1 rounded-lg bg-sky-500 text-slate-950 transition font-black">
+                                        🔍 Análisis
+                                    </button>
+                                    <button type="button" id="md-tab-standings-1" onclick="window.app.switchMDView('standings-1')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition">
+                                        🏆 1ª Div
+                                    </button>
+                                    <button type="button" id="md-tab-standings-2" onclick="window.app.switchMDView('standings-2')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition">
+                                        🥈 2ª Div
+                                    </button>
                                 </div>
                             </div>
 
-                            <select id="sel-method" class="w-full p-2.5 bg-slate-900 border border-purple-500/50 text-white rounded-xl font-bold text-xs focus:outline-none focus:border-purple-400">
-                                <option value="directo">Apuestas Directas</option>
-                                <option value="reducida-1">Reducida 1: 4 Triples (9 apuestas)</option>
-                                <option value="reducida-2" selected>Reducida 2: 7 Dobles (16 apuestas)</option>
-                                <option value="reducida-3">Reducida 3: 3 Dobles + 3 Triples (24 apuestas)</option>
-                                <option value="reducida-4">Reducida 4: 2 Triples + 6 Dobles (64 apuestas)</option>
-                                <option value="reducida-5">Reducida 5: 8 Triples (81 apuestas)</option>
-                                <option value="reducida-6">Reducida 6: 11 Dobles (132 apuestas)</option>
-                            </select>
-
-                            <button type="button" id="btn-copy-forecast" class="w-full mt-2.5 px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/50 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5">
-                                📋 Copiar Pronósticos de la Quiniela Base
-                            </button>
-                        </div>
-
-                        <div id="doubles-status" class="text-center font-bold text-xs text-purple-400"></div>
-
-                        <!-- Barra superior móvil para dobles: Desplegar/Ocultar todos los análisis de MD -->
-                        <div id="md-mobile-top-bar-doubles" class="hidden lg:hidden p-2.5 rounded-xl bg-slate-900/80 border border-sky-500/30 flex items-center justify-between gap-2 shadow-sm">
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm p-1 rounded-md bg-sky-500/20 text-sky-400">💡</span>
-                                <span class="text-xs font-bold text-slate-200">Análisis Mundo Deportivo</span>
+                            <!-- SECCIÓN 1: VISTA DE ANÁLISIS DEL PARTIDO -->
+                            <div id="md-view-analysis-box" class="space-y-3 min-h-[350px]">
+                                <!-- Contenido dinámico inyectado por JS -->
                             </div>
-                            <button type="button" id="btn-toggle-all-md-doubles" onclick="window.app.toggleAllMDInlineAnalysis()" class="px-2.5 py-1 text-[11px] font-black rounded-lg bg-sky-500/15 border border-sky-500/40 text-sky-400 hover:bg-sky-500/25 active:scale-95 transition flex items-center gap-1">
-                                <span id="label-toggle-all-md-doubles">Ver todos</span>
-                                <span id="arrow-toggle-all-md-doubles" class="text-[9px]">▼</span>
-                            </button>
-                        </div>
 
-                        <!-- Barra de origen de análisis para dobles -->
-                        <div id="md-source-bar-doubles" class="hidden py-1 px-2 mb-1.5 rounded-lg bg-sky-950/40 border border-sky-500/20 flex items-center justify-between text-[11px]">
-                            <div class="flex items-center gap-1.5 text-slate-300">
-                                <span class="text-purple-400">✌️</span>
-                                <span class="font-bold">Partidos y Combinación de Dobles</span>
+                            <!-- SECCIÓN 2: CLASIFICACIÓN DE PRIMERA DIVISIÓN -->
+                            <div id="md-view-standings-1" class="hidden space-y-2 min-h-[350px] max-h-[550px] overflow-y-auto custom-scroll pr-1">
+                                <!-- Tabla inyectada por JS -->
                             </div>
-                            <div class="flex items-center gap-1 text-[10px] text-sky-400 font-bold tracking-wide">
-                                <span>Fuente análisis:</span>
-                                <span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-extrabold uppercase">El Mundo Deportivo</span>
-                            </div>
-                        </div>
 
-                        <div id="doubles-container" class="space-y-1">
-                            <!-- 15 Filas de dobles generadas por JS -->
+                            <!-- SECCIÓN 3: CLASIFICACIÓN DE SEGUNDA DIVISIÓN -->
+                            <div id="md-view-standings-2" class="hidden space-y-2 min-h-[350px] max-h-[550px] overflow-y-auto custom-scroll pr-1">
+                                <!-- Tabla inyectada por JS -->
+                            </div>
+
+                            <!-- Pie informativo del asistente -->
+                            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-500">
+                                <span>ℹ️ Tu pronóstico es independiente de esta guía</span>
+                                <span class="text-sky-400 font-medium">Mundo Deportivo</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2278,6 +2288,14 @@
                 }
                 if (btnSaveBase) btnSaveBase.classList.remove('hidden');
                 if (btnSaveDoubles) btnSaveDoubles.classList.add('hidden');
+
+                if (window.app) {
+                    if (window.app.renderMDSidebar) window.app.renderMDSidebar();
+                    if (window.app.hoverMDMatch) {
+                        const matchIdx = window.app.selectedMDMatchIdx !== undefined ? window.app.selectedMDMatchIdx : 0;
+                        window.app.hoverMDMatch(matchIdx);
+                    }
+                }
             } else {
                 if (viewBase) viewBase.classList.add('hidden');
                 if (viewDoubles) viewDoubles.classList.remove('hidden');
@@ -2303,6 +2321,14 @@
                             btnSaveDoubles.classList.remove('hidden');
                             btnSaveDoubles.style.display = isLockedForEdit ? 'none' : 'block';
                         }
+                    }
+                }
+
+                if (window.app) {
+                    if (window.app.renderMDSidebar) window.app.renderMDSidebar();
+                    if (window.app.hoverMDMatch) {
+                        const matchIdx = window.app.selectedMDMatchIdx !== undefined ? window.app.selectedMDMatchIdx : 0;
+                        window.app.hoverMDMatch(matchIdx);
                     }
                 }
             }
