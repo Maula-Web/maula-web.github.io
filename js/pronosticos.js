@@ -108,12 +108,19 @@ class PronosticoManager {
                             const jornada = this.jornadas.find(j => j.id == parsedJId);
                             let targetMemberId = null;
                             if (jornada && typeof this.checkEligibility === 'function') {
+                                let firstPrizeId = null;
                                 for (const m of this.members) {
                                     const elig = this.checkEligibility(jornada.number, m.id);
-                                    if (elig && elig.eligible) {
+                                    if (elig && elig.isWinner) {
                                         targetMemberId = m.id;
                                         break;
                                     }
+                                    if (elig && elig.eligible && !firstPrizeId) {
+                                        firstPrizeId = m.id;
+                                    }
+                                }
+                                if (!targetMemberId && firstPrizeId) {
+                                    targetMemberId = firstPrizeId;
                                 }
                             }
                             if (!targetMemberId && this.members && this.members.length > 0) {
@@ -2456,7 +2463,7 @@ class PronosticoManager {
         }
 
         // 3. CALCULAR DATOS DE TODOS LOS SOCIOS PARA LA JORNADA PREVIA
-        const prizeThreshold = prevJornada.minHitsToWin || 10;
+        const prizeMap = prevJornada.prizes || prevJornada.prizeRates || {};
         const leaderboard = this.members.map(m => {
             const p = this.pronosticos.find(pred => {
                 const pJid = String(pred.jId || pred.jornadaId || '');
@@ -2465,26 +2472,41 @@ class PronosticoManager {
             });
 
             if (!p || !p.selection) {
-                return { id: String(m.id), name: m.name, points: -5, hits: 0, isLate: false, isPardoned: false };
+                return { id: String(m.id), name: m.name, points: -5, hits: 0, prize: 0, isLate: false, isPardoned: false };
             }
 
             const isLate = p.late && !p.pardoned;
             const isPardoned = p.pardoned || false;
 
             if (isLate) {
-                return { id: String(m.id), name: m.name, points: ScoringSystem.calculateScore(0, jDate), hits: 0, isLate: true, isPardoned: false };
+                return { id: String(m.id), name: m.name, points: ScoringSystem.calculateScore(0, jDate), hits: 0, prize: 0, isLate: true, isPardoned: false };
             }
 
-            const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
-            return { id: String(m.id), name: m.name, points: ev.points, hits: ev.hits, isLate: p.late || false, isPardoned: isPardoned };
+            // Usar ScoringSystem.evaluateMember si está disponible para calcular tanto puntos como premios económicos
+            let evPoints = 0;
+            let evHits = 0;
+            let evPrize = 0;
+            if (typeof ScoringSystem !== 'undefined' && typeof ScoringSystem.evaluateMember === 'function') {
+                const evMem = ScoringSystem.evaluateMember(m, prevJornada, p, { forceFinished: true });
+                evPoints = evMem.points;
+                evHits = evMem.hits;
+                evPrize = parseFloat(evMem.prize || 0);
+            } else {
+                const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
+                evPoints = ev.points;
+                evHits = ev.hits;
+                const pVal = prizeMap[ev.hits] || prizeMap[String(ev.hits)] || 0;
+                evPrize = parseFloat(pVal) || 0;
+            }
+
+            return { id: String(m.id), name: m.name, points: evPoints, hits: evHits, prize: evPrize, isLate: p.late || false, isPardoned: isPardoned };
         });
 
-        // 4. FILTRAR CANDIDATOS ELEGIBLES: excluir tarde sin premio ni perdón
+        // 4. FILTRAR CANDIDATOS ELEGIBLES PARA GANADOR: excluir tarde sin perdón
         const eligibleForWinner = leaderboard.filter(l => {
-            // Can compete if: not late, OR late but pardoned, OR late but got prize
             if (!l.isLate) return true;
             if (l.isPardoned) return true;
-            if (l.hits >= prizeThreshold) return true;
+            if (l.prize > 0) return true;
             return false;
         });
 
@@ -2512,20 +2534,67 @@ class PronosticoManager {
             console.log(`🏆 GANADOR ÚNICO J${prevJornada.number}: ${winnerCandidates[0].name} (${winnerCandidates[0].points} pts)`);
         }
 
-        // 8. Verificación para el socio actual: GANADOR ABSOLUTO o 10+ ACIERTOS
+        // 8. Verificación para el socio actual:
+        // Criterio 1: GANADOR ABSOLUTO de la jornada anterior.
+        // Criterio 2: PREMIO ECONÓMICO (en su columna individual O en la columna de dobles).
         const myStats = leaderboard.find(l => String(l.id) === String(memberId));
         const isAbsoluteWinner = absoluteWinnerId && String(memberId) === String(absoluteWinnerId);
-        const hasPrizeHits = myStats && myStats.hits >= prizeThreshold;
 
-        const isEligible = isAbsoluteWinner || hasPrizeHits;
+        // A) Premio económico en columna individual del socio
+        const hasIndividualMoneyPrize = myStats && myStats.prize > 0;
+
+        // B) Premio económico en la columna de dobles si este socio fue quien la rellenó en la jornada previa
+        let hasDoublesMoneyPrize = false;
+        const prevDoubles = (this.pronosticosExtra || []).find(pe => {
+            const pj = String(pe.jId !== undefined && pe.jId !== null ? pe.jId : pe.jornadaId);
+            return pj === String(prevJornada.id) || pj === String(prevJornada.number);
+        });
+
+        if (prevDoubles) {
+            const doublesAuthorId = String(prevDoubles.mId !== undefined && prevDoubles.mId !== null ? prevDoubles.mId : prevDoubles.memberId);
+            if (doublesAuthorId === String(memberId)) {
+                // Evaluar si la quiniela de dobles obtuvo premio económico
+                const dsel = prevDoubles.selection || prevDoubles.forecast || [];
+                if (Array.isArray(dsel) && dsel.some(s => s && String(s).trim() !== '' && String(s) !== '-')) {
+                    const isReduced = prevDoubles.isReduced !== false;
+                    try {
+                        const evD = ScoringSystem.evaluateForecast(dsel, officialResults, jDate, { isReduced });
+                        let dPrize = 0;
+                        if (evD && evD.breakdown) {
+                            Object.keys(evD.breakdown).forEach(h => {
+                                const cnt = evD.breakdown[h];
+                                let pV = prizeMap[h] || prizeMap[String(h)] || 0;
+                                if (typeof pV === 'string') pV = parseFloat(pV.replace(',', '.').replace('€', '').trim());
+                                if (cnt > 0 && pV > 0) dPrize += cnt * parseFloat(pV);
+                            });
+                        } else if (evD) {
+                            const cat = evD.officialHits !== undefined ? evD.officialHits : evD.hits;
+                            let pV = prizeMap[cat] || prizeMap[String(cat)] || 0;
+                            if (typeof pV === 'string') pV = parseFloat(pV.replace(',', '.').replace('€', '').trim());
+                            if (pV > 0) dPrize += parseFloat(pV);
+                        }
+                        if (dPrize > 0) {
+                            hasDoublesMoneyPrize = true;
+                        }
+                    } catch (e) {
+                        console.warn("Error evaluando premio económico de dobles previa:", e);
+                    }
+                }
+            }
+        }
+
+        const hasEconomicPrize = hasIndividualMoneyPrize || hasDoublesMoneyPrize;
+        const isEligible = isAbsoluteWinner || hasEconomicPrize;
 
         if (isEligible) {
-            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name} (${isAbsoluteWinner ? 'Ganador' : '10+ Aciertos'})`);
+            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name} (${isAbsoluteWinner ? 'Ganador' : (hasIndividualMoneyPrize ? 'Premio Individual' : 'Premio Dobles')})`);
         }
 
         return {
             eligible: isEligible,
-            reason: isEligible ? (isAbsoluteWinner ? 'winner' : 'hits') : 'not_winner'
+            isWinner: isAbsoluteWinner,
+            hasPrize: hasEconomicPrize,
+            reason: isEligible ? (isAbsoluteWinner ? 'winner' : 'prize') : 'not_winner'
         };
     }
 

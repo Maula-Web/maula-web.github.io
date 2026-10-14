@@ -2047,14 +2047,19 @@
             if (!j) return null;
             
             if (typeof window.app.checkEligibility === 'function') {
+                let firstPrizeMember = null;
                 for (const m of window.app.members) {
                     const elig = window.app.checkEligibility(j.number, m.id, true);
-                    if (elig && elig.eligible) {
-                        return m;
+                    if (elig && elig.isWinner) {
+                        return m; // El ganador de la jornada previa tiene máxima prioridad
+                    }
+                    if (elig && elig.eligible && !firstPrizeMember) {
+                        firstPrizeMember = m; // Socio con premio económico
                     }
                 }
+                if (firstPrizeMember) return firstPrizeMember;
             }
-            return window.app.members[0];
+            return null;
         };
 
         // 3. GESTIÓN DE LA VENTANA MODAL DEL EDITOR
