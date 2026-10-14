@@ -3200,6 +3200,7 @@ class PronosticoManager {
         if (!name1 || !name2) return false;
         const clean = s => s.toLowerCase()
             .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/\(f\)/gi, '') // Ignorar marca femenino (f) en la comparación
             .replace(/[^a-z0-9]/g, '');
         const c1 = clean(name1);
         const c2 = clean(name2);
@@ -3211,7 +3212,7 @@ class PronosticoManager {
             ['atletico', 'atmadrid', 'atm'],
             ['realmadrid', 'rmadrid', 'madrid'],
             ['barcelona', 'barca', 'fcb'],
-            ['athletic', 'athbilbao', 'bilbao'],
+            ['athletic', 'athclub', 'athbilbao', 'bilbao'],
             ['realsociedad', 'rsociedad', 'laerealsociedad'],
             ['rayovallecano', 'rayo'],
             ['celta', 'celtadevigo'],
@@ -3279,6 +3280,19 @@ class PronosticoManager {
         if (!this.currentJornadaHasMDAnalysis || !this.mdAnalysisData || !Array.isArray(this.mdAnalysisData.matches)) return null;
 
         if (match && match.home && match.away) {
+            // 1. Prioridad: si el partido de MD con el mismo número de orden (idx + 1) coincide con ambos equipos
+            if (typeof idx === 'number') {
+                const targetNum = idx + 1;
+                const mdByNum = this.mdAnalysisData.matches.find(m => m.num === targetNum);
+                if (mdByNum && (
+                    (this.areTeamsSimilar(match.home, mdByNum.home) && this.areTeamsSimilar(match.away, mdByNum.away)) ||
+                    (this.areTeamsSimilar(match.home, mdByNum.away) && this.areTeamsSimilar(match.away, mdByNum.home))
+                )) {
+                    return mdByNum;
+                }
+            }
+
+            // 2. Búsqueda por equipos similares en cualquier posición
             const found = this.mdAnalysisData.matches.find(mdM =>
                 (this.areTeamsSimilar(match.home, mdM.home) && this.areTeamsSimilar(match.away, mdM.away)) ||
                 (this.areTeamsSimilar(match.home, mdM.away) && this.areTeamsSimilar(match.away, mdM.home))

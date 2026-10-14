@@ -15,24 +15,57 @@ const DATA_DIR = path.join(__dirname, '../datos_auxiliares');
 const OUTPUT_FILE = path.join(DATA_DIR, 'analisis_mundodeportivo.json');
 
 // Normalizar nombres de equipos para comparación
-function normalizeTeamName(name) {
-    if (!name) return '';
-    return name
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Quitar tildes
-        .replace(/r\.\s*|c\.\s*|u\.\s*|d\.\s*|at\.\s*|ath\.\s*/g, '')
-        .replace(/\b(cf|cd|ud|sd|fc|de|club|real|atletico|athletic|racing|deportivo|balompie)\b/g, '')
-        .replace(/[^a-z0-9]/g, '')
-        .trim();
-}
+const cleanTeamStr = s => (s || '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\(f\)/gi, '') // Ignorar marca femenino (f) en la comparación
+    .replace(/[^a-z0-9]/g, '');
+
+const TEAM_ALIASES = [
+    ['atletico', 'atmadrid', 'atm'],
+    ['realmadrid', 'rmadrid', 'madrid'],
+    ['barcelona', 'barca', 'fcb'],
+    ['athletic', 'athclub', 'athbilbao', 'bilbao'],
+    ['realsociedad', 'rsociedad', 'laerealsociedad'],
+    ['rayovallecano', 'rayo'],
+    ['celta', 'celtadevigo'],
+    ['espanyol', 'rcdespanyol'],
+    ['valladolid', 'realvalladolid'],
+    ['zaragoza', 'realzaragoza'],
+    ['racing', 'racingsantander'],
+    ['sporting', 'sportinggijon'],
+    ['deportivo', 'depor', 'deportivolacoruna'],
+    ['castellon', 'cdcastellon'],
+    ['albacete', 'albacitebp'],
+    ['cadiz', 'cadizcf'],
+    ['cordoba', 'cordobacf'],
+    ['granada', 'granadacf'],
+    ['almeria', 'udalmeria'],
+    ['huesca', 'sdhuesca'],
+    ['burgos', 'burgoscf'],
+    ['eibar', 'sdeibar'],
+    ['mirandes', 'cdmirandes'],
+    ['ferrol', 'racingferrol'],
+    ['levante', 'udlevante'],
+    ['elche', 'elchecf'],
+    ['malaga', 'malagacf'],
+    ['eldense', 'cdeldense'],
+    ['cartagena', 'fccartagena'],
+    ['tenerife', 'cdtenerife']
+];
 
 // Similitud de cadenas
 function areTeamsSimilar(teamA, teamB) {
-    const a = normalizeTeamName(teamA);
-    const b = normalizeTeamName(teamB);
+    if (!teamA || !teamB) return false;
+    const a = cleanTeamStr(teamA);
+    const b = cleanTeamStr(teamB);
     if (!a || !b) return false;
     if (a === b) return true;
     if (a.includes(b) || b.includes(a)) return true;
+    for (const group of TEAM_ALIASES) {
+        const m1 = group.some(alias => a.includes(alias));
+        const m2 = group.some(alias => b.includes(alias));
+        if (m1 && m2) return true;
+    }
     return false;
 }
 

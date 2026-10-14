@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-14T14:22:34.242Z",
+  "updatedAt": "2026-10-14T14:48:44.614Z",
   "available": true,
-  "matchCountWithTarget": 12,
+  "matchCountWithTarget": 15,
   "isMidweek": false,
   "detectedJornadaNum": "14",
   "closingSchedule": "Sábado 17 (13:00)",
@@ -231,8 +231,8 @@
         "lae": null,
         "real": {
           "1": 35,
-          "2": 33,
-          "X": 32
+          "2": 34,
+          "X": 31
         }
       },
       "recommended": "1X"
