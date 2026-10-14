@@ -777,24 +777,51 @@ class SociosAppController {
             return pMid === mStr && p.isDice === true;
         });
 
-        // Para cada pronóstico de dado, buscar la jornada asociada
+        // Para cada pronóstico de dado, buscar la jornada asociada y verificar si YA SE HA JUGADO
         const playedDiceJornadas = [];
+        const pendingDiceJornadas = [];
+
         diceForecasts.forEach(p => {
             const pJid = String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId || '');
             const j = (this.jornadas || []).find(item => String(item.id) === pJid);
             const jNum = j && j.number !== undefined ? Number(j.number) : null;
-            playedDiceJornadas.push({ jNum, jornada: j });
+
+            // Comprobar si la jornada ya ha entrado en juego / disputado
+            const hasStarted = j && Array.isArray(j.matches) && j.matches.some(match => {
+                if (!match || !match.result) return false;
+                const r = String(match.result).trim();
+                return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+            });
+
+            if (hasStarted) {
+                // Jornada realmente jugada -> ROJO
+                playedDiceJornadas.push({ jNum, jornada: j });
+            } else {
+                // Pronóstico registrado pero jornada aún sin jugar -> AMARILLO
+                pendingDiceJornadas.push({ jNum, jornada: j });
+            }
         });
 
-        // Ordenar jornadas jugadas por número
+        // Ordenar jornadas por número
         playedDiceJornadas.sort((a, b) => (a.jNum || 0) - (b.jNum || 0));
+        pendingDiceJornadas.sort((a, b) => (a.jNum || 0) - (b.jNum || 0));
 
-        // Añadir a segmentos los jugados en ROJO (máximo 3)
+        // Añadir a segmentos los ya jugados en ROJO (máximo 3)
         playedDiceJornadas.slice(0, 3).forEach(item => {
             segments.push({
                 status: 'red',
                 jNum: item.jNum
             });
+        });
+
+        // Añadir a segmentos los que tienen pronóstico de dado pero aún no se han jugado en AMARILLO (hasta 3)
+        pendingDiceJornadas.forEach(item => {
+            if (segments.length < 3) {
+                segments.push({
+                    status: 'yellow',
+                    jNum: item.jNum
+                });
+            }
         });
 
         // 2. Si aún quedan huecos (hasta 3) y el dado está configurado (diceEnabled + fechas):
@@ -924,6 +951,13 @@ class SociosAppController {
                 `;
             }).join('');
 
+            const redCount = diceSegments.filter(s => s.status === 'red').length;
+            const yellowCount = diceSegments.filter(s => s.status === 'yellow').length;
+            let summaryCounterText = `${redCount} de 3 jornadas consumidas`;
+            if (yellowCount > 0) {
+                summaryCounterText += ` (${yellowCount} prog.)`;
+            }
+
             // Badge de estado del dado
             let diceBadge = '';
             if (isExhausted) {
@@ -1033,7 +1067,7 @@ class SociosAppController {
                                 ${segmentsHtml}
                             </div>
                             <div class="text-[10px] text-slate-500 text-right">
-                                ${diceUses} de 3 jornadas consumidas
+                                ${summaryCounterText}
                             </div>
                         </div>
                     </div>
