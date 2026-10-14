@@ -2292,6 +2292,51 @@
                 })();
                 const responsibleMember = window.getEligibleDoublesMember(nextJornada);
 
+                // Mapas de Búsqueda Rápida O(1)
+                const pronosticosMap = new Map();
+                const jornadasConPronostico = new Set();
+                if (this.pronosticos && Array.isArray(this.pronosticos)) {
+                    this.pronosticos.forEach(p => {
+                        if (!p) return;
+                        const jIds = [];
+                        if (p.jId !== undefined && p.jId !== null) jIds.push(String(p.jId));
+                        if (p.jornadaId !== undefined && p.jornadaId !== null) jIds.push(String(p.jornadaId));
+                        const mIds = [];
+                        if (p.mId !== undefined && p.mId !== null) mIds.push(String(p.mId));
+                        if (p.memberId !== undefined && p.memberId !== null) mIds.push(String(p.memberId));
+
+                        jIds.forEach(j => {
+                            jornadasConPronostico.add(j);
+                            mIds.forEach(m => {
+                                pronosticosMap.set(`${j}_${m}`, p);
+                            });
+                        });
+                    });
+                }
+
+                // Cálculo de Puntos Totales por Socio en la Temporada (sin bonificaciones ni penalizaciones en el display)
+                const memberTotalPts = {};
+                sortedMembers.forEach(m => { memberTotalPts[String(m.id)] = 0; });
+                if (typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateMember && this.jornadas) {
+                    this.jornadas.forEach(j => {
+                        const filledMatches = j.matches ? j.matches.filter(m => m.result && m.result.trim() !== '' && m.result.trim() !== '-').length : 0;
+                        const isFin = j.active === false || filledMatches === 15;
+                        if (filledMatches > 0 || isFin) {
+                            sortedMembers.forEach(m => {
+                                const p = pronosticosMap.get(`${String(j.id)}_${String(m.id)}`);
+                                if (p) {
+                                    try {
+                                        const ev = ScoringSystem.evaluateMember(m, j, p);
+                                        if (ev && ev.played && ev.hits >= 0) {
+                                            memberTotalPts[String(m.id)] += (ev.points || 0);
+                                        }
+                                    } catch (err) {}
+                                }
+                            });
+                        }
+                    });
+                }
+
                 sortedMembers.forEach((m) => {
                     const th = document.createElement('th');
                     th.className = 'summary-header-cell';
@@ -2318,10 +2363,16 @@
                         </span>
                     ` : '';
 
+                    const totalPts = memberTotalPts[String(m.id)] || 0;
+                    const pointsBadge = `
+                        <span class="forecast-badge-hits mt-0.5" title="Total temporada: ${totalPts} puntos">${totalPts}</span>
+                    `;
+
                     th.innerHTML = `
                         <div class="flex flex-col items-center justify-center gap-0.5 cursor-pointer group py-1" onclick="window.openEditorModal(${m.id}, false, '${targetJornadaForHeader ? targetJornadaForHeader.id : ''}')">
                             <span class="led-status-indicator led-${led.status}" title="${jNumText}${led.title}"></span>
                             <span class="text-[11px] font-bold ${isDoublesMember ? 'text-purple-500 dark:text-purple-300 font-black' : 'text-slate-700 dark:text-slate-300'} group-hover:text-amber-400 transition-colors" title="${AppUtils.getMemberName(m)}${isDoublesMember ? ' (Responsable Quiniela de Dobles)' : ''}">${shortName}</span>
+                            ${pointsBadge}
                             ${doublesBadge}
                         </div>
                     `;
@@ -2341,28 +2392,6 @@
                 headerRow.appendChild(thDoubles);
 
                 thead.appendChild(headerRow);
-
-                // Mapas de Búsqueda Rápida O(1)
-                const pronosticosMap = new Map();
-                const jornadasConPronostico = new Set();
-                if (this.pronosticos && Array.isArray(this.pronosticos)) {
-                    this.pronosticos.forEach(p => {
-                        if (!p) return;
-                        const jIds = [];
-                        if (p.jId !== undefined && p.jId !== null) jIds.push(String(p.jId));
-                        if (p.jornadaId !== undefined && p.jornadaId !== null) jIds.push(String(p.jornadaId));
-                        const mIds = [];
-                        if (p.mId !== undefined && p.mId !== null) mIds.push(String(p.mId));
-                        if (p.memberId !== undefined && p.memberId !== null) mIds.push(String(p.memberId));
-
-                        jIds.forEach(j => {
-                            jornadasConPronostico.add(j);
-                            mIds.forEach(m => {
-                                pronosticosMap.set(`${j}_${m}`, p);
-                            });
-                        });
-                    });
-                }
 
                 const pronosticosExtraMap = new Map();
                 const jornadasConDobles = new Set();
