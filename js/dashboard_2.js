@@ -1391,8 +1391,14 @@ class Dashboard2AppController {
             })
             .sort((a, b) => a.number - b.number)
             .find(j => {
-                const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
-                return filled < 15;
+                if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return true;
+                const filledResults = j.matches.filter(m => {
+                    if (!m || !m.result) return false;
+                    const r = String(m.result).trim();
+                    return r !== '' && r !== '-' && r.toLowerCase() !== 'por definir';
+                }).length;
+                // Si todos los 15 partidos tienen resultado definitivo, es una jornada pasada ya finalizada
+                return filledResults < 15;
             });
     }
 
