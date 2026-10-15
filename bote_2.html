@@ -1189,8 +1189,8 @@
                 </p>
             </div>
 
-            <!-- Barra de Control: Selector Visual vs Financiero -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs">
+            <!-- Barra de Control: Selector Visual vs Financiero y Leyenda -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs">
                 <div class="flex items-center gap-3 flex-wrap">
                     <span class="text-slate-400 font-semibold">Visualización:</span>
                     <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-700/80 gap-1">
@@ -1201,6 +1201,24 @@
                             <span>💶</span> Importes (€)
                         </button>
                     </div>
+                </div>
+
+                <!-- Leyenda de colores -->
+                <div class="flex items-center gap-2.5 sm:gap-3.5 flex-wrap text-[11px] text-slate-400 pt-1 lg:pt-0 border-t lg:border-t-0 border-slate-800/60">
+                    <span class="flex items-center gap-1 font-semibold text-emerald-400">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></span> Bonificación (10+ ac)
+                    </span>
+                    <span class="flex items-center gap-1 font-semibold text-emerald-300">
+                        <span class="inline-flex rounded border border-emerald-500/70 overflow-hidden font-mono text-[10px] leading-none">
+                            <span class="bg-emerald-500/30 px-1 py-0.5 text-emerald-300 font-bold">10</span>
+                            <span class="bg-rose-950 px-1 py-0.5 text-rose-300 font-black border-l border-rose-500/60">⚠️</span>
+                        </span> Bonificación + Penalización
+                    </span>
+                    <span class="flex items-center gap-1 font-semibold text-rose-400">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Penalización
+                    </span>
+                    <span class="flex items-center gap-1 font-semibold text-slate-300">👑 Ganador</span>
+                    <span class="flex items-center gap-1 font-semibold text-slate-300">💀 Maula</span>
                 </div>
             </div>
 

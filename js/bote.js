@@ -1692,10 +1692,17 @@ class BoteManager {
                 if (mov) {
                     const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0);
                     const payment = mov.aportacion + penalties;
+                    const hasBonus = typeof mov.aciertos === 'number' && mov.aciertos >= 10;
 
                     const isLoser = mov.isLoser || (mov.penalizacionMaula > 0) || this.wasLoserOfJornada(member.id, j);
                     cellContent = `<div style="font-size:1.1rem; font-weight:900; color: inherit;">${payment.toFixed(1)}€</div>`;
-                    cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${isLoser ? ' 💀' : ''}</div>`;
+
+                    if (hasBonus) {
+                        const penaltyAlert = penalties > 0 ? '<span title="Penalización adicional" style="color:#f87171; font-weight:900; margin-left:3px;">⚠️</span>' : '';
+                        cellContent += `<div style="font-size:0.75rem; font-weight:bold; margin-top:2px;"><span style="background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid #10b981; border-radius: 4px; padding: 1px 5px; display: inline-flex; align-items: center;" title="Bonificación por altos aciertos (${mov.aciertos} ac.)">${mov.aciertos} ac.${isLoser ? ' 💀' : ''}${penaltyAlert}</span></div>`;
+                    } else {
+                        cellContent += `<div style="font-size:0.75rem; opacity: 0.8; font-weight:bold;">${mov.aciertos} ac.${isLoser ? ' 💀' : ''}</div>`;
+                    }
                     if (mov.premios > 0) {
                         cellContent += `<div style="background: rgba(76, 175, 80, 0.2); color: #81c784; font-weight: bold; font-size: 0.75rem; margin-top:4px; padding: 2px 4px; border-radius: 4px; border: 1px solid #4CAF50;">+${mov.premios.toFixed(2).replace('.', ',')}€ 🏆</div>`;
                     }
@@ -1707,11 +1714,14 @@ class BoteManager {
                     if (penalties > 0) {
                         style = `background: var(--cuadrante-penalty-bg, #422a00); color: var(--cuadrante-penalty-text, #ffcc80); border-left: 3px solid var(--cuadrante-penalty-border, #ff9100); cursor: pointer;`;
                         const tooltip = [];
+                        if (hasBonus) tooltip.push(`✨ Bonificación por Altos Aciertos (${mov.aciertos} ac.)`);
                         if (mov.penalizacionUnos > 0) tooltip.push(`• Exceso de Unos: ${mov.penalizacionUnos.toFixed(2).replace('.', ',')}€`);
                         if (mov.penalizacionBajosAciertos > 0) tooltip.push(`• Bajos Aciertos: ${mov.penalizacionBajosAciertos.toFixed(2).replace('.', ',')}€`);
                         if (mov.penalizacionPIG > 0) tooltip.push(`• Fallo en PIG 🐷: ${mov.penalizacionPIG.toFixed(2).replace('.', ',')}€`);
                         if (mov.penalizacionMaula > 0) tooltip.push(`• Pen. Sellador: ${mov.penalizacionMaula.toFixed(2).replace('.', ',')}€`);
                         clickHandler = `onclick="window.Bote.showPenaltyDetail('${member.name}', ${j.number}, '${tooltip.join('<br>')}')"`;
+                    } else if (hasBonus) {
+                        style = `background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border-left: 3px solid #10b981;`;
                     }
 
                     if (this.wasWinnerOfJornada(member.id, j)) {

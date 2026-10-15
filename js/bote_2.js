@@ -1658,29 +1658,70 @@ class BoteAppController {
                 const isWin = (mov && mov.isWinner) || (j.winnerId && String(m.id) === String(j.winnerId));
                 const isLoss = (mov && mov.isLoser) || (j.loserId && String(m.id) === String(j.loserId));
                 const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0);
+                const hasBonus = typeof mov.aciertos === 'number' && mov.aciertos >= 10;
 
                 let cellClass = 'border-r border-slate-800/50 cursor-pointer p-1.5 sm:p-2 transition-all hover:brightness-125';
                 let cellContent = '';
 
                 if (this.matrizMode === 'visual') {
                     // Modo Visual: Iconos, aciertos y chips de estado
-                    let bgBadge = 'bg-slate-800/80 text-slate-300 border border-slate-700/60';
-                    if (isWin) bgBadge = 'bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 shadow-sm';
-                    else if (isLoss) bgBadge = 'bg-rose-500/25 text-rose-300 font-extrabold border border-rose-500/50 shadow-sm';
-                    else if (penalties > 0) bgBadge = 'bg-rose-950/70 text-rose-300 border border-rose-500/50 font-bold shadow-sm';
-
-                    cellContent = `
-                        <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg ${bgBadge} text-sm sm:text-base font-bold font-mono">
-                            ${mov.aciertos !== undefined ? mov.aciertos : '-'}
-                            ${isWin ? '👑' : ''}${isLoss ? '💀' : ''}
-                        </div>
-                    `;
+                    if (hasBonus) {
+                        if (penalties > 0) {
+                            // Bonificación por altos aciertos (verde) con penalización adicional (pestaña roja con ⚠️)
+                            cellContent = `
+                                <div class="inline-flex items-center rounded-lg border border-emerald-500/70 overflow-hidden font-mono shadow-sm text-sm sm:text-base group/chip" title="Bonificación por ${mov.aciertos} aciertos + Penalización (+${penalties.toFixed(2).replace('.', ',')} €)">
+                                    <span class="bg-emerald-500/25 text-emerald-300 font-extrabold px-2 py-0.5 flex items-center gap-0.5">
+                                        ${mov.aciertos}${isWin ? '👑' : ''}
+                                    </span>
+                                    <span class="bg-rose-950 text-rose-300 font-black px-1.5 py-0.5 border-l border-rose-500/60 text-xs flex items-center gap-0.5" title="Penalización adicional: +${penalties.toFixed(2).replace('.', ',')} €">
+                                        ⚠️
+                                    </span>
+                                </div>
+                            `;
+                        } else {
+                            // Bonificación por altos aciertos limpia (verde)
+                            const bgBadge = isWin
+                                ? 'bg-emerald-500/30 text-emerald-300 font-extrabold border border-emerald-400 shadow-sm shadow-emerald-950/50'
+                                : 'bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/50 shadow-sm';
+                            cellContent = `
+                                <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg ${bgBadge} text-sm sm:text-base font-bold font-mono" title="Bonificación por altos aciertos (${mov.aciertos} ac.)">
+                                    ${mov.aciertos}${isWin ? '👑' : ''}
+                                </div>
+                            `;
+                        }
+                    } else if (isWin) {
+                        cellContent = `
+                            <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 shadow-sm text-sm sm:text-base font-bold font-mono">
+                                ${mov.aciertos !== undefined ? mov.aciertos : '-'}👑
+                            </div>
+                        `;
+                    } else if (isLoss) {
+                        cellContent = `
+                            <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg bg-rose-500/25 text-rose-300 font-extrabold border border-rose-500/50 shadow-sm text-sm sm:text-base font-bold font-mono">
+                                ${mov.aciertos !== undefined ? mov.aciertos : '-'}💀
+                            </div>
+                        `;
+                    } else if (penalties > 0) {
+                        cellContent = `
+                            <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg bg-rose-950/70 text-rose-300 border border-rose-500/50 font-bold shadow-sm text-sm sm:text-base font-mono" title="Penalización: +${penalties.toFixed(2).replace('.', ',')} €">
+                                ${mov.aciertos !== undefined ? mov.aciertos : '-'}
+                            </div>
+                        `;
+                    } else {
+                        cellContent = `
+                            <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg bg-slate-800/80 text-slate-300 border border-slate-700/60 text-sm sm:text-base font-bold font-mono">
+                                ${mov.aciertos !== undefined ? mov.aciertos : '-'}
+                            </div>
+                        `;
+                    }
                 } else {
                     // Modo Financiero: Neto en euros de la jornada
                     const isPos = mov.neto >= 0;
+                    const bonusBadge = hasBonus ? `<span class="text-[10px] text-emerald-400 font-bold" title="Bonificación altos aciertos (${mov.aciertos} ac)">✨</span>` : '';
+                    const penaltyBadge = (hasBonus && penalties > 0) ? `<span class="text-[10px] text-rose-400 font-bold" title="Con penalización (+${penalties.toFixed(2).replace('.', ',')}€)">⚠️</span>` : '';
                     cellContent = `
-                        <span class="font-mono font-extrabold ${isPos ? 'text-emerald-400' : 'text-rose-400'} text-xs sm:text-sm">
-                            ${isPos ? '+' : ''}${mov.neto.toFixed(2).replace('.', ',')}€
+                        <span class="font-mono font-extrabold ${isPos ? 'text-emerald-400' : 'text-rose-400'} text-xs sm:text-sm inline-flex items-center gap-0.5">
+                            ${isPos ? '+' : ''}${mov.neto.toFixed(2).replace('.', ',')}€${bonusBadge}${penaltyBadge}
                         </span>
                     `;
                 }
@@ -1732,11 +1773,45 @@ class BoteAppController {
         title.textContent = `${member.name} - Jornada ${jornadaNum}`;
 
         const selladoText = mov.sellado < 0 ? `+${Math.abs(mov.sellado).toFixed(2).replace('.', ',')} € (${mov.isSelladoInCash ? 'Bizum' : 'Bote'})` : '-';
+        const hasBonus = typeof mov.aciertos === 'number' && mov.aciertos >= 10;
+        const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0);
+
+        let penaltyDetails = [];
+        if (mov.penalizacionUnos > 0) penaltyDetails.push(`Exceso de Unos (+${mov.penalizacionUnos.toFixed(2).replace('.', ',')} €)`);
+        if (mov.penalizacionPIG > 0) penaltyDetails.push(`Fallo en PIG 🐷 (+${mov.penalizacionPIG.toFixed(2).replace('.', ',')} €)`);
+        if (mov.penalizacionBajosAciertos > 0) penaltyDetails.push(`Bajos Aciertos (+${mov.penalizacionBajosAciertos.toFixed(2).replace('.', ',')} €)`);
+        if (mov.penalizacionMaula > 0) penaltyDetails.push(`Penalización Maula (+${mov.penalizacionMaula.toFixed(2).replace('.', ',')} €)`);
+
+        let bonusBanner = '';
+        if (hasBonus) {
+            if (penalties > 0) {
+                bonusBanner = `
+                    <div class="mb-2.5 p-2 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-xs flex flex-col gap-1 shadow-sm">
+                        <div class="flex items-center justify-between text-emerald-300 font-bold">
+                            <span>✨ Bonificación por Altos Aciertos</span>
+                            <span class="bg-emerald-500/20 px-1.5 py-0.5 rounded text-[11px] font-mono font-extrabold">${mov.aciertos} aciertos</span>
+                        </div>
+                        <div class="flex items-center justify-between text-rose-300 text-[11px] font-semibold pt-1 border-t border-emerald-500/20">
+                            <span class="flex items-center gap-1">⚠️ Penalización aplicada:</span>
+                            <span class="font-bold font-mono">+${penalties.toFixed(2).replace('.', ',')} €</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                bonusBanner = `
+                    <div class="mb-2.5 p-2 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-xs flex items-center justify-between text-emerald-300 font-bold shadow-sm">
+                        <span>✨ Bonificación por Altos Aciertos</span>
+                        <span class="bg-emerald-500/20 px-1.5 py-0.5 rounded text-[11px] font-mono font-extrabold">${mov.aciertos} aciertos</span>
+                    </div>
+                `;
+            }
+        }
 
         body.innerHTML = `
+            ${bonusBanner}
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Aciertos:</span>
-                <strong class="text-white">${mov.aciertos !== undefined ? mov.aciertos : '-'}${isWin ? ' <span class="text-emerald-400 font-bold text-xs ml-1">👑 (Ganador)</span>' : ''}${isLoss ? ' <span class="text-rose-400 font-bold text-xs ml-1">💀 (Maula)</span>' : ''}</strong>
+                <strong class="text-white">${mov.aciertos !== undefined ? mov.aciertos : '-'}${hasBonus ? ' <span class="text-emerald-400 font-bold text-xs ml-1">✨ (10+ ac.)</span>' : ''}${isWin ? ' <span class="text-emerald-400 font-bold text-xs ml-1">👑 (Ganador)</span>' : ''}${isLoss ? ' <span class="text-rose-400 font-bold text-xs ml-1">💀 (Maula)</span>' : ''}</strong>
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Cuota Base:</span>
@@ -1744,7 +1819,10 @@ class BoteAppController {
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Penalizaciones:</span>
-                <strong class="text-rose-400">+${((mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0)).toFixed(2).replace('.', ',')} €</strong>
+                <div class="text-right">
+                    <strong class="${penalties > 0 ? 'text-rose-400' : 'text-slate-400'} font-mono">${penalties > 0 ? '+' + penalties.toFixed(2).replace('.', ',') + ' €' : '-'}</strong>
+                    ${penaltyDetails.length > 0 ? `<div class="text-[10px] text-rose-300/80 font-normal mt-0.5 leading-tight">${penaltyDetails.join('<br>')}</div>` : ''}
+                </div>
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Premios:</span>
