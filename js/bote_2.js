@@ -430,7 +430,12 @@ class BoteAppController {
         const totalGastoSellado = jornadaSummaries.reduce((acc, j) => acc + (j.gastoSellado || 0), 0);
         const totalGastos = totalGastoSellado > 0 ? totalGastoSellado : 157.50;
         const totalPremios = memberSummaries.reduce((sum, m) => sum + m.breakdown.premios, 0);
-        const cajaRealOficial = (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA[season] && window.BOTE_FALLBACK_DATA[season].summary && window.BOTE_FALLBACK_DATA[season].summary.cajaReal) || 829.48;
+        let cajaRealOficial = (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA[season] && window.BOTE_FALLBACK_DATA[season].summary && window.BOTE_FALLBACK_DATA[season].summary.cajaReal) || 829.48;
+        if (season === '2026-2027') {
+            const subsequentJornadas = jornadaSummaries.filter(j => (parseInt(j.number, 10) || 0) > 8);
+            const netSubsequent = subsequentJornadas.reduce((acc, j) => acc + ((j.recaudacion || 0) - (j.gastoSellado || 0)), 0);
+            cajaRealOficial = 829.48 + netSubsequent;
+        }
 
         const seasonModel = {
             season,

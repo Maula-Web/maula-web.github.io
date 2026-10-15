@@ -420,6 +420,11 @@ class BoteEngine {
             }
         }
 
+        const matchesExtra = pronosticosExtra ? pronosticosExtra.filter(p =>
+            (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number) || parseInt(p.jId || p.jornadaId) === jornada.number) &&
+            p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
+        ) : [];
+
         if (jornada.number === 1) {
             const member = members.find(m => String(m.id) === String(memberId));
             if (member && member.name) {
@@ -431,11 +436,6 @@ class BoteEngine {
         } else if (jornadaIndex > 0) {
             const prevJornada = jornadas[jornadaIndex - 1];
             const prevWinnerId = this.getWinnerOfJornada(prevJornada, members, jornadas, pronosticos);
-
-            const matchesExtra = pronosticosExtra ? pronosticosExtra.filter(p =>
-                (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number) || parseInt(p.jId || p.jornadaId) === jornada.number) &&
-                p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
-            ) : [];
 
             const isPrevWinner = prevWinnerId && String(memberId) === String(prevWinnerId);
             const hadPrize = this.getPrizesForMemberJornada(memberId, prevJornada, pronosticos) > 0;
