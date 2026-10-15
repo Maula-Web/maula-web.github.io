@@ -1627,7 +1627,7 @@ class Dashboard2AppController {
                     if (!p) return false;
                     const pj = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId !== undefined ? p.jornadaId : ''));
                     const hasSigns = Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                    return (pj === targetJId || (targetJNum !== null && pj === String(targetJNum))) && hasSigns;
+                    return (pj === targetJId || (pj === String(targetJNum) && targetJId === String(targetJNum))) && hasSigns;
                 });
             }
 
@@ -1641,7 +1641,7 @@ class Dashboard2AppController {
                         if (!p) return false;
                         const pj = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId !== undefined ? p.jornadaId : ''));
                         const hasSigns = Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
-                        return (pj === cjId || pj === cjNum) && hasSigns;
+                        return (pj === cjId || (pj === cjNum && cjId === cjNum)) && hasSigns;
                     });
                     if (found) {
                         extra = found;

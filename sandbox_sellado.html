@@ -1241,7 +1241,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 const jId = String(jornada.id);
                 return (this.pronosticosExtra || []).some(p => {
                     const pJ = String(p.jId || p.jornadaId || '');
-                    return (pJ === jNum || pJ === jId) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                    return (pJ === jId || (pJ === jNum && String(jornada.id) === jNum)) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                 });
             },
 
@@ -1292,7 +1292,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 // 1. Obtener todas las Quinielas de Dobles válidas para esta jornada
                 let validExtras = (this.pronosticosExtra || []).filter(p => {
                     const pJ = String(p.jId || p.jornadaId || '');
-                    return (pJ === jNum || pJ === jId) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+                    return (pJ === jId || (pJ === jNum && String(jornada.id) === jNum)) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                 });
 
                 let p15Oficial = '10'; // Valor base por defecto

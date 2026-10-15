@@ -2102,7 +2102,7 @@
             // Si ya existe una quiniela de dobles guardada para esta jornada, su autor es responsable legítimo
             if (window.app && window.app.pronosticosExtra && Array.isArray(window.app.pronosticosExtra)) {
                 const jExtras = window.app.pronosticosExtra.filter(p =>
-                    (String(p.jId || p.jornadaId) === String(j.id) || String(p.jId || p.jornadaId) === String(j.number)) &&
+                    (String(p.jId || p.jornadaId) === String(j.id)) &&
                     p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
                 );
                 jExtras.forEach(pe => {
