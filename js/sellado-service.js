@@ -329,14 +329,16 @@
                 const envioRes = await this.enviarSelladoReal(jornada, compilacion.fileContent, compilacion.p15Oficial, ticketId);
 
                 // Registrar en Firestore (colección 'sellados')
+                const totalApuestas = compilacion.totalApuestas || 35;
+                const importeTotal = parseFloat((totalApuestas * 0.75).toFixed(2));
                 const registroSellado = {
                     id: ticketId,
                     ticketId: ticketId,
                     jornada: parseInt(jornada.number, 10),
                     temporada: jornada.season || '2026-2027',
                     p15Oficial: compilacion.p15Oficial,
-                    apuestas: 35,
-                    importe: 26.25,
+                    apuestas: totalApuestas,
+                    importe: importeTotal,
                     destino: envioRes.destino,
                     enviadoEn: envioRes.sentAt,
                     estado: 'ENVIADO',
@@ -357,7 +359,7 @@
                     try {
                         const tgConfig = await window.DataService.getDoc('config', 'telegram').catch(() => null);
                         if (tgConfig && tgConfig.token && tgConfig.chatId) {
-                            const msgTg = `🚀 *¡QUINIELLA DE 35 APUESTAS ENVIADA A LA ADMINISTRACIÓN!*\n\n- *Jornada:* ${jornada.number}\n- *Referencia:* \`${ticketId}\`\n- *Pleno al 15:* ${compilacion.p15Oficial}\n- *Importe:* 26,25 €\n\nEsperando validación oficial de SELAE y resguardo.`;
+                            const msgTg = `🚀 *¡QUINIELA DE ${totalApuestas} APUESTAS ENVIADA A LA ADMINISTRACIÓN!*\n\n- *Jornada:* ${jornada.number}\n- *Referencia:* \`${ticketId}\`\n- *Pleno al 15:* ${compilacion.p15Oficial}\n- *Importe:* ${importeTotal.toFixed(2)} €\n\nEsperando validación oficial de SELAE y resguardo.`;
                             await window.TelegramService.sendRaw(tgConfig.token, tgConfig.chatId, msgTg);
                         }
                     } catch (te) {

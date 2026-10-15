@@ -1289,26 +1289,42 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 const jNum = String(jornada.number || jornada.id);
                 const jId = String(jornada.id);
 
-                // 1. Obtener primero la Quiniela de Dobles para determinar el Pleno al 15 Oficial de TODO el boleto
-                let extra = (this.pronosticosExtra || []).find(p => {
+                // 1. Obtener todas las Quinielas de Dobles válidas para esta jornada
+                let validExtras = (this.pronosticosExtra || []).filter(p => {
                     const pJ = String(p.jId || p.jornadaId || '');
                     return (pJ === jNum || pJ === jId) && p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                 });
 
                 let p15Oficial = '10'; // Valor base por defecto
-                let doblesOrigenTipo = '';
                 let doblesCombinaciones = [];
 
-                if (extra && Array.isArray(extra.selection)) {
-                    doblesOrigenTipo = 'Dobles Reales (BD)';
-                    p15Oficial = this.formatP15(extra.selection[14]);
-                    doblesCombinaciones = this.desarrollarDobles(extra.selection, Boolean(extra.isReduced), p15Oficial);
-                    this.log(`Quiniela de dobles real cargada. Pleno al 15 oficial del boleto: ${p15Oficial}. ${doblesCombinaciones.length} combinaciones.`);
+                if (validExtras.length > 0) {
+                    p15Oficial = this.formatP15(validExtras[0].selection[14]);
+                    validExtras.forEach((extraItem, extraIdx) => {
+                        const mId = String(extraItem.mId || extraItem.memberId || '');
+                        const author = this.members.find(m => String(m.id) === mId);
+                        const authorName = author ? (author.name || `Socio ${mId}`) : `Socio ${mId || extraIdx + 1}`;
+                        const originLabel = `Dobles (${authorName})`;
+                        const d16 = this.desarrollarDobles(extraItem.selection, Boolean(extraItem.isReduced), p15Oficial);
+                        d16.forEach((item, combIdx) => {
+                            doblesCombinaciones.push({
+                                linea: item.linea,
+                                origen: `${originLabel} (Comb. ${combIdx + 1}/16)`
+                            });
+                        });
+                    });
+                    this.log(`${validExtras.length} quiniela(s) de dobles real(es) cargada(s). Pleno al 15 oficial del boleto: ${p15Oficial}. Total apuestas de dobles: ${doblesCombinaciones.length}.`);
                 } else {
-                    doblesOrigenTipo = 'Dobles Simulados (Estándar 4 Dobles)';
+                    const doblesOrigenTipo = 'Dobles Simulados (Estándar 4 Dobles)';
                     p15Oficial = '10';
-                    this.log(`Sin quiniela de dobles en BD para Jornada ${this.jornadaActual}. Usando Pleno al 15 estándar (${p15Oficial}) para las 35 apuestas.`);
-                    doblesCombinaciones = this.generarDoblesDemoStandard(jornada, p15Oficial);
+                    this.log(`Sin quiniela de dobles en BD para Jornada ${this.jornadaActual}. Usando Pleno al 15 estándar (${p15Oficial}).`);
+                    const demoCols = this.generarDoblesDemoStandard(jornada, p15Oficial);
+                    demoCols.forEach((item, combIdx) => {
+                        doblesCombinaciones.push({
+                            linea: item.linea,
+                            origen: `${doblesOrigenTipo} (Comb. ${combIdx + 1}/16)`
+                        });
+                    });
                 }
 
                 this.p15Oficial = p15Oficial;
@@ -1397,12 +1413,12 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                         linea: doble.linea,
                         p14: doble.linea.slice(0, 14),
                         p15: doble.linea.slice(14),
-                        origen: `${doblesOrigenTipo} (Comb. ${idx + 1}/16)`
+                        origen: doble.origen
                     });
 
                     this.apuestasGeneradas.push({
                         linea: doble.linea,
-                        origen: `${doblesOrigenTipo} (Comb. ${idx + 1}/16)`,
+                        origen: doble.origen,
                         tipo: 'Doble Desarrollado',
                         estado: 'OK',
                         p15Personal: p15Oficial,
@@ -1410,7 +1426,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     });
                 });
 
-                this.renderUI(sociosCompletos, sociosIncompletos, Boolean(extra));
+                this.renderUI(sociosCompletos, sociosIncompletos, validExtras.length > 0);
             },
 
             desarrollarDobles(selection, isReduced = false, p15Param = null) {
@@ -1559,11 +1575,12 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
             renderUI(completos = 19, incompletos = 0, doblesReales = false) {
                 const total = this.apuestasGeneradas.length;
                 const importe = (total * 0.75).toFixed(2);
+                const numDobles = this.doblesDetalle.length;
 
                 document.getElementById('kpi-simples').textContent = '19';
                 document.getElementById('kpi-simples-sub').textContent = `${completos}/19 Reales`;
-                document.getElementById('kpi-dobles').textContent = '16';
-                document.getElementById('kpi-dobles-sub').textContent = doblesReales ? 'Dobles Reales BD' : '16 Desarrollados';
+                document.getElementById('kpi-dobles').textContent = String(numDobles);
+                document.getElementById('kpi-dobles-sub').textContent = doblesReales ? (numDobles > 16 ? `${numDobles} (${numDobles/16} Socios)` : 'Dobles Reales BD') : `${numDobles} Desarrollados`;
                 document.getElementById('kpi-total').textContent = total;
                 document.getElementById('kpi-importe').textContent = `${importe} €`;
 
@@ -1583,10 +1600,10 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 if (badgeDobles) {
                     if (doblesReales) {
                         badgeDobles.className = 'px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30 whitespace-nowrap';
-                        badgeDobles.textContent = `🟣 Dobles Reales BD`;
+                        badgeDobles.textContent = numDobles > 16 ? `🟣 ${numDobles} Dobles (${numDobles/16} Socios)` : `🟣 Dobles Reales BD`;
                     } else {
                         badgeDobles.className = 'px-2.5 py-1 rounded-xl text-[11px] font-bold font-mono bg-slate-800 text-slate-300 border border-slate-700 whitespace-nowrap';
-                        badgeDobles.textContent = `⚪ Dobles 16 Comb.`;
+                        badgeDobles.textContent = `⚪ Dobles ${numDobles} Comb.`;
                     }
                 }
 
@@ -1603,7 +1620,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
 
                 const txtFileStats = document.getElementById('txt-file-stats');
                 if (txtFileStats) {
-                    txtFileStats.textContent = `Mostrando 35 apuestas preparadas para terminal SELAE / LotoGestión (P15 unificado: ${this.p15Oficial || '10'}):`;
+                    txtFileStats.textContent = `Mostrando ${total} apuestas preparadas para terminal SELAE / LotoGestión (P15 unificado: ${this.p15Oficial || '10'}):`;
                 }
 
                 // Cargar estado de sellado previo si existe para esta jornada
@@ -1684,7 +1701,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 const countEl = document.getElementById('socios-complete-count');
                 if (countEl) countEl.textContent = `${completos}/19 Completos`;
 
-                this.log(`Combinación lista para Jornada ${this.jornadaActual}: 35 apuestas (${importe} €). Pleno al 15 oficial: ${this.p15Oficial}.`, 'success');
+                this.log(`Combinación lista para Jornada ${this.jornadaActual}: ${total} apuestas (${importe} €). Pleno al 15 oficial: ${this.p15Oficial}.`, 'success');
 
                 if (this.currentTab === 'triples') {
                     this.renderSimulador9Triples();
@@ -1777,8 +1794,9 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
             async copiarPortapapeles() {
                 try {
                     await navigator.clipboard.writeText(this.getTxtContent());
-                    this.log('✅ Las 35 apuestas oficiales se han copiado al portapapeles.', 'success');
-                    alert('¡Las 35 apuestas oficiales se han copiado al portapapeles!');
+                    const total = this.apuestasGeneradas.length;
+                    this.log(`✅ Las ${total} apuestas oficiales se han copiado al portapapeles.`, 'success');
+                    alert(`¡Las ${total} apuestas oficiales se han copiado al portapapeles!`);
                 } catch(e) {
                     this.log('Error copiando al portapapeles', 'error');
                 }
@@ -1847,8 +1865,10 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 const labelAdjunto = document.getElementById('label-attachment-name');
                 if (labelAdjunto) labelAdjunto.textContent = fileName;
 
-                const asunto = encodeURIComponent(`[${ticketId}] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (26,25 €)`);
-                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia oficial: ${ticketId}\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 unificado: ${p15}\n- Importe oficial: 26,25 € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
+                const total = this.apuestasGeneradas.length;
+                const importe = (total * 0.75).toFixed(2);
+                const asunto = encodeURIComponent(`[${ticketId}] Sellado Jornada ${this.jornadaActual} - ${total} Apuestas (${importe} €)`);
+                const cuerpo = encodeURIComponent(`Hola,\n\nOs remitimos adjunto el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia oficial: ${ticketId}\n- Total apuestas: ${total} columnas simples (Soporte Digital / ASD)\n- Pleno al 15 unificado: ${p15}\n- Importe oficial: ${importe} € (a descontar de nuestro saldo en depósito).\n\nRogamos validación por Soporte Digital en vuestro Terminal Oficial de SELAE y envío del resguardo.\n\nGracias,\nPeña Los Maulas`);
                 
                 this.descargarTXT();
                 const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(destino)}&su=${asunto}&body=${cuerpo}`;
@@ -1893,8 +1913,10 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 if (labelAdjunto) labelAdjunto.textContent = fileName;
 
                 const fileContent = this.getTxtContent();
-                const subject = `[${ticketId}] Sellado Jornada ${this.jornadaActual} - 35 Apuestas (P15: ${p15})`;
-                const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia de sellado: ${ticketId}\n- Total apuestas: 35 columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15}\n- Importe oficial: 26,25 € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo indicando esta misma referencia.\n\nSaludos,\nPeña Los Maulas`;
+                const total = this.apuestasGeneradas.length;
+                const importe = (total * 0.75).toFixed(2);
+                const subject = `[${ticketId}] Sellado Jornada ${this.jornadaActual} - ${total} Apuestas (P15: ${p15})`;
+                const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${this.jornadaActual}.\n\n- Referencia de sellado: ${ticketId}\n- Total apuestas: ${total} columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15}\n- Importe oficial: ${importe} € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo indicando esta misma referencia.\n\nSaludos,\nPeña Los Maulas`;
 
                 btn.disabled = true;
                 btn.innerHTML = `<span>⏳</span> Conectando con Google Apps Script...`;
@@ -1948,7 +1970,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                         localStorage.setItem(`maulas_sellado_j_${this.jornadaActual}`, JSON.stringify(this.selladoRecord));
                         this.actualizarMonitorRespuesta(this.selladoRecord);
 
-                        alert(`¡CORREO REAL ENVIADO CON ÉXITO!\n\nSe ha enviado el archivo:\n"${fileName}"\n\nReferencia oficial: ${ticketId}\n\nCon las 35 apuestas (P15: ${p15}) desde Penalosmaulas@gmail.com a:\n\n👉 ${destino}\n\nPuedes pulsar 'Comprobar Respuesta' o activar el modo automático (30s) en el monitor de abajo para recibir el resguardo.`);
+                        alert(`¡CORREO REAL ENVIADO CON ÉXITO!\n\nSe ha enviado el archivo:\n"${fileName}"\n\nReferencia oficial: ${ticketId}\n\nCon las ${total} apuestas (P15: ${p15}) desde Penalosmaulas@gmail.com a:\n\n👉 ${destino}\n\nPuedes pulsar 'Comprobar Respuesta' o activar el modo automático (30s) en el monitor de abajo para recibir el resguardo.`);
                     } else {
                         const errMsg = (data && data.error) ? data.error : `HTTP ${res.status}`;
                         throw new Error(errMsg);

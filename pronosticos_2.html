@@ -2158,11 +2158,10 @@
             const eligibleMembers = window.getEligibleDoublesMembers(j);
             const isDoublesEligible = eligibleMembers.some(m => String(m.id) === String(window.app.currentMemberId)) || (window.app && window.app.correctionMode);
 
-            // Buscar si este socio específico tiene pronóstico de dobles guardado, o en general para la jornada
+            // Buscar si este socio específico tiene pronóstico de dobles guardado
             const existingExtra = (window.app && window.app.pronosticosExtra)
                 ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
                   || window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)))
-                  || (isDoublesEligible ? null : window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))))
                 : null;
             const hasDoublesForecast = !!(existingExtra && existingExtra.selection && existingExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'));
             const canViewDoubles = isDoublesEligible || hasDoublesForecast || openDoublesTab;

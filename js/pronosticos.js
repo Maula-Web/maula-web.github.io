@@ -2718,7 +2718,7 @@ class PronosticoManager {
         this.doublesStatus.className = '';
         this.btnSaveDoubles.style.display = isLocked ? 'none' : 'block';
 
-        // Load existing doubles: buscar primero el del socio actual, y sólo como fallback el general si no tiene
+        // Load existing doubles: buscar EXCLUSIVAMENTE el del socio actual en esta jornada
         const existingExtra = (this.pronosticosExtra || []).find(p => 
             (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) && 
             (String(p.mId || p.memberId) === String(this.currentMemberId)) &&
@@ -2726,11 +2726,6 @@ class PronosticoManager {
         ) || (this.pronosticosExtra || []).find(p => 
             (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) && 
             (String(p.mId || p.memberId) === String(this.currentMemberId))
-        ) || (this.pronosticosExtra || []).find(p => 
-            (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) && 
-            (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'))
-        ) || (this.pronosticosExtra || []).find(p => 
-            String(p.jId || p.jornadaId) === String(this.currentJornadaId)
         );
         const selections = existingExtra && existingExtra.selection ? existingExtra.selection : Array(15).fill('');
 
