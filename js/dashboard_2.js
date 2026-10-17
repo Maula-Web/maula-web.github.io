@@ -909,7 +909,7 @@ class Dashboard2AppController {
                 heroPigBadge.innerHTML = '<span>🐷</span> Sin PIG';
                 heroPigText.textContent = 'Sin derbi entre los 3 grandes';
                 heroPigText.className = 'text-[11px] sm:text-xs font-semibold text-slate-300 truncate mt-0.5';
-                if (heroPigSub) heroPigSub.textContent = 'Exento de penalización';
+                if (heroPigSub) heroPigSub.textContent = '';
             }
         }
 
