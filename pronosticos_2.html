@@ -1124,8 +1124,24 @@
         .dark .perc-X, .dark .perc-X b { color: #38bdf8 !important; text-shadow: none !important; }
         .dark .perc-2, .dark .perc-2 b { color: #fde047 !important; text-shadow: none !important; }
 
-        @media (max-width: 767px) { .desktop-only-flex { display: none !important; } }
-        @media (min-width: 768px) { .desktop-only-flex { display: flex !important; } }
+        @media (max-width: 1023px), (max-height: 550px) { .desktop-only-flex { display: none !important; } }
+        @media (min-width: 1024px) and (min-height: 551px) { .desktop-only-flex { display: flex !important; } }
+
+        /* Optimizaciones para Modo Móvil y Apaisado (Landscape) */
+        @media (max-width: 767px) {
+            body {
+                padding: 0.35rem 0.5rem !important;
+            }
+        }
+        @media (max-height: 550px) and (orientation: landscape) {
+            body {
+                padding-top: 0.35rem !important;
+                padding-bottom: 0.35rem !important;
+            }
+            #pronosticos-hub-section {
+                padding: 0.4rem 0.6rem !important;
+            }
+        }
 
         /* Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -1262,7 +1278,8 @@
         <!-- =====================================================================
              NIVEL 2: BARRA DE TÍTULO & ANUNCIO OFICIAL
              ===================================================================== -->
-        <div class="p-2.5 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-2.5 text-xs sm:text-sm order-2">
+        <!-- Top Announcement Bar (oculta en móviles para ganar enorme espacio vertical) -->
+        <div class="hidden lg:flex p-2.5 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex-col md:flex-row items-center justify-between gap-2.5 text-xs sm:text-sm order-2">
             <div class="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
                 <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-base sm:text-xl shrink-0">📝</span>
                 <div class="min-w-0">
@@ -1282,21 +1299,41 @@
         </div>
 
         <!-- =====================================================================
-             NIVEL 3: TARJETAS BENTO RESUMEN (PLEGABLES EN MÓVIL PARA MAXIMIZAR ESPACIO)
+             NIVEL 3: TARJETAS BENTO RESUMEN
              ===================================================================== -->
         <section class="space-y-2 order-3">
-            <!-- Barra Maestra de Despliegue en Móvil (< lg) -->
-            <div class="kpi-master-bar flex lg:hidden items-center justify-between px-1 py-0.5 text-xs text-slate-500 dark:text-slate-400 font-bold">
-                <span class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-                    <span>📊</span> Tarjetas de Información
-                </span>
-                <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
-                    <span class="kpi-master-text">Desplegar todos</span>
-                    <span class="kpi-master-icon text-[10px]">▼</span>
-                </button>
+            <!-- TARJETA RESUMEN ÚNICA EN MÓVIL (Resume los cuatro indicadores en una sola fila compacta) -->
+            <div id="kpi-mobile-summary" class="lg:hidden glass-panel p-2.5 sm:p-3 border-amber-500/30 shadow-md">
+                <div class="grid grid-cols-4 gap-1 text-center divide-x divide-slate-200 dark:divide-slate-800/80">
+                    <!-- 1. Plazo Oficial -->
+                    <div class="flex flex-col items-center justify-center px-0.5">
+                        <span class="text-[10px] text-amber-500 dark:text-amber-400 font-bold uppercase tracking-wider flex items-center gap-0.5">⏱️ Plazo</span>
+                        <span id="kpi-mobile-plazo-status" class="text-xs sm:text-sm font-black font-mono text-emerald-500 dark:text-emerald-400 mt-0.5 truncate max-w-full">Abierto</span>
+                        <span id="kpi-mobile-countdown" class="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-full">Jue 17:00h</span>
+                    </div>
+                    <!-- 2. Censo Sellado -->
+                    <div class="flex flex-col items-center justify-center px-0.5">
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-0.5">📋 Censo</span>
+                        <span id="kpi-mobile-recibidos-count" class="text-xs sm:text-sm font-black font-mono text-emerald-600 dark:text-emerald-300 mt-0.5">-- / 19</span>
+                        <span id="kpi-mobile-recibidos-pct" class="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate">0%</span>
+                    </div>
+                    <!-- 3. Quiniela Dobles -->
+                    <div class="flex flex-col items-center justify-center px-0.5">
+                        <span class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider flex items-center gap-0.5">✌️ Dobles</span>
+                        <span id="kpi-mobile-dobles-resp" class="text-xs sm:text-sm font-black text-purple-600 dark:text-purple-300 mt-0.5 truncate max-w-[80px]">Responsable</span>
+                        <span id="kpi-mobile-dobles-cost" class="text-[9px] text-slate-500 dark:text-slate-400 font-mono font-medium truncate">12,00 €</span>
+                    </div>
+                    <!-- 4. Socio Activo -->
+                    <div class="flex flex-col items-center justify-center px-0.5">
+                        <span class="text-[10px] text-sky-600 dark:text-sky-400 font-bold uppercase tracking-wider flex items-center gap-0.5">👤 Socio</span>
+                        <span id="kpi-mobile-socio-name" class="text-xs sm:text-sm font-black text-slate-800 dark:text-white mt-0.5 truncate max-w-[80px]">Socio</span>
+                        <span id="kpi-mobile-socio-status" class="text-[9px] text-amber-500 dark:text-amber-400 font-medium truncate">Pendiente</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+            <!-- 4 TARJETAS INFORMATIVAS DETALLADAS PARA ESCRITORIO -->
+            <div class="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
 
                 <!-- KPI 1: Plazo Oficial con Reloj Digital Sincronizado con Dashboard 2 -->
                 <div class="glass-panel collapsible-kpi p-3 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition" id="kpi-card-plazo">
@@ -1510,55 +1547,96 @@
         <!-- =====================================================================
              NIVEL 4: HUB DE CONTROL Y SELECTORES
              ===================================================================== -->
-        <section class="glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-4">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+        <section id="pronosticos-hub-section" class="glass-panel p-2.5 sm:p-4 border-amber-500/40 space-y-2 sm:space-y-3 order-4">
+            <!-- Fila 1: Selector de Jornada ◀ [Sel] ▶ + Acciones en Móvil / Botones en Escritorio -->
+            <div class="flex items-center justify-between gap-2 sm:gap-3 w-full">
+                <!-- Selector de Jornada -->
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-[220px] sm:min-w-[280px] flex-1 sm:flex-initial">
+                    <button type="button" id="btn-jornada-prev" onclick="window.navigateJornadaByNumber(-1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior">
+                        ◀
+                    </button>
                     
-                    <!-- SELECTOR DE JORNADA CON FLECHAS ◀ Y ▶ -->
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" id="btn-jornada-prev" onclick="window.navigateJornadaByNumber(-1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada anterior (reducir número)">
-                            ◀
-                        </button>
-                        
-                        <div class="relative min-w-[170px] sm:min-w-[240px]">
-                            <label for="sel-jornada" class="sr-only">Seleccionar Jornada</label>
-                            <select id="sel-jornada" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
-                                <!-- Opciones inyectadas por pronosticos.js -->
-                            </select>
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 text-xs pointer-events-none">▼</span>
-                        </div>
-
-                        <button type="button" id="btn-jornada-next" onclick="window.navigateJornadaByNumber(1)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente (aumentar número)">
-                            ▶
-                        </button>
+                    <div class="relative min-w-[150px] sm:min-w-[220px] flex-1">
+                        <label for="sel-jornada" class="sr-only">Seleccionar Jornada</label>
+                        <select id="sel-jornada" class="w-full pl-2.5 sm:pl-3 pr-7 py-2 bg-white dark:bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm truncate">
+                            <!-- Opciones inyectadas por pronosticos.js -->
+                        </select>
+                        <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-500 text-xs pointer-events-none">▼</span>
                     </div>
 
-                    <!-- SELECTOR DE SOCIO -->
-                    <div class="relative min-w-[150px] sm:min-w-[200px]">
+                    <button type="button" id="btn-jornada-next" onclick="window.navigateJornadaByNumber(1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500 shadow-sm" title="Jornada siguiente">
+                        ▶
+                    </button>
+                </div>
+
+                <!-- EN MÓVIL: Botón Desplegable de Acciones -->
+                <div class="relative lg:hidden shrink-0" id="mobile-quiniela-actions-container">
+                    <button type="button" onclick="window.toggleMobileQuinielaActions()" class="px-2.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold text-xs border border-amber-500/40 transition flex items-center gap-1 shadow-sm whitespace-nowrap">
+                        <span>⚙️</span>
+                        <span>Acciones</span>
+                        <span class="text-[10px] text-amber-500 dark:text-amber-400">▼</span>
+                    </button>
+                    <div id="mobile-quiniela-actions-dropdown" class="hidden absolute right-0 mt-2 w-60 glass-panel border border-amber-500/50 rounded-xl shadow-2xl p-1.5 z-50 divide-y divide-slate-200 dark:divide-slate-800 text-xs bg-white dark:bg-slate-950">
+                        <div class="py-1 space-y-0.5">
+                            <button type="button" onclick="window.openEditorForCurrentMember(); window.toggleMobileQuinielaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-amber-500/10 text-slate-800 dark:text-slate-200 font-bold flex items-center gap-2">
+                                <span>✏️</span> Editar Boleto de este Socio
+                            </button>
+                            <button type="button" onclick="window.openEditorForDoubles(); window.toggleMobileQuinielaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold flex items-center gap-2">
+                                <span>✌️</span> Rellenar Dobles
+                            </button>
+                        </div>
+                        <div class="py-1 space-y-0.5">
+                            <button type="button" onclick="document.getElementById('btn-view-jornada')?.click(); window.toggleMobileQuinielaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-emerald-500/10 text-slate-700 dark:text-slate-300 flex items-center gap-2 font-semibold">
+                                <span>👁️</span> Ver todos los pronósticos
+                            </button>
+                            <button type="button" onclick="document.getElementById('btn-help-doubles')?.click(); window.toggleMobileQuinielaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-500/10 text-slate-700 dark:text-slate-300 flex items-center gap-2 font-semibold">
+                                <span>❓</span> Ayuda Sellado
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EN ESCRITORIO: Selector Socio + Chip Plazo + Botones completos -->
+                <div class="hidden lg:flex items-center gap-2 sm:gap-2.5 flex-1 justify-end">
+                    <!-- SELECTOR DE SOCIO ESCRITORIO -->
+                    <div class="relative min-w-[160px] max-w-[220px]">
                         <label for="sel-member" class="sr-only">Seleccionar Socio</label>
-                        <select id="sel-member" class="w-full pl-3 pr-8 py-1.5 sm:py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm">
+                        <select id="sel-member" class="w-full pl-3 pr-8 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm truncate">
                             <!-- Opciones inyectadas por pronosticos.js -->
                         </select>
                         <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
                     </div>
 
-                    <!-- CHIP DE PLAZO OFICIAL / CIERRE CON ALTO CONTRASTE -->
-                    <div id="deadline-info-wrap" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-extrabold font-mono bg-slate-900 border border-slate-700 text-white flex items-center gap-2 shadow-sm">
+                    <!-- CHIP DE PLAZO OFICIAL ESCRITORIO -->
+                    <div id="deadline-info-wrap" class="px-3 py-2 rounded-xl text-xs font-extrabold font-mono bg-slate-900 border border-slate-700 text-white flex items-center gap-2 shadow-sm shrink-0">
                         <span id="deadline-led-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span id="deadline-info" class="text-slate-100">Cargando plazo...</span>
                     </div>
-                </div>
 
-                <!-- BOTONES DE ACCIÓN DEL HUB -->
-                <div class="flex items-center gap-2 flex-wrap justify-end">
-                    <button type="button" id="btn-help-doubles" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-blue-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <!-- BOTONES DE ACCIÓN ESCRITORIO -->
+                    <button type="button" id="btn-help-doubles" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-blue-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm whitespace-nowrap">
                         <span>❓</span> Ayuda Sellado
                     </button>
 
-                    <button type="button" id="btn-view-jornada" class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md">
-                        <span>👁️</span> Ver todos los pronósticos
+                    <button type="button" id="btn-view-jornada" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md whitespace-nowrap">
+                        <span>👁️</span> Ver todos
                     </button>
                 </div>
+            </div>
+
+            <!-- Fila 2 en Móvil: Selector de Socio + Botón Rápido Editar Mi Boleto -->
+            <div class="flex lg:hidden items-center gap-2 w-full pt-1.5 border-t border-slate-200 dark:border-slate-800/80">
+                <div class="relative flex-1 min-w-0">
+                    <label for="sel-member-mobile" class="sr-only">Seleccionar Socio</label>
+                    <select id="sel-member-mobile" onchange="if(window.app && window.app.selMember) { window.app.selMember.value = this.value; window.app.selMember.dispatchEvent(new Event('change')); }" class="w-full pl-2.5 pr-7 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-sm truncate">
+                        <!-- Sincronizado por JS -->
+                    </select>
+                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
+                </div>
+
+                <button type="button" onclick="window.openEditorForCurrentMember()" class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow whitespace-nowrap shrink-0">
+                    <span>✏️</span> Editar
+                </button>
             </div>
         </section>
 
@@ -1566,24 +1644,24 @@
         <!-- =====================================================================
              NIVEL 5: PANEL GENERAL DE SELLADO (PRONÓSTICOS DE CADA SOCIO EN VERTICAL)
              ===================================================================== -->
-        <section class="glass-panel p-4 sm:p-6 border-amber-500/40 space-y-4 order-5">
+        <section class="glass-panel p-2.5 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-5">
             
-            <div class="flex flex-col sm:flex-row justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800 gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg">📊</span>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 sm:pb-3 border-b border-slate-200 dark:border-slate-800 gap-2 sm:gap-3">
+                <div class="flex items-center gap-2 sm:gap-2.5">
+                    <span class="p-1.5 sm:p-2 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-base sm:text-lg">📊</span>
                     <div>
-                        <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
+                        <h3 class="text-sm sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
                             <span>Panel General de Sellado</span>
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Pronósticos en bloques horizontales por jornada. Haz clic en cualquier celda para editar el boleto.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Pronósticos en bloques horizontales por jornada. Haz clic en cualquier celda para editar el boleto.</p>
                     </div>
                 </div>
 
-                <!-- Leyenda solo de LEDs (los colores de signos son autoexplicativos) -->
-                <div class="flex items-center gap-3 text-xs font-bold flex-wrap justify-end">
-                    <span id="panel-sellado-jornada-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40">Indicadores: Siguiente Jornada</span>
+                <!-- Leyenda solo de LEDs -->
+                <div class="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-bold flex-wrap justify-start sm:justify-end">
+                    <span id="panel-sellado-jornada-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40">Indicadores: Siguiente Jornada</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-green"></span> Completo</span>
-                    <span class="flex items-center gap-1"><span class="led-status-indicator led-yellow"></span> Falta Dobles</span>
+                    <span class="flex items-center gap-1"><span class="led-status-indicator led-yellow"></span> Dobles</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-red"></span> Pendiente</span>
                 </div>
             </div>
@@ -3050,7 +3128,93 @@
                         if (dotEl) dotEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
                     }
                 }
+
+                // 6. ACTUALIZACIÓN DE TARJETA RESUMEN ÚNICA EN MÓVIL
+                const mobPlazoStatus = document.getElementById('kpi-mobile-plazo-status');
+                const mobCountdown = document.getElementById('kpi-mobile-countdown');
+                if (mobPlazoStatus) {
+                    mobPlazoStatus.textContent = badgeTexto;
+                    mobPlazoStatus.className = `text-xs sm:text-sm font-black font-mono mt-0.5 truncate max-w-full ${badgeClase.includes('emerald') ? 'text-emerald-400' : (badgeClase.includes('rose') ? 'text-rose-400' : (badgeClase.includes('sky') ? 'text-sky-400' : 'text-amber-400'))}`;
+                }
+                if (mobCountdown) {
+                    if (deadline && !isNaN(deadline.getTime())) {
+                        const now = new Date().getTime();
+                        const diff = deadline.getTime() - now;
+                        if (diff > 0) {
+                            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            mobCountdown.textContent = `${d}d ${h}h rest.`;
+                        } else {
+                            mobCountdown.textContent = isFinished ? 'Finalizada' : (hasStarted ? 'En juego' : 'Cerrado');
+                        }
+                    } else {
+                        mobCountdown.textContent = 'Jue 17:00h';
+                    }
+                }
+
+                const mobCensoCount = document.getElementById('kpi-mobile-recibidos-count');
+                const mobCensoPct = document.getElementById('kpi-mobile-recibidos-pct');
+                if (mobCensoCount) mobCensoCount.textContent = `${recibidos} / ${totalSocios}`;
+                if (mobCensoPct) mobCensoPct.textContent = `${pct}%`;
+
+                const mobDoblesResp = document.getElementById('kpi-mobile-dobles-resp');
+                const mobDoblesCost = document.getElementById('kpi-mobile-dobles-cost');
+                if (mobDoblesResp) {
+                    let respName = 'Por asignar';
+                    if (eligibleList.length > 0) {
+                        respName = AppUtils.getMemberName(eligibleList[0]).split(' ')[0];
+                        if (eligibleList.length > 1) respName += ` +${eligibleList.length - 1}`;
+                    } else {
+                        const resp = window.getEligibleDoublesMember(jornada);
+                        if (resp) respName = AppUtils.getMemberName(resp).split(' ')[0];
+                    }
+                    mobDoblesResp.textContent = respName;
+                }
+                if (mobDoblesCost) mobDoblesCost.textContent = '12,00 €';
+
+                const mobSocioName = document.getElementById('kpi-mobile-socio-name');
+                const mobSocioStatus = document.getElementById('kpi-mobile-socio-status');
+                if (member && mobSocioName) {
+                    mobSocioName.textContent = member.alias || AppUtils.getMemberName(member).split(' ')[0];
+                    const led = this.getMemberStatusLed(member.id, jornada);
+                    if (mobSocioStatus) {
+                        mobSocioStatus.textContent = led.title || 'Pendiente';
+                        mobSocioStatus.className = `text-[9px] font-bold truncate max-w-full ${led.status === 'green' ? 'text-emerald-400' : (led.status === 'yellow' ? 'text-amber-400' : 'text-rose-400')}`;
+                    }
+                }
+
+                // 7. Sincronización bidireccional del selector de socios móvil
+                const selDesktop = document.getElementById('sel-member');
+                const selMobile = document.getElementById('sel-member-mobile');
+                if (selDesktop && selMobile && selDesktop.options.length > 0) {
+                    if (selMobile.options.length !== selDesktop.options.length) {
+                        selMobile.innerHTML = selDesktop.innerHTML;
+                    }
+                    if (selMobile.value !== selDesktop.value) {
+                        selMobile.value = selDesktop.value;
+                    }
+                }
             };
+
+            // E. Desplegable de acciones móvil
+            window.toggleMobileQuinielaActions = function(force) {
+                const dropdown = document.getElementById('mobile-quiniela-actions-dropdown');
+                if (!dropdown) return;
+                if (typeof force === 'boolean') {
+                    if (force) dropdown.classList.remove('hidden');
+                    else dropdown.classList.add('hidden');
+                } else {
+                    dropdown.classList.toggle('hidden');
+                }
+            };
+
+            document.addEventListener('click', function(e) {
+                const container = document.getElementById('mobile-quiniela-actions-container');
+                const dropdown = document.getElementById('mobile-quiniela-actions-dropdown');
+                if (container && dropdown && !container.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
 
             // D. Interceptar loadForecast: texto de Cierre/Expirado más claro y supresión de Pleno al 15 si no es PIG
             const originalLoadForecast = PM.prototype.loadForecast;
