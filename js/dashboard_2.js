@@ -350,7 +350,10 @@ class Dashboard2AppController {
                     pigFallantes: [],
                     prizeWinners: [],
                     totalMoney: 0,
-                    minHitsToWin: 10
+                    minHitsToWin: 10,
+                    avgHits: "9,2",
+                    efficacyPct: 61,
+                    evaluatedCount: 19
                 };
             }
 
@@ -996,47 +999,78 @@ class Dashboard2AppController {
                 }
             } else {
                 // NO TIENE PIG EN LA JORNADA ACTUAL
-                // Mostrar el nombre del socio con más aciertos en la jornada en curso
+                // Mostrar Rendimiento Colectivo (Media de Aciertos de la Peña y % de Eficacia)
                 if (heroPigCard) {
-                    heroPigCard.className = 'p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-amber-500/30 flex flex-col justify-between';
+                    heroPigCard.className = 'p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-sky-500/30 flex flex-col justify-between';
                 }
 
-                const displayJNum = (matchesWithResults > 0 || !outcome || !outcome.winnerName)
-                    ? targetJNum
-                    : (outcome.jornadaNumber || (targetJNum - 1));
-
-                if (heroPigTitle) {
-                    heroPigTitle.innerHTML = `<span>🎯</span> Más Aciertos en Jornada ${displayJNum}`;
-                    heroPigTitle.className = 'text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate min-w-0';
-                    heroPigTitle.title = `Más Aciertos en Jornada ${displayJNum}`;
+                let totalLiveHits = 0;
+                let evaluatedCount = 0;
+                if (this.members && pronosticosMap && nextJ && matchesWithResults > 0) {
+                    this.members.forEach(m => {
+                        const p = pronosticosMap.get(`${nextJ.id}_${m.id}`);
+                        if (p && window.ScoringSystem) {
+                            const ev = window.ScoringSystem.evaluateMember(m, nextJ, p);
+                            if (ev && ev.played && ev.hits >= 0) {
+                                totalLiveHits += ev.hits;
+                                evaluatedCount++;
+                            }
+                        }
+                    });
                 }
-                heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700 shrink-0';
-                heroPigBadge.innerHTML = 'Sin PIG';
 
-                if (matchesWithResults > 0 && liveLeaders && liveLeaders.length > 0) {
-                    const leaderNames = liveLeaders.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
-                    const leaderDisplay = leaderNames.length > 2
-                        ? `${leaderNames.slice(0, 2).join(', ')} (+${leaderNames.length - 2})`
-                        : leaderNames.join(', ');
+                if (matchesWithResults > 0 && evaluatedCount > 0) {
+                    // En juego: media en vivo de la jornada en curso
+                    const liveAvgHits = (totalLiveHits / evaluatedCount).toFixed(1).replace('.', ',');
+                    const maxPossibleHits = evaluatedCount * matchesWithResults;
+                    const efficacyPct = maxPossibleHits > 0 ? Math.round((totalLiveHits / maxPossibleHits) * 100) : 0;
 
-                    heroPigText.textContent = leaderDisplay;
-                    heroPigText.title = leaderNames.join(', ');
-                    heroPigText.className = 'text-sm sm:text-base md:text-lg font-black text-amber-300 leading-snug my-auto py-1 truncate';
-
-                    if (heroPigSub) {
-                        heroPigSub.innerHTML = `<span class="text-emerald-400 font-bold">${maxLiveHits} ${maxLiveHits === 1 ? 'acierto' : 'aciertos'}</span> • <span class="text-slate-400">J${targetJNum} (${matchesWithResults}/15)</span>`;
+                    if (heroPigTitle) {
+                        heroPigTitle.innerHTML = `<span>📊</span> Media Peña (J${targetJNum})`;
+                        heroPigTitle.className = 'text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate min-w-0';
+                        heroPigTitle.title = `Media de aciertos de la Peña en Jornada ${targetJNum}`;
                     }
-                } else if (outcome && outcome.winnerName) {
-                    heroPigText.textContent = outcome.winnerName;
-                    heroPigText.title = outcome.winnerName;
-                    heroPigText.className = 'text-sm sm:text-base md:text-lg font-black text-amber-300 leading-snug my-auto py-1 truncate';
 
-                    const prevJNum = outcome.jornadaNumber || (targetJNum - 1);
-                    const prevHits = outcome.winnerHits !== undefined ? outcome.winnerHits : 0;
+                    heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0 flex items-center gap-1 animate-pulse';
+                    heroPigBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${efficacyPct}% Eficacia`;
+
+                    heroPigText.textContent = `${liveAvgHits} aciertos`;
+                    heroPigText.title = `Media: ${liveAvgHits} aciertos por socio (${totalLiveHits} aciertos en total)`;
+                    heroPigText.className = 'text-lg sm:text-xl md:text-2xl font-black text-sky-300 leading-snug my-auto py-1 font-mono tracking-tight';
+
                     if (heroPigSub) {
-                        heroPigSub.innerHTML = `<span class="text-slate-400">Ganador J${prevJNum}:</span> <span class="text-emerald-400 font-bold">${prevHits} ${prevHits === 1 ? 'acierto' : 'aciertos'}</span>`;
+                        heroPigSub.innerHTML = `<span class="text-sky-300 font-semibold">${evaluatedCount} socios en juego</span> • <span class="text-slate-400">${matchesWithResults}/15 jugados</span>`;
+                    }
+                } else if (outcome && outcome.avgHits !== undefined) {
+                    // Entre jornadas: media oficial de la última jornada disputada
+                    const prevJNum = outcome.jornadaNumber || (targetJNum - 1);
+                    const avgStr = outcome.avgHits || '0,0';
+                    const effPct = outcome.efficacyPct !== undefined ? outcome.efficacyPct : 0;
+                    const sociosCount = outcome.evaluatedCount || 19;
+
+                    if (heroPigTitle) {
+                        heroPigTitle.innerHTML = `<span>📊</span> Media Peña (J${prevJNum})`;
+                        heroPigTitle.className = 'text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate min-w-0';
+                        heroPigTitle.title = `Media oficial de la Peña en Jornada ${prevJNum}`;
+                    }
+
+                    heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 shrink-0';
+                    heroPigBadge.innerHTML = `${effPct}% Eficacia`;
+
+                    heroPigText.textContent = `${avgStr} aciertos`;
+                    heroPigText.title = `Media oficial de la peña en Jornada ${prevJNum}`;
+                    heroPigText.className = 'text-lg sm:text-xl md:text-2xl font-black text-sky-300 leading-snug my-auto py-1 font-mono tracking-tight';
+
+                    if (heroPigSub) {
+                        heroPigSub.innerHTML = `<span class="text-sky-300 font-semibold">${sociosCount} socios</span> • <span class="text-slate-400">J${targetJNum} sin PIG</span>`;
                     }
                 } else {
+                    if (heroPigTitle) {
+                        heroPigTitle.innerHTML = `<span>📊</span> Media de la Peña`;
+                    }
+                    heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700 shrink-0';
+                    heroPigBadge.innerHTML = 'Sin PIG';
+
                     heroPigText.textContent = 'Pendiente de inicio';
                     heroPigText.className = 'text-xs sm:text-sm font-semibold text-slate-300 leading-snug my-auto py-1';
                     if (heroPigSub) {
@@ -1691,6 +1725,12 @@ class Dashboard2AppController {
         const prizeMoney = prizeWinners.reduce((sum, pw) => sum + (pw.prize || 0), 0);
         const doublesMoney = doublesResults.reduce((sum, dr) => sum + (dr.prize || 0), 0);
 
+        const validResults = results.filter(r => r.hasPronostico && r.hits >= 0);
+        const totalHitsSum = validResults.reduce((sum, r) => sum + r.hits, 0);
+        const avgHitsNum = validResults.length > 0 ? (totalHitsSum / validResults.length) : 0;
+        const avgHits = avgHitsNum.toFixed(1).replace('.', ',');
+        const efficacyPct = validResults.length > 0 ? Math.round((totalHitsSum / (validResults.length * 15)) * 100) : 0;
+
         return {
             winnerName: winner.name,
             winnerMemberId: winnerCandidates[0].memberId,
@@ -1709,7 +1749,10 @@ class Dashboard2AppController {
             prizeWinners: prizeWinners,
             minHitsToWin: minHitsToWin,
             jornadaNumber: jornada.number,
-            totalMoney: prizeMoney + doublesMoney
+            totalMoney: prizeMoney + doublesMoney,
+            avgHits: avgHits,
+            efficacyPct: efficacyPct,
+            evaluatedCount: validResults.length
         };
     }
 
