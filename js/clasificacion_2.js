@@ -81,6 +81,26 @@
                         }
                     });
 
+                    // Comprobar parámetros de URL o anclaje para abrir la vista solicitada (ej: Matriz Histórica)
+                    try {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const viewParam = (urlParams.get('view') || urlParams.get('tab') || '').toLowerCase();
+                        const hashParam = (window.location.hash || '').toLowerCase();
+
+                        if (viewParam === 'matrix' || viewParam === 'matriz' || hashParam === '#view-matrix' || hashParam === '#matriz') {
+                            if (!this.matrixRendered) this.renderMatrixTable();
+                            this.switchView('matrix');
+                            setTimeout(() => {
+                                const targetEl = document.getElementById('view-matrix') || document.querySelector('.view-switcher-box');
+                                if (targetEl) {
+                                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            }, 120);
+                        }
+                    } catch (eParam) {
+                        console.warn("[Clasificacion2] Error leyendo parámetros de vista:", eParam);
+                    }
+
                 } catch (err) {
                     console.error("[Clasificacion2] Error en init:", err);
                 }

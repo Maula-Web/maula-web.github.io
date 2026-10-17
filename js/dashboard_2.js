@@ -641,7 +641,7 @@ class Dashboard2AppController {
         }
         const btnHeroClasificacion = document.getElementById('btn-hero-clasificacion');
         if (btnHeroClasificacion) {
-            btnHeroClasificacion.href = 'clasificacion_2.html';
+            btnHeroClasificacion.href = 'clasificacion_2.html?view=matrix';
         }
 
         // Usuario logueado en la cabecera
