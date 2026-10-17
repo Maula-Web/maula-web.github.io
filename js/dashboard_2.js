@@ -1333,7 +1333,7 @@ class Dashboard2AppController {
         // Renderizar elementos con loop continuo infinito (duplicados exactamente una vez)
         const renderItemHtml = (it, idx) => `
             <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.DashboardApp && window.DashboardApp.handleTickerClick(${idx})">
-                <span class="text-amber-400/80 font-mono text-[9px] sm:text-[10px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
+                <span class="text-amber-400/80 font-mono text-[10px] sm:text-[11px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
                 <span>${it}</span>
                 <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>
             </span>
