@@ -377,8 +377,9 @@ class Dashboard2AppController {
             const targetJNum = this.nextJornada ? this.nextJornada.number : (playedJornadas.length + 1);
 
             let isNextInProgress = false;
+            let matchesWithResults = 0;
             if (this.nextJornada && this.nextJornada.matches) {
-                const matchesWithResults = this.nextJornada.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length;
+                matchesWithResults = this.nextJornada.matches.filter(m => m.result && m.result !== '' && m.result !== '-').length;
                 isNextInProgress = matchesWithResults > 0 && matchesWithResults < 15;
             }
 
@@ -410,14 +411,14 @@ class Dashboard2AppController {
             const nextJornadaNum = targetJNum;
             const upcomingJornadaNum = targetJNum + 1; // La jornada posterior para la que sellarán/rellenarán si targetJNum está en juego
 
-            if (isNextInProgress && this.nextJornada && this.members) {
-                // Si la jornada está en juego, buscar los aciertos y puntos actuales de todos los socios
-                let maxLiveHits = -1;
-                let minLiveHits = 999;
-                let minLivePoints = 9999;
-                let liveLeaders = [];
-                let liveLosers = [];
+            let maxLiveHits = -1;
+            let minLiveHits = 999;
+            let minLivePoints = 9999;
+            let liveLeaders = [];
+            let liveLosers = [];
 
+            if (matchesWithResults > 0 && this.nextJornada && this.members) {
+                // Si la jornada tiene partidos con resultado, buscar los aciertos y puntos actuales de todos los socios
                 this.members.forEach(m => {
                     const p = pronosticosMap.get(`${this.nextJornada.id}_${m.id}`);
                     if (p && window.ScoringSystem) {
@@ -448,11 +449,13 @@ class Dashboard2AppController {
                     const leaderNames = liveLeaders.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
                     currentWinnerName = leaderNames.slice(0, 2).join(', ') + (leaderNames.length > 2 ? ` (+${leaderNames.length - 2})` : '');
                     
-                    if (elWinnerSubtitle) {
-                        elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Líder Provisional (J${nextJornadaNum}):</span>`;
-                    }
-                    if (elWinnerDetail) {
-                        elWinnerDetail.innerHTML = `<span class="text-amber-300 font-medium">Rellenará dobles en J${upcomingJornadaNum}</span> <span class="text-slate-400 text-[11px]">(${liveLeaders.length > 1 ? `Empate a ${liveWinnerHits} ac.` : 'Liderando en vivo'})</span>`;
+                    if (isNextInProgress) {
+                        if (elWinnerSubtitle) {
+                            elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Líder Provisional (J${nextJornadaNum}):</span>`;
+                        }
+                        if (elWinnerDetail) {
+                            elWinnerDetail.innerHTML = `<span class="text-amber-300 font-medium">Rellenará dobles en J${upcomingJornadaNum}</span> <span class="text-slate-400 text-[11px]">(${liveLeaders.length > 1 ? `Empate a ${liveWinnerHits} ac.` : 'Liderando en vivo'})</span>`;
+                        }
                     }
                 }
 
@@ -571,7 +574,14 @@ class Dashboard2AppController {
             }
 
             // G. Widget 6: 🐸 Último Clasificado (Rana) / 🐷 Partido PIG (Tarjeta Híbrida)
-            this.renderPigWidget(lastJornadaOutcome, this.nextJornada, lastMember, penultimateDiff, playedCount, sortedMembers.length);
+            this.renderPigWidget(lastJornadaOutcome, this.nextJornada, lastMember, penultimateDiff, playedCount, sortedMembers.length, {
+                liveLeaders,
+                maxLiveHits,
+                matchesWithResults,
+                isNextInProgress,
+                targetJNum,
+                pronosticosMap
+            });
 
             // H. Widget 7: 💰 Bote Acumulado en Caja
             this.renderBoteWidget(playedJornadas);
@@ -902,7 +912,7 @@ class Dashboard2AppController {
     /**
      * Widget Híbrido Rotativo: 🐸 Último Clasificado (Rana) / 🐷 Partido PIG
      */
-    renderPigWidget(outcome, nextJ, lastMember, penultimateDiff, playedCount, totalMembers) {
+    renderPigWidget(outcome, nextJ, lastMember, penultimateDiff, playedCount, totalMembers, liveContext = {}) {
         const content = document.getElementById('pig-content');
         const statusLabel = document.getElementById('pig-status-label');
         const elBadge = document.getElementById('pig-badge');
@@ -919,23 +929,114 @@ class Dashboard2AppController {
         const nextHasPig = nextPigInfo !== null;
         const nextMatchDesc = (nextPigInfo && nextPigInfo.match) ? `(P.${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
 
-        // Actualizar indicador directo en el Cuadro de Mando Principal
+        const liveLeaders = liveContext.liveLeaders || [];
+        const maxLiveHits = liveContext.maxLiveHits !== undefined ? liveContext.maxLiveHits : -1;
+        const matchesWithResults = liveContext.matchesWithResults || 0;
+        const targetJNum = liveContext.targetJNum || (nextJ ? nextJ.number : '');
+        const pronosticosMap = liveContext.pronosticosMap || this.pronosticosMap;
+
+        // Actualizar indicador directo en el Cuadro de Mando Principal (Pilar 2)
+        const heroPigCard = document.getElementById('hero-pig-card');
+        const heroPigTitle = document.getElementById('hero-pig-title');
         const heroPigBadge = document.getElementById('hero-pig-badge');
         const heroPigText = document.getElementById('hero-pig-text');
         const heroPigSub = document.getElementById('hero-pig-sub');
+
         if (heroPigBadge && heroPigText) {
             if (nextHasPig && nextPigInfo && nextPigInfo.match) {
+                // SÍ HAY PIG EN LA JORNADA ACTUAL
+                if (heroPigCard) {
+                    heroPigCard.className = 'p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-pink-500/40 flex flex-col justify-between';
+                }
+                if (heroPigTitle) {
+                    heroPigTitle.innerHTML = '<span>🐷</span> Partido PIG';
+                    heroPigTitle.className = 'text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1';
+                }
                 heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse shrink-0';
                 heroPigBadge.innerHTML = '¡HAY PIG!';
-                heroPigText.textContent = `${nextPigInfo.match.home} vs ${nextPigInfo.match.away}`;
-                heroPigText.className = 'text-xs sm:text-sm md:text-base font-black text-pink-300 leading-snug my-auto py-1';
-                if (heroPigSub) heroPigSub.textContent = `Penalización fallo: -${penaltyVal} €`;
+
+                // Mostrar el partido
+                const matchName = `${nextPigInfo.match.home} vs ${nextPigInfo.match.away}`;
+                heroPigText.textContent = matchName;
+                heroPigText.title = matchName;
+                heroPigText.className = 'text-xs sm:text-sm md:text-base font-black text-pink-300 leading-snug my-auto py-1 truncate';
+
+                // Número de acertantes y de socios que han fallado (sin nombres)
+                const pigMatch = nextPigInfo.match;
+                const pigRes = pigMatch.result ? String(pigMatch.result).trim().toUpperCase() : '';
+                const isPigPlayed = pigRes !== '' && pigRes !== '-' && pigRes !== 'POR DEFINIR';
+
+                let pigHitsCount = 0;
+                let pigMissCount = 0;
+
+                if (isPigPlayed && this.members && pronosticosMap) {
+                    const normPigRes = window.ScoringSystem ? window.ScoringSystem.normalizeSign(pigRes) : pigRes;
+                    this.members.forEach(m => {
+                        const p = pronosticosMap.get(`${nextJ.id}_${m.id}`);
+                        if (p) {
+                            const predArr = (p && p.selection) || (p && p.forecast);
+                            const pred = predArr && predArr[nextPigInfo.index] ? String(predArr[nextPigInfo.index]).trim().toUpperCase() : '';
+                            if (pred) {
+                                if (pred === normPigRes || pred === pigRes) {
+                                    pigHitsCount++;
+                                } else {
+                                    pigMissCount++;
+                                }
+                            }
+                        }
+                    });
+                }
+
+                if (heroPigSub) {
+                    if (isPigPlayed) {
+                        heroPigSub.innerHTML = `<span class="text-emerald-400 font-bold">${pigHitsCount} acertantes</span> • <span class="text-rose-400 font-bold">${pigMissCount} fallos</span>`;
+                    } else {
+                        heroPigSub.innerHTML = `<span class="text-slate-400">Por disputar</span> • <span class="text-pink-300 font-semibold">Penalización fallo: -${penaltyVal} €</span>`;
+                    }
+                }
             } else {
+                // NO TIENE PIG EN LA JORNADA ACTUAL
+                // Mostrar el nombre del socio con más aciertos en la jornada en curso
+                if (heroPigCard) {
+                    heroPigCard.className = 'p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-amber-500/30 flex flex-col justify-between';
+                }
+                if (heroPigTitle) {
+                    heroPigTitle.innerHTML = '<span>🎯</span> Más Aciertos';
+                    heroPigTitle.className = 'text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1';
+                }
                 heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700 shrink-0';
                 heroPigBadge.innerHTML = 'Sin PIG';
-                heroPigText.textContent = 'Sin derbi entre los 3 grandes';
-                heroPigText.className = 'text-xs sm:text-sm font-semibold text-slate-300 leading-snug my-auto py-1';
-                if (heroPigSub) heroPigSub.textContent = '';
+
+                if (matchesWithResults > 0 && liveLeaders && liveLeaders.length > 0) {
+                    const leaderNames = liveLeaders.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
+                    const leaderDisplay = leaderNames.length > 2
+                        ? `${leaderNames.slice(0, 2).join(', ')} (+${leaderNames.length - 2})`
+                        : leaderNames.join(', ');
+
+                    heroPigText.textContent = leaderDisplay;
+                    heroPigText.title = leaderNames.join(', ');
+                    heroPigText.className = 'text-sm sm:text-base md:text-lg font-black text-amber-300 leading-snug my-auto py-1 truncate';
+
+                    if (heroPigSub) {
+                        heroPigSub.innerHTML = `<span class="text-emerald-400 font-bold">${maxLiveHits} ${maxLiveHits === 1 ? 'acierto' : 'aciertos'}</span> • <span class="text-slate-400">J${targetJNum} (${matchesWithResults}/15)</span>`;
+                    }
+                } else if (outcome && outcome.winnerName) {
+                    heroPigText.textContent = outcome.winnerName;
+                    heroPigText.title = outcome.winnerName;
+                    heroPigText.className = 'text-sm sm:text-base md:text-lg font-black text-amber-300 leading-snug my-auto py-1 truncate';
+
+                    const prevJNum = outcome.jornadaNumber || (targetJNum - 1);
+                    const prevHits = outcome.winnerHits !== undefined ? outcome.winnerHits : 0;
+                    if (heroPigSub) {
+                        heroPigSub.innerHTML = `<span class="text-slate-400">Ganador J${prevJNum}:</span> <span class="text-emerald-400 font-bold">${prevHits} ${prevHits === 1 ? 'acierto' : 'aciertos'}</span>`;
+                    }
+                } else {
+                    heroPigText.textContent = 'Pendiente de inicio';
+                    heroPigText.className = 'text-xs sm:text-sm font-semibold text-slate-300 leading-snug my-auto py-1';
+                    if (heroPigSub) {
+                        heroPigSub.innerHTML = `<span class="text-slate-400">Jornada ${targetJNum} sin PIG</span>`;
+                    }
+                }
             }
         }
 
@@ -1601,6 +1702,7 @@ class Dashboard2AppController {
             doublesResults: doublesResults,
             prizeWinners: prizeWinners,
             minHitsToWin: minHitsToWin,
+            jornadaNumber: jornada.number,
             totalMoney: prizeMoney + doublesMoney
         };
     }
