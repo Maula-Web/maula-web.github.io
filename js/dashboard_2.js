@@ -520,9 +520,9 @@ class Dashboard2AppController {
             const elLoserDetail = document.getElementById('role-loser-detail');
 
             if (isNextInProgress && liveLoserName) {
-                // En juego: el sellador es provisional
+                // En juego: el sellador es provisional y sellaría la siguiente jornada
                 if (elLoserSubtitle) {
-                    elLoserSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-rose-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Sellador J${nextJornadaNum}</span>`;
+                    elLoserSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-rose-400 font-bold truncate"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse shrink-0"></span> Sellaría la Jornada ${upcomingJornadaNum}</span>`;
                 }
                 if (elLoserName) elLoserName.textContent = liveLoserName;
                 if (elLoserBadge) {
@@ -539,7 +539,7 @@ class Dashboard2AppController {
                 const closedJNum = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
                 const nextSealJNum = targetJNum;
                 if (elLoserSubtitle) {
-                    elLoserSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Sellador J${closedJNum}</span>`;
+                    elLoserSubtitle.innerHTML = `<span class="text-slate-300 font-bold truncate">Sella la Jornada ${nextSealJNum}</span>`;
                 }
                 if (elLoserName) elLoserName.textContent = lastJornadaOutcome.loserName || 'Pendiente';
                 if (elLoserBadge) {
