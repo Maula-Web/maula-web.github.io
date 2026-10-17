@@ -230,16 +230,39 @@ class Jornadas2AppController {
             return;
         }
 
-        // Buscar jornada en curso (con resultados parciales) o la última con resultados
-        let defaultJornada = official.find(j => {
-            const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
-            return filled > 0 && filled < 15;
-        });
+        // 0. Si viene especificada en los parámetros URL (?jId=... o ?jNum=...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramJId = urlParams.get('jId') || urlParams.get('id');
+        const paramJNum = urlParams.get('jNum') || urlParams.get('jornada');
+        let defaultJornada = null;
 
+        if (paramJId) {
+            defaultJornada = official.find(j => String(j.id) === String(paramJId));
+        }
+        if (!defaultJornada && paramJNum) {
+            defaultJornada = official.find(j => Number(j.number) === Number(paramJNum));
+        }
+
+        // 1. Prioridad: Jornada con partidos disputándose en directo (resultados parciales: entre 1 y 14)
         if (!defaultJornada) {
-            // Si no hay en juego, buscar la última finalizada
+            defaultJornada = official.find(j => {
+                const filled = j.matches ? j.matches.filter(m => m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-').length : 0;
+                return filled > 0 && filled < 15;
+            });
+        }
+
+        // 2. Prioridad: Jornada en curso de la semana (primera jornada activa por disputar, aún sin terminar, filled < 15)
+        if (!defaultJornada) {
+            defaultJornada = official.find(j => {
+                const filled = j.matches ? j.matches.filter(m => m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-').length : 0;
+                return filled < 15;
+            });
+        }
+
+        // 3. Fallback: Si toda la temporada está finalizada (todas 15/15), mostrar la última jornada
+        if (!defaultJornada) {
             const finished = official.filter(j => {
-                const filled = j.matches ? j.matches.filter(m => m.result && m.result !== '').length : 0;
+                const filled = j.matches ? j.matches.filter(m => m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-').length : 0;
                 return filled === 15;
             });
             if (finished.length > 0) {
