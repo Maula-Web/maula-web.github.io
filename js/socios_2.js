@@ -22,7 +22,7 @@ class SociosAppController {
         
         this.currentCategory = 'all';
         this.searchQuery = '';
-        this.viewMode = localStorage.getItem('maulas_socios_view') || 'grid';
+        this.viewMode = localStorage.getItem('maulas_socios_view') || 'table';
         this.deleteMode = false;
         
         this.sortColumn = 'id';
@@ -399,6 +399,20 @@ class SociosAppController {
             elTotalComp.textContent = `${totalSocios} socios`;
         }
 
+        // Resumen móvil
+        const elMobTotal = document.getElementById('kpi-mobile-total');
+        const elMobCensoSub = document.getElementById('kpi-mobile-censo-sub');
+        if (elMobTotal) elMobTotal.textContent = totalSocios;
+        if (elMobCensoSub) {
+            if (deudores.length > 0) {
+                elMobCensoSub.textContent = `${deudores.length} deuda`;
+                elMobCensoSub.className = 'text-[9px] text-rose-400 font-bold truncate';
+            } else {
+                elMobCensoSub.textContent = '100% solv.';
+                elMobCensoSub.className = 'text-[9px] text-emerald-400 font-bold truncate';
+            }
+        }
+
         if (elCensoStatus) {
             if (deudores.length > 0) {
                 elCensoStatus.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30';
@@ -491,6 +505,12 @@ class SociosAppController {
         const elUsadosComp = document.getElementById('kpi-dados-usados-compact');
         if (elUsadosComp) elUsadosComp.textContent = `${totalDadosUsados} usadas`;
 
+        // Resumen móvil dados
+        const elMobDadosActivos = document.getElementById('kpi-mobile-dados-activos');
+        const elMobDadosUsados = document.getElementById('kpi-mobile-dados-usados');
+        if (elMobDadosActivos) elMobDadosActivos.textContent = dadosActivosHoy;
+        if (elMobDadosUsados) elMobDadosUsados.textContent = `${totalDadosUsados} / ${maxComodinesTemporada}`;
+
         // Inyectar en KPI 4: Conectividad (Telegram + Push)
         const elTg = document.getElementById('kpi-telegram-vinculados');
         const elPush = document.getElementById('kpi-push-vinculados');
@@ -504,6 +524,12 @@ class SociosAppController {
         const elConectComp = document.getElementById('kpi-conectividad-compact');
         if (elConectComp) {
             elConectComp.textContent = `${conPush} Push · ${conTelegram} TG`;
+        }
+
+        // Resumen móvil conectividad
+        const elMobConect = document.getElementById('kpi-mobile-conectividad');
+        if (elMobConect) {
+            elMobConect.textContent = `${conTelegram} TG · ${conPush} Push`;
         }
 
         // Inyectar Desglose de Conectividad (Telegram + Push) en el desplegable
@@ -717,14 +743,17 @@ class SociosAppController {
         const containerGrid = document.getElementById('members-grid-container');
         const containerTable = document.getElementById('members-table-container');
 
+        const activeClass = 'px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-black transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md';
+        const inactiveClass = 'px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60';
+
         if (mode === 'grid') {
-            if (btnGrid) btnGrid.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow flex items-center gap-1.5';
-            if (btnTable) btnTable.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center gap-1.5';
+            if (btnGrid) btnGrid.className = activeClass;
+            if (btnTable) btnTable.className = inactiveClass;
             if (containerGrid) containerGrid.classList.remove('hidden');
             if (containerTable) containerTable.classList.add('hidden');
         } else {
-            if (btnGrid) btnGrid.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center gap-1.5';
-            if (btnTable) btnTable.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow flex items-center gap-1.5';
+            if (btnGrid) btnGrid.className = inactiveClass;
+            if (btnTable) btnTable.className = activeClass;
             if (containerGrid) containerGrid.classList.add('hidden');
             if (containerTable) containerTable.classList.remove('hidden');
         }
@@ -749,11 +778,11 @@ class SociosAppController {
         if (this.deleteMode) {
             if (icon) icon.textContent = '✕';
             if (txt) txt.textContent = 'Terminar Bajas';
-            if (btn) btn.className = 'px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-rose-600/30';
+            if (btn) btn.className = 'px-3.5 sm:px-4 py-2 sm:py-2.5 bg-rose-600 hover:bg-rose-700 text-white border border-rose-400 font-extrabold rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_22px_rgba(244,63,94,0.6)] animate-pulse';
         } else {
             if (icon) icon.textContent = '➖';
             if (txt) txt.textContent = 'Modo Bajas';
-            if (btn) btn.className = 'px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold rounded-xl text-sm transition flex items-center gap-2';
+            if (btn) btn.className = 'px-3.5 sm:px-4 py-2 sm:py-2.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/50 hover:border-rose-400 font-extrabold rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.25)] hover:shadow-[0_0_22px_rgba(244,63,94,0.4)] flex items-center justify-center gap-2 text-xs sm:text-sm transition-all transform hover:-translate-y-0.5 active:translate-y-0';
         }
 
         this.applyFilters();
@@ -989,7 +1018,7 @@ class SociosAppController {
             }
 
             return `
-                <div class="glass-panel member-card p-5 flex flex-col justify-between border-slate-800/80">
+                <div class="glass-panel member-card p-4 sm:p-5 flex flex-col justify-between border-amber-500/40 bg-slate-950/80">
                     <div>
                         <!-- Fila Superior: Avatar + Nº Socio -->
                         <div class="flex items-start justify-between gap-3 mb-3">
@@ -1111,13 +1140,13 @@ class SociosAppController {
 
             let diceBadge = '';
             if (isExhausted) {
-                diceBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">⚠️ Agotado</span>`;
+                diceBadge = `<span class="px-2.5 py-1 rounded-lg text-xs sm:text-sm font-black bg-rose-500/25 text-rose-300 border border-rose-500/50 inline-flex items-center gap-1.5 shadow-sm">⚠️ Agotado</span>`;
             } else if (isActive) {
-                diceBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">🎲 Activo (${dateRangeStr})</span>`;
+                diceBadge = `<span class="px-2.5 py-1 rounded-lg text-xs sm:text-sm font-black bg-amber-500/25 text-amber-300 border border-amber-500/50 inline-flex items-center gap-1.5 animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.25)]">🎲 Activo (${dateRangeStr})</span>`;
             } else if (m.diceEnabled && m.diceStartDate) {
-                diceBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400">Prog. (${dateRangeStr})</span>`;
+                diceBadge = `<span class="px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold bg-slate-800 text-slate-200 border border-slate-700 inline-flex items-center gap-1.5">⏳ Prog. (${dateRangeStr})</span>`;
             } else {
-                diceBadge = `<span class="text-slate-500 text-xs">Inactivo</span>`;
+                diceBadge = `<span class="px-2 py-0.5 rounded text-xs sm:text-sm font-semibold text-slate-400">⚪ Inactivo</span>`;
             }
 
             let actionBtn = '';
@@ -1164,7 +1193,7 @@ class SociosAppController {
                     </td>
                     <td class="py-3 px-4">${diceBadge}</td>
                     <td class="py-3 px-4 text-center">
-                        <span class="px-2 py-0.5 rounded font-bold ${diceUses >= 3 ? 'text-rose-400 bg-rose-500/10' : 'text-slate-300 bg-slate-800'}">
+                        <span class="px-2.5 py-1 rounded-lg text-xs sm:text-sm font-black ${diceUses >= 3 ? 'text-rose-400 bg-rose-500/20 border border-rose-500/40' : 'text-slate-200 bg-slate-800 border border-slate-700'}">
                             ${diceUses} / 3
                         </span>
                     </td>

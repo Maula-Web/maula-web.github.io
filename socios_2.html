@@ -135,14 +135,16 @@
             animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Tarjeta de socio con hover sutil */
+        /* Tarjeta de socio con reborde amarillo destacado */
         .member-card {
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(245, 158, 11, 0.12) !important;
         }
         .member-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(255, 145, 0, 0.5);
-            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 145, 0, 0.15);
+            border-color: rgba(245, 158, 11, 0.95) !important;
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(245, 158, 11, 0.35) !important;
         }
 
         /* REGLAS CRÍTICAS DE PADDING PARA INPUTS CON ICONOS (PREVALECE SOBRE STYLES.CSS) */
@@ -406,51 +408,69 @@
         </nav>
 
         <!-- CABECERA PRINCIPAL -->
-        <header class="glass-panel p-5 md:p-6 border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 sm:w-14 sm:h-14 min-w-[3rem] min-h-[3rem] sm:min-w-[3.5rem] sm:min-h-[3.5rem] shrink-0 flex-shrink-0 aspect-square rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 text-2xl sm:text-3xl">
+        <header class="glass-panel p-3.5 sm:p-5 md:p-6 border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 min-w-[2.5rem] min-h-[2.5rem] sm:min-w-[3rem] sm:min-h-[3rem] shrink-0 aspect-square rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 text-xl sm:text-2xl">
                     👥
                 </div>
                 <div>
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <h1 class="text-amber-500 dark:text-amber-400 font-extrabold text-xs sm:text-base block truncate">SOCIOS</h1>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                        <h1 class="text-amber-500 dark:text-amber-400 font-extrabold text-sm sm:text-base md:text-lg block tracking-wide">SOCIOS</h1>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
                             Temporada 2026-2027
                         </span>
-                        
                     </div>
-                    <p class="text-xs md:text-sm text-slate-400 mt-1">
-                        Censo oficial de la Peña Maulas, fichas deportivas de socios y control del Dado de Quinielas.
+                    <p class="hidden sm:block text-xs md:text-sm text-slate-400 mt-1">
+                        Censo de la Peña Maulas, fichas deportivas de socios y control del Dado de Quinielas.
                     </p>
                 </div>
             </div>
 
-            <!-- Botones de Acción de Cabecera -->
-            <div class="flex items-center gap-3 flex-wrap">
-                <button id="btn-add-socio" onclick="window.SociosApp.openModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-amber-500/25 flex items-center gap-2 text-sm transition">
-                    <span class="text-lg leading-none">➕</span>
-                    <span>Alta de Nuevo Socio</span>
+            <!-- Botones de Acción de Cabecera (Alta y Bajas) con aspecto igualado, color propio y leve glow -->
+            <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <button id="btn-add-socio" onclick="window.SociosApp.openModal()" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 hover:border-emerald-400 font-extrabold rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.25)] hover:shadow-[0_0_22px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 text-xs sm:text-sm transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                    <span class="text-base sm:text-lg leading-none">➕</span>
+                    <span class="whitespace-nowrap">Alta Socio</span>
                 </button>
-                <button id="btn-toggle-delete" onclick="window.SociosApp.toggleDeleteMode()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold rounded-xl text-sm transition flex items-center gap-2">
-                    <span id="delete-mode-icon">➖</span>
-                    <span id="delete-mode-text">Modo Bajas</span>
+                <button id="btn-toggle-delete" onclick="window.SociosApp.toggleDeleteMode()" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/50 hover:border-rose-400 font-extrabold rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.25)] hover:shadow-[0_0_22px_rgba(244,63,94,0.4)] flex items-center justify-center gap-2 text-xs sm:text-sm transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                    <span id="delete-mode-icon" class="text-base sm:text-lg leading-none">➖</span>
+                    <span id="delete-mode-text" class="whitespace-nowrap">Modo Bajas</span>
                 </button>
             </div>
         </header>
 
-        <!-- Master toggle bar en móvil para Bento KPIs -->
-        <div class="kpi-master-bar flex lg:hidden items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 py-1 px-1">
-            <span class="flex items-center gap-1.5 text-slate-300">
-                <span>👥</span> Métricas del Censo
-            </span>
-            <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
-                <span class="kpi-master-text">Desplegar todos</span>
-                <span class="kpi-master-icon text-[10px]">▼</span>
-            </button>
+        <!-- TARJETA RESUMEN ÚNICA EN MÓVIL (RESUME LAS CUATRO MÉTRICAS EN UNA SOLA FILA COMPACTA) -->
+        <div id="kpi-mobile-summary" class="lg:hidden glass-panel p-2.5 sm:p-3 border-amber-500/30 shadow-md">
+            <div class="grid grid-cols-4 gap-1 text-center divide-x divide-slate-800/80">
+                <!-- 1. Censo -->
+                <div class="flex flex-col items-center justify-center px-1">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-0.5">🏛️ Censo</span>
+                    <span id="kpi-mobile-total" class="text-sm sm:text-base font-black font-mono text-white mt-0.5">--</span>
+                    <span id="kpi-mobile-censo-sub" class="text-[9px] text-emerald-400 font-bold truncate">100% solv.</span>
+                </div>
+                <!-- 2. Dados Hoy -->
+                <div class="flex flex-col items-center justify-center px-1">
+                    <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-0.5">🎲 En curso</span>
+                    <span id="kpi-mobile-dados-activos" class="text-sm sm:text-base font-black font-mono text-amber-400 mt-0.5">--</span>
+                    <span class="text-[9px] text-amber-300/80 font-medium truncate">dados hoy</span>
+                </div>
+                <!-- 3. Comodines -->
+                <div class="flex flex-col items-center justify-center px-1">
+                    <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-0.5">🎯 Comodín</span>
+                    <span id="kpi-mobile-dados-usados" class="text-sm sm:text-base font-black font-mono text-emerald-400 mt-0.5">--</span>
+                    <span class="text-[9px] text-slate-400 font-medium truncate">usadas</span>
+                </div>
+                <!-- 4. Conectividad -->
+                <div class="flex flex-col items-center justify-center px-1">
+                    <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider flex items-center gap-0.5">📡 En línea</span>
+                    <span id="kpi-mobile-conectividad" class="text-xs sm:text-sm font-black font-mono text-sky-300 mt-0.5 truncate">--</span>
+                    <span class="text-[9px] text-slate-400 font-medium truncate">TG • Push</span>
+                </div>
+            </div>
         </div>
 
-        <!-- TARJETAS RESUMEN / KPIS (SIEMPRE EN PRIMER PLANO ABSOLUTO) -->
-        <section id="kpi-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-50 overflow-visible">
+        <!-- TARJETAS RESUMEN / KPIS (EN ESCRITORIO GRID DE 4 COLUMNAS CON TOOLTIPS) -->
+        <section id="kpi-section" class="hidden lg:grid grid-cols-4 gap-4 relative z-50 overflow-visible">
             <!-- KPI 1: Censo Activo & Estado en Bote -->
             <div class="glass-panel p-4 sm:p-5 relative group kpi-card cursor-help transition-all hover:border-amber-500/50 overflow-visible collapsible-kpi">
                 <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
@@ -656,26 +676,26 @@
                 </button>
             </div>
 
-            <!-- Selector de Vista: Fichas vs Tabla -->
-            <div class="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-800 self-end md:self-auto">
-                <button id="view-mode-grid" onclick="window.SociosApp.setViewMode('grid')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow flex items-center gap-1.5">
-                    <span>🎴</span>
-                    <span class="hidden sm:inline">Fichas</span>
+            <!-- Selector de Vista: Fichas vs Tabla (Botones ampliados) -->
+            <div class="flex items-center bg-slate-950/90 p-1 sm:p-1.5 rounded-xl border border-amber-500/30 self-end md:self-auto shrink-0 shadow-inner">
+                <button id="view-mode-table" onclick="window.SociosApp.setViewMode('table')" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-black transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
+                    <span class="text-base sm:text-lg">📑</span>
+                    <span>Tabla</span>
                 </button>
-                <button id="view-mode-table" onclick="window.SociosApp.setViewMode('table')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center gap-1.5">
-                    <span>📑</span>
-                    <span class="hidden sm:inline">Tabla</span>
+                <button id="view-mode-grid" onclick="window.SociosApp.setViewMode('grid')" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                    <span class="text-base sm:text-lg">🎴</span>
+                    <span>Fichas</span>
                 </button>
             </div>
         </div>
 
         <!-- VISTA A: FICHAS DEPORTIVAS (GRID) -->
-        <section id="members-grid-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <section id="members-grid-container" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <!-- Populated dynamically by JS -->
         </section>
 
-        <!-- VISTA B: TABLA COMPACTA EN UNA SOLA LÍNEA (ESTILO BOTE 2) -->
-        <section id="members-table-container" class="hidden glass-panel overflow-hidden border-slate-800">
+        <!-- VISTA B: TABLA COMPACTA EN UNA SOLA LÍNEA (VISTA POR DEFECTO) -->
+        <section id="members-table-container" class="glass-panel overflow-hidden border-slate-800 shadow-xl">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs table-nowrap">
                     <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800 tracking-wider">
@@ -686,8 +706,8 @@
                             <th class="py-3.5 px-4">Correo Electrónico</th>
                             <th class="py-3.5 px-4 cursor-pointer hover:text-white" onclick="window.SociosApp.sortBy('saldo')">Estado en Bote ↕</th>
                             <th class="py-3.5 px-4">Conectividad</th>
-                            <th class="py-3.5 px-4">Dado 🎲 (Estado & Fechas)</th>
-                            <th class="py-3.5 px-4 text-center cursor-pointer hover:text-white" onclick="window.SociosApp.sortBy('diceUses')">Usadas / 3 ↕</th>
+                            <th class="py-3.5 px-4 font-bold text-xs sm:text-sm text-amber-400">Dado 🎲 (Estado & Fechas)</th>
+                            <th class="py-3.5 px-4 text-center cursor-pointer hover:text-white font-bold text-xs sm:text-sm" onclick="window.SociosApp.sortBy('diceUses')">Usadas / 3 ↕</th>
                             <th class="py-3.5 px-4 text-right">Acción</th>
                         </tr>
                     </thead>
