@@ -642,20 +642,20 @@
         </section>
 
         <!-- BARRA DE BÚSQUEDA, FILTROS Y CONMUTADOR DE VISTAS -->
-        <div class="glass-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="glass-panel p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-4">
             <!-- Buscador en tiempo real -->
-            <div class="w-full md:w-80 relative flex items-center">
+            <div class="w-full md:w-72 lg:w-80 relative flex items-center">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center pointer-events-none text-slate-400 text-sm select-none z-10">
                     🔍
                 </span>
-                <input type="text" id="search-input" oninput="window.SociosApp.applyFilters()" placeholder="Buscar socio, apodo, email, @nick..." style="padding-left: 3.25rem !important; padding-right: 2.5rem !important;" class="w-full py-2.5 bg-slate-900/80 border border-slate-700 focus:border-amber-500 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500 transition shadow-inner">
+                <input type="text" id="search-input" oninput="window.SociosApp.applyFilters()" placeholder="Buscar socio, apodo, email, @nick..." style="padding-left: 3.25rem !important; padding-right: 2.5rem !important;" class="w-full py-2 sm:py-2.5 bg-slate-900/80 border border-slate-700 focus:border-amber-500 rounded-xl text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500 transition shadow-inner">
                 <button id="search-clear-btn" onclick="window.SociosApp.clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-slate-400 hover:text-white text-xs font-bold transition p-1 z-10" title="Borrar búsqueda">
                     ✕
                 </button>
             </div>
 
-            <!-- Filtros por Categoría (Píldoras) -->
-            <div class="flex items-center gap-1.5 flex-wrap overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+            <!-- Filtros por Categoría en Escritorio (Píldoras) -->
+            <div class="hidden md:flex items-center gap-1.5 flex-wrap overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
                 <button onclick="window.SociosApp.setCategoryFilter('all')" data-cat="all" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow-md">
                     Todos (<span id="count-all">0</span>)
                 </button>
@@ -676,13 +676,43 @@
                 </button>
             </div>
 
-            <!-- Selector de Vista: Fichas vs Tabla (Botones ampliados) -->
-            <div class="flex items-center bg-slate-950/90 p-1 sm:p-1.5 rounded-xl border border-amber-500/30 self-end md:self-auto shrink-0 shadow-inner">
-                <button id="view-mode-table" onclick="window.SociosApp.setViewMode('table')" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-black transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
+            <!-- EN MÓVIL: FILA COMPACTA CON DESPLEGABLE DE FILTROS Y SELECTOR DE VISTA -->
+            <div class="flex md:hidden items-center justify-between gap-2 w-full">
+                <!-- Desplegable Filtro Móvil -->
+                <div class="relative flex-1 min-w-0">
+                    <select id="mobile-filter-select" onchange="window.SociosApp.setCategoryFilter(this.value)" class="w-full appearance-none bg-slate-900 border border-amber-500/40 text-amber-300 font-bold text-xs py-2 pl-3 pr-8 rounded-xl focus:border-amber-400 focus:outline-none shadow-sm truncate">
+                        <option value="all">Todos (0)</option>
+                        <option value="dice_active">🎲 Dado Activo (0)</option>
+                        <option value="dice_exhausted">⚠️ Dado Agotado (0)</option>
+                        <option value="telegram">💬 Con Telegram (0)</option>
+                        <option value="push">🔔 Con Push (0)</option>
+                        <option value="debt">🔴 Saldo Deudor (0)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-amber-400 text-xs">
+                        ▼
+                    </div>
+                </div>
+
+                <!-- Selector de Vista en Móvil (Fichas vs Tabla) -->
+                <div class="flex items-center bg-slate-950/90 p-1 rounded-xl border border-amber-500/30 shrink-0 shadow-inner">
+                    <button onclick="window.SociosApp.setViewMode('table')" data-view-btn="table" class="view-btn-table px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-md">
+                        <span>📑</span>
+                        <span>Tabla</span>
+                    </button>
+                    <button onclick="window.SociosApp.setViewMode('grid')" data-view-btn="grid" class="view-btn-grid px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white">
+                        <span>🎴</span>
+                        <span>Fichas</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de Vista en Escritorio (Fichas vs Tabla) -->
+            <div class="hidden md:flex items-center bg-slate-950/90 p-1 sm:p-1.5 rounded-xl border border-amber-500/30 self-end md:self-auto shrink-0 shadow-inner">
+                <button id="view-mode-table" onclick="window.SociosApp.setViewMode('table')" data-view-btn="table" class="view-btn-table px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-black transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
                     <span class="text-base sm:text-lg">📑</span>
                     <span>Tabla</span>
                 </button>
-                <button id="view-mode-grid" onclick="window.SociosApp.setViewMode('grid')" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <button id="view-mode-grid" onclick="window.SociosApp.setViewMode('grid')" data-view-btn="grid" class="view-btn-grid px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
                     <span class="text-base sm:text-lg">🎴</span>
                     <span>Fichas</span>
                 </button>
@@ -696,8 +726,8 @@
 
         <!-- VISTA B: TABLA COMPACTA EN UNA SOLA LÍNEA (VISTA POR DEFECTO) -->
         <section id="members-table-container" class="glass-panel overflow-hidden border-slate-800 shadow-xl">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs table-nowrap">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left text-xs table-nowrap min-w-[720px]">
                     <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800 tracking-wider">
                         <tr>
                             <th class="py-3.5 px-4 cursor-pointer hover:text-white" onclick="window.SociosApp.sortBy('id')">Nº Socio ↕</th>

@@ -45,11 +45,15 @@ class SociosAppController {
 
         this.showMainContent();
 
+        // 1.5 Carga INMEDIATA desde fallback local para que la tabla y KPIs nunca queden en blanco ni un milisegundo
+        this.loadImmediateFallbackData();
+        this.setViewMode(this.viewMode, false);
+        this.applyFilters();
+
         // 2. Cargar datos de la base de datos
         await this.loadLiveFirebaseData();
 
-        // 3. Configurar interfaz inicial
-        this.setViewMode(this.viewMode, false);
+        // 3. Configurar selector de fechas
         this.initDatePicker();
         this.applyFilters();
     }
@@ -83,26 +87,70 @@ class SociosAppController {
     }
 
     /**
+     * Carga inmediata de socios desde BOTE_FALLBACK_DATA para renderizar instantáneamente sin esperar a la red
+     */
+    loadImmediateFallbackData() {
+        if (this.members && this.members.length > 0) return;
+        if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027']) {
+            const seasonData = window.BOTE_FALLBACK_DATA['2026-2027'];
+            if (Array.isArray(seasonData.memberSummaries) && seasonData.memberSummaries.length > 0) {
+                this.members = seasonData.memberSummaries.map(m => {
+                    const cleanName = (m.name || '').toLowerCase()
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                        .replace(/[^a-z0-9]/g, "");
+                    return {
+                        id: m.id,
+                        name: m.name,
+                        phone: m.phone || m.name,
+                        email: `${cleanName}@maulas.com`,
+                        tgNick: '',
+                        ...m
+                    };
+                });
+            }
+        }
+        this.loadMemberBalancesFromBote2();
+        this.updateCategoryCounts();
+    }
+
+    /**
      * Carga de datos reales desde Firestore y recuperación de balances de Bote 2
      */
     async loadLiveFirebaseData() {
         try {
             if (window.DataService) {
                 await window.DataService.init();
-                this.members = await window.DataService.getAll('members') || [];
-                this.pronosticos = await window.DataService.getAll('pronosticos') || [];
-                this.jornadas = await window.DataService.getAll('jornadas') || [];
+                const [liveMembers, livePronos, liveJornadas] = await Promise.all([
+                    window.DataService.getAll('members').catch(() => null),
+                    window.DataService.getAll('pronosticos').catch(() => null),
+                    window.DataService.getAll('jornadas').catch(() => null)
+                ]);
+
+                if (Array.isArray(liveMembers) && liveMembers.length > 0) {
+                    this.members = liveMembers;
+                }
+                if (Array.isArray(livePronos) && livePronos.length > 0) {
+                    this.pronosticos = livePronos;
+                }
+                if (Array.isArray(liveJornadas) && liveJornadas.length > 0) {
+                    this.jornadas = liveJornadas;
+                }
             }
             if (!this.members || this.members.length === 0) {
-                if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027']) {
-                    this.members = window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries || [];
-                }
+                this.loadImmediateFallbackData();
             }
             this.pushSubscriptions = await this.loadPushSubscriptions();
             this.loadMemberBalancesFromBote2();
+            this.updateCategoryCounts();
+            this.applyFilters();
         } catch (e) {
             console.error('[Socios 2.0] Error cargando datos de Firestore:', e);
+            if (!this.members || this.members.length === 0) {
+                this.loadImmediateFallbackData();
+            }
             this.loadMemberBalancesFromBote2();
+            this.updateCategoryCounts();
+            this.applyFilters();
         }
     }
 
@@ -631,6 +679,23 @@ class SociosAppController {
         setTxt('count-telegram', cTg);
         setTxt('count-push', cPush);
         setTxt('count-debt', cDebt);
+
+        // Actualizar opciones del desplegable en móvil
+        const mobSelect = document.getElementById('mobile-filter-select');
+        if (mobSelect) {
+            const optAll = mobSelect.querySelector('option[value="all"]');
+            if (optAll) optAll.textContent = `Todos (${cAll})`;
+            const optActive = mobSelect.querySelector('option[value="dice_active"]');
+            if (optActive) optActive.textContent = `🎲 Dado Activo (${cActive})`;
+            const optExhausted = mobSelect.querySelector('option[value="dice_exhausted"]');
+            if (optExhausted) optExhausted.textContent = `⚠️ Dado Agotado (${cExhausted})`;
+            const optTg = mobSelect.querySelector('option[value="telegram"]');
+            if (optTg) optTg.textContent = `💬 Con Telegram (${cTg})`;
+            const optPush = mobSelect.querySelector('option[value="push"]');
+            if (optPush) optPush.textContent = `🔔 Con Push (${cPush})`;
+            const optDebt = mobSelect.querySelector('option[value="debt"]');
+            if (optDebt) optDebt.textContent = `🔴 Saldo Deudor (${cDebt})`;
+        }
     }
 
     /**
@@ -731,6 +796,12 @@ class SociosAppController {
                 btn.className = 'cat-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700';
             }
         });
+
+        const mobSelect = document.getElementById('mobile-filter-select');
+        if (mobSelect && mobSelect.value !== cat) {
+            mobSelect.value = cat;
+        }
+
         this.applyFilters();
     }
 
@@ -738,22 +809,33 @@ class SociosAppController {
         this.viewMode = mode;
         if (save) localStorage.setItem('maulas_socios_view', mode);
 
-        const btnGrid = document.getElementById('view-mode-grid');
-        const btnTable = document.getElementById('view-mode-table');
         const containerGrid = document.getElementById('members-grid-container');
         const containerTable = document.getElementById('members-table-container');
 
-        const activeClass = 'px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-black transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md';
-        const inactiveClass = 'px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60';
+        const activeDesktop = 'view-btn-table px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-black transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md';
+        const inactiveDesktop = 'view-btn-table px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60';
+
+        const activeMobile = 'view-btn-table px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-md';
+        const inactiveMobile = 'view-btn-table px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white';
+
+        document.querySelectorAll('[data-view-btn="table"]').forEach(btn => {
+            const isMob = btn.closest('.md\\:hidden') !== null;
+            btn.className = (mode === 'table')
+                ? (isMob ? activeMobile : activeDesktop)
+                : (isMob ? inactiveMobile : inactiveDesktop);
+        });
+
+        document.querySelectorAll('[data-view-btn="grid"]').forEach(btn => {
+            const isMob = btn.closest('.md\\:hidden') !== null;
+            btn.className = (mode === 'grid')
+                ? (isMob ? activeMobile.replace(/view-btn-table/g, 'view-btn-grid') : activeDesktop.replace(/view-btn-table/g, 'view-btn-grid'))
+                : (isMob ? inactiveMobile.replace(/view-btn-table/g, 'view-btn-grid') : inactiveDesktop.replace(/view-btn-table/g, 'view-btn-grid'));
+        });
 
         if (mode === 'grid') {
-            if (btnGrid) btnGrid.className = activeClass;
-            if (btnTable) btnTable.className = inactiveClass;
             if (containerGrid) containerGrid.classList.remove('hidden');
             if (containerTable) containerTable.classList.add('hidden');
         } else {
-            if (btnGrid) btnGrid.className = inactiveClass;
-            if (btnTable) btnTable.className = activeClass;
             if (containerGrid) containerGrid.classList.add('hidden');
             if (containerTable) containerTable.classList.remove('hidden');
         }
