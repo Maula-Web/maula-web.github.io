@@ -284,43 +284,43 @@
              ===================================================================== -->
         <div id="live-jornada-banner" class="glass-panel p-3 sm:p-4 border-amber-500/40 relative shadow-xl space-y-2.5 sm:space-y-3">
             <!-- Fila Superior: Siguiente Jornada + Cuenta Atrás / Tiempo Límite -->
-            <div class="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
-                <!-- Izquierda: Jornada y Estado -->
-                <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
-                    <span id="live-banner-icon" class="text-xl sm:text-2xl shrink-0">⚽</span>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <span id="live-banner-tag" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono">
-                                Próxima Jornada
-                            </span>
-                            <span id="cd-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                <span>Plazo Abierto</span>
-                            </span>
-                        </div>
-                        <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base uppercase tracking-tight truncate mt-0.5">
-                            Jornada 15
-                        </h2>
+            <div class="border-b border-slate-800/80 pb-2 space-y-1.5">
+                <!-- Badges y Cuenta Atrás Digital -->
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span id="live-banner-icon" class="text-base sm:text-lg shrink-0">⚽</span>
+                        <span id="live-banner-tag" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono">
+                            Próxima Jornada
+                        </span>
+                        <span id="cd-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span>Plazo Abierto</span>
+                        </span>
                     </div>
-                </div>
 
-                <!-- Derecha: Tiempo Límite y Cuenta Atrás Viva -->
-                <div class="text-right shrink-0">
-                    <div class="text-[10px] text-slate-400 uppercase font-semibold">Límite para rellenar:</div>
-                    <div id="cd-deadline-label" class="text-xs font-bold text-amber-300 font-mono leading-tight">Jueves 17:00h</div>
                     <!-- Cuenta atrás digital compacta -->
-                    <div class="flex items-center justify-end gap-0.5 sm:gap-1 font-mono text-xs font-black text-white mt-0.5">
+                    <div class="flex items-center justify-end gap-0.5 sm:gap-1 font-mono text-xs font-black text-white shrink-0">
                         <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 text-amber-400 font-mono" id="cd-days">--</span><span class="text-slate-500 text-[9px]">d</span>
                         <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 font-mono" id="cd-hours">--</span><span class="text-slate-500 text-[9px]">h</span>
                         <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 font-mono" id="cd-mins">--</span><span class="text-slate-500 text-[9px]">m</span>
                         <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 text-emerald-400 font-mono" id="cd-secs">--</span><span class="text-slate-500 text-[9px]">s</span>
                     </div>
                 </div>
+
+                <!-- Título Completo de la Jornada y Fecha Límite -->
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base uppercase tracking-tight">
+                        Jornada 15
+                    </h2>
+                    <div class="text-[10px] sm:text-xs text-slate-400 font-mono">
+                        Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
+                    </div>
+                </div>
             </div>
 
             <p id="live-banner-subtitle" class="hidden text-[11px] text-slate-400"></p>
 
-            <!-- Grid de los 4 Pilares Vitales de la Peña (Caja, Sella, Dobles, PIG) -->
+            <!-- Grid de los 4 Pilares Vitales de la Peña (Nivel 1: Caja y PIG | Nivel 2: Dobles y Sella) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
                 <!-- Pilar 1: 💰 Caja de la Peña -->
                 <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-emerald-500/30 flex flex-col justify-between">
@@ -338,21 +338,22 @@
                     </div>
                 </div>
 
-                <!-- Pilar 2: ✍️ Quién Sella -->
-                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-rose-500/30 flex flex-col justify-between">
+                <!-- Pilar 2: 🐷 Si hay PIG (Subido al primer nivel junto a Caja Real) -->
+                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between">
                     <div class="flex items-center justify-between gap-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                            <span>✍️</span> Sella:
+                            <span>🐷</span> Partido PIG
                         </span>
-                        <span id="role-loser-badge" class="hidden text-[9px] font-mono px-1 rounded bg-rose-500/20 text-rose-300"></span>
+                        <span id="hero-pig-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                            Comprobando...
+                        </span>
                     </div>
-                    <div id="role-loser-name" class="text-sm sm:text-base md:text-lg font-black text-rose-400 truncate tracking-tight my-1">
+                    <div id="hero-pig-text" class="text-[11px] sm:text-xs font-bold text-slate-200 truncate my-1">
                         Cargando...
                     </div>
-                    <div id="role-loser-subtitle" class="text-[9px] sm:text-[10px] text-slate-400 truncate">
-                        Sellador designado
+                    <div id="hero-pig-sub" class="text-[9px] sm:text-[10px] text-slate-400 truncate">
+                        Interés General
                     </div>
-                    <span id="role-loser-detail" class="hidden"></span>
                 </div>
 
                 <!-- Pilar 3: 👑 Quién hace Dobles -->
@@ -373,22 +374,21 @@
                     <span id="role-winner-detail" class="hidden"></span>
                 </div>
 
-                <!-- Pilar 4: 🐷 Si hay PIG -->
-                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between">
+                <!-- Pilar 4: ✍️ Quién Sella (Bajado al segundo nivel junto a Dobles) -->
+                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-rose-500/30 flex flex-col justify-between">
                     <div class="flex items-center justify-between gap-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                            <span>🐷</span> Partido PIG
+                            <span>✍️</span> Sella:
                         </span>
-                        <span id="hero-pig-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
-                            Comprobando...
-                        </span>
+                        <span id="role-loser-badge" class="hidden text-[9px] font-mono px-1 rounded bg-rose-500/20 text-rose-300"></span>
                     </div>
-                    <div id="hero-pig-text" class="text-[11px] sm:text-xs font-bold text-slate-200 truncate my-1">
+                    <div id="role-loser-name" class="text-sm sm:text-base md:text-lg font-black text-rose-400 truncate tracking-tight my-1">
                         Cargando...
                     </div>
-                    <div id="hero-pig-sub" class="text-[9px] sm:text-[10px] text-slate-400 truncate">
-                        Interés General
+                    <div id="role-loser-subtitle" class="text-[9px] sm:text-[10px] text-slate-400 truncate">
+                        Sellador designado
                     </div>
+                    <span id="role-loser-detail" class="hidden"></span>
                 </div>
             </div>
 
