@@ -607,6 +607,23 @@ class Dashboard2AppController {
         if (btnRellenar && nextJ) {
             btnRellenar.href = `pronosticos_2.html?openEditor=true&jId=${encodeURIComponent(nextJ.id)}`;
         }
+        const btnHeroRellenar = document.getElementById('btn-hero-rellenar');
+        if (btnHeroRellenar && nextJ) {
+            btnHeroRellenar.href = `pronosticos_2.html?openEditor=true&jId=${encodeURIComponent(nextJ.id)}`;
+        }
+        const btnHeroJornada = document.getElementById('btn-hero-jornada');
+        if (btnHeroJornada && nextJ) {
+            btnHeroJornada.href = `jornadas_2.html?jId=${encodeURIComponent(nextJ.id)}`;
+        }
+
+        // Usuario logueado en la cabecera
+        const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+        let user = null;
+        try { if (userStr) user = JSON.parse(userStr); } catch (e) {}
+        const elNavUser = document.getElementById('navbar-user-name');
+        if (elNavUser && user && user.name) {
+            elNavUser.textContent = user.name;
+        }
 
         if (inProgress) {
             if (icon) icon.innerHTML = '⚡';
@@ -857,6 +874,26 @@ class Dashboard2AppController {
         const nextPigInfo = this.findPigMatch(nextJ);
         const nextHasPig = nextPigInfo !== null;
         const nextMatchDesc = (nextPigInfo && nextPigInfo.match) ? `(P.${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
+
+        // Actualizar indicador directo en el Cuadro de Mando Principal
+        const heroPigBadge = document.getElementById('hero-pig-badge');
+        const heroPigText = document.getElementById('hero-pig-text');
+        const heroPigSub = document.getElementById('hero-pig-sub');
+        if (heroPigBadge && heroPigText) {
+            if (nextHasPig && nextPigInfo && nextPigInfo.match) {
+                heroPigBadge.className = 'px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse';
+                heroPigBadge.innerHTML = '<span>🐷</span> ¡HAY PIG!';
+                heroPigText.textContent = `${nextPigInfo.match.home} vs ${nextPigInfo.match.away}`;
+                heroPigText.className = 'text-[11px] sm:text-xs font-black text-pink-300 truncate mt-0.5';
+                if (heroPigSub) heroPigSub.textContent = `Penalización fallo: -${penaltyVal} €`;
+            } else {
+                heroPigBadge.className = 'px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+                heroPigBadge.innerHTML = '<span>🐷</span> Sin PIG';
+                heroPigText.textContent = 'Sin derbi entre los 3 grandes';
+                heroPigText.className = 'text-[11px] sm:text-xs font-semibold text-slate-300 truncate mt-0.5';
+                if (heroPigSub) heroPigSub.textContent = 'Exento de penalización';
+            }
+        }
 
         // Comprobar si se han sellado todos los pronósticos de la nueva jornada
         const totalSocios = (this.members && this.members.length >= 19) ? this.members.length : (this.members ? this.members.length : 19);
