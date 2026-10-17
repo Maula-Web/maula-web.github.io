@@ -42,6 +42,11 @@ class Dashboard2AppController {
 
         // 4. Configurar listeners de interfaz (cierre de dropdowns, etc.)
         this.initUiListeners();
+
+        // 5. Ajustar altura vertical completa en móviles si detalles está plegado
+        if (typeof window.adjustDashboardMobileHeight === 'function') {
+            window.adjustDashboardMobileHeight();
+        }
     }
 
     /**
