@@ -2069,12 +2069,25 @@
             }
         };
 
-        // 2. BUSCAR LOS SOCIOS RESPONSABLES DE LA QUINIELA DE DOBLES
+        // 2. BUSCAR LOS SOCIOS RESPONSABLES DE LA QUINIELA DE DOBLES (CON CACHÉ MEMOIZADA)
+        window._eligibleDoublesCache = new Map();
+        window.clearEligibleDoublesCache = function() {
+            if (window._eligibleDoublesCache) window._eligibleDoublesCache.clear();
+            if (window.app && window.app._prevJornadaEvalCache) {
+                window.app._prevJornadaEvalCache.clear();
+            }
+        };
+
         window.getEligibleDoublesMembers = function(jornada) {
             if (!window.app || !window.app.members || window.app.members.length === 0) return [];
             const j = jornada || (window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null);
             if (!j) return [];
             
+            const cacheKey = String(j.id !== undefined ? j.id : j.number);
+            if (window._eligibleDoublesCache && window._eligibleDoublesCache.has(cacheKey)) {
+                return window._eligibleDoublesCache.get(cacheKey);
+            }
+
             const list = [];
             if (typeof window.app.checkEligibility === 'function') {
                 for (const m of window.app.members) {
@@ -2112,6 +2125,10 @@
                         list.push(mem);
                     }
                 });
+            }
+
+            if (window._eligibleDoublesCache) {
+                window._eligibleDoublesCache.set(cacheKey, list);
             }
             return list;
         };
@@ -2489,7 +2506,8 @@
                     });
                 }
 
-                // Cálculo de Puntos Totales por Socio en la Temporada (sin bonificaciones ni penalizaciones en el display)
+                // Cálculo de Puntos Totales por Socio en la Temporada y Mapa de Evaluaciones
+                const memberScoresMap = new Map();
                 const memberTotalPts = {};
                 sortedMembers.forEach(m => { memberTotalPts[String(m.id)] = 0; });
                 if (typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateMember && this.jornadas) {
@@ -2503,6 +2521,7 @@
                                     try {
                                         const ev = ScoringSystem.evaluateMember(m, j, p);
                                         if (ev && ev.played && ev.hits >= 0) {
+                                            memberScoresMap.set(`${String(j.id)}_${String(m.id)}`, ev);
                                             memberTotalPts[String(m.id)] += (ev.points || 0);
                                         }
                                     } catch (err) {}
@@ -2519,7 +2538,7 @@
                     th.style.maxWidth = '58px';
                     th.setAttribute('data-mid', m.id);
                     
-                    const led = this.getMemberStatusLed(m.id, targetJornadaForHeader);
+                    const led = this.getMemberStatusLed(m.id, targetJornadaForHeader, eligibleDoublesMembers);
                     const jNumText = targetJornadaForHeader ? `J${targetJornadaForHeader.number}: ` : '';
                     const nameParts = AppUtils.getMemberName(m).split(' ');
                     const shortName = nameParts[0].length > 7 ? nameParts[0].substring(0, 6) + '.' : nameParts[0];
@@ -2637,7 +2656,7 @@
                             isPlayed = p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
                         }
 
-                        const cellLed = this.getMemberStatusLed(m.id, j);
+                        const cellLed = this.getMemberStatusLed(m.id, j, jEligibleMembers);
                         const isCellDoubles = jEligibleMembers.some(em => String(em.id) === String(m.id));
                         let cellContent = '';
 
@@ -2673,9 +2692,9 @@
                             // Cálculo de Aciertos y Bonus/Penalización
                             let statsBadgesHtml = '';
                             const filledMatchesCount = (j.matches || []).filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length;
-                            if (filledMatchesCount > 0 && typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateMember) {
+                            if (filledMatchesCount > 0) {
                                 try {
-                                    const evMember = ScoringSystem.evaluateMember(m, j, p);
+                                    const evMember = memberScoresMap.get(`${String(j.id)}_${String(m.id)}`) || (typeof ScoringSystem !== 'undefined' && ScoringSystem.evaluateMember ? ScoringSystem.evaluateMember(m, j, p) : null);
                                     if (evMember && evMember.hits >= 0) {
                                         const hitsHtml = `<span class="forecast-badge-hits" title="${evMember.hits} aciertos en ${filledMatchesCount} partidos">${evMember.hits}</span>`;
                                         let bonusHtml = '';
@@ -3167,13 +3186,18 @@
                         if (window.app.selMember) window.app.selMember.value = window.app.currentMemberId;
                     }
 
+                    if (window.app._initialRenderDone) {
+                        if (window.app.updateKPIsCustom) window.app.updateKPIsCustom();
+                        return;
+                    }
+
                     if (window.app.loadForecast) window.app.loadForecast();
                     if (window.app.updateActiveSelectionUI) window.app.updateActiveSelectionUI();
                     window.app.renderSummaryTable();
                     if (window.app.updateKPIsCustom) window.app.updateKPIsCustom();
                 } else if (attempts > 60) {
                     clearInterval(checkAppData);
-                    if (window.app && window.app.renderSummaryTable) {
+                    if (window.app && window.app.renderSummaryTable && !window.app._initialRenderDone) {
                         window.app.renderSummaryTable();
                     }
                 }

@@ -241,6 +241,25 @@ class PronosticoManager {
         }
 
         this.populateDropdowns();
+
+        // 1. Auto-selección inmediata del usuario autenticado en la sesión
+        const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+        if (userStr) {
+            try {
+                const u = JSON.parse(userStr);
+                const found = (this.members || []).find(m => 
+                    String(m.id) === String(u.id) ||
+                    (u.email && m.email && m.email.toLowerCase() === u.email.toLowerCase()) ||
+                    (u.name && m.name && m.name.toLowerCase() === u.name.toLowerCase()) ||
+                    (u.phone && m.phone && m.phone.toLowerCase() === u.phone.toLowerCase())
+                );
+                if (found) {
+                    this.currentMemberId = String(found.id);
+                    if (this.selMember) this.selMember.value = this.currentMemberId;
+                }
+            } catch(e) {}
+        }
+
         if (!this.currentMemberId && this.selMember && this.selMember.value) {
             this.currentMemberId = this.selMember.value;
         }
@@ -259,6 +278,7 @@ class PronosticoManager {
         if (this.currentMemberId && this.currentJornadaId) {
             this.loadForecast();
         }
+        this._initialRenderDone = true;
     }
 
     // ... (populateDropdowns, updateCorrectionUI, etc remains same) ...
@@ -1062,8 +1082,12 @@ class PronosticoManager {
                     this.pronosticos.push(record);
                 }
 
-                // Update summary table in background
-                this.renderSummaryTable();
+                // Update summary table in background (debounced to avoid blocking UI during typing)
+                if (window.clearEligibleDoublesCache) window.clearEligibleDoublesCache();
+                if (this._renderSummaryDebounce) clearTimeout(this._renderSummaryDebounce);
+                this._renderSummaryDebounce = setTimeout(() => {
+                    this.renderSummaryTable();
+                }, 500);
                 console.log("Auto-save silenciado OK (Late:", isLate, ")");
 
                 // NEW: Alert if completed (checking first 14 signs)
@@ -1475,6 +1499,8 @@ class PronosticoManager {
             }
         }
 
+        if (window.clearEligibleDoublesCache) window.clearEligibleDoublesCache();
+        if (this._prevJornadaEvalCache) this._prevJornadaEvalCache.clear();
         this.renderSummaryTable(); // Refresh summary
 
         // Check for Habemus Quinielam (Telegram) de inmediato y sin depender de temporizadores bloqueados por alertas
@@ -1625,7 +1651,7 @@ class PronosticoManager {
      * - 'yellow': Pronóstico completo, pero falta rellenar la Quiniela de Dobles (solo para el socio responsable de dobles).
      * - 'red': Falta algún signo del pronóstico o está pendiente.
      */
-    getMemberStatusLed(memberId, targetJornada) {
+    getMemberStatusLed(memberId, targetJornada, precalculatedEligibleDoubles = null) {
         if (!targetJornada) return { status: 'red', title: 'Sin jornada' };
         const jIdStr = String(targetJornada.id);
         const mIdStr = String(memberId);
@@ -1671,7 +1697,9 @@ class PronosticoManager {
         // Comprobar si este socio es el responsable/elegible para la Quiniela de Dobles en esta jornada.
         let isEligibleDoubles = false;
         try {
-            if (typeof window !== 'undefined' && typeof window.getEligibleDoublesMembers === 'function') {
+            if (precalculatedEligibleDoubles !== null && Array.isArray(precalculatedEligibleDoubles)) {
+                isEligibleDoubles = precalculatedEligibleDoubles.some(m => String(m.id) === mIdStr);
+            } else if (typeof window !== 'undefined' && typeof window.getEligibleDoublesMembers === 'function') {
                 const dms = window.getEligibleDoublesMembers(targetJornada);
                 if (dms && dms.some(m => String(m.id) === mIdStr)) {
                     isEligibleDoubles = true;
@@ -1682,7 +1710,7 @@ class PronosticoManager {
                     isEligibleDoubles = true;
                 }
             }
-            if (!isEligibleDoubles && typeof this.checkEligibility === 'function') {
+            if (!isEligibleDoubles && precalculatedEligibleDoubles === null && typeof this.checkEligibility === 'function') {
                 const elig = this.checkEligibility(targetJornada.number, memberId, true);
                 if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) {
                     isEligibleDoubles = true;
@@ -2521,93 +2549,97 @@ class PronosticoManager {
             return { eligible: false };
         }
 
-        // 3. CALCULAR DATOS DE TODOS LOS SOCIOS PARA LA JORNADA PREVIA
-        const prizeMap = (prevJornada.prizes && typeof prevJornada.prizes === 'object' && Object.keys(prevJornada.prizes).length > 0)
-            ? prevJornada.prizes 
-            : (prevJornada.prizeRates || {});
-        const leaderboard = this.members.map(m => {
-            const p = this.pronosticos.find(pred => {
-                const pJid = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : (pred.jornadaId || ''));
-                const pMid = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : (pred.memberId || ''));
-                const matchJ = (pJid === String(prevJornada.id) || pJid === String(prevJornada.number));
-                const matchM = (pMid === String(m.id));
-                return matchJ && matchM;
+        // 3. CALCULAR DATOS DE TODOS LOS SOCIOS PARA LA JORNADA PREVIA (CON CACHÉ O(1))
+        if (!this._prevJornadaEvalCache) this._prevJornadaEvalCache = new Map();
+        const prevKey = `${prevJornada.id}_${prevJornada.number}`;
+        let cachedEval = this._prevJornadaEvalCache.get(prevKey);
+
+        if (!cachedEval) {
+            const prizeMap = (prevJornada.prizes && typeof prevJornada.prizes === 'object' && Object.keys(prevJornada.prizes).length > 0)
+                ? prevJornada.prizes 
+                : (prevJornada.prizeRates || {});
+            const leaderboard = this.members.map(m => {
+                const p = this.pronosticos.find(pred => {
+                    const pJid = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : (pred.jornadaId || ''));
+                    const pMid = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : (pred.memberId || ''));
+                    const matchJ = (pJid === String(prevJornada.id) || pJid === String(prevJornada.number));
+                    const matchM = (pMid === String(m.id));
+                    return matchJ && matchM;
+                });
+
+                if (!p || !p.selection) {
+                    return { id: String(m.id), name: m.name, points: -5, hits: 0, prize: 0, isLate: false, isPardoned: false };
+                }
+
+                const isLate = p.late && !p.pardoned;
+                const isPardoned = p.pardoned || false;
+
+                if (isLate) {
+                    return { id: String(m.id), name: m.name, points: ScoringSystem.calculateScore(0, jDate), hits: 0, prize: 0, isLate: true, isPardoned: false };
+                }
+
+                let evPoints = 0;
+                let evHits = 0;
+                let evPrize = 0;
+                if (p.selection && Array.isArray(p.selection)) {
+                    const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
+                    evPoints = ev.points;
+                    evHits = ev.hits;
+                    const pVal = prizeMap[ev.hits] || prizeMap[String(ev.hits)] || 0;
+                    evPrize = typeof pVal === 'number' ? pVal : parseFloat(String(pVal).replace(',', '.').replace('€', '').trim() || 0);
+                }
+                if (typeof ScoringSystem !== 'undefined' && typeof ScoringSystem.evaluateMember === 'function') {
+                    try {
+                        const evMem = ScoringSystem.evaluateMember(m, prevJornada, p, { forceFinished: true });
+                        if (evMem) {
+                            evPoints = evMem.points;
+                            evHits = evMem.hits;
+                            const pMemPrize = typeof evMem.prize === 'number' ? evMem.prize : parseFloat(String(evMem.prize || 0).replace(',', '.').replace('€', '').trim() || 0);
+                            if (pMemPrize > 0) evPrize = pMemPrize;
+                        }
+                    } catch (e) {}
+                }
+                if (typeof BoteEngine !== 'undefined' && typeof BoteEngine.getPrizesForMemberJornada === 'function') {
+                    try {
+                        const bPrize = BoteEngine.getPrizesForMemberJornada(m.id, prevJornada, this.pronosticos);
+                        if (bPrize > 0) evPrize = bPrize;
+                    } catch (e) {}
+                }
+
+                return { id: String(m.id), name: m.name, points: evPoints, hits: evHits, prize: evPrize, isLate: p.late || false, isPardoned: isPardoned };
             });
 
-            if (!p || !p.selection) {
-                return { id: String(m.id), name: m.name, points: -5, hits: 0, prize: 0, isLate: false, isPardoned: false };
+            // 4. FILTRAR CANDIDATOS ELEGIBLES PARA GANADOR: excluir tarde sin perdón
+            const eligibleForWinner = leaderboard.filter(l => {
+                if (!l.isLate) return true;
+                if (l.isPardoned) return true;
+                if (l.prize > 0) return true;
+                return false;
+            });
+
+            let absoluteWinnerId = null;
+            if (eligibleForWinner.length > 0) {
+                // 5. ENCONTRAR MÁXIMO DE PUNTOS
+                const maxPoints = Math.max(...eligibleForWinner.map(l => l.points));
+                let winnerCandidates = eligibleForWinner.filter(l => l.points === maxPoints);
+
+                // 6. DESEMPATE RECURSIVO SI HAY EMPATE
+                if (winnerCandidates.length > 1) {
+                    winnerCandidates = this.resolveTieEligibility(winnerCandidates, prevJornada.number);
+                }
+
+                // 7. El ganador es el primero de la lista
+                if (winnerCandidates.length > 0 && winnerCandidates[0].points > -5) {
+                    absoluteWinnerId = winnerCandidates[0].id;
+                }
             }
 
-            const isLate = p.late && !p.pardoned;
-            const isPardoned = p.pardoned || false;
-
-            if (isLate) {
-                return { id: String(m.id), name: m.name, points: ScoringSystem.calculateScore(0, jDate), hits: 0, prize: 0, isLate: true, isPardoned: false };
-            }
-
-            // Usar ScoringSystem.evaluateMember si está disponible para calcular tanto puntos como premios económicos
-            let evPoints = 0;
-            let evHits = 0;
-            let evPrize = 0;
-            if (p.selection && Array.isArray(p.selection)) {
-                const ev = ScoringSystem.evaluateForecast(p.selection, officialResults, jDate);
-                evPoints = ev.points;
-                evHits = ev.hits;
-                const pVal = prizeMap[ev.hits] || prizeMap[String(ev.hits)] || 0;
-                evPrize = typeof pVal === 'number' ? pVal : parseFloat(String(pVal).replace(',', '.').replace('€', '').trim() || 0);
-            }
-            if (typeof ScoringSystem !== 'undefined' && typeof ScoringSystem.evaluateMember === 'function') {
-                try {
-                    const evMem = ScoringSystem.evaluateMember(m, prevJornada, p, { forceFinished: true });
-                    if (evMem) {
-                        evPoints = evMem.points;
-                        evHits = evMem.hits;
-                        const pMemPrize = typeof evMem.prize === 'number' ? evMem.prize : parseFloat(String(evMem.prize || 0).replace(',', '.').replace('€', '').trim() || 0);
-                        if (pMemPrize > 0) evPrize = pMemPrize;
-                    }
-                } catch (e) {}
-            }
-            if (typeof BoteEngine !== 'undefined' && typeof BoteEngine.getPrizesForMemberJornada === 'function') {
-                try {
-                    const bPrize = BoteEngine.getPrizesForMemberJornada(m.id, prevJornada, this.pronosticos);
-                    if (bPrize > 0) evPrize = bPrize;
-                } catch (e) {}
-            }
-
-            return { id: String(m.id), name: m.name, points: evPoints, hits: evHits, prize: evPrize, isLate: p.late || false, isPardoned: isPardoned };
-        });
-
-        // 4. FILTRAR CANDIDATOS ELEGIBLES PARA GANADOR: excluir tarde sin perdón
-        const eligibleForWinner = leaderboard.filter(l => {
-            if (!l.isLate) return true;
-            if (l.isPardoned) return true;
-            if (l.prize > 0) return true;
-            return false;
-        });
-
-        if (eligibleForWinner.length === 0) {
-            console.log(`DOUBLES: Ningún socio elegible en J${prevJornada.number}`);
-            return { eligible: false };
+            cachedEval = { leaderboard, absoluteWinnerId };
+            this._prevJornadaEvalCache.set(prevKey, cachedEval);
         }
 
-        // 5. ENCONTRAR MÁXIMO DE PUNTOS
-        const maxPoints = Math.max(...eligibleForWinner.map(l => l.points));
-        let winnerCandidates = eligibleForWinner.filter(l => l.points === maxPoints);
-
-        console.log(`DOUBLES: J${prevJornada.number} - Candidatos con ${maxPoints} puntos:`, winnerCandidates.map(c => c.name));
-
-        // 6. DESEMPATE RECURSIVO SI HAY EMPATE
-        if (winnerCandidates.length > 1) {
-            console.log(`DOUBLES: Empate detectado, aplicando desempate recursivo...`);
-            winnerCandidates = this.resolveTieEligibility(winnerCandidates, prevJornada.number);
-        }
-
-        // 7. El ganador es el primero de la lista
-        let absoluteWinnerId = null;
-        if (winnerCandidates.length > 0 && winnerCandidates[0].points > -5) {
-            absoluteWinnerId = winnerCandidates[0].id;
-            console.log(`🏆 GANADOR ÚNICO J${prevJornada.number}: ${winnerCandidates[0].name} (${winnerCandidates[0].points} pts)`);
-        }
+        const leaderboard = cachedEval.leaderboard;
+        const absoluteWinnerId = cachedEval.absoluteWinnerId;
 
         // 8. Verificación para el socio actual:
         // Criterio 1: GANADOR ABSOLUTO de la jornada anterior.
@@ -3205,6 +3237,8 @@ class PronosticoManager {
             this.btnSaveDoubles.style.backgroundColor = '#4caf50';
 
             // Refresh summary table to show the new/updated doubles row
+            if (window.clearEligibleDoublesCache) window.clearEligibleDoublesCache();
+            if (this._prevJornadaEvalCache) this._prevJornadaEvalCache.clear();
             this.renderSummaryTable();
 
             // Verificación y auto-envío desatendido del boleto oficial a la administración
@@ -3408,9 +3442,19 @@ class PronosticoManager {
 
     async loadMDAnalysisData() {
         try {
-            const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?v=${Date.now()}`);
+            const cached = sessionStorage.getItem('maulas_md_analysis');
+            if (cached) {
+                try {
+                    this.mdAnalysisData = JSON.parse(cached);
+                    return;
+                } catch(e) {}
+            }
+            const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?v=20261017_v1`);
             if (res.ok) {
                 this.mdAnalysisData = await res.json();
+                try {
+                    sessionStorage.setItem('maulas_md_analysis', JSON.stringify(this.mdAnalysisData));
+                } catch(e) {}
             }
         } catch (e) {
             console.warn('No se pudo cargar el análisis de Mundo Deportivo:', e);
