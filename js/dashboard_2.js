@@ -1103,7 +1103,7 @@ class Dashboard2AppController {
     }
 
     /**
-     * Widget Bote en caja - Sincronizado al 100% con los cálculos oficiales consolidados de Bote 2
+     * Widget Bote en caja - Sincronizado al 100% con los cálculos consolidados de Bote 2
      * FUENTE OFICIAL: BOTE_FALLBACK_DATA['2026-2027'].summary (nunca se recalcula aquí)
      * Si BoteEngine está activo en vivo sobreescribe con los datos de Firestore
      */
@@ -1234,7 +1234,7 @@ class Dashboard2AppController {
         if (isNextInProgress && liveLoserName) {
             items.push(`✍️ <strong class="text-rose-400">Sellador provisional en juego:</strong> ${liveLoserName} ocupa el puesto de sellado.`);
         } else if (outcome && outcome.loserName) {
-            items.push(`✍️ <strong class="text-rose-400">Sellador Oficial:</strong> ${outcome.loserName} acude a loterías a sellar el boleto colectivo.`);
+            items.push(`✍️ <strong class="text-rose-400">Sellador:</strong> ${outcome.loserName} acude a loterías a sellar el boleto colectivo.`);
         } else {
             items.push(`✍️ <strong class="text-rose-400">Sellador de la semana:</strong> Reembolsado al 100% por la caja común del Bote.`);
         }
@@ -1323,10 +1323,10 @@ class Dashboard2AppController {
         const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`;
         items.push(`📈 <strong class="text-emerald-300">Superávit Peña:</strong> ${superavit >= 0 ? '+' : ''}${superavitFmt} a favor de la caja común.`);
 
-        // 14. Próxima Cena Oficial de la Peña
+        // 14. Próxima Cena de la Peña
         items.push(`🍽️ <strong class="text-amber-300">Cenas de la Peña:</strong> 1ª Vuelta el Vie 29 Ene 2027 • Fin de Temporada el Vie 04 Jun 2027.`);
 
-        // 15. Tradición Maula / Broma Oficial
+        // 15. Tradición Maula / Broma
         items.push(`🚩 <strong class="text-rose-300">Tradición Maula:</strong> Botón de expulsión de Emilio disponible salvo en la hora previa al cierre.`);
 
         // Asegurar que siempre hay exactamente 15 elementos
@@ -1378,7 +1378,7 @@ class Dashboard2AppController {
     }
 
     /**
-     * Broma oficial: Expulsar a Emilio
+     * Broma: Expulsar a Emilio
      */
     async handlePrankDisplay() {
         const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
@@ -1711,7 +1711,7 @@ class Dashboard2AppController {
                             • <strong>Tarjeta Híbrida Rotativa:</strong> Esta tarjeta rota inteligentemente según la actualidad de la peña. Las semanas donde la jornada anterior hubo un Partido de Interés General (PIG), se muestran los resultados del PIG, los acertantes y quiénes deben pagar la penalización. En las semanas sin PIG, se muestra al último clasificado de la general con la Rana 🐸.
                         </p>
                         <p>
-                            • La clasificación general se actualiza automáticamente tras cada jornada sumando los puntos oficiales de todos los socios.
+                            • La clasificación general se actualiza automáticamente tras cada jornada sumando los puntos de todos los socios.
                         </p>
                     </div>
                 `
@@ -1726,7 +1726,7 @@ class Dashboard2AppController {
                     </div>
                     <div class="space-y-2 text-xs text-slate-300 pt-1">
                         <p>
-                            • El ganador selecciona los <strong>signos dobles</strong> de la combinación oficial de la peña para la siguiente jornada.
+                            • El ganador selecciona los <strong>signos dobles</strong> de la combinación de la peña para la siguiente jornada.
                         </p>
                         <p>
                             • El coste íntegro del boleto es financiado por el bote común de la peña, y cualquier premio que obtenga la combinación se reparte según las normas oficiales.
