@@ -418,15 +418,15 @@ class Jornadas2AppController {
         const statusText = document.getElementById('selected-jornada-status-text');
         if (statusChip && statusText) {
             if (isFinished) {
-                statusChip.className = 'hidden lg:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-blue-950/70 text-blue-400 border border-blue-500/70 items-center gap-1.5 shadow-sm shrink-0';
+                statusChip.className = 'hidden xl:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-blue-950/70 text-blue-400 border border-blue-500/70 items-center gap-1.5 shadow-sm shrink-0';
                 statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]';
                 statusText.textContent = 'Jugada (15/15)';
             } else if (isInProgress) {
-                statusChip.className = 'hidden lg:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-950/70 text-amber-300 border border-amber-500/70 items-center gap-1.5 shadow-sm shrink-0';
+                statusChip.className = 'hidden xl:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-950/70 text-amber-300 border border-amber-500/70 items-center gap-1.5 shadow-sm shrink-0';
                 statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping shadow-[0_0_8px_rgba(251,191,36,0.8)]';
                 statusText.textContent = `En Juego (${filledMatches}/15)`;
             } else {
-                statusChip.className = 'hidden lg:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-950/70 text-emerald-400 border border-emerald-500/70 items-center gap-1.5 shadow-sm shrink-0';
+                statusChip.className = 'hidden xl:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-950/70 text-emerald-400 border border-emerald-500/70 items-center gap-1.5 shadow-sm shrink-0';
                 statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]';
                 statusText.textContent = 'Próxima a Jugar';
             }

@@ -304,6 +304,12 @@
             #jornadas-hub-section {
                 padding: 0.4rem 0.6rem !important;
             }
+            #jornada-select-dropdown {
+                min-width: 220px !important;
+            }
+            #selected-jornada-status-chip {
+                display: none !important;
+            }
         }
 </style>
 </head>
@@ -718,31 +724,31 @@
              ===================================================================== -->
         <section id="jornadas-hub-section" class="glass-panel p-2.5 sm:p-4 border-amber-500/40 space-y-2.5 sm:space-y-3 order-4 min-w-0 max-w-full sticky top-1 sm:top-2 z-40 bg-slate-950/95 backdrop-blur-md shadow-2xl transition-all">
             <!-- Barra Superior del Hub: Selector desplegable moderno + Acciones compactas en Móvil / Botones en PC -->
-            <div class="flex items-center justify-between gap-2 w-full flex-nowrap">
+            <div class="flex items-center justify-between gap-2 sm:gap-3 w-full">
                 <!-- Selector y Navegación ◀ [Dropdown] ▶ -->
-                <div class="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-[260px] sm:min-w-[300px] flex-1 sm:flex-initial">
                     <!-- Flecha Anterior -->
-                    <button type="button" id="btn-prev-jornada" onclick="window.JornadasApp.navigateJornada(-1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada anterior">
+                    <button type="button" id="btn-prev-jornada" onclick="window.JornadasApp.navigateJornada(-1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none shadow-sm" title="Jornada anterior">
                         ◀
                     </button>
 
                     <!-- Selector Desplegable Estilizado de Jornadas -->
-                    <div class="relative flex-1 min-w-0">
+                    <div class="relative min-w-[190px] sm:min-w-[230px] flex-1">
                         <label for="jornada-select-dropdown" class="sr-only">Seleccionar Jornada</label>
-                        <select id="jornada-select-dropdown" onchange="window.JornadasApp.handleSelectJornada(this.value)" class="w-full pl-2.5 sm:pl-3 pr-6 sm:pr-7 py-2 bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-inner truncate">
+                        <select id="jornada-select-dropdown" onchange="window.JornadasApp.handleSelectJornada(this.value)" class="w-full pl-2.5 sm:pl-3 pr-7 py-2 bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-inner truncate">
                             <option value="">Cargando jornadas...</option>
                         </select>
-                        <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
+                        <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
                     </div>
 
                     <!-- Flecha Siguiente -->
-                    <button type="button" id="btn-next-jornada" onclick="window.JornadasApp.navigateJornada(1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada siguiente">
+                    <button type="button" id="btn-next-jornada" onclick="window.JornadasApp.navigateJornada(1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none shadow-sm" title="Jornada siguiente">
                         ▶
                     </button>
                 </div>
 
-                <!-- Badge Dinámico de Estado (Visible en Escritorio) -->
-                <span id="selected-jornada-status-chip" class="hidden lg:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 items-center justify-center gap-1.5 shrink-0">
+                <!-- Badge Dinámico de Estado (Visible en Pantallas Grandes xl) -->
+                <span id="selected-jornada-status-chip" class="hidden xl:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 items-center justify-center gap-1.5 shrink-0">
                     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                     <span id="selected-jornada-status-text">Finalizada</span>
                 </span>
@@ -777,22 +783,22 @@
                     </div>
                 </div>
 
-                <!-- EN ESCRITORIO: Botones de Acción Completos -->
-                <div class="hidden lg:flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
-                    <button type="button" onclick="window.JornadasApp.openAuditModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow" title="Auditar integridad y detectar discrepancias de toda la temporada">
-                        <span>🔍</span> Verificación Total
+                <!-- EN ESCRITORIO: Botones de Acción Completos (1 sola fila limpia sin wrapping) -->
+                <div class="hidden lg:flex items-center gap-1 sm:gap-1.5 flex-nowrap justify-end shrink-0">
+                    <button type="button" onclick="window.JornadasApp.openAuditModal()" class="px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Auditar integridad y detectar discrepancias de toda la temporada">
+                        <span>🔍</span> <span class="hidden 2xl:inline">Verificación Total</span><span class="2xl:hidden">Auditoría</span>
                     </button>
-                    <button type="button" onclick="window.JornadasApp.openImportMatchesModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
-                        <span>📋</span> Importar Partidos
+                    <button type="button" onclick="window.JornadasApp.openImportMatchesModal()" class="px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Importar Partidos oficiales">
+                        <span>📋</span> <span class="hidden xl:inline">Importar </span><span>Partidos</span>
                     </button>
-                    <button type="button" onclick="window.JornadasApp.openImportResultsModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
-                        <span>📥</span> Importar Resultados
+                    <button type="button" onclick="window.JornadasApp.openImportResultsModal()" class="px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Importar Resultados escrutados">
+                        <span>📥</span> <span class="hidden xl:inline">Importar </span><span>Resultados</span>
                     </button>
-                    <button type="button" onclick="window.JornadasApp.openEditModalCurrent()" class="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/50 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
-                        <span>✏️</span> Editar Jornada
+                    <button type="button" onclick="window.JornadasApp.openEditModalCurrent()" class="px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/50 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Editar jornada activa">
+                        <span>✏️</span> <span>Editar</span><span class="hidden xl:inline"> Jornada</span>
                     </button>
-                    <button type="button" onclick="window.JornadasApp.openNewJornadaModal()" class="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-[11px] sm:text-xs transition flex items-center gap-1.5 shadow">
-                        <span>➕</span> Nueva
+                    <button type="button" onclick="window.JornadasApp.openNewJornadaModal()" class="px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-[11px] sm:text-xs transition flex items-center gap-1 shadow whitespace-nowrap" title="Crear nueva jornada">
+                        <span>➕</span> <span>Nueva</span>
                     </button>
                 </div>
             </div>
