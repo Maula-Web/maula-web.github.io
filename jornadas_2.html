@@ -311,6 +311,13 @@
                 display: none !important;
             }
         }
+
+        /* Ocultar icono en botón acciones en modo vertical */
+        @media (orientation: portrait) {
+            .btn-actions-icon {
+                display: none !important;
+            }
+        }
 </style>
 </head>
 
@@ -756,7 +763,7 @@
                 <!-- EN MÓVIL: Botón Desplegable de Acciones (Ahorra múltiples filas y gana enorme espacio vertical) -->
                 <div class="relative lg:hidden shrink-0" id="mobile-jornada-actions-container">
                     <button type="button" onclick="window.toggleMobileJornadaActions()" class="px-2.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs border border-amber-500/40 transition flex items-center gap-1 shadow-sm whitespace-nowrap">
-                        <span>⚙️</span>
+                        <span class="btn-actions-icon hidden landscape:inline">⚙️</span>
                         <span>Acciones</span>
                         <span class="text-[10px] text-amber-400">▼</span>
                     </button>
