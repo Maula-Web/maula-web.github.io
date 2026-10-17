@@ -639,6 +639,10 @@ class Dashboard2AppController {
         if (btnHeroJornada && nextJ) {
             btnHeroJornada.href = `jornadas_2.html?jId=${encodeURIComponent(nextJ.id)}`;
         }
+        const btnHeroClasificacion = document.getElementById('btn-hero-clasificacion');
+        if (btnHeroClasificacion) {
+            btnHeroClasificacion.href = 'clasificacion_2.html';
+        }
 
         // Usuario logueado en la cabecera
         const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
