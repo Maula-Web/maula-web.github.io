@@ -110,7 +110,7 @@ class SociosAppController {
             }
         }
         this.loadMemberBalancesFromBote2();
-        this.updateCategoryCounts();
+        this.updatePillCounters();
     }
 
     /**
@@ -141,7 +141,7 @@ class SociosAppController {
             }
             this.pushSubscriptions = await this.loadPushSubscriptions();
             this.loadMemberBalancesFromBote2();
-            this.updateCategoryCounts();
+            this.updatePillCounters();
             this.applyFilters();
         } catch (e) {
             console.error('[Socios 2.0] Error cargando datos de Firestore:', e);
@@ -149,9 +149,13 @@ class SociosAppController {
                 this.loadImmediateFallbackData();
             }
             this.loadMemberBalancesFromBote2();
-            this.updateCategoryCounts();
+            this.updatePillCounters();
             this.applyFilters();
         }
+    }
+
+    updateCategoryCounts() {
+        return this.updatePillCounters();
     }
 
     /**
