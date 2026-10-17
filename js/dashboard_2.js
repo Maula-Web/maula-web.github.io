@@ -1027,7 +1027,7 @@ class Dashboard2AppController {
 
                     if (heroPigTitle) {
                         heroPigTitle.innerHTML = `<span>📊</span> Media Peña (J${targetJNum})`;
-                        heroPigTitle.className = 'text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate min-w-0';
+                        heroPigTitle.className = 'text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1';
                         heroPigTitle.title = `Media de aciertos de la Peña en Jornada ${targetJNum}`;
                     }
 
@@ -1050,7 +1050,7 @@ class Dashboard2AppController {
 
                     if (heroPigTitle) {
                         heroPigTitle.innerHTML = `<span>📊</span> Media Peña (J${prevJNum})`;
-                        heroPigTitle.className = 'text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate min-w-0';
+                        heroPigTitle.className = 'text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1';
                         heroPigTitle.title = `Media oficial de la Peña en Jornada ${prevJNum}`;
                     }
 
