@@ -428,8 +428,8 @@
             </div>
         </nav>
 
-        <!-- Top Announcement Bar -->
-        <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm order-2 w-full max-w-full overflow-hidden">
+        <!-- Top Announcement Bar (oculta en móviles para ganar espacio vertical) -->
+        <div class="hidden sm:flex p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm order-2 w-full max-w-full overflow-hidden">
             <div class="flex items-center gap-3 w-full min-w-0">
                 <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-base sm:text-lg flex items-center justify-center shadow-inner shrink-0">⚽</span>
                 <div class="min-w-0 flex-1">
@@ -449,21 +449,41 @@
         </div>
 
         <!-- =====================================================================
-             BENTO KPIS: 4 TARJETAS INFORMATIVAS (PLEGABLES EN MÓVIL)
+             BENTO KPIS: INDICADORES DE LA JORNADA
              ===================================================================== -->
         <section class="space-y-2 order-3">
-            <!-- Barra Maestra de Despliegue en Móvil (< lg) -->
-            <div class="kpi-master-bar flex lg:hidden items-center justify-between px-1 py-0.5 text-xs text-slate-400 font-bold">
-                <span class="flex items-center gap-1.5 text-slate-300">
-                    <span>📊</span> Indicadores de la Jornada
-                </span>
-                <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
-                    <span class="kpi-master-text">Desplegar todos</span>
-                    <span class="kpi-master-icon text-[10px]">▼</span>
-                </button>
+            <!-- TARJETA RESUMEN ÚNICA EN MÓVIL (Resume los cuatro indicadores en una sola fila compacta) -->
+            <div id="kpi-mobile-summary" class="lg:hidden glass-panel p-2.5 sm:p-3 border-amber-500/30 shadow-md">
+                <div class="grid grid-cols-4 gap-1 text-center divide-x divide-slate-800/80">
+                    <!-- 1. Estado y Jornada -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-0.5">⏱️ Estado</span>
+                        <span id="kpi-mobile-jornada-num" class="text-xs sm:text-sm font-black font-mono text-white mt-0.5 truncate">Jornada -</span>
+                        <span id="kpi-mobile-jornada-status" class="text-[9px] text-emerald-400 font-bold truncate">15/15 reg.</span>
+                    </div>
+                    <!-- 2. Signos 1-X-2 -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider flex items-center gap-0.5">📊 1-X-2</span>
+                        <span id="kpi-mobile-signos" class="text-xs sm:text-sm font-black font-mono text-sky-300 mt-0.5">0 - 0 - 0</span>
+                        <span id="kpi-mobile-pleno" class="text-[9px] text-slate-400 font-medium truncate">P15: -</span>
+                    </div>
+                    <!-- 3. Partido PIG -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-pink-400 font-bold uppercase tracking-wider flex items-center gap-0.5">🐷 PIG</span>
+                        <span id="kpi-mobile-pig-teams" class="text-xs sm:text-sm font-black text-pink-300 mt-0.5 truncate max-w-[80px]">Sin PIG</span>
+                        <span id="kpi-mobile-pig-penalty" class="text-[9px] text-slate-400 font-medium truncate">Exento</span>
+                    </div>
+                    <!-- 4. Premios -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-0.5">💰 Premios</span>
+                        <span id="kpi-mobile-prizes" class="text-xs sm:text-sm font-black font-mono text-emerald-400 mt-0.5">0,00 €</span>
+                        <span id="kpi-mobile-prizes-sub" class="text-[9px] text-slate-400 font-medium truncate">Loterías</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+            <!-- 4 TARJETAS INFORMATIVAS DETALLADAS PARA ESCRITORIO -->
+            <div class="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
 
                 <!-- KPI 1: ESTADO Y FECHA OFICIAL -->
                 <div class="glass-panel collapsible-kpi p-3 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition">
@@ -686,42 +706,70 @@
              HUB DE CONTROL Y SELECTOR DE JORNADAS 2.0 (DESPLEGABLE & PÍLDORAS)
              ===================================================================== -->
         <section id="jornadas-hub-section" class="glass-panel p-2.5 sm:p-4 border-amber-500/40 space-y-2.5 sm:space-y-3 order-4 min-w-0 max-w-full sticky top-1 sm:top-2 z-40 bg-slate-950/95 backdrop-blur-md shadow-2xl transition-all">
-            <!-- Barra Superior del Hub: Selector desplegable moderno + Botones Admin -->
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto min-w-0">
-                    <!-- Fila con Flechas y Selector Dropdown juntos en una sola línea -->
-                    <div class="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
-                        <!-- Flecha Anterior -->
-                        <button type="button" id="btn-prev-jornada" onclick="window.JornadasApp.navigateJornada(-1)" class="w-9 h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada anterior">
-                            ◀
-                        </button>
+            <!-- Barra Superior del Hub: Selector desplegable moderno + Acciones compactas en Móvil / Botones en PC -->
+            <div class="flex items-center justify-between gap-2 w-full flex-nowrap">
+                <!-- Selector y Navegación ◀ [Dropdown] ▶ -->
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+                    <!-- Flecha Anterior -->
+                    <button type="button" id="btn-prev-jornada" onclick="window.JornadasApp.navigateJornada(-1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada anterior">
+                        ◀
+                    </button>
 
-                        <!-- Selector Desplegable Estilizado de Jornadas -->
-                        <div class="relative flex-1 min-w-0">
-                            <label for="jornada-select-dropdown" class="sr-only">Seleccionar Jornada</label>
-                            <select id="jornada-select-dropdown" onchange="window.JornadasApp.handleSelectJornada(this.value)" class="w-full pl-3 pr-7 py-2 bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-inner truncate">
-                                <option value="">Cargando jornadas...</option>
-                            </select>
-                            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
-                        </div>
-
-                        <!-- Flecha Siguiente -->
-                        <button type="button" id="btn-next-jornada" onclick="window.JornadasApp.navigateJornada(1)" class="w-9 h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada siguiente">
-                            ▶
-                        </button>
+                    <!-- Selector Desplegable Estilizado de Jornadas -->
+                    <div class="relative flex-1 min-w-0">
+                        <label for="jornada-select-dropdown" class="sr-only">Seleccionar Jornada</label>
+                        <select id="jornada-select-dropdown" onchange="window.JornadasApp.handleSelectJornada(this.value)" class="w-full pl-2.5 sm:pl-3 pr-6 sm:pr-7 py-2 bg-slate-950 border border-amber-500/50 hover:border-amber-400 focus:border-amber-400 rounded-xl text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer appearance-none shadow-inner truncate">
+                            <option value="">Cargando jornadas...</option>
+                        </select>
+                        <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">▼</span>
                     </div>
 
-                    <!-- Badge Dinámico de Estado de la Jornada Seleccionada -->
-                    <span id="selected-jornada-status-chip" class="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 inline-flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                        <span id="selected-jornada-status-text">Finalizada</span>
-                    </span>
+                    <!-- Flecha Siguiente -->
+                    <button type="button" id="btn-next-jornada" onclick="window.JornadasApp.navigateJornada(1)" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-xs sm:text-sm transition hover:border-amber-500/50 disabled:opacity-30 disabled:pointer-events-none" title="Jornada siguiente">
+                        ▶
+                    </button>
                 </div>
 
-                <!-- Botones de Acción / Herramientas de Administrador -->
-                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-start lg:justify-end">
+                <!-- Badge Dinámico de Estado (Visible en Escritorio) -->
+                <span id="selected-jornada-status-chip" class="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 items-center justify-center gap-1.5 shrink-0">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="selected-jornada-status-text">Finalizada</span>
+                </span>
+
+                <!-- EN MÓVIL: Botón Desplegable de Acciones (Ahorra múltiples filas y gana enorme espacio vertical) -->
+                <div class="relative sm:hidden shrink-0" id="mobile-jornada-actions-container">
+                    <button type="button" onclick="window.toggleMobileJornadaActions()" class="px-2.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs border border-amber-500/40 transition flex items-center gap-1 shadow-sm whitespace-nowrap">
+                        <span>⚙️</span>
+                        <span>Acciones</span>
+                        <span class="text-[10px] text-amber-400">▼</span>
+                    </button>
+                    <div id="mobile-jornada-actions-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-panel border border-amber-500/50 rounded-xl shadow-2xl p-1.5 z-50 divide-y divide-slate-800 text-xs">
+                        <div class="py-1 space-y-0.5">
+                            <button type="button" onclick="window.JornadasApp.openEditModalCurrent(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-amber-500/10 hover:text-amber-300 text-slate-200 font-semibold flex items-center gap-2">
+                                <span>✏️</span> Editar Jornada
+                            </button>
+                            <button type="button" onclick="window.JornadasApp.openNewJornadaModal(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-amber-500/10 hover:text-amber-300 text-amber-400 font-bold flex items-center gap-2">
+                                <span>➕</span> Nueva Jornada
+                            </button>
+                        </div>
+                        <div class="py-1 space-y-0.5">
+                            <button type="button" onclick="window.JornadasApp.openImportResultsModal(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-emerald-500/10 hover:text-emerald-300 text-slate-200 flex items-center gap-2">
+                                <span>📥</span> Importar Resultados
+                            </button>
+                            <button type="button" onclick="window.JornadasApp.openImportMatchesModal(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-300 text-slate-200 flex items-center gap-2">
+                                <span>📋</span> Importar Partidos
+                            </button>
+                            <button type="button" onclick="window.JornadasApp.openAuditModal(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-500/10 hover:text-sky-300 text-slate-200 flex items-center gap-2">
+                                <span>🔍</span> Verificación Total
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EN ESCRITORIO: Botones de Acción Completos -->
+                <div class="hidden sm:flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
                     <button type="button" onclick="window.JornadasApp.openAuditModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow" title="Auditar integridad y detectar discrepancias de toda la temporada">
-                        <span>🔍</span> Verificación Total de Resultados
+                        <span>🔍</span> Verificación Total
                     </button>
                     <button type="button" onclick="window.JornadasApp.openImportMatchesModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 shadow">
                         <span>📋</span> Importar Partidos
@@ -738,8 +786,8 @@
                 </div>
             </div>
 
-            <!-- Carrusel Deslizable de Píldoras de Navegación Rápida -->
-            <div class="pt-2 border-t border-slate-800/80 min-w-0 max-w-full">
+            <!-- Carrusel Deslizable de Píldoras de Navegación Rápida (Oculto en móvil) -->
+            <div class="hidden sm:block pt-2 border-t border-slate-800/80 min-w-0 max-w-full">
                 <div class="flex items-center justify-between text-xs text-slate-400 mb-1.5">
                     <span class="font-medium">Jornadas oficiales de la temporada (Domingos):</span>
                     <span id="total-jornadas-counter" class="font-mono text-amber-400">0 jornadas</span>

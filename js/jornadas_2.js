@@ -497,6 +497,37 @@ class Jornadas2AppController {
             if (elPigPenalty) elPigPenalty.textContent = 'Exento';
         }
 
+        // 4.1 Actualizar métricas de Tarjeta Resumen Única en Móvil
+        const mobJNum = document.getElementById('kpi-mobile-jornada-num');
+        const mobJStatus = document.getElementById('kpi-mobile-jornada-status');
+        if (mobJNum) mobJNum.textContent = `Jornada ${jornada.number}`;
+        if (mobJStatus) {
+            mobJStatus.textContent = isFinished ? '15/15 reg.' : (isInProgress ? `${filledMatches}/15 reg.` : 'Pendiente');
+            mobJStatus.className = `text-[9px] font-bold truncate ${isFinished ? 'text-blue-400' : (isInProgress ? 'text-amber-400' : 'text-emerald-400')}`;
+        }
+
+        const mobSignos = document.getElementById('kpi-mobile-signos');
+        const mobPleno = document.getElementById('kpi-mobile-pleno');
+        if (mobSignos) mobSignos.textContent = `${count1} - ${countX} - ${count2}`;
+        if (mobPleno) mobPleno.textContent = `P15: ${plenoScore}`;
+
+        const mobPigTeams = document.getElementById('kpi-mobile-pig-teams');
+        const mobPigPenalty = document.getElementById('kpi-mobile-pig-penalty');
+        if (pigInfo && pigInfo.match) {
+            const m = pigInfo.match;
+            if (mobPigTeams) mobPigTeams.textContent = `${m.home} - ${m.away}`;
+            if (mobPigPenalty) {
+                mobPigPenalty.textContent = '1,00 € mult.';
+                mobPigPenalty.className = 'text-[9px] text-pink-400 font-bold truncate';
+            }
+        } else {
+            if (mobPigTeams) mobPigTeams.textContent = 'Sin PIG';
+            if (mobPigPenalty) {
+                mobPigPenalty.textContent = 'Exento';
+                mobPigPenalty.className = 'text-[9px] text-slate-400 font-medium truncate';
+            }
+        }
+
         // 4b. Desplegable de Aciertos y Fallos PIG
         const elPigDesgloseContainer = document.getElementById('kpi-pig-desglose-container');
         const elPigDesgloseSummaryText = document.getElementById('kpi-pig-desglose-summary-text');
@@ -726,6 +757,14 @@ class Jornadas2AppController {
         } else {
             elDetail.textContent = 'Sin premios registrados en la jornada';
             elDetail.className = 'text-xs text-slate-400 truncate';
+        }
+
+        const mobPrizes = document.getElementById('kpi-mobile-prizes');
+        const mobPrizesSub = document.getElementById('kpi-mobile-prizes-sub');
+        if (mobPrizes) mobPrizes.textContent = formattedPrize;
+        if (mobPrizesSub) {
+            mobPrizesSub.textContent = winnersCount > 0 ? `${winnersCount} con premio` : 'Sin premios';
+            mobPrizesSub.className = `text-[9px] font-medium truncate ${winnersCount > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}`;
         }
     }
 
@@ -2369,4 +2408,23 @@ class Jornadas2AppController {
 // Inicialización automática al cargar el documento
 document.addEventListener('DOMContentLoaded', () => {
     window.JornadasApp = new Jornadas2AppController();
+});
+
+// Gestor del menú desplegable de acciones de jornada para móviles
+window.toggleMobileJornadaActions = function(forceClose) {
+    const dropdown = document.getElementById('mobile-jornada-actions-dropdown');
+    if (!dropdown) return;
+    if (forceClose === false) {
+        dropdown.classList.add('hidden');
+    } else {
+        dropdown.classList.toggle('hidden');
+    }
+};
+
+document.addEventListener('click', (e) => {
+    const container = document.getElementById('mobile-jornada-actions-container');
+    const dropdown = document.getElementById('mobile-jornada-actions-dropdown');
+    if (container && dropdown && !container.contains(e.target)) {
+        dropdown.classList.add('hidden');
+    }
 });
