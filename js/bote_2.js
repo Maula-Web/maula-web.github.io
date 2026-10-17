@@ -618,6 +618,8 @@ class BoteAppController {
             cardCaja.textContent = val;
             const cComp = document.getElementById('card-caja-real-compact');
             if (cComp) cComp.textContent = val;
+            const mobCaja = document.getElementById('kpi-mobile-caja');
+            if (mobCaja) mobCaja.textContent = val;
         }
         const actualSumaSaldos = (data.memberSummaries && data.memberSummaries.length > 0)
             ? data.memberSummaries.reduce((sum, m) => sum + (m.saldo || 0), 0)
@@ -628,22 +630,34 @@ class BoteAppController {
             cardIn.textContent = val;
             const cComp = document.getElementById('card-total-ingresos-compact');
             if (cComp) cComp.textContent = val;
+            const mobIn = document.getElementById('kpi-mobile-ingresos');
+            if (mobIn) mobIn.textContent = val;
         }
         if (cardOut) {
             const val = (s.totalGastos || 0).toFixed(2).replace('.', ',') + ' €';
             cardOut.textContent = val;
             const cComp = document.getElementById('card-total-gastos-compact');
             if (cComp) cComp.textContent = val;
+            const mobOut = document.getElementById('kpi-mobile-gastos');
+            if (mobOut) mobOut.textContent = val;
         }
         if (cardPrem) {
             const val = (s.totalPremios || 0).toFixed(2).replace('.', ',') + ' €';
             cardPrem.textContent = val;
             const cComp = document.getElementById('card-total-premios-compact');
             if (cComp) cComp.textContent = val;
+            const mobPrem = document.getElementById('kpi-mobile-premios');
+            if (mobPrem) mobPrem.textContent = val;
         }
         if (cardSuperavit) {
             const superavit = (s.cajaReal || 0) - actualSumaSaldos;
-            cardSuperavit.textContent = `${superavit >= 0 ? '+' : ''}${superavit.toFixed(2).replace('.', ',')} €`;
+            const supFormatted = `${superavit >= 0 ? '+' : ''}${superavit.toFixed(2).replace('.', ',')} €`;
+            cardSuperavit.textContent = supFormatted;
+            const mobSup = document.getElementById('kpi-mobile-superavit');
+            if (mobSup) {
+                mobSup.textContent = `Sup: ${supFormatted}`;
+                mobSup.className = `text-[9px] font-bold truncate ${superavit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            }
         }
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
         if (bJornadas) bJornadas.textContent = data.jornadaSummaries.length;
@@ -866,10 +880,41 @@ class BoteAppController {
                 </tr>
             `;
         }
+
+        // Actualizar contadores en filtros desktop y desplegable móvil
+        if (data.memberSummaries) {
+            const tot = data.memberSummaries.length;
+            const pos = data.memberSummaries.filter(m => m.saldo >= 0).length;
+            const neg = data.memberSummaries.filter(m => m.saldo < 0).length;
+            
+            const btnAll = document.querySelector('#member-filters button[data-filter="all"]');
+            const btnPos = document.querySelector('#member-filters button[data-filter="positive"]');
+            const btnNeg = document.querySelector('#member-filters button[data-filter="negative"]');
+            if (btnAll) btnAll.textContent = `Todos (${tot})`;
+            if (btnPos) btnPos.textContent = `En Positivo (${pos})`;
+            if (btnNeg) btnNeg.textContent = `En Deuda (${neg})`;
+
+            const mobSelect = document.getElementById('mobile-member-filter');
+            if (mobSelect) {
+                const optAll = mobSelect.querySelector('option[value="all"]');
+                const optPos = mobSelect.querySelector('option[value="positive"]');
+                const optNeg = mobSelect.querySelector('option[value="negative"]');
+                if (optAll) optAll.textContent = `Todos (${tot})`;
+                if (optPos) optPos.textContent = `🟢 En Positivo (${pos})`;
+                if (optNeg) optNeg.textContent = `🔴 En Deuda (${neg})`;
+                if (mobSelect.value !== (this.memberFilter || 'all')) {
+                    mobSelect.value = this.memberFilter || 'all';
+                }
+            }
+        }
     }
 
     filterMembers(type) {
         this.memberFilter = type;
+        const mobSelect = document.getElementById('mobile-member-filter');
+        if (mobSelect && mobSelect.value !== type) {
+            mobSelect.value = type;
+        }
         document.querySelectorAll('#member-filters button').forEach(b => {
             if (b.dataset.filter === type) {
                 b.className = 'px-3 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 border border-orange-400 shadow-sm';
@@ -3969,28 +4014,22 @@ class BoteAppController {
 
     setSociosViewMode(mode) {
         this.sociosViewMode = mode;
-        const btnTable = document.getElementById('btn-socios-mode-table');
-        const btnChart = document.getElementById('btn-socios-mode-chart');
         const tableCont = document.getElementById('socios-table-container');
         const chartCont = document.getElementById('socios-chart-container');
 
+        document.querySelectorAll('[data-socios-view]').forEach(btn => {
+            if (btn.dataset.sociosView === mode) {
+                btn.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm';
+            } else {
+                btn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60';
+            }
+        });
+
         if (mode === 'chart') {
-            if (btnChart) {
-                btnChart.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm';
-            }
-            if (btnTable) {
-                btnTable.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60';
-            }
             if (tableCont) tableCont.classList.add('hidden');
             if (chartCont) chartCont.classList.remove('hidden');
             setTimeout(() => this.renderSociosChart(), 50);
         } else {
-            if (btnTable) {
-                btnTable.className = 'px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm';
-            }
-            if (btnChart) {
-                btnChart.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60';
-            }
             if (chartCont) chartCont.classList.add('hidden');
             if (tableCont) tableCont.classList.remove('hidden');
         }

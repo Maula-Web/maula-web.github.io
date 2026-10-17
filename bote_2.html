@@ -521,10 +521,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="text-amber-500 dark:text-amber-400 font-extrabold text-xs sm:text-base block truncate">BOTE & TESORERÍA</h1>
-                        <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                            Peña Maulas
-                        </span>
+                        <h1 class="text-amber-500 dark:text-amber-400 font-extrabold text-base sm:text-xl block truncate">BOTE & TESORERÍA</h1>
                     </div>
                     <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Control financiero, balances individuales y reconstrucción jornada a jornada</p>
                 </div>
@@ -578,20 +575,40 @@
             </div>
         </header>
 
-        <!-- Bento Grid Financiero (Plegable en Móvil para ver la tabla de saldos) -->
+        <!-- Bento Grid Financiero -->
         <section class="space-y-2">
-            <!-- Barra Maestra de Despliegue en Móvil (< lg) -->
-            <div class="kpi-master-bar flex lg:hidden items-center justify-between px-1 py-0.5 text-xs text-slate-400 font-bold">
-                <span class="flex items-center gap-1.5 text-slate-300">
-                    <span>💰</span> Resumen Financiero
-                </span>
-                <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
-                    <span class="kpi-master-text">Desplegar todos</span>
-                    <span class="kpi-master-icon text-[10px]">▼</span>
-                </button>
+            <!-- TARJETA RESUMEN ÚNICA EN MÓVIL (Resume las cuatro métricas financieras en una sola fila compacta) -->
+            <div id="kpi-mobile-summary" class="lg:hidden glass-panel p-2.5 sm:p-3 border-amber-500/30 shadow-md">
+                <div class="grid grid-cols-4 gap-1 text-center divide-x divide-slate-800/80">
+                    <!-- 1. Bote Total (Caja Real) -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-0.5">💰 Caja Real</span>
+                        <span id="kpi-mobile-caja" class="text-xs sm:text-sm font-black font-mono text-amber-400 mt-0.5">829,48 €</span>
+                        <span id="kpi-mobile-superavit" class="text-[9px] text-emerald-400 font-bold truncate">Sup: +127,52 €</span>
+                    </div>
+                    <!-- 2. Total Ingresos -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-0.5">📥 Ingresos</span>
+                        <span id="kpi-mobile-ingresos" class="text-xs sm:text-sm font-black font-mono text-emerald-400 mt-0.5">0,00 €</span>
+                        <span class="text-[9px] text-slate-400 font-medium truncate">Cuotas/Bizums</span>
+                    </div>
+                    <!-- 3. Total Gastos -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-rose-400 font-bold uppercase tracking-wider flex items-center gap-0.5">📤 Gastos</span>
+                        <span id="kpi-mobile-gastos" class="text-xs sm:text-sm font-black font-mono text-rose-400 mt-0.5">0,00 €</span>
+                        <span class="text-[9px] text-slate-400 font-medium truncate">Sellado LAE</span>
+                    </div>
+                    <!-- 4. Premios Ganados -->
+                    <div class="flex flex-col items-center justify-center px-1">
+                        <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-0.5">🏆 Premios</span>
+                        <span id="kpi-mobile-premios" class="text-xs sm:text-sm font-black font-mono text-amber-400 mt-0.5">0,00 €</span>
+                        <span class="text-[9px] text-slate-400 font-medium truncate">Acumulado LAE</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-4 relative z-30">
+            <!-- Bento Grid Financiero para Pantallas Grandes (Desktop) -->
+            <div class="hidden lg:grid lg:grid-cols-5 gap-2.5 sm:gap-4 relative z-30">
                 
                 <!-- Hero Card: Bote Total en Caja (2 columnas en pantallas grandes) -->
                 <div class="lg:col-span-2 glass-panel collapsible-kpi p-3 sm:p-5 relative flex flex-col justify-between border-amber-500/40 bg-gradient-to-br from-amber-950/20 via-slate-900/60 to-slate-900/80">
@@ -809,7 +826,8 @@
 
             <!-- Barra de Filtros y Modo de Vista -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs">
-                <div class="flex items-center gap-2 flex-wrap">
+                <!-- Filtros en Escritorio (Píldoras) -->
+                <div class="hidden sm:flex items-center gap-2 flex-wrap">
                     <span class="text-slate-400 font-semibold">Filtrar:</span>
                     <div class="flex gap-1.5" id="member-filters">
                         <button onclick="window.BoteApp.filterMembers('all')" data-filter="all" class="px-3 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 border border-orange-400 shadow-sm">Todos (19)</button>
@@ -818,11 +836,37 @@
                     </div>
                 </div>
 
-                <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-700/80 self-start sm:self-center gap-1">
-                    <button onclick="window.BoteApp.setSociosViewMode('table')" id="btn-socios-mode-table" class="px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm">
+                <!-- EN MÓVIL: FILA COMPACTA CON DESPLEGABLE DE FILTROS Y SELECTOR DE VISTA -->
+                <div class="flex sm:hidden items-center justify-between gap-2 w-full">
+                    <!-- Desplegable Filtro Móvil -->
+                    <div class="relative flex-1 min-w-0">
+                        <select id="mobile-member-filter" onchange="window.BoteApp.filterMembers(this.value)" class="w-full appearance-none bg-slate-900 border border-amber-500/40 text-amber-300 font-bold text-xs py-2 pl-3 pr-8 rounded-xl focus:border-amber-400 focus:outline-none shadow-sm truncate">
+                            <option value="all">Todos (19)</option>
+                            <option value="positive">🟢 En Positivo</option>
+                            <option value="negative">🔴 En Deuda</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-amber-400 text-xs">
+                            ▼
+                        </div>
+                    </div>
+
+                    <!-- Selector de Vista en Móvil -->
+                    <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-amber-500/30 shrink-0 gap-1 shadow-inner">
+                        <button onclick="window.BoteApp.setSociosViewMode('table')" data-socios-view="table" class="px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm">
+                            <span>📋</span> Tabla
+                        </button>
+                        <button onclick="window.BoteApp.setSociosViewMode('chart')" data-socios-view="chart" class="px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60">
+                            <span>📊</span> Gráfico
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Selector de Vista en Escritorio -->
+                <div class="hidden sm:inline-flex rounded-xl bg-slate-950 p-1 border border-slate-700/80 self-start sm:self-center gap-1">
+                    <button onclick="window.BoteApp.setSociosViewMode('table')" data-socios-view="table" id="btn-socios-mode-table" class="px-2.5 py-1 rounded-lg font-bold bg-orange-500 text-slate-950 text-xs flex items-center gap-1.5 transition-all border border-orange-400 shadow-sm">
                         <span>📋</span> Tabla
                     </button>
-                    <button onclick="window.BoteApp.setSociosViewMode('chart')" id="btn-socios-mode-chart" class="px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60">
+                    <button onclick="window.BoteApp.setSociosViewMode('chart')" data-socios-view="chart" id="btn-socios-mode-chart" class="px-2.5 py-1 rounded-lg font-semibold text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-all border border-slate-600/70 bg-slate-900/90 hover:border-orange-500/60">
                         <span>📊</span> Gráfico Comparativo
                     </button>
                 </div>
