@@ -478,9 +478,10 @@ class Dashboard2AppController {
             }
 
             if (liveWinnerHits === null) {
-                // Jornada cerrada / no en juego: mostrar ganador oficial de la última jornada cerrada
+                // Jornada cerrada / no en juego: mostrar ganador de la última jornada cerrada
                 if (elWinnerSubtitle) {
-                    elWinnerSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Ganador Oficial (J${lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1))}):</span>`;
+                    const winJ = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
+                    elWinnerSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Ganador J${winJ}</span>`;
                 }
                 currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
                 if (elWinnerDetail) {
@@ -498,7 +499,7 @@ class Dashboard2AppController {
                 if (hitsToShow !== null && hitsToShow >= 0) {
                     elWinnerHitsBadge.classList.remove('hidden');
                     const isLive = liveWinnerHits !== null;
-                    elWinnerHitsBadge.textContent = `${hitsToShow} ${hitsToShow === 1 ? 'acierto' : 'aciertos'}${isLive ? ' (Provisional)' : ''}`;
+                    elWinnerHitsBadge.textContent = `${hitsToShow} ${hitsToShow === 1 ? 'acierto' : 'aciertos'}`;
                     if (isLive) {
                         elWinnerHitsBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm animate-pulse';
                     } else {
@@ -518,13 +519,13 @@ class Dashboard2AppController {
             if (isNextInProgress && liveLoserName) {
                 // En juego: el sellador es provisional
                 if (elLoserSubtitle) {
-                    elLoserSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-rose-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Sellador Provisional (J${nextJornadaNum}):</span>`;
+                    elLoserSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-rose-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Sellador J${nextJornadaNum}</span>`;
                 }
                 if (elLoserName) elLoserName.textContent = liveLoserName;
                 if (elLoserBadge) {
                     elLoserBadge.classList.remove('hidden');
-                    const ptsText = (liveLoserPoints !== null && liveLoserPoints !== undefined) ? `${liveLoserPoints} ${liveLoserPoints === 1 ? 'pto' : 'pts'} ` : '';
-                    elLoserBadge.textContent = `${ptsText}(Provisional)`;
+                    const ptsText = (liveLoserPoints !== null && liveLoserPoints !== undefined) ? `${liveLoserPoints} ${liveLoserPoints === 1 ? 'pto' : 'pts'}` : '0 pts';
+                    elLoserBadge.textContent = ptsText;
                     elLoserBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-sm animate-pulse';
                 }
                 if (elLoserDetail) {
@@ -535,7 +536,7 @@ class Dashboard2AppController {
                 const closedJNum = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
                 const nextSealJNum = targetJNum;
                 if (elLoserSubtitle) {
-                    elLoserSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Sellador Oficial (J${closedJNum}):</span>`;
+                    elLoserSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Sellador J${closedJNum}</span>`;
                 }
                 if (elLoserName) elLoserName.textContent = lastJornadaOutcome.loserName || 'Pendiente';
                 if (elLoserBadge) {
@@ -920,16 +921,16 @@ class Dashboard2AppController {
         const heroPigSub = document.getElementById('hero-pig-sub');
         if (heroPigBadge && heroPigText) {
             if (nextHasPig && nextPigInfo && nextPigInfo.match) {
-                heroPigBadge.className = 'px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse';
-                heroPigBadge.innerHTML = '<span>🐷</span> ¡HAY PIG!';
+                heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse shrink-0';
+                heroPigBadge.innerHTML = '¡HAY PIG!';
                 heroPigText.textContent = `${nextPigInfo.match.home} vs ${nextPigInfo.match.away}`;
-                heroPigText.className = 'text-[11px] sm:text-xs font-black text-pink-300 truncate mt-0.5';
+                heroPigText.className = 'text-xs sm:text-sm md:text-base font-black text-pink-300 leading-snug my-auto py-1';
                 if (heroPigSub) heroPigSub.textContent = `Penalización fallo: -${penaltyVal} €`;
             } else {
-                heroPigBadge.className = 'px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
-                heroPigBadge.innerHTML = '<span>🐷</span> Sin PIG';
+                heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700 shrink-0';
+                heroPigBadge.innerHTML = 'Sin PIG';
                 heroPigText.textContent = 'Sin derbi entre los 3 grandes';
-                heroPigText.className = 'text-[11px] sm:text-xs font-semibold text-slate-300 truncate mt-0.5';
+                heroPigText.className = 'text-xs sm:text-sm font-semibold text-slate-300 leading-snug my-auto py-1';
                 if (heroPigSub) heroPigSub.textContent = '';
             }
         }
