@@ -644,6 +644,11 @@ class Dashboard2AppController {
         }
 
         if (inProgress) {
+            const elContainer = document.getElementById('countdown-timer-container');
+            if (elContainer) {
+                elContainer.classList.remove('countdown-active');
+                elContainer.classList.add('countdown-idle');
+            }
             if (icon) icon.innerHTML = '⚡';
             if (tag) {
                 tag.textContent = 'En Vivo';
@@ -697,8 +702,13 @@ class Dashboard2AppController {
             const elM = document.getElementById('cd-mins');
             const elS = document.getElementById('cd-secs');
             const elBadge = document.getElementById('cd-status-badge');
+            const elContainer = document.getElementById('countdown-timer-container');
 
             if (diff <= 0) {
+                if (elContainer) {
+                    elContainer.classList.remove('countdown-active');
+                    elContainer.classList.add('countdown-idle');
+                }
                 if (elD) elD.textContent = '00';
                 if (elH) elH.textContent = '00';
                 if (elM) elM.textContent = '00';
@@ -709,6 +719,12 @@ class Dashboard2AppController {
                 }
                 clearInterval(this.countdownInterval);
                 return;
+            }
+
+            // Cuenta atrás activa: reloj grande y destacado
+            if (elContainer) {
+                elContainer.classList.remove('countdown-idle');
+                elContainer.classList.add('countdown-active');
             }
 
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -1311,10 +1327,10 @@ class Dashboard2AppController {
 
         // Renderizar elementos con loop continuo infinito (duplicados exactamente una vez)
         const renderItemHtml = (it, idx) => `
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 cursor-pointer hover:text-white transition" onclick="window.DashboardApp && window.DashboardApp.handleTickerClick(${idx})">
-                <span class="text-amber-400/80 font-mono text-[9px] sm:text-[10px] font-bold">#${idx + 1}</span>
+            <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.DashboardApp && window.DashboardApp.handleTickerClick(${idx})">
+                <span class="text-amber-400/80 font-mono text-[9px] sm:text-[10px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
                 <span>${it}</span>
-                <span class="text-amber-500/50 font-black ml-3 text-sm select-none">•</span>
+                <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>
             </span>
         `;
 

@@ -141,10 +141,66 @@
                 transform: translate3d(-50%, 0, 0);
             }
         }
+
+        /* Cuenta atrás: grande durante la cuenta atrás activa, discreta cuando la jornada está en juego */
+        #countdown-timer-container.countdown-active {
+            gap: 0.25rem;
+            transition: all 0.3s ease;
+        }
+        #countdown-timer-container.countdown-active .cd-digit {
+            padding: 0.2rem 0.45rem;
+            font-size: 0.95rem;
+            font-weight: 900;
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+        #countdown-timer-container.countdown-active .cd-unit {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #f59e0b;
+        }
+        @media (min-width: 768px) {
+            #countdown-timer-container.countdown-active {
+                gap: 0.4rem;
+            }
+            #countdown-timer-container.countdown-active .cd-digit {
+                padding: 0.35rem 0.65rem;
+                font-size: 1.35rem;
+                border-width: 1.5px;
+                box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+            }
+            #countdown-timer-container.countdown-active .cd-unit {
+                font-size: 0.85rem;
+                margin-right: 0.25rem;
+            }
+        }
+        #countdown-timer-container.countdown-idle .cd-digit {
+            padding: 0.125rem 0.25rem;
+            font-size: 0.75rem;
+            border-color: rgba(51, 65, 85, 0.6);
+        }
+        #countdown-timer-container.countdown-idle .cd-unit {
+            font-size: 0.55rem;
+            color: #64748b;
+        }
+
+        /* Sección 'Ver más detalles': desplegada automáticamente en PC, plegable sólo en móviles */
+        @media (min-width: 768px) {
+            #details-extra-section {
+                display: block !important;
+            }
+            #details-extra-section summary {
+                display: none !important;
+                pointer-events: none !important;
+            }
+            #details-extra-section > div {
+                display: block !important;
+            }
+        }
 </style>
 </head>
 
-<body class="p-2 sm:p-4 lg:p-6 pb-12 sm:pb-14 antialiased selection:bg-amber-500 selection:text-black">
+<body class="p-2 sm:p-4 lg:p-6 pb-14 sm:pb-16 md:pb-20 lg:pb-24 antialiased selection:bg-amber-500 selection:text-black">
     <!-- Scripts base del sistema -->
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
@@ -282,108 +338,108 @@
         <!-- =====================================================================
              CUADRO DE MANDO PRINCIPAL: ESTADO ACTUAL DE LA PEÑA (TARJETA HERO ÚNICA)
              ===================================================================== -->
-        <div id="live-jornada-banner" class="glass-panel p-3 sm:p-4 border-amber-500/40 relative shadow-xl space-y-2.5 sm:space-y-3">
+        <div id="live-jornada-banner" class="glass-panel p-3 sm:p-4 md:p-6 lg:p-7 border-amber-500/40 relative shadow-xl space-y-2.5 sm:space-y-3.5 md:space-y-5">
             <!-- Fila Superior: Siguiente Jornada + Cuenta Atrás / Tiempo Límite -->
-            <div class="border-b border-slate-800/80 pb-2 space-y-1.5">
+            <div class="border-b border-slate-800/80 pb-2 md:pb-3 space-y-1.5 md:space-y-2">
                 <!-- Badges y Cuenta Atrás Digital -->
                 <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span id="live-banner-icon" class="text-base sm:text-lg shrink-0">⚽</span>
-                        <span id="live-banner-tag" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono">
+                    <div class="flex items-center gap-1.5 md:gap-2 flex-wrap">
+                        <span id="live-banner-icon" class="text-base sm:text-lg md:text-2xl shrink-0">⚽</span>
+                        <span id="live-banner-tag" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded text-[10px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono">
                             Próxima Jornada
                         </span>
-                        <span id="cd-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span id="cd-status-badge" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400"></span>
                             <span>Plazo Abierto</span>
                         </span>
                     </div>
 
-                    <!-- Cuenta atrás digital compacta -->
-                    <div class="flex items-center justify-end gap-0.5 sm:gap-1 font-mono text-xs font-black text-white shrink-0">
-                        <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 text-amber-400 font-mono" id="cd-days">--</span><span class="text-slate-500 text-[9px]">d</span>
-                        <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 font-mono" id="cd-hours">--</span><span class="text-slate-500 text-[9px]">h</span>
-                        <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 font-mono" id="cd-mins">--</span><span class="text-slate-500 text-[9px]">m</span>
-                        <span class="bg-slate-950/80 px-1 py-0.5 rounded border border-slate-800 text-emerald-400 font-mono" id="cd-secs">--</span><span class="text-slate-500 text-[9px]">s</span>
+                    <!-- Cuenta atrás digital con tamaño dinámico (grande en cuenta atrás, compacta en juego) -->
+                    <div id="countdown-timer-container" class="countdown-idle flex items-center justify-end font-mono font-black text-white shrink-0">
+                        <span class="bg-slate-950/80 rounded border border-slate-800 text-amber-400 font-mono cd-digit" id="cd-days">--</span><span class="text-slate-500 cd-unit">d</span>
+                        <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-hours">--</span><span class="text-slate-500 cd-unit">h</span>
+                        <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-mins">--</span><span class="text-slate-500 cd-unit">m</span>
+                        <span class="bg-slate-950/80 rounded border border-slate-800 text-emerald-400 font-mono cd-digit" id="cd-secs">--</span><span class="text-slate-500 cd-unit">s</span>
                     </div>
                 </div>
 
                 <!-- Título Completo de la Jornada y Fecha Límite -->
-                <div class="flex items-center justify-between gap-2 flex-wrap">
-                    <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base uppercase tracking-tight">
+                <div class="flex items-center justify-between gap-2 flex-wrap pt-0.5">
+                    <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base md:text-xl lg:text-2xl uppercase tracking-tight">
                         Jornada 15
                     </h2>
-                    <div class="text-[10px] sm:text-xs text-slate-400 font-mono">
+                    <div class="text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-400 font-mono">
                         Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
                     </div>
                 </div>
             </div>
 
-            <p id="live-banner-subtitle" class="hidden text-[11px] text-slate-400"></p>
+            <p id="live-banner-subtitle" class="hidden text-[11px] md:text-xs text-slate-400"></p>
 
             <!-- Grid de los 4 Pilares Vitales de la Peña (Nivel 1: Caja y PIG | Nivel 2: Dobles y Sella) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
                 <!-- Pilar 1: 💰 Caja de la Peña -->
-                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-emerald-500/30 flex flex-col justify-between">
+                <div class="p-2 sm:p-2.5 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-emerald-500/30 flex flex-col justify-between">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="text-[10px] sm:text-[11px] md:text-xs lg:text-sm text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
                             <span>💰</span> Caja Real
                         </span>
-                        <a href="bote_2.html" class="text-[10px] text-emerald-400 hover:underline">Bote →</a>
+                        <a href="bote_2.html" class="text-[10px] sm:text-xs md:text-sm text-emerald-400 hover:underline font-bold">Bote →</a>
                     </div>
-                    <div id="dashboard-bote-total" class="text-lg sm:text-2xl font-black font-mono text-emerald-400 tracking-tight my-1">
+                    <div id="dashboard-bote-total" class="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black font-mono text-emerald-400 tracking-tight my-1 md:my-2">
                         -- €
                     </div>
-                    <div class="text-[9px] sm:text-[10px] text-slate-400 truncate">
+                    <div class="text-[9px] sm:text-[10px] md:text-xs text-slate-400 truncate">
                         Tesorería sincronizada
                     </div>
                 </div>
 
                 <!-- Pilar 2: 🐷 Si hay PIG (Subido al primer nivel junto a Caja Real) -->
-                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between">
+                <div class="p-2 sm:p-2.5 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="text-[10px] sm:text-[11px] md:text-xs lg:text-sm text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
                             <span>🐷</span> Partido PIG
                         </span>
-                        <span id="hero-pig-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                        <span id="hero-pig-badge" class="px-1.5 py-0.2 md:py-0.5 rounded-full text-[9px] md:text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
                             Comprobando...
                         </span>
                     </div>
-                    <div id="hero-pig-text" class="text-[11px] sm:text-xs font-bold text-slate-200 truncate my-1">
+                    <div id="hero-pig-text" class="text-[11px] sm:text-xs md:text-sm lg:text-base font-bold text-slate-200 truncate my-1 md:my-2">
                         Cargando...
                     </div>
-                    <div id="hero-pig-sub" class="text-[9px] sm:text-[10px] text-slate-400 truncate min-h-[14px]"></div>
+                    <div id="hero-pig-sub" class="text-[9px] sm:text-[10px] md:text-xs text-slate-400 truncate min-h-[14px]"></div>
                 </div>
 
                 <!-- Pilar 3: 👑 Quién hace Dobles -->
-                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-amber-500/30 flex flex-col justify-between">
+                <div class="p-2 sm:p-2.5 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-amber-500/30 flex flex-col justify-between">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="text-[10px] sm:text-[11px] md:text-xs lg:text-sm text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
                             <span>👑</span> Dobles:
                         </span>
-                        <button type="button" onclick="window.DashboardApp && window.DashboardApp.openDoblesModal()" class="text-[10px] text-amber-400 hover:underline font-bold">Ver →</button>
+                        <button type="button" onclick="window.DashboardApp && window.DashboardApp.openDoblesModal()" class="text-[10px] sm:text-xs md:text-sm text-amber-400 hover:underline font-bold">Ver →</button>
                     </div>
-                    <div id="role-winner-name" class="text-sm sm:text-base md:text-lg font-black text-amber-400 truncate tracking-tight my-1">
+                    <div id="role-winner-name" class="text-sm sm:text-base md:text-xl lg:text-2xl font-black text-amber-400 truncate tracking-tight my-1 md:my-2">
                         Cargando...
                     </div>
-                    <div class="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400">
+                    <div class="flex items-center justify-between text-[9px] sm:text-[10px] md:text-xs text-slate-400">
                         <span id="role-winner-subtitle" class="truncate">Ganador semanal</span>
-                        <span id="role-winner-hits-badge" class="hidden text-[9px] text-amber-300 font-mono font-bold"></span>
+                        <span id="role-winner-hits-badge" class="hidden text-[9px] md:text-xs text-amber-300 font-mono font-bold"></span>
                     </div>
                     <span id="role-winner-detail" class="hidden"></span>
                 </div>
 
                 <!-- Pilar 4: ✍️ Quién Sella (Bajado al segundo nivel junto a Dobles) -->
-                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-rose-500/30 flex flex-col justify-between">
+                <div class="p-2 sm:p-2.5 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-rose-500/30 flex flex-col justify-between">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="text-[10px] sm:text-[11px] md:text-xs lg:text-sm text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
                             <span>✍️</span> Sella:
                         </span>
-                        <span id="role-loser-badge" class="hidden text-[9px] font-mono px-1 rounded bg-rose-500/20 text-rose-300"></span>
+                        <span id="role-loser-badge" class="hidden text-[9px] md:text-xs font-mono px-1 rounded bg-rose-500/20 text-rose-300"></span>
                     </div>
-                    <div id="role-loser-name" class="text-sm sm:text-base md:text-lg font-black text-rose-400 truncate tracking-tight my-1">
+                    <div id="role-loser-name" class="text-sm sm:text-base md:text-xl lg:text-2xl font-black text-rose-400 truncate tracking-tight my-1 md:my-2">
                         Cargando...
                     </div>
-                    <div id="role-loser-subtitle" class="text-[9px] sm:text-[10px] text-slate-400 truncate">
+                    <div id="role-loser-subtitle" class="text-[9px] sm:text-[10px] md:text-xs text-slate-400 truncate">
                         Sellador designado
                     </div>
                     <span id="role-loser-detail" class="hidden"></span>
@@ -391,23 +447,23 @@
             </div>
 
             <!-- Fila Inferior: Tu Quiniela & Progreso de Envíos de la Peña -->
-            <div class="pt-2 border-t border-slate-800/80 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-1.5 text-xs">
+            <div class="pt-2 md:pt-3 border-t border-slate-800/80 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-1.5 text-xs md:text-sm">
                 <div class="flex items-center gap-1.5 truncate">
-                    <span class="text-slate-400 text-[11px] sm:text-xs">Tu Quiniela:</span>
-                    <strong id="my-forecast-badge" class="text-amber-400 font-bold text-[11px] sm:text-xs">Comprobando...</strong>
+                    <span class="text-slate-400 text-[11px] sm:text-xs md:text-sm lg:text-base">Tu Quiniela:</span>
+                    <strong id="my-forecast-badge" class="text-amber-400 font-bold text-[11px] sm:text-xs md:text-sm lg:text-base">Comprobando...</strong>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <button type="button" onclick="window.DashboardApp && window.DashboardApp.openSubmittedListModal()" class="text-slate-400 hover:text-amber-300 text-[11px] sm:text-xs flex items-center gap-1 font-medium transition">
+                    <button type="button" onclick="window.DashboardApp && window.DashboardApp.openSubmittedListModal()" class="text-slate-400 hover:text-amber-300 text-[11px] sm:text-xs md:text-sm lg:text-base flex items-center gap-1 font-medium transition">
                         <span>Envíos:</span>
                         <strong id="submitted-count" class="text-white font-mono font-bold">0</strong>/<strong id="total-members-count" class="text-white font-mono font-bold">19</strong>
                         (<span id="submitted-percentage" class="text-emerald-400 font-mono font-bold">0%</span>)
-                        <span class="text-amber-400 text-xs">📋</span>
+                        <span class="text-amber-400 text-xs md:text-sm">📋</span>
                     </button>
                     <span id="participation-jornada-badge" class="hidden"></span>
                 </div>
             </div>
             <!-- Barra de Progreso Compacta -->
-            <div class="w-full bg-slate-950 rounded-full h-1 sm:h-1.5 border border-slate-800 overflow-hidden">
+            <div class="w-full bg-slate-950 rounded-full h-1 sm:h-1.5 md:h-2 lg:h-2.5 border border-slate-800 overflow-hidden">
                 <div id="submitted-progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: 0%;"></div>
             </div>
         </div>
@@ -415,16 +471,16 @@
         <!-- =====================================================================
              ACCIONES DIRECTAS PRINCIPALES: GRANDES BOTONES DE ACCIÓN
              ===================================================================== -->
-        <div class="grid grid-cols-2 gap-2 sm:gap-3" id="live-banner-actions">
+        <div class="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4" id="live-banner-actions">
             <!-- Botón Primario: Rellenar Mi Quiniela -->
-            <a href="pronosticos_2.html?openEditor=true" id="btn-hero-rellenar" class="py-2.5 sm:py-3.5 px-2 sm:px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-center select-none">
-                <span class="text-base sm:text-lg">✍️</span>
+            <a href="pronosticos_2.html?openEditor=true" id="btn-hero-rellenar" class="py-2.5 sm:py-3.5 md:py-4 px-2 sm:px-4 md:px-6 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 text-slate-950 font-black text-xs sm:text-sm md:text-base lg:text-lg shadow-lg shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-center select-none">
+                <span class="text-base sm:text-lg md:text-2xl">✍️</span>
                 <span class="truncate">Rellenar Mi Quiniela</span>
             </a>
 
             <!-- Botón Secundario: Ver Jornada Actual / Resultados -->
-            <a href="jornadas_2.html" id="btn-hero-jornada" class="py-2.5 sm:py-3.5 px-2 sm:px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-amber-500/40 hover:border-amber-400 font-black text-xs sm:text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-center select-none">
-                <span class="text-base sm:text-lg">⚽</span>
+            <a href="jornadas_2.html" id="btn-hero-jornada" class="py-2.5 sm:py-3.5 md:py-4 px-2 sm:px-4 md:px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-amber-500/40 hover:border-amber-400 font-black text-xs sm:text-sm md:text-base lg:text-lg shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-center select-none">
+                <span class="text-base sm:text-lg md:text-2xl">⚽</span>
                 <span class="truncate">Ver Jornada Actual</span>
             </a>
         </div>
@@ -433,24 +489,24 @@
         <!-- =====================================================================
              ALERTA DE BOTE OFICIAL (SI EXISTE)
              ===================================================================== -->
-        <div id="official-bote-alert" class="hidden p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-amber-500/20 via-orange-500/25 to-amber-500/20 border border-amber-500/60 shadow-md flex items-center justify-between gap-2.5 pulse-soft text-xs">
+        <div id="official-bote-alert" class="hidden p-2.5 sm:p-3 md:p-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-orange-500/25 to-amber-500/20 border border-amber-500/60 shadow-md flex items-center justify-between gap-2.5 pulse-soft text-xs md:text-sm">
             <div class="flex items-center gap-2.5 min-w-0">
-                <span class="text-xl sm:text-2xl shrink-0">💰</span>
+                <span class="text-xl sm:text-2xl md:text-3xl shrink-0">💰</span>
                 <div class="min-w-0">
-                    <strong class="text-amber-300 font-extrabold text-xs sm:text-sm tracking-wide block truncate">¡HAY BOTE OFICIAL EN LA QUINIELA!</strong>
-                    <p class="text-slate-300 text-[10px] sm:text-[11px] truncate">Bote millonario especial acumulado en la categoría especial (15 aciertos).</p>
+                    <strong class="text-amber-300 font-extrabold text-xs sm:text-sm md:text-base tracking-wide block truncate">¡HAY BOTE OFICIAL EN LA QUINIELA!</strong>
+                    <p class="text-slate-300 text-[10px] sm:text-[11px] md:text-xs truncate">Bote millonario especial acumulado en la categoría especial (15 aciertos).</p>
                 </div>
             </div>
-            <a href="pronosticos_2.html" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] transition shrink-0 whitespace-nowrap">
+            <a href="pronosticos_2.html" class="px-2.5 md:px-4 py-1 md:py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] md:text-xs lg:text-sm transition shrink-0 whitespace-nowrap">
                 ¡A por él! →
             </a>
         </div>
 
         <!-- =====================================================================
-             DETALLES SECUNDARIOS Y ESTADÍSTICAS (DESPLEGABLE ELEGANTE)
+             DETALLES SECUNDARIOS Y ESTADÍSTICAS (DESPLEGABLE EN MÓVIL, FIJO EN PC)
              ===================================================================== -->
-        <details class="glass-panel p-2.5 sm:p-3.5 border-slate-800 group/extra">
-            <summary class="flex items-center justify-between cursor-pointer list-none text-xs font-bold text-slate-400 hover:text-amber-400 select-none py-1">
+        <details id="details-extra-section" class="glass-panel p-2.5 sm:p-3.5 md:p-6 border-slate-800 group/extra" open>
+            <summary class="md:hidden flex items-center justify-between cursor-pointer list-none text-xs font-bold text-slate-400 hover:text-amber-400 select-none py-1">
                 <span class="flex items-center gap-2">
                     <span>📊</span>
                     <span>Ver Más Detalles: Cenas, Premios, Líder y Opciones</span>
@@ -458,92 +514,104 @@
                 <span class="text-slate-500 group-open/extra:rotate-180 transition-transform">▼</span>
             </summary>
 
-            <div class="pt-3 space-y-4 border-t border-slate-800/80 mt-2">
+            <!-- Encabezado fijo visible sólo en PC (sustituye al summary interactivo de móvil) -->
+            <div class="hidden md:flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">📊</span>
+                    <div>
+                        <h3 class="text-base lg:text-lg font-black text-white tracking-wide">Estadísticas y Detalles de la Peña</h3>
+                        <p class="text-xs text-slate-400">Cenas oficiales, líder general, premios acumulados y balance</p>
+                    </div>
+                </div>
+                <span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg">Temporada 2026-2027</span>
+            </div>
+
+            <div class="pt-2 md:pt-0 space-y-3.5 md:space-y-5 border-t md:border-t-0 border-slate-800/80 mt-1 md:mt-0">
                 <!-- Calendario de Cenas Oficiales -->
-                <div class="p-2.5 sm:p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                        <span class="text-base sm:text-lg">🍽️</span>
+                <div class="p-2.5 sm:p-3 md:p-4 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-base sm:text-lg md:text-2xl">🍽️</span>
                         <div>
-                            <span class="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">CENAS PEÑA</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-white ml-1.5">Fechas Oficiales</span>
+                            <span class="px-1.5 py-0.2 md:py-0.5 rounded text-[8px] md:text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">CENAS PEÑA</span>
+                            <span class="text-xs sm:text-sm md:text-base font-extrabold text-white ml-1.5">Fechas Oficiales</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/60 text-xs">
-                            <span class="px-1 py-0.2 rounded text-[8px] font-bold bg-amber-500 text-slate-950">1ª VUELTA</span>
-                            <span class="font-mono font-black text-amber-300 text-[11px]">Vie 29 Ene 2027</span>
+                    <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+                        <div class="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/60 text-xs md:text-sm">
+                            <span class="px-1 py-0.2 md:py-0.5 rounded text-[8px] md:text-[10px] font-bold bg-amber-500 text-slate-950">1ª VUELTA</span>
+                            <span class="font-mono font-black text-amber-300 text-[11px] md:text-xs lg:text-sm">Vie 29 Ene 2027</span>
                         </div>
-                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs">
-                            <span class="px-1 py-0.2 rounded text-[8px] font-bold bg-slate-800 text-slate-400">2ª VUELTA</span>
-                            <span class="font-mono font-bold text-slate-300 text-[11px]">Vie 04 Jun 2027</span>
+                        <div class="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs md:text-sm">
+                            <span class="px-1 py-0.2 md:py-0.5 rounded text-[8px] md:text-[10px] font-bold bg-slate-800 text-slate-400">2ª VUELTA</span>
+                            <span class="font-mono font-bold text-slate-300 text-[11px] md:text-xs lg:text-sm">Vie 04 Jun 2027</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Grid de Widgets Estadísticos -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                     <!-- Líder Temporada -->
-                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
                                 🏆 Líder General
                             </span>
-                            <span class="text-xs font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showInfo('lider')">ℹ️</span>
+                            <span class="text-xs md:text-sm font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showInfo('lider')">ℹ️</span>
                         </div>
                         <div>
-                            <h4 id="leader-name" class="text-base sm:text-lg font-black text-white truncate">Cargando...</h4>
-                            <div class="flex items-baseline gap-2 pt-0.5">
-                                <span id="leader-points" class="font-mono text-sm font-extrabold text-amber-400">0 pts</span>
-                                <span id="leader-diff" class="text-[10px] text-slate-400 font-medium">(+0 pts)</span>
+                            <h4 id="leader-name" class="text-base sm:text-lg md:text-xl lg:text-2xl font-black text-white truncate">Cargando...</h4>
+                            <div class="flex items-baseline gap-2 pt-1">
+                                <span id="leader-points" class="font-mono text-sm md:text-base lg:text-lg font-extrabold text-amber-400">0 pts</span>
+                                <span id="leader-diff" class="text-[10px] md:text-xs text-slate-400 font-medium">(+0 pts)</span>
                             </div>
                         </div>
-                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] flex items-center justify-between">
+                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] md:text-xs flex items-center justify-between">
                             <span id="leader-jornadas-count" class="text-slate-400">6 jornadas</span>
                             <a href="clasificacion_2.html" class="text-amber-400 font-bold hover:underline">Ver Tabla →</a>
                         </div>
                     </div>
 
                     <!-- Detalle Tesorería Bote -->
-                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                                 💰 Desglose Bote
                             </span>
-                            <span class="text-xs font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showInfo('bote')">ℹ️</span>
+                            <span class="text-xs md:text-sm font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showInfo('bote')">ℹ️</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-1.5 text-xs">
-                            <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">
-                                <span class="text-[9px] text-slate-400 block">Saldos Socios:</span>
-                                <strong id="dashboard-bote-neto" class="text-white font-mono text-[11px] font-bold">-- €</strong>
+                        <div class="grid grid-cols-2 gap-1.5 md:gap-2 text-xs md:text-sm">
+                            <div class="p-1.5 md:p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <span class="text-[9px] md:text-xs text-slate-400 block">Saldos Socios:</span>
+                                <strong id="dashboard-bote-neto" class="text-white font-mono text-[11px] md:text-sm lg:text-base font-bold">-- €</strong>
                             </div>
-                            <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800">
-                                <span class="text-[9px] text-slate-400 block">Superávit Peña:</span>
-                                <strong id="dashboard-bote-premios" class="text-amber-400 font-mono text-[11px] font-bold">-- €</strong>
+                            <div class="p-1.5 md:p-2 rounded-lg bg-slate-900 border border-slate-800">
+                                <span class="text-[9px] md:text-xs text-slate-400 block">Superávit Peña:</span>
+                                <strong id="dashboard-bote-premios" class="text-amber-400 font-mono text-[11px] md:text-sm lg:text-base font-bold">-- €</strong>
                             </div>
                         </div>
-                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] flex items-center justify-between">
+                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] md:text-xs flex items-center justify-between">
                             <span class="text-slate-400">Tesorería</span>
                             <a href="bote_2.html" class="text-emerald-400 font-bold hover:underline">Ir a Bote →</a>
                         </div>
                     </div>
 
                     <!-- Premios Semana y Temporada -->
-                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40">
                                 🎁 Premios
                             </span>
-                            <span class="text-xs font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showInfo('premios')">ℹ️</span>
+                            <span class="text-xs md:text-sm font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showInfo('premios')">ℹ️</span>
                         </div>
                         <div>
-                            <div class="text-[10px] text-slate-400">Total Temporada:</div>
-                            <div id="season-prize-total" class="text-base sm:text-lg font-black font-mono text-white">0,00 €</div>
-                            <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
+                            <div class="text-[10px] md:text-xs text-slate-400">Total Temporada:</div>
+                            <div id="season-prize-total" class="text-base sm:text-lg md:text-xl lg:text-2xl font-black font-mono text-white">0,00 €</div>
+                            <div class="flex items-center justify-between text-[10px] md:text-xs text-slate-400 pt-0.5">
                                 <span>Indiv: <strong id="season-indiv-count" class="text-emerald-400 font-mono">0</strong></span>
                                 <span>Dobles: <strong id="season-dobles-count" class="text-purple-400 font-mono">0</strong></span>
                             </div>
                         </div>
-                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] flex items-center justify-between">
+                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] md:text-xs flex items-center justify-between">
                             <span id="weekly-prize-total" class="text-slate-400 font-mono">Última: 0,00 €</span>
                             <a href="resumen_2.html" class="text-amber-400 font-bold hover:underline">Histórico →</a>
                         </div>
@@ -551,20 +619,20 @@
                     </div>
 
                     <!-- Rana / PIG Detalle Híbrido -->
-                    <div id="pig-hybrid-widget" class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div id="pig-hybrid-widget" class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
-                            <span id="pig-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                            <span id="pig-badge" class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
                                 <span id="pig-badge-icon">🐸</span> <span id="pig-badge-text">Último Clasificado</span>
                             </span>
-                            <span class="text-xs font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showPigOrRanaInfo()">ℹ️</span>
+                            <span class="text-xs md:text-sm font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showPigOrRanaInfo()">ℹ️</span>
                         </div>
                         <div>
-                            <span id="pig-status-label" class="text-[10px] text-slate-400 block font-medium">Farolillo Rojo:</span>
-                            <div id="pig-content" class="text-xs font-semibold text-slate-200 mt-0.5">
+                            <span id="pig-status-label" class="text-[10px] md:text-xs text-slate-400 block font-medium">Farolillo Rojo:</span>
+                            <div id="pig-content" class="text-xs md:text-sm font-semibold text-slate-200 mt-0.5">
                                 Cargando...
                             </div>
                         </div>
-                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] flex items-center justify-between">
+                        <div class="pt-2 mt-2 border-t border-slate-800 text-[10px] md:text-xs flex items-center justify-between">
                             <span id="pig-foot-left" class="text-slate-400 font-semibold">6 jornadas</span>
                             <span id="pig-foot-right">
                                 <a href="clasificacion_2.html" class="text-amber-400 font-bold hover:underline">Tabla →</a>
@@ -578,33 +646,23 @@
                 </div>
 
                 <!-- Broma de Emilio -->
-                <div id="prank-container" class="p-3 sm:p-4 rounded-xl bg-rose-950/20 border border-rose-500/40 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div id="prank-container" class="p-3 sm:p-4 md:p-5 rounded-xl bg-rose-950/20 border border-rose-500/40 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <span class="text-2xl shrink-0">🚩</span>
+                        <span class="text-2xl md:text-3xl shrink-0">🚩</span>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-xs sm:text-sm font-extrabold text-white">Botón de Expulsión Temporal de Emilio</h3>
-                                <span class="px-1.5 py-0.2 rounded text-[8px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase">Broma</span>
+                                <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-white">Botón de Expulsión Temporal de Emilio</h3>
+                                <span class="px-1.5 py-0.2 md:py-0.5 rounded text-[8px] md:text-[10px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase">Broma</span>
                             </div>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Expulsa a Emilio de la web durante 15 minutos con notificación automática a Telegram.</p>
-                            <div id="prank-cooldown-msg" class="hidden text-[11px] text-rose-400 font-bold mt-0.5">
+                            <p class="text-[11px] md:text-xs lg:text-sm text-slate-400 mt-0.5">Expulsa a Emilio de la web durante 15 minutos con notificación automática a Telegram.</p>
+                            <div id="prank-cooldown-msg" class="hidden text-[11px] md:text-xs text-rose-400 font-bold mt-0.5">
                                 ⚠️ Queda menos de 1 hora para el cierre. Expulsión deshabilitada.
                             </div>
                         </div>
                     </div>
-                    <button id="btn-expulsar-emilio" onclick="window.DashboardApp && window.DashboardApp.executePrank()" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-black text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <button id="btn-expulsar-emilio" onclick="window.DashboardApp && window.DashboardApp.executePrank()" class="w-full sm:w-auto px-4 md:px-6 py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-black text-xs md:text-sm shadow-md active:scale-95 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
                         <span>🚩</span> ECHAR A EMILIO
                     </button>
-                </div>
-
-                <!-- Enlaces Adicionales (Votaciones, Admin) -->
-                <div class="pt-2 border-t border-slate-800 flex items-center justify-end gap-2 text-xs">
-                    <a href="votaciones_2.html" data-version-link="votaciones" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition flex items-center gap-1.5">
-                        <span>🗳️</span> <span>Votaciones</span>
-                    </a>
-                    <a href="admin_2.html" data-version-link="admin" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition flex items-center gap-1.5">
-                        <span>⚙️</span> <span>Administración</span>
-                    </a>
                 </div>
             </div>
         </details>
@@ -728,10 +786,10 @@
     <!-- =====================================================================
          CINTA INFERIOR DE NOTICIAS Y RESULTADOS EN TIEMPO REAL (TICKER MAULAS)
          ===================================================================== -->
-    <footer id="news-ticker-bar" class="fixed bottom-0 left-0 right-0 z-[110] bg-slate-950/95 backdrop-blur-md border-t border-amber-500/40 text-xs shadow-2xl h-8 sm:h-9 flex items-center overflow-hidden select-none">
+    <footer id="news-ticker-bar" class="fixed bottom-0 left-0 right-0 z-[110] bg-slate-950/95 backdrop-blur-md border-t border-amber-500/40 text-xs shadow-2xl h-8 sm:h-9 md:h-11 lg:h-12 flex items-center overflow-hidden select-none">
         <!-- Badge 'AL DÍA' en el lateral izquierdo -->
-        <div class="h-full px-2.5 sm:px-3 bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-black text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center gap-1.5 shrink-0 z-10 shadow-md">
-            <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+        <div class="h-full px-2.5 sm:px-3 md:px-4 bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-black text-[10px] sm:text-[11px] md:text-xs lg:text-sm uppercase tracking-wider flex items-center gap-1.5 md:gap-2 shrink-0 z-10 shadow-md">
+            <span class="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-red-600 animate-ping"></span>
             <span class="hidden xs:inline">PEÑA AL DÍA</span>
             <span class="xs:hidden">AL DÍA</span>
         </div>
@@ -740,7 +798,7 @@
         <div class="ticker-wrap flex-1 overflow-hidden relative h-full flex items-center" id="ticker-container" 
              ontouchstart="document.getElementById('ticker-content')?.classList.add('is-paused')" 
              ontouchend="document.getElementById('ticker-content')?.classList.remove('is-paused')">
-            <div class="ticker-move flex items-center whitespace-nowrap will-change-transform text-slate-200 text-[11px] sm:text-xs" id="ticker-content">
+            <div class="ticker-move flex items-center whitespace-nowrap will-change-transform text-slate-200 text-[11px] sm:text-xs md:text-sm lg:text-[15px]" id="ticker-content">
                 <!-- Se inyectan dinámicamente los 15 datos -->
             </div>
         </div>
@@ -748,7 +806,7 @@
 
     <!-- SCRIPT DE CONTROLADOR DASHBOARD 2.0 -->
     <script src="js/dashboard_2.js"></script>
-    <!-- Seguridad: garantizar que el contenido principal siempre es visible -->
+    <!-- Seguridad: garantizar que el contenido principal siempre es visible y que detalles abre en PC -->
     <script>
         (function () {
             var mainId = 'main-content';
@@ -759,6 +817,15 @@
             }
             var restr = document.getElementById('restricted-screen');
             if (restr) { restr.style.display = 'none'; restr.classList.add('hidden'); }
+
+            var det = document.getElementById('details-extra-section');
+            function checkDet() {
+                if (det && window.innerWidth >= 768) {
+                    det.open = true;
+                }
+            }
+            checkDet();
+            window.addEventListener('resize', checkDet);
         })();
     </script>
 </body>
