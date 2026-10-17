@@ -293,7 +293,7 @@ class Jornadas2AppController {
             let statusDot = '🟢';
 
             if (filled === 15) {
-                statusLabel = 'Jugada (15/15)';
+                statusLabel = 'Jugada';
                 statusClass = 'opt-status-finished';
                 statusDot = '🔵';
             } else if (filled > 0) {
@@ -304,10 +304,12 @@ class Jornadas2AppController {
 
             const hasPig = j.matches && j.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
             const pigIcon = hasPig ? ' 🐷' : '';
+            const shortDate = j.date ? j.date.replace(/\/202\d/, '') : '';
+            const datePart = shortDate ? ` • ${shortDate}` : '';
 
             return `
                 <option value="${j.id}" class="${statusClass}" ${j.id == this.selectedJornadaId ? 'selected' : ''}>
-                    ${statusDot} Jornada ${j.number} - ${j.date || 'Sin fecha'} [${statusLabel}]${pigIcon}
+                    ${statusDot} Jornada ${j.number}${datePart} [${statusLabel}]${pigIcon}
                 </option>
             `;
         }).join('');
@@ -411,20 +413,20 @@ class Jornadas2AppController {
         const isFinished = filledMatches === 15;
         const isInProgress = filledMatches > 0 && filledMatches < 15;
 
-        // 1. Estado en Chip Superior
+        // 1. Estado en Chip Superior (Visible en escritorio, oculto en móviles para no ahogar el desplegable)
         const statusChip = document.getElementById('selected-jornada-status-chip');
         const statusText = document.getElementById('selected-jornada-status-text');
         if (statusChip && statusText) {
             if (isFinished) {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-blue-950/70 text-blue-400 border border-blue-500/70 flex items-center gap-1.5 shadow-sm';
+                statusChip.className = 'hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-blue-950/70 text-blue-400 border border-blue-500/70 items-center gap-1.5 shadow-sm shrink-0';
                 statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]';
                 statusText.textContent = 'Jugada (15/15)';
             } else if (isInProgress) {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-950/70 text-amber-300 border border-amber-500/70 flex items-center gap-1.5 shadow-sm';
+                statusChip.className = 'hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-amber-950/70 text-amber-300 border border-amber-500/70 items-center gap-1.5 shadow-sm shrink-0';
                 statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping shadow-[0_0_8px_rgba(251,191,36,0.8)]';
                 statusText.textContent = `En Juego (${filledMatches}/15)`;
             } else {
-                statusChip.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-950/70 text-emerald-400 border border-emerald-500/70 flex items-center gap-1.5 shadow-sm';
+                statusChip.className = 'hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-950/70 text-emerald-400 border border-emerald-500/70 items-center gap-1.5 shadow-sm shrink-0';
                 statusChip.querySelector('.rounded-full').className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]';
                 statusText.textContent = 'Próxima a Jugar';
             }
