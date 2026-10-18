@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Juego oficial <strong>Maula Hero</strong> actualizado: ¡Bonus Pleno al 15 de +1000 pts extra en modo dobles, vidas blindadas y teletipo de piques en la carátula!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: ¡a partir del nivel 3 caen elementos a distintas velocidades, superbonus Pleno al 15 en modo dobles y teletipo de piques!`,
                 url: 'juego.html'
             });
 

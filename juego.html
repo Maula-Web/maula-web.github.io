@@ -748,6 +748,9 @@
                     <p class="text-slate-300 text-[11px]">
                         Cada 2 minutos de juego superados, el cronómetro se reinicia y subes de nivel. La velocidad base de los balones aumenta de forma progresiva.
                     </p>
+                    <p class="text-amber-300 text-[11px] font-bold">
+                        ⚡ <strong>A partir del Nivel 3</strong>: Los elementos caen a <strong>velocidades distintas</strong> (balones acelerados con estela azul o relámpago dorada y cambios de ritmo), poniendo a prueba tus mejores reflejos. (¡La velocidad nunca bajará de la inicial!).
+                    </p>
                 </div>
             </div>
 
@@ -1622,14 +1625,50 @@
                     }
 
                     // Cálculo de velocidad actual (la velocidad nunca bajará más de la inicial)
-                    let speed = Math.max(this.baseInitialSpeed, this.currentBaseSpeed);
-                    if (type === 'emilio') speed *= 2.6; // ¡Emilio baja a toda velocidad!
+                    const baseSpeed = Math.max(this.baseInitialSpeed, this.currentBaseSpeed);
+                    let speed = baseSpeed;
+                    let speedTier = 'normal';
+
+                    if (type === 'emilio') {
+                        speed = baseSpeed * 2.6; // ¡Emilio baja a toda velocidad!
+                        speedTier = 'emilio';
+                    } else if (this.level >= 3) {
+                        // A partir del nivel 3 habrá elementos que caigan a velocidades distintas
+                        const speedRoll = Math.random();
+                        let mult = 1.0;
+
+                        if (speedRoll < 0.28) {
+                            // Ráfaga relámpago (mucho más rápido)
+                            mult = 1.35 + Math.random() * 0.20;
+                            speedTier = 'superfast';
+                        } else if (speedRoll < 0.60) {
+                            // Balón acelerado con efecto
+                            mult = 1.18 + Math.random() * 0.12;
+                            speedTier = 'fast';
+                        } else if (speedRoll < 0.82) {
+                            // Cambio de tempo (más pausado pero nunca menor que la velocidad inicial)
+                            mult = 0.88;
+                            speedTier = 'slow';
+                        } else {
+                            mult = 1.0;
+                            speedTier = 'normal';
+                        }
+
+                        // En niveles más altos (4+), la velocidad punta crece progresivamente
+                        if (this.level >= 4) {
+                            mult += (this.level - 3) * 0.05;
+                        }
+
+                        // REGLA FUNDAMENTAL: La velocidad nunca bajará más de la inicial
+                        speed = Math.max(this.baseInitialSpeed, baseSpeed * mult);
+                    }
 
                     const note = {
                         lane: lane,
                         type: type,
                         y: -45,
                         speed: speed,
+                        speedTier: speedTier,
                         radius: type === 'pleno' ? 36 : (type === 'emilio' ? 26 : 28),
                         rotation: 0,
                         rotSpeed: (Math.random() - 0.5) * 0.12,
@@ -1971,7 +2010,11 @@
                             this.levelElapsed = 0;
                             this.playSound('level_up');
                             this.createFireworks(this.width / 2, this.height * 0.35);
-                            this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#2563eb', '#ffffff');
+                            if (this.level === 3) {
+                                this.addComicBanner('¡NIVEL 3!', '¡Cuidado! Elementos a distintas velocidades', '#f59e0b', '#ffffff');
+                            } else {
+                                this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#2563eb', '#ffffff');
+                            }
                         }
 
                         // El número de elementos que caen aumenta lentamente:
@@ -2032,9 +2075,10 @@
                             }
                         }
 
-                        // Rastro de cometa
-                        if (Math.random() < 0.35) {
-                            note.trail.push({ x: this.getLaneX(note.lane), y: note.y, alpha: 0.6 });
+                        // Rastro de cometa (más intenso en elementos rápidos o con efecto)
+                        const trailChance = (note.speedTier === 'superfast' || note.type === 'emilio') ? 0.70 : (note.speedTier === 'fast' ? 0.52 : 0.35);
+                        if (Math.random() < trailChance) {
+                            note.trail.push({ x: this.getLaneX(note.lane), y: note.y, alpha: 0.65 });
                         }
                         for (let t = note.trail.length - 1; t >= 0; t--) {
                             note.trail[t].alpha -= 0.04;
@@ -2417,7 +2461,13 @@
 
                         // Rastro
                         for (const tr of note.trail) {
-                            ctx.fillStyle = `rgba(255, 255, 255, ${tr.alpha * 0.35})`;
+                            if (note.speedTier === 'superfast' || note.type === 'emilio') {
+                                ctx.fillStyle = `rgba(245, 158, 11, ${tr.alpha * 0.55})`;
+                            } else if (note.speedTier === 'fast') {
+                                ctx.fillStyle = `rgba(56, 189, 248, ${tr.alpha * 0.50})`;
+                            } else {
+                                ctx.fillStyle = `rgba(255, 255, 255, ${tr.alpha * 0.35})`;
+                            }
                             ctx.beginPath();
                             ctx.arc(tr.x, tr.y, note.radius * 0.5, 0, Math.PI * 2);
                             ctx.fill();
