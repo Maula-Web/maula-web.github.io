@@ -4500,3 +4500,68 @@ button:not(:disabled):active {
     background-size: 200% 100%;
 }
 
+/* =========================================================================
+   NAVBAR SUPERIOR STICKY / SIEMPRE VISIBLE EN TODAS LAS HOJAS (PC Y MÓVIL)
+   ========================================================================= */
+.main-navbar-sticky {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* =========================================================================
+   TELETIPO / TICKER INFERIOR EN TODAS LAS HOJAS
+   ========================================================================= */
+body.has-ticker {
+    padding-bottom: 3.5rem !important;
+}
+
+@media (min-width: 768px) {
+    body.has-ticker {
+        padding-bottom: 4rem !important;
+    }
+}
+
+.ticker-wrap {
+    mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);
+}
+
+.ticker-move {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: ticker-slide 85s linear infinite;
+}
+
+.ticker-move:hover,
+.ticker-move:active,
+.ticker-move.is-paused {
+    animation-play-state: paused !important;
+}
+
+@keyframes ticker-slide {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+/* Adaptación del teletipo al tema claro */
+.light-theme #news-ticker-bar {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-top-color: rgba(245, 158, 11, 0.45) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.light-theme #news-ticker-bar #ticker-content {
+    color: #1e293b !important;
+}
+
+.light-theme #news-ticker-bar #ticker-content span.text-amber-400\/80 {
+    color: #d97706 !important;
+}
+
