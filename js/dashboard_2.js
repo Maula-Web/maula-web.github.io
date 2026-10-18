@@ -1278,8 +1278,8 @@ class Dashboard2AppController {
             }
         }
 
-        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 829.48) : 829.48;
-        let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 701.96) : 701.96;
+        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1091.52) : 1091.52;
+        let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 694.71) : 694.71;
         let superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
 
         if (elTotal) elTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace(".", ",")} €`;
@@ -1375,24 +1375,34 @@ class Dashboard2AppController {
         if (isNextInProgress && liveLoserName) {
             items.push(`✍️ <strong class="text-rose-400">Sellador provisional en juego:</strong> ${liveLoserName} ocupa el puesto de sellado.`);
         } else if (outcome && outcome.loserName) {
-            items.push(`✍️ <strong class="text-rose-400">Sellador:</strong> ${outcome.loserName} acude a loterías a sellar el boleto colectivo.`);
-        } else {
-            items.push(`✍️ <strong class="text-rose-400">Sellador de la semana:</strong> Reembolsado al 100% por la caja común del Bote.`);
+            items.push(`✍️ <strong class="text-rose-400">Sellador designado:</strong> ${outcome.loserName} acude a loterías a sellar el boleto colectivo.`);
         }
 
-        // 4. Quiniela colectiva de dobles
-        items.push(`👑 <strong class="text-amber-400">Quiniela de Dobles:</strong> Financiada al 100% por el Bote común de la peña.`);
+        // 4. Podio General: 2º y 3º puesto
+        if (sortedMembers && sortedMembers.length > 1) {
+            const sec = sortedMembers[1];
+            const thi = sortedMembers[2];
+            const podioStr = thi ? `🥈 2º ${sec.name} (${sec.totalPoints || 0} pts) • 🥉 3º ${thi.name} (${thi.totalPoints || 0} pts)` : `🥈 2º ${sec.name} (${sec.totalPoints || 0} pts)`;
+            items.push(`🏅 <strong class="text-slate-300">Podio General:</strong> ${podioStr}.`);
+        }
 
         // 5. Caja Real de la Peña
         let summary = null;
-        if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
+        try {
+            const cached = localStorage.getItem('maulas_bote2_summary');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed && typeof parsed.cajaReal === 'number') summary = parsed;
+            }
+        } catch (e) { }
+        if (!summary && window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
             summary = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
         }
         if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
             const sd = window.BoteApp.getSeasonData();
             if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') summary = sd.summary;
         }
-        const cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 829.48) : 829.48;
+        const cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1091.52) : 1091.52;
         const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
         items.push(`💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común.`);
 
@@ -1405,8 +1415,6 @@ class Dashboard2AppController {
         } else if (outcome && outcome.isPig) {
             const numAcertantes = outcome.pigAcertantes ? outcome.pigAcertantes.length : 0;
             items.push(`🐷 <strong class="text-pink-300">Partido PIG previo:</strong> ${numAcertantes} socios acertaron y quedaron exentos.`);
-        } else {
-            items.push(`🐷 <strong class="text-slate-300">Partido PIG:</strong> Sin derbi entre los 3 grandes esta semana (todos los socios exentos).`);
         }
 
         // 7. Límite para rellenar
@@ -1429,46 +1437,41 @@ class Dashboard2AppController {
         // 10. Farolillo rojo (Rana)
         if (lastMember) {
             items.push(`🐸 <strong class="text-rose-400">Farolillo Rojo:</strong> ${lastMember.name} ocupa la última posición con ${lastMember.totalPoints || 0} pts.`);
-        } else {
-            items.push(`🐸 <strong class="text-rose-400">Farolillo Rojo:</strong> La Rana de la peña busca escapar del colista.`);
         }
 
         // 11. Premios conseguidos en la temporada
         const prizeMoneyFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(totalSeasonMoney || 0) : `${(totalSeasonMoney || 0).toFixed(2).replace('.', ',')} €`;
         items.push(`🎁 <strong class="text-emerald-400">Premios Temporada 2026-27:</strong> ${prizeMoneyFmt} cobrados (${indivCount || 0} individuales y ${doblesCount || 0} en dobles).`);
 
-        // 12. Resultados de partidos recientes o en vivo
-        let resultsItem = null;
-        if (isNextInProgress && nextJ && Array.isArray(nextJ.matches)) {
-            const liveMatches = nextJ.matches.filter(m => m.result && m.result !== '' && m.result !== '-');
+        // 12. Resultados de partidos detallados de la jornada en curso o más reciente
+        const activeJ = (isNextInProgress && nextJ) ? nextJ : (playedJornadas && playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1] : null);
+        if (activeJ && Array.isArray(activeJ.matches)) {
+            const liveMatches = activeJ.matches.filter(m => m.result && m.result !== '' && m.result !== '-');
             if (liveMatches.length > 0) {
-                const sample = liveMatches.slice(0, 3).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
-                resultsItem = `⚽ <strong class="text-amber-300">Marcadores en juego (J.${nextJ.number}):</strong> ${sample}.`;
+                const jTag = isNextInProgress ? `Marcadores en juego (J.${activeJ.number})` : `Resultados Oficiales J.${activeJ.number}`;
+                const chunk1 = liveMatches.slice(0, 5).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
+                items.push(`⚽ <strong class="text-amber-300">${jTag}:</strong> ${chunk1}.`);
+                if (liveMatches.length > 5) {
+                    const chunk2 = liveMatches.slice(5, 10).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
+                    items.push(`⚽ <strong class="text-amber-300">Más resultados J.${activeJ.number}:</strong> ${chunk2}.`);
+                }
+                if (liveMatches.length > 10) {
+                    const chunk3 = liveMatches.slice(10, 15).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
+                    items.push(`⚽ <strong class="text-amber-300">Partidos 11-15 J.${activeJ.number}:</strong> ${chunk3}.`);
+                }
+            } else {
+                items.push(`⚽ <strong class="text-slate-300">Jornada ${activeJ.number}:</strong> Partidos pendientes de inicio.`);
             }
         }
-        if (!resultsItem) {
-            const lastJ = playedJornadas && playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1] : null;
-            if (lastJ && Array.isArray(lastJ.matches)) {
-                const sample = lastJ.matches.slice(0, 3).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
-                resultsItem = `⚽ <strong class="text-slate-300">Marcadores J.${lastJ.number}:</strong> ${sample}.`;
-            }
-        }
-        if (!resultsItem) {
-            resultsItem = `⚽ <strong class="text-slate-300">Resultados Oficiales:</strong> Escrutinio avalado por Loterías y Apuestas del Estado.`;
-        }
-        items.push(resultsItem);
 
         // 13. Superávit y balance neto de la peña
-        const totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 701.96) : 701.96;
+        const totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 694.71) : 694.71;
         const superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
         const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`;
         items.push(`📈 <strong class="text-emerald-300">Superávit Peña:</strong> ${superavit >= 0 ? '+' : ''}${superavitFmt} a favor de la caja común.`);
 
         // 14. Próxima Cena de la Peña
         items.push(`🍽️ <strong class="text-amber-300">Cenas de la Peña:</strong> 1ª Vuelta el Vie 29 Ene 2027 • Fin de Temporada el Vie 04 Jun 2027.`);
-
-        // 15. Tradición Maula / Broma
-        items.push(`🚩 <strong class="text-rose-300">Tradición Maula:</strong> Botón de expulsión de Emilio disponible salvo en la hora previa al cierre.`);
 
         // Asegurar que siempre hay exactamente 15 elementos
         while (items.length < 15) {
