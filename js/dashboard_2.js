@@ -454,7 +454,7 @@ class Dashboard2AppController {
                     
                     if (isNextInProgress) {
                         if (elWinnerSubtitle) {
-                            elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Líder Provisional (J${nextJornadaNum}):</span>`;
+                            elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Ganador provisional (J${nextJornadaNum})</span>`;
                         }
                         if (elWinnerDetail) {
                             elWinnerDetail.innerHTML = `<span class="text-amber-300 font-medium">Rellenará dobles en J${upcomingJornadaNum}</span> <span class="text-slate-400 text-[11px]">(${liveLeaders.length > 1 ? `Empate a ${liveWinnerHits} ac.` : 'Liderando en vivo'})</span>`;
