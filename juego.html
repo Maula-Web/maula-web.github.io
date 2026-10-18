@@ -237,12 +237,12 @@
                     <span class="text-[11px] font-mono-bold text-slate-300" id="hud-level-timer">02:00</span>
                 </div>
 
-                <!-- Botones de Acción (Volver Web, Audio, Ranking, Pausa) -->
+                <!-- Botones de Acción (Volver al Dashboard, Audio, Ranking, Pausa) -->
                 <div class="flex items-center gap-1 shrink-0">
-                    <a href="dashboard_2.html" 
+                    <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
                        class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-emerald-500/80 flex items-center justify-center text-xs transition text-slate-300 hover:text-white" 
-                       title="Volver a la Web Principal">
-                        <span>🌐</span>
+                       title="Volver al Dashboard">
+                        <span>🏠</span>
                     </a>
                     <button type="button" id="btn-toggle-sound" onclick="window.ArcadeFrenesi.toggleSound()" 
                             class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
@@ -436,16 +436,16 @@
                 </div>
             </div>
 
-            <!-- Botones de Inicio y Volver a la Web (Pantalla Principal) -->
+            <!-- Botones de Inicio y Volver al Dashboard (Pantalla Principal) -->
             <div class="flex items-center gap-2 w-full">
                 <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
                         class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-2xl tracking-wide hover:brightness-110 shadow-xl shadow-amber-500/25 transition transform active:scale-95">
                     ¡SALTAR AL CÉSPED! 🚀
                 </button>
-                <a href="dashboard_2.html" 
+                <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
                    class="px-4 py-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition whitespace-nowrap shadow-md"
-                   title="Volver a la Web Principal">
-                    <span>🌐</span> Volver a la Web
+                   title="Volver al Dashboard">
+                    <span>🏠</span> Volver al Dashboard
                 </a>
             </div>
         </div>
@@ -483,9 +483,9 @@
                 Abre la Peña Maulas desde el navegador de tu teléfono móvil para jugar y competir por el récord de la peña.
             </p>
 
-            <a href="dashboard_2.html" 
+            <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
                class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-xl tracking-wide hover:brightness-110 shadow-xl shadow-amber-500/25 transition transform active:scale-95 flex items-center justify-center gap-2">
-                <span>🏠</span> Volver a la Web Principal
+                <span>🏠</span> Volver al Dashboard
             </a>
         </div>
     </div>
@@ -537,10 +537,10 @@
                 </button>
             </div>
 
-            <!-- Botón Volver a la Web en Pantalla Pitido Final -->
-            <a href="dashboard_2.html" 
+            <!-- Botón Volver al Dashboard en Pantalla Pitido Final -->
+            <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
                class="w-full py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 hover:border-emerald-500/80 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
-                <span>🌐</span> Volver a la Web Principal
+                <span>🏠</span> Volver al Dashboard
             </a>
         </div>
     </div>
@@ -702,6 +702,16 @@
                         const modalPC = document.getElementById('modal-pc-warning');
                         if (modalPC) modalPC.classList.remove('hidden');
                     }
+                }
+
+                goToDashboard(e) {
+                    if (e && e.preventDefault) e.preventDefault();
+                    let target = 'dashboard_2.html';
+                    try {
+                        const mode = localStorage.getItem('maulas_version_mode');
+                        if (mode === 'v1') target = 'dashboard.html';
+                    } catch (err) {}
+                    window.location.href = target;
                 }
 
                 getConnectedSocio() {
