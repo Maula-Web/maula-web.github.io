@@ -356,32 +356,32 @@
          MODAL 1: CARÁTULA DE INICIO & PRESENTACIÓN (UNA SOLA PANTALLA MÓVIL SIN SCROLL)
          ========================================================================= -->
     <div id="modal-start" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md overflow-hidden">
-        <div class="modal-glass w-full max-w-md h-full max-h-[100dvh] sm:max-h-[640px] rounded-2xl sm:rounded-3xl p-3 sm:p-4 text-center flex flex-col justify-between animate-scale-in overflow-hidden shadow-2xl border border-amber-500/40">
+        <div class="modal-glass w-full max-w-md h-full max-h-[100dvh] sm:max-h-[660px] rounded-2xl sm:rounded-3xl p-2.5 sm:p-4 text-center flex flex-col justify-between animate-scale-in overflow-hidden shadow-2xl border border-amber-500/40 select-none">
             <!-- Encabezado / Logo y Título -->
-            <div class="flex flex-col items-center">
+            <div class="flex flex-col items-center shrink-0">
                 <div class="flex items-center justify-center gap-2">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-lg sm:text-xl shadow-lg border border-amber-300/60 shrink-0">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-lg shadow-md border border-amber-300/60 shrink-0">
                         ⚽
                     </div>
                     <div class="text-left leading-none">
-                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-amber-400 block">PEÑA MAULAS ARCADE</span>
+                        <span class="text-[9px] font-black uppercase tracking-widest text-amber-400 block">PEÑA MAULAS ARCADE</span>
                         <h1 class="text-2xl sm:text-3xl font-comic text-white tracking-wide leading-tight">
                             ¡MAULA HERO!
                         </h1>
                     </div>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-0.5 max-w-xs leading-tight">
+                <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">
                     2 min por nivel · Acierta al ritmo 1-X-2 y salva los boletos tardíos
                 </p>
             </div>
 
             <!-- Ficha del Jugador -->
-            <div class="w-full bg-slate-900/90 rounded-xl px-2.5 py-1.5 border border-amber-500/40 flex items-center justify-between text-left shadow-inner">
+            <div class="w-full bg-slate-900/90 rounded-xl px-2.5 py-1 border border-amber-500/40 flex items-center justify-between text-left shadow-inner shrink-0">
                 <div class="flex items-center gap-2 min-w-0">
-                    <span class="text-base shrink-0">👤</span>
+                    <span class="text-sm shrink-0">👤</span>
                     <div class="truncate">
-                        <span class="text-[9px] font-extrabold text-slate-400 block uppercase leading-none">Jugador</span>
-                        <span id="start-socio-name" class="text-xs font-black text-amber-300 truncate block mt-0.5">Socio Maula</span>
+                        <span class="text-[8px] font-extrabold text-slate-400 block uppercase leading-none">Jugador</span>
+                        <span id="start-socio-name" class="text-xs font-black text-amber-300 truncate block">Socio Maula</span>
                     </div>
                 </div>
                 <div class="text-right shrink-0">
@@ -393,56 +393,71 @@
                 </div>
             </div>
 
-            <!-- Tarjetas de la Carátula -->
-            <div class="flex flex-col gap-1.5 w-full text-left">
-                <!-- Tarjeta 1: Sellar Tarde -->
-                <div class="p-2 rounded-xl bg-slate-900/80 border border-rose-500/40 flex items-start gap-2 shadow-sm">
-                    <span class="text-xl shrink-0 mt-0.5">⏰</span>
+            <!-- Guía de Elementos de Juego (Todos los elementos originales integrados) -->
+            <div class="grid grid-cols-2 gap-1.5 w-full text-left">
+                <!-- 1. Sellar Tarde -->
+                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-rose-500/40 flex items-start gap-1.5 shadow-sm">
+                    <span class="text-base shrink-0 mt-0.5">⏰</span>
                     <div class="leading-tight">
-                        <span class="block text-rose-300 font-black text-[11px]">Sellar tarde</span>
-                        <span class="text-[9px] text-slate-300 leading-tight block mt-0.5">Desliza hacia arriba en el área de penalti inferior para conseguir sellar a tiempo. Si no lo consigues serás un Maula y sufrirás las consecuencias.</span>
+                        <span class="block text-rose-300 font-black text-[10px]">Sellar tarde</span>
+                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Desliza hacia arriba en el área de penalti inferior para sellar a tiempo. Si no, serás un Maula y sufrirás las consecuencias.</span>
                     </div>
                 </div>
 
-                <!-- Tarjeta 2 y 3: Echar a Emilio y Lingote de Oro -->
-                <div class="grid grid-cols-2 gap-1.5 w-full">
-                    <!-- Echar a Emilio -->
-                    <div class="p-2 rounded-xl bg-slate-900/80 border border-yellow-500/40 flex items-start gap-1.5 shadow-sm">
-                        <span class="text-xl shrink-0 mt-0.5">🥾</span>
-                        <div class="leading-tight">
-                            <span class="block text-yellow-300 font-black text-[11px]">Echar a Emilio</span>
-                            <span class="text-[9px] text-slate-300 leading-tight block mt-0.5">Si consigues echar a Emilio, te quedarás relajado y eso se nota...</span>
-                        </div>
+                <!-- 2. El Metamórfico -->
+                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-cyan-500/40 flex items-start gap-1.5 shadow-sm">
+                    <span class="text-base shrink-0 mt-0.5">📖🐸👕</span>
+                    <div class="leading-tight">
+                        <span class="block text-cyan-300 font-black text-[10px]">El Metamórfico</span>
+                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Cambia: Estatutos (lluvia x2), Rana (mitad pts) o Polo (x2 pts). ¡Dejarlo pasar NO resta vidas!</span>
                     </div>
+                </div>
 
-                    <!-- Lingote de oro -->
-                    <div class="p-2 rounded-xl bg-slate-900/80 border border-amber-400/40 flex items-start gap-1.5 shadow-sm">
-                        <span class="text-xl shrink-0 mt-0.5">🧈</span>
-                        <div class="leading-tight">
-                            <span class="block text-amber-300 font-black text-[11px]">Lingote de oro</span>
-                            <span class="text-[9px] text-slate-300 leading-tight block mt-0.5">Fórrate con la Peña y consigue mogollón de puntos.</span>
-                        </div>
+                <!-- 3. Echar a Emilio -->
+                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-yellow-500/40 flex items-start gap-1.5 shadow-sm">
+                    <span class="text-base shrink-0 mt-0.5">🥾</span>
+                    <div class="leading-tight">
+                        <span class="block text-yellow-300 font-black text-[10px]">Echar a Emilio</span>
+                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Si consigues echar a Emilio, te quedarás relajado y eso se nota... (¡NO resta vidas!)</span>
+                    </div>
+                </div>
+
+                <!-- 4. Lingote de Oro -->
+                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-amber-400/40 flex items-start gap-1.5 shadow-sm">
+                    <span class="text-base shrink-0 mt-0.5">🧈</span>
+                    <div class="leading-tight">
+                        <span class="block text-amber-300 font-black text-[10px]">Lingote de oro</span>
+                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Fórrate con la Peña y consigue mogollón de puntos.</span>
+                    </div>
+                </div>
+
+                <!-- 5. Banner Especial: Modo Quiniela de Dobles -->
+                <div class="col-span-2 p-1.5 rounded-xl bg-purple-950/60 border border-purple-500/50 flex items-start gap-1.5 shadow-sm text-purple-200">
+                    <span class="text-base shrink-0 mt-0.5">⚡</span>
+                    <div class="leading-tight">
+                        <span class="block text-white font-black text-[10px]">¡Modo Quiniela de Dobles! (Cada 30.000 pts)</span>
+                        <span class="text-[8.5px] text-purple-300 leading-tight block mt-0.5">Durante 15s sólo llueven balones dobles a velocidad 1.5x. ¡Caza <strong>"No se reduce"</strong> para doblar puntos y ganar <strong>+1 vida</strong>! (NO quita vidas).</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Botones de Acción (Saltar al Césped, Ranking, Instrucciones y Dashboard) -->
-            <div class="flex flex-col gap-1.5 w-full pt-0.5">
+            <!-- Botones de Acción (Saltar al Césped, Ranking, Manual y Salir) -->
+            <div class="flex flex-col gap-1.5 w-full pt-0.5 shrink-0">
                 <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
-                        class="w-full py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-xl sm:text-2xl tracking-wide hover:brightness-110 shadow-lg shadow-amber-500/25 transition transform active:scale-95">
+                        class="w-full py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-xl sm:text-2xl tracking-wide hover:brightness-110 shadow-lg shadow-amber-500/25 transition transform active:scale-95">
                     ¡SALTAR AL CÉSPED! 🚀
                 </button>
                 <div class="grid grid-cols-3 gap-1.5 w-full">
                     <button type="button" onclick="window.ArcadeFrenesi.showRankingModal()" 
-                            class="py-2 px-1 rounded-xl bg-slate-900 border border-amber-500/40 hover:bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                            class="py-1.5 px-1 rounded-xl bg-slate-900 border border-amber-500/40 hover:bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <span>🏆</span> Ranking
                     </button>
                     <button type="button" onclick="window.ArcadeFrenesi.showInstructionsModal()" 
-                            class="py-2 px-1 rounded-xl bg-slate-900 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                            class="py-1.5 px-1 rounded-xl bg-slate-900 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <span>📖</span> Manual
                     </button>
                     <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
-                       class="py-2 px-1 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition whitespace-nowrap shadow-sm"
+                       class="py-1.5 px-1 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition whitespace-nowrap shadow-sm"
                        title="Volver al Dashboard">
                         <span>🏠</span> Salir
                     </a>
