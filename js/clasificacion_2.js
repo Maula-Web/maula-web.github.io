@@ -515,6 +515,30 @@
                 const balEl = document.getElementById('kpi-balance-neto');
                 balEl.textContent = `${balanceNeto >= 0 ? '+' : ''}${balanceNeto} pts`;
                 balEl.className = `font-bold font-mono ${balanceNeto >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
+
+                // Sincronización con la Tarjeta Resumen Única en Móvil
+                const mobLiderPts = document.getElementById('kpi-mobile-lider-puntos');
+                if (mobLiderPts && top1) mobLiderPts.textContent = `${top1.grandTotal} pts`;
+                const mobLiderNom = document.getElementById('kpi-mobile-lider-nombre');
+                if (mobLiderNom && top1) mobLiderNom.textContent = top1.name;
+
+                const mobRecPts = document.getElementById('kpi-mobile-record-puntos');
+                if (mobRecPts) mobRecPts.textContent = `${recordPts} pts`;
+                const mobRecSoc = document.getElementById('kpi-mobile-record-socio');
+                if (mobRecSoc) mobRecSoc.textContent = recordSocio ? `${recordSocio.split(' ')[0]} (J${recordJNum})` : `Jornada ${recordJNum}`;
+
+                const mobPremTot = document.getElementById('kpi-mobile-premios-total');
+                if (mobPremTot) mobPremTot.textContent = formattedPremios;
+                const mobPremCnt = document.getElementById('kpi-mobile-premios-count');
+                if (mobPremCnt) mobPremCnt.textContent = `${sociosPremiados} soc.`;
+
+                const mobBalNeto = document.getElementById('kpi-mobile-balance-neto');
+                if (mobBalNeto) {
+                    mobBalNeto.textContent = netoText;
+                    mobBalNeto.className = `text-xs sm:text-sm font-black font-mono mt-0.5 truncate ${balanceNeto >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
+                }
+                const mobBonPen = document.getElementById('kpi-mobile-bonus-penal');
+                if (mobBonPen) mobBonPen.textContent = `+${totalPosBonus} / -${totalNegPenal}`;
             }
 
             // --- RENDERIZADO DE LA TABLA DE RANKING (CON RANA AL ÚLTIMO) ---
@@ -635,23 +659,26 @@
 
                     html += `
                         <tr class="${rowBg} hover:bg-slate-100 dark:hover:bg-slate-800/40 transition cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawer(${s.member.id})">
-                            <td class="py-2.5 px-3 text-center whitespace-nowrap"><div class="inline-flex items-center justify-center">${medalBadge}${changeHtml}</div></td>
-                            <td class="py-2.5 px-4">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-[10px] font-bold text-amber-600 dark:text-amber-400 font-mono shrink-0">
+                            <td class="py-2 sm:py-2.5 px-1.5 sm:px-3 text-center whitespace-nowrap"><div class="inline-flex items-center justify-center">${medalBadge}${changeHtml}</div></td>
+                            <td class="py-2 sm:py-2.5 px-2 sm:px-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 font-mono shrink-0">
                                         ${s.member.id}
                                     </div>
-                                    <div class="font-extrabold text-slate-900 dark:text-white">${s.name}</div>
+                                    <div class="min-w-0">
+                                        <div class="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm truncate">${s.name}</div>
+                                        ${s.prizeTotal > 0 ? `<div class="lg:hidden text-[9px] font-mono font-bold text-purple-600 dark:text-purple-400">💰 ${this.formatMoney(s.prizeTotal)}</div>` : ''}
+                                    </div>
                                 </div>
                             </td>
-                            <td class="py-2.5 px-4 text-center">
-                                <div class="flex flex-col items-center min-w-[130px]">
+                            <td class="py-2 sm:py-2.5 px-1.5 sm:px-4 text-center">
+                                <div class="flex flex-col items-center min-w-[105px] sm:min-w-[130px]">
                                     <div class="flex items-baseline gap-1">
-                                        <span class="text-base font-black font-mono text-amber-600 dark:text-amber-400">${s.grandTotal}</span>
-                                        <span class="text-[10px] font-sans font-bold text-slate-500 dark:text-slate-400">pts</span>
+                                        <span class="text-sm sm:text-base font-black font-mono text-amber-600 dark:text-amber-400">${s.grandTotal}</span>
+                                        <span class="text-[9px] sm:text-[10px] font-sans font-bold text-slate-500 dark:text-slate-400">pts</span>
                                     </div>
                                     <!-- Desglose directo de puntos: base + bonus - penal -->
-                                    <div class="inline-flex items-center justify-center gap-1.5 mt-0.5 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-[10px] font-mono font-bold shadow-xs cursor-help hover:border-amber-400 transition"
+                                    <div class="inline-flex items-center justify-center gap-1 sm:gap-1.5 mt-0.5 px-1.5 sm:px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-[9px] sm:text-[10px] font-mono font-bold shadow-xs cursor-help hover:border-amber-400 transition"
                                          data-card-type="breakdown" data-card-id="${s.member.id}">
                                         <span class="text-slate-700 dark:text-slate-300 font-extrabold" data-card-type="breakdown" data-card-id="${s.member.id}">${s.baseTotal}</span>
                                         <span class="text-slate-400 dark:text-slate-600">|</span>
@@ -659,33 +686,33 @@
                                         <span class="text-slate-400 dark:text-slate-600">|</span>
                                         <span class="text-rose-600 dark:text-rose-400 font-black" data-card-type="penalty" data-card-id="${s.member.id}">${s.negativePenalties > 0 ? '-' + s.negativePenalties : '-0'}</span>
                                     </div>
-                                    <div class="w-24 h-1.5 bg-slate-200 dark:bg-slate-700/50 rounded-full mt-1.5 overflow-hidden">
+                                    <div class="w-16 sm:w-24 h-1 sm:h-1.5 bg-slate-200 dark:bg-slate-700/50 rounded-full mt-1 sm:mt-1.5 overflow-hidden">
                                         <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400" style="width: ${progressPct}%"></div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-800 dark:text-slate-200">${s.baseTotal}</td>
-                            <td class="py-2.5 px-3 text-center font-mono font-bold">
+                            <td class="hidden md:table-cell py-2.5 px-3 text-center font-mono font-bold text-slate-800 dark:text-slate-200">${s.baseTotal}</td>
+                            <td class="hidden md:table-cell py-2.5 px-3 text-center font-mono font-bold">
                                 ${s.positiveBonus > 0 
                                     ? `<span class="cursor-help px-2 py-0.5 rounded-full text-xs font-black bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:border-emerald-400 transition" data-card-type="bonus" data-card-id="${s.member.id}">+${s.positiveBonus}</span>`
                                     : `<span class="text-slate-400 dark:text-slate-500 text-xs">0</span>`
                                 }
                             </td>
-                            <td class="py-2.5 px-3 text-center font-mono font-bold">
+                            <td class="hidden md:table-cell py-2.5 px-3 text-center font-mono font-bold">
                                 ${(s.negativePenalties > 0 || s.penaltyCounts.late > 0)
                                     ? `<span class="cursor-help px-2 py-0.5 rounded-full text-xs font-black bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30 hover:border-rose-400 transition inline-flex items-center gap-1" data-card-type="penalty" data-card-id="${s.member.id}">-${s.negativePenalties} ${s.penaltyCounts.late > 0 ? '⏱️' : ''}</span>`
                                     : `<span class="text-slate-400 dark:text-slate-500 text-xs">0</span>`
                                 }
                             </td>
-                            <td class="py-2.5 px-3 text-center font-mono font-bold">
+                            <td class="hidden lg:table-cell py-2.5 px-3 text-center font-mono font-bold">
                                 ${s.prizeTotal > 0 
                                     ? `<span class="cursor-help px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-400 transition" data-card-type="prize" data-card-id="${s.member.id}">${this.formatMoney(s.prizeTotal)}</span>`
                                     : `<span class="text-slate-400 dark:text-slate-500 text-xs">-</span>`
                                 }
                             </td>
-                            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-600 dark:text-slate-400">${media}</td>
-                            <td class="py-2.5 px-3 text-center">${formHtml}</td>
-                            <td class="py-2.5 px-3 text-center">
+                            <td class="hidden sm:table-cell py-2.5 px-3 text-center font-mono font-bold text-slate-600 dark:text-slate-400">${media}</td>
+                            <td class="py-2 sm:py-2.5 px-1 sm:px-3 text-center">${formHtml}</td>
+                            <td class="hidden sm:table-cell py-2.5 px-3 text-center">
                                 <button type="button" class="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[10px] font-bold transition">
                                     👁️
                                 </button>
@@ -1382,6 +1409,20 @@
                     }
                 });
 
+                // Actualizar indicador y checkmarks en móvil
+                const mobileLabel = document.getElementById('mobile-active-view-label');
+                if (mobileLabel) {
+                    if (viewName === 'matrix') mobileLabel.innerHTML = '📊 Desglose';
+                    else if (viewName === 'chart') mobileLabel.innerHTML = '🚀 Escalada';
+                    else mobileLabel.innerHTML = '🏅 Ranking';
+                }
+                const chkRanking = document.getElementById('mobile-check-ranking');
+                const chkMatrix = document.getElementById('mobile-check-matrix');
+                const chkChart = document.getElementById('mobile-check-chart');
+                if (chkRanking) chkRanking.classList.toggle('hidden', viewName !== 'ranking');
+                if (chkMatrix) chkMatrix.classList.toggle('hidden', viewName !== 'matrix');
+                if (chkChart) chkChart.classList.toggle('hidden', viewName !== 'chart');
+
                 if (viewName === 'chart') {
                     if (!this.chartInitialized) {
                         this.initChart();
@@ -1406,6 +1447,19 @@
                         btn.className = 'category-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
                     }
                 });
+
+                // Actualizar checkmarks de filtros en móvil
+                const filterMap = {
+                    all: document.getElementById('mobile-filter-check-all'),
+                    podium: document.getElementById('mobile-filter-check-podium'),
+                    prizes: document.getElementById('mobile-filter-check-prizes'),
+                    penalties: document.getElementById('mobile-filter-check-penalties')
+                };
+                Object.keys(filterMap).forEach(k => {
+                    const el = filterMap[k];
+                    if (el) el.classList.toggle('hidden', k !== filterName);
+                });
+
                 this.renderRankingTable();
             }
 
