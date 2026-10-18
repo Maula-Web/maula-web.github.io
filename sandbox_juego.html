@@ -393,7 +393,7 @@
                     <span class="text-xl">⏰</span>
                     <div>
                         <span class="block text-white font-extrabold">Sellar Tarde</span>
-                        <span class="text-[9px] text-rose-400 font-normal">¡Desliza arriba ⬆️ para sellar a tiempo! Tocar = 💥 Tarde</span>
+                        <span class="text-[9px] text-rose-400 font-normal">¡Desliza arriba ⬆️ en el <strong>Área de Penalti</strong> inferior para salvarlo! Tocarlo = 💥 Tarde</span>
                     </div>
                 </div>
 
@@ -401,7 +401,7 @@
                     <span class="text-xl">📖🐸👕</span>
                     <div>
                         <span class="block text-white font-extrabold">El Metamórfico</span>
-                        <span class="text-[9px] text-slate-300 font-normal">Cambia: Estatutos (x2 lluvia), Rana (mitad de puntos) o Polo (x2 pts). ¡Se pueden dejar pasar sin perder vidas!</span>
+                        <span class="text-[9px] text-slate-300 font-normal">Cambia: Estatutos (lluvia x2), Rana (mitad pts) o Polo (x2 pts). ¡Dejarlo pasar NO resta vidas!</span>
                     </div>
                 </div>
 
@@ -409,7 +409,7 @@
                     <span class="text-xl">🥾</span>
                     <div>
                         <span class="block text-white font-extrabold">Echar a Emilio</span>
-                        <span class="text-[9px] text-amber-400 font-normal">¡Ultrarrápido! Explota todo x2 pts y activa cámara lenta</span>
+                        <span class="text-[9px] text-amber-400 font-normal">¡Ultrarrápido! Explota todo x2 pts y cámara lenta 10s. ¡Dejarlo pasar NO resta vidas!</span>
                     </div>
                 </div>
 
@@ -417,7 +417,7 @@
                     <span class="text-xl">🧈</span>
                     <div>
                         <span class="block text-white font-extrabold">Lingote de Oro</span>
-                        <span class="text-[9px] text-amber-200 font-normal">Puntos x2.5 y lluvia de monedas doradas</span>
+                        <span class="text-[9px] text-amber-200 font-normal">Puntos x2.5 y lluvia de monedas doradas puras</span>
                     </div>
                 </div>
 
@@ -426,7 +426,7 @@
                     <span class="text-2xl shrink-0">⚡</span>
                     <div>
                         <span class="block text-white font-black text-xs">¡Modo Quiniela de Dobles! (Cada 30.000 pts)</span>
-                        <span class="text-[9px] text-purple-300 font-medium leading-tight">Durante 15s sólo llueven balones de 2 en 2 a velocidad 1.5x creciente. ¡Caza el botón ultrarrápido <strong>"No se reduce"</strong> para multiplicar x2 todos los puntos de dobles!</span>
+                        <span class="text-[9px] text-purple-300 font-medium leading-tight">Durante 15s sólo llueven balones de 2 en 2 a velocidad 1.5x creciente. ¡Caza <strong>"No se reduce"</strong> para multiplicar x2 los puntos de dobles y <strong>restaurar +1 vida</strong>! (Dejarlo pasar NO quita vidas).</span>
                     </div>
                 </div>
             </div>
@@ -756,13 +756,13 @@
                         if (this.doblesMusicPlayer) {
                             this.doblesMusicPlayer.src = 'audio/modo_dobles.mp3';
                             this.doblesMusicPlayer.addEventListener('error', () => {
-                                if (!this.doblesMusicPlayer.src.endsWith('gol_rapido.mp3')) {
-                                    this.doblesMusicPlayer.src = 'audio/gol_rapido.mp3';
+                                if (!this.doblesMusicPlayer.src.endsWith('dobles.mp3')) {
+                                    this.doblesMusicPlayer.src = 'audio/dobles.mp3';
                                 }
                             }, { once: true });
                             this.hasCustomDoblesMusic = true;
                             const doblesMusicLabel = document.getElementById('dobles-music-status-label');
-                            if (doblesMusicLabel) doblesMusicLabel.textContent = '⚡ Gol Rápido (Oficial)';
+                            if (doblesMusicLabel) doblesMusicLabel.textContent = '⚡ Dobles.mp3 (Oficial)';
                         }
                     } catch (e) {
                         console.warn("Música dobles por defecto:", e);
@@ -1094,8 +1094,8 @@
                     this.startMusic();
                     this.updateHUD();
 
-                    // Cartel cómico de inicio
-                    this.addComicBanner('¡VAMOS!', '¡JORNADA EN JUEGO!', '#f59e0b', '#dc2626');
+                    // Cartel cómico de inicio (Texto claro y brillante)
+                    this.addComicBanner('¡VAMOS!', '¡JORNADA EN JUEGO!', '#ef4444', '#fef08a');
 
                     this.lastTick = performance.now();
                     requestAnimationFrame(this.gameLoop.bind(this));
@@ -1177,7 +1177,7 @@
                     this.playSound('level_up');
                     this.createFireworks(this.width / 2, this.height * 0.35);
                     this.screenShake = 18;
-                    this.addComicBanner('¡MODO DOBLES!', '¡Quiniela de Dobles durante 15s!', '#f3e8ff', '#7c3aed');
+                    this.addComicBanner('¡MODO DOBLES!', '¡Quiniela de Dobles durante 15s!', '#7c3aed', '#fef08a');
 
                     this.startDoblesMusic();
                     this.updateHUD();
@@ -1188,7 +1188,7 @@
                     this.isDoblesMode = false;
                     this.stopDoblesMusic();
 
-                    this.addComicBanner('¡FIN DE DOBLES!', 'Volviendo a la jornada regular', '#fef08a', '#2563eb');
+                    this.addComicBanner('¡FIN DE DOBLES!', 'Volviendo a la jornada regular', '#2563eb', '#ffffff');
                     this.nextDoblesThreshold = (Math.floor(this.score / 30000) + 1) * 30000;
                     this.updateHUD();
                 }
@@ -1311,6 +1311,14 @@
                     this.createExplosion(x, y, '#c084fc', 32);
                     this.screenShake = 16;
 
+                    // Cazar el elemento "No se reduce" restaura una vida (hasta el máximo de 3)
+                    if (this.lives < 3) {
+                        this.lives++;
+                        this.addFloatingText(x, y - 55, '❤️ +1 VIDA RESTAURADA', '#34d399');
+                    } else {
+                        this.addFloatingText(x, y - 55, '❤️ VIDAS AL MÁXIMO (3/3)', '#34d399');
+                    }
+
                     // Multiplica por 2 todos los puntos conseguidos por la de dobles
                     // 1. Duplica retroactivamente los puntos ganados hasta este momento en dobles
                     const retroactiveBonus = this.doblesPointsEarned;
@@ -1322,14 +1330,23 @@
                         this.doblesPointsEarned += 500;
                     }
 
-                    this.addFloatingText(x, y - 30, `¡NO SE REDUCE! x2`, '#e879f9');
-                    this.addComicBanner('¡NO SE REDUCE!', '¡Quiniela al Directo! Puntos de Dobles x2', '#f3e8ff', '#7c3aed');
+                    this.addFloatingText(x, y - 30, `¡NO SE REDUCE! x2`, '#fde047');
+                    this.addComicBanner('¡NO SE REDUCE!', '¡Puntos de Dobles x2 y +1 Vida!', '#9333ea', '#fef08a');
                     this.updateHUD();
                 }
 
                 // GENERACIÓN DE ELEMENTOS
-                spawnNote() {
-                    const lane = Math.floor(Math.random() * 3);
+                spawnNote(forcedLane = null) {
+                    let lane = forcedLane;
+                    if (lane === null || lane === undefined) {
+                        // Buscar carriles disponibles que no tengan ya una nota recién nacida en la parte alta
+                        const availableLanes = [0, 1, 2].filter(l => {
+                            return !this.notes.some(n => n.lane === l && n.y < 95);
+                        });
+                        lane = availableLanes.length > 0
+                            ? availableLanes[Math.floor(Math.random() * availableLanes.length)]
+                            : Math.floor(Math.random() * 3);
+                    }
                     const rand = Math.random();
 
                     let type = 'normal';
@@ -1411,7 +1428,7 @@
                             this.screenShake = 20;
                             this.playSound('hit_trap');
                             this.createExplosion(laneX, closestNote.y, '#ef4444', 40);
-                            this.addComicBanner('¡TARDE!', '¡SELLASTE FUERA DE PLAZO! DESLIZA ARRIBA', '#fef08a', '#dc2626');
+                            this.addComicBanner('¡TARDE!', '¡SELLASTE FUERA DE PLAZO! DESLIZA EN EL ÁREA', '#dc2626', '#fef08a');
                             const hitIdx = this.notes.indexOf(closestNote);
                             if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
                             this.checkGameOver();
@@ -1455,14 +1472,14 @@
                                 ratingColor = '#f59e0b';
                                 this.playSound('hit_gold');
                                 this.createCoinShower(laneX, closestNote.y);
-                                this.addComicBanner('¡LINGOTE!', '+250% Puntos de Oro Puro', '#fffbeb', '#f59e0b');
+                                this.addComicBanner('¡LINGOTE!', '+250% Puntos de Oro Puro', '#ca8a04', '#ffffff');
                             } else if (closestNote.type === 'pleno') {
                                 basePoints = 500;
                                 ratingText = '🚨 PLENO AL 15';
                                 ratingColor = '#fbbf24';
                                 this.playSound('hit_gold');
                                 this.createFireworks(laneX, closestNote.y);
-                                this.addComicBanner('¡PLENO!', '+500 Pts de la Peña', '#fef08a', '#10b981');
+                                this.addComicBanner('¡PLENO!', '+500 Pts de la Peña', '#059669', '#fde047');
                             }
 
                             // Aplicar modificadores de buff activos (Rana ÷2 o Polo x2)
@@ -1506,14 +1523,18 @@
                 handleSwipeUp(laneIndex) {
                     if (!this.isPlaying || this.isPaused) return false;
 
+                    const areaTop = this.targetY - 65;
+
                     // Buscar boleto de sellar tarde en este carril
                     let lavaNote = null;
                     let minDist = Infinity;
 
                     for (const note of this.notes) {
                         if (note.lane === laneIndex && !note.hit && note.type === 'lava') {
+                            // Está dentro o en la aproximación del área de penalti
+                            const inArea = (note.y >= areaTop - 25 && note.y <= this.height + 40);
                             const dist = Math.abs(note.y - this.targetY);
-                            if (dist < minDist && dist < 145) {
+                            if (inArea && dist < minDist) {
                                 minDist = dist;
                                 lavaNote = note;
                             }
@@ -1549,7 +1570,7 @@
 
                         this.createExplosion(laneX, lavaNote.y, '#10b981', 22);
                         this.addFloatingText(laneX, lavaNote.y - 30, `+${bonusPoints} ¡SELLADO!`, '#34d399');
-                        this.addComicBanner('¡A TIEMPO!', '¡Quiniela Sellada in extremis! +200 pts', '#dcfce7', '#10b981');
+                        this.addComicBanner('¡A TIEMPO!', '¡Quiniela Sellada in extremis! +200 pts', '#059669', '#ffffff');
 
                         const hitIdx = this.notes.indexOf(lavaNote);
                         if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
@@ -1587,7 +1608,7 @@
                     // Activar Slo-Mo por 10 segundos
                     this.buffs.emilioSlowMoTime = 10;
 
-                    this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Pantalla Limpia + Cámara Lenta 10s', '#fef08a', '#dc2626');
+                    this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Pantalla Limpia + Cámara Lenta 10s', '#dc2626', '#ffffff');
                     this.createFireworks(x, y);
                     this.updateHUD();
                 }
@@ -1599,19 +1620,19 @@
                         this.buffs.doubleSpawnTime = 3;
                         this.playSound('hit_gold');
                         this.createExplosion(x, y, '#d97706', 25);
-                        this.addComicBanner('¡ESTATUTOS!', 'Lluvia x2 de Elementos durante 3s', '#fffbeb', '#d97706');
+                        this.addComicBanner('¡ESTATUTOS!', 'Lluvia x2 de Elementos durante 3s', '#d97706', '#ffffff');
                     } else if (phase === 1) {
                         // 🐸 RANA: Puntos valen la mitad durante 10 segundos
                         this.buffs.frogPenaltyTime = 10;
                         this.playSound('frog');
                         this.createExplosion(x, y, '#22c55e', 25);
-                        this.addComicBanner('¡CROAC!', 'Maldición de la Rana: Mitad de puntos durante 10s', '#dcfce7', '#16a34a');
+                        this.addComicBanner('¡CROAC!', 'Maldición de la Rana: Mitad de puntos durante 10s', '#15803d', '#ffffff');
                     } else if (phase === 2) {
                         // 👕 POLO MAULA NEGRO CUELLO BLANCO: Puntos x2 durante 10 segundos
                         this.buffs.poloBonusTime = 10;
                         this.playSound('hit_gold');
                         this.createExplosion(x, y, '#ffffff', 30);
-                        this.addComicBanner('¡POLO MAULA!', 'Elegancia Peñista: Puntos x2 durante 10s', '#f8fafc', '#0f172a');
+                        this.addComicBanner('¡POLO MAULA!', 'Elegancia Peñista: Puntos x2 durante 10s', '#1e293b', '#ffffff');
                     }
                     this.score += 100;
                     this.checkDoblesTrigger();
@@ -1619,12 +1640,18 @@
                 }
 
                 // BANNERS ESTILO ONOMATOPEYA CÓMIC (Inspirado en la imagen BOOM!)
-                addComicBanner(title, subtitle, bgYellow, textColor) {
+                addComicBanner(title, subtitle, bgStar, textColor) {
+                    // Garantizar SIEMPRE colores claros y brillantes en los textos para máxima legibilidad
+                    let brightTextColor = textColor || '#ffffff';
+                    if (brightTextColor === '#0f172a' || brightTextColor === '#1e293b' || brightTextColor === '#000000') {
+                        brightTextColor = '#ffffff';
+                    }
+
                     this.comicBanners.push({
                         title: title,
                         subtitle: subtitle,
-                        bg: bgYellow || '#fef08a',
-                        textColor: textColor || '#dc2626',
+                        bg: bgStar || '#ef4444',
+                        textColor: brightTextColor,
                         scale: 0.2,
                         targetScale: 1.0,
                         alpha: 1.0,
@@ -1691,16 +1718,36 @@
                             this.levelElapsed = 0;
                             this.playSound('level_up');
                             this.createFireworks(this.width / 2, this.height * 0.35);
-                            this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#fef08a', '#2563eb');
+                            this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#2563eb', '#ffffff');
                         }
 
-                        // Spawning dinámico regular
-                        let spawnRate = Math.max(480, 1150 - (this.level * 90) - (progressInLevel * 300));
-                        if (this.buffs.doubleSpawnTime > 0) spawnRate *= 0.5; // ¡Lluvia x2 de Estatutos!
+                        // El número de elementos que caen aumenta lentamente:
+                        // Límite máximo de elementos simultáneos (para que nunca se haga imposible):
+                        // Nivel 1: de 3 a 4 notas
+                        // Nivel 2: 4 a 5 notas
+                        // Nivel 3+: máximo 6 notas en pantalla (tope seguro absoluto de jugabilidad)
+                        const maxAllowedNotes = Math.min(6, 3 + Math.floor((this.level - 1) * 0.75) + (progressInLevel > 0.4 ? 1 : 0));
+
+                        // El intervalo de caída se reduce lentamente de forma progresiva
+                        let spawnRate = Math.max(480, 1080 - (this.level * 65) - (progressInLevel * 220));
+                        if (this.buffs.doubleSpawnTime > 0) spawnRate *= 0.55; // Lluvia x2 de Estatutos
 
                         if (timestamp - this.lastSpawnTime > spawnRate) {
-                            this.spawnNote();
-                            this.lastSpawnTime = timestamp;
+                            const canSpawn = (this.buffs.doubleSpawnTime > 0)
+                                ? (this.notes.length < maxAllowedNotes + 2)
+                                : (this.notes.length < maxAllowedNotes);
+
+                            if (canSpawn) {
+                                this.spawnNote();
+
+                                // Ocasionalmente conforme avanza la partida, puede caer un segundo elemento simultáneo
+                                // pero respetando siempre el límite máximo para que nunca sea imposible:
+                                const multiChance = Math.min(0.20, 0.04 + ((this.level - 1) * 0.04) + (progressInLevel * 0.05));
+                                if (Math.random() < multiChance && this.notes.length < maxAllowedNotes) {
+                                    this.spawnNote();
+                                }
+                                this.lastSpawnTime = timestamp;
+                            }
                         }
                     }
 
@@ -1745,13 +1792,13 @@
                         if (note.y > this.height + 40) {
                             if (!note.hit) {
                                 if (note.type === 'lava') {
-                                    // Si un boleto de sellar tarde se escapa sin salvarse, ¡pierdes vida!
+                                    // Si un boleto de sellar tarde se escapa sin salvarse en el área, ¡pierdes vida!
                                     this.lives--;
                                     this.combo = 0;
                                     this.multiplier = 1;
                                     this.screenShake = 14;
                                     this.playSound('hit_trap');
-                                    this.addComicBanner('¡SIN SELLAR!', '¡Se te pasó la hora de sellar!', '#fef08a', '#dc2626');
+                                    this.addComicBanner('¡SIN SELLAR!', '¡Se te pasó la hora de sellar!', '#dc2626', '#fef08a');
                                     this.checkGameOver();
                                 } else if (note.type === 'normal' || note.type === 'gold' || note.type === 'pleno') {
                                     this.lives--;
@@ -1762,6 +1809,7 @@
                                     this.addFloatingText(this.getLaneX(note.lane), this.targetY, '¡FALLO!', '#94a3b8');
                                     this.checkGameOver();
                                 }
+                                // NOTA REGLAMENTARIA: Dejar pasar metamórficos, botas o no se reduce NO quita vidas.
                                 this.updateHUD();
                             }
                             this.notes.splice(i, 1);
@@ -1848,20 +1896,23 @@
                     // B) Fondo de Carriles y Césped Neón
                     this.drawLanesBackground(ctx);
 
-                    // C) Línea de Meta y Receptores
+                    // C) Área de Fútbol en la parte inferior (Zona de Devolución de Sellar Tarde)
+                    this.drawPenaltyArea(ctx);
+
+                    // D) Línea de Meta y Receptores
                     this.drawTargetReceptors(ctx);
 
-                    // D) Balones y Elementos que caen
+                    // E) Balones y Elementos que caen
                     this.drawNotes(ctx);
 
-                    // E) Boletos de Sellar Tarde Validados hacia arriba
+                    // F) Boletos de Sellar Tarde Validados hacia arriba
                     this.drawDeflectedBalls(ctx);
 
-                    // F) Partículas & Textos Flotantes
+                    // G) Partículas & Textos Flotantes
                     this.drawParticles(ctx);
                     this.drawFloatingTexts(ctx);
 
-                    // G) Carteles Estilo Cómic Onomatopeya (BOOM!)
+                    // H) Carteles Estilo Cómic Onomatopeya (BOOM!)
                     this.drawComicBanners(ctx);
 
                     // H) Efecto Visual Especial si está activo el MODO DOBLES
@@ -1966,6 +2017,94 @@
                             ctx.stroke();
                         }
                     }
+                }
+
+                // ÁREA DE FÚTBOL EN LA PARTE INFERIOR (Zona de Devolución de Sellar Tarde)
+                drawPenaltyArea(ctx) {
+                    ctx.save();
+                    const areaTop = this.targetY - 65;
+                    const areaBottom = this.height;
+                    const areaHeight = areaBottom - areaTop;
+
+                    // Comprobar si hay algún boleto de sellar tarde dentro del área de penalti
+                    let hasLavaInArea = false;
+                    for (const n of this.notes) {
+                        if (n.type === 'lava' && !n.hit && n.y >= areaTop - 25 && n.y <= areaBottom + 30) {
+                            hasLavaInArea = true;
+                            break;
+                        }
+                    }
+
+                    const pulse = hasLavaInArea ? (0.6 + 0.4 * Math.sin(performance.now() * 0.012)) : 0.2;
+
+                    // 1. Césped especial esmeralda del área de penalti con franjas de corte
+                    const grassGrad = ctx.createLinearGradient(0, areaTop, 0, areaBottom);
+                    grassGrad.addColorStop(0, hasLavaInArea ? `rgba(16, 185, 129, ${0.18 + pulse * 0.12})` : 'rgba(5, 150, 105, 0.12)');
+                    grassGrad.addColorStop(1, hasLavaInArea ? `rgba(16, 185, 129, ${0.32 + pulse * 0.15})` : 'rgba(16, 185, 129, 0.22)');
+                    ctx.fillStyle = grassGrad;
+                    ctx.fillRect(8, areaTop, this.width - 16, areaHeight);
+
+                    // Franjas de corte de césped horizontal de estadio
+                    const stripeH = 22;
+                    for (let sy = areaTop; sy < areaBottom; sy += stripeH * 2) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
+                        ctx.fillRect(8, sy, this.width - 16, Math.min(stripeH, areaBottom - sy));
+                    }
+
+                    // 2. Líneas reglamentarias del área grande
+                    const areaX = 14;
+                    const areaW = this.width - 28;
+
+                    ctx.shadowColor = hasLavaInArea ? '#34d399' : 'rgba(255, 255, 255, 0.45)';
+                    ctx.shadowBlur = hasLavaInArea ? (14 + pulse * 10) : 6;
+                    ctx.strokeStyle = hasLavaInArea ? `rgba(52, 211, 153, ${0.9 + pulse * 0.1})` : 'rgba(255, 255, 255, 0.65)';
+                    ctx.lineWidth = hasLavaInArea ? 3.5 : 2.5;
+
+                    // Línea horizontal superior del área y postes laterales
+                    ctx.beginPath();
+                    ctx.moveTo(areaX, areaBottom);
+                    ctx.lineTo(areaX, areaTop);
+                    ctx.lineTo(areaX + areaW, areaTop);
+                    ctx.lineTo(areaX + areaW, areaBottom);
+                    ctx.stroke();
+
+                    // 3. Media luna del área (Penalty Arc) arriba de la línea frontal
+                    const arcRadius = 42;
+                    ctx.beginPath();
+                    ctx.arc(this.width / 2, areaTop, arcRadius, Math.PI + 0.5, 2 * Math.PI - 0.5);
+                    ctx.stroke();
+
+                    // 4. Área pequeña (Goal Area)
+                    const smallW = areaW * 0.52;
+                    const smallX = (this.width - smallW) / 2;
+                    const smallTop = this.height - 48;
+                    ctx.lineWidth = 1.8;
+                    ctx.beginPath();
+                    ctx.moveTo(smallX, areaBottom);
+                    ctx.lineTo(smallX, smallTop);
+                    ctx.lineTo(smallX + smallW, smallTop);
+                    ctx.lineTo(smallX + smallW, areaBottom);
+                    ctx.stroke();
+
+                    // 5. Punto de penalti
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(this.width / 2, this.targetY - 18, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 6. Rótulo sutil indicativo en el césped del área
+                    ctx.save();
+                    ctx.font = '900 10px Plus Jakarta Sans, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = hasLavaInArea ? '#34d399' : 'rgba(209, 250, 229, 0.65)';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText('⬆️ ÁREA DE PENALTI (DESLIZA PARA SELLAR) ⬆️', this.width / 2, areaTop + 14);
+                    ctx.restore();
+
+                    ctx.restore();
                 }
 
                 drawTargetReceptors(ctx) {
@@ -2473,20 +2612,25 @@
                         ctx.lineWidth = 2.5;
                         ctx.strokeText(cb.title, 0, -10);
 
-                        // 3. Subtítulo explicativo en caja de texto cómic
+                        // 3. Subtítulo explicativo en caja de texto cómic (Texto nítido, claro y brillante)
                         if (cb.subtitle) {
-                            ctx.font = '800 11px Plus Jakarta Sans, sans-serif';
-                            const subW = ctx.measureText(cb.subtitle).width + 16;
-                            ctx.fillStyle = '#000000';
-                            ctx.fillRect(-subW / 2 + 2, 16 + 2, subW, 20);
-                            ctx.fillStyle = '#ffffff';
-                            ctx.fillRect(-subW / 2, 16, subW, 20);
-                            ctx.strokeStyle = '#000000';
-                            ctx.lineWidth = 1.5;
-                            ctx.strokeRect(-subW / 2, 16, subW, 20);
+                            ctx.font = '800 11.5px Plus Jakarta Sans, sans-serif';
+                            const subW = ctx.measureText(cb.subtitle).width + 24;
 
-                            ctx.fillStyle = '#0f172a';
-                            ctx.fillText(cb.subtitle, 0, 26);
+                            // Sombra negra 3D cómic desplazada
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(-subW / 2 + 2.5, 16 + 2.5, subW, 22);
+
+                            // Fondo oscuro con borde blanco luminoso
+                            ctx.fillStyle = '#0a0f1d';
+                            ctx.fillRect(-subW / 2, 16, subW, 22);
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.lineWidth = 2.0;
+                            ctx.strokeRect(-subW / 2, 16, subW, 22);
+
+                            // Texto en blanco puro de alta visibilidad (¡Nunca oscuro!)
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillText(cb.subtitle, 0, 27);
                         }
 
                         ctx.restore();
