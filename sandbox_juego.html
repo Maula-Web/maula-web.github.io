@@ -2466,30 +2466,81 @@
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🥾', 0, -5);
-                    ctx.font = '900 8px Bangers, sans-serif';
+
+                    ctx.font = '900 9px Bangers, sans-serif';
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 2.5;
+                    ctx.strokeText('EMILIO', 0, 13);
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillText('EMILIO', 0, 12);
+                    ctx.fillText('EMILIO', 0, 13);
                 }
 
+                // BALÓN SUPER BONUS: PLENO AL 15 (Texto con borde oscuro grueso y máxima legibilidad)
                 renderPlenoBall(ctx, radius) {
+                    ctx.save();
                     ctx.shadowColor = '#f59e0b';
                     ctx.shadowBlur = 30;
 
-                    const grad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius);
-                    grad.addColorStop(0, '#ffffff');
-                    grad.addColorStop(0.4, '#f59e0b');
-                    grad.addColorStop(1, '#ef4444');
+                    // 1. Esfera con gradiente de fuego / naranja brillante
+                    const grad = ctx.createRadialGradient(0, -radius * 0.25, radius * 0.1, 0, 0, radius);
+                    grad.addColorStop(0, '#ffedd5');
+                    grad.addColorStop(0.35, '#f97316');
+                    grad.addColorStop(0.75, '#ea580c');
+                    grad.addColorStop(1, '#991b1b');
                     ctx.fillStyle = grad;
                     ctx.beginPath();
                     ctx.arc(0, 0, radius, 0, Math.PI * 2);
                     ctx.fill();
 
+                    // 2. Anillo exterior dorado de Pleno al 15
+                    ctx.strokeStyle = '#fde047';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // Aro interior fino de contraste
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius * 0.82, 0, Math.PI * 2);
+                    ctx.stroke();
+
                     ctx.shadowBlur = 0;
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '900 18px Outfit, sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('P15', 0, 0);
+
+                    // 3. Palabra superior "PLENO" con borde negro oscuro
+                    ctx.font = '900 9.5px Bangers, sans-serif';
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 2.8;
+                    ctx.strokeText('PLENO', 0, -radius * 0.38);
+                    ctx.fillStyle = '#fde047';
+                    ctx.fillText('PLENO', 0, -radius * 0.38);
+
+                    // 4. Número central "15" grande con borde negro grueso y relieve 3D
+                    ctx.font = '900 23px Bangers, sans-serif';
+
+                    // Sombra negra 3D de apoyo
+                    ctx.fillStyle = '#000000';
+                    for (let off = 3; off >= 1; off--) {
+                        ctx.fillText('15', off * 0.6, 2 + off * 0.6);
+                    }
+
+                    // Borde exterior negro grueso para máxima legibilidad
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 4.2;
+                    ctx.lineJoin = 'round';
+                    ctx.strokeText('15', 0, 2);
+
+                    // Relleno blanco puro brillante
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText('15', 0, 2);
+
+                    // 5. Estrellas doradas inferiores
+                    ctx.font = '900 7px sans-serif';
+                    ctx.fillStyle = '#fde047';
+                    ctx.fillText('★ ★ ★', 0, radius * 0.56);
+
+                    ctx.restore();
                 }
 
                 // ELEMENTO "NO SE REDUCE" (MODO DOBLES - PUNTOS DE DOBLES x2)
