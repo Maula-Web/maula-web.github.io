@@ -594,20 +594,20 @@
             </div>
 
             <!-- Bento KPIs en Desktop (oculto en móvil) -->
-            <div id="kpi-section" class="hidden lg:grid lg:grid-cols-4 gap-2.5 sm:gap-3 relative z-50 overflow-visible">
+            <div id="kpi-section" class="hidden lg:grid lg:grid-cols-4 gap-3 xl:gap-4 relative z-50 overflow-visible">
                 <!-- KPI 1: Líder & Distancia -->
-                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                <div class="glass-panel collapsible-kpi kpi-card p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible shadow-sm">
                     <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                         <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/50 flex items-center gap-1 shadow-sm">
-                                <span>👑</span> Líder General
+                            <span class="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/50 flex items-center gap-1.5 shadow-sm">
+                                <span class="text-sm">👑</span> Líder General
                             </span>
                             <span id="kpi-lider-puntos-compact" class="text-xs font-mono font-black text-amber-600 dark:text-amber-400 lg:hidden">-- pts</span>
                         </div>
 
                         <div class="flex items-center gap-2">
                             <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
-                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
                                     ℹ️
                                 </div>
                                 <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
@@ -624,36 +624,36 @@
                         </div>
                     </div>
 
-                    <!-- Contenido Plegable en Móvil -->
-                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
+                    <!-- Contenido Plegable en Móvil / Principal en PC -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-3">
                         <div>
-                            <h4 id="kpi-lider-nombre" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
-                            <div class="flex items-baseline gap-2 mt-0.5">
-                                <span id="kpi-lider-puntos" class="text-xl font-black text-amber-600 dark:text-amber-400 font-mono">-- pts</span>
-                                <span id="kpi-lider-ventaja" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">+-- sobre el 2º</span>
+                            <h4 id="kpi-lider-nombre" class="text-lg xl:text-xl font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span id="kpi-lider-puntos" class="text-2xl xl:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">-- pts</span>
+                                <span id="kpi-lider-ventaja" class="text-xs xl:text-sm font-mono font-bold text-slate-500 dark:text-slate-400">+-- sobre el 2º</span>
                             </div>
                         </div>
 
-                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                            <span>Efectividad</span>
-                            <span id="kpi-lider-efectividad" class="text-amber-600 dark:text-amber-500 font-bold font-mono">--%</span>
+                        <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center font-medium">
+                            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold">Efectividad</span>
+                            <span id="kpi-lider-efectividad" class="text-sm xl:text-base text-amber-600 dark:text-amber-500 font-black font-mono">--%</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- KPI 2: Récord de Jornada -->
-                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                <div class="glass-panel collapsible-kpi kpi-card p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible shadow-sm">
                     <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                         <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 border border-emerald-500/50 flex items-center gap-1 shadow-sm">
-                                <span>🎯</span> Récord en 1 J
+                            <span class="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 border border-emerald-500/50 flex items-center gap-1.5 shadow-sm">
+                                <span class="text-sm">🎯</span> Récord en 1 J
                             </span>
                             <span id="kpi-record-puntos-compact" class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 lg:hidden">-- pts</span>
                         </div>
 
                         <div class="flex items-center gap-2">
                             <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
-                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
                                     ℹ️
                                 </div>
                                 <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
@@ -670,36 +670,36 @@
                         </div>
                     </div>
 
-                    <!-- Contenido Plegable en Móvil -->
-                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
+                    <!-- Contenido Plegable en Móvil / Principal en PC -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-3">
                         <div>
-                            <h4 id="kpi-record-socio" class="text-base font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
-                            <div class="flex items-baseline gap-2 mt-0.5">
-                                <span id="kpi-record-puntos" class="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">-- pts</span>
-                                <span id="kpi-record-jornada" class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">Jornada --</span>
+                            <h4 id="kpi-record-socio" class="text-lg xl:text-xl font-black text-slate-900 dark:text-white truncate">Calculando...</h4>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span id="kpi-record-puntos" class="text-2xl xl:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">-- pts</span>
+                                <span id="kpi-record-jornada" class="text-xs xl:text-sm font-mono font-bold text-slate-500 dark:text-slate-400">Jornada --</span>
                             </div>
                         </div>
 
-                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                            <span>Aciertos reales</span>
-                            <span id="kpi-record-hits" class="text-emerald-600 dark:text-emerald-500 font-bold font-mono">-- aciertos</span>
+                        <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center font-medium">
+                            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold">Aciertos reales</span>
+                            <span id="kpi-record-hits" class="text-sm xl:text-base text-emerald-600 dark:text-emerald-500 font-black font-mono">-- aciertos</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- KPI 3: Bolsa de Premios (€) -->
-                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                <div class="glass-panel collapsible-kpi kpi-card p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible shadow-sm">
                     <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                         <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-500/25 text-purple-900 dark:text-purple-200 border border-purple-500/50 flex items-center gap-1 shadow-sm">
-                                <span>💰</span> Premios
+                            <span class="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-purple-500/25 text-purple-900 dark:text-purple-200 border border-purple-500/50 flex items-center gap-1.5 shadow-sm">
+                                <span class="text-sm">💰</span> Premios
                             </span>
                             <span id="kpi-premios-total-compact" class="text-xs font-mono font-black text-purple-600 dark:text-purple-400 lg:hidden">-- €</span>
                         </div>
 
                         <div class="flex items-center gap-2">
                             <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
-                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
                                     ℹ️
                                 </div>
                                 <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
@@ -715,33 +715,33 @@
                         </div>
                     </div>
 
-                    <!-- Contenido Plegable en Móvil -->
-                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
+                    <!-- Contenido Plegable en Móvil / Principal en PC -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-3">
                         <div>
-                            <h4 id="kpi-premios-total" class="text-xl font-black text-purple-600 dark:text-purple-400 font-mono">-- €</h4>
-                            <p id="kpi-premios-top-socio" class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Máx. ganador: Calculando...</p>
+                            <h4 id="kpi-premios-total" class="text-2xl xl:text-3xl font-black text-purple-600 dark:text-purple-400 font-mono">-- €</h4>
+                            <p id="kpi-premios-top-socio" class="text-xs xl:text-sm text-slate-600 dark:text-slate-400 mt-1 truncate font-medium">Máx. ganador: Calculando...</p>
                         </div>
 
-                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                            <span>Socios premiados</span>
-                            <span id="kpi-premios-count" class="text-purple-600 dark:text-purple-400 font-bold font-mono">-- socios</span>
+                        <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center font-medium">
+                            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold">Socios premiados</span>
+                            <span id="kpi-premios-count" class="text-sm xl:text-base text-purple-600 dark:text-purple-400 font-black font-mono">-- socios</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- KPI 4: Balance Bonus vs Penalizaciones -->
-                <div class="glass-panel collapsible-kpi kpi-card p-3 sm:p-4 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible">
+                <div class="glass-panel collapsible-kpi kpi-card p-4 sm:p-5 border-amber-500/40 relative flex flex-col justify-between hover:border-amber-400 transition overflow-visible shadow-sm">
                     <div class="collapsible-kpi-header flex items-center justify-between cursor-pointer lg:cursor-default" onclick="window.toggleKpiCard(this)">
                         <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-500/25 text-sky-900 dark:text-sky-200 border border-sky-500/50 flex items-center gap-1 shadow-sm">
-                                <span>⚖️</span> Bonus / Penal
+                            <span class="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-sky-500/25 text-sky-900 dark:text-sky-200 border border-sky-500/50 flex items-center gap-1.5 shadow-sm">
+                                <span class="text-sm">⚖️</span> Bonus / Penal
                             </span>
                             <span id="kpi-balance-neto-compact" class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 lg:hidden">-- pts</span>
                         </div>
 
                         <div class="flex items-center gap-2">
                             <div class="group/tip relative inline-flex cursor-help shrink-0" onclick="event.stopPropagation()">
-                                <div class="w-5 h-5 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-[10px] font-bold transition-all shadow-sm select-none">
+                                <div class="w-6 h-6 rounded-lg bg-sky-950/80 border border-sky-500/60 hover:border-sky-400 text-sky-400 flex items-center justify-center text-xs font-bold transition-all shadow-sm select-none">
                                     ℹ️
                                 </div>
                                 <div class="invisible group-hover/tip:visible opacity-0 group-hover/tip:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3 bg-[#0b0f19] border border-amber-500/70 text-slate-200 rounded-2xl shadow-2xl text-xs z-[100070] pointer-events-none text-left">
@@ -759,24 +759,24 @@
                         </div>
                     </div>
 
-                    <!-- Contenido Plegable en Móvil -->
-                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-2">
+                    <!-- Contenido Plegable en Móvil / Principal en PC -->
+                    <div class="collapsible-kpi-body hidden lg:flex flex-col justify-between flex-1 mt-3">
                         <div>
-                            <div class="flex items-baseline gap-3 mt-0.5">
+                            <div class="flex items-baseline gap-4 mt-1">
                                 <div>
-                                    <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Bonus</span>
-                                    <span id="kpi-bonus-total" class="text-lg font-black text-emerald-600 dark:text-emerald-400 font-mono">+--</span>
+                                    <span class="text-xs text-slate-600 dark:text-slate-400 block font-bold mb-0.5">Bonus</span>
+                                    <span id="kpi-bonus-total" class="text-xl xl:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">+--</span>
                                 </div>
-                                <div class="border-l border-slate-300 dark:border-slate-700 pl-3">
-                                    <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-bold">Penalizaciones</span>
-                                    <span id="kpi-penal-total" class="text-lg font-black text-rose-600 dark:text-rose-400 font-mono">---</span>
+                                <div class="border-l border-slate-300 dark:border-slate-700 pl-4">
+                                    <span class="text-xs text-slate-600 dark:text-slate-400 block font-bold mb-0.5">Penalizaciones</span>
+                                    <span id="kpi-penal-total" class="text-xl xl:text-2xl font-black text-rose-600 dark:text-rose-400 font-mono">---</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="pt-1.5 mt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                            <span>Balance neto</span>
-                            <span id="kpi-balance-neto" class="font-bold font-mono text-emerald-600 dark:text-emerald-400">-- pts</span>
+                        <div class="pt-2 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center font-medium">
+                            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold">Balance neto</span>
+                            <span id="kpi-balance-neto" class="text-sm xl:text-base font-black font-mono text-emerald-600 dark:text-emerald-400">-- pts</span>
                         </div>
                     </div>
                 </div>
