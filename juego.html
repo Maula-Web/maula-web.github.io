@@ -469,7 +469,7 @@
                     <span class="text-base shrink-0 mt-0.5">⚡</span>
                     <div class="leading-tight">
                         <span class="block text-white font-black text-[10px]">¡Modo Quiniela de Dobles! (Cada 30.000 pts)</span>
-                        <span class="text-[8.5px] text-purple-300 leading-tight block mt-0.5">Durante 15s sólo llueven balones dobles a velocidad 1.5x. ¡Los balones perdidos NO quitan vidas! Caza <strong>"No se reduce"</strong> para doblar puntos y ganar <strong>+1 vida</strong>.</span>
+                        <span class="text-[8.5px] text-purple-300 leading-tight block mt-0.5">Durante 15s sólo llueven balones dobles a velocidad 1.5x. ¡Los balones perdidos NO quitan vidas! Caza <strong>"No se reduce"</strong> para x2 y <strong>+1 vida</strong>. ¡Acertar todos otorga <strong>+1000 pts (Pleno al 15)</strong>!</span>
                     </div>
                 </div>
             </div>
@@ -733,6 +733,9 @@
                     </p>
                     <p class="text-slate-300 text-[11px]">
                         🛡️ <strong>"No se reduce"</strong>: Aparece una única vez durante este modo. ¡Cázalo para multiplicar x2 todos los puntos de la ronda de dobles y <strong>restaurar +1 vida perdida</strong>! Además, durante todo este modo <strong>los balones perdidos NO restan vidas</strong>.
+                    </p>
+                    <p class="text-amber-300 text-[11px] font-bold">
+                        🌟 <strong>¡PLENO AL 15 CONSEGUIDO!</strong>: Si consigues acertar todos los balones dobles de la ronda (sin contar el comodín "No se reduce"), ¡recibirás un superbonus inmediato de <strong>+1000 puntos extra</strong> y la ovación de la Peña!
                     </p>
                 </div>
 
@@ -1087,6 +1090,20 @@
                                 o.start(now + i * 0.07);
                                 o.stop(now + i * 0.07 + 0.4);
                             });
+                        } else if (type === 'pleno_al_15') {
+                            // Fanfarria triunfal de Pleno al 15 (Acordes mayores apoteósicos)
+                            [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98].forEach((freq, i) => {
+                                const o = this.audioCtx.createOscillator();
+                                const g = this.audioCtx.createGain();
+                                o.connect(g);
+                                g.connect(this.audioCtx.destination);
+                                o.type = 'triangle';
+                                o.frequency.setValueAtTime(freq, now + i * 0.08);
+                                g.gain.setValueAtTime(0.35, now + i * 0.08);
+                                g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.55);
+                                o.start(now + i * 0.08);
+                                o.stop(now + i * 0.08 + 0.55);
+                            });
                         }
                     } catch (e) {
                         console.warn("Audio error:", e);
@@ -1272,6 +1289,9 @@
                     this.doblesNoReduceActive = false;
                     this.hasSpawnedNoReduce = false;
                     this.doblesPointsEarned = 0;
+                    this.doblesTotalBalls = 0;
+                    this.doblesHitBalls = 0;
+                    this.doblesMissedAny = false;
                     this.stopDoblesMusic();
 
                     // Reinicio de ciclo de 2 minutos
@@ -1372,6 +1392,9 @@
                     this.hasSpawnedNoReduce = false;
                     this.noReduceSpawnTime = Math.random() * 7 + 4; // Entre el segundo 4 y el 11
                     this.doblesPointsEarned = 0;
+                    this.doblesTotalBalls = 0;
+                    this.doblesHitBalls = 0;
+                    this.doblesMissedAny = false;
 
                     // Comienza a velocidad 1.5x de la velocidad actual
                     this.doblesBaseSpeed = Math.max(5.4, this.currentBaseSpeed * 1.5);
@@ -1398,7 +1421,21 @@
                     this.isDoblesMode = false;
                     this.stopDoblesMusic();
 
-                    this.addComicBanner('¡FIN DE DOBLES!', 'Volviendo a la jornada regular', '#2563eb', '#ffffff');
+                    // Comprobar si ha conseguido Pleno al 15 en dobles (acertar todos los balones dobles sin contar el no se reduce)
+                    const isPlenoAl15 = !this.doblesMissedAny && this.doblesTotalBalls > 0 && this.doblesHitBalls >= this.doblesTotalBalls;
+
+                    if (isPlenoAl15) {
+                        this.score += 1000;
+                        this.playSound('pleno_al_15');
+                        this.createFireworks(this.width / 2, this.height * 0.35);
+                        this.createFireworks(this.width / 4, this.height * 0.48);
+                        this.createFireworks(3 * this.width / 4, this.height * 0.48);
+                        this.addFloatingText(this.width / 2, this.height * 0.4, '⭐ +1000 ¡PLENO AL 15!', '#f59e0b');
+                        this.addComicBanner('¡PLENO AL 15 CONSEGUIDO!', '+1000 Puntos Extra de la Peña', '#f59e0b', '#ffffff');
+                    } else {
+                        this.addComicBanner('¡FIN DE DOBLES!', 'Volviendo a la jornada regular', '#2563eb', '#ffffff');
+                    }
+
                     this.nextDoblesThreshold = (Math.floor(this.score / 30000) + 1) * 30000;
                     this.updateHUD();
                 }
@@ -1492,6 +1529,7 @@
 
                     this.notes.push(createDoblesNote(l1));
                     this.notes.push(createDoblesNote(l2));
+                    this.doblesTotalBalls += 2;
                 }
 
                 // Spawning del elemento "No se reduce"
@@ -1706,6 +1744,11 @@
 
                             let finalPoints = Math.round(basePoints * this.multiplier * buffMult);
 
+                            // Si es una bola de dobles (sin contar el no se reduce)
+                            if (closestNote.isDobles && closestNote.type !== 'noreduce') {
+                                this.doblesHitBalls++;
+                            }
+
                             // Si estamos en Modo Dobles
                             if (this.isDoblesMode) {
                                 if (this.doblesNoReduceActive) finalPoints *= 2;
@@ -1863,7 +1906,7 @@
                         alpha: 1.0,
                         y: this.height * 0.32,
                         vy: 0.2,
-                        duration: 1.8,
+                        duration: title.includes('PLENO') ? 2.5 : 1.8,
                         age: 0,
                         angle: (Math.random() - 0.5) * 0.16
                     });
@@ -1899,14 +1942,18 @@
                             this.spawnNoReduceNote();
                         }
 
-                        // Spawning exclusivo de balones de dos en dos
-                        const doblesSpawnRate = Math.max(460, 880 - (this.doblesTimeElapsed * 22));
-                        if (timestamp - this.lastSpawnTime > doblesSpawnRate) {
-                            this.spawnDoblesPair();
-                            this.lastSpawnTime = timestamp;
+                        // Spawning exclusivo de balones de dos en dos (mientras quede tiempo de dobles)
+                        if (this.doblesTimeLeft > 0) {
+                            const doblesSpawnRate = Math.max(460, 880 - (this.doblesTimeElapsed * 22));
+                            if (timestamp - this.lastSpawnTime > doblesSpawnRate) {
+                                this.spawnDoblesPair();
+                                this.lastSpawnTime = timestamp;
+                            }
                         }
 
-                        if (this.doblesTimeLeft <= 0) {
+                        // Comprobar si ha terminado el tiempo y ya salieron o se acertaron todas las notas de dobles en pantalla (o timeout de seguridad)
+                        const remainingDoblesNotes = this.notes.some(n => n.isDobles);
+                        if (this.doblesTimeLeft <= 0 && (!remainingDoblesNotes || this.doblesTimeLeft < -2.5)) {
                             this.endDoblesMode();
                         }
                     } else {
@@ -1997,6 +2044,9 @@
                         // ¿Ha superado la línea de meta?
                         if (note.y > this.height + 40) {
                             if (!note.hit) {
+                                if (note.isDobles && note.type !== 'noreduce') {
+                                    this.doblesMissedAny = true;
+                                }
                                 if (note.type === 'lava') {
                                     // Si un boleto de sellar tarde se escapa sin salvarse en el área, ¡pierdes vida!
                                     if (!this.isDoblesMode && !note.isDobles) {
@@ -2851,11 +2901,18 @@
                         ctx.scale(cb.scale, cb.scale);
                         ctx.globalAlpha = Math.max(0, cb.alpha);
 
-                        // 1. Estrella dentada amarilla de explosión cómic
-                        this.drawComicExplosionStar(ctx, 0, 0, 140, 75, cb.bg);
+                        // 1. Estrella dentada de explosión cómic adaptativa
+                        const starOuterR = cb.title.length > 20 ? 175 : (cb.title.length > 14 ? 155 : 140);
+                        const starInnerR = cb.title.length > 20 ? 95 : (cb.title.length > 14 ? 85 : 75);
+                        this.drawComicExplosionStar(ctx, 0, 0, starOuterR, starInnerR, cb.bg);
 
-                        // 2. Texto en relieve pop-art 3D inclinado (Estilo Bangers)
-                        ctx.font = '900 48px Bangers, cursive, sans-serif';
+                        // 2. Texto en relieve pop-art 3D inclinado (Estilo Bangers adaptativo)
+                        let titleFontSize = 48;
+                        if (cb.title.length > 22) titleFontSize = 26;
+                        else if (cb.title.length > 16) titleFontSize = 33;
+                        else if (cb.title.length > 12) titleFontSize = 40;
+
+                        ctx.font = `900 ${titleFontSize}px Bangers, cursive, sans-serif`;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
 

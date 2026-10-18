@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Ya disponible el juego oficial <strong>Maula Hero</strong> en tu móvil. ¡Pon a prueba tus reflejos y compite por el récord de la Peña!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Juego oficial <strong>Maula Hero</strong> actualizado: ¡Bonus Pleno al 15 de +1000 pts extra en modo dobles, vidas blindadas y teletipo de piques en la carátula!`,
                 url: 'juego.html'
             });
 

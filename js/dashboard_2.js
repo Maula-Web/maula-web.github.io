@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Nuevo teletipo de piques en la carátula, vidas blindadas en modo dobles y centrado vertical móvil.`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Bonus Pleno al 15 de +1000 pts extra al acertar todos los balones en modo dobles, vidas blindadas y teletipo de piques!`,
             url: 'juego.html'
         });
 
