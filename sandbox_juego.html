@@ -420,17 +420,37 @@
                         <span class="text-[9px] text-amber-200 font-normal">Puntos x2.5 y lluvia de monedas doradas</span>
                     </div>
                 </div>
+
+                <!-- Banner Especial: Modo Quiniela de Dobles -->
+                <div class="col-span-2 p-2.5 rounded-2xl bg-purple-950/50 border border-purple-500/50 text-purple-200 flex items-center gap-2.5 shadow-lg shadow-purple-900/20">
+                    <span class="text-2xl shrink-0">⚡</span>
+                    <div>
+                        <span class="block text-white font-black text-xs">¡Modo Quiniela de Dobles! (Cada 30.000 pts)</span>
+                        <span class="text-[9px] text-purple-300 font-medium leading-tight">Durante 15s sólo llueven balones de 2 en 2 a velocidad 1.5x creciente. ¡Caza el botón ultrarrápido <strong>"No se reduce"</strong> para multiplicar x2 todos los puntos de dobles!</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Selector de Música MP3 Propia (Opcional) -->
-            <div class="w-full text-left bg-slate-900/40 p-2.5 rounded-xl border border-slate-800 text-xs">
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-slate-300 font-bold flex items-center gap-1.5">
-                        <span>🎵</span> Música MP3
-                    </span>
-                    <span class="text-[10px] text-amber-400" id="music-status-label">Sintetizador Activo</span>
+            <!-- Selectores de Música MP3 Propia (Opcional) -->
+            <div class="w-full text-left bg-slate-900/40 p-2.5 rounded-xl border border-slate-800 text-xs flex flex-col gap-2">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-slate-300 font-bold flex items-center gap-1.5">
+                            <span>🎵</span> Música Principal
+                        </span>
+                        <span class="text-[10px] text-amber-400" id="music-status-label">Gol Rápido (Oficial)</span>
+                    </div>
+                    <input type="file" id="mp3-file-input" accept="audio/mp3,audio/*" class="w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer">
                 </div>
-                <input type="file" id="mp3-file-input" accept="audio/mp3,audio/*" class="w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer">
+                <div class="pt-1.5 border-t border-slate-800/60">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-purple-300 font-bold flex items-center gap-1.5">
+                            <span>⚡</span> Música Modo Dobles
+                        </span>
+                        <span class="text-[10px] text-purple-400" id="dobles-music-status-label">audio/modo_dobles.mp3</span>
+                    </div>
+                    <input type="file" id="dobles-mp3-file-input" accept="audio/mp3,audio/*" class="w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
+                </div>
             </div>
 
             <!-- Botón Jugar -->
@@ -522,8 +542,9 @@
         </div>
     </div>
 
-    <!-- Elemento Audio Oculto para Música de Fondo -->
+    <!-- Elementos de Audio Ocultos para Música de Fondo -->
     <audio id="bg-audio-player" loop preload="auto"></audio>
+    <audio id="dobles-audio-player" loop preload="auto"></audio>
 
     <!-- MOTOR DEL JUEGO ARCADE -->
     <script>
@@ -606,6 +627,22 @@
 
                     // Control de gestos (Swipe Up)
                     this.touchState = {};
+
+                    // Modo Quiniela de Dobles (se activa cada 30.000 puntos durante 15s)
+                    this.nextDoblesThreshold = 30000;
+                    this.isDoblesMode = false;
+                    this.doblesTimeLeft = 0;
+                    this.doblesTotalTime = 15;
+                    this.doblesTimeElapsed = 0;
+                    this.doblesBaseSpeed = 3.6;
+                    this.doblesCurrentSpeed = 3.6;
+                    this.doblesPointsEarned = 0;
+                    this.doblesNoReduceActive = false;
+                    this.hasSpawnedNoReduce = false;
+                    this.noReduceSpawnTime = 0;
+                    this.doblesMusicPlayer = document.getElementById('dobles-audio-player');
+                    this.hasCustomDoblesMusic = false;
+                    this.synthDoblesTimer = null;
 
                     // Socio actual oficial (siempre el socio conectado) y récords
                     this.currentSocio = this.getConnectedSocio();
@@ -710,6 +747,37 @@
                                 this.bgMusicPlayer.src = url;
                                 this.hasCustomMusic = true;
                                 document.getElementById('music-status-label').textContent = '🎵 ' + file.name.slice(0, 18) + '...';
+                            }
+                        });
+                    }
+
+                    // Cargar por defecto la música del Modo Dobles
+                    try {
+                        if (this.doblesMusicPlayer) {
+                            this.doblesMusicPlayer.src = 'audio/modo_dobles.mp3';
+                            this.doblesMusicPlayer.addEventListener('error', () => {
+                                if (!this.doblesMusicPlayer.src.endsWith('gol_rapido.mp3')) {
+                                    this.doblesMusicPlayer.src = 'audio/gol_rapido.mp3';
+                                }
+                            }, { once: true });
+                            this.hasCustomDoblesMusic = true;
+                            const doblesMusicLabel = document.getElementById('dobles-music-status-label');
+                            if (doblesMusicLabel) doblesMusicLabel.textContent = '⚡ Gol Rápido (Oficial)';
+                        }
+                    } catch (e) {
+                        console.warn("Música dobles por defecto:", e);
+                    }
+
+                    const doblesFileInput = document.getElementById('dobles-mp3-file-input');
+                    if (doblesFileInput && this.doblesMusicPlayer) {
+                        doblesFileInput.addEventListener('change', (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const url = URL.createObjectURL(file);
+                                this.doblesMusicPlayer.src = url;
+                                this.hasCustomDoblesMusic = true;
+                                const lbl = document.getElementById('dobles-music-status-label');
+                                if (lbl) lbl.textContent = '⚡ ' + file.name.slice(0, 18) + '...';
                             }
                         });
                     }
@@ -985,6 +1053,16 @@
                     this.hitsCount = 0;
                     this.perfectCount = 0;
 
+                    // Reinicio de Modo Dobles
+                    this.nextDoblesThreshold = 30000;
+                    this.isDoblesMode = false;
+                    this.doblesTimeLeft = 0;
+                    this.doblesTimeElapsed = 0;
+                    this.doblesNoReduceActive = false;
+                    this.hasSpawnedNoReduce = false;
+                    this.doblesPointsEarned = 0;
+                    this.stopDoblesMusic();
+
                     // Reinicio de ciclo de 2 minutos
                     this.level = 1;
                     this.levelElapsed = 0;
@@ -1033,6 +1111,7 @@
 
                 stopMusic() {
                     if (this.bgMusicPlayer) this.bgMusicPlayer.pause();
+                    this.stopDoblesMusic();
                 }
 
                 togglePause() {
@@ -1044,9 +1123,14 @@
                     if (!this.isPaused) {
                         this.lastTick = performance.now();
                         requestAnimationFrame(this.gameLoop.bind(this));
-                        if (this.hasCustomMusic) this.bgMusicPlayer.play().catch(() => {});
+                        if (this.isDoblesMode) {
+                            if (this.hasCustomDoblesMusic && this.doblesMusicPlayer) this.doblesMusicPlayer.play().catch(() => {});
+                        } else {
+                            if (this.hasCustomMusic && this.bgMusicPlayer) this.bgMusicPlayer.play().catch(() => {});
+                        }
                     } else {
-                        if (this.hasCustomMusic) this.bgMusicPlayer.pause();
+                        if (this.bgMusicPlayer) this.bgMusicPlayer.pause();
+                        if (this.doblesMusicPlayer) this.doblesMusicPlayer.pause();
                     }
                 }
 
@@ -1055,6 +1139,192 @@
                     const icon = document.getElementById('sound-icon');
                     if (icon) icon.textContent = this.soundEnabled ? '🔊' : '🔇';
                     if (this.bgMusicPlayer) this.bgMusicPlayer.muted = !this.soundEnabled;
+                    if (this.doblesMusicPlayer) this.doblesMusicPlayer.muted = !this.soundEnabled;
+                }
+
+                // =================================================================
+                // GESTIÓN DEL MODO QUINIELA DE DOBLES (Cada 30.000 puntos / 15s)
+                // =================================================================
+                checkDoblesTrigger() {
+                    if (!this.isDoblesMode && this.score >= this.nextDoblesThreshold) {
+                        this.nextDoblesThreshold += 30000;
+                        this.startDoblesMode();
+                    }
+                }
+
+                startDoblesMode() {
+                    if (this.isDoblesMode) return;
+                    this.isDoblesMode = true;
+                    this.doblesTimeLeft = 15.0;
+                    this.doblesTotalTime = 15.0;
+                    this.doblesTimeElapsed = 0;
+                    this.doblesNoReduceActive = false;
+                    this.hasSpawnedNoReduce = false;
+                    this.noReduceSpawnTime = Math.random() * 7 + 4; // Entre el segundo 4 y el 11
+                    this.doblesPointsEarned = 0;
+
+                    // Comienza a velocidad 1.5x de la velocidad actual
+                    this.doblesBaseSpeed = Math.max(5.4, this.currentBaseSpeed * 1.5);
+                    this.doblesCurrentSpeed = this.doblesBaseSpeed;
+
+                    // Todos los elementos de la pantalla desaparecen
+                    for (const n of this.notes) {
+                        const nx = this.getLaneX(n.lane);
+                        this.createExplosion(nx, n.y, '#c084fc', 22);
+                    }
+                    this.notes = [];
+
+                    this.playSound('level_up');
+                    this.createFireworks(this.width / 2, this.height * 0.35);
+                    this.screenShake = 18;
+                    this.addComicBanner('¡MODO DOBLES!', '¡Quiniela de Dobles durante 15s!', '#f3e8ff', '#7c3aed');
+
+                    this.startDoblesMusic();
+                    this.updateHUD();
+                }
+
+                endDoblesMode() {
+                    if (!this.isDoblesMode) return;
+                    this.isDoblesMode = false;
+                    this.stopDoblesMusic();
+
+                    this.addComicBanner('¡FIN DE DOBLES!', 'Volviendo a la jornada regular', '#fef08a', '#2563eb');
+                    this.nextDoblesThreshold = (Math.floor(this.score / 30000) + 1) * 30000;
+                    this.updateHUD();
+                }
+
+                startDoblesMusic() {
+                    if (!this.soundEnabled) return;
+                    if (this.bgMusicPlayer) this.bgMusicPlayer.pause();
+
+                    if (this.doblesMusicPlayer) {
+                        this.doblesMusicPlayer.currentTime = 0;
+                        this.doblesMusicPlayer.volume = 0.75;
+                        const p = this.doblesMusicPlayer.play();
+                        if (p !== undefined) {
+                            p.catch(() => {
+                                // Fallback a sintetizador si aún no se ha colocado el mp3 en la carpeta
+                                this.startSynthDoblesRhythm();
+                            });
+                        }
+                    } else {
+                        this.startSynthDoblesRhythm();
+                    }
+                }
+
+                stopDoblesMusic() {
+                    if (this.doblesMusicPlayer) {
+                        this.doblesMusicPlayer.pause();
+                        this.doblesMusicPlayer.currentTime = 0;
+                    }
+                    this.stopSynthDoblesRhythm();
+
+                    if (this.isPlaying && !this.isPaused && this.hasCustomMusic && this.bgMusicPlayer) {
+                        this.bgMusicPlayer.play().catch(() => {});
+                    }
+                }
+
+                startSynthDoblesRhythm() {
+                    if (this.synthDoblesTimer || !this.audioCtx) return;
+                    try {
+                        let step = 0;
+                        const notes = [261.63, 329.63, 392.00, 523.25, 440.00, 523.25, 659.25, 783.99]; // Arpegio energético
+                        this.synthDoblesTimer = setInterval(() => {
+                            if (!this.isPlaying || this.isPaused || !this.soundEnabled || !this.isDoblesMode) return;
+                            try {
+                                const now = this.audioCtx.currentTime;
+                                const osc = this.audioCtx.createOscillator();
+                                const gain = this.audioCtx.createGain();
+                                osc.type = 'sawtooth';
+                                osc.frequency.setValueAtTime(notes[step % notes.length], now);
+                                gain.gain.setValueAtTime(0.08, now);
+                                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                                osc.connect(gain);
+                                gain.connect(this.audioCtx.destination);
+                                osc.start(now);
+                                osc.stop(now + 0.12);
+                                step++;
+                            } catch (e) {}
+                        }, 130);
+                    } catch (e) {}
+                }
+
+                stopSynthDoblesRhythm() {
+                    if (this.synthDoblesTimer) {
+                        clearInterval(this.synthDoblesTimer);
+                        this.synthDoblesTimer = null;
+                    }
+                }
+
+                // Spawning exclusivo de dos balones en simultáneo
+                spawnDoblesPair() {
+                    const shuffledLanes = [0, 1, 2].sort(() => Math.random() - 0.5);
+                    const l1 = shuffledLanes[0];
+                    const l2 = shuffledLanes[1];
+
+                    const createDoblesNote = (lane) => {
+                        let type = 'normal';
+                        if (Math.random() < 0.15) type = 'gold';
+
+                        return {
+                            lane: lane,
+                            type: type,
+                            y: -45,
+                            speed: this.doblesCurrentSpeed,
+                            radius: 28,
+                            rotation: 0,
+                            rotSpeed: (Math.random() - 0.5) * 0.12,
+                            hit: false,
+                            trail: [],
+                            isDobles: true
+                        };
+                    };
+
+                    this.notes.push(createDoblesNote(l1));
+                    this.notes.push(createDoblesNote(l2));
+                }
+
+                // Spawning del elemento "No se reduce"
+                spawnNoReduceNote() {
+                    const lane = Math.floor(Math.random() * 3);
+                    const note = {
+                        lane: lane,
+                        type: 'noreduce',
+                        y: -45,
+                        speed: this.doblesCurrentSpeed * 2.6, // Misma velocidad ultrarrápida que la bota
+                        radius: 28,
+                        rotation: 0,
+                        rotSpeed: (Math.random() - 0.5) * 0.18,
+                        hit: false,
+                        trail: [],
+                        isDobles: true
+                    };
+                    this.notes.push(note);
+                    this.playSound('swipe_deflect');
+                    this.addFloatingText(this.getLaneX(lane), 60, '⚡ ¡NO SE REDUCE!', '#c084fc');
+                }
+
+                triggerNoReduceCaught(x, y) {
+                    this.doblesNoReduceActive = true;
+                    this.playSound('hit_gold');
+                    this.createFireworks(x, y);
+                    this.createExplosion(x, y, '#c084fc', 32);
+                    this.screenShake = 16;
+
+                    // Multiplica por 2 todos los puntos conseguidos por la de dobles
+                    // 1. Duplica retroactivamente los puntos ganados hasta este momento en dobles
+                    const retroactiveBonus = this.doblesPointsEarned;
+                    if (retroactiveBonus > 0) {
+                        this.score += retroactiveBonus;
+                        this.doblesPointsEarned *= 2;
+                    } else {
+                        this.score += 500;
+                        this.doblesPointsEarned += 500;
+                    }
+
+                    this.addFloatingText(x, y - 30, `¡NO SE REDUCE! x2`, '#e879f9');
+                    this.addComicBanner('¡NO SE REDUCE!', '¡Quiniela al Directo! Puntos de Dobles x2', '#f3e8ff', '#7c3aed');
+                    this.updateHUD();
                 }
 
                 // GENERACIÓN DE ELEMENTOS
@@ -1156,7 +1426,13 @@
                             const hitIdx = this.notes.indexOf(closestNote);
                             if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
                         }
-                        // CASO D: BALÓN NORMAL / ORO / PLENO
+                        // CASO D: BOTÓN "NO SE REDUCE" CAZADO (MODO DOBLES)
+                        else if (closestNote.type === 'noreduce') {
+                            this.triggerNoReduceCaught(laneX, closestNote.y);
+                            const hitIdx = this.notes.indexOf(closestNote);
+                            if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
+                        }
+                        // CASO E: BALÓN NORMAL / ORO / PLENO
                         else {
                             this.hitsCount++;
                             let basePoints = 60;
@@ -1202,8 +1478,16 @@
                             else if (this.combo >= 8) this.multiplier = 2;
                             else this.multiplier = 1;
 
-                            const finalPoints = Math.round(basePoints * this.multiplier * buffMult);
+                            let finalPoints = Math.round(basePoints * this.multiplier * buffMult);
+
+                            // Si estamos en Modo Dobles
+                            if (this.isDoblesMode) {
+                                if (this.doblesNoReduceActive) finalPoints *= 2;
+                                this.doblesPointsEarned += finalPoints;
+                            }
+
                             this.score += finalPoints;
+                            this.checkDoblesTrigger();
 
                             this.createHitSparks(laneX, closestNote.y, LANE_COLORS[laneIndex].hex);
                             this.addFloatingText(laneX, closestNote.y - 25, `+${finalPoints} ${ratingText}`, ratingColor);
@@ -1261,6 +1545,7 @@
                         let buffMult = (this.buffs.poloBonusTime > 0 ? 2.0 : 1.0) * (this.buffs.frogPenaltyTime > 0 ? 0.5 : 1.0);
                         const bonusPoints = Math.round(200 * this.multiplier * buffMult);
                         this.score += bonusPoints;
+                        this.checkDoblesTrigger();
 
                         this.createExplosion(laneX, lavaNote.y, '#10b981', 22);
                         this.addFloatingText(laneX, lavaNote.y - 30, `+${bonusPoints} ¡SELLADO!`, '#34d399');
@@ -1297,6 +1582,7 @@
 
                     // Puntos conseguidos
                     this.score += Math.max(600, totalBonus);
+                    this.checkDoblesTrigger();
 
                     // Activar Slo-Mo por 10 segundos
                     this.buffs.emilioSlowMoTime = 10;
@@ -1328,6 +1614,7 @@
                         this.addComicBanner('¡POLO MAULA!', 'Elegancia Peñista: Puntos x2 durante 10s', '#f8fafc', '#0f172a');
                     }
                     this.score += 100;
+                    this.checkDoblesTrigger();
                     this.updateHUD();
                 }
 
@@ -1365,21 +1652,56 @@
                         return;
                     }
 
-                    // 1. Progresión del Nivel y Cronómetro de 2 minutos
-                    this.levelElapsed += dt;
-                    const progressInLevel = Math.min(1.0, this.levelElapsed / this.levelDuration);
+                    // 1. Gestión de Modo Dobles vs Progresión del Nivel
+                    if (this.isDoblesMode) {
+                        this.doblesTimeElapsed += dt;
+                        this.doblesTimeLeft -= dt;
 
-                    // La velocidad aumenta progresivamente a lo largo de los 2 minutos
-                    const speedMultiplier = 1.0 + (progressInLevel * 0.95);
-                    this.currentBaseSpeed = (this.baseInitialSpeed + (this.level - 1) * 0.5) * speedMultiplier;
+                        // Durante este modo, la velocidad aumenta 1.5x veces más rápido
+                        this.doblesCurrentSpeed += dt * 0.45 * 1.5;
 
-                    // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL!
-                    if (this.levelElapsed >= this.levelDuration) {
-                        this.level++;
-                        this.levelElapsed = 0;
-                        this.playSound('level_up');
-                        this.createFireworks(this.width / 2, this.height * 0.35);
-                        this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#fef08a', '#2563eb');
+                        // Comprobar spawn de "No se reduce" (sale una sola vez aleatoriamente)
+                        if (!this.hasSpawnedNoReduce && this.doblesTimeElapsed >= this.noReduceSpawnTime) {
+                            this.hasSpawnedNoReduce = true;
+                            this.spawnNoReduceNote();
+                        }
+
+                        // Spawning exclusivo de balones de dos en dos
+                        const doblesSpawnRate = Math.max(460, 880 - (this.doblesTimeElapsed * 22));
+                        if (timestamp - this.lastSpawnTime > doblesSpawnRate) {
+                            this.spawnDoblesPair();
+                            this.lastSpawnTime = timestamp;
+                        }
+
+                        if (this.doblesTimeLeft <= 0) {
+                            this.endDoblesMode();
+                        }
+                    } else {
+                        // Progresión normal del Nivel y Cronómetro de 2 minutos
+                        this.levelElapsed += dt;
+                        const progressInLevel = Math.min(1.0, this.levelElapsed / this.levelDuration);
+
+                        // La velocidad aumenta progresivamente a lo largo de los 2 minutos
+                        const speedMultiplier = 1.0 + (progressInLevel * 0.95);
+                        this.currentBaseSpeed = (this.baseInitialSpeed + (this.level - 1) * 0.5) * speedMultiplier;
+
+                        // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL!
+                        if (this.levelElapsed >= this.levelDuration) {
+                            this.level++;
+                            this.levelElapsed = 0;
+                            this.playSound('level_up');
+                            this.createFireworks(this.width / 2, this.height * 0.35);
+                            this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#fef08a', '#2563eb');
+                        }
+
+                        // Spawning dinámico regular
+                        let spawnRate = Math.max(480, 1150 - (this.level * 90) - (progressInLevel * 300));
+                        if (this.buffs.doubleSpawnTime > 0) spawnRate *= 0.5; // ¡Lluvia x2 de Estatutos!
+
+                        if (timestamp - this.lastSpawnTime > spawnRate) {
+                            this.spawnNote();
+                            this.lastSpawnTime = timestamp;
+                        }
                     }
 
                     // 2. Decrementar Temporizadores de Buffs
@@ -1388,19 +1710,14 @@
                     if (this.buffs.poloBonusTime > 0) this.buffs.poloBonusTime -= dt;
                     if (this.buffs.emilioSlowMoTime > 0) this.buffs.emilioSlowMoTime -= dt;
 
-                    // 3. Spawning dinámico
-                    let spawnRate = Math.max(480, 1150 - (this.level * 90) - (progressInLevel * 300));
-                    if (this.buffs.doubleSpawnTime > 0) spawnRate *= 0.5; // ¡Lluvia x2 de Estatutos!
-
-                    if (timestamp - this.lastSpawnTime > spawnRate) {
-                        this.spawnNote();
-                        this.lastSpawnTime = timestamp;
-                    }
-
-                    // 4. Actualizar Notas
+                    // 3. Actualizar Notas
                     for (let i = this.notes.length - 1; i >= 0; i--) {
                         const note = this.notes[i];
                         let speed = note.speed;
+                        if (this.isDoblesMode) {
+                            if (note.type === 'noreduce') speed = this.doblesCurrentSpeed * 2.6;
+                            else speed = this.doblesCurrentSpeed;
+                        }
                         if (this.buffs.emilioSlowMoTime > 0) speed *= 0.5;
 
                         note.y += speed;
@@ -1546,6 +1863,32 @@
 
                     // G) Carteles Estilo Cómic Onomatopeya (BOOM!)
                     this.drawComicBanners(ctx);
+
+                    // H) Efecto Visual Especial si está activo el MODO DOBLES
+                    if (this.isDoblesMode) {
+                        const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.008);
+                        ctx.save();
+                        // Marco neón pulsante púrpura / magenta
+                        ctx.strokeStyle = `rgba(168, 85, 247, ${0.45 + pulse * 0.45})`;
+                        ctx.lineWidth = 5 + pulse * 3;
+                        ctx.strokeRect(0, 0, this.width, this.height);
+
+                        // Franja superior de aviso
+                        ctx.fillStyle = `rgba(88, 28, 135, ${0.5 + pulse * 0.25})`;
+                        ctx.fillRect(0, 0, this.width, 28);
+                        ctx.fillStyle = '#f3e8ff';
+                        ctx.font = '900 12px Bangers, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(`⚡ QUINIELA DE DOBLES (${Math.ceil(this.doblesTimeLeft)}s) ⚡`, this.width / 2, 14);
+
+                        if (this.doblesNoReduceActive) {
+                            ctx.fillStyle = '#fef08a';
+                            ctx.font = '900 10px Bangers, sans-serif';
+                            ctx.fillText(`★ NO SE REDUCE ACTIVO (PUNTOS x2) ★`, this.width / 2, 38);
+                        }
+                        ctx.restore();
+                    }
 
                     ctx.restore();
                 }
@@ -1696,6 +2039,8 @@
                             this.renderEmilioButton(ctx, note.radius);
                         } else if (note.type === 'pleno') {
                             this.renderPlenoBall(ctx, note.radius);
+                        } else if (note.type === 'noreduce') {
+                            this.renderNoReduceItem(ctx, note.radius);
                         }
 
                         ctx.restore();
@@ -1985,6 +2330,71 @@
                     ctx.fillText('P15', 0, 0);
                 }
 
+                // ELEMENTO "NO SE REDUCE" (MODO DOBLES - PUNTOS DE DOBLES x2)
+                renderNoReduceItem(ctx, radius) {
+                    ctx.save();
+                    ctx.shadowColor = '#c084fc';
+                    ctx.shadowBlur = 28;
+
+                    // 1. Escudo octogonal con gradiente eléctrico
+                    const grad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius);
+                    grad.addColorStop(0, '#fdf4ff');
+                    grad.addColorStop(0.3, '#c084fc');
+                    grad.addColorStop(0.7, '#7e22ce');
+                    grad.addColorStop(1, '#3b0764');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    const sides = 8;
+                    for (let i = 0; i < sides; i++) {
+                        const ang = (i * 2 * Math.PI) / sides - Math.PI / 8;
+                        const px = Math.cos(ang) * radius;
+                        const py = Math.sin(ang) * radius;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 2. Borde dorado brillante y aro interior
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 3.5;
+                    ctx.stroke();
+
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius * 0.78, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // 3. Tipografía y rayos de alta visibilidad
+                    ctx.shadowBlur = 0;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    // Rayo superior
+                    ctx.fillStyle = '#fde047';
+                    ctx.font = '900 13px sans-serif';
+                    ctx.fillText('⚡', 0, -radius * 0.45);
+
+                    // Texto "NO SE"
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '900 9px Bangers, sans-serif';
+                    ctx.fillText('NO SE', 0, -radius * 0.1);
+
+                    // Texto "REDUCE"
+                    ctx.fillStyle = '#facc15';
+                    ctx.font = '900 11px Bangers, sans-serif';
+                    ctx.fillText('REDUCE', 0, radius * 0.28);
+
+                    // Badge "×2 DOBLES"
+                    ctx.fillStyle = '#f3e8ff';
+                    ctx.font = '800 7.5px Plus Jakarta Sans, sans-serif';
+                    ctx.fillText('×2 DOBLES', 0, radius * 0.62);
+
+                    ctx.restore();
+                }
+
                 drawDeflectedBalls(ctx) {
                     for (const b of this.deflectedBalls) {
                         ctx.save();
@@ -2270,26 +2680,47 @@
                         elLives.innerHTML = html;
                     }
 
-                    // Temporizador del Nivel y Barra de 2 minutos
-                    const remainingSec = Math.max(0, Math.ceil(this.levelDuration - this.levelElapsed));
-                    const mins = String(Math.floor(remainingSec / 60)).padStart(2, '0');
-                    const secs = String(remainingSec % 60).padStart(2, '0');
-                    const elTimer = document.getElementById('hud-level-timer');
-                    if (elTimer) elTimer.textContent = `${mins}:${secs}`;
+                    // Temporizador del Nivel y Barra de 2 minutos / Modo Dobles
+                    if (this.isDoblesMode) {
+                        const secLeft = Math.max(0, Math.ceil(this.doblesTimeLeft));
+                        const elTimer = document.getElementById('hud-level-timer');
+                        if (elTimer) elTimer.textContent = `00:${String(secLeft).padStart(2, '0')}`;
 
-                    const elLvlBadge = document.getElementById('hud-level-badge');
-                    if (elLvlBadge) elLvlBadge.textContent = `NIVEL ${this.level}`;
+                        const elLvlBadge = document.getElementById('hud-level-badge');
+                        if (elLvlBadge) elLvlBadge.textContent = '⚡ DOBLES';
 
-                    const bar = document.getElementById('level-progress-bar');
-                    if (bar) {
-                        const progress = Math.min(100, (this.levelElapsed / this.levelDuration) * 100);
-                        bar.style.width = `${progress}%`;
+                        const bar = document.getElementById('level-progress-bar');
+                        if (bar) {
+                            const progress = Math.min(100, ((this.doblesTotalTime - this.doblesTimeLeft) / this.doblesTotalTime) * 100);
+                            bar.style.width = `${progress}%`;
+                        }
+                    } else {
+                        const remainingSec = Math.max(0, Math.ceil(this.levelDuration - this.levelElapsed));
+                        const mins = String(Math.floor(remainingSec / 60)).padStart(2, '0');
+                        const secs = String(remainingSec % 60).padStart(2, '0');
+                        const elTimer = document.getElementById('hud-level-timer');
+                        if (elTimer) elTimer.textContent = `${mins}:${secs}`;
+
+                        const elLvlBadge = document.getElementById('hud-level-badge');
+                        if (elLvlBadge) elLvlBadge.textContent = `NIVEL ${this.level}`;
+
+                        const bar = document.getElementById('level-progress-bar');
+                        if (bar) {
+                            const progress = Math.min(100, (this.levelElapsed / this.levelDuration) * 100);
+                            bar.style.width = `${progress}%`;
+                        }
                     }
 
                     // Chips de Buffs Activos en HUD
                     const buffsContainer = document.getElementById('hud-active-buffs');
                     if (buffsContainer) {
                         let buffsHtml = '';
+                        if (this.isDoblesMode) {
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-purple-600/30 border border-purple-400 text-[10px] font-black text-purple-200 animate-pulse">⚡ DOBLES (${Math.ceil(this.doblesTimeLeft)}s)</span>`;
+                            if (this.doblesNoReduceActive) {
+                                buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-amber-500/30 border border-amber-300 text-[10px] font-black text-amber-200">💎 NO SE REDUCE (x2)</span>`;
+                            }
+                        }
                         if (this.buffs.doubleSpawnTime > 0) {
                             buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-[10px] font-extrabold text-amber-300">📖 Lluvia x2 (${Math.ceil(this.buffs.doubleSpawnTime)}s)</span>`;
                         }
