@@ -826,43 +826,51 @@
                         if (key === 'd' || key === '2' || key === 'arrowright') this.highlightPad(2, false);
                     });
 
-                    // 2. Control Táctil y Ratón con Detección de Swipe Up (Deslizar hacia arriba)
-                    const registerTouchTarget = (element, laneIndex) => {
-                        let startY = 0;
-                        let startTime = 0;
-                        let isSwiped = false;
+                    // 2. Control Táctil y Ratón con SOPORTE MULTITÁCTIL SIMULTÁNEO (Pulsar 2 carriles a la vez)
+                    const activePointers = new Map();
 
+                    const registerTouchTarget = (element, laneIndex) => {
                         element.addEventListener('pointerdown', (e) => {
                             if (!this.isPlaying || this.isPaused) return;
-                            startY = e.clientY;
-                            startTime = performance.now();
-                            isSwiped = false;
+                            activePointers.set(e.pointerId, {
+                                lane: laneIndex,
+                                startY: e.clientY,
+                                startTime: performance.now(),
+                                isSwiped: false
+                            });
                             this.highlightPad(laneIndex, true);
-                            element.setPointerCapture?.(e.pointerId);
+                            try { element.setPointerCapture(e.pointerId); } catch(err) {}
                         });
 
                         element.addEventListener('pointermove', (e) => {
-                            if (!this.isPlaying || this.isPaused || isSwiped) return;
-                            const deltaY = startY - e.clientY; // Positivo si se mueve hacia arriba
-                            // Si desliza hacia arriba al menos 24px en menos de 450ms: ¡SWIPE UP!
+                            if (!this.isPlaying || this.isPaused) return;
+                            const p = activePointers.get(e.pointerId);
+                            if (!p || p.isSwiped) return;
+                            const deltaY = p.startY - e.clientY;
                             if (deltaY > 24) {
-                                isSwiped = true;
-                                this.handleSwipeUp(laneIndex);
-                                this.highlightPad(laneIndex, false);
+                                p.isSwiped = true;
+                                this.handleSwipeUp(p.lane);
+                                this.highlightPad(p.lane, false);
                             }
                         });
 
                         element.addEventListener('pointerup', (e) => {
-                            this.highlightPad(laneIndex, false);
-                            if (!this.isPlaying || this.isPaused) return;
-                            // Si no fue un deslizamiento hacia arriba, cuenta como TAP normal
-                            if (!isSwiped) {
-                                this.handleTap(laneIndex);
+                            const p = activePointers.get(e.pointerId);
+                            if (p) {
+                                this.highlightPad(p.lane, false);
+                                if (this.isPlaying && !this.isPaused && !p.isSwiped) {
+                                    this.handleTap(p.lane);
+                                }
+                                activePointers.delete(e.pointerId);
                             }
                         });
 
-                        element.addEventListener('pointercancel', () => {
-                            this.highlightPad(laneIndex, false);
+                        element.addEventListener('pointercancel', (e) => {
+                            const p = activePointers.get(e.pointerId);
+                            if (p) {
+                                this.highlightPad(p.lane, false);
+                                activePointers.delete(e.pointerId);
+                            }
                         });
                     };
 
@@ -870,37 +878,53 @@
                     registerTouchTarget(document.getElementById('btn-input-x'), 1);
                     registerTouchTarget(document.getElementById('btn-input-2'), 2);
 
-                    // Toque directo en los 3 carriles del canvas
-                    let canvasTouchStartY = 0;
-                    let canvasLane = 0;
-                    let canvasSwiped = false;
+                    // Toque directo simultáneo multitáctil en el Canvas (permite 2 o 3 dedos a la vez)
+                    const canvasPointers = new Map();
 
                     this.canvas.addEventListener('pointerdown', (e) => {
                         if (!this.isPlaying || this.isPaused) return;
                         const rect = this.canvas.getBoundingClientRect();
                         const clientX = e.clientX - rect.left;
                         const laneWidth = rect.width / 3;
-                        canvasLane = Math.min(2, Math.max(0, Math.floor(clientX / laneWidth)));
-                        canvasTouchStartY = e.clientY;
-                        canvasSwiped = false;
-                        this.highlightPad(canvasLane, true);
+                        const lane = Math.min(2, Math.max(0, Math.floor(clientX / laneWidth)));
+
+                        canvasPointers.set(e.pointerId, {
+                            lane: lane,
+                            startY: e.clientY,
+                            isSwiped: false
+                        });
+                        this.highlightPad(lane, true);
+                        try { this.canvas.setPointerCapture(e.pointerId); } catch(err) {}
                     });
 
                     this.canvas.addEventListener('pointermove', (e) => {
-                        if (!this.isPlaying || this.isPaused || canvasSwiped) return;
-                        const deltaY = canvasTouchStartY - e.clientY;
-                        if (deltaY > 26) {
-                            canvasSwiped = true;
-                            this.handleSwipeUp(canvasLane);
-                            this.highlightPad(canvasLane, false);
+                        if (!this.isPlaying || this.isPaused) return;
+                        const p = canvasPointers.get(e.pointerId);
+                        if (!p || p.isSwiped) return;
+                        const deltaY = p.startY - e.clientY;
+                        if (deltaY > 24) {
+                            p.isSwiped = true;
+                            this.handleSwipeUp(p.lane);
+                            this.highlightPad(p.lane, false);
                         }
                     });
 
-                    this.canvas.addEventListener('pointerup', () => {
-                        this.highlightPad(canvasLane, false);
-                        if (!this.isPlaying || this.isPaused) return;
-                        if (!canvasSwiped) {
-                            this.handleTap(canvasLane);
+                    this.canvas.addEventListener('pointerup', (e) => {
+                        const p = canvasPointers.get(e.pointerId);
+                        if (p) {
+                            this.highlightPad(p.lane, false);
+                            if (this.isPlaying && !this.isPaused && !p.isSwiped) {
+                                this.handleTap(p.lane);
+                            }
+                            canvasPointers.delete(e.pointerId);
+                        }
+                    });
+
+                    this.canvas.addEventListener('pointercancel', (e) => {
+                        const p = canvasPointers.get(e.pointerId);
+                        if (p) {
+                            this.highlightPad(p.lane, false);
+                            canvasPointers.delete(e.pointerId);
                         }
                     });
                 }
