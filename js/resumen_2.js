@@ -471,6 +471,27 @@
                 document.getElementById('kpi-pct-fiable').textContent = `${bestRegularidad.pct.toFixed(0)}%`;
                 document.getElementById('kpi-bar-fiable').style.width = `${bestRegularidad.pct}%`;
 
+                // Poblar Tarjeta Resumen Única para Móvil (#kpi-mobile-summary)
+                const mobAciertoVal = document.getElementById('kpi-mobile-acierto-val');
+                const mobAciertoSub = document.getElementById('kpi-mobile-acierto-sub');
+                if (mobAciertoVal) mobAciertoVal.textContent = effText;
+                if (mobAciertoSub) mobAciertoSub.textContent = `${this.globalAvgHits.toFixed(1)}/14 med.`;
+
+                const mobRecordVal = document.getElementById('kpi-mobile-record-val');
+                const mobRecordSub = document.getElementById('kpi-mobile-record-sub');
+                if (mobRecordVal) mobRecordVal.textContent = `${bestRecord.hits} ac.`;
+                if (mobRecordSub) mobRecordSub.textContent = bestRecord.name ? bestRecord.name : 'En disputa';
+
+                const mobPremiosVal = document.getElementById('kpi-mobile-premios-val');
+                const mobPremiosSub = document.getElementById('kpi-mobile-premios-sub');
+                if (mobPremiosVal) mobPremiosVal.textContent = premMoney;
+                if (mobPremiosSub) mobPremiosSub.textContent = totalDoblesPrize > 0 ? 'Socios+Dobles' : 'Total LAE';
+
+                const mobFiableVal = document.getElementById('kpi-mobile-fiable-val');
+                const mobFiableSub = document.getElementById('kpi-mobile-fiable-sub');
+                if (mobFiableVal) mobFiableVal.textContent = `${bestRegularidad.pct.toFixed(0)}%`;
+                if (mobFiableSub) mobFiableSub.textContent = bestRegularidad.name || 'Regularidad';
+
                 // KPI 5: Talismán vs Trampa (Compensación estadística por volumen de partidos)
                 // Se priorizan clubes con muestra representativa (mínimo 2 partidos)
                 const candidateTeams = Object.values(this.teamStats).filter(t => t.totalMatches >= 2);
@@ -1543,6 +1564,35 @@
                     }
                 });
 
+                // Actualizar indicador y marcas de verificación en móvil
+                const viewMeta = {
+                    'evolucion': { icon: '📈', name: 'Evolución' },
+                    'casillas': { icon: '🎯', name: 'Radiografía 1-14' },
+                    'clubes': { icon: '⚽', name: 'Radar Clubes' },
+                    'jornadas': { icon: '📊', name: 'Rendimiento Jornadas' },
+                    'dobles': { icon: '✌️', name: 'Dobles' },
+                    'duelo': { icon: '⚡', name: 'Duelo 1 vs 1' }
+                };
+                const meta = viewMeta[viewName] || { icon: '📊', name: viewName };
+                const mobIcon = document.getElementById('mobile-active-view-icon');
+                const mobName = document.getElementById('mobile-active-view-name');
+                if (mobIcon) mobIcon.textContent = meta.icon;
+                if (mobName) mobName.textContent = meta.name;
+
+                views.forEach(v => {
+                    const check = document.getElementById(`mobile-check-${v}`);
+                    if (check) {
+                        if (v === viewName) check.classList.remove('hidden');
+                        else check.classList.add('hidden');
+                    }
+                });
+
+                const evoActions = document.getElementById('mobile-resumen-evolucion-actions');
+                if (evoActions) {
+                    if (viewName === 'evolucion') evoActions.classList.remove('hidden');
+                    else evoActions.classList.add('hidden');
+                }
+
                 if (viewName === 'evolucion' && this.chart) {
                     this.chart.resize();
                 }
@@ -1863,9 +1913,44 @@
                     }
                 }, 150);
             }
+
+            /**
+             * Muestra el modal explicativo al tocar un indicador en móvil
+             */
+            openKpiDetail(type) {
+                const contentData = this.generateExplanatoryCardContent(type);
+                if (!contentData) return;
+                const modal = document.getElementById('resumen-detail-modal');
+                const title = document.getElementById('modal-detail-title');
+                const content = document.getElementById('modal-detail-content');
+                if (!modal || !title || !content) return;
+
+                const titles = {
+                    'kpi-efectividad': '🎯 Efectividad Colectiva de la Peña',
+                    'kpi-bombazo': '🚀 Récord en 1 Boleto',
+                    'kpi-premios': '💰 Premios Oficiales en Metálico',
+                    'kpi-fiabilidad': '🛡️ Míster Regularidad',
+                    'kpi-equipos': '⚽ Radar de Clubes: Talismán vs Trampa'
+                };
+
+                title.textContent = titles[type] || 'Detalle del Indicador';
+                content.innerHTML = `<div class="p-2 sm:p-4 text-xs sm:text-sm">${contentData.html}</div>`;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                modal.style.display = 'flex';
+            }
+
+            closeDetailModal() {
+                const modal = document.getElementById('resumen-detail-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    modal.style.display = 'none';
+                }
+            }
         }
 
         // Inicializar aplicación al cargar el DOM
         document.addEventListener('DOMContentLoaded', () => {
             window.ResumenApp = new Resumen2App();
-        });
+        });

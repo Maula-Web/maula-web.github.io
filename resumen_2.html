@@ -246,6 +246,26 @@
             border-color: rgba(217, 119, 6, 0.8) !important;
             color: #b45309 !important;
         }
+
+        @media (max-width: 767px) { 
+            .desktop-only-flex { display: none !important; }
+            body { padding: 0.35rem 0.5rem !important; }
+        }
+        @media (min-width: 768px) { .desktop-only-flex { display: flex !important; } }
+        @media (max-height: 550px) and (orientation: landscape) {
+            body {
+                padding-top: 0.35rem !important;
+                padding-bottom: 0.35rem !important;
+            }
+            .header-control-bar {
+                padding: 0.4rem 0.6rem !important;
+            }
+        }
+        @media (orientation: portrait) {
+            .btn-actions-icon {
+                display: none !important;
+            }
+        }
     </style>
 
     <!-- Script de Inicio Rápido de Tema y Acceso Restringido -->
@@ -380,29 +400,30 @@
         </nav>
 
         <!-- BARRA DE TÍTULO Y CONTROLES PRINCIPALES -->
-        <div class="header-control-bar p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 text-xs sm:text-sm shadow-md">
-            <div class="flex items-center gap-3">
-                <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg sm:text-xl flex items-center justify-center shadow-inner">
+        <div class="header-control-bar p-2 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 sm:gap-3 text-xs sm:text-sm shadow-md">
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <span class="p-1.5 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-base sm:text-xl flex items-center justify-center shadow-inner shrink-0">
                     📊
                 </span>
-                <div>
-                    <div class="flex items-center gap-2 flex-wrap">
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                         <strong class="text-amber-500 dark:text-amber-400 font-extrabold text-xs sm:text-base block truncate">CENTRO DE INTELIGENCIA & RESUMEN</strong>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40">
-                            Temporada 2026-2027
+                        <span class="px-2 py-0.5 rounded-full text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40 shrink-0">
+                            <span class="hidden sm:inline">Temporada 2026-2027</span>
+                            <span class="sm:hidden">TEMP. 2026-2027</span>
                         </span>
-                        <span class="badge-disputadas px-2 py-0.5 rounded-full text-[10px] font-mono font-bold" id="kpi-header-badge">
+                        <span class="badge-disputadas px-2 py-0.5 rounded-full text-[10px] font-mono font-bold shrink-0" id="kpi-header-badge">
                             Cargando datos oficiales...
                         </span>
                     </div>
-                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden sm:block">
                         Estudio Estadístico Integral · Tendencias, Fiabilidad de Clubes, Récords y Evolución
                     </p>
                 </div>
             </div>
 
-            <!-- Resumen Rápido en Mini-Pills -->
-            <div class="flex items-center gap-2 flex-wrap lg:justify-end">
+            <!-- Resumen Rápido en Mini-Pills (Oculto en móvil ya que kpi-mobile-summary lo consolida) -->
+            <div class="hidden lg:flex items-center gap-2 flex-wrap lg:justify-end">
                 <div class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-800 text-center flex items-center gap-2">
                     <span class="text-xs">📅</span>
                     <div class="text-left">
@@ -427,22 +448,42 @@
             </div>
         </div>
 
-        <!-- Master toggle bar en móvil para Bento KPIs -->
+        <!-- =====================================================================
+             NIVEL 1: INDICADORES CLAVE (BENTO KPIS EN ESCRITORIO / TARJETA ÚNICA EN MÓVIL)
+             ===================================================================== -->
         <section id="kpi-section" class="space-y-2">
-            <div class="kpi-master-bar flex lg:hidden items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 py-1 px-1">
-                <span class="flex items-center gap-1.5 text-slate-300">
-                    <span>📊</span> Métricas de Temporada
-                </span>
-                <button type="button" onclick="window.toggleAllKpiCards(this)" class="kpi-master-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-amber-500 text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer">
-                    <span class="kpi-master-text">Desplegar todos</span>
-                    <span class="kpi-master-icon text-[10px]">▼</span>
-                </button>
+            <!-- TARJETA RESUMEN ÚNICA EN MÓVIL (Agrupa 4 métricas clave en una sola tarjeta compacta) -->
+            <div id="kpi-mobile-summary" class="lg:hidden glass-panel p-2 sm:p-2.5 border-amber-500/30 shadow-md">
+                <div class="grid grid-cols-4 gap-1 text-center divide-x divide-slate-200 dark:divide-slate-800/80">
+                    <!-- 1. Acierto Peña -->
+                    <div class="flex flex-col items-center justify-center px-0.5 min-w-0 cursor-pointer" onclick="window.ResumenApp && window.ResumenApp.openKpiDetail('kpi-efectividad')">
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-0.5 truncate">🎯 Acierto</span>
+                        <span id="kpi-mobile-acierto-val" class="text-xs sm:text-sm font-black font-mono text-emerald-600 dark:text-emerald-400 mt-0.5 truncate">--%</span>
+                        <span id="kpi-mobile-acierto-sub" class="text-[9px] text-slate-700 dark:text-slate-300 font-medium truncate max-w-full">--/14 med.</span>
+                    </div>
+                    <!-- 2. Récord -->
+                    <div class="flex flex-col items-center justify-center px-0.5 min-w-0 cursor-pointer" onclick="window.ResumenApp && window.ResumenApp.openKpiDetail('kpi-bombazo')">
+                        <span class="text-[10px] text-amber-500 dark:text-amber-400 font-bold uppercase tracking-wider flex items-center gap-0.5 truncate">🚀 Récord</span>
+                        <span id="kpi-mobile-record-val" class="text-xs sm:text-sm font-black font-mono text-amber-600 dark:text-amber-400 mt-0.5 truncate">-- ac.</span>
+                        <span id="kpi-mobile-record-sub" class="text-[9px] text-slate-700 dark:text-slate-300 font-medium truncate max-w-full">En disputa</span>
+                    </div>
+                    <!-- 3. Premios Bote -->
+                    <div class="flex flex-col items-center justify-center px-0.5 min-w-0 cursor-pointer" onclick="window.ResumenApp && window.ResumenApp.openKpiDetail('kpi-premios')">
+                        <span class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider flex items-center gap-0.5 truncate">💰 Premios</span>
+                        <span id="kpi-mobile-premios-val" class="text-xs sm:text-sm font-black font-mono text-purple-600 dark:text-purple-400 mt-0.5 truncate">-- €</span>
+                        <span id="kpi-mobile-premios-sub" class="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-full">Total LAE</span>
+                    </div>
+                    <!-- 4. Regularidad -->
+                    <div class="flex flex-col items-center justify-center px-0.5 min-w-0 cursor-pointer" onclick="window.ResumenApp && window.ResumenApp.openKpiDetail('kpi-fiabilidad')">
+                        <span class="text-[10px] text-sky-600 dark:text-sky-400 font-bold uppercase tracking-wider flex items-center gap-0.5 truncate">🛡️ Constancia</span>
+                        <span id="kpi-mobile-fiable-val" class="text-xs sm:text-sm font-black font-mono text-sky-600 dark:text-sky-400 mt-0.5 truncate">--%</span>
+                        <span id="kpi-mobile-fiable-sub" class="text-[9px] text-slate-700 dark:text-slate-300 font-medium truncate max-w-full">--</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- =====================================================================
-                 NIVEL 1: BENTO GRID DE 5 SUPER-KPIS DE TEMPORADA
-                 ===================================================================== -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- Bento KPIs en Desktop (oculto en móvil) -->
+            <div class="hidden lg:grid lg:grid-cols-5 gap-3">
                 <!-- KPI 1: Efectividad Global Peña -->
                 <div class="glass-panel p-3.5 sm:p-4 flex flex-col justify-between kpi-card cursor-help hover:border-emerald-500/50 transition-all duration-300 group collapsible-kpi"
                      data-card-type="kpi-efectividad">
@@ -605,10 +646,11 @@
         </section>
 
         <!-- =====================================================================
-             NIVEL 2: SELECTOR DE PERSPECTIVA (6 VISTAS INTERACTIVAS)
+             NIVEL 2: SELECTOR DE PERSPECTIVA (6 VISTAS INTERACTIVAS & DROPDOWN MÓVIL)
              ===================================================================== -->
-        <section class="glass-panel p-2 sm:p-2.5 shadow-md">
-            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+        <section id="resumen-perspective-section" class="glass-panel p-2 sm:p-2.5 shadow-md relative z-30">
+            <!-- Barra en Escritorio (>= lg) -->
+            <div class="hidden lg:flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
                 <button type="button" onclick="window.ResumenApp.switchView('evolucion')" id="tab-btn-evolucion"
                         class="tab-btn-active px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 border border-transparent">
                     <span>📈</span> Evolución & Comparativa
@@ -634,6 +676,75 @@
                     <span>⚡</span> Duelo 1 vs 1
                 </button>
             </div>
+
+            <!-- Barra en Móvil (< lg): Vista Activa + Desplegable de Vistas y Acciones -->
+            <div class="flex lg:hidden items-center justify-between gap-2 w-full">
+                <!-- Indicador de Vista Activa Móvil -->
+                <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-800">
+                    <span id="mobile-active-view-icon" class="text-sm">📈</span>
+                    <span id="mobile-active-view-name" class="text-xs font-black text-amber-600 dark:text-amber-400 whitespace-nowrap">Evolución</span>
+                </div>
+
+                <!-- Botón Desplegable de Vistas y Acciones Móvil -->
+                <div class="relative shrink-0 z-40" id="mobile-resumen-actions-container">
+                    <button type="button" id="btn-mobile-resumen-actions" onclick="window.toggleMobileResumenActions()" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold text-xs border border-amber-500/40 transition flex items-center gap-1 shadow-sm whitespace-nowrap">
+                        <span class="btn-actions-icon hidden landscape:inline">⚙️</span>
+                        <span>Vistas & Acciones</span>
+                        <span class="text-[10px] text-amber-500 dark:text-amber-400">▼</span>
+                    </button>
+
+                    <!-- Dropdown Flotante -->
+                    <div id="mobile-resumen-actions-dropdown" class="hidden absolute right-0 mt-2 w-64 glass-panel border border-amber-500/50 rounded-xl shadow-2xl p-2 z-50 divide-y divide-slate-200 dark:divide-slate-800 text-xs bg-white dark:bg-slate-950">
+                        <!-- Grupo 1: Cambiar Perspectiva -->
+                        <div class="py-1 space-y-0.5">
+                            <div class="px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400 tracking-wider">Cambiar Perspectiva</div>
+                            <button type="button" onclick="window.ResumenApp.switchView('evolucion'); window.toggleMobileResumenActions(false);" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 text-slate-800 dark:text-slate-200 font-bold flex items-center justify-between">
+                                <span class="flex items-center gap-2"><span>📈</span> Evolución & Comparativa</span>
+                                <span id="mobile-check-evolucion" class="text-amber-500 font-black">✓</span>
+                            </button>
+                            <button type="button" onclick="window.ResumenApp.switchView('casillas'); window.toggleMobileResumenActions(false);" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-between">
+                                <span class="flex items-center gap-2"><span>🎯</span> Radiografía 1-14 (Casillas)</span>
+                                <span id="mobile-check-casillas" class="hidden text-amber-500 font-black">✓</span>
+                            </button>
+                            <button type="button" onclick="window.ResumenApp.switchView('clubes'); window.toggleMobileResumenActions(false);" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-between">
+                                <span class="flex items-center gap-2"><span>⚽</span> Radar de Clubes</span>
+                                <span id="mobile-check-clubes" class="hidden text-amber-500 font-black">✓</span>
+                            </button>
+                            <button type="button" onclick="window.ResumenApp.switchView('jornadas'); window.toggleMobileResumenActions(false);" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-between">
+                                <span class="flex items-center gap-2"><span>📊</span> Rendimiento por Jornada</span>
+                                <span id="mobile-check-jornadas" class="hidden text-amber-500 font-black">✓</span>
+                            </button>
+                            <button type="button" onclick="window.ResumenApp.switchView('dobles'); window.toggleMobileResumenActions(false);" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-between">
+                                <span class="flex items-center gap-2"><span>✌️</span> Quiniela de Dobles</span>
+                                <span id="mobile-check-dobles" class="hidden text-amber-500 font-black">✓</span>
+                            </button>
+                            <button type="button" onclick="window.ResumenApp.switchView('duelo'); window.toggleMobileResumenActions(false);" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-between">
+                                <span class="flex items-center gap-2"><span>⚡</span> Duelo 1 vs 1</span>
+                                <span id="mobile-check-duelo" class="hidden text-amber-500 font-black">✓</span>
+                            </button>
+                        </div>
+
+                        <!-- Grupo 2: Acciones Rápidas (Gráfica de Evolución) -->
+                        <div id="mobile-resumen-evolucion-actions" class="py-1 space-y-1">
+                            <div class="px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400 tracking-wider">Acciones Gráfica</div>
+                            <div class="grid grid-cols-2 gap-1 px-1">
+                                <button type="button" onclick="window.ResumenApp.selectTop(4); window.toggleMobileResumenActions(false);" class="px-2 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-bold text-center">
+                                    ⭐ Top 4
+                                </button>
+                                <button type="button" onclick="window.ResumenApp.selectTop(3); window.toggleMobileResumenActions(false);" class="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-bold text-center">
+                                    🥇 Podio (Top 3)
+                                </button>
+                                <button type="button" onclick="window.ResumenApp.selectAllMembers(); window.toggleMobileResumenActions(false);" class="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-bold text-center">
+                                    👥 Todos
+                                </button>
+                                <button type="button" onclick="window.ResumenApp.clearSelection(); window.toggleMobileResumenActions(false);" class="px-2 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-[11px] font-bold text-center">
+                                    ✕ Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- =====================================================================
@@ -647,13 +758,13 @@
                         <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
                             <span>📈</span> Gráfica de Puntuaciones Acumuladas
                         </h3>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
                             Haz clic en los socios para añadirlos o quitarlos del gráfico (máximo 5). Haz clic en los puntos del gráfico para ver el boleto de esa jornada.
                         </p>
                     </div>
 
-                    <!-- Botones de Acción Rápida -->
-                    <div class="flex items-center gap-1.5 flex-wrap">
+                    <!-- Botones de Acción Rápida (En móvil se integran en el desplegable de acciones) -->
+                    <div class="hidden sm:flex items-center gap-1.5 flex-wrap">
                         <button type="button" onclick="window.ResumenApp.selectTop(4)" class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-bold transition">
                             ⭐ Top 4
                         </button>
@@ -706,7 +817,7 @@
                 </div>
 
                 <!-- Canvas del Gráfico Chart.js -->
-                <div class="relative w-full h-[360px] sm:h-[420px] lg:h-[480px] mt-2">
+                <div id="evolution-chart-wrapper" class="relative w-full h-[260px] sm:h-[380px] lg:h-[480px] mt-2">
                     <canvas id="evolutionChart"></canvas>
                 </div>
             </div>
@@ -1120,6 +1231,63 @@
          ===================================================================== -->
     <script src="js/app-table-sorter.js"></script>
     <script src="js/resumen_2.js"></script>
+    <script>
+        // Control del menú desplegable de acciones/vistas en móvil
+        window.toggleMobileResumenActions = function(forceState) {
+            const dropdown = document.getElementById('mobile-resumen-actions-dropdown');
+            if (!dropdown) return;
+            const shouldShow = (typeof forceState === 'boolean') ? forceState : dropdown.classList.contains('hidden');
+            if (shouldShow) {
+                dropdown.classList.remove('hidden');
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        };
+
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('mobile-resumen-actions-container');
+            const dropdown = document.getElementById('mobile-resumen-actions-dropdown');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                if (container && !container.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        // Cálculo dinámico de pantalla y altura óptima en móvil para recuperar espacio vertical
+        function adjustResumenMobileLayout() {
+            const chartWrapper = document.getElementById('evolution-chart-wrapper');
+            if (!chartWrapper) return;
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const isMobile = vw < 768;
+            const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+
+            if (isMobile) {
+                if (isLandscape && vh < 550) {
+                    chartWrapper.style.height = Math.max(180, vh - 160) + 'px';
+                } else {
+                    // En vertical móvil: altura optimizada para ver gráfica sin ocupar toda la pantalla
+                    const optimalH = Math.min(320, Math.max(220, Math.round(vh * 0.35)));
+                    chartWrapper.style.height = optimalH + 'px';
+                }
+                if (window.ResumenApp && window.ResumenApp.chart) {
+                    window.ResumenApp.chart.resize();
+                }
+            } else {
+                chartWrapper.style.height = '';
+            }
+        }
+
+        window.addEventListener('resize', adjustResumenMobileLayout);
+        window.addEventListener('orientationchange', function() {
+            setTimeout(adjustResumenMobileLayout, 150);
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            adjustResumenMobileLayout();
+            setTimeout(adjustResumenMobileLayout, 300);
+        });
+    </script>
     <script src="js/teletipo.js"></script>
 </body>
 
