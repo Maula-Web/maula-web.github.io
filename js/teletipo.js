@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: podio (oro, plata y bronce) reservado a aciertos con puntos > 0, carátula más legible y velocidades variadas!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: ¡cambios de nivel con onomatopeyas cómic (¡BOOM!, ¡ZAP!, ¡POW!), podio exclusivo y velocidades variadas!`,
                 url: 'juego.html'
             });
 

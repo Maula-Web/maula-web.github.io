@@ -1935,6 +1935,8 @@
                         brightTextColor = '#ffffff';
                     }
 
+                    const isSpecialLong = title.includes('PLENO') || ['¡BOOM!', '¡ZAP!', '¡POW!', '¡KABOOM!', '¡CRASH!', '¡ZASCA!'].includes(title);
+
                     this.comicBanners.push({
                         title: title,
                         subtitle: subtitle,
@@ -1945,7 +1947,7 @@
                         alpha: 1.0,
                         y: this.height * 0.32,
                         vy: 0.2,
-                        duration: title.includes('PLENO') ? 2.5 : 1.8,
+                        duration: isSpecialLong ? 2.4 : 1.8,
                         age: 0,
                         angle: (Math.random() - 0.5) * 0.16
                     });
@@ -2004,17 +2006,34 @@
                         const speedMultiplier = 1.0 + (progressInLevel * 0.95);
                         this.currentBaseSpeed = Math.max(this.baseInitialSpeed, (this.baseInitialSpeed + (this.level - 1) * 0.5) * speedMultiplier);
 
-                        // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL!
+                        // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL CON ONOMATOPEYA!
                         if (this.levelElapsed >= this.levelDuration) {
                             this.level++;
                             this.levelElapsed = 0;
                             this.playSound('level_up');
+                            this.screenShake = 16;
                             this.createFireworks(this.width / 2, this.height * 0.35);
-                            if (this.level === 3) {
-                                this.addComicBanner('¡NIVEL 3!', '¡Cuidado! Elementos a distintas velocidades', '#f59e0b', '#ffffff');
-                            } else {
-                                this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#2563eb', '#ffffff');
-                            }
+                            this.createFireworks(this.width / 4, this.height * 0.45);
+                            this.createFireworks(3 * this.width / 4, this.height * 0.45);
+                            this.addFloatingText(this.width / 2, this.height * 0.45, `🆙 ¡NIVEL ${this.level}!`, '#facc15');
+
+                            // Anuncio de cambio de nivel con onomatopeya cómic explosiva
+                            const levelOnomatopoeias = {
+                                2: { onomato: '¡BOOM!', bg: '#ef4444', sub: '¡NIVEL 2! Más velocidad y ritmo renovado' },
+                                3: { onomato: '¡ZAP!', bg: '#f59e0b', sub: '¡NIVEL 3! ¡Cuidado con las distintas velocidades!' },
+                                4: { onomato: '¡POW!', bg: '#8b5cf6', sub: '¡NIVEL 4! Lluvia rápida de quinielas' },
+                                5: { onomato: '¡KABOOM!', bg: '#ec4899', sub: '¡NIVEL 5! Tensión extrema de la Peña' },
+                                6: { onomato: '¡CRASH!', bg: '#06b6d4', sub: '¡NIVEL 6! Reflejos de auténtico Maula' },
+                                7: { onomato: '¡ZASCA!', bg: '#10b981', sub: '¡NIVEL 7! ¡Ritmo sobrehumano!' }
+                            };
+
+                            const info = levelOnomatopoeias[this.level] || {
+                                onomato: (this.level % 2 === 0 ? '¡BOOM!' : '¡ZAP!'),
+                                bg: '#ef4444',
+                                sub: `¡NIVEL ${this.level}! Velocidad e intensidad al máximo`
+                            };
+
+                            this.addComicBanner(info.onomato, info.sub, info.bg, '#ffffff');
                         }
 
                         // El número de elementos que caen aumenta lentamente:
