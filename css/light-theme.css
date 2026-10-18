@@ -1670,48 +1670,81 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
    ========================================================================= */
 
 /* 1. Dashboard 2: Botones Principales Hero de Acción */
+.light-theme .btn-hero-quiniela,
 .light-theme #btn-hero-rellenar {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-    border: 1.5px solid #059669 !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28) !important;
+    background: #ecfdf5 !important;
+    background-image: none !important;
+    border: 2px solid #059669 !important;
+    color: #047857 !important;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15) !important;
 }
+.light-theme .btn-hero-quiniela:hover,
 .light-theme #btn-hero-rellenar:hover {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    background: #059669 !important;
+    background-image: none !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
+    border-color: #047857 !important;
+    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35) !important;
 }
-.light-theme #btn-hero-rellenar * {
+.light-theme .btn-hero-quiniela span,
+.light-theme #btn-hero-rellenar span {
+    color: #047857 !important;
+    font-weight: 900 !important;
+}
+.light-theme .btn-hero-quiniela:hover span,
+.light-theme #btn-hero-rellenar:hover span {
     color: #ffffff !important;
 }
 
+.light-theme .btn-hero-jornada,
 .light-theme #btn-hero-jornada {
-    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
-    border: 1.5px solid #0284c7 !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28) !important;
+    background: #f0f9ff !important;
+    background-image: none !important;
+    border: 2px solid #0284c7 !important;
+    color: #0369a1 !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15) !important;
 }
+.light-theme .btn-hero-jornada:hover,
 .light-theme #btn-hero-jornada:hover {
-    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
+    background: #0284c7 !important;
+    background-image: none !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4) !important;
+    border-color: #0369a1 !important;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35) !important;
 }
-.light-theme #btn-hero-jornada * {
+.light-theme .btn-hero-jornada span,
+.light-theme #btn-hero-jornada span {
+    color: #0369a1 !important;
+    font-weight: 900 !important;
+}
+.light-theme .btn-hero-jornada:hover span,
+.light-theme #btn-hero-jornada:hover span {
     color: #ffffff !important;
 }
 
+.light-theme .btn-hero-clasificacion,
 .light-theme #btn-hero-clasificacion {
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
-    border: 1.5px solid #7c3aed !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.28) !important;
+    background: #faf5ff !important;
+    background-image: none !important;
+    border: 2px solid #7c3aed !important;
+    color: #6d28d9 !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15) !important;
 }
+.light-theme .btn-hero-clasificacion:hover,
 .light-theme #btn-hero-clasificacion:hover {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    background: #7c3aed !important;
+    background-image: none !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4) !important;
+    border-color: #5b21b6 !important;
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35) !important;
 }
-.light-theme #btn-hero-clasificacion * {
+.light-theme .btn-hero-clasificacion span,
+.light-theme #btn-hero-clasificacion span {
+    color: #6d28d9 !important;
+    font-weight: 900 !important;
+}
+.light-theme .btn-hero-clasificacion:hover span,
+.light-theme #btn-hero-clasificacion:hover span {
     color: #ffffff !important;
 }
 
@@ -1877,42 +1910,58 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
 }
 
 /* 4. Quiniela 2 (Pronósticos): Botones de Dobles */
+.light-theme #btn-rellenar-dobles-main,
 .light-theme button[onclick*="openEditorForDoubles"],
 .light-theme #btn-open-doubles-editor {
     background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
-    border: 1.5px solid #7c3aed !important;
+    border: 1.5px solid #6d28d9 !important;
     color: #ffffff !important;
     box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35) !important;
 }
+.light-theme #btn-rellenar-dobles-main:hover,
 .light-theme button[onclick*="openEditorForDoubles"]:hover,
 .light-theme #btn-open-doubles-editor:hover {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%) !important;
     color: #ffffff !important;
     box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45) !important;
 }
+.light-theme #btn-rellenar-dobles-main span,
+.light-theme button[onclick*="openEditorForDoubles"] span,
+.light-theme #btn-open-doubles-editor span,
+.light-theme #btn-rellenar-dobles-main *,
 .light-theme button[onclick*="openEditorForDoubles"] *,
 .light-theme #btn-open-doubles-editor * {
     color: #ffffff !important;
+    font-weight: 800 !important;
 }
 
+.light-theme .btn-dobles-socio,
 .light-theme #kpi-dobles-buttons-container button,
 .light-theme button[onclick*="openEditorModal"][class*="purple"] {
     background-color: #faf5ff !important;
-    border: 1px solid #d8b4fe !important;
-    color: #6b21a8 !important;
-    box-shadow: 0 1px 3px rgba(107, 33, 168, 0.08) !important;
+    border: 1.5px solid #c084fc !important;
+    color: #581c87 !important;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.1) !important;
 }
+.light-theme .btn-dobles-socio:hover,
 .light-theme #kpi-dobles-buttons-container button:hover,
 .light-theme button[onclick*="openEditorModal"][class*="purple"]:hover {
     background-color: #f3e8ff !important;
-    border-color: #c084fc !important;
+    border-color: #a855f7 !important;
+}
+.light-theme .btn-dobles-socio .btn-dobles-title,
+.light-theme #kpi-dobles-buttons-container button span {
     color: #581c87 !important;
 }
+.light-theme .btn-dobles-socio .btn-dobles-name,
 .light-theme #kpi-dobles-buttons-container button strong {
     color: #b45309 !important;
+    font-weight: 900 !important;
 }
+.light-theme .btn-dobles-socio .btn-dobles-action,
 .light-theme #kpi-dobles-buttons-container button span.font-mono {
     color: #7c3aed !important;
+    font-weight: 800 !important;
 }
 
 /* 5. Glow de Casilla Oro y Casilla Trampa en Modo Claro (Resumen 2) */

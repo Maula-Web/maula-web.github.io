@@ -1480,8 +1480,8 @@
                             <p id="kpi-dobles-responsable" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Responsable: Calculando...</p>
 
                             <!-- Control para rellenar dobles -->
-                            <button type="button" onclick="window.openEditorForDoubles()" class="w-full mt-2.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
-                                <span>✌️</span> Rellenar Quiniela de Dobles
+                            <button type="button" id="btn-rellenar-dobles-main" onclick="window.openEditorForDoubles()" class="w-full mt-2.5 px-3 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md">
+                                <span>✌️</span> <span>Rellenar Quiniela de Dobles</span>
                             </button>
                             <div id="kpi-dobles-buttons-container" class="mt-2 flex flex-col gap-1.5"></div>
                         </div>
@@ -3082,9 +3082,9 @@
                 if (doublesBtnsContainer) {
                     if (eligibleList.length > 1) {
                         doublesBtnsContainer.innerHTML = eligibleList.map(em => `
-                            <button type="button" onclick="window.openEditorModal(${em.id}, true, '${jornada.id}')" class="w-full px-2.5 py-1.5 rounded-lg bg-purple-900/60 hover:bg-purple-800/70 border border-purple-500/50 text-purple-200 text-xs font-bold transition flex items-center justify-between shadow-sm active:scale-95">
-                                <span>✌️ Dobles: <strong class="text-amber-300">${AppUtils.getMemberName(em).split(' ')[0]}</strong></span>
-                                <span class="text-[10px] text-purple-300 font-mono">Rellenar →</span>
+                            <button type="button" onclick="window.openEditorModal(${em.id}, true, '${jornada.id}')" class="btn-dobles-socio w-full px-3 py-2 rounded-lg transition flex items-center justify-between shadow-sm active:scale-95">
+                                <span class="btn-dobles-title flex items-center gap-1 font-bold text-xs">✌️ Dobles: <strong class="btn-dobles-name font-black">${AppUtils.getMemberName(em).split(' ')[0]}</strong></span>
+                                <span class="btn-dobles-action text-xs font-mono font-bold">Rellenar →</span>
                             </button>
                         `).join('');
                         doublesBtnsContainer.classList.remove('hidden');
