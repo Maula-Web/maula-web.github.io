@@ -1516,6 +1516,11 @@ class Dashboard2AppController {
         if (el) {
             const url = el.getAttribute('data-url');
             if (url) {
+                if (url === 'juego.html' || url.includes('juego.html')) {
+                    const sep = url.includes('?') ? '&' : '?';
+                    location.href = url + sep + '_t=' + Date.now();
+                    return;
+                }
                 location.href = url;
                 return;
             }
@@ -1536,7 +1541,7 @@ class Dashboard2AppController {
         if (idx === 0) {
             location.href = 'jornadas_2.html';
         } else if (idx === 1) {
-            location.href = 'juego.html';
+            location.href = 'juego.html?_t=' + Date.now();
         } else if (idx === 2) {
             this.openDoblesModal();
         } else if (idx === 3) {
@@ -1560,7 +1565,7 @@ class Dashboard2AppController {
         } else if (idx === 14) {
             this.showInfo('cenas');
         } else {
-            location.href = 'juego.html';
+            location.href = 'juego.html?_t=' + Date.now();
         }
     }
 

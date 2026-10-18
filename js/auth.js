@@ -161,6 +161,10 @@ const Auth = {
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Maula Hero</span>
                 `;
 
+                btnArcade.addEventListener('click', () => {
+                    btnArcade.href = 'juego.html?_t=' + Date.now();
+                });
+
                 const sandboxLinkV2 = navMenu.querySelector('#btn-sandbox-nav-v2');
                 const adminLinkV2 = navMenu.querySelector('a[href*="admin_2.html"]');
                 if (sandboxLinkV2) {
@@ -178,6 +182,9 @@ const Auth = {
                 const btnArcadeV1 = document.createElement('a');
                 btnArcadeV1.id = 'btn-arcade-sidebar';
                 btnArcadeV1.href = 'juego.html';
+                btnArcadeV1.addEventListener('click', () => {
+                    btnArcadeV1.href = 'juego.html?_t=' + Date.now();
+                });
                 btnArcadeV1.className = 'btn-primary md:hidden';
                 btnArcadeV1.style.border = '1px dashed #f59e0b';
                 btnArcadeV1.style.color = '#f59e0b';

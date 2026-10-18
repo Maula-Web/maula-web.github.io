@@ -5,12 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>PEÑA MAULAS - Maula Hero</title>
 
+    <!-- Prevención de caché HTTP para auto-actualización constante -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#090d16">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script>
+        // Versión de compilación del cliente de Maula Hero
+        const GAME_CLIENT_VERSION = '2026.10.18.228cf26';
+
+        // Auto-actualización automática al entrar al juego para recoger siempre los últimos cambios
+        (function initAutoUpdateOnEntry() {
+            let isChecking = false;
+
+            async function checkLatestVersion() {
+                if (isChecking) return;
+                isChecking = true;
+
+                // 1. Limpieza preventiva de caché local para juego.html
+                if ('caches' in window) {
+                    try {
+                        const keys = await caches.keys();
+                        for (const k of keys) {
+                            const c = await caches.open(k);
+                            await c.delete('juego.html');
+                            await c.delete('./juego.html');
+                        }
+                    } catch (e) {}
+                }
+
+                // 2. Comprobar actualización en Service Worker si está registrado
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const reg = await navigator.serviceWorker.getRegistration();
+                        if (reg) await reg.update();
+                    } catch (e) {}
+                }
+
+                // 3. Consultar al servidor la versión más reciente sin caché HTTP
+                try {
+                    const res = await fetch('juego.html?_check=' + Date.now(), {
+                        cache: 'no-store',
+                        headers: {
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache'
+                        }
+                    });
+
+                    if (res.ok) {
+                        const text = await res.text();
+                        const match = text.match(/const\s+GAME_CLIENT_VERSION\s*=\s*['"]([^'"]+)['"]/);
+                        if (match && match[1] && match[1] !== GAME_CLIENT_VERSION) {
+                            console.log('⚡ Nueva versión de Maula Hero detectada (' + match[1] + '). Actualizando automáticamente...');
+                            const currentUrl = new URL(window.location.href);
+                            currentUrl.searchParams.set('_v', match[1]);
+                            currentUrl.searchParams.set('_ts', Date.now());
+                            window.location.replace(currentUrl.toString());
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Verificación silenciosa de versión:', err);
+                } finally {
+                    isChecking = false;
+                }
+            }
+
+            // Ejecutar al entrar inmediatamente
+            checkLatestVersion();
+
+            // Re-ejecutar al volver a la pestaña tras bloqueo de pantalla o cambio de app en móvil
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') checkLatestVersion();
+            });
+            window.addEventListener('pageshow', (e) => {
+                if (e.persisted) checkLatestVersion();
+            });
+        })();
+    </script>
 
     <!-- Tipografías de alta gama e impacto cómic -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

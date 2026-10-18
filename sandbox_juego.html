@@ -5,7 +5,8 @@
     <meta http-equiv="refresh" content="0; url=juego.html">
     <title>Redirigiendo a Maula Hero...</title>
     <script>
-        window.location.replace('juego.html' + window.location.search + window.location.hash);
+        const sep = window.location.search ? '&' : '?';
+        window.location.replace('juego.html' + window.location.search + sep + '_t=' + Date.now() + window.location.hash);
     </script>
 </head>
 <body style="background:#040711; color:#f8fafc; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">

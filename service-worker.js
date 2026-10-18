@@ -60,7 +60,7 @@ try {
     console.warn('[service-worker.js] Aviso cargando Firebase Messaging en SW:', e);
 }
 
-const CACHE_NAME = 'maulas-pwa-v2.05';
+const CACHE_NAME = 'maulas-pwa-v2.06';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -198,6 +198,26 @@ self.addEventListener('fetch', (event) => {
 
     // A. Navegación HTML: Network-First con fallback a Caché
     if (req.mode === 'navigate' || req.headers.get('accept')?.includes('text/html')) {
+        // Para Maula Hero (juego.html): Siempre forzar búsqueda directa en red (cache: 'reload') para recoger cambios al entrar
+        if (url.pathname.includes('juego.html')) {
+            event.respondWith(
+                fetch(req, { cache: 'reload' })
+                    .then((networkResp) => {
+                        if (networkResp && networkResp.status === 200) {
+                            const copy = networkResp.clone();
+                            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+                        }
+                        return networkResp;
+                    })
+                    .catch(async () => {
+                        const cached = await caches.match(req);
+                        if (cached) return cached;
+                        return caches.match('juego.html');
+                    })
+            );
+            return;
+        }
+
         event.respondWith(
             fetch(req)
                 .then((networkResp) => {
