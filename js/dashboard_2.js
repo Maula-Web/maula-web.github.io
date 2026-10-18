@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Curva continua de velocidad fluida, respiro regulado (-30%) al echar a Emilio, comodines balanceados y descanso entre dobles!`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Los paneles de puntuación, el ranking oficial y la carátula ahora muestran el nivel alcanzado!`,
             url: 'juego.html'
         });
 

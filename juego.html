@@ -281,7 +281,10 @@
             <div class="flex items-center justify-between px-3 py-1.5 rounded-2xl bg-slate-950/75 border border-slate-800 backdrop-blur-md shadow-xl">
                 <!-- Score Actual -->
                 <div class="flex flex-col">
-                    <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400">PUNTOS</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400">PUNTOS</span>
+                        <span id="hud-score-level-badge" class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-extrabold text-[9px] border border-emerald-500/30">NIVEL 1</span>
+                    </div>
                     <span id="hud-score" class="font-mono-bold text-xl sm:text-2xl font-black text-white leading-none tracking-tight">
                         0
                     </span>
@@ -3467,6 +3470,11 @@
                         buffsContainer.innerHTML = buffsHtml;
                     }
 
+                    const elScoreLvl = document.getElementById('hud-score-level-badge');
+                    if (elScoreLvl) {
+                        elScoreLvl.textContent = this.isDoblesMode ? '⚡ DOBLES' : `NIVEL ${this.level}`;
+                    }
+
                     const elSocioName = document.getElementById('socio-display-name');
                     if (elSocioName) elSocioName.textContent = this.currentSocio;
 
@@ -3475,8 +3483,10 @@
 
                     const elStartBest = document.getElementById('start-socio-best');
                     if (elStartBest) {
-                        const best = (this.highScores[this.currentSocio]?.score || 0).toLocaleString();
-                        elStartBest.textContent = `Récord: ${best}`;
+                        const socioData = this.highScores[this.currentSocio];
+                        const best = (socioData?.score || 0).toLocaleString();
+                        const lvl = socioData?.maxLevel || 1;
+                        elStartBest.textContent = `Récord: ${best} (Nivel ${lvl})`;
                     }
 
                     this.updateCaratulaTicker();
@@ -3495,7 +3505,7 @@
                     });
 
                     const sorted = Object.entries(scoresMap)
-                        .map(([name, data]) => ({ name, score: data.score || 0, maxCombo: data.maxCombo || 0, games: data.games || 0 }))
+                        .map(([name, data]) => ({ name, score: data.score || 0, maxCombo: data.maxCombo || 0, games: data.games || 0, maxLevel: data.maxLevel || 1 }))
                         .sort((a, b) => b.score - a.score);
 
                     const leader = sorted[0];
@@ -3536,7 +3546,7 @@
                         items.push(`
                             <span class="inline-flex items-center gap-1.5 px-2 py-0.5">
                                 <span class="text-amber-400 font-mono text-[10.5px] font-bold">${badge}</span>
-                                <span class="${colorClass} text-[11px]">${socio.name}${meBadge}: <strong class="text-amber-300 font-black">${socio.score.toLocaleString()}</strong> pts</span>
+                                <span class="${colorClass} text-[11px]">${socio.name}${meBadge}: <strong class="text-amber-300 font-black">${socio.score.toLocaleString()}</strong> pts <span class="text-emerald-400 font-bold text-[10px]">(Niv. ${socio.maxLevel || 1})</span></span>
                             </span>
                         `);
 
@@ -3583,7 +3593,10 @@
                         document.getElementById('final-combo').textContent = this.maxCombo;
                         document.getElementById('final-level').textContent = `Nivel ${this.level}`;
                         document.getElementById('final-socio-name').textContent = this.currentSocio;
-                        document.getElementById('final-best').textContent = (this.highScores[this.currentSocio]?.score || this.score).toLocaleString();
+                        const socioRecord = this.highScores[this.currentSocio];
+                        const bestScore = (socioRecord?.score || this.score).toLocaleString();
+                        const bestLevel = socioRecord?.maxLevel || this.level;
+                        document.getElementById('final-best').textContent = `${bestScore} (Nivel ${bestLevel})`;
 
                         setTimeout(() => {
                             document.getElementById('modal-gameover').classList.remove('hidden');
@@ -3600,8 +3613,10 @@
                     if (elDisplayName) elDisplayName.textContent = this.currentSocio;
                     const elStartBest = document.getElementById('start-socio-best');
                     if (elStartBest) {
-                        const best = (this.highScores[this.currentSocio]?.score || 0).toLocaleString();
-                        elStartBest.textContent = `Récord: ${best}`;
+                        const socioData = this.highScores[this.currentSocio];
+                        const best = (socioData?.score || 0).toLocaleString();
+                        const lvl = socioData?.maxLevel || 1;
+                        elStartBest.textContent = `Récord: ${best} (Nivel ${lvl})`;
                     }
                 }
 
@@ -3802,12 +3817,15 @@
                                         </div>
                                         <div class="flex items-center gap-1.5 mt-0.5">
                                             ${funnyTag ? `${funnyTag} <span class="text-slate-600">·</span>` : ''}
-                                            <span class="text-[10px] text-slate-400 font-mono">Combo: ${entry.maxCombo || 0} 🔥 · Nivel ${entry.maxLevel || 1}</span>
+                                            <span class="text-[10px] text-slate-400 font-mono">Combo: ${entry.maxCombo || 0} 🔥</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <span class="font-mono-bold text-sm font-black text-amber-400 block">${(entry.score || 0).toLocaleString()} pts</span>
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <span class="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black font-mono">Niv. ${entry.maxLevel || 1}</span>
+                                        <span class="font-mono-bold text-sm font-black text-amber-400 block">${(entry.score || 0).toLocaleString()} pts</span>
+                                    </div>
                                     <span class="text-[9px] text-slate-500 font-mono">${entry.games || 0} partida${(entry.games || 0) === 1 ? '' : 's'}</span>
                                 </div>
                             </div>
