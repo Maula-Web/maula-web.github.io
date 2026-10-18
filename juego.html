@@ -436,7 +436,7 @@
                     <span class="text-base shrink-0 mt-0.5">⚡</span>
                     <div class="leading-tight">
                         <span class="block text-white font-black text-[10px]">¡Modo Quiniela de Dobles! (Cada 30.000 pts)</span>
-                        <span class="text-[8.5px] text-purple-300 leading-tight block mt-0.5">Durante 15s sólo llueven balones dobles a velocidad 1.5x. ¡Caza <strong>"No se reduce"</strong> para doblar puntos y ganar <strong>+1 vida</strong>! (NO quita vidas).</span>
+                        <span class="text-[8.5px] text-purple-300 leading-tight block mt-0.5">Durante 15s sólo llueven balones dobles a velocidad 1.5x. ¡Los balones perdidos NO quitan vidas! Caza <strong>"No se reduce"</strong> para doblar puntos y ganar <strong>+1 vida</strong>.</span>
                     </div>
                 </div>
             </div>
@@ -699,7 +699,7 @@
                         Cada 30.000 puntos alcanzados, el césped se limpia y durante <strong>15 segundos</strong> sólo llueven balones dobles a velocidad 1.5x creciente con música electrónica propia.
                     </p>
                     <p class="text-slate-300 text-[11px]">
-                        🛡️ <strong>"No se reduce"</strong>: Aparece una única vez durante este modo. ¡Cázalo para multiplicar x2 todos los puntos de la ronda de dobles y <strong>restaurar +1 vida perdida</strong>! Dejarlo pasar no quita vidas.
+                        🛡️ <strong>"No se reduce"</strong>: Aparece una única vez durante este modo. ¡Cázalo para multiplicar x2 todos los puntos de la ronda de dobles y <strong>restaurar +1 vida perdida</strong>! Además, durante todo este modo <strong>los balones perdidos NO restan vidas</strong>.
                     </p>
                 </div>
 
@@ -1966,23 +1966,28 @@
                             if (!note.hit) {
                                 if (note.type === 'lava') {
                                     // Si un boleto de sellar tarde se escapa sin salvarse en el área, ¡pierdes vida!
-                                    this.lives--;
+                                    if (!this.isDoblesMode && !note.isDobles) {
+                                        this.lives--;
+                                        this.checkGameOver();
+                                    }
                                     this.combo = 0;
                                     this.multiplier = 1;
                                     this.screenShake = 14;
                                     this.playSound('hit_trap');
                                     this.addComicBanner('¡SIN SELLAR!', '¡Se te pasó la hora de sellar!', '#dc2626', '#fef08a');
-                                    this.checkGameOver();
                                 } else if (note.type === 'normal' || note.type === 'gold' || note.type === 'pleno') {
-                                    this.lives--;
+                                    // Los balones perdidos durante el modo dobles NO restan vidas
+                                    if (!this.isDoblesMode && !note.isDobles) {
+                                        this.lives--;
+                                        this.checkGameOver();
+                                    }
                                     this.combo = 0;
                                     this.multiplier = 1;
-                                    this.screenShake = 10;
+                                    this.screenShake = this.isDoblesMode ? 3 : 10;
                                     this.playSound('miss');
                                     this.addFloatingText(this.getLaneX(note.lane), this.targetY, '¡FALLO!', '#94a3b8');
-                                    this.checkGameOver();
                                 }
-                                // NOTA REGLAMENTARIA: Dejar pasar metamórficos, botas o no se reduce NO quita vidas.
+                                // NOTA REGLAMENTARIA: Dejar pasar metamórficos, botas, no se reduce o balones en Modo Dobles NO quita vidas.
                                 this.updateHUD();
                             }
                             this.notes.splice(i, 1);
