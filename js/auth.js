@@ -155,10 +155,10 @@ const Auth = {
                 btnArcade.href = 'juego.html';
                 // md:hidden oculta en pantallas medianas y de escritorio (PC/mouse), visible en smartphones
                 btnArcade.className = 'flex md:hidden flex-col items-center justify-center px-1.5 sm:px-2 py-1 rounded-xl text-center hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold transition group flex-shrink-0 animate-pulse';
-                btnArcade.title = 'Arcade Frenesí 1-X-2 (Móvil)';
+                btnArcade.title = 'Maula Hero (Móvil)';
                 btnArcade.innerHTML = `
                     <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🎮</span>
-                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Arcade</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Maula Hero</span>
                 `;
 
                 const sandboxLinkV2 = navMenu.querySelector('#btn-sandbox-nav-v2');
@@ -182,8 +182,8 @@ const Auth = {
                 btnArcadeV1.style.border = '1px dashed #f59e0b';
                 btnArcadeV1.style.color = '#f59e0b';
                 btnArcadeV1.style.fontWeight = 'bold';
-                btnArcadeV1.textContent = '🎮 ARCADE';
-                btnArcadeV1.title = 'Arcade Frenesí 1-X-2 (Móvil)';
+                btnArcadeV1.textContent = '🎮 MAULA HERO';
+                btnArcadeV1.title = 'Maula Hero (Móvil)';
 
                 const sandboxV1 = document.getElementById('btn-sandbox-sidebar');
                 if (sandboxV1) {
