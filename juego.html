@@ -751,6 +751,9 @@
                     <p class="text-amber-300 text-[11px] font-bold">
                         ⚡ <strong>A partir del Nivel 3</strong>: Los elementos caen a <strong>velocidades distintas</strong> (balones acelerados con estela azul o relámpago dorada y cambios de ritmo), poniendo a prueba tus mejores reflejos. (¡La velocidad nunca bajará de la inicial!).
                     </p>
+                    <p class="text-cyan-300 text-[11px] font-bold">
+                        🌀 <strong>A partir del Nivel 5</strong>: Un <strong>5% de los balones</strong> cambia de trayectoria pasando de una pista a otra en un movimiento continuo y fluido. ¡Sigue su estela curva y la flecha luminosa anticipatoria para cazarlos en su pista de destino!
+                    </p>
                 </div>
             </div>
 
@@ -1663,8 +1666,25 @@
                         speed = Math.max(this.baseInitialSpeed, baseSpeed * mult);
                     }
 
+                    // Trayectoria con efecto / cambio de carril (Solo balones normales/oro/pleno a partir del nivel 5, exactamente 5% de probabilidad)
+                    let trajectoryShift = null;
+                    const isBallType = (type === 'normal' || type === 'gold' || type === 'pleno');
+                    if (this.level >= 5 && isBallType && Math.random() < 0.05) {
+                        const targetLane = lane === 0 ? 1 : (lane === 2 ? 1 : (Math.random() < 0.5 ? 0 : 2));
+                        trajectoryShift = {
+                            fromLane: lane,
+                            toLane: targetLane,
+                            // Transición fluida entre el 20% y el 65% de la pantalla para máxima predictibilidad
+                            startY: this.height * 0.20,
+                            endY: this.height * 0.65,
+                            arrowPulse: 0
+                        };
+                    }
+
                     const note = {
                         lane: lane,
+                        currentX: this.getLaneX(lane),
+                        trajectoryShift: trajectoryShift,
                         type: type,
                         y: -45,
                         speed: speed,
@@ -2085,6 +2105,45 @@
                         note.y += speed;
                         note.rotation += note.rotSpeed;
 
+                        // Actualización de cambio de trayectoria continuo entre pistas (Nivel 5+)
+                        if (note.trajectoryShift) {
+                            const ts = note.trajectoryShift;
+                            const fromX = this.getLaneX(ts.fromLane);
+                            const toX = this.getLaneX(ts.toLane);
+
+                            if (note.y < ts.startY) {
+                                note.currentX = fromX;
+                                note.lane = ts.fromLane;
+                            } else if (note.y >= ts.startY && note.y <= ts.endY) {
+                                // Interpolación suave S-curve (smoothstep)
+                                const rawProgress = (note.y - ts.startY) / (ts.endY - ts.startY);
+                                const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
+                                note.currentX = fromX + (toX - fromX) * progress;
+
+                                // Determina el carril activo según proximidad para hit-detection precisa
+                                note.lane = (rawProgress >= 0.5) ? ts.toLane : ts.fromLane;
+
+                                // Partículas sutiles de estela curva al girar
+                                if (Math.random() < 0.35) {
+                                    this.particles.push({
+                                        x: note.currentX,
+                                        y: note.y,
+                                        vx: (toX - fromX) * 0.015 + (Math.random() - 0.5) * 1.5,
+                                        vy: (Math.random() - 0.5) * 1.5,
+                                        radius: 2.5,
+                                        color: '#38bdf8',
+                                        alpha: 0.7,
+                                        decay: 0.05
+                                    });
+                                }
+                            } else {
+                                note.currentX = toX;
+                                note.lane = ts.toLane;
+                            }
+                        } else {
+                            note.currentX = this.getLaneX(note.lane);
+                        }
+
                         // Actualizar metamorfosis
                         if (note.type === 'morph') {
                             note.morphTimer += dt;
@@ -2095,9 +2154,9 @@
                         }
 
                         // Rastro de cometa (más intenso en elementos rápidos o con efecto)
-                        const trailChance = (note.speedTier === 'superfast' || note.type === 'emilio') ? 0.70 : (note.speedTier === 'fast' ? 0.52 : 0.35);
+                        const trailChance = (note.speedTier === 'superfast' || note.type === 'emilio' || note.trajectoryShift) ? 0.70 : (note.speedTier === 'fast' ? 0.52 : 0.35);
                         if (Math.random() < trailChance) {
-                            note.trail.push({ x: this.getLaneX(note.lane), y: note.y, alpha: 0.65 });
+                            note.trail.push({ x: note.currentX, y: note.y, alpha: 0.65 });
                         }
                         for (let t = note.trail.length - 1; t >= 0; t--) {
                             note.trail[t].alpha -= 0.04;
@@ -2473,9 +2532,45 @@
                 }
 
                 drawNotes(ctx) {
+                    // 1. Dibujar líneas guía anticipatorias para balones con cambio de trayectoria (predictibilidad)
+                    for (const note of this.notes) {
+                        if (note.hit || !note.trajectoryShift) continue;
+                        const ts = note.trajectoryShift;
+                        const fromX = this.getLaneX(ts.fromLane);
+                        const toX = this.getLaneX(ts.toLane);
+
+                        ctx.save();
+                        // Guía curva punteada en cian/ámbar suave y pulsante
+                        const pulse = 0.4 + 0.3 * Math.sin(performance.now() * 0.008);
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${pulse})`;
+                        ctx.lineWidth = 2.5;
+                        ctx.setLineDash([6, 6]);
+
+                        ctx.beginPath();
+                        ctx.moveTo(fromX, ts.startY);
+                        // Curva Bezier entre la pista de origen y la pista de destino
+                        const midY = (ts.startY + ts.endY) / 2;
+                        ctx.bezierCurveTo(fromX, midY, toX, midY, toX, ts.endY);
+                        ctx.stroke();
+
+                        // Flecha indicadora de dirección en la pista de destino
+                        const arrowY = Math.min(this.targetY - 20, ts.endY + 25);
+                        ctx.fillStyle = `rgba(56, 189, 248, ${pulse * 1.2})`;
+                        ctx.beginPath();
+                        const dir = toX > fromX ? 1 : -1;
+                        ctx.moveTo(toX + dir * 8, arrowY);
+                        ctx.lineTo(toX - dir * 6, arrowY - 6);
+                        ctx.lineTo(toX - dir * 6, arrowY + 6);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        ctx.restore();
+                    }
+
+                    // 2. Dibujar elementos
                     for (const note of this.notes) {
                         if (note.hit) continue;
-                        const x = this.getLaneX(note.lane);
+                        const x = note.currentX !== undefined ? note.currentX : this.getLaneX(note.lane);
                         const y = note.y;
 
                         // Rastro
@@ -2484,6 +2579,8 @@
                                 ctx.fillStyle = `rgba(245, 158, 11, ${tr.alpha * 0.55})`;
                             } else if (note.speedTier === 'fast') {
                                 ctx.fillStyle = `rgba(56, 189, 248, ${tr.alpha * 0.50})`;
+                            } else if (note.trajectoryShift) {
+                                ctx.fillStyle = `rgba(56, 189, 248, ${tr.alpha * 0.60})`;
                             } else {
                                 ctx.fillStyle = `rgba(255, 255, 255, ${tr.alpha * 0.35})`;
                             }
@@ -2510,6 +2607,21 @@
                             this.renderPlenoBall(ctx, note.radius);
                         } else if (note.type === 'noreduce') {
                             this.renderNoReduceItem(ctx, note.radius);
+                        }
+
+                        // Distintivo visual especial para balones con efecto de curva
+                        if (note.trajectoryShift && (note.type === 'normal' || note.type === 'gold' || note.type === 'pleno')) {
+                            ctx.save();
+                            ctx.rotate(-note.rotation); // Mantener texto derecho
+                            ctx.font = '900 11px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillStyle = '#38bdf8';
+                            ctx.shadowColor = '#0284c7';
+                            ctx.shadowBlur = 8;
+                            const shiftDir = note.trajectoryShift.toLane > note.trajectoryShift.fromLane ? '↪' : '↩';
+                            ctx.fillText(shiftDir, 0, -note.radius - 8);
+                            ctx.restore();
                         }
 
                         ctx.restore();

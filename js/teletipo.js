@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: ¡cambios de nivel con onomatopeyas cómic (¡BOOM!, ¡ZAP!, ¡POW!), podio exclusivo y velocidades variadas!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡a partir del nivel 5 los balones cambian suavemente de trayectoria entre pistas con guías anticipatorias luminosas!`,
                 url: 'juego.html'
             });
 

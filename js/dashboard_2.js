@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Nuevas onomatopeyas cómic (¡BOOM!, ¡ZAP!, ¡POW!) en cambios de nivel, podio exclusivo y velocidades variadas desde el nivel 3.`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡A partir del nivel 5 balones con cambio continuo de trayectoria entre pistas y guías anticipatorias luminosas!`,
             url: 'juego.html'
         });
 
