@@ -19,7 +19,7 @@
 
     <script>
         // Versión de compilación del cliente de Maula Hero
-        const GAME_CLIENT_VERSION = '2026.10.18.level_prog_v1';
+        const GAME_CLIENT_VERSION = '2026.10.18.level_prog_v2';
 
         // Auto-actualización automática al entrar al juego para recoger siempre los últimos cambios
         (function initAutoUpdateOnEntry() {
@@ -327,11 +327,11 @@
                     </span>
                 </div>
 
-                <!-- Temporizador de Nivel (Ciclos de 1 min) y Velocidad -->
+                <!-- Temporizador de Nivel (Rondas dinámicas de 25s o por Puntos) -->
                 <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/60 shadow text-xs">
                     <span class="text-amber-400 font-black text-xs" id="hud-level-badge">NIVEL 1</span>
                     <span class="text-slate-500">|</span>
-                    <span class="text-[11px] font-mono-bold text-slate-300" id="hud-level-timer">01:00</span>
+                    <span class="text-[11px] font-mono-bold text-slate-300" id="hud-level-timer">00:25</span>
                 </div>
 
                 <!-- Botones de Acción (Volver al Dashboard, Audio, Ranking, Pausa) -->
@@ -897,9 +897,9 @@
                     this.hitsCount = 0;
                     this.perfectCount = 0;
 
-                    // Progresión de Niveles y Curva de Velocidad Continua
+                    // Progresión de Niveles y Curva de Velocidad Continua (25s o por Puntos)
                     this.level = 1;
-                    this.levelDuration = 60; // 1 minuto (60 segundos) por nivel
+                    this.levelDuration = 25; // 25 segundos o umbral de puntuación por nivel
                     this.levelElapsed = 0;
                     this.totalPlayTime = 0;
                     this.baseInitialSpeed = 5.0;
@@ -1400,8 +1400,9 @@
                     this.doblesMissedAny = false;
                     this.stopDoblesMusic();
 
-                    // Reinicio de ciclo y progresión continua
+                    // Reinicio de ciclo y progresión continua (25s o por Puntos)
                     this.level = 1;
+                    this.levelDuration = 25;
                     this.levelElapsed = 0;
                     this.totalPlayTime = 0;
                     this.baseInitialSpeed = 5.0;
@@ -2123,7 +2124,7 @@
                         scale: 0.2,
                         targetScale: 1.0,
                         alpha: 1.0,
-                        y: this.height * 0.32,
+                        y: this.height * 0.27, // Elevado a la zona superior para no tapar los carriles ni receptores
                         vy: 0.2,
                         duration: isSpecialLong ? 2.4 : 1.8,
                         age: 0,
@@ -2131,20 +2132,36 @@
                     });
                 }
 
+                // UMBRALES DE PUNTUACIÓN POR NIVEL PARA ASCENSO POR HABILIDAD / MÉRITO
+                getLevelScoreThreshold(targetLevel) {
+                    if (targetLevel <= 1) return 0;
+                    const thresholds = {
+                        2: 7000,
+                        3: 16000,
+                        4: 28000,
+                        5: 45000,
+                        6: 65000,
+                        7: 90000
+                    };
+                    if (thresholds[targetLevel]) return thresholds[targetLevel];
+                    return 90000 + (targetLevel - 7) * 30000;
+                }
+
                 // SUBIDA DE NIVEL OFICIAL CON FANFARRIA, ONOMATOPEYA Y ACTUALIZACIÓN EN VIVO
                 triggerLevelUp() {
                     this.level++;
                     this.levelElapsed = 0;
+                    this.timeFreeze = 0.55; // Pausa dramática de 0.55s para celebrar el nivel sin notas sorpresa cayendo
                     this.playSound('level_up');
-                    this.screenShake = 18;
+                    this.screenShake = 16;
                     this.createFireworks(this.width / 2, this.height * 0.35);
                     this.createFireworks(this.width / 4, this.height * 0.45);
                     this.createFireworks(3 * this.width / 4, this.height * 0.45);
-                    this.addFloatingText(this.width / 2, this.height * 0.45, `🆙 ¡NIVEL ${this.level}!`, '#facc15');
+                    this.addFloatingText(this.width / 2, this.height * 0.42, `🆙 ¡NIVEL ${this.level}!`, '#facc15');
 
                     // Actualizar la velocidad base inmediatamente para el nuevo nivel alcanzado
-                    const timeProgression = this.totalPlayTime * 0.024;
-                    const levelProgression = (this.level - 1) * 0.65;
+                    const timeProgression = this.totalPlayTime * 0.020;
+                    const levelProgression = (this.level - 1) * 0.50;
                     this.currentBaseSpeed = Math.min(this.maxPlayableSpeed, this.baseInitialSpeed + timeProgression + levelProgression);
 
                     // Anuncio de cambio de nivel con onomatopeya cómic explosiva
@@ -2234,17 +2251,18 @@
                             this.endDoblesMode();
                         }
                     } else {
-                        // Progresión normal del Nivel y Cronómetro (1 minuto por nivel)
+                        // Progresión normal del Nivel y Cronómetro (25s o por Puntuación acumulada)
                         this.levelElapsed += dt;
                         this.totalPlayTime += dt;
 
                         // Curva de velocidad continua y perceptible que escala dinámicamente con el tiempo y el nivel
-                        const timeProgression = this.totalPlayTime * 0.024;
-                        const levelProgression = (this.level - 1) * 0.65;
+                        const timeProgression = this.totalPlayTime * 0.020;
+                        const levelProgression = (this.level - 1) * 0.50;
                         this.currentBaseSpeed = Math.min(this.maxPlayableSpeed, this.baseInitialSpeed + timeProgression + levelProgression);
 
-                        // ¿Cumplido el minuto del nivel? ¡AUMENTO DE NIVEL CON ONOMATOPEYA!
-                        if (this.levelElapsed >= this.levelDuration) {
+                        // ¿Cumplidos los 25s o alcanzado el umbral de puntos del nivel? ¡AUMENTO DE NIVEL!
+                        const nextLevelTarget = this.getLevelScoreThreshold(this.level + 1);
+                        if (this.levelElapsed >= this.levelDuration || (this.score >= nextLevelTarget && this.levelElapsed >= 2.0)) {
                             this.triggerLevelUp();
                         }
 
@@ -3516,10 +3534,15 @@
                         const elLvlBadge = document.getElementById('hud-level-badge');
                         if (elLvlBadge) elLvlBadge.textContent = `NIVEL ${this.level}`;
 
+                        const prevScore = this.getLevelScoreThreshold(this.level);
+                        const nextScore = this.getLevelScoreThreshold(this.level + 1);
+                        const scoreProgress = Math.max(0, Math.min(1, (this.score - prevScore) / Math.max(1, nextScore - prevScore)));
+                        const timeProgress = Math.max(0, Math.min(1, this.levelElapsed / this.levelDuration));
+                        const bestProgress = Math.max(timeProgress, scoreProgress);
+
                         const bar = document.getElementById('level-progress-bar');
                         if (bar) {
-                            const progress = Math.min(100, Math.max(0, (this.levelElapsed / this.levelDuration) * 100));
-                            bar.style.width = `${progress}%`;
+                            bar.style.width = `${Math.min(100, Math.max(0, Math.round(bestProgress * 100)))}%`;
                         }
                     }
 

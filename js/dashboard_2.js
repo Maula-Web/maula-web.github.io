@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Subida de nivel ajustada a 1 min por ronda con progreso y cronómetro en vivo!`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Subida de nivel ágil cada 25s o por puntos conseguidos, pausa de celebración y barra dual de progreso.`,
             url: 'juego.html'
         });
 

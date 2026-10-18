@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡subida de nivel renovada a rondas dinámicas de 1 min con cronómetro y barra de progreso en vivo!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: subida de nivel ágil cada 25s o por puntos conseguidos, pausa de celebración y barra dual de progreso.`,
                 url: 'juego.html'
             });
 
