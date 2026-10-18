@@ -43,6 +43,7 @@ const Auth = {
             this.checkPrankStatus(parsedUser);
             this.initPushIfTargetUser(parsedUser);
             this.initFernandoSandbox(parsedUser);
+            this.initArcadeMobileLink(parsedUser);
         }
     },
 
@@ -107,20 +108,6 @@ const Auth = {
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Sandbox</span>
                 `;
                 adminLinkV2.insertAdjacentElement('afterend', btnV2);
-
-                // Botón directo a Arcade Frenesí 1-X-2
-                if (!document.getElementById('btn-arcade-nav-v2')) {
-                    const btnArcade = document.createElement('a');
-                    btnArcade.id = 'btn-arcade-nav-v2';
-                    btnArcade.href = 'sandbox_juego.html';
-                    btnArcade.className = 'flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold transition group flex-shrink-0 animate-pulse';
-                    btnArcade.title = 'Arcade Frenesí 1-X-2 (Exclusivo Fernando)';
-                    btnArcade.innerHTML = `
-                        <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🎮</span>
-                        <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Arcade</span>
-                    `;
-                    btnV2.insertAdjacentElement('afterend', btnArcade);
-                }
             }
 
             // 2. En versión V1 (sidebar-menu)
@@ -141,18 +128,68 @@ const Auth = {
                 } else {
                     sidebar.appendChild(btnV1);
                 }
+            }
+        };
 
-                if (!document.getElementById('btn-arcade-sidebar')) {
-                    const btnArcadeV1 = document.createElement('a');
-                    btnArcadeV1.id = 'btn-arcade-sidebar';
-                    btnArcadeV1.href = 'sandbox_juego.html';
-                    btnArcadeV1.className = 'btn-primary';
-                    btnArcadeV1.style.border = '1px dashed #f59e0b';
-                    btnArcadeV1.style.color = '#f59e0b';
-                    btnArcadeV1.style.fontWeight = 'bold';
-                    btnArcadeV1.textContent = '🎮 ARCADE';
-                    btnArcadeV1.title = 'Arcade Frenesí 1-X-2 (Exclusivo Fernando)';
-                    btnV1.insertAdjacentElement('afterend', btnArcadeV1);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(injectLink, 80));
+        } else {
+            setTimeout(injectLink, 80);
+        }
+    },
+
+    initArcadeMobileLink(user) {
+        if (!user) return;
+        const path = (window.location.pathname || '').toLowerCase();
+        if (path.includes('juego.html')) return;
+
+        const injectLink = () => {
+            // 1. En versión V2: Inyectar botón de Arcade EXCLUSIVO para Móvil (md:hidden oculta en PC)
+            const navMenu = document.querySelector('nav div.overflow-x-auto') || 
+                            document.querySelector('a[href*="admin_2.html"]')?.parentElement ||
+                            document.querySelector('a[href*="votaciones_2.html"]')?.parentElement;
+
+            if (navMenu && !document.getElementById('btn-arcade-nav-v2')) {
+                const btnArcade = document.createElement('a');
+                btnArcade.id = 'btn-arcade-nav-v2';
+                btnArcade.href = 'juego.html';
+                // md:hidden oculta en pantallas medianas y de escritorio (PC/mouse), visible en smartphones
+                btnArcade.className = 'flex md:hidden flex-col items-center justify-center px-1.5 sm:px-2 py-1 rounded-xl text-center hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold transition group flex-shrink-0 animate-pulse';
+                btnArcade.title = 'Arcade Frenesí 1-X-2 (Móvil)';
+                btnArcade.innerHTML = `
+                    <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🎮</span>
+                    <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Arcade</span>
+                `;
+
+                const sandboxLinkV2 = navMenu.querySelector('#btn-sandbox-nav-v2');
+                const adminLinkV2 = navMenu.querySelector('a[href*="admin_2.html"]');
+                if (sandboxLinkV2) {
+                    sandboxLinkV2.insertAdjacentElement('afterend', btnArcade);
+                } else if (adminLinkV2) {
+                    adminLinkV2.insertAdjacentElement('afterend', btnArcade);
+                } else {
+                    navMenu.appendChild(btnArcade);
+                }
+            }
+
+            // 2. En versión V1 (sidebar-menu): visible solo en móvil
+            const sidebar = document.querySelector('.sidebar-menu');
+            if (sidebar && !document.getElementById('btn-arcade-sidebar')) {
+                const btnArcadeV1 = document.createElement('a');
+                btnArcadeV1.id = 'btn-arcade-sidebar';
+                btnArcadeV1.href = 'juego.html';
+                btnArcadeV1.className = 'btn-primary md:hidden';
+                btnArcadeV1.style.border = '1px dashed #f59e0b';
+                btnArcadeV1.style.color = '#f59e0b';
+                btnArcadeV1.style.fontWeight = 'bold';
+                btnArcadeV1.textContent = '🎮 ARCADE';
+                btnArcadeV1.title = 'Arcade Frenesí 1-X-2 (Móvil)';
+
+                const sandboxV1 = document.getElementById('btn-sandbox-sidebar');
+                if (sandboxV1) {
+                    sandboxV1.insertAdjacentElement('afterend', btnArcadeV1);
+                } else {
+                    sidebar.appendChild(btnArcadeV1);
                 }
             }
         };
