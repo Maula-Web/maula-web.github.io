@@ -3653,6 +3653,14 @@
                             this.highScores = initialScores;
                         }
 
+                        // Reseteo forzado de la puntuación de Fernando Lozano a 0
+                        const resetLozanoKey = 'maula_hero_reset_lozano_zero_v1';
+                        if (!localStorage.getItem(resetLozanoKey)) {
+                            this.highScores['Fernando Lozano'] = { score: 0, maxCombo: 0, maxLevel: 1, games: 0 };
+                            localStorage.setItem('maulas_arcade_records', JSON.stringify(this.highScores));
+                            localStorage.setItem(resetLozanoKey, 'true');
+                        }
+
                         try {
                             const db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
                             if (db) {
@@ -3664,6 +3672,13 @@
                                             this.highScores[socio] = cloudScores[socio];
                                         }
                                     });
+                                    // Asegurar que la puntuación de Fernando Lozano queda en 0 en el estado y en la nube
+                                    if (this.highScores['Fernando Lozano'] && this.highScores['Fernando Lozano'].score !== 0) {
+                                        this.highScores['Fernando Lozano'] = { score: 0, maxCombo: 0, maxLevel: 1, games: 0 };
+                                        db.collection('game_records').doc('maula_hero_highscores').set({
+                                            scores: { 'Fernando Lozano': { score: 0, maxCombo: 0, maxLevel: 1, games: 0 } }
+                                        }, { merge: true }).catch(() => {});
+                                    }
                                     localStorage.setItem('maulas_arcade_records', JSON.stringify(this.highScores));
                                 }
                             }
