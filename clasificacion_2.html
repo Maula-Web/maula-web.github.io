@@ -148,16 +148,27 @@
             color: #ffffff !important;
             border: 1px solid rgba(51, 65, 85, 0.8) !important;
         }
-        .light-theme .search-input-control {
+        .light-theme .search-input-control,
+        html.light-theme .search-input-control,
+        body.light-theme .search-input-control,
+        .light-theme #member-search-input,
+        .light-theme #member-search-input-mobile {
+            background-color: #ffffff !important;
             background: #ffffff !important;
             color: #0f172a !important;
-            border-color: #cbd5e1 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
         }
         .search-input-control::placeholder {
             color: #94a3b8;
         }
-        .light-theme .search-input-control::placeholder {
-            color: #64748b;
+        .light-theme .search-input-control::placeholder,
+        html.light-theme .search-input-control::placeholder,
+        body.light-theme .search-input-control::placeholder,
+        .light-theme #member-search-input::placeholder,
+        .light-theme #member-search-input-mobile::placeholder {
+            color: #64748b !important;
+            opacity: 1 !important;
         }
 
         .badge-disputadas {

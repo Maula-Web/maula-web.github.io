@@ -470,22 +470,92 @@ body.light-theme {
    ========================================================================= */
 .light-theme input,
 .light-theme select,
-.light-theme textarea {
+.light-theme textarea,
+.light-theme .search-input-control,
+.light-theme .form-control-v2,
+.light-theme #member-search-input,
+.light-theme #member-search-input-mobile,
+.light-theme #team-search-input,
+.light-theme #vote-search-input,
+.light-theme #vote-sort-select,
+.light-theme #log-search-input,
+html.light-theme input,
+html.light-theme select,
+html.light-theme textarea,
+html.light-theme .search-input-control,
+html.light-theme .form-control-v2,
+html.light-theme #member-search-input,
+html.light-theme #member-search-input-mobile,
+html.light-theme #team-search-input,
+html.light-theme #vote-search-input,
+html.light-theme #vote-sort-select,
+html.light-theme #log-search-input,
+body.light-theme input,
+body.light-theme select,
+body.light-theme textarea,
+body.light-theme .search-input-control,
+body.light-theme .form-control-v2,
+body.light-theme #member-search-input,
+body.light-theme #member-search-input-mobile,
+body.light-theme #team-search-input,
+body.light-theme #vote-search-input,
+body.light-theme #vote-sort-select,
+body.light-theme #log-search-input {
     background-color: #ffffff !important;
+    background: #ffffff !important;
     color: #0f172a !important;
-    border-color: #e8dfcf !important;
+    border: 1.5px solid #cbd5e1 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
 .light-theme input::placeholder,
-.light-theme textarea::placeholder {
-    color: #94a3b8 !important;
+.light-theme textarea::placeholder,
+.light-theme .search-input-control::placeholder,
+.light-theme .form-control-v2::placeholder,
+.light-theme #member-search-input::placeholder,
+.light-theme #member-search-input-mobile::placeholder,
+.light-theme #vote-search-input::placeholder,
+html.light-theme input::placeholder,
+html.light-theme textarea::placeholder,
+html.light-theme .search-input-control::placeholder,
+html.light-theme .form-control-v2::placeholder,
+body.light-theme input::placeholder,
+body.light-theme textarea::placeholder,
+body.light-theme .search-input-control::placeholder,
+body.light-theme .form-control-v2::placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
 }
 
 .light-theme input:focus,
 .light-theme select:focus,
-.light-theme textarea:focus {
+.light-theme textarea:focus,
+.light-theme .search-input-control:focus,
+.light-theme .form-control-v2:focus,
+html.light-theme input:focus,
+html.light-theme select:focus,
+html.light-theme textarea:focus,
+html.light-theme .search-input-control:focus,
+html.light-theme .form-control-v2:focus,
+body.light-theme input:focus,
+body.light-theme select:focus,
+body.light-theme textarea:focus,
+body.light-theme .search-input-control:focus,
+body.light-theme .form-control-v2:focus {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
     border-color: #d97706 !important;
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18) !important;
+    outline: none !important;
+}
+
+.light-theme select option,
+html.light-theme select option,
+body.light-theme select option {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
 }
 
 /* =========================================================================

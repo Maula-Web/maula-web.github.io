@@ -144,14 +144,41 @@
             border-color: #f59e0b !important;
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) !important;
         }
-        .light-theme .form-control-v2 {
+        .light-theme .form-control-v2,
+        html.light-theme .form-control-v2,
+        body.light-theme .form-control-v2,
+        .light-theme #vote-search-input,
+        .light-theme #vote-sort-select {
+            background-color: #ffffff !important;
             background: #ffffff !important;
             color: #0f172a !important;
-            border: 1px solid #cbd5e1 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
         }
-        .light-theme .form-control-v2:focus {
+        .light-theme .form-control-v2:focus,
+        html.light-theme .form-control-v2:focus,
+        body.light-theme .form-control-v2:focus,
+        .light-theme #vote-search-input:focus,
+        .light-theme #vote-sort-select:focus {
             border-color: #d97706 !important;
-            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15) !important;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18) !important;
+        }
+        .form-control-v2::placeholder {
+            color: #94a3b8;
+        }
+        .light-theme .form-control-v2::placeholder,
+        html.light-theme .form-control-v2::placeholder,
+        body.light-theme .form-control-v2::placeholder,
+        .light-theme #vote-search-input::placeholder {
+            color: #64748b !important;
+            opacity: 1 !important;
+        }
+        .light-theme select.form-control-v2 option,
+        html.light-theme select.form-control-v2 option,
+        body.light-theme select.form-control-v2 option {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
         }
 
         /* Voting Card Animations */

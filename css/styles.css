@@ -2379,19 +2379,27 @@ tbody tr:hover {
 }
 
 /* Forms in Dark Mode */
-.form-group label {
+html:not(.light-theme) .form-group label,
+body:not(.light-theme) .form-group label {
     color: #cbd5e1;
     font-weight: 600;
     font-size: 0.9rem;
 }
 
-input[type="text"]:not(#search-input):not(#form-inp-tgnick):not(#form-inp-dice-range),
-input[type="number"],
-input[type="email"],
-input[type="tel"],
-input[type="password"],
-select,
-textarea {
+html:not(.light-theme) input[type="text"]:not(#search-input):not(#form-inp-tgnick):not(#form-inp-dice-range),
+html:not(.light-theme) input[type="number"],
+html:not(.light-theme) input[type="email"],
+html:not(.light-theme) input[type="tel"],
+html:not(.light-theme) input[type="password"],
+html:not(.light-theme) select,
+html:not(.light-theme) textarea,
+body:not(.light-theme) input[type="text"]:not(#search-input):not(#form-inp-tgnick):not(#form-inp-dice-range),
+body:not(.light-theme) input[type="number"],
+body:not(.light-theme) input[type="email"],
+body:not(.light-theme) input[type="tel"],
+body:not(.light-theme) input[type="password"],
+body:not(.light-theme) select,
+body:not(.light-theme) textarea {
     background-color: #1a1a1a !important;
     border: 1px solid #3d3d3d !important;
     color: #ffffff !important;
