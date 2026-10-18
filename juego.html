@@ -355,8 +355,8 @@
     <!-- =========================================================================
          MODAL 1: CARÁTULA DE INICIO & PRESENTACIÓN (UNA SOLA PANTALLA MÓVIL SIN SCROLL)
          ========================================================================= -->
-    <div id="modal-start" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md overflow-hidden">
-        <div class="modal-glass w-full max-w-md h-full max-h-[100dvh] sm:max-h-[660px] rounded-2xl sm:rounded-3xl p-2.5 sm:p-4 text-center flex flex-col justify-between animate-scale-in overflow-hidden shadow-2xl border border-amber-500/40 select-none">
+    <div id="modal-start" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md overflow-hidden pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div class="modal-glass w-full max-w-md flex flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-2xl sm:rounded-3xl p-3 sm:p-4 text-center animate-scale-in shadow-2xl border border-amber-500/40 select-none my-auto">
             <!-- Encabezado / Logo y Título -->
             <div class="flex flex-col items-center shrink-0">
                 <div class="flex items-center justify-center gap-2">
@@ -3161,7 +3161,7 @@
                         initialScores[socio] = { score: 0, maxCombo: 0, maxLevel: 1, games: 0 };
                     });
 
-                    const resetDoneKey = 'maula_hero_reset_all_zero_v1';
+                    const resetDoneKey = 'maula_hero_reset_all_zero_v2';
                     const hasReset = localStorage.getItem(resetDoneKey);
 
                     if (!hasReset) {
@@ -3171,8 +3171,8 @@
                         localStorage.setItem(resetDoneKey, 'true');
 
                         try {
-                            if (window.firebase && window.firebase.firestore) {
-                                const db = window.firebase.firestore();
+                            const db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
+                            if (db) {
                                 await db.collection('game_records').doc('maula_hero_highscores').set({
                                     scores: initialScores,
                                     updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
@@ -3198,8 +3198,8 @@
                         }
 
                         try {
-                            if (window.firebase && window.firebase.firestore) {
-                                const db = window.firebase.firestore();
+                            const db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
+                            if (db) {
                                 const doc = await db.collection('game_records').doc('maula_hero_highscores').get();
                                 if (doc.exists) {
                                     const cloudScores = doc.data().scores || {};
@@ -3212,6 +3212,33 @@
                                 }
                             }
                         } catch (e) {}
+                    }
+                    this.updateHUD();
+                }
+
+                async resetAllScoresToZero() {
+                    const initialScores = {};
+                    DEFAULT_MEMBERS.forEach(socio => {
+                        initialScores[socio] = { score: 0, maxCombo: 0, maxLevel: 1, games: 0 };
+                    });
+                    this.highScores = initialScores;
+                    localStorage.setItem('maulas_arcade_records', JSON.stringify(this.highScores));
+                    localStorage.removeItem('maulas_arcade_frenesi_records');
+                    localStorage.setItem('maula_hero_reset_all_zero_v2', 'true');
+                    try {
+                        const db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
+                        if (db) {
+                            await db.collection('game_records').doc('maula_hero_highscores').set({
+                                scores: initialScores,
+                                updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            await db.collection('game_records').doc('frenesi_highscores').set({
+                                scores: initialScores,
+                                updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    } catch (e) {
+                        console.warn(e);
                     }
                     this.updateHUD();
                 }
@@ -3332,6 +3359,7 @@
 
             window.addEventListener('DOMContentLoaded', () => {
                 window.MaulaHero = window.ArcadeFrenesi = new FrenesiEngine();
+                window.resetAllScores = () => window.MaulaHero.resetAllScoresToZero();
             });
 
         })();
