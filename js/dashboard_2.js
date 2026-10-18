@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Velocidad inicial aumentada y aceleración continua en vivo para un mayor reto arcade!`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Subida de nivel ajustada a 1 min por ronda con progreso y cronómetro en vivo!`,
             url: 'juego.html'
         });
 
