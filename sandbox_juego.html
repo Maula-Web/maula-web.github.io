@@ -12,10 +12,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Tipografías de alta gama -->
+    <!-- Tipografías de alta gama e impacto cómic -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS v3 -->
     <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
@@ -28,12 +28,12 @@
 
     <style>
         :root {
-            --color-bg: #050811;
+            --color-bg: #040711;
             --lane-1-color: #00d2ff;
             --lane-x-color: #10b981;
             --lane-2-color: #ff3366;
             --gold-color: #f59e0b;
-            --trap-color: #a855f7;
+            --trap-color: #ef4444;
         }
 
         * {
@@ -58,6 +58,10 @@
             justify-content: space-between;
         }
 
+        .font-comic {
+            font-family: 'Bangers', cursive, sans-serif;
+            letter-spacing: 0.05em;
+        }
         .font-game {
             font-family: 'Outfit', sans-serif;
         }
@@ -75,14 +79,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at 50% 30%, rgba(30, 41, 59, 0.4) 0%, rgba(5, 8, 17, 0.95) 75%);
+            background: radial-gradient(circle at 50% 20%, rgba(15, 23, 42, 0.6) 0%, rgba(4, 7, 17, 0.98) 85%);
         }
 
         canvas#game-canvas {
             display: block;
             width: 100%;
             height: 100%;
-            max-width: 520px;
+            max-width: 540px;
             image-rendering: auto;
             position: absolute;
             top: 0;
@@ -98,7 +102,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            max-width: 520px;
+            max-width: 540px;
             z-index: 20;
             pointer-events: none;
         }
@@ -113,19 +117,19 @@
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            max-width: 520px;
+            max-width: 540px;
             z-index: 25;
-            padding: 0.75rem 1rem 1.25rem;
+            padding: 0.5rem 0.85rem 1rem;
             display: flex;
-            gap: 0.75rem;
+            gap: 0.65rem;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(to top, rgba(5, 8, 17, 0.95) 0%, rgba(5, 8, 17, 0.75) 65%, transparent 100%);
+            background: linear-gradient(to top, rgba(4, 7, 17, 0.96) 0%, rgba(4, 7, 17, 0.8) 70%, transparent 100%);
         }
 
         .btn-pad {
             flex: 1;
-            height: 72px;
+            height: 74px;
             border-radius: 1.25rem;
             display: flex;
             flex-direction: column;
@@ -140,7 +144,7 @@
             -webkit-backdrop-filter: blur(8px);
         }
         .btn-pad:active, .btn-pad.is-pressed {
-            transform: scale(0.93) translateY(3px);
+            transform: scale(0.92) translateY(3px);
             filter: brightness(1.35);
         }
 
@@ -151,7 +155,7 @@
             box-shadow: 0 4px 15px rgba(0, 210, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
         .btn-pad-1:active, .btn-pad-1.is-pressed {
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.8), inset 0 0 10px rgba(0, 210, 255, 0.6);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.85), inset 0 0 10px rgba(0, 210, 255, 0.6);
         }
 
         .btn-pad-x {
@@ -160,7 +164,7 @@
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
         .btn-pad-x:active, .btn-pad-x.is-pressed {
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.8), inset 0 0 10px rgba(16, 185, 129, 0.6);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.85), inset 0 0 10px rgba(16, 185, 129, 0.6);
         }
 
         .btn-pad-2 {
@@ -169,16 +173,16 @@
             box-shadow: 0 4px 15px rgba(255, 51, 102, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
         .btn-pad-2:active, .btn-pad-2.is-pressed {
-            box-shadow: 0 0 25px rgba(255, 51, 102, 0.8), inset 0 0 10px rgba(255, 51, 102, 0.6);
+            box-shadow: 0 0 25px rgba(255, 51, 102, 0.85), inset 0 0 10px rgba(255, 51, 102, 0.6);
         }
 
         /* Modales estilizados */
         .modal-glass {
-            background: rgba(11, 15, 26, 0.94);
+            background: rgba(11, 15, 26, 0.95);
             border: 1px solid rgba(245, 158, 11, 0.35);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(245, 158, 11, 0.2);
         }
 
         /* Resplandor del modo fiebre */
@@ -190,93 +194,107 @@
             100% { box-shadow: inset 0 0 45px rgba(245, 158, 11, 0.6), 0 0 35px rgba(245, 158, 11, 0.4); }
         }
 
+        /* Chips de buff temporales */
+        .buff-chip {
+            animation: bounceIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* Scroll personalizado */
         .custom-scroll::-webkit-scrollbar { width: 5px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
         .custom-scroll::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-[#050811] text-slate-100 flex flex-col justify-between h-screen w-screen overflow-hidden">
+<body class="bg-[#040711] text-slate-100 flex flex-col justify-between h-screen w-screen overflow-hidden">
 
     <!-- CONTENEDOR PRINCIPAL DEL JUEGO -->
     <div id="game-wrapper" class="relative w-full h-full">
 
         <!-- =====================================================================
-             HUD SUPERIOR (Puntuación, Combo, Vidas, Socio)
+             HUD SUPERIOR (Puntuación, Nivel, Cronómetro 2 min, Combo, Vidas, Buffs)
              ===================================================================== -->
-        <header class="hud-overlay p-3 sm:p-4 flex flex-col gap-2">
-            <!-- Barra Superior: Info Peñista + Controles -->
-            <div class="flex items-center justify-between gap-2">
+        <header class="hud-overlay p-2.5 sm:p-3.5 flex flex-col gap-1.5">
+            <!-- Barra Superior: Info Peñista + Nivel & Temporizador + Controles -->
+            <div class="flex items-center justify-between gap-1.5">
                 <!-- Selector / Badge de Socio -->
                 <button type="button" id="btn-open-socio-picker" onclick="window.ArcadeFrenesi.showSocioModal()" 
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-amber-500/30 text-xs font-bold transition shadow-lg">
-                    <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center font-black text-xs shadow" id="socio-avatar">
+                        class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/85 hover:bg-slate-800 border border-amber-500/30 text-xs font-bold transition shadow-lg shrink-0">
+                    <span class="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center font-black text-[10px] shadow" id="socio-avatar">
                         👑
                     </span>
-                    <span id="socio-display-name" class="text-amber-300 font-extrabold max-w-[120px] truncate">
+                    <span id="socio-display-name" class="text-amber-300 font-extrabold max-w-[100px] truncate text-[11px] sm:text-xs">
                         Socio Maula
                     </span>
-                    <span class="text-[10px] text-slate-400">▼</span>
+                    <span class="text-[9px] text-slate-400">▼</span>
                 </button>
 
-                <!-- Estado del Bote / Récord Máximo Personal -->
-                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-mono-bold text-amber-400">
-                    <span class="text-xs">🏆</span>
-                    <span class="text-[10px] text-slate-400">RÉCORD:</span>
-                    <span id="hud-high-score">0</span>
+                <!-- Temporizador de Nivel (Ciclos de 2 min) y Velocidad -->
+                <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/60 shadow text-xs">
+                    <span class="text-amber-400 font-black text-xs" id="hud-level-badge">NIVEL 1</span>
+                    <span class="text-slate-500">|</span>
+                    <span class="text-[11px] font-mono-bold text-slate-300" id="hud-level-timer">02:00</span>
                 </div>
 
                 <!-- Botones de Acción (Pausa, Ranking, Audio) -->
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1 shrink-0">
                     <button type="button" id="btn-toggle-sound" onclick="window.ArcadeFrenesi.toggleSound()" 
-                            class="w-8 h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
+                            class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
                         <span id="sound-icon">🔊</span>
                     </button>
                     <button type="button" id="btn-open-ranking" onclick="window.ArcadeFrenesi.showRankingModal()" 
-                            class="w-8 h-8 rounded-xl bg-slate-900/80 border border-amber-500/50 hover:bg-amber-500/20 flex items-center justify-center text-xs transition" title="Ver Ranking de la Peña">
-                        <span>📊</span>
+                            class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900/80 border border-amber-500/50 hover:bg-amber-500/20 flex items-center justify-center text-xs transition" title="Ver Ranking de la Peña">
+                        <span>🏆</span>
                     </button>
                     <button type="button" id="btn-pause-game" onclick="window.ArcadeFrenesi.togglePause()" 
-                            class="w-8 h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
+                            class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
                         <span id="pause-icon">⏸️</span>
                     </button>
                 </div>
             </div>
 
             <!-- Panel de Marcador Central: Puntos, Combo & Vidas -->
-            <div class="flex items-center justify-between px-3 py-2 rounded-2xl bg-slate-950/70 border border-slate-800 backdrop-blur-md shadow-xl">
+            <div class="flex items-center justify-between px-3 py-1.5 rounded-2xl bg-slate-950/75 border border-slate-800 backdrop-blur-md shadow-xl">
                 <!-- Score Actual -->
                 <div class="flex flex-col">
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">PUNTOS</span>
-                    <span id="hud-score" class="font-mono-bold text-2xl sm:text-3xl font-black text-white leading-none tracking-tight">
+                    <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400">PUNTOS</span>
+                    <span id="hud-score" class="font-mono-bold text-xl sm:text-2xl font-black text-white leading-none tracking-tight">
                         0
                     </span>
                 </div>
 
                 <!-- Multiplicador & Combo -->
                 <div class="flex flex-col items-center">
-                    <span id="hud-multiplier" class="font-game text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase">
+                    <span id="hud-multiplier" class="font-game text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase">
                         x1 MULTI
                     </span>
-                    <span id="hud-combo" class="text-xs font-extrabold text-amber-400 font-mono-bold mt-0.5">
+                    <span id="hud-combo" class="text-[11px] font-extrabold text-amber-400 font-mono-bold mt-0.5">
                         0 COMBO
                     </span>
                 </div>
 
                 <!-- Vidas / Balones restantes -->
                 <div class="flex flex-col items-end">
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">VIDAS</span>
-                    <div id="hud-lives" class="flex items-center gap-1 mt-0.5">
-                        <span class="text-base text-emerald-400">⚽</span>
-                        <span class="text-base text-emerald-400">⚽</span>
-                        <span class="text-base text-emerald-400">⚽</span>
+                    <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400">VIDAS</span>
+                    <div id="hud-lives" class="flex items-center gap-0.5 mt-0.5">
+                        <span class="text-sm text-emerald-400">⚽</span>
+                        <span class="text-sm text-emerald-400">⚽</span>
+                        <span class="text-sm text-emerald-400">⚽</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Barra de Fiebre / Modo Pleno al 15 -->
+            <!-- Chips de Power-ups Activos (Estatutos, Rana, Polo, Emilio Slo-mo) -->
+            <div id="hud-active-buffs" class="flex items-center gap-1.5 flex-wrap min-h-[22px]">
+                <!-- Inyectado dinámicamente -->
+            </div>
+
+            <!-- Barra de Progreso del Nivel (2 minutos) -->
             <div class="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden border border-slate-800">
-                <div id="fever-progress-bar" class="h-full bg-gradient-to-r from-amber-500 via-emerald-400 to-amber-300 w-0 transition-all duration-150"></div>
+                <div id="level-progress-bar" class="h-full bg-gradient-to-r from-cyan-500 via-amber-400 to-rose-500 w-0 transition-all duration-200"></div>
             </div>
         </header>
 
@@ -286,61 +304,73 @@
         <canvas id="game-canvas"></canvas>
 
         <!-- =====================================================================
-             CONTROLES TÁCTILES INFERIORES (Móvil & PC Feedback)
+             CONTROLES TÁCTILES INFERIORES (Móvil & PC Feedback con Soporte de Deslizar)
              ===================================================================== -->
         <footer class="controls-overlay">
             <!-- Botón Carril 1 -->
-            <button type="button" id="btn-input-1" 
-                    onpointerdown="window.ArcadeFrenesi.handleInput(0)" 
-                    class="btn-pad btn-pad-1">
-                <span class="font-game text-2xl sm:text-3xl font-black text-cyan-300 leading-none">1</span>
-                <span class="text-[10px] font-bold text-cyan-200/80 tracking-wider">LOCAL</span>
-                <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-cyan-400/60 hidden sm:inline">[A]</span>
-            </button>
+            <div class="flex-1 flex flex-col items-center relative">
+                <div class="text-[9px] font-bold text-cyan-300/80 uppercase tracking-wider mb-0.5 flex items-center gap-0.5">
+                    <span>⬆️ Desliza</span>
+                </div>
+                <button type="button" id="btn-input-1" 
+                        class="btn-pad btn-pad-1 w-full">
+                    <span class="font-game text-2xl sm:text-3xl font-black text-cyan-300 leading-none">1</span>
+                    <span class="text-[9px] font-bold text-cyan-200/80 tracking-wider">LOCAL</span>
+                    <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-cyan-400/60 hidden sm:inline">[A / ↑]</span>
+                </button>
+            </div>
 
             <!-- Botón Carril X -->
-            <button type="button" id="btn-input-x" 
-                    onpointerdown="window.ArcadeFrenesi.handleInput(1)" 
-                    class="btn-pad btn-pad-x">
-                <span class="font-game text-2xl sm:text-3xl font-black text-emerald-300 leading-none">X</span>
-                <span class="text-[10px] font-bold text-emerald-200/80 tracking-wider">EMPATE</span>
-                <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-emerald-400/60 hidden sm:inline">[S]</span>
-            </button>
+            <div class="flex-1 flex flex-col items-center relative">
+                <div class="text-[9px] font-bold text-emerald-300/80 uppercase tracking-wider mb-0.5 flex items-center gap-0.5">
+                    <span>⬆️ Desliza</span>
+                </div>
+                <button type="button" id="btn-input-x" 
+                        class="btn-pad btn-pad-x w-full">
+                    <span class="font-game text-2xl sm:text-3xl font-black text-emerald-300 leading-none">X</span>
+                    <span class="text-[9px] font-bold text-emerald-200/80 tracking-wider">EMPATE</span>
+                    <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-emerald-400/60 hidden sm:inline">[S / W]</span>
+                </button>
+            </div>
 
             <!-- Botón Carril 2 -->
-            <button type="button" id="btn-input-2" 
-                    onpointerdown="window.ArcadeFrenesi.handleInput(2)" 
-                    class="btn-pad btn-pad-2">
-                <span class="font-game text-2xl sm:text-3xl font-black text-rose-300 leading-none">2</span>
-                <span class="text-[10px] font-bold text-rose-200/80 tracking-wider">VISITANTE</span>
-                <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-rose-400/60 hidden sm:inline">[D]</span>
-            </button>
+            <div class="flex-1 flex flex-col items-center relative">
+                <div class="text-[9px] font-bold text-rose-300/80 uppercase tracking-wider mb-0.5 flex items-center gap-0.5">
+                    <span>⬆️ Desliza</span>
+                </div>
+                <button type="button" id="btn-input-2" 
+                        class="btn-pad btn-pad-2 w-full">
+                    <span class="font-game text-2xl sm:text-3xl font-black text-rose-300 leading-none">2</span>
+                    <span class="text-[9px] font-bold text-rose-200/80 tracking-wider">VISITANTE</span>
+                    <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-rose-400/60 hidden sm:inline">[D / ↑]</span>
+                </button>
+            </div>
         </footer>
 
     </div>
 
     <!-- =========================================================================
-         MODAL 1: PANTALLA DE INICIO / PRESENTACIÓN
+         MODAL 1: PANTALLA DE INICIO / PRESENTACIÓN & INSTRUCCIONES
          ========================================================================= -->
-    <div id="modal-start" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <div class="modal-glass w-full max-w-md rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center gap-4 animate-scale-in">
+    <div id="modal-start" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md">
+        <div class="modal-glass w-full max-w-md rounded-3xl p-5 sm:p-7 text-center flex flex-col items-center gap-3.5 animate-scale-in max-h-[94vh] overflow-y-auto custom-scroll">
             <!-- Corona / Logo Arcade -->
-            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-4xl shadow-2xl border-2 border-amber-300/60">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-3xl shadow-2xl border-2 border-amber-300/60">
                 ⚽
             </div>
 
             <div>
-                <span class="text-xs font-black uppercase tracking-widest text-amber-400">PEÑA MAULAS ARCADE</span>
-                <h1 class="text-3xl sm:text-4xl font-game font-black text-white tracking-tight mt-1">
-                    FRENESÍ 1-X-2
+                <span class="text-[11px] font-black uppercase tracking-widest text-amber-400">PEÑA MAULAS ARCADE</span>
+                <h1 class="text-3xl sm:text-4xl font-comic text-white tracking-wide mt-0.5">
+                    ¡FRENESÍ 1-X-2!
                 </h1>
-                <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-                    Acierta los signos al cruzar la línea de gol. ¡Esquiva las trampas y desata la Casilla Oro!
+                <p class="text-xs text-slate-400 mt-0.5 max-w-xs mx-auto">
+                    La velocidad aumenta durante 2 minutos hasta subir de nivel. ¡Acierta y devuelve balones de lava!
                 </p>
             </div>
 
             <!-- Selector de Socio que Juega -->
-            <div class="w-full bg-slate-900/90 rounded-2xl p-3 border border-slate-800 text-left">
+            <div class="w-full bg-slate-900/90 rounded-2xl p-2.5 border border-slate-800 text-left">
                 <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
                     ¿Quién va a jugar? (Guardará tu récord):
                 </label>
@@ -349,22 +379,38 @@
                 </select>
             </div>
 
-            <!-- Leyenda de Fichas -->
-            <div class="grid grid-cols-3 gap-2 w-full text-[11px] font-bold">
-                <div class="p-2 rounded-xl bg-slate-900/60 border border-cyan-500/30 text-cyan-300 flex flex-col items-center">
-                    <span class="text-base">⚽</span>
-                    <span>1 - X - 2</span>
-                    <span class="text-[9px] text-slate-400 font-normal">Aciértalos</span>
+            <!-- Guía Ilustrada de Elementos de Juego -->
+            <div class="grid grid-cols-2 gap-2 w-full text-[11px] font-bold text-left">
+                <div class="p-2 rounded-xl bg-slate-900/70 border border-rose-500/40 text-rose-300 flex items-center gap-2">
+                    <span class="text-xl">🌋</span>
+                    <div>
+                        <span class="block text-white font-extrabold">Balón de Lava</span>
+                        <span class="text-[9px] text-rose-400 font-normal">¡Desliza arriba ⬆️ para devolverlo! Tocar = 💥</span>
+                    </div>
                 </div>
-                <div class="p-2 rounded-xl bg-slate-900/60 border border-amber-500/40 text-amber-300 flex flex-col items-center">
-                    <span class="text-base">🏆</span>
-                    <span>Casilla Oro</span>
-                    <span class="text-[9px] text-slate-400 font-normal">x2 Puntos</span>
+
+                <div class="p-2 rounded-xl bg-slate-900/70 border border-amber-500/40 text-amber-300 flex items-center gap-2">
+                    <span class="text-xl">📖🐸👕</span>
+                    <div>
+                        <span class="block text-white font-extrabold">El Metamórfico</span>
+                        <span class="text-[9px] text-slate-300 font-normal">Cambia: Estatutos (x2 lluvia), Rana (÷2 pts) o Polo (x2 pts)</span>
+                    </div>
                 </div>
-                <div class="p-2 rounded-xl bg-slate-900/60 border border-rose-500/30 text-rose-300 flex flex-col items-center">
-                    <span class="text-base">💣</span>
-                    <span>Casilla Trampa</span>
-                    <span class="text-[9px] text-slate-400 font-normal">¡NO tocar!</span>
+
+                <div class="p-2 rounded-xl bg-slate-900/70 border border-yellow-500/40 text-yellow-300 flex items-center gap-2">
+                    <span class="text-xl">🥾</span>
+                    <div>
+                        <span class="block text-white font-extrabold">Echar a Emilio</span>
+                        <span class="text-[9px] text-amber-400 font-normal">¡Ultrarrápido! Explota todo x2 pts y activa cámara lenta</span>
+                    </div>
+                </div>
+
+                <div class="p-2 rounded-xl bg-slate-900/70 border border-amber-400/40 text-amber-300 flex items-center gap-2">
+                    <span class="text-xl">👑</span>
+                    <div>
+                        <span class="block text-white font-extrabold">Casilla Oro</span>
+                        <span class="text-[9px] text-amber-200 font-normal">Tío Gilito: Puntos x2.5 y lluvia de monedas</span>
+                    </div>
                 </div>
             </div>
 
@@ -381,8 +427,8 @@
 
             <!-- Botón Jugar -->
             <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
-                    class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-game font-black text-lg tracking-wide hover:brightness-110 shadow-xl shadow-amber-500/25 transition transform active:scale-95">
-                ¡EMPEZAR PARTIDA! 🚀
+                    class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-2xl tracking-wide hover:brightness-110 shadow-xl shadow-amber-500/25 transition transform active:scale-95">
+                ¡SALTAR AL CÉSPED! 🚀
             </button>
         </div>
     </div>
@@ -398,7 +444,7 @@
 
             <div>
                 <span class="text-xs font-black uppercase tracking-widest text-slate-400">FIN DEL PARTIDO</span>
-                <h2 class="text-3xl font-game font-black text-white mt-1">¡PITIDO FINAL!</h2>
+                <h2 class="text-4xl font-comic text-white mt-0.5">¡PITIDO FINAL!</h2>
                 <p id="gameover-subtitle" class="text-xs text-amber-400 font-bold mt-0.5">¡Gran partido de la jornada!</p>
             </div>
 
@@ -413,8 +459,8 @@
                     <span id="final-combo" class="font-mono-bold text-2xl font-black text-amber-400">0</span>
                 </div>
                 <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Aciertos / Perfectos</span>
-                    <span id="final-hits" class="font-mono-bold text-lg font-black text-emerald-400">0</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Nivel Alcanzado</span>
+                    <span id="final-level" class="font-mono-bold text-lg font-black text-emerald-400">Nivel 1</span>
                 </div>
                 <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
                     <span class="text-[10px] font-bold text-slate-400 uppercase block">Récord de <span id="final-socio-name">Socio</span></span>
@@ -425,8 +471,8 @@
             <!-- Botones de Acción Post-Partida -->
             <div class="flex items-center gap-2 w-full mt-2">
                 <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
-                        class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-game font-black text-base shadow-lg hover:brightness-110 active:scale-95 transition">
-                    🔄 REINTENTAR
+                        class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-comic text-xl shadow-lg hover:brightness-110 active:scale-95 transition">
+                    🔄 OTRA JORNADA
                 </button>
                 <button type="button" onclick="window.ArcadeFrenesi.showRankingModal()" 
                         class="px-4 py-3 rounded-xl bg-slate-900 border border-amber-500/40 text-amber-300 font-bold text-sm hover:bg-slate-800 transition">
@@ -445,8 +491,8 @@
                 <div class="flex items-center gap-2 text-left">
                     <span class="text-2xl">🏆</span>
                     <div>
-                        <h3 class="font-game font-black text-lg text-white">TABLA DE HONOR ARCADE</h3>
-                        <p class="text-[11px] text-slate-400">Puntuaciones máximas de los socios de la Peña</p>
+                        <h3 class="font-comic text-2xl text-white">TABLA DE HONOR ARCADE</h3>
+                        <p class="text-[11px] text-slate-400">Puntuaciones máximas oficiales de la Peña Maulas</p>
                     </div>
                 </div>
                 <button type="button" onclick="window.ArcadeFrenesi.closeRankingModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
@@ -456,7 +502,6 @@
 
             <!-- Lista de Récords con Scroll -->
             <div id="ranking-list-container" class="overflow-y-auto custom-scroll space-y-1.5 pr-1 max-h-[55vh] text-left">
-                <!-- Inyectado por JS -->
                 <div class="p-8 text-center text-slate-400 text-xs">Cargando clasificación...</div>
             </div>
 
@@ -475,7 +520,7 @@
     <!-- MOTOR DEL JUEGO ARCADE -->
     <script>
         /**
-         * ARCADE FRENESÍ 1-X-2 - Motor de Juego de Habilidad
+         * ARCADE FRENESÍ 1-X-2 (Versión 2.0 Avanzada)
          * Peña Maulas Official Sandbox Game
          */
         (function () {
@@ -488,7 +533,6 @@
                 "Rafa", "Ramón", "Raúl Romera", "Samuel"
             ];
 
-            // Colores temáticos por carril
             const LANE_COLORS = [
                 { hex: '#00d2ff', rgb: [0, 210, 255], label: '1' },
                 { hex: '#10b981', rgb: [16, 185, 129], label: 'X' },
@@ -516,33 +560,53 @@
                     this.lives = 3;
                     this.hitsCount = 0;
                     this.perfectCount = 0;
+
+                    // Progresión de Niveles (Ciclos de 120s / 2 minutos)
                     this.level = 1;
-                    
-                    // Notas y Partículas
+                    this.levelDuration = 120; // 2 minutos en segundos
+                    this.levelElapsed = 0;
+                    this.baseInitialSpeed = 3.6;
+                    this.currentBaseSpeed = 3.6;
+
+                    // Buffs y Modificadores de Estado
+                    this.buffs = {
+                        doubleSpawnTime: 0,   // Estatutos (3s de lluvia x2)
+                        frogPenaltyTime: 0,   // Rana (10s de puntos / 2)
+                        poloBonusTime: 0,     // Polo negro cuello blanco (10s de puntos x2)
+                        emilioSlowMoTime: 0   // Echar a Emilio (10s de velocidad reducida a la mitad)
+                    };
+                    this.timeFreeze = 0; // Detención momentánea al cazar a Emilio
+
+                    // Notas, Partículas, Textos y Carteles Cómic
                     this.notes = [];
                     this.particles = [];
                     this.floatingTexts = [];
+                    this.comicBanners = [];
+                    this.deflectedBalls = []; // Balones de lava disparados hacia arriba
                     this.lastSpawnTime = 0;
-                    this.spawnInterval = 1200; // ms
-                    this.baseSpeed = 3.8; // px per tick
                     this.screenShake = 0;
+
+                    // Gradas animadas de fondo
+                    this.crowdFlags = [];
+                    this.searchlights = [];
 
                     // Dimensiones y Layout
                     this.width = 400;
                     this.height = 700;
-                    this.targetY = 0; // Línea de impacto
+                    this.targetY = 0;
                     this.hitRadius = 38;
+
+                    // Control de gestos (Swipe Up)
+                    this.touchState = {};
 
                     // Socio actual y récords
                     this.currentSocio = localStorage.getItem('maulas_arcade_current_socio') || 'Fernando Lozano';
                     this.highScores = {};
 
-                    // Teclas presionadas
-                    this.activeKeys = {};
-
                     this.initCanvas();
+                    this.initCrowd();
                     this.initAudio();
-                    this.initEvents();
+                    this.initControls();
                     this.loadHighScores();
                     this.populateSocioDropdown();
                     this.updateHUD();
@@ -551,7 +615,7 @@
                 initCanvas() {
                     const resize = () => {
                         const wrapper = document.getElementById('game-wrapper');
-                        const w = Math.min(wrapper.clientWidth, 520);
+                        const w = Math.min(wrapper.clientWidth, 540);
                         const h = wrapper.clientHeight;
                         const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -561,21 +625,42 @@
                         this.canvas.height = h * dpr;
                         this.ctx.scale(dpr, dpr);
 
-                        // La línea de impacto se sitúa a 115px del fondo (justo sobre los botones)
-                        this.targetY = this.height - 110;
+                        // La línea de impacto se ubica sobre los botones
+                        this.targetY = this.height - 118;
                     };
                     window.addEventListener('resize', resize);
                     resize();
                 }
 
+                initCrowd() {
+                    // Inicializar banderas y aficionados en las gradas laterales
+                    this.crowdFlags = [];
+                    const flagColors = ['#00d2ff', '#10b981', '#ff3366', '#f59e0b', '#ffffff'];
+                    for (let side = 0; side < 2; side++) {
+                        for (let i = 0; i < 16; i++) {
+                            this.crowdFlags.push({
+                                side: side, // 0: Izquierda, 1: Derecha
+                                y: 50 + i * 36,
+                                color: flagColors[i % flagColors.length],
+                                phase: Math.random() * Math.PI * 2,
+                                speed: 2.5 + Math.random() * 2,
+                                size: 10 + Math.random() * 8
+                            });
+                        }
+                    }
+
+                    // Focos de estadio
+                    this.searchlights = [
+                        { x: 30, angle: -0.3, speed: 0.008, color: 'rgba(0, 210, 255, 0.08)' },
+                        { x: this.width - 30, angle: 0.3, speed: -0.007, color: 'rgba(245, 158, 11, 0.08)' }
+                    ];
+                }
+
                 initAudio() {
-                    // Inicializar Web Audio API con primer gesto de usuario
                     const unlockAudio = () => {
                         if (!this.audioCtx) {
                             const AudioContext = window.AudioContext || window.webkitAudioContext;
-                            if (AudioContext) {
-                                this.audioCtx = new AudioContext();
-                            }
+                            if (AudioContext) this.audioCtx = new AudioContext();
                         }
                         if (this.audioCtx && this.audioCtx.state === 'suspended') {
                             this.audioCtx.resume();
@@ -584,7 +669,16 @@
                     window.addEventListener('pointerdown', unlockAudio, { once: true });
                     window.addEventListener('keydown', unlockAudio, { once: true });
 
-                    // Selector de archivo MP3 opcional
+                    // Cargar por defecto la música oficial de la Peña: Gol Rápido
+                    try {
+                        this.bgMusicPlayer.src = 'audio/gol_rapido.mp3';
+                        this.hasCustomMusic = true;
+                        const musicLabel = document.getElementById('music-status-label');
+                        if (musicLabel) musicLabel.textContent = '🎵 Gol Rápido (Oficial)';
+                    } catch (e) {
+                        console.warn("Música por defecto:", e);
+                    }
+
                     const fileInput = document.getElementById('mp3-file-input');
                     if (fileInput) {
                         fileInput.addEventListener('change', (e) => {
@@ -610,22 +704,21 @@
 
                         if (type === 'hit_perfect') {
                             osc.type = 'triangle';
-                            osc.frequency.setValueAtTime(523.25, now); // C5
-                            osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.12); // C6
+                            osc.frequency.setValueAtTime(523.25, now);
+                            osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.12);
                             gain.gain.setValueAtTime(0.25, now);
                             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
                             osc.start(now);
                             osc.stop(now + 0.15);
                         } else if (type === 'hit_good') {
                             osc.type = 'sine';
-                            osc.frequency.setValueAtTime(440, now); // A4
-                            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                            osc.frequency.setValueAtTime(440, now);
+                            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1);
                             gain.gain.setValueAtTime(0.2, now);
                             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
                             osc.start(now);
                             osc.stop(now + 0.12);
                         } else if (type === 'hit_gold') {
-                            // Arpegio celestial Tío Gilito
                             [880, 1108.73, 1318.51, 1760].forEach((freq, i) => {
                                 const o = this.audioCtx.createOscillator();
                                 const g = this.audioCtx.createGain();
@@ -638,43 +731,88 @@
                                 o.start(now + i * 0.04);
                                 o.stop(now + i * 0.04 + 0.25);
                             });
-                        } else if (type === 'hit_trap' || type === 'miss') {
-                            // Ruido / explosión
+                        } else if (type === 'swipe_deflect') {
+                            // Devolución ZASCA de lava (Sweep ascendente metálico)
                             osc.type = 'sawtooth';
-                            osc.frequency.setValueAtTime(120, now);
-                            osc.frequency.linearRampToValueAtTime(40, now + 0.25);
-                            gain.gain.setValueAtTime(0.3, now);
-                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                            osc.start(now);
-                            osc.stop(now + 0.25);
-                        } else if (type === 'whistle') {
-                            // Silbato de árbitro
-                            osc.type = 'sine';
-                            osc.frequency.setValueAtTime(2200, now);
-                            osc.frequency.setValueAtTime(2400, now + 0.08);
-                            gain.gain.setValueAtTime(0.25, now);
-                            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                            osc.frequency.setValueAtTime(220, now);
+                            osc.frequency.exponentialRampToValueAtTime(1320, now + 0.25);
+                            gain.gain.setValueAtTime(0.35, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
                             osc.start(now);
                             osc.stop(now + 0.3);
+                        } else if (type === 'hit_trap' || type === 'miss') {
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(140, now);
+                            osc.frequency.linearRampToValueAtTime(30, now + 0.28);
+                            gain.gain.setValueAtTime(0.35, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                            osc.start(now);
+                            osc.stop(now + 0.28);
+                        } else if (type === 'emilio') {
+                            // Alarma / ovación de Echar a Emilio
+                            [587.33, 880, 1174.66, 1760].forEach((f, idx) => {
+                                const o = this.audioCtx.createOscillator();
+                                const g = this.audioCtx.createGain();
+                                o.connect(g);
+                                g.connect(this.audioCtx.destination);
+                                o.type = 'square';
+                                o.frequency.setValueAtTime(f, now + idx * 0.08);
+                                g.gain.setValueAtTime(0.22, now + idx * 0.08);
+                                g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+                                o.start(now + idx * 0.08);
+                                o.stop(now + idx * 0.08 + 0.35);
+                            });
+                        } else if (type === 'frog') {
+                            // Croac cómico
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(180, now);
+                            osc.frequency.setValueAtTime(120, now + 0.08);
+                            osc.frequency.setValueAtTime(90, now + 0.16);
+                            gain.gain.setValueAtTime(0.25, now);
+                            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                            osc.start(now);
+                            osc.stop(now + 0.25);
+                        } else if (type === 'level_up') {
+                            // Fanfarria subida de nivel
+                            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                                const o = this.audioCtx.createOscillator();
+                                const g = this.audioCtx.createGain();
+                                o.connect(g);
+                                g.connect(this.audioCtx.destination);
+                                o.type = 'triangle';
+                                o.frequency.setValueAtTime(freq, now + i * 0.07);
+                                g.gain.setValueAtTime(0.28, now + i * 0.07);
+                                g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.4);
+                                o.start(now + i * 0.07);
+                                o.stop(now + i * 0.07 + 0.4);
+                            });
                         }
                     } catch (e) {
                         console.warn("Audio error:", e);
                     }
                 }
 
-                initEvents() {
-                    // Controles por Teclado
+                initControls() {
+                    // 1. Teclado PC (A/S/D o 1/X/2 para pulsar normal; Flecha Arriba o W para SWIPE UP)
                     window.addEventListener('keydown', (e) => {
                         if (e.repeat) return;
                         const key = e.key.toLowerCase();
+                        
+                        // Deflexión de lava hacia arriba con flecha arriba o W
+                        if (key === 'arrowup' || key === 'w') {
+                            // Si se presiona arriba, busca en los 3 carriles si hay balón de lava en zona
+                            this.handleSwipeUp(0) || this.handleSwipeUp(1) || this.handleSwipeUp(2);
+                            return;
+                        }
+
                         if (key === 'a' || key === '1' || key === 'arrowleft') {
-                            this.handleInput(0);
+                            this.handleTap(0);
                             this.highlightPad(0, true);
                         } else if (key === 's' || key === 'x' || key === 'arrowdown') {
-                            this.handleInput(1);
+                            this.handleTap(1);
                             this.highlightPad(1, true);
                         } else if (key === 'd' || key === '2' || key === 'arrowright') {
-                            this.handleInput(2);
+                            this.handleTap(2);
                             this.highlightPad(2, true);
                         } else if (key === 'escape' || key === 'p') {
                             this.togglePause();
@@ -688,16 +826,82 @@
                         if (key === 'd' || key === '2' || key === 'arrowright') this.highlightPad(2, false);
                     });
 
-                    // Toque directo en el Canvas (Divide el ancho en 3 carriles)
+                    // 2. Control Táctil y Ratón con Detección de Swipe Up (Deslizar hacia arriba)
+                    const registerTouchTarget = (element, laneIndex) => {
+                        let startY = 0;
+                        let startTime = 0;
+                        let isSwiped = false;
+
+                        element.addEventListener('pointerdown', (e) => {
+                            if (!this.isPlaying || this.isPaused) return;
+                            startY = e.clientY;
+                            startTime = performance.now();
+                            isSwiped = false;
+                            this.highlightPad(laneIndex, true);
+                            element.setPointerCapture?.(e.pointerId);
+                        });
+
+                        element.addEventListener('pointermove', (e) => {
+                            if (!this.isPlaying || this.isPaused || isSwiped) return;
+                            const deltaY = startY - e.clientY; // Positivo si se mueve hacia arriba
+                            // Si desliza hacia arriba al menos 24px en menos de 450ms: ¡SWIPE UP!
+                            if (deltaY > 24) {
+                                isSwiped = true;
+                                this.handleSwipeUp(laneIndex);
+                                this.highlightPad(laneIndex, false);
+                            }
+                        });
+
+                        element.addEventListener('pointerup', (e) => {
+                            this.highlightPad(laneIndex, false);
+                            if (!this.isPlaying || this.isPaused) return;
+                            // Si no fue un deslizamiento hacia arriba, cuenta como TAP normal
+                            if (!isSwiped) {
+                                this.handleTap(laneIndex);
+                            }
+                        });
+
+                        element.addEventListener('pointercancel', () => {
+                            this.highlightPad(laneIndex, false);
+                        });
+                    };
+
+                    registerTouchTarget(document.getElementById('btn-input-1'), 0);
+                    registerTouchTarget(document.getElementById('btn-input-x'), 1);
+                    registerTouchTarget(document.getElementById('btn-input-2'), 2);
+
+                    // Toque directo en los 3 carriles del canvas
+                    let canvasTouchStartY = 0;
+                    let canvasLane = 0;
+                    let canvasSwiped = false;
+
                     this.canvas.addEventListener('pointerdown', (e) => {
                         if (!this.isPlaying || this.isPaused) return;
                         const rect = this.canvas.getBoundingClientRect();
                         const clientX = e.clientX - rect.left;
                         const laneWidth = rect.width / 3;
-                        const laneIndex = Math.min(2, Math.max(0, Math.floor(clientX / laneWidth)));
-                        this.handleInput(laneIndex);
-                        this.highlightPad(laneIndex, true);
-                        setTimeout(() => this.highlightPad(laneIndex, false), 120);
+                        canvasLane = Math.min(2, Math.max(0, Math.floor(clientX / laneWidth)));
+                        canvasTouchStartY = e.clientY;
+                        canvasSwiped = false;
+                        this.highlightPad(canvasLane, true);
+                    });
+
+                    this.canvas.addEventListener('pointermove', (e) => {
+                        if (!this.isPlaying || this.isPaused || canvasSwiped) return;
+                        const deltaY = canvasTouchStartY - e.clientY;
+                        if (deltaY > 26) {
+                            canvasSwiped = true;
+                            this.handleSwipeUp(canvasLane);
+                            this.highlightPad(canvasLane, false);
+                        }
+                    });
+
+                    this.canvas.addEventListener('pointerup', () => {
+                        this.highlightPad(canvasLane, false);
+                        if (!this.isPlaying || this.isPaused) return;
+                        if (!canvasSwiped) {
+                            this.handleTap(canvasLane);
+                        }
                     });
                 }
 
@@ -708,6 +912,11 @@
                         if (isPressed) el.classList.add('is-pressed');
                         else el.classList.remove('is-pressed');
                     }
+                }
+
+                getLaneX(laneIndex) {
+                    const laneWidth = this.width / 3;
+                    return (laneIndex * laneWidth) + (laneWidth / 2);
                 }
 
                 // INICIO DE PARTIDA
@@ -729,21 +938,40 @@
                     this.lives = 3;
                     this.hitsCount = 0;
                     this.perfectCount = 0;
+
+                    // Reinicio de ciclo de 2 minutos
                     this.level = 1;
+                    this.levelElapsed = 0;
+                    this.baseInitialSpeed = 3.6;
+                    this.currentBaseSpeed = 3.6;
+
+                    // Reinicio de Buffs
+                    this.buffs = {
+                        doubleSpawnTime: 0,
+                        frogPenaltyTime: 0,
+                        poloBonusTime: 0,
+                        emilioSlowMoTime: 0
+                    };
+                    this.timeFreeze = 0;
+
                     this.notes = [];
                     this.particles = [];
                     this.floatingTexts = [];
+                    this.comicBanners = [];
+                    this.deflectedBalls = [];
+
                     this.lastSpawnTime = performance.now();
-                    this.spawnInterval = 1100;
-                    this.baseSpeed = 4.2;
                     this.screenShake = 0;
 
                     this.isPlaying = true;
                     this.isPaused = false;
 
-                    this.playSound('whistle');
+                    this.playSound('level_up');
                     this.startMusic();
                     this.updateHUD();
+
+                    // Cartel cómico de inicio
+                    this.addComicBanner('¡VAMOS!', '¡JORNADA EN JUEGO!', '#f59e0b', '#dc2626');
 
                     this.lastTick = performance.now();
                     requestAnimationFrame(this.gameLoop.bind(this));
@@ -753,14 +981,12 @@
                     if (this.hasCustomMusic && this.bgMusicPlayer) {
                         this.bgMusicPlayer.currentTime = 0;
                         this.bgMusicPlayer.volume = 0.65;
-                        this.bgMusicPlayer.play().catch(e => console.log("Audio play delayed:", e));
+                        this.bgMusicPlayer.play().catch(() => {});
                     }
                 }
 
                 stopMusic() {
-                    if (this.bgMusicPlayer) {
-                        this.bgMusicPlayer.pause();
-                    }
+                    if (this.bgMusicPlayer) this.bgMusicPlayer.pause();
                 }
 
                 togglePause() {
@@ -785,56 +1011,71 @@
                     if (this.bgMusicPlayer) this.bgMusicPlayer.muted = !this.soundEnabled;
                 }
 
-                // GENERACIÓN DE NOTAS (BALONES Y EVENTOS)
+                // GENERACIÓN DE ELEMENTOS
                 spawnNote() {
                     const lane = Math.floor(Math.random() * 3);
                     const rand = Math.random();
 
                     let type = 'normal';
-                    // Ficha Casilla Oro (Tío Gilito): 10% probabilidad
-                    if (rand < 0.12) {
+
+                    // 1. Botón "Echar a Emilio" (Sorpresa relámpago muy difícil, ~4% probabilidad)
+                    if (rand < 0.045 && this.levelElapsed > 12) {
+                        type = 'emilio';
+                    }
+                    // 2. Elemento Metamórfico (Estatutos, Rana, Polo, ~14% probabilidad)
+                    else if (rand < 0.18) {
+                        type = 'morph';
+                    }
+                    // 3. Casilla Oro (Tío Gilito, ~12% probabilidad)
+                    else if (rand < 0.30) {
                         type = 'gold';
-                    } 
-                    // Casilla Trampa: 14% probabilidad (a partir del nivel 2)
-                    else if (rand > 0.85 && this.level >= 2) {
-                        type = 'trap';
+                    }
+                    // 4. Balón de Lava (Casilla Trampa que se devuelve deslizando, ~18% probabilidad)
+                    else if (rand < 0.48) {
+                        type = 'lava';
                     }
 
-                    // Super Bonus Pleno al 15 cuando el combo es múltiplo de 14
-                    if (this.combo > 0 && this.combo % 14 === 0 && rand < 0.5) {
+                    // Super Bonus Pleno al 15 cada 14 combos
+                    if (this.combo > 0 && this.combo % 14 === 0 && Math.random() < 0.5) {
                         type = 'pleno';
                     }
+
+                    // Cálculo de velocidad actual teniendo en cuenta Slo-Mo de Emilio
+                    let speed = this.currentBaseSpeed;
+                    if (this.buffs.emilioSlowMoTime > 0) speed *= 0.5;
+                    if (type === 'emilio') speed *= 2.6; // ¡Emilio baja a toda velocidad!
 
                     const note = {
                         lane: lane,
                         type: type,
-                        y: -40,
-                        speed: this.baseSpeed + (this.level * 0.35) + (Math.random() * 0.4),
-                        radius: type === 'pleno' ? 36 : 28,
+                        y: -45,
+                        speed: speed,
+                        radius: type === 'pleno' ? 36 : (type === 'emilio' ? 26 : 28),
                         rotation: 0,
-                        rotSpeed: (Math.random() - 0.5) * 0.1,
+                        rotSpeed: (Math.random() - 0.5) * 0.12,
                         hit: false,
-                        trail: []
+                        trail: [],
+                        // Para el elemento metamórfico: cambia cada 280ms entre 0 (Estatutos), 1 (Rana), 2 (Polo)
+                        morphPhase: Math.floor(Math.random() * 3),
+                        morphTimer: 0
                     };
 
                     this.notes.push(note);
                 }
 
-                // GESTIÓN DE ENTRADA DEL USUARIO
-                handleInput(laneIndex) {
+                // GESTIÓN DE ACCIÓN TAP (PULSACIÓN NORMAL)
+                handleTap(laneIndex) {
                     if (!this.isPlaying || this.isPaused) return;
+                    if (navigator.vibrate) navigator.vibrate(20);
 
-                    // Vibración táctil en móvil
-                    if (navigator.vibrate) navigator.vibrate(25);
-
-                    // Buscar la nota más cercana a la línea de meta en este carril
+                    // Buscar la nota más cercana a la línea de impacto
                     let closestNote = null;
                     let minDist = Infinity;
 
                     for (const note of this.notes) {
                         if (note.lane === laneIndex && !note.hit) {
                             const dist = Math.abs(note.y - this.targetY);
-                            if (dist < minDist && dist < 120) {
+                            if (dist < minDist && dist < 125) {
                                 minDist = dist;
                                 closestNote = note;
                             }
@@ -846,27 +1087,34 @@
                     if (closestNote) {
                         closestNote.hit = true;
 
-                        // Caso 1: ¡CASILLA TRAMPA PULSADA! (Error grave)
-                        if (closestNote.type === 'trap') {
+                        // CASO A: BALÓN DE LAVA TOCADO CON TAP (ERROR: ¡HABÍA QUE DESLIZARLO!)
+                        if (closestNote.type === 'lava') {
                             this.lives--;
                             this.combo = 0;
                             this.multiplier = 1;
-                            this.screenShake = 16;
+                            this.screenShake = 20;
                             this.playSound('hit_trap');
-                            this.createExplosion(laneX, closestNote.y, '#a855f7', 35);
-                            this.addFloatingText(laneX, closestNote.y - 20, '¡TRAMPA! -1 VIDA', '#ef4444');
+                            this.createExplosion(laneX, closestNote.y, '#ef4444', 40);
+                            this.addComicBanner('¡BOOM!', '¡ERA LAVA! DESLIZA ARRIBA', '#fef08a', '#dc2626');
                             this.checkGameOver();
                         }
-                        // Caso 2: Acierto en Balón Normal, Oro o Pleno
+                        // CASO B: BOTÓN DE ECHAR A EMILIO CAZADO (¡ÉPICO!)
+                        else if (closestNote.type === 'emilio') {
+                            this.triggerEmilioCaught(laneX, closestNote.y);
+                        }
+                        // CASO C: ELEMENTO METAMÓRFICO (Estatutos / Rana / Polo)
+                        else if (closestNote.type === 'morph') {
+                            this.triggerMorphCaught(closestNote.morphPhase, laneX, closestNote.y);
+                        }
+                        // CASO D: BALÓN NORMAL / ORO / PLENO
                         else {
                             this.hitsCount++;
-                            let points = 50;
+                            let basePoints = 60;
                             let ratingText = '¡BUENO!';
                             let ratingColor = '#38bdf8';
 
-                            // Clasificación por precisión
                             if (minDist <= 22) {
-                                points = 120;
+                                basePoints = 130;
                                 ratingText = '¡PERFECTO!';
                                 ratingColor = '#34d399';
                                 this.perfectCount++;
@@ -875,22 +1123,27 @@
                                 this.playSound('hit_good');
                             }
 
-                            // Modificadores de tipo de nota
                             if (closestNote.type === 'gold') {
-                                points *= 2.5;
-                                ratingText = '🏆 ¡TÍO GILITO! x2.5';
+                                basePoints *= 2.5;
+                                ratingText = '🏆 TÍO GILITO x2.5';
                                 ratingColor = '#f59e0b';
                                 this.playSound('hit_gold');
                                 this.createCoinShower(laneX, closestNote.y);
+                                this.addComicBanner('¡ORO!', '+250% Puntos Tío Gilito', '#fffbeb', '#f59e0b');
                             } else if (closestNote.type === 'pleno') {
-                                points = 500;
-                                ratingText = '🚨 ¡PLENO AL 15!';
+                                basePoints = 500;
+                                ratingText = '🚨 PLENO AL 15';
                                 ratingColor = '#fbbf24';
                                 this.playSound('hit_gold');
                                 this.createFireworks(laneX, closestNote.y);
+                                this.addComicBanner('¡PLENO!', '+500 Pts de la Peña', '#fef08a', '#10b981');
                             }
 
-                            // Incrementar combo y multiplicador
+                            // Aplicar modificadores de buff activos (Rana ÷2 o Polo x2)
+                            let buffMult = 1.0;
+                            if (this.buffs.poloBonusTime > 0) buffMult *= 2.0;
+                            if (this.buffs.frogPenaltyTime > 0) buffMult *= 0.5;
+
                             this.combo++;
                             if (this.combo > this.maxCombo) this.maxCombo = this.combo;
 
@@ -899,52 +1152,209 @@
                             else if (this.combo >= 8) this.multiplier = 2;
                             else this.multiplier = 1;
 
-                            const finalPoints = Math.round(points * this.multiplier);
+                            const finalPoints = Math.round(basePoints * this.multiplier * buffMult);
                             this.score += finalPoints;
 
                             this.createHitSparks(laneX, closestNote.y, LANE_COLORS[laneIndex].hex);
                             this.addFloatingText(laneX, closestNote.y - 25, `+${finalPoints} ${ratingText}`, ratingColor);
-
-                            // Subida de nivel progresivo
-                            if (this.hitsCount % 15 === 0) {
-                                this.level++;
-                                this.spawnInterval = Math.max(550, 1100 - (this.level * 70));
-                            }
                         }
                     } else {
-                        // Pulsación al aire en vacío (Pequeña penalización de combo si no había nada)
                         this.createMissRipple(laneX, this.targetY);
                     }
 
                     this.updateHUD();
                 }
 
-                getLaneX(laneIndex) {
-                    const laneWidth = this.width / 3;
-                    return (laneIndex * laneWidth) + (laneWidth / 2);
+                // GESTIÓN DE SWIPE UP (DESLIZAR HACIA ARRIBA) PARA BALONES DE LAVA
+                handleSwipeUp(laneIndex) {
+                    if (!this.isPlaying || this.isPaused) return false;
+
+                    // Buscar balón de lava en este carril
+                    let lavaNote = null;
+                    let minDist = Infinity;
+
+                    for (const note of this.notes) {
+                        if (note.lane === laneIndex && !note.hit && note.type === 'lava') {
+                            const dist = Math.abs(note.y - this.targetY);
+                            if (dist < minDist && dist < 140) {
+                                minDist = dist;
+                                lavaNote = note;
+                            }
+                        }
+                    }
+
+                    const laneX = this.getLaneX(laneIndex);
+
+                    if (lavaNote) {
+                        lavaNote.hit = true;
+                        if (navigator.vibrate) navigator.vibrate([30, 40, 50]);
+
+                        this.playSound('swipe_deflect');
+                        this.screenShake = 8;
+
+                        // Crear proyectil de lava devuelto hacia arriba a toda velocidad
+                        this.deflectedBalls.push({
+                            x: laneX,
+                            y: lavaNote.y,
+                            vy: -20,
+                            radius: lavaNote.radius,
+                            rotation: 0
+                        });
+
+                        this.hitsCount++;
+                        this.combo++;
+                        if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+
+                        let buffMult = (this.buffs.poloBonusTime > 0 ? 2.0 : 1.0) * (this.buffs.frogPenaltyTime > 0 ? 0.5 : 1.0);
+                        const bonusPoints = Math.round(200 * this.multiplier * buffMult);
+                        this.score += bonusPoints;
+
+                        this.createExplosion(laneX, lavaNote.y, '#f97316', 22);
+                        this.addFloatingText(laneX, lavaNote.y - 30, `+${bonusPoints} ¡DEVUELTO!`, '#fb923c');
+                        this.addComicBanner('¡ZASCA!', '¡Lava Devuelta! +200 pts', '#fef08a', '#ea580c');
+
+                        this.updateHUD();
+                        return true;
+                    }
+                    return false;
                 }
 
-                // GAME LOOP PRINCIPAL
+                // EVENTO: BOTÓN DE ECHAR A EMILIO CAZADO
+                triggerEmilioCaught(x, y) {
+                    this.playSound('emilio');
+                    this.timeFreeze = 0.9; // 0.9 segundos de congelación dramática
+                    this.screenShake = 22;
+
+                    // Todos los elementos en pantalla explotan y dan doble de puntos
+                    let explodedCount = 0;
+                    for (const n of this.notes) {
+                        if (!n.hit) {
+                            n.hit = true;
+                            explodedCount++;
+                            const nx = this.getLaneX(n.lane);
+                            this.createExplosion(nx, n.y, '#f59e0b', 20);
+                            this.score += 200;
+                        }
+                    }
+
+                    // Activar Slo-Mo por 10 segundos
+                    this.buffs.emilioSlowMoTime = 10;
+
+                    this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Pantalla Limpia + Cámara Lenta 10s', '#fef08a', '#dc2626');
+                    this.createFireworks(x, y);
+                    this.updateHUD();
+                }
+
+                // EVENTO: ELEMENTO METAMÓRFICO CAZADO
+                triggerMorphCaught(phase, x, y) {
+                    if (phase === 0) {
+                        // 📖 ESTATUTOS: Lluvia x2 durante 3 segundos
+                        this.buffs.doubleSpawnTime = 3;
+                        this.playSound('hit_gold');
+                        this.createExplosion(x, y, '#d97706', 25);
+                        this.addComicBanner('¡ESTATUTOS!', 'Lluvia x2 de Elementos durante 3s', '#fffbeb', '#d97706');
+                    } else if (phase === 1) {
+                        // 🐸 RANA: Puntos valen la mitad durante 10 segundos
+                        this.buffs.frogPenaltyTime = 10;
+                        this.playSound('frog');
+                        this.createExplosion(x, y, '#22c55e', 25);
+                        this.addComicBanner('¡CROAC!', 'Maldición de la Rana: Puntos / 2 durante 10s', '#dcfce7', '#16a34a');
+                    } else if (phase === 2) {
+                        // 👕 POLO MAULA NEGRO CUELLO BLANCO: Puntos x2 durante 10 segundos
+                        this.buffs.poloBonusTime = 10;
+                        this.playSound('hit_gold');
+                        this.createExplosion(x, y, '#ffffff', 30);
+                        this.addComicBanner('¡POLO MAULA!', 'Elegancia Peñista: Puntos x2 durante 10s', '#f8fafc', '#0f172a');
+                    }
+                    this.score += 100;
+                    this.updateHUD();
+                }
+
+                // BANNERS ESTILO ONOMATOPEYA CÓMIC (Inspirado en la imagen BOOM!)
+                addComicBanner(title, subtitle, bgYellow, textColor) {
+                    this.comicBanners.push({
+                        title: title,
+                        subtitle: subtitle,
+                        bg: bgYellow || '#fef08a',
+                        textColor: textColor || '#dc2626',
+                        scale: 0.2,
+                        targetScale: 1.0,
+                        alpha: 1.0,
+                        y: this.height * 0.32,
+                        vy: 0.2,
+                        duration: 1.8,
+                        age: 0,
+                        angle: (Math.random() - 0.5) * 0.16
+                    });
+                }
+
+                // BUCLE PRINCIPAL DEL JUEGO
                 gameLoop(timestamp) {
                     if (!this.isPlaying || this.isPaused) return;
 
-                    const dt = (timestamp - this.lastTick) / 1000;
+                    const dt = Math.min((timestamp - this.lastTick) / 1000, 0.1);
                     this.lastTick = timestamp;
 
-                    // 1. Spawning
-                    if (timestamp - this.lastSpawnTime > this.spawnInterval) {
+                    // Si hay Time Freeze (Emilio atrapado), pausar movimiento brevemente
+                    if (this.timeFreeze > 0) {
+                        this.timeFreeze -= dt;
+                        this.render();
+                        requestAnimationFrame(this.gameLoop.bind(this));
+                        return;
+                    }
+
+                    // 1. Progresión del Nivel y Cronómetro de 2 minutos
+                    this.levelElapsed += dt;
+                    const progressInLevel = Math.min(1.0, this.levelElapsed / this.levelDuration);
+
+                    // La velocidad aumenta progresivamente a lo largo de los 2 minutos
+                    const speedMultiplier = 1.0 + (progressInLevel * 0.95);
+                    this.currentBaseSpeed = (this.baseInitialSpeed + (this.level - 1) * 0.5) * speedMultiplier;
+
+                    // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL!
+                    if (this.levelElapsed >= this.levelDuration) {
+                        this.level++;
+                        this.levelElapsed = 0;
+                        this.playSound('level_up');
+                        this.createFireworks(this.width / 2, this.height * 0.35);
+                        this.addComicBanner(`¡NIVEL ${this.level}!`, '¡Más elementos en pantalla y velocidad renovada!', '#fef08a', '#2563eb');
+                    }
+
+                    // 2. Decrementar Temporizadores de Buffs
+                    if (this.buffs.doubleSpawnTime > 0) this.buffs.doubleSpawnTime -= dt;
+                    if (this.buffs.frogPenaltyTime > 0) this.buffs.frogPenaltyTime -= dt;
+                    if (this.buffs.poloBonusTime > 0) this.buffs.poloBonusTime -= dt;
+                    if (this.buffs.emilioSlowMoTime > 0) this.buffs.emilioSlowMoTime -= dt;
+
+                    // 3. Spawning dinámico
+                    let spawnRate = Math.max(480, 1150 - (this.level * 90) - (progressInLevel * 300));
+                    if (this.buffs.doubleSpawnTime > 0) spawnRate *= 0.5; // ¡Lluvia x2 de Estatutos!
+
+                    if (timestamp - this.lastSpawnTime > spawnRate) {
                         this.spawnNote();
                         this.lastSpawnTime = timestamp;
                     }
 
-                    // 2. Update Notes
+                    // 4. Actualizar Notas
                     for (let i = this.notes.length - 1; i >= 0; i--) {
                         const note = this.notes[i];
-                        note.y += note.speed;
+                        let speed = note.speed;
+                        if (this.buffs.emilioSlowMoTime > 0) speed *= 0.5;
+
+                        note.y += speed;
                         note.rotation += note.rotSpeed;
 
-                        // Rastro de cometa para notas
-                        if (Math.random() < 0.4) {
+                        // Actualizar metamorfosis
+                        if (note.type === 'morph') {
+                            note.morphTimer += dt;
+                            if (note.morphTimer > 0.28) {
+                                note.morphPhase = (note.morphPhase + 1) % 3;
+                                note.morphTimer = 0;
+                            }
+                        }
+
+                        // Rastro de cometa
+                        if (Math.random() < 0.35) {
                             note.trail.push({ x: this.getLaneX(note.lane), y: note.y, alpha: 0.6 });
                         }
                         for (let t = note.trail.length - 1; t >= 0; t--) {
@@ -952,16 +1362,19 @@
                             if (note.trail[t].alpha <= 0) note.trail.splice(t, 1);
                         }
 
-                        // ¿Ha pasado la línea de gol sin tocar?
+                        // ¿Ha superado la línea de meta?
                         if (note.y > this.height + 40) {
                             if (!note.hit) {
-                                if (note.type === 'trap') {
-                                    // ¡Dejar pasar una trampa es una evasión exitosa!
-                                    this.score += 60;
-                                    const lx = this.getLaneX(note.lane);
-                                    this.addFloatingText(lx, this.targetY, '🛡️ ¡TRAMPA ESQUIVADA! +60', '#a855f7');
-                                } else {
-                                    // Pérdida de vida por fallo
+                                if (note.type === 'lava') {
+                                    // Si un balón de lava se escapa sin devolverse, ¡pierdes vida!
+                                    this.lives--;
+                                    this.combo = 0;
+                                    this.multiplier = 1;
+                                    this.screenShake = 14;
+                                    this.playSound('hit_trap');
+                                    this.addComicBanner('¡FALLO!', '¡Se te escapó la lava!', '#fef08a', '#dc2626');
+                                    this.checkGameOver();
+                                } else if (note.type === 'normal' || note.type === 'gold' || note.type === 'pleno') {
                                     this.lives--;
                                     this.combo = 0;
                                     this.multiplier = 1;
@@ -976,7 +1389,27 @@
                         }
                     }
 
-                    // 3. Update Particles & Texts
+                    // 5. Actualizar balones de lava devueltos
+                    for (let i = this.deflectedBalls.length - 1; i >= 0; i--) {
+                        const b = this.deflectedBalls[i];
+                        b.y += b.vy;
+                        b.rotation += 0.2;
+                        if (Math.random() < 0.6) {
+                            this.particles.push({
+                                x: b.x,
+                                y: b.y,
+                                vx: (Math.random() - 0.5) * 3,
+                                vy: (Math.random() - 0.5) * 3,
+                                radius: 3,
+                                color: '#f97316',
+                                alpha: 0.9,
+                                decay: 0.05
+                            });
+                        }
+                        if (b.y < -60) this.deflectedBalls.splice(i, 1);
+                    }
+
+                    // 6. Actualizar Partículas, Textos y Carteles Cómic
                     for (let i = this.particles.length - 1; i >= 0; i--) {
                         const p = this.particles[i];
                         p.x += p.vx;
@@ -993,23 +1426,31 @@
                         if (ft.alpha <= 0) this.floatingTexts.splice(i, 1);
                     }
 
-                    if (this.screenShake > 0) {
-                        this.screenShake *= 0.88;
-                        if (this.screenShake < 0.4) this.screenShake = 0;
+                    for (let i = this.comicBanners.length - 1; i >= 0; i--) {
+                        const cb = this.comicBanners[i];
+                        cb.age += dt;
+                        cb.y -= cb.vy;
+                        if (cb.scale < cb.targetScale) cb.scale += (cb.targetScale - cb.scale) * 0.25;
+                        if (cb.age > cb.duration - 0.4) cb.alpha -= 0.04;
+                        if (cb.age >= cb.duration || cb.alpha <= 0) this.comicBanners.splice(i, 1);
                     }
 
-                    // 4. Render
+                    if (this.screenShake > 0) {
+                        this.screenShake *= 0.88;
+                        if (this.screenShake < 0.3) this.screenShake = 0;
+                    }
+
+                    // 7. Render
                     this.render();
 
                     requestAnimationFrame(this.gameLoop.bind(this));
                 }
 
-                // RENDERIZADO VISUAL ULTRADETALLADO
+                // RENDERIZADO VISUAL
                 render() {
                     const ctx = this.ctx;
                     ctx.save();
 
-                    // Sacudida de pantalla
                     if (this.screenShake > 0) {
                         const dx = (Math.random() - 0.5) * this.screenShake;
                         const dy = (Math.random() - 0.5) * this.screenShake;
@@ -1018,39 +1459,95 @@
 
                     ctx.clearRect(0, 0, this.width, this.height);
 
-                    // A) Fondo del Estadio & Perspectiva de Carriles
+                    // A) Gradas con Banderas Animadas en los laterales
+                    this.drawAnimatedCrowd(ctx);
+
+                    // B) Fondo de Carriles y Césped Neón
                     this.drawLanesBackground(ctx);
 
-                    // B) Línea de Meta / Zona de Impacto
+                    // C) Línea de Meta y Receptores
                     this.drawTargetReceptors(ctx);
 
-                    // C) Dibujar Notas (Balones que caen)
+                    // D) Balones y Elementos que caen
                     this.drawNotes(ctx);
 
-                    // D) Partículas & Textos Flotantes
+                    // E) Balones de Lava Devueltos hacia arriba
+                    this.drawDeflectedBalls(ctx);
+
+                    // F) Partículas & Textos Flotantes
                     this.drawParticles(ctx);
                     this.drawFloatingTexts(ctx);
+
+                    // G) Carteles Estilo Cómic Onomatopeya (BOOM!)
+                    this.drawComicBanners(ctx);
 
                     ctx.restore();
                 }
 
-                drawLanesBackground(ctx) {
+                // GRADAS ANIMADAS EN LOS LATERALES
+                drawAnimatedCrowd(ctx) {
+                    const now = performance.now() * 0.003;
                     const laneW = this.width / 3;
 
-                    // Fondo de cuadrícula cibernética / césped neón
+                    // 1. Gradas laterales (Banderitas ondeando)
+                    for (const flag of this.crowdFlags) {
+                        const baseX = flag.side === 0 ? 12 : this.width - 12;
+                        const wave = Math.sin(now * flag.speed + flag.phase) * 8;
+
+                        ctx.save();
+                        ctx.fillStyle = flag.color;
+                        ctx.shadowColor = flag.color;
+                        ctx.shadowBlur = 8;
+                        ctx.beginPath();
+                        ctx.moveTo(baseX, flag.y);
+                        ctx.lineTo(baseX + (flag.side === 0 ? flag.size : -flag.size), flag.y - flag.size * 0.4 + wave * 0.5);
+                        ctx.lineTo(baseX + (flag.side === 0 ? flag.size * 0.8 : -flag.size * 0.8), flag.y + flag.size * 0.4 - wave * 0.5);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        // Asta de la bandera
+                        ctx.strokeStyle = '#475569';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.moveTo(baseX, flag.y - 10);
+                        ctx.lineTo(baseX, flag.y + 12);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+
+                    // 2. Focos de estadio barriendo suavemente
+                    for (const sl of this.searchlights) {
+                        sl.angle += sl.speed;
+                        if (Math.abs(sl.angle) > 0.45) sl.speed = -sl.speed;
+
+                        ctx.save();
+                        const grad = ctx.createRadialGradient(sl.x, 0, 10, sl.x + Math.sin(sl.angle) * 350, 450, 280);
+                        grad.addColorStop(0, sl.color);
+                        grad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.moveTo(sl.x, 0);
+                        ctx.lineTo(sl.x - 140 + Math.sin(sl.angle) * 220, this.height);
+                        ctx.lineTo(sl.x + 140 + Math.sin(sl.angle) * 220, this.height);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+
+                drawLanesBackground(ctx) {
+                    const laneW = this.width / 3;
                     for (let i = 0; i < 3; i++) {
                         const x = i * laneW;
-                        const colorObj = LANE_COLORS[i];
+                        const c = LANE_COLORS[i];
 
-                        // Gradiente suave vertical
                         const grad = ctx.createLinearGradient(0, 0, 0, this.height);
-                        grad.addColorStop(0, 'rgba(5, 8, 17, 0.4)');
-                        grad.addColorStop(0.7, `rgba(${colorObj.rgb.join(',')}, 0.05)`);
-                        grad.addColorStop(1, `rgba(${colorObj.rgb.join(',')}, 0.12)`);
+                        grad.addColorStop(0, 'rgba(4, 7, 17, 0.35)');
+                        grad.addColorStop(0.7, `rgba(${c.rgb.join(',')}, 0.05)`);
+                        grad.addColorStop(1, `rgba(${c.rgb.join(',')}, 0.12)`);
                         ctx.fillStyle = grad;
                         ctx.fillRect(x, 0, laneW, this.height);
 
-                        // Divisores de carril con haz de luz
                         if (i > 0) {
                             ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
                             ctx.lineWidth = 1.5;
@@ -1063,7 +1560,6 @@
                 }
 
                 drawTargetReceptors(ctx) {
-                    const laneW = this.width / 3;
                     const y = this.targetY;
 
                     // Línea horizontal guía resplandeciente
@@ -1082,7 +1578,6 @@
                         const x = this.getLaneX(i);
                         const c = LANE_COLORS[i];
 
-                        // Halo exterior
                         ctx.save();
                         ctx.shadowColor = c.hex;
                         ctx.shadowBlur = 15;
@@ -1092,11 +1587,9 @@
                         ctx.arc(x, y, this.hitRadius, 0, Math.PI * 2);
                         ctx.stroke();
 
-                        // Fondo circular translúcido
                         ctx.fillStyle = `rgba(${c.rgb.join(',')}, 0.15)`;
                         ctx.fill();
 
-                        // Glifo central (1, X, 2)
                         ctx.shadowBlur = 0;
                         ctx.fillStyle = '#ffffff';
                         ctx.font = '900 22px Outfit, sans-serif';
@@ -1112,7 +1605,7 @@
                         const x = this.getLaneX(note.lane);
                         const y = note.y;
 
-                        // Rastro de cometa
+                        // Rastro
                         for (const tr of note.trail) {
                             ctx.fillStyle = `rgba(255, 255, 255, ${tr.alpha * 0.35})`;
                             ctx.beginPath();
@@ -1128,8 +1621,12 @@
                             this.renderClassicBall(ctx, note.radius, LANE_COLORS[note.lane].hex);
                         } else if (note.type === 'gold') {
                             this.renderGoldBall(ctx, note.radius);
-                        } else if (note.type === 'trap') {
-                            this.renderTrapBall(ctx, note.radius);
+                        } else if (note.type === 'lava') {
+                            this.renderLavaBall(ctx, note.radius);
+                        } else if (note.type === 'morph') {
+                            this.renderMorphItem(ctx, note.radius, note.morphPhase);
+                        } else if (note.type === 'emilio') {
+                            this.renderEmilioButton(ctx, note.radius);
                         } else if (note.type === 'pleno') {
                             this.renderPlenoBall(ctx, note.radius);
                         }
@@ -1138,12 +1635,11 @@
                     }
                 }
 
-                // BALÓN CLÁSICO CON DETALLES DE CUERO Y GLOBO NEÓN
+                // BALÓN CLÁSICO
                 renderClassicBall(ctx, radius, glowColor) {
                     ctx.shadowColor = glowColor;
                     ctx.shadowBlur = 18;
 
-                    // Esfera 3D con luz radial
                     const grad = ctx.createRadialGradient(-radius * 0.35, -radius * 0.35, radius * 0.1, 0, 0, radius);
                     grad.addColorStop(0, '#ffffff');
                     grad.addColorStop(0.75, '#e2e8f0');
@@ -1153,12 +1649,10 @@
                     ctx.arc(0, 0, radius, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Pentágono central negro de cuero
                     ctx.shadowBlur = 0;
                     ctx.fillStyle = '#0f172a';
                     this.drawPentagon(ctx, 0, 0, radius * 0.42);
 
-                    // Acentos de costura
                     ctx.strokeStyle = '#334155';
                     ctx.lineWidth = 1.5;
                     for (let a = 0; a < 5; a++) {
@@ -1174,12 +1668,11 @@
                     }
                 }
 
-                // CASILLA ORO (TÍO GILITO) - LINGOTE METÁLICO
+                // CASILLA ORO (TÍO GILITO)
                 renderGoldBall(ctx, radius) {
                     ctx.shadowColor = '#f59e0b';
                     ctx.shadowBlur = 24;
 
-                    // Gradiente dorado metálico
                     const grad = ctx.createRadialGradient(-radius * 0.4, -radius * 0.4, radius * 0.15, 0, 0, radius);
                     grad.addColorStop(0, '#fffbeb');
                     grad.addColorStop(0.3, '#fef08a');
@@ -1190,12 +1683,10 @@
                     ctx.arc(0, 0, radius, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Borde irisado oro
                     ctx.strokeStyle = '#fef08a';
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // Corona de Tío Gilito
                     ctx.shadowBlur = 0;
                     ctx.fillStyle = '#78350f';
                     ctx.font = `${radius * 0.9}px sans-serif`;
@@ -1204,42 +1695,105 @@
                     ctx.fillText('👑', 0, 1);
                 }
 
-                // CASILLA TRAMPA (HUMO OSCURO, PINCHOS Y CALAVERA)
-                renderTrapBall(ctx, radius) {
-                    ctx.shadowColor = '#dc2626';
-                    ctx.shadowBlur = 22;
+                // BALÓN DE LAVA (HAY QUE DESLIZARLO HACIA ARRIBA)
+                renderLavaBall(ctx, radius) {
+                    ctx.shadowColor = '#ea580c';
+                    ctx.shadowBlur = 25;
 
-                    // Esfera oscura con lava púrpura
-                    const grad = ctx.createRadialGradient(-radius * 0.3, -radius * 0.3, radius * 0.1, 0, 0, radius);
-                    grad.addColorStop(0, '#7f1d1d');
-                    grad.addColorStop(0.6, '#1e1b4b');
-                    grad.addColorStop(1, '#020617');
+                    // Esfera volcánica incandescente
+                    const grad = ctx.createRadialGradient(-radius * 0.35, -radius * 0.35, radius * 0.1, 0, 0, radius);
+                    grad.addColorStop(0, '#fef08a');
+                    grad.addColorStop(0.3, '#f97316');
+                    grad.addColorStop(0.7, '#dc2626');
+                    grad.addColorStop(1, '#450a0a');
                     ctx.fillStyle = grad;
                     ctx.beginPath();
                     ctx.arc(0, 0, radius, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Pinchos metálicos exteriores
-                    ctx.fillStyle = '#ef4444';
-                    for (let i = 0; i < 8; i++) {
-                        const ang = (i * Math.PI) / 4;
-                        const sx = Math.cos(ang) * (radius + 6);
-                        const sy = Math.sin(ang) * (radius + 6);
-                        ctx.beginPath();
-                        ctx.arc(sx, sy, 3, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-
-                    // Calavera central
+                    // Grietas de fuego y flecha hacia arriba indicando el deslizamiento
                     ctx.shadowBlur = 0;
                     ctx.fillStyle = '#ffffff';
-                    ctx.font = `${radius * 0.9}px sans-serif`;
+                    ctx.font = '900 18px Bangers, sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('☠️', 0, 1);
+                    ctx.fillText('⬆️ LAVA', 0, -2);
+                    ctx.font = '700 9px Plus Jakarta Sans, sans-serif';
+                    ctx.fillText('SWIPE UP', 0, 11);
                 }
 
-                // PLENO AL 15 (BOLA GIGANTE DE FUEGO)
+                // ELEMENTO METAMÓRFICO (0: Estatutos, 1: Rana, 2: Polo)
+                renderMorphItem(ctx, radius, phase) {
+                    ctx.shadowColor = phase === 0 ? '#f59e0b' : (phase === 1 ? '#22c55e' : '#ffffff');
+                    ctx.shadowBlur = 20;
+
+                    // Fondo circular con marco cambiante
+                    ctx.fillStyle = '#0f172a';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = phase === 0 ? '#f59e0b' : (phase === 1 ? '#22c55e' : '#e2e8f0');
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    ctx.shadowBlur = 0;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    if (phase === 0) {
+                        // 📖 ESTATUTOS
+                        ctx.font = '22px sans-serif';
+                        ctx.fillText('📖', 0, -4);
+                        ctx.font = '800 8px Plus Jakarta Sans, sans-serif';
+                        ctx.fillStyle = '#f59e0b';
+                        ctx.fillText('ESTATUTOS', 0, 14);
+                    } else if (phase === 1) {
+                        // 🐸 RANA
+                        ctx.font = '22px sans-serif';
+                        ctx.fillText('🐸', 0, -4);
+                        ctx.font = '800 8px Plus Jakarta Sans, sans-serif';
+                        ctx.fillStyle = '#22c55e';
+                        ctx.fillText('÷2 PUNTOS', 0, 14);
+                    } else if (phase === 2) {
+                        // 👕 POLO MAULA NEGRO CUELLO BLANCO
+                        ctx.font = '22px sans-serif';
+                        ctx.fillText('👕', 0, -4);
+                        ctx.font = '800 8px Plus Jakarta Sans, sans-serif';
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillText('x2 PUNTOS', 0, 14);
+                    }
+                }
+
+                // BOTÓN DE ECHAR A EMILIO (Sorpresa relámpago)
+                renderEmilioButton(ctx, radius) {
+                    ctx.shadowColor = '#dc2626';
+                    ctx.shadowBlur = 30;
+
+                    const grad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius);
+                    grad.addColorStop(0, '#fef08a');
+                    grad.addColorStop(0.5, '#f59e0b');
+                    grad.addColorStop(1, '#dc2626');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '20px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('🥾', 0, -5);
+                    ctx.font = '900 8px Bangers, sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText('EMILIO', 0, 12);
+                }
+
                 renderPlenoBall(ctx, radius) {
                     ctx.shadowColor = '#f59e0b';
                     ctx.shadowBlur = 30;
@@ -1261,6 +1815,21 @@
                     ctx.fillText('P15', 0, 0);
                 }
 
+                drawDeflectedBalls(ctx) {
+                    for (const b of this.deflectedBalls) {
+                        ctx.save();
+                        ctx.translate(b.x, b.y);
+                        ctx.rotate(b.rotation);
+                        ctx.shadowColor = '#ea580c';
+                        ctx.shadowBlur = 25;
+                        ctx.fillStyle = '#f97316';
+                        ctx.beginPath();
+                        ctx.arc(0, 0, b.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+
                 drawPentagon(ctx, x, y, r) {
                     ctx.beginPath();
                     for (let i = 0; i < 5; i++) {
@@ -1274,21 +1843,108 @@
                     ctx.fill();
                 }
 
-                // SISTEMA DE PARTÍCULAS & EFECTOS
+                // DIBUJADO DE CARTELES ESTILO CÓMIC ONOMATOPEYA (BOOM!)
+                drawComicBanners(ctx) {
+                    for (const cb of this.comicBanners) {
+                        ctx.save();
+                        ctx.translate(this.width / 2, cb.y);
+                        ctx.rotate(cb.angle);
+                        ctx.scale(cb.scale, cb.scale);
+                        ctx.globalAlpha = Math.max(0, cb.alpha);
+
+                        // 1. Estrella dentada amarilla de explosión cómic
+                        this.drawComicExplosionStar(ctx, 0, 0, 140, 75, cb.bg);
+
+                        // 2. Texto en relieve pop-art 3D inclinado (Estilo Bangers)
+                        ctx.font = '900 48px Bangers, cursive, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        // Sombra gruesa negra 3D
+                        ctx.fillStyle = '#000000';
+                        for (let off = 6; off >= 1; off--) {
+                            ctx.fillText(cb.title, off * 0.8, -10 + off * 0.8);
+                        }
+
+                        // Texto frontal brillante
+                        ctx.fillStyle = cb.textColor;
+                        ctx.fillText(cb.title, 0, -10);
+
+                        // Contorno fino negro
+                        ctx.strokeStyle = '#000000';
+                        ctx.lineWidth = 2.5;
+                        ctx.strokeText(cb.title, 0, -10);
+
+                        // 3. Subtítulo explicativo en caja de texto cómic
+                        if (cb.subtitle) {
+                            ctx.font = '800 11px Plus Jakarta Sans, sans-serif';
+                            const subW = ctx.measureText(cb.subtitle).width + 16;
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(-subW / 2 + 2, 16 + 2, subW, 20);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(-subW / 2, 16, subW, 20);
+                            ctx.strokeStyle = '#000000';
+                            ctx.lineWidth = 1.5;
+                            ctx.strokeRect(-subW / 2, 16, subW, 20);
+
+                            ctx.fillStyle = '#0f172a';
+                            ctx.fillText(cb.subtitle, 0, 26);
+                        }
+
+                        ctx.restore();
+                    }
+                }
+
+                drawComicExplosionStar(ctx, cx, cy, outerR, innerR, fillYellow) {
+                    const points = 16;
+                    ctx.save();
+                    ctx.beginPath();
+                    for (let i = 0; i < points * 2; i++) {
+                        const r = (i % 2 === 0) ? outerR : innerR;
+                        const a = (i * Math.PI) / points;
+                        const x = cx + Math.cos(a) * r;
+                        const y = cy + Math.sin(a) * (r * 0.65);
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+
+                    // Sombra cómic negra desplazada
+                    ctx.fillStyle = '#000000';
+                    ctx.fill();
+                    ctx.translate(-4, -4);
+
+                    // Relleno de explosión amarillo/dorado
+                    ctx.fillStyle = fillYellow;
+                    ctx.fill();
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 3.5;
+                    ctx.stroke();
+
+                    // Puntos de semitono (Ben-day dots)
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+                    for (let dx = -innerR; dx < innerR; dx += 12) {
+                        for (let dy = -innerR * 0.5; dy < innerR * 0.5; dy += 12) {
+                            ctx.beginPath();
+                            ctx.arc(cx + dx, cy + dy, 1.8, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    ctx.restore();
+                }
+
+                // SISTEMA DE PARTÍCULAS
                 createHitSparks(x, y, colorHex) {
                     for (let i = 0; i < 18; i++) {
                         const angle = Math.random() * Math.PI * 2;
                         const speed = 2.5 + Math.random() * 5.5;
                         this.particles.push({
-                            x: x,
-                            y: y,
+                            x: x, y: y,
                             vx: Math.cos(angle) * speed,
                             vy: Math.sin(angle) * speed,
                             radius: 2 + Math.random() * 3,
                             color: colorHex,
-                            alpha: 1,
-                            decay: 0.035,
-                            gravity: 0.12
+                            alpha: 1, decay: 0.035, gravity: 0.12
                         });
                     }
                 }
@@ -1298,16 +1954,12 @@
                         const angle = Math.random() * Math.PI * 2;
                         const speed = 3 + Math.random() * 6;
                         this.particles.push({
-                            x: x,
-                            y: y,
+                            x: x, y: y,
                             vx: Math.cos(angle) * speed,
                             vy: Math.sin(angle) * speed,
                             radius: 3 + Math.random() * 3,
                             color: '#f59e0b',
-                            alpha: 1,
-                            decay: 0.025,
-                            gravity: 0.18,
-                            isCoin: true
+                            alpha: 1, decay: 0.025, gravity: 0.18
                         });
                     }
                 }
@@ -1318,15 +1970,12 @@
                         const angle = Math.random() * Math.PI * 2;
                         const speed = 3 + Math.random() * 8;
                         this.particles.push({
-                            x: x,
-                            y: y,
+                            x: x, y: y,
                             vx: Math.cos(angle) * speed,
                             vy: Math.sin(angle) * speed,
                             radius: 3 + Math.random() * 4,
                             color: colors[Math.floor(Math.random() * colors.length)],
-                            alpha: 1,
-                            decay: 0.02,
-                            gravity: 0.1
+                            alpha: 1, decay: 0.02, gravity: 0.1
                         });
                     }
                 }
@@ -1336,43 +1985,32 @@
                         const angle = Math.random() * Math.PI * 2;
                         const speed = 2 + Math.random() * 7;
                         this.particles.push({
-                            x: x,
-                            y: y,
+                            x: x, y: y,
                             vx: Math.cos(angle) * speed,
                             vy: Math.sin(angle) * speed,
                             radius: 3 + Math.random() * 4,
                             color: color,
-                            alpha: 1,
-                            decay: 0.03,
-                            gravity: 0.08
+                            alpha: 1, decay: 0.03, gravity: 0.08
                         });
                     }
                 }
 
                 createMissRipple(x, y) {
                     this.particles.push({
-                        x: x,
-                        y: y,
-                        vx: 0,
-                        vy: 0,
-                        radius: 12,
-                        maxRadius: 45,
+                        x: x, y: y,
+                        vx: 0, vy: 0,
+                        radius: 12, maxRadius: 45,
                         color: 'rgba(255, 255, 255, 0.4)',
-                        alpha: 0.8,
-                        decay: 0.05,
+                        alpha: 0.8, decay: 0.05,
                         isRipple: true
                     });
                 }
 
                 addFloatingText(x, y, text, color) {
                     this.floatingTexts.push({
-                        x: x,
-                        y: y,
-                        text: text,
-                        color: color,
-                        alpha: 1,
-                        vy: 1.8,
-                        decay: 0.025
+                        x: x, y: y,
+                        text: text, color: color,
+                        alpha: 1, vy: 1.8, decay: 0.025
                     });
                 }
 
@@ -1412,7 +2050,7 @@
                     }
                 }
 
-                // GESTIÓN DE HUD Y PUNTUACIONES
+                // HUD Y ACTUALIZACIONES DE INTERFAZ
                 updateHUD() {
                     const elScore = document.getElementById('hud-score');
                     if (elScore) elScore.textContent = this.score.toLocaleString();
@@ -1424,9 +2062,9 @@
                     if (elMulti) {
                         elMulti.textContent = `x${this.multiplier} MULTI`;
                         if (this.multiplier >= 3) {
-                            elMulti.className = 'font-game text-xs font-black px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 shadow-md fever-glow uppercase';
+                            elMulti.className = 'font-game text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 shadow-md fever-glow uppercase';
                         } else {
-                            elMulti.className = 'font-game text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase';
+                            elMulti.className = 'font-game text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase';
                         }
                     }
 
@@ -1436,27 +2074,49 @@
                         let html = '';
                         for (let i = 0; i < 3; i++) {
                             if (i < this.lives) {
-                                html += '<span class="text-base text-emerald-400">⚽</span>';
+                                html += '<span class="text-sm text-emerald-400">⚽</span>';
                             } else {
-                                html += '<span class="text-base text-slate-600 opacity-40">⚽</span>';
+                                html += '<span class="text-sm text-slate-600 opacity-40">⚽</span>';
                             }
                         }
                         elLives.innerHTML = html;
                     }
 
-                    // Récord del socio actual
-                    const currentBest = this.highScores[this.currentSocio]?.score || 0;
-                    const elHighScore = document.getElementById('hud-high-score');
-                    if (elHighScore) elHighScore.textContent = currentBest.toLocaleString();
+                    // Temporizador del Nivel y Barra de 2 minutos
+                    const remainingSec = Math.max(0, Math.ceil(this.levelDuration - this.levelElapsed));
+                    const mins = String(Math.floor(remainingSec / 60)).padStart(2, '0');
+                    const secs = String(remainingSec % 60).padStart(2, '0');
+                    const elTimer = document.getElementById('hud-level-timer');
+                    if (elTimer) elTimer.textContent = `${mins}:${secs}`;
 
-                    // Barra de fiebre
-                    const bar = document.getElementById('fever-progress-bar');
+                    const elLvlBadge = document.getElementById('hud-level-badge');
+                    if (elLvlBadge) elLvlBadge.textContent = `NIVEL ${this.level}`;
+
+                    const bar = document.getElementById('level-progress-bar');
                     if (bar) {
-                        const progress = Math.min(100, (this.combo / 20) * 100);
+                        const progress = Math.min(100, (this.levelElapsed / this.levelDuration) * 100);
                         bar.style.width = `${progress}%`;
                     }
 
-                    // Nombre del socio en header
+                    // Chips de Buffs Activos en HUD
+                    const buffsContainer = document.getElementById('hud-active-buffs');
+                    if (buffsContainer) {
+                        let buffsHtml = '';
+                        if (this.buffs.doubleSpawnTime > 0) {
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-[10px] font-extrabold text-amber-300">📖 Lluvia x2 (${Math.ceil(this.buffs.doubleSpawnTime)}s)</span>`;
+                        }
+                        if (this.buffs.frogPenaltyTime > 0) {
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-extrabold text-emerald-300">🐸 Puntos ÷2 (${Math.ceil(this.buffs.frogPenaltyTime)}s)</span>`;
+                        }
+                        if (this.buffs.poloBonusTime > 0) {
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-white/20 border border-white/40 text-[10px] font-extrabold text-white">👕 Puntos x2 (${Math.ceil(this.buffs.poloBonusTime)}s)</span>`;
+                        }
+                        if (this.buffs.emilioSlowMoTime > 0) {
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-rose-500/20 border border-rose-500/40 text-[10px] font-extrabold text-rose-300">🥾 Slo-Mo (${Math.ceil(this.buffs.emilioSlowMoTime)}s)</span>`;
+                        }
+                        buffsContainer.innerHTML = buffsHtml;
+                    }
+
                     const elSocioName = document.getElementById('socio-display-name');
                     if (elSocioName) elSocioName.textContent = this.currentSocio;
                 }
@@ -1468,13 +2128,11 @@
                         this.stopMusic();
                         this.playSound('whistle');
 
-                        // Guardar puntuación si supera récord
-                        this.saveScore(this.currentSocio, this.score, this.maxCombo);
+                        this.saveScore(this.currentSocio, this.score, this.maxCombo, this.level);
 
-                        // Mostrar modal Game Over
                         document.getElementById('final-score').textContent = this.score.toLocaleString();
                         document.getElementById('final-combo').textContent = this.maxCombo;
-                        document.getElementById('final-hits').textContent = `${this.hitsCount} (${this.perfectCount} perf.)`;
+                        document.getElementById('final-level').textContent = `Nivel ${this.level}`;
                         document.getElementById('final-socio-name').textContent = this.currentSocio;
                         document.getElementById('final-best').textContent = (this.highScores[this.currentSocio]?.score || this.score).toLocaleString();
 
@@ -1497,9 +2155,7 @@
                                 membersList = data.map(m => m.name);
                             }
                         }
-                    } catch (e) {
-                        console.warn("Usando socios por defecto:", e);
-                    }
+                    } catch (e) {}
 
                     select.innerHTML = membersList.map(name => {
                         const selected = name === this.currentSocio ? 'selected' : '';
@@ -1517,24 +2173,19 @@
                     document.getElementById('modal-start').classList.remove('hidden');
                 }
 
-                // GUARDADO Y CARGA DE RÉCORDS (FIRESTORE + LOCALSTORAGE)
+                // GUARDADO Y CARGA DE RÉCORDS
                 async loadHighScores() {
-                    // 1. Cargar desde LocalStorage inmediato
                     try {
                         const local = localStorage.getItem('maulas_arcade_frenesi_records');
-                        if (local) {
-                            this.highScores = JSON.parse(local);
-                        }
+                        if (local) this.highScores = JSON.parse(local);
                     } catch (e) {}
 
-                    // 2. Cargar desde Firestore Cloud
                     try {
                         if (window.firebase && window.firebase.firestore) {
                             const db = window.firebase.firestore();
                             const doc = await db.collection('game_records').doc('frenesi_highscores').get();
                             if (doc.exists) {
                                 const cloudScores = doc.data().scores || {};
-                                // Mezclar manteniendo el valor más alto
                                 Object.keys(cloudScores).forEach(socio => {
                                     if (!this.highScores[socio] || cloudScores[socio].score > this.highScores[socio].score) {
                                         this.highScores[socio] = cloudScores[socio];
@@ -1543,20 +2194,18 @@
                                 localStorage.setItem('maulas_arcade_frenesi_records', JSON.stringify(this.highScores));
                             }
                         }
-                    } catch (e) {
-                        console.warn("Modo offline en récords:", e);
-                    }
+                    } catch (e) {}
                     this.updateHUD();
                 }
 
-                async saveScore(socio, newScore, maxCombo) {
+                async saveScore(socio, newScore, maxCombo, levelReached) {
                     if (!socio) return;
-                    const prev = this.highScores[socio] || { score: 0, maxCombo: 0, games: 0 };
+                    const prev = this.highScores[socio] || { score: 0, maxCombo: 0, maxLevel: 1, games: 0 };
                     
-                    const isNewRecord = newScore > prev.score;
                     const recordData = {
                         score: Math.max(prev.score, newScore),
                         maxCombo: Math.max(prev.maxCombo, maxCombo),
+                        maxLevel: Math.max(prev.maxLevel || 1, levelReached || 1),
                         games: (prev.games || 0) + 1,
                         lastPlayed: new Date().toISOString()
                     };
@@ -1564,7 +2213,6 @@
                     this.highScores[socio] = recordData;
                     localStorage.setItem('maulas_arcade_frenesi_records', JSON.stringify(this.highScores));
 
-                    // Sincronizar en la nube si hay conexión
                     try {
                         if (window.firebase && window.firebase.firestore) {
                             const db = window.firebase.firestore();
@@ -1572,11 +2220,8 @@
                                 scores: this.highScores,
                                 updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
                             }, { merge: true });
-                            console.log("Récord sincronizado en Firestore Cloud.");
                         }
-                    } catch (e) {
-                        console.warn("Guardado local (nube no disponible):", e);
-                    }
+                    } catch (e) {}
 
                     this.updateHUD();
                 }
@@ -1586,7 +2231,6 @@
                     const container = document.getElementById('ranking-list-container');
                     if (!modal || !container) return;
 
-                    // Ordenar socios por puntuación descendente
                     const sorted = Object.entries(this.highScores)
                         .map(([name, data]) => ({ name, ...data }))
                         .sort((a, b) => b.score - a.score);
@@ -1621,7 +2265,7 @@
                                         ${badge}
                                         <div>
                                             <span class="font-extrabold text-xs block text-white">${entry.name}</span>
-                                            <span class="text-[10px] text-slate-400">Combo: ${entry.maxCombo || 0} 🔥</span>
+                                            <span class="text-[10px] text-slate-400">Combo: ${entry.maxCombo || 0} 🔥 · Nivel ${entry.maxLevel || 1}</span>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -1641,7 +2285,6 @@
                 }
             }
 
-            // Instancia Global
             window.addEventListener('DOMContentLoaded', () => {
                 window.ArcadeFrenesi = new FrenesiEngine();
             });
