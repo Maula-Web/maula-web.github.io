@@ -823,9 +823,9 @@
                     this.levelDuration = 120; // 2 minutos en segundos
                     this.levelElapsed = 0;
                     this.totalPlayTime = 0;
-                    this.baseInitialSpeed = 3.6;
-                    this.currentBaseSpeed = 3.6;
-                    this.maxPlayableSpeed = 7.8; // Máximo de velocidad jugable equilibrada
+                    this.baseInitialSpeed = 5.0;
+                    this.currentBaseSpeed = 5.0;
+                    this.maxPlayableSpeed = 9.8; // Máximo de velocidad jugable equilibrada y desafiante
 
                     // Control de Baja de Velocidad Temporal (Slo-Mo Echar a Emilio)
                     this.slowMoTimer = 0;    // Duración activa de velocidad reducida (-30%, máx <=10s)
@@ -1325,8 +1325,8 @@
                     this.level = 1;
                     this.levelElapsed = 0;
                     this.totalPlayTime = 0;
-                    this.baseInitialSpeed = 3.6;
-                    this.currentBaseSpeed = 3.6;
+                    this.baseInitialSpeed = 5.0;
+                    this.currentBaseSpeed = 5.0;
 
                     // Reinicio de Baja de Velocidad y Cooldowns
                     this.slowMoTimer = 0;
@@ -1437,8 +1437,8 @@
                     this.doblesHitBalls = 0;
                     this.doblesMissedAny = false;
 
-                    // Comienza a velocidad 1.5x de la velocidad actual
-                    this.doblesBaseSpeed = Math.max(5.4, this.currentBaseSpeed * 1.5);
+                    // Comienza con aceleración sobre la velocidad actual (mínimo 7.0)
+                    this.doblesBaseSpeed = Math.max(7.0, this.currentBaseSpeed * 1.35);
                     this.doblesCurrentSpeed = this.doblesBaseSpeed;
 
                     // Todos los elementos de la pantalla desaparecen
@@ -1683,40 +1683,39 @@
                     const baseSpeed = Math.max(this.baseInitialSpeed, this.currentBaseSpeed);
                     let speed = baseSpeed;
                     let speedTier = 'normal';
+                    let speedMultiplier = 1.0;
 
                     if (type === 'emilio') {
-                        speed = baseSpeed * 2.6; // ¡Emilio baja a toda velocidad!
+                        speedMultiplier = 2.4; // Emilio cae como una exhalación
                         speedTier = 'emilio';
                     } else if (this.level >= 3) {
                         // A partir del nivel 3 habrá elementos que caigan a velocidades distintas
                         const speedRoll = Math.random();
-                        let mult = 1.0;
 
                         if (speedRoll < 0.28) {
                             // Ráfaga relámpago (mucho más rápido)
-                            mult = 1.35 + Math.random() * 0.20;
+                            speedMultiplier = 1.35 + Math.random() * 0.15;
                             speedTier = 'superfast';
                         } else if (speedRoll < 0.60) {
                             // Balón acelerado con efecto
-                            mult = 1.18 + Math.random() * 0.12;
+                            speedMultiplier = 1.18 + Math.random() * 0.10;
                             speedTier = 'fast';
                         } else if (speedRoll < 0.82) {
                             // Cambio de tempo (más pausado pero nunca menor que la velocidad inicial)
-                            mult = 0.88;
+                            speedMultiplier = 0.90;
                             speedTier = 'slow';
                         } else {
-                            mult = 1.0;
+                            speedMultiplier = 1.0;
                             speedTier = 'normal';
                         }
 
                         // En niveles más altos (4+), la velocidad punta crece progresivamente
                         if (this.level >= 4) {
-                            mult += (this.level - 3) * 0.05;
+                            speedMultiplier += (this.level - 3) * 0.04;
                         }
-
-                        // REGLA FUNDAMENTAL: La velocidad nunca bajará más de la inicial
-                        speed = Math.max(this.baseInitialSpeed, baseSpeed * mult);
                     }
+
+                    speed = Math.max(this.baseInitialSpeed, baseSpeed * speedMultiplier);
 
                     // Trayectoria con efecto / cambio de carril (Solo balones normales/oro/pleno a partir del nivel 5, exactamente 5% de probabilidad)
                     let trajectoryShift = null;
@@ -1740,6 +1739,7 @@
                         type: type,
                         y: -45,
                         speed: speed,
+                        speedMultiplier: speedMultiplier,
                         speedTier: speedTier,
                         radius: type === 'pleno' ? 36 : (type === 'emilio' ? 26 : 28),
                         rotation: 0,
@@ -2124,10 +2124,10 @@
                         this.totalPlayTime += dt;
                         const progressInLevel = Math.min(1.0, this.levelElapsed / this.levelDuration);
 
-                        // Curva de velocidad continua que sube suavemente hasta el tope jugable (sin resetear al cambiar de nivel)
-                        const levelBase = this.baseInitialSpeed + Math.min(3.4, (this.level - 1) * 0.85);
-                        const levelProg = (this.level >= 5 ? 0 : progressInLevel * 0.85);
-                        this.currentBaseSpeed = Math.min(this.maxPlayableSpeed, levelBase + levelProg);
+                        // Curva de velocidad continua y perceptible que escala dinámicamente con el tiempo y el nivel
+                        const timeProgression = this.totalPlayTime * 0.024;
+                        const levelProgression = (this.level - 1) * 0.65;
+                        this.currentBaseSpeed = Math.min(this.maxPlayableSpeed, this.baseInitialSpeed + timeProgression + levelProgression);
 
                         // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL CON ONOMATOPEYA!
                         if (this.levelElapsed >= this.levelDuration) {
@@ -2159,12 +2159,13 @@
                             this.addComicBanner(info.onomato, info.sub, info.bg, '#ffffff');
                         }
 
-                        // El número de elementos que caen aumenta lentamente:
-                        const maxAllowedNotes = Math.min(6, 3 + Math.floor((this.level - 1) * 0.75) + (progressInLevel > 0.4 ? 1 : 0));
+                        // El número de elementos que caen aumenta gradualmente con la partida:
+                        const maxAllowedNotes = Math.min(7, 4 + Math.floor((this.level - 1) * 0.8) + (this.totalPlayTime > 40 ? 1 : 0));
 
-                        // El intervalo de caída se reduce drásticamente durante Estatutos (Lluvia rápida)
-                        let spawnRate = Math.max(480, 1080 - (this.level * 65) - (progressInLevel * 220));
-                        if (this.buffs.doubleSpawnTime > 0) spawnRate = 260; // Lluvia rápida de balones
+                        // El intervalo de caída se reduce continuamente con el tiempo de juego y nivel (ritmo arcade trepidante)
+                        let baseSpawn = 780 - (this.totalPlayTime * 1.6) - ((this.level - 1) * 75);
+                        let spawnRate = Math.max(360, baseSpawn);
+                        if (this.buffs.doubleSpawnTime > 0) spawnRate = 240; // Lluvia rápida de balones (Estatutos)
 
                         if (timestamp - this.lastSpawnTime > spawnRate) {
                             const canSpawn = (this.buffs.doubleSpawnTime > 0)
@@ -2174,7 +2175,7 @@
                             if (canSpawn) {
                                 this.spawnNote();
 
-                                const multiChance = (this.buffs.doubleSpawnTime > 0) ? 0.35 : Math.min(0.20, 0.04 + ((this.level - 1) * 0.04) + (progressInLevel * 0.05));
+                                const multiChance = (this.buffs.doubleSpawnTime > 0) ? 0.35 : Math.min(0.24, 0.05 + ((this.level - 1) * 0.04) + (this.totalPlayTime * 0.001));
                                 if (Math.random() < multiChance && ((this.buffs.doubleSpawnTime > 0) ? this.notes.length < 8 : this.notes.length < maxAllowedNotes)) {
                                     this.spawnNote();
                                 }
@@ -2191,7 +2192,7 @@
                     // 4. Actualizar Notas
                     for (let i = this.notes.length - 1; i >= 0; i--) {
                         const note = this.notes[i];
-                        let speed = note.speed;
+                        let speed = note.speedMultiplier ? (this.currentBaseSpeed * note.speedMultiplier) : note.speed;
                         if (this.isDoblesMode) {
                             if (note.type === 'noreduce') speed = this.doblesCurrentSpeed * 2.6;
                             else speed = this.doblesCurrentSpeed;

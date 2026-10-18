@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡los Estatutos ahora desatan una lluvia rápida de balones y disparan el combo x3!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡velocidad inicial más viva y aceleración continua dinámica para un auténtico reto arcade!`,
                 url: 'juego.html'
             });
 
