@@ -107,6 +107,20 @@ const Auth = {
                     <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Sandbox</span>
                 `;
                 adminLinkV2.insertAdjacentElement('afterend', btnV2);
+
+                // Botón directo a Arcade Frenesí 1-X-2
+                if (!document.getElementById('btn-arcade-nav-v2')) {
+                    const btnArcade = document.createElement('a');
+                    btnArcade.id = 'btn-arcade-nav-v2';
+                    btnArcade.href = 'sandbox_juego.html';
+                    btnArcade.className = 'flex flex-col items-center justify-center px-1.5 sm:px-2 xl:px-2.5 py-1 rounded-xl text-center hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold transition group flex-shrink-0 animate-pulse';
+                    btnArcade.title = 'Arcade Frenesí 1-X-2 (Exclusivo Fernando)';
+                    btnArcade.innerHTML = `
+                        <span class="text-sm xl:text-base leading-none group-hover:scale-110 transition-transform">🎮</span>
+                        <span class="text-[10px] xl:text-[11px] font-bold whitespace-nowrap mt-1">Arcade</span>
+                    `;
+                    btnV2.insertAdjacentElement('afterend', btnArcade);
+                }
             }
 
             // 2. En versión V1 (sidebar-menu)
@@ -126,6 +140,19 @@ const Auth = {
                     adminLinkV1.insertAdjacentElement('afterend', btnV1);
                 } else {
                     sidebar.appendChild(btnV1);
+                }
+
+                if (!document.getElementById('btn-arcade-sidebar')) {
+                    const btnArcadeV1 = document.createElement('a');
+                    btnArcadeV1.id = 'btn-arcade-sidebar';
+                    btnArcadeV1.href = 'sandbox_juego.html';
+                    btnArcadeV1.className = 'btn-primary';
+                    btnArcadeV1.style.border = '1px dashed #f59e0b';
+                    btnArcadeV1.style.color = '#f59e0b';
+                    btnArcadeV1.style.fontWeight = 'bold';
+                    btnArcadeV1.textContent = '🎮 ARCADE';
+                    btnArcadeV1.title = 'Arcade Frenesí 1-X-2 (Exclusivo Fernando)';
+                    btnV1.insertAdjacentElement('afterend', btnArcadeV1);
                 }
             }
         };

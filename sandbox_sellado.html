@@ -125,7 +125,10 @@
                 <button id="btn-recargar-sandbox" onclick="SandboxManager.recargarDatos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 shadow cursor-pointer active:scale-95">
                     🔄 Recargar
                 </button>
-                <button onclick="SandboxManager.switchTab('triples'); document.getElementById('tab-btn-triples').scrollIntoView({behavior: 'smooth'});" class="px-3.5 py-1.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 hover:text-white text-xs font-black transition flex items-center gap-1.5 border border-purple-500/50 shadow cursor-pointer active:scale-95 animate-pulse">
+                <button onclick="SandboxManager.switchTab('arcade'); document.getElementById('view-tab-arcade').scrollIntoView({behavior: 'smooth'});" class="px-3.5 py-1.5 rounded-xl bg-amber-500/25 hover:bg-amber-500/40 text-amber-300 hover:text-white text-xs font-black transition flex items-center gap-1.5 border border-amber-500/50 shadow cursor-pointer active:scale-95 animate-pulse">
+                    <span>🎮</span> Arcade 1-X-2
+                </button>
+                <button onclick="SandboxManager.switchTab('triples'); document.getElementById('tab-btn-triples').scrollIntoView({behavior: 'smooth'});" class="px-3.5 py-1.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 hover:text-white text-xs font-black transition flex items-center gap-1.5 border border-purple-500/50 shadow cursor-pointer active:scale-95">
                     <span>⚡</span> 9 Triples (Simulador MD)
                 </button>
                 <button onclick="SelladoService.mostrarModalHistorial()" class="px-3 py-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 border border-emerald-500/40 shadow cursor-pointer active:scale-95">
@@ -133,6 +136,32 @@
                 </button>
             </div>
         </header>
+
+        <!-- BANNER DE ACCESO DIRECTO AL ARCADE FRENESÍ 1-X-2 -->
+        <div class="glass-panel p-3.5 sm:p-4 border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900/80 to-purple-950/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 border border-amber-300/50 flex items-center justify-center text-2xl shadow-lg shrink-0">
+                    ⚽
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">NUEVO JUEGO ARCADE</span>
+                        <span class="text-sm text-white font-extrabold">FRENESÍ 1-X-2 (SANDBOX VIP)</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-0.5">
+                        Juego de habilidad con ritmo 1-X-2, balones de lava (swipe up), metamórficos, botón de Echar a Emilio, gradas animadas y ranking de socios.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                <button onclick="SandboxManager.switchTab('arcade'); document.getElementById('view-tab-arcade').scrollIntoView({behavior: 'smooth'});" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-500/30 hover:bg-amber-500/50 text-amber-300 hover:text-white font-black text-xs transition border border-amber-500/50 flex items-center justify-center gap-1.5 shadow">
+                    <span>🎮</span> Ver Aquí Abajo
+                </button>
+                <a href="sandbox_juego.html" target="_blank" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95">
+                    <span>🚀</span> Pantalla Completa ↗
+                </a>
+            </div>
+        </div>
 
         <!-- BANNER DE ACCESO DIRECTO AL ESTUDIO DE 9 TRIPLES -->
         <div class="glass-panel p-3.5 sm:p-4 border-purple-500/40 bg-gradient-to-r from-purple-950/40 via-slate-900/60 to-purple-950/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
@@ -770,6 +799,9 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     <button id="tab-btn-dobles" onclick="SandboxManager.switchTab('dobles')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent whitespace-nowrap">
                         <span>🎲</span> Desglose Dobles (16 Apuestas)
                     </button>
+                    <button id="tab-btn-arcade" onclick="SandboxManager.switchTab('arcade')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 border border-amber-500/40 whitespace-nowrap shadow-sm">
+                        <span>🎮</span> Arcade Frenesí 1-X-2
+                    </button>
                     <button id="tab-btn-triples" onclick="SandboxManager.switchTab('triples')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-purple-400 hover:text-purple-300 hover:bg-purple-950/40 border border-purple-500/30 whitespace-nowrap">
                         <span>⚡</span> Simulador 9 Triples (25 Apuestas · MD)
                     </button>
@@ -987,6 +1019,34 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     </div>
                 </div>
 
+            </div>
+
+            <!-- VISTA 5: ARCADE FRENESÍ 1-X-2 (MINIJUEGO DE HABILIDAD) -->
+            <div id="view-tab-arcade" class="hidden space-y-4">
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900/80 to-purple-950/40 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 border border-amber-300/50 flex items-center justify-center text-2xl shadow-lg shrink-0">
+                            ⚽
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">MINIJUEGO DE LA PEÑA</span>
+                                <span class="text-sm text-white font-extrabold">Frenesí 1-X-2 (Modo Sandbox Arcade)</span>
+                            </div>
+                            <p class="text-xs text-slate-300 mt-0.5">
+                                Ritmo 1-X-2 con balones de lava (swipe up), metamórficos, botón de Echar a Emilio, gradas animadas, música de Gol Rápido y ranking oficial de socios.
+                            </p>
+                        </div>
+                    </div>
+                    <a href="sandbox_juego.html" target="_blank" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 shrink-0 cursor-pointer active:scale-95">
+                        <span>🚀</span> Abrir en Pantalla Completa ↗
+                    </a>
+                </div>
+
+                <!-- Marco de Juego Embebido -->
+                <div class="w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-[#040711]">
+                    <iframe src="sandbox_juego.html" class="w-full h-[760px] border-0" allow="autoplay"></iframe>
+                </div>
             </div>
 
         <!-- CONSOLA DE AUDITORÍA Y REGISTRO EN TIEMPO REAL -->
@@ -1710,7 +1770,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
 
             switchTab(tabId) {
                 this.currentTab = tabId;
-                const tabs = ['txt', 'socios', 'dobles', 'triples'];
+                const tabs = ['txt', 'socios', 'dobles', 'triples', 'arcade'];
                 tabs.forEach(t => {
                     const btn = document.getElementById(`tab-btn-${t}`);
                     const view = document.getElementById(`view-tab-${t}`);
@@ -1718,6 +1778,8 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     if (t === tabId) {
                         if (t === 'triples') {
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-purple-500/20 text-purple-300 border border-purple-500/40 whitespace-nowrap shadow';
+                        } else if (t === 'arcade') {
+                            btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/50 whitespace-nowrap shadow-md';
                         } else {
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap';
                         }
