@@ -237,8 +237,13 @@
                     <span class="text-[11px] font-mono-bold text-slate-300" id="hud-level-timer">02:00</span>
                 </div>
 
-                <!-- Botones de Acción (Pausa, Ranking, Audio) -->
+                <!-- Botones de Acción (Volver Web, Audio, Ranking, Pausa) -->
                 <div class="flex items-center gap-1 shrink-0">
+                    <a href="sandbox_sellado.html" 
+                       class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-emerald-500/80 flex items-center justify-center text-xs transition text-slate-300 hover:text-white" 
+                       title="Volver a la Web de la Peña">
+                        <span>🌐</span>
+                    </a>
                     <button type="button" id="btn-toggle-sound" onclick="window.ArcadeFrenesi.toggleSound()" 
                             class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
                         <span id="sound-icon">🔊</span>
@@ -438,7 +443,7 @@
                         <span class="text-slate-300 font-bold flex items-center gap-1.5">
                             <span>🎵</span> Música Principal
                         </span>
-                        <span class="text-[10px] text-amber-400" id="music-status-label">Gol Rápido (Oficial)</span>
+                        <span class="text-[10px] text-amber-400 font-mono" id="music-status-label">Fast_Goal.mp3 (Oficial)</span>
                     </div>
                     <input type="file" id="mp3-file-input" accept="audio/mp3,audio/*" class="w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer">
                 </div>
@@ -447,17 +452,24 @@
                         <span class="text-purple-300 font-bold flex items-center gap-1.5">
                             <span>⚡</span> Música Modo Dobles
                         </span>
-                        <span class="text-[10px] text-purple-400" id="dobles-music-status-label">audio/modo_dobles.mp3</span>
+                        <span class="text-[10px] text-purple-400 font-mono" id="dobles-music-status-label">Dobles.mp3 (Oficial)</span>
                     </div>
                     <input type="file" id="dobles-mp3-file-input" accept="audio/mp3,audio/*" class="w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
                 </div>
             </div>
 
-            <!-- Botón Jugar -->
-            <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
-                    class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-2xl tracking-wide hover:brightness-110 shadow-xl shadow-amber-500/25 transition transform active:scale-95">
-                ¡SALTAR AL CÉSPED! 🚀
-            </button>
+            <!-- Botones de Inicio y Volver a la Web (Pantalla Principal) -->
+            <div class="flex items-center gap-2 w-full">
+                <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
+                        class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-2xl tracking-wide hover:brightness-110 shadow-xl shadow-amber-500/25 transition transform active:scale-95">
+                    ¡SALTAR AL CÉSPED! 🚀
+                </button>
+                <a href="sandbox_sellado.html" 
+                   class="px-4 py-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition whitespace-nowrap shadow-md"
+                   title="Volver a la Web de la Peña">
+                    <span>🌐</span> Volver a la Web
+                </a>
+            </div>
         </div>
     </div>
 
@@ -496,7 +508,7 @@
                 </div>
             </div>
 
-            <!-- Botones de Acción Post-Partida -->
+            <!-- Botones de Acción Post-Partida (Pitido Final) -->
             <div class="flex items-center gap-2 w-full mt-2">
                 <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
                         class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-comic text-xl shadow-lg hover:brightness-110 active:scale-95 transition">
@@ -507,6 +519,12 @@
                     🏆 Ranking
                 </button>
             </div>
+
+            <!-- Botón Volver a la Web en Pantalla Pitido Final -->
+            <a href="sandbox_sellado.html" 
+               class="w-full py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 hover:border-emerald-500/80 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+                <span>🌐</span> Volver a la Web de la Peña
+            </a>
         </div>
     </div>
 
@@ -728,12 +746,17 @@
                     window.addEventListener('pointerdown', unlockAudio, { once: true });
                     window.addEventListener('keydown', unlockAudio, { once: true });
 
-                    // Cargar por defecto la música oficial de la Peña: Gol Rápido
+                    // Cargar por defecto la música oficial del juego: Fast_Goal.mp3
                     try {
-                        this.bgMusicPlayer.src = 'audio/gol_rapido.mp3';
+                        this.bgMusicPlayer.src = 'datos_auxiliares/Fast_Goal.mp3';
+                        this.bgMusicPlayer.addEventListener('error', () => {
+                            if (!this.bgMusicPlayer.src.endsWith('Fast_Goal.mp3') && !this.bgMusicPlayer.src.endsWith('gol_rapido.mp3')) {
+                                this.bgMusicPlayer.src = 'audio/gol_rapido.mp3';
+                            }
+                        }, { once: true });
                         this.hasCustomMusic = true;
                         const musicLabel = document.getElementById('music-status-label');
-                        if (musicLabel) musicLabel.textContent = '🎵 Gol Rápido (Oficial)';
+                        if (musicLabel) musicLabel.textContent = '🎵 Fast_Goal.mp3 (Oficial)';
                     } catch (e) {
                         console.warn("Música por defecto:", e);
                     }
@@ -751,12 +774,12 @@
                         });
                     }
 
-                    // Cargar por defecto la música del Modo Dobles
+                    // Cargar por defecto la música del Modo Dobles: Dobles.mp3
                     try {
                         if (this.doblesMusicPlayer) {
-                            this.doblesMusicPlayer.src = 'audio/modo_dobles.mp3';
+                            this.doblesMusicPlayer.src = 'datos_auxiliares/Dobles.mp3';
                             this.doblesMusicPlayer.addEventListener('error', () => {
-                                if (!this.doblesMusicPlayer.src.endsWith('dobles.mp3')) {
+                                if (!this.doblesMusicPlayer.src.endsWith('Dobles.mp3') && !this.doblesMusicPlayer.src.endsWith('dobles.mp3')) {
                                     this.doblesMusicPlayer.src = 'audio/dobles.mp3';
                                 }
                             }, { once: true });
