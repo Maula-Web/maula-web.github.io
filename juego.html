@@ -3187,20 +3187,20 @@
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
 
-                        // Sombra gruesa negra 3D
-                        ctx.fillStyle = '#000000';
-                        for (let off = 6; off >= 1; off--) {
-                            ctx.fillText(cb.title, off * 0.8, -10 + off * 0.8);
-                        }
+                        // 1. Sombra suave cómic (limpia y sin apelmazar el interior de las letras)
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+                        ctx.fillText(cb.title, 2, -10 + 2);
 
-                        // Texto frontal brillante
+                        // 2. Reborde negro fino y nítido (trazado primero)
+                        ctx.strokeStyle = '#000000';
+                        ctx.lineWidth = 1.6;
+                        ctx.lineJoin = 'round';
+                        ctx.miterLimit = 2;
+                        ctx.strokeText(cb.title, 0, -10);
+
+                        // 3. Relleno frontal brillante encima (conserva el 100% del interior y la legibilidad)
                         ctx.fillStyle = cb.textColor;
                         ctx.fillText(cb.title, 0, -10);
-
-                        // Contorno fino negro
-                        ctx.strokeStyle = '#000000';
-                        ctx.lineWidth = 2.5;
-                        ctx.strokeText(cb.title, 0, -10);
 
                         // 3. Subtítulo explicativo en caja de texto cómic (Texto nítido, claro y brillante)
                         if (cb.subtitle) {

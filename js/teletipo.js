@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡los paneles de puntuación, la carátula y la Tabla de Honor ahora muestran el nivel alcanzado por cada socio!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡onomatopeyas cómic con tipografía refinada, reborde fino ultra nítido y niveles en los paneles de puntuación!`,
                 url: 'juego.html'
             });
 
