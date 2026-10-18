@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: carátula con textos más grandes y legibles, elementos a distintas velocidades desde el nivel 3 y Pleno al 15!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: podio (oro, plata y bronce) reservado a aciertos con puntos > 0, carátula más legible y velocidades variadas!`,
                 url: 'juego.html'
             });
 

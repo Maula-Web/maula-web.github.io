@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Carátula mejorada con tipografía más grande y legible en móvil, y elementos a distintas velocidades desde el nivel 3.`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Podio (oro, plata y bronce) reservado para socios con puntuación > 0, textos ampliados en carátula y velocidades variadas desde el nivel 3.`,
             url: 'juego.html'
         });
 
