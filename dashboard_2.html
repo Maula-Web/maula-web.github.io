@@ -199,9 +199,9 @@
         }
 
         /* ==========================================================================
-           LAYOUT FULL-HEIGHT RESPONSIVO PARA MÓVIL (PANTALLA COMPLETA SIN SCROLL SI ESTÁ PLEGADO)
+           LAYOUT RESPONSIVO PARA MÓVIL EN VERTICAL (PORTRAIT)
            ========================================================================== */
-        @media (max-width: 767px) {
+        @media (max-width: 767px) and (orientation: portrait) {
             html, body {
                 height: 100%;
                 overflow-x: hidden;
@@ -255,7 +255,7 @@
                 margin-bottom: 0.2rem !important;
             }
 
-            /* Cuando se despliegan los detalles en móvil: permitir scroll vertical fluido */
+            /* Cuando se despliegan los detalles en móvil vertical: permitir scroll vertical fluido */
             body.mobile-details-open {
                 overflow-y: auto !important;
                 height: auto !important;
@@ -272,6 +272,61 @@
             body.mobile-details-open #hero-pillars-grid {
                 display: grid !important;
                 grid-template-rows: auto !important;
+            }
+        }
+
+        /* ==========================================================================
+           MODO HORIZONTAL / PAISAJE (SCROLL VERTICAL SIEMPRE HABILITADO)
+           ========================================================================== */
+        @media (orientation: landscape) and (max-height: 650px), (orientation: landscape) and (max-width: 1024px) {
+            html, body {
+                height: auto !important;
+                min-height: 100% !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            body.mobile-details-folded,
+            body.mobile-details-open,
+            body {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                padding-bottom: 4.5rem !important;
+            }
+            #main-content,
+            body.mobile-details-folded #main-content,
+            body.mobile-details-open #main-content {
+                display: block !important;
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+                overflow-y: visible !important;
+                padding-bottom: 3rem !important;
+            }
+            #live-jornada-banner,
+            body.mobile-details-folded #live-jornada-banner {
+                display: block !important;
+                flex: none !important;
+                min-height: auto !important;
+                height: auto !important;
+            }
+            #hero-pillars-grid,
+            body.mobile-details-folded #hero-pillars-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                grid-template-rows: auto !important;
+                flex: none !important;
+                min-height: auto !important;
+                height: auto !important;
+                gap: 0.5rem !important;
+            }
+            #hero-pillars-grid > div,
+            body.mobile-details-folded #hero-pillars-grid > div {
+                display: flex !important;
+                min-height: auto !important;
+                height: auto !important;
             }
         }
 </style>
@@ -913,28 +968,53 @@
             var ticker = document.getElementById('news-ticker-bar');
 
             function adjustDashboardMobileHeight() {
+                var isLandscape = (window.innerWidth > window.innerHeight) || (window.matchMedia && window.matchMedia('(orientation: landscape)').matches);
                 var isMobile = window.innerWidth < 768;
+                var isShortScreen = window.innerHeight < 600;
+
+                // En modo apaisado / horizontal móvil o pantallas de baja altura, SIEMPRE permitir scroll vertical natural
+                if (isLandscape && (isMobile || isShortScreen || window.innerWidth <= 1024)) {
+                    document.body.classList.remove('mobile-details-folded');
+                    document.body.classList.add('mobile-details-open');
+                    document.body.style.overflowY = 'auto';
+                    document.documentElement.style.overflowY = 'auto';
+                    if (main) {
+                        main.style.height = 'auto';
+                        main.style.minHeight = '100%';
+                        main.style.overflow = 'visible';
+                    }
+                    return;
+                }
+
                 if (!isMobile) {
                     document.body.classList.remove('mobile-details-folded', 'mobile-details-open');
+                    document.body.style.overflowY = '';
+                    document.documentElement.style.overflowY = '';
                     if (main) {
                         main.style.height = '';
                         main.style.minHeight = '';
+                        main.style.overflow = '';
                     }
                     if (det) det.open = true;
                     return;
                 }
 
-                // En móvil
+                // En móvil vertical (portrait)
                 if (det && det.open) {
                     document.body.classList.remove('mobile-details-folded');
                     document.body.classList.add('mobile-details-open');
+                    document.body.style.overflowY = 'auto';
+                    document.documentElement.style.overflowY = 'auto';
                     if (main) {
                         main.style.height = 'auto';
                         main.style.minHeight = '100%';
+                        main.style.overflow = 'visible';
                     }
                 } else {
                     document.body.classList.remove('mobile-details-open');
                     document.body.classList.add('mobile-details-folded');
+                    document.body.style.overflowY = '';
+                    document.documentElement.style.overflowY = '';
 
                     // Medir altura real del viewport disponible en el dispositivo móvil
                     var vh = window.innerHeight;
@@ -943,9 +1023,12 @@
                     var bottomSafety = 6;
                     var targetHeight = vh - tickerH - topPadding - bottomSafety;
 
-                    if (main && targetHeight > 350) {
+                    if (main && targetHeight > 420) {
                         main.style.height = targetHeight + 'px';
                         main.style.minHeight = targetHeight + 'px';
+                    } else if (main) {
+                        main.style.height = 'auto';
+                        main.style.minHeight = '100%';
                     }
                 }
             }
