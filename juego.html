@@ -290,7 +290,7 @@
                 </div>
             </div>
 
-            <!-- Chips de Power-ups Activos (Estatutos, Rana, Polo, Emilio Slo-mo) -->
+            <!-- Chips de Power-ups Activos (Estatutos, Rana, Polo) -->
             <div id="hud-active-buffs" class="flex items-center gap-1.5 flex-wrap min-h-[22px]">
                 <!-- Inyectado dinámicamente -->
             </div>
@@ -637,7 +637,7 @@
                         <strong>Si consigues echar a Emilio, te quedarás relajado y eso se nota...</strong>
                     </p>
                     <p class="text-slate-300 text-[11px]">
-                        Caza la bota para detonar todos los elementos presentes en pantalla con puntuación doble (+200 pts cada uno) y activar <strong>10 segundos de cámara lenta</strong> relajante. Dejar pasar este elemento <strong>NO resta vidas</strong>.
+                        Caza la bota para detonar todos los elementos presentes en pantalla con puntuación doble (+200 pts cada uno) y limpiar por completo la pantalla para darte un respiro. Dejar pasar este elemento <strong>NO resta vidas</strong>.
                     </p>
                 </div>
 
@@ -769,8 +769,7 @@
                     this.buffs = {
                         doubleSpawnTime: 0,   // Estatutos (3s de lluvia x2)
                         frogPenaltyTime: 0,   // Rana (10s de puntos / 2)
-                        poloBonusTime: 0,     // Polo negro cuello blanco (10s de puntos x2)
-                        emilioSlowMoTime: 0   // Echar a Emilio (10s de velocidad reducida a la mitad)
+                        poloBonusTime: 0      // Polo negro cuello blanco (10s de puntos x2)
                     };
                     this.timeFreeze = 0; // Detención momentánea al cazar a Emilio
 
@@ -1237,8 +1236,7 @@
                     this.buffs = {
                         doubleSpawnTime: 0,
                         frogPenaltyTime: 0,
-                        poloBonusTime: 0,
-                        emilioSlowMoTime: 0
+                        poloBonusTime: 0
                     };
                     this.timeFreeze = 0;
 
@@ -1537,9 +1535,8 @@
                         type = 'pleno';
                     }
 
-                    // Cálculo de velocidad actual teniendo en cuenta Slo-Mo de Emilio
-                    let speed = this.currentBaseSpeed;
-                    if (this.buffs.emilioSlowMoTime > 0) speed *= 0.5;
+                    // Cálculo de velocidad actual (la velocidad nunca bajará más de la inicial)
+                    let speed = Math.max(this.baseInitialSpeed, this.currentBaseSpeed);
                     if (type === 'emilio') speed *= 2.6; // ¡Emilio baja a toda velocidad!
 
                     const note = {
@@ -1769,10 +1766,7 @@
                     this.score += Math.max(600, totalBonus);
                     this.checkDoblesTrigger();
 
-                    // Activar Slo-Mo por 10 segundos
-                    this.buffs.emilioSlowMoTime = 10;
-
-                    this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Pantalla Limpia + Cámara Lenta 10s', '#dc2626', '#ffffff');
+                    this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Pantalla Limpia + Puntos Dobles', '#dc2626', '#ffffff');
                     this.createFireworks(x, y);
                     this.updateHUD();
                 }
@@ -1872,9 +1866,9 @@
                         this.levelElapsed += dt;
                         const progressInLevel = Math.min(1.0, this.levelElapsed / this.levelDuration);
 
-                        // La velocidad aumenta progresivamente a lo largo de los 2 minutos
+                        // La velocidad aumenta progresivamente a lo largo de los 2 minutos (nunca bajará más de la inicial)
                         const speedMultiplier = 1.0 + (progressInLevel * 0.95);
-                        this.currentBaseSpeed = (this.baseInitialSpeed + (this.level - 1) * 0.5) * speedMultiplier;
+                        this.currentBaseSpeed = Math.max(this.baseInitialSpeed, (this.baseInitialSpeed + (this.level - 1) * 0.5) * speedMultiplier);
 
                         // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL!
                         if (this.levelElapsed >= this.levelDuration) {
@@ -1919,7 +1913,6 @@
                     if (this.buffs.doubleSpawnTime > 0) this.buffs.doubleSpawnTime -= dt;
                     if (this.buffs.frogPenaltyTime > 0) this.buffs.frogPenaltyTime -= dt;
                     if (this.buffs.poloBonusTime > 0) this.buffs.poloBonusTime -= dt;
-                    if (this.buffs.emilioSlowMoTime > 0) this.buffs.emilioSlowMoTime -= dt;
 
                     // 3. Actualizar Notas
                     for (let i = this.notes.length - 1; i >= 0; i--) {
@@ -1928,8 +1921,9 @@
                         if (this.isDoblesMode) {
                             if (note.type === 'noreduce') speed = this.doblesCurrentSpeed * 2.6;
                             else speed = this.doblesCurrentSpeed;
+                        } else {
+                            speed = Math.max(this.baseInitialSpeed, speed);
                         }
-                        if (this.buffs.emilioSlowMoTime > 0) speed *= 0.5;
 
                         note.y += speed;
                         note.rotation += note.rotSpeed;
@@ -3088,9 +3082,6 @@
                         }
                         if (this.buffs.poloBonusTime > 0) {
                             buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-white/20 border border-white/40 text-[10px] font-extrabold text-white">👕 Puntos x2 (${Math.ceil(this.buffs.poloBonusTime)}s)</span>`;
-                        }
-                        if (this.buffs.emilioSlowMoTime > 0) {
-                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-rose-500/20 border border-rose-500/40 text-[10px] font-extrabold text-rose-300">🥾 Slo-Mo (${Math.ceil(this.buffs.emilioSlowMoTime)}s)</span>`;
                         }
                         buffsContainer.innerHTML = buffsHtml;
                     }
