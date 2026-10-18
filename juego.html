@@ -445,7 +445,7 @@
                     <span class="text-xl shrink-0 mt-0.5">📖</span>
                     <div class="leading-tight">
                         <span class="block text-cyan-300 font-black text-xs sm:text-[13px]">El Metamórfico</span>
-                        <span class="text-[10px] sm:text-[11px] text-slate-200 leading-snug block mt-0.5">Cambia: Estatutos (lluvia x2), Rana (mitad pts) o Polo (x2 pts). ¡Dejarlo pasar NO resta vidas!</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-200 leading-snug block mt-0.5">Cambia: Estatutos (lluvia rápida y combo x3), Rana (mitad pts) o Polo (x2 pts). ¡Dejarlo pasar NO resta vidas!</span>
                     </div>
                 </div>
 
@@ -716,7 +716,7 @@
                         Va mutando periódicamente entre 3 estados:
                     </p>
                     <ul class="list-disc list-inside space-y-0.5 text-[11px] text-slate-300 pl-1">
-                        <li>📜 <strong>Estatutos</strong>: Lluvia rápida de balones y combo x2.</li>
+                        <li>📜 <strong>Estatutos</strong>: Lluvia rápida de balones y combo x3.</li>
                         <li>🐸 <strong>Rana</strong>: Reduce temporalmente a la mitad los puntos obtenidos.</li>
                         <li>👕 <strong>Polo Maula</strong>: Duplica los puntos conseguidos.</li>
                     </ul>
@@ -845,7 +845,7 @@
 
                     // Buffs y Modificadores de Estado
                     this.buffs = {
-                        doubleSpawnTime: 0,   // Estatutos (3s de lluvia x2)
+                        doubleSpawnTime: 0,   // Estatutos (Lluvia rápida y combo x3)
                         frogPenaltyTime: 0,   // Rana (10s de puntos / 2)
                         poloBonusTime: 0      // Polo negro cuello blanco (10s de puntos x2)
                     };
@@ -1845,13 +1845,19 @@
                             if (this.buffs.poloBonusTime > 0) buffMult *= 2.0;
                             if (this.buffs.frogPenaltyTime > 0) buffMult *= 0.5;
 
-                            this.combo++;
+                            // Estatutos otorga combo x3
+                            const comboAdd = (this.buffs.doubleSpawnTime > 0) ? 3 : 1;
+                            this.combo += comboAdd;
                             if (this.combo > this.maxCombo) this.maxCombo = this.combo;
 
-                            if (this.combo >= 30) this.multiplier = 4;
-                            else if (this.combo >= 18) this.multiplier = 3;
-                            else if (this.combo >= 8) this.multiplier = 2;
-                            else this.multiplier = 1;
+                            if (this.buffs.doubleSpawnTime > 0) {
+                                this.multiplier = Math.max(3, this.multiplier);
+                            } else {
+                                if (this.combo >= 30) this.multiplier = 4;
+                                else if (this.combo >= 18) this.multiplier = 3;
+                                else if (this.combo >= 8) this.multiplier = 2;
+                                else this.multiplier = 1;
+                            }
 
                             let finalPoints = Math.round(basePoints * this.multiplier * buffMult);
 
@@ -1923,8 +1929,13 @@
                         });
 
                         this.hitsCount++;
-                        this.combo++;
+                        const comboAdd = (this.buffs.doubleSpawnTime > 0) ? 3 : 1;
+                        this.combo += comboAdd;
                         if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+
+                        if (this.buffs.doubleSpawnTime > 0) {
+                            this.multiplier = Math.max(3, this.multiplier);
+                        }
 
                         let buffMult = (this.buffs.poloBonusTime > 0 ? 2.0 : 1.0) * (this.buffs.frogPenaltyTime > 0 ? 0.5 : 1.0);
                         const bonusPoints = Math.round(200 * this.multiplier * buffMult);
@@ -1991,11 +2002,12 @@
                 // EVENTO: ELEMENTO METAMÓRFICO CAZADO
                 triggerMorphCaught(phase, x, y) {
                     if (phase === 0) {
-                        // 📖 ESTATUTOS: Lluvia x2 durante 3 segundos
-                        this.buffs.doubleSpawnTime = 3;
+                        // 📜 ESTATUTOS: Lluvia rápida de balones y combo x3 durante 4 segundos
+                        this.buffs.doubleSpawnTime = 4.0;
+                        this.multiplier = Math.max(3, this.multiplier);
                         this.playSound('hit_gold');
                         this.createExplosion(x, y, '#d97706', 25);
-                        this.addComicBanner('¡ESTATUTOS!', 'Lluvia x2 de Elementos durante 3s', '#d97706', '#ffffff');
+                        this.addComicBanner('¡ESTATUTOS!', '¡Lluvia Rápida y Combo x3!', '#d97706', '#ffffff');
                     } else if (phase === 1) {
                         // 🐸 RANA: Puntos valen la mitad durante 10 segundos
                         this.buffs.frogPenaltyTime = 10;
@@ -2150,20 +2162,20 @@
                         // El número de elementos que caen aumenta lentamente:
                         const maxAllowedNotes = Math.min(6, 3 + Math.floor((this.level - 1) * 0.75) + (progressInLevel > 0.4 ? 1 : 0));
 
-                        // El intervalo de caída se reduce lentamente de forma progresiva
+                        // El intervalo de caída se reduce drásticamente durante Estatutos (Lluvia rápida)
                         let spawnRate = Math.max(480, 1080 - (this.level * 65) - (progressInLevel * 220));
-                        if (this.buffs.doubleSpawnTime > 0) spawnRate *= 0.55; // Lluvia x2 de Estatutos
+                        if (this.buffs.doubleSpawnTime > 0) spawnRate = 260; // Lluvia rápida de balones
 
                         if (timestamp - this.lastSpawnTime > spawnRate) {
                             const canSpawn = (this.buffs.doubleSpawnTime > 0)
-                                ? (this.notes.length < maxAllowedNotes + 2)
+                                ? (this.notes.length < 8)
                                 : (this.notes.length < maxAllowedNotes);
 
                             if (canSpawn) {
                                 this.spawnNote();
 
-                                const multiChance = Math.min(0.20, 0.04 + ((this.level - 1) * 0.04) + (progressInLevel * 0.05));
-                                if (Math.random() < multiChance && this.notes.length < maxAllowedNotes) {
+                                const multiChance = (this.buffs.doubleSpawnTime > 0) ? 0.35 : Math.min(0.20, 0.04 + ((this.level - 1) * 0.04) + (progressInLevel * 0.05));
+                                if (Math.random() < multiChance && ((this.buffs.doubleSpawnTime > 0) ? this.notes.length < 8 : this.notes.length < maxAllowedNotes)) {
                                     this.spawnNote();
                                 }
                                 this.lastSpawnTime = timestamp;
@@ -2184,6 +2196,10 @@
                             if (note.type === 'noreduce') speed = this.doblesCurrentSpeed * 2.6;
                             else speed = this.doblesCurrentSpeed;
                         } else {
+                            // Estatutos: lluvia rápida de balones con velocidad acelerada (1.30x)
+                            if (this.buffs.doubleSpawnTime > 0) {
+                                speed = speed * 1.30;
+                            }
                             // Si la baja de velocidad está activa, reduce un 30% (factor 0.70)
                             // "La velocidad no podrá bajar menos del 30% de la velocidad actual y nunca más de 10 segundos"
                             if (this.slowMoTimer > 0) {
@@ -3456,7 +3472,7 @@
                             }
                         }
                         if (this.buffs.doubleSpawnTime > 0) {
-                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-[10px] font-extrabold text-amber-300">📖 Lluvia x2 (${Math.ceil(this.buffs.doubleSpawnTime)}s)</span>`;
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-[10px] font-extrabold text-amber-300 animate-pulse">📜 Estatutos: Lluvia Rápida + Combo x3 (${Math.ceil(this.buffs.doubleSpawnTime)}s)</span>`;
                         }
                         if (this.buffs.frogPenaltyTime > 0) {
                             buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-extrabold text-emerald-300">🐸 Mitad de Puntos (${Math.ceil(this.buffs.frogPenaltyTime)}s)</span>`;

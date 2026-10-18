@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡onomatopeyas cómic con tipografía refinada, reborde fino ultra nítido y niveles en los paneles de puntuación!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡los Estatutos ahora desatan una lluvia rápida de balones y disparan el combo x3!`,
                 url: 'juego.html'
             });
 

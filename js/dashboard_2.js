@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Onomatopeyas cómic con tipografía refinada, reborde fino ultra nítido y niveles en los paneles de puntuación!`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Los Estatutos ahora activan lluvia rápida de balones y multiplican el combo x3!`,
             url: 'juego.html'
         });
 
