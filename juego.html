@@ -685,7 +685,7 @@
                         <strong>Si consigues echar a Emilio, te quedarás relajado y eso se nota...</strong>
                     </p>
                     <p class="text-slate-300 text-[11px]">
-                        Caza la bota para detonar todos los elementos presentes en pantalla con puntuación doble (+200 pts cada uno) y limpiar por completo la pantalla para darte un respiro. Dejar pasar este elemento <strong>NO resta vidas</strong>.
+                        Caza la bota para detonar todos los elementos en pantalla con puntuación doble (+200 pts cada uno), limpiar el césped y disfrutar de <strong>8 segundos de respiro con un 30% menos de velocidad</strong>. Tras el respiro recuperarás la velocidad previa (con 20s de descanso antes de poder volver a frenar). Dejar pasar la bota <strong>NO resta vidas</strong>.
                     </p>
                 </div>
 
@@ -729,7 +729,7 @@
                         <h4 class="font-bold text-white text-sm">Modo Quiniela de Dobles (Cada 30.000 pts)</h4>
                     </div>
                     <p class="text-purple-200 text-[11px]">
-                        Cada 30.000 puntos alcanzados, el césped se limpia y durante <strong>15 segundos</strong> sólo llueven balones dobles a velocidad 1.5x creciente con música electrónica propia.
+                        Cada 30.000 puntos alcanzados (con al menos <strong>1 minuto de descanso</strong> entre rondas), el césped se limpia y durante <strong>15 segundos</strong> sólo llueven balones dobles a velocidad 1.5x creciente con música electrónica propia.
                     </p>
                     <p class="text-slate-300 text-[11px]">
                         🛡️ <strong>"No se reduce"</strong>: Aparece una única vez durante este modo. ¡Cázalo para multiplicar x2 todos los puntos de la ronda de dobles y <strong>restaurar +1 vida perdida</strong>! Además, durante todo este modo <strong>los balones perdidos NO restan vidas</strong>.
@@ -746,7 +746,7 @@
                         <h4 class="font-bold text-white text-sm">Ciclos de Nivel (Cada 2 minutos)</h4>
                     </div>
                     <p class="text-slate-300 text-[11px]">
-                        Cada 2 minutos de juego superados, el cronómetro se reinicia y subes de nivel. La velocidad base de los balones aumenta de forma progresiva.
+                        Cada 2 minutos de juego superados, el cronómetro se reinicia y subes de nivel. La velocidad base sube de forma continua y fluida hacia el tope jugable, sin caídas bruscas al cambiar de nivel.
                     </p>
                     <p class="text-amber-300 text-[11px] font-bold">
                         ⚡ <strong>A partir del Nivel 3</strong>: Los elementos caen a <strong>velocidades distintas</strong> (balones acelerados con estela azul o relámpago dorada y cambios de ritmo), poniendo a prueba tus mejores reflejos. (¡La velocidad nunca bajará de la inicial!).
@@ -815,12 +815,30 @@
                     this.hitsCount = 0;
                     this.perfectCount = 0;
 
-                    // Progresión de Niveles (Ciclos de 120s / 2 minutos)
+                    // Progresión de Niveles y Curva de Velocidad Continua
                     this.level = 1;
                     this.levelDuration = 120; // 2 minutos en segundos
                     this.levelElapsed = 0;
+                    this.totalPlayTime = 0;
                     this.baseInitialSpeed = 3.6;
                     this.currentBaseSpeed = 3.6;
+                    this.maxPlayableSpeed = 7.8; // Máximo de velocidad jugable equilibrada
+
+                    // Control de Baja de Velocidad Temporal (Slo-Mo Echar a Emilio)
+                    this.slowMoTimer = 0;    // Duración activa de velocidad reducida (-30%, máx <=10s)
+                    this.slowMoCooldown = 0; // Cooldown obligatorio de 20s tras bajar velocidad
+
+                    // Cooldown de Modo Dobles (mínimo 1 minuto / 60s tras jugarlo)
+                    this.doblesCooldown = 0;
+
+                    // Cadencia y control de salida de elementos especiales (evitar ventajas continuas)
+                    this.lastSpecialSpawnTimes = {
+                        anySpecial: 0,
+                        emilio: 0,
+                        morph: 0,
+                        gold: 0,
+                        pleno: 0
+                    };
 
                     // Buffs y Modificadores de Estado
                     this.buffs = {
@@ -1300,11 +1318,24 @@
                     this.doblesMissedAny = false;
                     this.stopDoblesMusic();
 
-                    // Reinicio de ciclo de 2 minutos
+                    // Reinicio de ciclo y progresión continua
                     this.level = 1;
                     this.levelElapsed = 0;
+                    this.totalPlayTime = 0;
                     this.baseInitialSpeed = 3.6;
                     this.currentBaseSpeed = 3.6;
+
+                    // Reinicio de Baja de Velocidad y Cooldowns
+                    this.slowMoTimer = 0;
+                    this.slowMoCooldown = 0;
+                    this.doblesCooldown = 0;
+                    this.lastSpecialSpawnTimes = {
+                        anySpecial: 0,
+                        emilio: 0,
+                        morph: 0,
+                        gold: 0,
+                        pleno: 0
+                    };
 
                     // Reinicio de Buffs
                     this.buffs = {
@@ -1382,7 +1413,8 @@
                 // GESTIÓN DEL MODO QUINIELA DE DOBLES (Cada 30.000 puntos / 15s)
                 // =================================================================
                 checkDoblesTrigger() {
-                    if (!this.isDoblesMode && this.score >= this.nextDoblesThreshold) {
+                    // Modo Dobles solo se activa si no está en juego, ha superado el umbral y han pasado al menos 60s desde la última vez
+                    if (!this.isDoblesMode && this.doblesCooldown <= 0 && this.score >= this.nextDoblesThreshold) {
                         this.nextDoblesThreshold += 30000;
                         this.startDoblesMode();
                     }
@@ -1443,6 +1475,7 @@
                     }
 
                     this.nextDoblesThreshold = (Math.floor(this.score / 30000) + 1) * 30000;
+                    this.doblesCooldown = 60.0; // Cooldown obligatorio de al menos 1 minuto (60s) tras jugar a dobles
                     this.updateHUD();
                 }
 
@@ -1605,26 +1638,42 @@
 
                     let type = 'normal';
 
-                    // 1. Botón "Echar a Emilio" (Sorpresa relámpago muy difícil, ~4% probabilidad)
-                    if (rand < 0.045 && this.levelElapsed > 12) {
+                    // Control de cadencia de elementos especiales (para que no salgan continuamente ni den ventaja excesiva)
+                    const nowSec = this.totalPlayTime || (performance.now() / 1000);
+                    const canSpawnAnySpecial = (nowSec - this.lastSpecialSpawnTimes.anySpecial >= 4.5);
+                    const canSpawnEmilio = canSpawnAnySpecial && (nowSec - this.lastSpecialSpawnTimes.emilio >= 35.0) && (nowSec >= 20.0);
+                    const canSpawnMorph = canSpawnAnySpecial && (nowSec - this.lastSpecialSpawnTimes.morph >= 16.0) && (this.buffs.doubleSpawnTime <= 0 && this.buffs.frogPenaltyTime <= 0 && this.buffs.poloBonusTime <= 0);
+                    const canSpawnGold = canSpawnAnySpecial && (nowSec - this.lastSpecialSpawnTimes.gold >= 7.5);
+                    const canSpawnPleno = canSpawnAnySpecial && (nowSec - this.lastSpecialSpawnTimes.pleno >= 15.0);
+
+                    // 1. Botón "Echar a Emilio" (Sorpresa relámpago con cadencia regulada)
+                    if (canSpawnEmilio && rand < 0.04) {
                         type = 'emilio';
+                        this.lastSpecialSpawnTimes.emilio = nowSec;
+                        this.lastSpecialSpawnTimes.anySpecial = nowSec;
                     }
-                    // 2. Elemento Metamórfico (Estatutos, Rana, Polo, ~14% probabilidad)
-                    else if (rand < 0.18) {
+                    // 2. Elemento Metamórfico (Estatutos, Rana, Polo con cadencia regulada)
+                    else if (canSpawnMorph && rand < 0.16) {
                         type = 'morph';
+                        this.lastSpecialSpawnTimes.morph = nowSec;
+                        this.lastSpecialSpawnTimes.anySpecial = nowSec;
                     }
-                    // 3. Casilla Oro: Lingote de Oro (~12% probabilidad)
-                    else if (rand < 0.30) {
+                    // 3. Casilla Oro: Lingote de Oro con cadencia regulada
+                    else if (canSpawnGold && rand < 0.28) {
                         type = 'gold';
+                        this.lastSpecialSpawnTimes.gold = nowSec;
+                        this.lastSpecialSpawnTimes.anySpecial = nowSec;
                     }
-                    // 4. Sellar Tarde (Casilla Peligro que se salva deslizando arriba, ~18% probabilidad)
-                    else if (rand < 0.48) {
+                    // 4. Sellar Tarde (Casilla Peligro que se salva deslizando arriba, ~16% probabilidad)
+                    else if (rand < 0.44) {
                         type = 'lava';
                     }
 
-                    // Super Bonus Pleno al 15 cada 14 combos
-                    if (this.combo > 0 && this.combo % 14 === 0 && Math.random() < 0.5) {
+                    // Super Bonus Pleno al 15 cada 14 combos con cadencia regulada
+                    if (canSpawnPleno && this.combo > 0 && this.combo % 14 === 0 && Math.random() < 0.45) {
                         type = 'pleno';
+                        this.lastSpecialSpawnTimes.pleno = nowSec;
+                        this.lastSpecialSpawnTimes.anySpecial = nowSec;
                     }
 
                     // Cálculo de velocidad actual (la velocidad nunca bajará más de la inicial)
@@ -1916,7 +1965,22 @@
                     this.score += Math.max(600, totalBonus);
                     this.checkDoblesTrigger();
 
-                    this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Pantalla Limpia + Puntos Dobles', '#dc2626', '#ffffff');
+                    // Gestión de baja de velocidad temporal (Slo-Mo Echar a Emilio):
+                    // 1. Reducción máxima del 30% de la velocidad actual durante un periodo corto (8s, nunca más de 10s).
+                    // 2. Si ya hay un contador activo, cazar otro elemento no restaura ni extiende el cronómetro.
+                    // 3. Si se consiguió bajar la velocidad, no se podrá volver a bajar durante al menos los próximos 20s.
+                    let slowMoTriggered = false;
+                    if (this.slowMoTimer <= 0 && this.slowMoCooldown <= 0) {
+                        this.slowMoTimer = 8.0; // 8 segundos de velocidad reducida un 30%
+                        slowMoTriggered = true;
+                    }
+
+                    if (slowMoTriggered) {
+                        this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Respiro -30% Vel (8s)', '#dc2626', '#ffffff');
+                    } else {
+                        this.addComicBanner('¡A LA CALLE!', '¡Emilio Expulsado! Pantalla Limpia + Puntos Dobles', '#dc2626', '#ffffff');
+                    }
+
                     this.createFireworks(x, y);
                     this.updateHUD();
                 }
@@ -1989,7 +2053,29 @@
                         return;
                     }
 
-                    // 1. Gestión de Modo Dobles vs Progresión del Nivel
+                    // 1. Temporizadores de Reducción de Velocidad y Cooldowns
+                    if (this.slowMoTimer > 0) {
+                        this.slowMoTimer -= dt;
+                        if (this.slowMoTimer <= 0) {
+                            this.slowMoTimer = 0;
+                            this.slowMoCooldown = 20.0; // Tras bajar la velocidad, no se podrá volver a bajar durante al menos los próximos 20s
+                            this.addFloatingText(this.width / 2, this.height * 0.45, '⚡ VELOCIDAD RECUPERADA', '#38bdf8');
+                            this.updateHUD();
+                        }
+                    } else if (this.slowMoCooldown > 0) {
+                        this.slowMoCooldown -= dt;
+                        if (this.slowMoCooldown < 0) this.slowMoCooldown = 0;
+                    }
+
+                    if (this.doblesCooldown > 0) {
+                        this.doblesCooldown -= dt;
+                        if (this.doblesCooldown <= 0) {
+                            this.doblesCooldown = 0;
+                            this.checkDoblesTrigger(); // Si ya había alcanzado el umbral de puntos, entra en dobles tras cumplir el minuto
+                        }
+                    }
+
+                    // 2. Gestión de Modo Dobles vs Progresión del Nivel
                     if (this.isDoblesMode) {
                         this.doblesTimeElapsed += dt;
                         this.doblesTimeLeft -= dt;
@@ -2020,11 +2106,13 @@
                     } else {
                         // Progresión normal del Nivel y Cronómetro de 2 minutos
                         this.levelElapsed += dt;
+                        this.totalPlayTime += dt;
                         const progressInLevel = Math.min(1.0, this.levelElapsed / this.levelDuration);
 
-                        // La velocidad aumenta progresivamente a lo largo de los 2 minutos (nunca bajará más de la inicial)
-                        const speedMultiplier = 1.0 + (progressInLevel * 0.95);
-                        this.currentBaseSpeed = Math.max(this.baseInitialSpeed, (this.baseInitialSpeed + (this.level - 1) * 0.5) * speedMultiplier);
+                        // Curva de velocidad continua que sube suavemente hasta el tope jugable (sin resetear al cambiar de nivel)
+                        const levelBase = this.baseInitialSpeed + Math.min(3.4, (this.level - 1) * 0.85);
+                        const levelProg = (this.level >= 5 ? 0 : progressInLevel * 0.85);
+                        this.currentBaseSpeed = Math.min(this.maxPlayableSpeed, levelBase + levelProg);
 
                         // ¿Cumplidos los 2 minutos? ¡AUMENTO DE NIVEL CON ONOMATOPEYA!
                         if (this.levelElapsed >= this.levelDuration) {
@@ -2057,10 +2145,6 @@
                         }
 
                         // El número de elementos que caen aumenta lentamente:
-                        // Límite máximo de elementos simultáneos (para que nunca se haga imposible):
-                        // Nivel 1: de 3 a 4 notas
-                        // Nivel 2: 4 a 5 notas
-                        // Nivel 3+: máximo 6 notas en pantalla (tope seguro absoluto de jugabilidad)
                         const maxAllowedNotes = Math.min(6, 3 + Math.floor((this.level - 1) * 0.75) + (progressInLevel > 0.4 ? 1 : 0));
 
                         // El intervalo de caída se reduce lentamente de forma progresiva
@@ -2075,8 +2159,6 @@
                             if (canSpawn) {
                                 this.spawnNote();
 
-                                // Ocasionalmente conforme avanza la partida, puede caer un segundo elemento simultáneo
-                                // pero respetando siempre el límite máximo para que nunca sea imposible:
                                 const multiChance = Math.min(0.20, 0.04 + ((this.level - 1) * 0.04) + (progressInLevel * 0.05));
                                 if (Math.random() < multiChance && this.notes.length < maxAllowedNotes) {
                                     this.spawnNote();
@@ -2086,12 +2168,12 @@
                         }
                     }
 
-                    // 2. Decrementar Temporizadores de Buffs
+                    // 3. Decrementar Temporizadores de Buffs
                     if (this.buffs.doubleSpawnTime > 0) this.buffs.doubleSpawnTime -= dt;
                     if (this.buffs.frogPenaltyTime > 0) this.buffs.frogPenaltyTime -= dt;
                     if (this.buffs.poloBonusTime > 0) this.buffs.poloBonusTime -= dt;
 
-                    // 3. Actualizar Notas
+                    // 4. Actualizar Notas
                     for (let i = this.notes.length - 1; i >= 0; i--) {
                         const note = this.notes[i];
                         let speed = note.speed;
@@ -2099,7 +2181,12 @@
                             if (note.type === 'noreduce') speed = this.doblesCurrentSpeed * 2.6;
                             else speed = this.doblesCurrentSpeed;
                         } else {
-                            speed = Math.max(this.baseInitialSpeed, speed);
+                            // Si la baja de velocidad está activa, reduce un 30% (factor 0.70)
+                            // "La velocidad no podrá bajar menos del 30% de la velocidad actual y nunca más de 10 segundos"
+                            if (this.slowMoTimer > 0) {
+                                speed = speed * 0.70;
+                            }
+                            speed = Math.max(this.baseInitialSpeed * 0.70, speed);
                         }
 
                         note.y += speed;
@@ -3373,6 +3460,9 @@
                         }
                         if (this.buffs.poloBonusTime > 0) {
                             buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-white/20 border border-white/40 text-[10px] font-extrabold text-white">👕 Puntos x2 (${Math.ceil(this.buffs.poloBonusTime)}s)</span>`;
+                        }
+                        if (this.slowMoTimer > 0) {
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-rose-500/20 border border-rose-500/40 text-[10px] font-extrabold text-rose-300">🥾 Respiro -30% (${Math.ceil(this.slowMoTimer)}s)</span>`;
                         }
                         buffsContainer.innerHTML = buffsHtml;
                     }

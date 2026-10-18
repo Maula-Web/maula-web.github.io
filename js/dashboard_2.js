@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡A partir del nivel 5 balones con cambio continuo de trayectoria entre pistas y guías anticipatorias luminosas!`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> ¡Curva continua de velocidad fluida, respiro regulado (-30%) al echar a Emilio, comodines balanceados y descanso entre dobles!`,
             url: 'juego.html'
         });
 

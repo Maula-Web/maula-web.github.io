@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡a partir del nivel 5 los balones cambian suavemente de trayectoria entre pistas con guías anticipatorias luminosas!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: ¡curva continua de velocidad fluida, respiro regulado (-30%) al echar a Emilio, comodines balanceados y descanso entre dobles!`,
                 url: 'juego.html'
             });
 
