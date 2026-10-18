@@ -825,12 +825,14 @@
                         if (cnt > maxCount) { maxCount = cnt; topSign = s; }
                     });
 
+                    const highlightClass = isGold ? 'casilla-card-gold' : (isTrap ? 'casilla-card-trap' : '');
+
                     return `
-                        <div class="glass-panel p-3 flex flex-col justify-between cursor-pointer hover:border-amber-500/50 transition group shadow-sm ${isGold ? 'border-amber-500/80 shadow-amber-500/10' : (isTrap ? 'border-rose-500/60' : '')}"
+                        <div class="glass-panel p-3 flex flex-col justify-between cursor-pointer hover:border-amber-500/50 transition group shadow-sm ${highlightClass}"
                              onclick="window.ResumenApp.openCasillaDetail(${c.casillaIndex})">
                             <div class="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800">
                                 <span class="font-mono text-xs font-black text-slate-500 dark:text-slate-400">Casilla #${c.matchNum}</span>
-                                ${isGold ? '<span class="text-xs font-black text-amber-500" title="Casilla Talismán">⭐ Oro</span>' : (isTrap ? '<span class="text-xs font-black text-rose-500" title="Casilla Trampa">🚩 Trampa</span>' : '')}
+                                ${isGold ? '<span class="text-xs font-black text-amber-500 flex items-center gap-1" title="Casilla Talismán">⭐ Oro</span>' : (isTrap ? '<span class="text-xs font-black text-rose-500 flex items-center gap-1" title="Casilla Trampa">🚩 Trampa</span>' : '')}
                             </div>
                             <div class="my-2 text-center">
                                 <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">${rate.toFixed(0)}%</div>

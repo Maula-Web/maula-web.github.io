@@ -873,8 +873,8 @@
              VISTA 2: RADIOGRAFÍA CASILLA POR CASILLA (1 A 14)
              ===================================================================== -->
         <div id="view-container-casillas" class="space-y-3 hidden">
-            <div class="glass-panel p-4 space-y-2">
-                <div class="flex items-center justify-between">
+            <div class="glass-panel p-3.5 sm:p-4 space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h3 class="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
                             <span>🎯</span> Radiografía Estadística de los 14 Partidos
@@ -883,9 +883,13 @@
                             Análisis del porcentaje de acierto de la peña en cada casilla de la quiniela a lo largo de toda la temporada.
                         </p>
                     </div>
-                    <div class="flex items-center gap-2 text-xs font-mono">
-                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/30">⭐ Casilla Oro</span>
-                        <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/30">🚩 Casilla Trampa</span>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 text-xs font-mono w-full sm:w-auto shrink-0">
+                        <span class="badge-gold-ingot px-3.5 py-1.5 rounded-full text-center flex items-center justify-center gap-1.5 shadow-sm text-xs font-black cursor-default w-full sm:w-auto">
+                            <span>⭐</span> <span>Casilla Oro</span>
+                        </span>
+                        <span class="px-3.5 py-1.5 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/40 text-center flex items-center justify-center gap-1.5 shadow-sm text-xs cursor-default w-full sm:w-auto">
+                            <span>🚩</span> <span>Casilla Trampa</span>
+                        </span>
                     </div>
                 </div>
             </div>

@@ -4565,3 +4565,30 @@ body.has-ticker {
     color: #d97706 !important;
 }
 
+/* =========================================================================
+   GLOW EFFECTS PARA CASILLAS ESTADÍSTICAS (RESUMEN 2)
+   ========================================================================= */
+.casilla-card-gold {
+    border-color: rgba(245, 158, 11, 0.95) !important;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), 0 0 40px rgba(217, 119, 6, 0.25), inset 0 0 12px rgba(245, 158, 11, 0.12) !important;
+    position: relative;
+    z-index: 2;
+}
+
+.casilla-card-gold:hover {
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.65), 0 0 55px rgba(217, 119, 6, 0.35), inset 0 0 18px rgba(245, 158, 11, 0.2) !important;
+}
+
+.casilla-card-trap {
+    border-color: rgba(244, 63, 94, 0.95) !important;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.45), 0 0 40px rgba(225, 29, 72, 0.25), inset 0 0 12px rgba(244, 63, 94, 0.12) !important;
+    position: relative;
+    z-index: 2;
+}
+
+.casilla-card-trap:hover {
+    border-color: #ff4d6d !important;
+    box-shadow: 0 0 30px rgba(244, 63, 94, 0.65), 0 0 55px rgba(225, 29, 72, 0.35), inset 0 0 18px rgba(244, 63, 94, 0.2) !important;
+}
+

@@ -1422,6 +1422,40 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 46. SIMPLIFICACIÓN MÓVIL, TELETIPO EN VIVO, MODO CLARO Y RADIOGRAFÍA (CASILLAS ORO/TRAMPA)
+
+### A. Simplificación Integral en Móviles y Recuperación de Espacio Vertical
+- **Menú y Teletipo Siempre Visibles**: El menú superior (`nav`) y el teletipo informativo permanecen anclados y visibles en todas las hojas tanto en PC como en móvil, permitiendo navegación inmediata en cualquier punto del scroll.
+- **Tarjetas Resumen Compactas en Móvil**: En Clasificación, Pronósticos y Resumen, los 4 indicadores KPI superiores se unifican en móvil en una única tarjeta de 1 fila (`#kpi-mobile-summary`), liberando hasta un 40% de pantalla para el contenido principal.
+- **Botonera de Vistas y Acciones**: Los controles secundarios de las pantallas se agrupan en un botón desplegable elegante («Vistas y Acciones») para maximizar la interactividad sin saturar visualmente.
+- **Ajustes en Clasificación**:
+  - Cambio de denominación: de *"Matriz Histórica"* a **"Desglose de Puntuaciones"**.
+  - Subida de nivel del indicador ("8 jornadas jugadas") y abreviación a "TEMP. 2026-2027", eliminando chapas redundantes.
+  - Podio en PC ordenado estrictamente de 1º a 3º con datos (aciertos, bonus y premios) un 100% más grandes.
+- **Scroll Horizontal/Apaisado en Dashboard**: Corregido el bloqueo de desplazamiento vertical cuando el dispositivo móvil se orienta en horizontal (`overflow-y: auto`, eliminación de cerrojos rígidos de altura).
+
+### B. Corrección de Tesorería y Resultados en Vivo en Teletipo
+- **Caja Real Oficial Unificada**: Fijada en **1.091,52 €** con superávit de **+396,81 €** en todos los fallbacks, widgets y en el teletipo.
+- **Eliminación del Parpadeo en Bote**: Se actualizaron los valores estáticos iniciales de `bote_2.html`, eliminando la transición visual errónea de 829,48 € a 1.091,52 €.
+- **Partidos y Resultados Reales**: El teletipo detecta con precisión la jornada en curso/reciente mostrando marcadores y signos en bloques limpios de 5 partidos (ej. partidos 1-5, 6-10, 11-15).
+- **Limpieza de Contenido**: Se suprimieron avisos de bromas ("echar a Emilio") o reglas teóricas, dando prioridad al podio general, líder, farolillo rojo y sellador de la semana.
+
+### C. Adaptación de Botones e Indicadores en Modo Claro (`.light-theme`)
+- **Dashboard**: Grandes botones Hero de acción (`Rellenar Quiniela`, `Ver Jornada Actual`, `Clasificación Actual`) con gradientes vibrantes y texto blanco protegido. Countdown con fondo crema suave y cifras legibles.
+- **Socios**: Contenedor del selector de vista `[ Tabla | Fichas ]` adaptado a fondo claro cálido con contraste nítido en el botón inactivo; botones `Alta Socio` y `Modo Bajas` destacados con ribetes cromáticos nítidos.
+- **Resultados**: Carrusel de jornadas (`#jornadas-pills-carousel`) y chips de estado convertidos a suaves píldoras pastel con tipografía de alto contraste (azul eléctrico para finalizadas, oro para en juego, esmeralda para pendientes).
+- **Iconos de Información (`ℹ️`)**: Normalizados a botones sutiles azul cielo, retirando artefactos amarillos y deformaciones de relleno.
+- **Quiniela de Dobles**: Botón de rellenar dobles con contraste contrastado y sub-botones individuales (`Dobles: Socio`) en suaves tarjetas violeta.
+
+### D. Radiografía de Casillas: Efecto Oro Metálico y Glow Neón
+- **Pastillas en Móvil**: Las pastillas `Casilla Oro` y `Casilla Trampa` se apilan verticalmente en móviles (`flex-col gap-2 w-full`) para evitar apelotonamiento, expandiendo su ancho para facilitar su lectura.
+- **Chapa Metálica Lingote de Oro**: La pastilla `Casilla Oro` adopta la clase `.badge-gold-ingot`, con gradiente multicapa metálico idéntico al Tío Gilito y destello móvil reflectante (*shimmer*).
+- **Glow en Casillas Estadísticas**: Las tarjetas de información de la parrilla (1 a 14) reciben resplandor luminoso (*Glow*):
+  - `.casilla-card-gold`: Resplandor dorado cálido (`box-shadow: 0 0 20px rgba(245, 158, 11, 0.45)...`).
+  - `.casilla-card-trap`: Resplandor carmesí de peligro (`box-shadow: 0 0 20px rgba(244, 63, 94, 0.45)...`).
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

@@ -137,11 +137,17 @@ body.light-theme {
    Afecta a sub-cajas, tarjetas internas, inputs, selects y tiles.
    ========================================================================= */
 .light-theme .bg-slate-950,
+.light-theme .bg-slate-950\/95,
+.light-theme .bg-slate-950\/90,
+.light-theme .bg-slate-950\/85,
 .light-theme .bg-slate-950\/80,
 .light-theme .bg-slate-950\/70,
 .light-theme .bg-slate-950\/60,
+.light-theme .bg-slate-950\/50,
 .light-theme .bg-slate-950\/40,
 .light-theme .bg-slate-950\/30,
+.light-theme .bg-slate-950\/20,
+.light-theme .bg-slate-950\/10,
 .light-theme .bg-slate-900,
 .light-theme .bg-slate-900\/95,
 .light-theme .bg-slate-900\/90,
@@ -154,6 +160,78 @@ body.light-theme {
 .light-theme .bg-\[\#0b0f19\] {
     background-color: #ffffff !important;
     border-color: #e8dfcf !important;
+}
+
+/* Fondos tintados oscuros (Tailwind -950 y -900) adaptados a elegantes fondos pastel en Modo Claro */
+.light-theme .bg-blue-950,
+.light-theme .bg-blue-950\/80,
+.light-theme .bg-blue-950\/70,
+.light-theme .bg-blue-950\/60,
+.light-theme .bg-blue-950\/40,
+.light-theme .bg-blue-950\/20,
+.light-theme .bg-blue-900\/60,
+.light-theme .bg-sky-950,
+.light-theme .bg-sky-950\/80,
+.light-theme .bg-sky-950\/60,
+.light-theme .bg-sky-950\/40,
+.light-theme .bg-sky-950\/20,
+.light-theme .bg-sky-900\/60 {
+    background-color: #f0f9ff !important;
+    border-color: #7dd3fc !important;
+    color: #0284c7 !important;
+}
+
+.light-theme .bg-emerald-950,
+.light-theme .bg-emerald-950\/80,
+.light-theme .bg-emerald-950\/70,
+.light-theme .bg-emerald-950\/60,
+.light-theme .bg-emerald-950\/40,
+.light-theme .bg-emerald-950\/30,
+.light-theme .bg-emerald-950\/20,
+.light-theme .bg-emerald-900\/60,
+.light-theme .bg-emerald-900\/50 {
+    background-color: #ecfdf5 !important;
+    border-color: #6ee7b7 !important;
+    color: #047857 !important;
+}
+
+.light-theme .bg-amber-950,
+.light-theme .bg-amber-950\/80,
+.light-theme .bg-amber-950\/70,
+.light-theme .bg-amber-950\/60,
+.light-theme .bg-amber-950\/40,
+.light-theme .bg-amber-950\/20,
+.light-theme .bg-amber-900\/60,
+.light-theme .bg-amber-900\/50 {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+
+.light-theme .bg-purple-950,
+.light-theme .bg-purple-950\/80,
+.light-theme .bg-purple-950\/70,
+.light-theme .bg-purple-950\/60,
+.light-theme .bg-purple-950\/40,
+.light-theme .bg-purple-950\/30,
+.light-theme .bg-purple-950\/20,
+.light-theme .bg-purple-900\/60,
+.light-theme .bg-purple-900\/50 {
+    background-color: #faf5ff !important;
+    border-color: #d8b4fe !important;
+    color: #6b21a8 !important;
+}
+
+.light-theme .bg-rose-950,
+.light-theme .bg-rose-950\/80,
+.light-theme .bg-rose-950\/70,
+.light-theme .bg-rose-950\/60,
+.light-theme .bg-rose-950\/40,
+.light-theme .bg-rose-950\/20,
+.light-theme .bg-rose-900\/60 {
+    background-color: #fff1f2 !important;
+    border-color: #fecdd3 !important;
+    color: #be123c !important;
 }
 
 /* Tono crema / arena suave para cajas secundarias, pills y botones */
@@ -417,22 +495,20 @@ body.light-theme {
    ========================================================================= */
 /* El botón / icono azul ℹ️ */
 .light-theme .group\/tip > div:first-child,
-.light-theme .group\/tip > div[onclick*="showInfo"],
-.light-theme .group span:has(span.text-amber-400),
-.light-theme .kpi-card span.text-amber-400 {
-    background-color: #fef3c7 !important;
-    border: 1px solid #f59e0b !important;
-    color: #b45309 !important;
-    box-shadow: 0 1px 3px rgba(217, 119, 6, 0.15) !important;
-    border-radius: 6px;
-    padding: 0 4px;
+.light-theme .group\/tip > div[onclick*="showInfo"] {
+    background-color: #f0f9ff !important;
+    border: 1px solid #bae6fd !important;
+    color: #0284c7 !important;
+    box-shadow: 0 1px 2px rgba(2, 132, 199, 0.08) !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
 }
 
 .light-theme .group\/tip > div:first-child:hover,
 .light-theme .group\/tip > div[onclick*="showInfo"]:hover {
-    background-color: #fde68a !important;
-    border-color: #d97706 !important;
-    color: #78350f !important;
+    background-color: #e0f2fe !important;
+    border-color: #38bdf8 !important;
+    color: #0369a1 !important;
 }
 
 /* Las tarjetas emergentes flotantes de tooltips en todas las hojas */
@@ -1587,4 +1663,295 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
 .light-theme .modal-dialog-panel .text-slate-300,
 .light-theme .modal-dialog-panel .text-slate-400 {
     color: #334155 !important;
+}
+
+/* =========================================================================
+   ADAPTACIONES DE BOTONES E INDICADORES ESPECÍFICOS EN MODO CLARO
+   ========================================================================= */
+
+/* 1. Dashboard 2: Botones Principales Hero de Acción */
+.light-theme #btn-hero-rellenar {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    border: 1.5px solid #059669 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28) !important;
+}
+.light-theme #btn-hero-rellenar:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
+}
+.light-theme #btn-hero-rellenar * {
+    color: #ffffff !important;
+}
+
+.light-theme #btn-hero-jornada {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    border: 1.5px solid #0284c7 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28) !important;
+}
+.light-theme #btn-hero-jornada:hover {
+    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4) !important;
+}
+.light-theme #btn-hero-jornada * {
+    color: #ffffff !important;
+}
+
+.light-theme #btn-hero-clasificacion {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+    border: 1.5px solid #7c3aed !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.28) !important;
+}
+.light-theme #btn-hero-clasificacion:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4) !important;
+}
+.light-theme #btn-hero-clasificacion * {
+    color: #ffffff !important;
+}
+
+/* Dígitos del Countdown en Dashboard */
+.light-theme .cd-digit {
+    background-color: #f5efe4 !important;
+    border-color: #e2d9cc !important;
+    font-weight: 800 !important;
+}
+.light-theme .cd-unit {
+    color: #786b59 !important;
+    font-weight: 700 !important;
+}
+.light-theme #cd-deadline-label {
+    color: #92400e !important;
+}
+
+/* 2. Socios 2: Selector de Vista (Tabla vs Fichas) y Botones de Cabecera */
+.light-theme [data-view-btn] {
+    transition: all 0.2s ease;
+}
+.light-theme div:has(> [data-view-btn]),
+.light-theme .flex:has(> [data-view-btn]) {
+    background-color: #f5efe4 !important;
+    border: 1px solid #e5decb !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+.light-theme [data-view-btn]:not(.bg-amber-500) {
+    color: #64748b !important;
+}
+.light-theme [data-view-btn]:not(.bg-amber-500):hover {
+    color: #0f172a !important;
+    background-color: #eae1d1 !important;
+}
+.light-theme [data-view-btn].bg-amber-500 {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35) !important;
+}
+.light-theme [data-view-btn].bg-amber-500 * {
+    color: #ffffff !important;
+}
+
+.light-theme button[onclick*="openNewMemberModal"] {
+    background-color: #ecfdf5 !important;
+    border: 1.5px solid #10b981 !important;
+    color: #047857 !important;
+}
+.light-theme button[onclick*="openNewMemberModal"]:hover {
+    background-color: #d1fae5 !important;
+    border-color: #059669 !important;
+}
+.light-theme #btn-toggle-bajas {
+    background-color: #fff1f2 !important;
+    border: 1.5px solid #f43f5e !important;
+    color: #be123c !important;
+}
+.light-theme #btn-toggle-bajas:hover {
+    background-color: #ffe4e6 !important;
+    border-color: #e11d48 !important;
+}
+
+/* 3. Jornadas 2 (Resultados): Carrusel de Píldoras y Chips de Estado */
+.light-theme #selected-jornada-status-chip[class*="amber"],
+.light-theme #selected-jornada-status-chip.bg-amber-950\/70 {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+.light-theme #selected-jornada-status-chip[class*="amber"] #selected-jornada-status-text,
+.light-theme #selected-jornada-status-chip.bg-amber-950\/70 #selected-jornada-status-text {
+    color: #92400e !important;
+}
+
+.light-theme #selected-jornada-status-chip[class*="blue"],
+.light-theme #selected-jornada-status-chip.bg-blue-950\/70 {
+    background-color: #e0f2fe !important;
+    border-color: #38bdf8 !important;
+    color: #0369a1 !important;
+}
+.light-theme #selected-jornada-status-chip[class*="blue"] #selected-jornada-status-text,
+.light-theme #selected-jornada-status-chip.bg-blue-950\/70 #selected-jornada-status-text {
+    color: #0369a1 !important;
+}
+
+.light-theme #selected-jornada-status-chip[class*="emerald"],
+.light-theme #selected-jornada-status-chip.bg-emerald-950\/70 {
+    background-color: #d1fae5 !important;
+    border-color: #34d399 !important;
+    color: #065f46 !important;
+}
+.light-theme #selected-jornada-status-chip[class*="emerald"] #selected-jornada-status-text,
+.light-theme #selected-jornada-status-chip.bg-emerald-950\/70 #selected-jornada-status-text {
+    color: #065f46 !important;
+}
+
+.light-theme #jornadas-pills-carousel button[class*="bg-blue-950"] {
+    background-color: #f0f9ff !important;
+    border-color: #7dd3fc !important;
+    color: #0284c7 !important;
+}
+.light-theme #jornadas-pills-carousel button[class*="bg-blue-950"]:hover {
+    background-color: #e0f2fe !important;
+    border-color: #0284c7 !important;
+}
+.light-theme #jornadas-pills-carousel button[class*="bg-blue-950"] * {
+    color: #0284c7 !important;
+}
+
+.light-theme #jornadas-pills-carousel button[class*="bg-amber-950"] {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+.light-theme #jornadas-pills-carousel button[class*="bg-amber-950"]:hover {
+    background-color: #fde68a !important;
+    border-color: #d97706 !important;
+}
+.light-theme #jornadas-pills-carousel button[class*="bg-amber-950"] * {
+    color: #92400e !important;
+}
+
+.light-theme #jornadas-pills-carousel button[class*="bg-emerald-950"] {
+    background-color: #ecfdf5 !important;
+    border-color: #6ee7b7 !important;
+    color: #047857 !important;
+}
+.light-theme #jornadas-pills-carousel button[class*="bg-emerald-950"]:hover {
+    background-color: #d1fae5 !important;
+    border-color: #059669 !important;
+}
+.light-theme #jornadas-pills-carousel button[class*="bg-emerald-950"] * {
+    color: #047857 !important;
+}
+
+.light-theme #jornadas-pills-carousel button.ring-2,
+.light-theme #jornadas-pills-carousel button[class*="ring-2"] {
+    box-shadow: 0 0 0 2.5px #d97706, 0 4px 12px rgba(217, 119, 6, 0.25) !important;
+    border-color: #d97706 !important;
+    font-weight: 900 !important;
+}
+
+.light-theme #btn-prev-jornada,
+.light-theme #btn-next-jornada,
+.light-theme #btn-prev-jornada-bottom,
+.light-theme #btn-next-jornada-bottom {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+    color: #b45309 !important;
+}
+.light-theme #btn-prev-jornada:hover:not(:disabled),
+.light-theme #btn-next-jornada:hover:not(:disabled),
+.light-theme #btn-prev-jornada-bottom:hover:not(:disabled),
+.light-theme #btn-next-jornada-bottom:hover:not(:disabled) {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+
+.light-theme #section-jornadas-bottom-nav {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+}
+
+/* 4. Quiniela 2 (Pronósticos): Botones de Dobles */
+.light-theme button[onclick*="openEditorForDoubles"],
+.light-theme #btn-open-doubles-editor {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+    border: 1.5px solid #7c3aed !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35) !important;
+}
+.light-theme button[onclick*="openEditorForDoubles"]:hover,
+.light-theme #btn-open-doubles-editor:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45) !important;
+}
+.light-theme button[onclick*="openEditorForDoubles"] *,
+.light-theme #btn-open-doubles-editor * {
+    color: #ffffff !important;
+}
+
+.light-theme #kpi-dobles-buttons-container button,
+.light-theme button[onclick*="openEditorModal"][class*="purple"] {
+    background-color: #faf5ff !important;
+    border: 1px solid #d8b4fe !important;
+    color: #6b21a8 !important;
+    box-shadow: 0 1px 3px rgba(107, 33, 168, 0.08) !important;
+}
+.light-theme #kpi-dobles-buttons-container button:hover,
+.light-theme button[onclick*="openEditorModal"][class*="purple"]:hover {
+    background-color: #f3e8ff !important;
+    border-color: #c084fc !important;
+    color: #581c87 !important;
+}
+.light-theme #kpi-dobles-buttons-container button strong {
+    color: #b45309 !important;
+}
+.light-theme #kpi-dobles-buttons-container button span.font-mono {
+    color: #7c3aed !important;
+}
+
+/* 5. Glow de Casilla Oro y Casilla Trampa en Modo Claro (Resumen 2) */
+.light-theme .casilla-card-gold {
+    background-color: #ffffff !important;
+    border: 2px solid #d97706 !important;
+    box-shadow: 0 0 20px rgba(217, 119, 6, 0.35), 0 8px 24px -4px rgba(217, 119, 6, 0.2), inset 0 0 12px rgba(245, 158, 11, 0.1) !important;
+}
+
+.light-theme .casilla-card-gold:hover {
+    box-shadow: 0 0 28px rgba(217, 119, 6, 0.5), 0 10px 30px -4px rgba(217, 119, 6, 0.3), inset 0 0 16px rgba(245, 158, 11, 0.18) !important;
+}
+
+.light-theme .casilla-card-trap {
+    background-color: #ffffff !important;
+    border: 2px solid #e11d48 !important;
+    box-shadow: 0 0 20px rgba(225, 29, 72, 0.35), 0 8px 24px -4px rgba(225, 29, 72, 0.2), inset 0 0 12px rgba(244, 63, 94, 0.1) !important;
+}
+
+.light-theme .casilla-card-trap:hover {
+    box-shadow: 0 0 28px rgba(225, 29, 72, 0.5), 0 10px 30px -4px rgba(225, 29, 72, 0.3), inset 0 0 16px rgba(244, 63, 94, 0.18) !important;
+}
+
+/* Preservar texto blanco en botones con fondo sólido/gradiente */
+.light-theme button.bg-purple-600,
+.light-theme button.bg-purple-700,
+.light-theme button.bg-emerald-600,
+.light-theme button.bg-emerald-700,
+.light-theme button.bg-sky-600,
+.light-theme button.bg-sky-700,
+.light-theme button.bg-blue-600,
+.light-theme button.bg-blue-700,
+.light-theme button.bg-rose-600,
+.light-theme button.bg-rose-700,
+.light-theme [class*="bg-gradient-to"][class*="text-white"],
+.light-theme button[class*="bg-purple-600"] *,
+.light-theme button[class*="bg-emerald-600"] *,
+.light-theme button[class*="bg-sky-600"] *,
+.light-theme button[class*="bg-blue-600"] *,
+.light-theme button[class*="bg-rose-600"] * {
+    color: #ffffff !important;
 }
