@@ -70,7 +70,7 @@
                     // Actualizar contador de jornadas en título
                     const badgeJ = document.getElementById('badge-total-jornadas-text') || document.getElementById('badge-total-jornadas');
                     const disputadas = this.jornadas.filter(j => j.matches && j.matches.some(m => m.result && m.result.trim() !== '')).length;
-                    if (badgeJ) badgeJ.textContent = `${disputadas} Jornadas disputadas`;
+                    if (badgeJ) badgeJ.textContent = `${disputadas} jornadas jugadas`;
 
                     // Redimensionar gráfico y ajustar tabla en resize de ventana
                     window.addEventListener('resize', () => {

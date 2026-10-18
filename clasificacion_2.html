@@ -535,21 +535,24 @@
         </nav>
 
         <!-- BARRA DE TÍTULO PRINCIPAL (MISMO FORMATO VISUAL QUE EL RESTO DE HOJAS) -->
-        <div class="header-control-bar p-2.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3 text-xs sm:text-sm shadow-md order-2">
-            <div class="flex items-center gap-2.5 sm:gap-3">
-                <span class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-lg sm:text-xl flex items-center justify-center shadow-inner shrink-0">
+        <div class="header-control-bar p-2 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm shadow-md order-2">
+            <div class="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
+                <span class="p-1.5 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 text-base sm:text-xl flex items-center justify-center shadow-inner shrink-0">
                     🏆
                 </span>
-                <div>
-                    <div class="flex items-center gap-2 flex-wrap">
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                         <strong class="text-amber-500 dark:text-amber-400 font-extrabold text-xs sm:text-base block truncate">CLASIFICACIÓN OFICIAL</strong>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40">
-                            Temporada 2026-2027
-                        </span>
-                        <span id="badge-total-jornadas" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold badge-disputadas flex items-center gap-1.5 shadow-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                            <span id="badge-total-jornadas-text">-- Jornadas disputadas</span>
-                        </span>
+                        <div class="flex items-center gap-1.5 flex-nowrap shrink-0">
+                            <span class="px-2 py-0.5 rounded-full text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40 whitespace-nowrap">
+                                <span class="hidden sm:inline">Temporada 2026-2027</span>
+                                <span class="sm:hidden">TEMP. 2026-2027</span>
+                            </span>
+                            <span id="badge-total-jornadas" class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-bold badge-disputadas flex items-center gap-1 shadow-sm whitespace-nowrap">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                <span id="badge-total-jornadas-text">-- jornadas jugadas</span>
+                            </span>
+                        </div>
                     </div>
                     <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 hidden sm:block">Puntuaciones acumuladas, desglose de puntuaciones jornada a jornada, podio y desglose oficial de bonus.</p>
                 </div>
@@ -781,49 +784,11 @@
         </section>
 
         <!-- =====================================================================
-             NIVEL 3: EL PODIO DE HONOR (COMPACTO EN 3 COLUMNAS EN MÓVIL)
+             NIVEL 3: EL PODIO DE HONOR (COMPACTO EN 3 COLUMNAS EN MÓVIL, 1º A 3º EN PC)
              ===================================================================== -->
         <section id="podium-section" class="grid grid-cols-3 gap-1.5 sm:gap-3 items-stretch order-4">
-            <!-- 2º Puesto (Plata) -->
-            <div id="podium-card-2" class="glass-panel p-2 sm:p-3 border-slate-400/50 podium-2 rounded-2xl flex flex-col justify-between order-2 sm:order-1 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(2)">
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-slate-200 dark:bg-slate-400/20 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-400/40 flex items-center gap-1">
-                            <span>🥈</span> <span class="hidden xs:inline">2º Clasificado</span><span class="xs:hidden">2º</span>
-                        </span>
-                        <span class="text-[10px] sm:text-xs font-mono font-bold text-slate-500 dark:text-slate-400">#2</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 sm:gap-2.5 py-0.5 sm:py-1">
-                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-slate-200 dark:bg-slate-400/20 border border-slate-300 dark:border-slate-400/50 flex items-center justify-center text-sm sm:text-lg shadow-sm shrink-0">
-                            🥈
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <h3 id="podium-name-2" class="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
-                            <div class="flex items-baseline gap-1 sm:gap-2">
-                                <span id="podium-points-2" class="text-sm sm:text-xl font-black font-mono text-slate-800 dark:text-slate-200">-- pts</span>
-                                <span id="podium-diff-2" class="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 hidden xs:inline">--</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pt-1 mt-1 border-t border-slate-200 dark:border-slate-700/60 hidden sm:grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
-                    <div>
-                        <span class="text-slate-500 dark:text-slate-300 text-[9px] block font-semibold">Aciertos</span>
-                        <strong id="podium-hits-2" class="text-slate-900 dark:text-white">--</strong>
-                    </div>
-                    <div>
-                        <span class="text-slate-500 dark:text-slate-300 text-[9px] block font-semibold">Bonus</span>
-                        <strong id="podium-bonus-2" class="text-emerald-600 dark:text-emerald-400">--</strong>
-                    </div>
-                    <div>
-                        <span class="text-slate-500 dark:text-slate-300 text-[9px] block font-semibold">Premios</span>
-                        <strong id="podium-prize-2" class="text-purple-600 dark:text-purple-400">--€</strong>
-                    </div>
-                </div>
-            </div>
-
             <!-- 1º Puesto (Oro) -->
-            <div id="podium-card-1" class="glass-panel p-2 sm:p-3 border-amber-500/60 podium-1 rounded-2xl flex flex-col justify-between order-1 sm:order-2 transition hover:scale-[1.01] cursor-pointer shadow-md" onclick="window.ClasificacionApp.openMemberDrawerByRank(1)">
+            <div id="podium-card-1" class="glass-panel p-2 sm:p-3 border-amber-500/60 podium-1 rounded-2xl flex flex-col justify-between order-1 sm:order-1 transition hover:scale-[1.01] cursor-pointer shadow-md" onclick="window.ClasificacionApp.openMemberDrawerByRank(1)">
                 <div>
                     <div class="flex items-center justify-between mb-1">
                         <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-amber-500/20 dark:bg-amber-500/30 text-amber-950 dark:text-amber-300 border border-amber-500/40 dark:border-amber-500/60 flex items-center gap-1 shadow-sm">
@@ -844,18 +809,56 @@
                         </div>
                     </div>
                 </div>
-                <div class="pt-1 mt-1 border-t border-amber-500/40 hidden sm:grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
+                <div class="pt-2 mt-2 border-t border-amber-500/40 hidden sm:grid grid-cols-3 gap-1 text-center font-mono">
                     <div>
-                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[9px] block font-semibold">Aciertos</span>
-                        <strong id="podium-hits-1" class="text-slate-900 dark:text-white text-xs">--</strong>
+                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Aciertos</span>
+                        <strong id="podium-hits-1" class="text-slate-900 dark:text-white text-xl sm:text-2xl font-black font-mono block">--</strong>
                     </div>
                     <div>
-                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[9px] block font-semibold">Bonus</span>
-                        <strong id="podium-bonus-1" class="text-emerald-600 dark:text-emerald-400 text-xs">--</strong>
+                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Bonus</span>
+                        <strong id="podium-bonus-1" class="text-emerald-600 dark:text-emerald-400 text-xl sm:text-2xl font-black font-mono block">--</strong>
                     </div>
                     <div>
-                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[9px] block font-semibold">Premios</span>
-                        <strong id="podium-prize-1" class="text-purple-600 dark:text-purple-300 text-xs">--€</strong>
+                        <span class="text-amber-900/80 dark:text-amber-200/90 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Premios</span>
+                        <strong id="podium-prize-1" class="text-purple-600 dark:text-purple-300 text-xl sm:text-2xl font-black font-mono block">--€</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2º Puesto (Plata) -->
+            <div id="podium-card-2" class="glass-panel p-2 sm:p-3 border-slate-400/50 podium-2 rounded-2xl flex flex-col justify-between order-2 sm:order-2 transition hover:scale-[1.01] cursor-pointer" onclick="window.ClasificacionApp.openMemberDrawerByRank(2)">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-slate-200 dark:bg-slate-400/20 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-400/40 flex items-center gap-1">
+                            <span>🥈</span> <span class="hidden xs:inline">2º Clasificado</span><span class="xs:hidden">2º</span>
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-mono font-bold text-slate-500 dark:text-slate-400">#2</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 sm:gap-2.5 py-0.5 sm:py-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-slate-200 dark:bg-slate-400/20 border border-slate-300 dark:border-slate-400/50 flex items-center justify-center text-sm sm:text-lg shadow-sm shrink-0">
+                            🥈
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 id="podium-name-2" class="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">Cargando...</h3>
+                            <div class="flex items-baseline gap-1 sm:gap-2">
+                                <span id="podium-points-2" class="text-sm sm:text-xl font-black font-mono text-slate-800 dark:text-slate-200">-- pts</span>
+                                <span id="podium-diff-2" class="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 hidden xs:inline">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-700/60 hidden sm:grid grid-cols-3 gap-1 text-center font-mono">
+                    <div>
+                        <span class="text-slate-600 dark:text-slate-300 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Aciertos</span>
+                        <strong id="podium-hits-2" class="text-slate-900 dark:text-white text-xl sm:text-2xl font-black font-mono block">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-600 dark:text-slate-300 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Bonus</span>
+                        <strong id="podium-bonus-2" class="text-emerald-600 dark:text-emerald-400 text-xl sm:text-2xl font-black font-mono block">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-600 dark:text-slate-300 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Premios</span>
+                        <strong id="podium-prize-2" class="text-purple-600 dark:text-purple-400 text-xl sm:text-2xl font-black font-mono block">--€</strong>
                     </div>
                 </div>
             </div>
@@ -882,18 +885,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="pt-1 mt-1 border-t border-slate-200 dark:border-slate-700/60 hidden sm:grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
+                <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-700/60 hidden sm:grid grid-cols-3 gap-1 text-center font-mono">
                     <div>
-                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[9px] block font-semibold">Aciertos</span>
-                        <strong id="podium-hits-3" class="text-slate-900 dark:text-white">--</strong>
+                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Aciertos</span>
+                        <strong id="podium-hits-3" class="text-slate-900 dark:text-white text-xl sm:text-2xl font-black font-mono block">--</strong>
                     </div>
                     <div>
-                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[9px] block font-semibold">Bonus</span>
-                        <strong id="podium-bonus-3" class="text-emerald-600 dark:text-emerald-400">--</strong>
+                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Bonus</span>
+                        <strong id="podium-bonus-3" class="text-emerald-600 dark:text-emerald-400 text-xl sm:text-2xl font-black font-mono block">--</strong>
                     </div>
                     <div>
-                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[9px] block font-semibold">Premios</span>
-                        <strong id="podium-prize-3" class="text-purple-600 dark:text-purple-400">--€</strong>
+                        <span class="text-amber-950/80 dark:text-amber-200/90 text-[10px] sm:text-xs block font-bold uppercase tracking-wider mb-0.5">Premios</span>
+                        <strong id="podium-prize-3" class="text-purple-600 dark:text-purple-400 text-xl sm:text-2xl font-black font-mono block">--€</strong>
                     </div>
                 </div>
             </div>
@@ -1083,7 +1086,6 @@
                     <div>
                         <h3 class="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
                             <span>Desglose de Puntuaciones por Jornada</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/40">Todas las Jornadas</span>
                         </h3>
                         <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Filas superiores fijas con totales generales. Cada fila inferior muestra los aciertos y puntos de cada socio.</p>
                     </div>
