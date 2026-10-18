@@ -1120,6 +1120,8 @@
                             this.playSound('hit_trap');
                             this.createExplosion(laneX, closestNote.y, '#ef4444', 40);
                             this.addComicBanner('¡BOOM!', '¡ERA LAVA! DESLIZA ARRIBA', '#fef08a', '#dc2626');
+                            const hitIdx = this.notes.indexOf(closestNote);
+                            if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
                             this.checkGameOver();
                         }
                         // CASO B: BOTÓN DE ECHAR A EMILIO CAZADO (¡ÉPICO!)
@@ -1129,6 +1131,8 @@
                         // CASO C: ELEMENTO METAMÓRFICO (Estatutos / Rana / Polo)
                         else if (closestNote.type === 'morph') {
                             this.triggerMorphCaught(closestNote.morphPhase, laneX, closestNote.y);
+                            const hitIdx = this.notes.indexOf(closestNote);
+                            if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
                         }
                         // CASO D: BALÓN NORMAL / ORO / PLENO
                         else {
@@ -1181,6 +1185,9 @@
 
                             this.createHitSparks(laneX, closestNote.y, LANE_COLORS[laneIndex].hex);
                             this.addFloatingText(laneX, closestNote.y - 25, `+${finalPoints} ${ratingText}`, ratingColor);
+
+                            const hitIdx = this.notes.indexOf(closestNote);
+                            if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
                         }
                     } else {
                         this.createMissRipple(laneX, this.targetY);
@@ -1237,6 +1244,9 @@
                         this.addFloatingText(laneX, lavaNote.y - 30, `+${bonusPoints} ¡DEVUELTO!`, '#fb923c');
                         this.addComicBanner('¡ZASCA!', '¡Lava Devuelta! +200 pts', '#fef08a', '#ea580c');
 
+                        const hitIdx = this.notes.indexOf(lavaNote);
+                        if (hitIdx !== -1) this.notes.splice(hitIdx, 1);
+
                         this.updateHUD();
                         return true;
                     }
@@ -1246,20 +1256,25 @@
                 // EVENTO: BOTÓN DE ECHAR A EMILIO CAZADO
                 triggerEmilioCaught(x, y) {
                     this.playSound('emilio');
-                    this.timeFreeze = 0.9; // 0.9 segundos de congelación dramática
-                    this.screenShake = 22;
+                    this.timeFreeze = 0.8; // Pausa dramática mientras todo estalla
+                    this.screenShake = 24;
 
                     // Todos los elementos en pantalla explotan y dan doble de puntos
-                    let explodedCount = 0;
+                    let totalBonus = 0;
                     for (const n of this.notes) {
-                        if (!n.hit) {
-                            n.hit = true;
-                            explodedCount++;
-                            const nx = this.getLaneX(n.lane);
-                            this.createExplosion(nx, n.y, '#f59e0b', 20);
-                            this.score += 200;
-                        }
+                        const nx = this.getLaneX(n.lane);
+                        this.createExplosion(nx, n.y, '#f59e0b', 22);
+                        this.createFireworks(nx, n.y);
+                        const pts = Math.round(200 * this.multiplier * 2);
+                        totalBonus += pts;
+                        this.addFloatingText(nx, n.y - 15, `+${pts}`, '#fbbf24');
                     }
+
+                    // Limpiar absolutamente todos los elementos en pantalla
+                    this.notes = [];
+
+                    // Puntos conseguidos
+                    this.score += Math.max(600, totalBonus);
 
                     // Activar Slo-Mo por 10 segundos
                     this.buffs.emilioSlowMoTime = 10;
@@ -1319,9 +1334,10 @@
                     const dt = Math.min((timestamp - this.lastTick) / 1000, 0.1);
                     this.lastTick = timestamp;
 
-                    // Si hay Time Freeze (Emilio atrapado), pausar movimiento brevemente
+                    // Si hay Time Freeze (Emilio atrapado), pausar movimiento brevemente pero animar efectos
                     if (this.timeFreeze > 0) {
                         this.timeFreeze -= dt;
+                        this.updateFX(dt);
                         this.render();
                         requestAnimationFrame(this.gameLoop.bind(this));
                         return;
@@ -1433,7 +1449,16 @@
                         if (b.y < -60) this.deflectedBalls.splice(i, 1);
                     }
 
-                    // 6. Actualizar Partículas, Textos y Carteles Cómic
+                    // 6. Actualizar Efectos, Partículas, Textos y Carteles Cómic
+                    this.updateFX(dt);
+
+                    // 7. Render
+                    this.render();
+
+                    requestAnimationFrame(this.gameLoop.bind(this));
+                }
+
+                updateFX(dt) {
                     for (let i = this.particles.length - 1; i >= 0; i--) {
                         const p = this.particles[i];
                         p.x += p.vx;
@@ -1463,11 +1488,6 @@
                         this.screenShake *= 0.88;
                         if (this.screenShake < 0.3) this.screenShake = 0;
                     }
-
-                    // 7. Render
-                    this.render();
-
-                    requestAnimationFrame(this.gameLoop.bind(this));
                 }
 
                 // RENDERIZADO VISUAL
@@ -1626,6 +1646,7 @@
 
                 drawNotes(ctx) {
                     for (const note of this.notes) {
+                        if (note.hit) continue;
                         const x = this.getLaneX(note.lane);
                         const y = note.y;
 
