@@ -374,7 +374,7 @@
          MODAL 1: CARÁTULA DE INICIO & PRESENTACIÓN (UNA SOLA PANTALLA MÓVIL SIN SCROLL)
          ========================================================================= -->
     <div id="modal-start" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md overflow-hidden pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <div class="modal-glass w-full max-w-md flex flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-2xl sm:rounded-3xl p-3 sm:p-4 text-center animate-scale-in shadow-2xl border border-amber-500/40 select-none my-auto">
+        <div class="modal-glass w-full max-w-md flex flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 text-center animate-scale-in shadow-2xl border border-amber-500/40 select-none my-auto">
             <!-- Encabezado / Logo y Título -->
             <div class="flex flex-col items-center shrink-0">
                 <div class="flex items-center justify-center gap-2">
@@ -382,29 +382,29 @@
                         ⚽
                     </div>
                     <div class="text-left leading-none">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-amber-400 block">PEÑA MAULAS ARCADE</span>
+                        <span class="text-[11px] font-black uppercase tracking-widest text-amber-400 block">PEÑA MAULAS ARCADE</span>
                         <h1 class="text-2xl sm:text-3xl font-comic text-white tracking-wide leading-tight">
                             ¡MAULA HERO!
                         </h1>
                     </div>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                <p class="text-xs sm:text-[13px] text-slate-300 mt-1 leading-tight font-medium">
                     2 min por nivel · Acierta al ritmo 1-X-2 y salva los boletos tardíos
                 </p>
             </div>
 
             <!-- Ficha del Jugador -->
-            <div class="w-full bg-slate-900/90 rounded-xl px-2.5 py-1 border border-amber-500/40 flex items-center justify-between text-left shadow-inner shrink-0">
-                <div class="flex items-center gap-2 min-w-0">
-                    <span class="text-sm shrink-0">👤</span>
+            <div class="w-full bg-slate-900/90 rounded-xl px-3 py-1.5 border border-amber-500/40 flex items-center justify-between text-left shadow-inner shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="text-base shrink-0">👤</span>
                     <div class="truncate">
-                        <span class="text-[8px] font-extrabold text-slate-400 block uppercase leading-none">Jugador</span>
-                        <span id="start-socio-name" class="text-xs font-black text-amber-300 truncate block">Socio Maula</span>
+                        <span class="text-[10px] font-extrabold text-slate-400 block uppercase leading-none">Jugador</span>
+                        <span id="start-socio-name" class="text-sm font-black text-amber-300 truncate block mt-0.5">Socio Maula</span>
                     </div>
                 </div>
                 <div class="text-right shrink-0">
-                    <span id="start-socio-best" class="text-[10px] text-amber-400 font-mono font-bold block leading-none">Récord: 0</span>
-                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[8px] border border-emerald-500/30 mt-0.5">
+                    <span id="start-socio-best" class="text-xs sm:text-[13px] text-amber-400 font-mono font-bold block leading-none">Récord: 0</span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[9px] border border-emerald-500/30 mt-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         ACTIVO
                     </span>
@@ -412,85 +412,85 @@
             </div>
 
             <!-- Teletipo Arcade de Récords y Mensajes de Pique Maula -->
-            <div class="w-full bg-slate-950/85 rounded-xl border border-amber-500/35 px-2 py-0.5 overflow-hidden relative shadow-inner flex items-center shrink-0">
-                <div class="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500/30 to-rose-500/30 text-amber-300 font-black text-[8px] uppercase tracking-wider shrink-0 mr-1.5 border border-amber-500/40 shadow-sm">
+            <div class="w-full bg-slate-950/85 rounded-xl border border-amber-500/35 px-2 py-1 overflow-hidden relative shadow-inner flex items-center shrink-0">
+                <div class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500/30 to-rose-500/30 text-amber-300 font-black text-[9.5px] uppercase tracking-wider shrink-0 mr-1.5 border border-amber-500/40 shadow-sm">
                     <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
                     <span>PIQUE</span>
                 </div>
-                <div class="ticker-wrap flex-1 overflow-hidden relative h-4 flex items-center"
+                <div class="ticker-wrap flex-1 overflow-hidden relative h-5 flex items-center"
                      ontouchstart="document.getElementById('caratula-ticker-content')?.classList.add('is-paused')"
                      ontouchend="document.getElementById('caratula-ticker-content')?.classList.remove('is-paused')">
-                    <div id="caratula-ticker-content" class="ticker-move flex items-center whitespace-nowrap will-change-transform text-[9px] text-slate-300 font-medium">
+                    <div id="caratula-ticker-content" class="ticker-move flex items-center whitespace-nowrap will-change-transform text-[11px] text-slate-200 font-semibold">
                         <!-- Generado dinámicamente con puntuaciones de todos los socios y piques -->
                     </div>
                 </div>
             </div>
 
             <!-- Guía de Elementos de Juego (Todos los elementos originales integrados) -->
-            <div class="grid grid-cols-2 gap-1.5 w-full text-left">
+            <div class="grid grid-cols-2 gap-1.5 sm:gap-2 w-full text-left">
                 <!-- 1. Sellar Tarde -->
-                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-rose-500/40 flex items-start gap-1.5 shadow-sm">
-                    <span class="text-base shrink-0 mt-0.5">⏰</span>
+                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/85 border border-rose-500/40 flex items-start gap-2 shadow-sm">
+                    <span class="text-xl shrink-0 mt-0.5">⏰</span>
                     <div class="leading-tight">
-                        <span class="block text-rose-300 font-black text-[10px]">Sellar tarde</span>
-                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Desliza hacia arriba en el área de penalti inferior para sellar a tiempo. Si no, serás un Maula y sufrirás las consecuencias.</span>
+                        <span class="block text-rose-300 font-black text-xs sm:text-[13px]">Sellar tarde</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-200 leading-snug block mt-0.5">Desliza hacia arriba en el área de penalti inferior para sellar a tiempo. Si no, serás un Maula y sufrirás las consecuencias.</span>
                     </div>
                 </div>
 
                 <!-- 2. El Metamórfico -->
-                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-cyan-500/40 flex items-start gap-1.5 shadow-sm">
-                    <span class="text-base shrink-0 mt-0.5">📖🐸👕</span>
+                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/85 border border-cyan-500/40 flex items-start gap-2 shadow-sm">
+                    <span class="text-xl shrink-0 mt-0.5">📖</span>
                     <div class="leading-tight">
-                        <span class="block text-cyan-300 font-black text-[10px]">El Metamórfico</span>
-                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Cambia: Estatutos (lluvia x2), Rana (mitad pts) o Polo (x2 pts). ¡Dejarlo pasar NO resta vidas!</span>
+                        <span class="block text-cyan-300 font-black text-xs sm:text-[13px]">El Metamórfico</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-200 leading-snug block mt-0.5">Cambia: Estatutos (lluvia x2), Rana (mitad pts) o Polo (x2 pts). ¡Dejarlo pasar NO resta vidas!</span>
                     </div>
                 </div>
 
                 <!-- 3. Echar a Emilio -->
-                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-yellow-500/40 flex items-start gap-1.5 shadow-sm">
-                    <span class="text-base shrink-0 mt-0.5">🥾</span>
+                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/85 border border-yellow-500/40 flex items-start gap-2 shadow-sm">
+                    <span class="text-xl shrink-0 mt-0.5">🥾</span>
                     <div class="leading-tight">
-                        <span class="block text-yellow-300 font-black text-[10px]">Echar a Emilio</span>
-                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Si consigues echar a Emilio, te quedarás relajado y eso se nota... (¡NO resta vidas!)</span>
+                        <span class="block text-yellow-300 font-black text-xs sm:text-[13px]">Echar a Emilio</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-200 leading-snug block mt-0.5">Si consigues echar a Emilio, te quedarás relajado y eso se nota... (¡NO resta vidas!)</span>
                     </div>
                 </div>
 
                 <!-- 4. Lingote de Oro -->
-                <div class="p-1.5 rounded-xl bg-slate-900/80 border border-amber-400/40 flex items-start gap-1.5 shadow-sm">
-                    <span class="text-base shrink-0 mt-0.5">🧈</span>
+                <div class="p-2 sm:p-2.5 rounded-xl bg-slate-900/85 border border-amber-400/40 flex items-start gap-2 shadow-sm">
+                    <span class="text-xl shrink-0 mt-0.5">🧈</span>
                     <div class="leading-tight">
-                        <span class="block text-amber-300 font-black text-[10px]">Lingote de oro</span>
-                        <span class="text-[8.5px] text-slate-300 leading-tight block mt-0.5">Fórrate con la Peña y consigue mogollón de puntos.</span>
+                        <span class="block text-amber-300 font-black text-xs sm:text-[13px]">Lingote de oro</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-200 leading-snug block mt-0.5">Fórrate con la Peña y consigue mogollón de puntos.</span>
                     </div>
                 </div>
 
                 <!-- 5. Banner Especial: Modo Quiniela de Dobles -->
-                <div class="col-span-2 p-1.5 rounded-xl bg-purple-950/60 border border-purple-500/50 flex items-start gap-1.5 shadow-sm text-purple-200">
-                    <span class="text-base shrink-0 mt-0.5">⚡</span>
+                <div class="col-span-2 p-2 sm:p-2.5 rounded-xl bg-purple-950/70 border border-purple-500/50 flex items-start gap-2 shadow-sm text-purple-200">
+                    <span class="text-xl shrink-0 mt-0.5">⚡</span>
                     <div class="leading-tight">
-                        <span class="block text-white font-black text-[10px]">¡Modo Quiniela de Dobles! (Cada 30.000 pts)</span>
-                        <span class="text-[8.5px] text-purple-300 leading-tight block mt-0.5">Durante 15s sólo llueven balones dobles a velocidad 1.5x. ¡Los balones perdidos NO quitan vidas! Caza <strong>"No se reduce"</strong> para x2 y <strong>+1 vida</strong>. ¡Acertar todos otorga <strong>+1000 pts (Pleno al 15)</strong>!</span>
+                        <span class="block text-white font-black text-xs sm:text-[13px]">¡Modo Quiniela de Dobles! (Cada 30.000 pts)</span>
+                        <span class="text-[10px] sm:text-[11px] text-purple-200 leading-snug block mt-0.5">Durante 15s sólo llueven balones dobles a velocidad 1.5x. ¡Los balones perdidos NO quitan vidas! Caza <strong>"No se reduce"</strong> para x2 y <strong>+1 vida</strong>. ¡Acertar todos otorga <strong>+1000 pts (Pleno al 15)</strong>!</span>
                     </div>
                 </div>
             </div>
 
             <!-- Botones de Acción (Saltar al Césped, Ranking, Manual y Salir) -->
-            <div class="flex flex-col gap-1.5 w-full pt-0.5 shrink-0">
+            <div class="flex flex-col gap-1.5 w-full pt-1 shrink-0">
                 <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
-                        class="w-full py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-xl sm:text-2xl tracking-wide hover:brightness-110 shadow-lg shadow-amber-500/25 transition transform active:scale-95">
+                        class="w-full py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-xl sm:text-2xl tracking-wide hover:brightness-110 shadow-lg shadow-amber-500/25 transition transform active:scale-95">
                     ¡SALTAR AL CÉSPED! 🚀
                 </button>
                 <div class="grid grid-cols-3 gap-1.5 w-full">
                     <button type="button" onclick="window.ArcadeFrenesi.showRankingModal()" 
-                            class="py-1.5 px-1 rounded-xl bg-slate-900 border border-amber-500/40 hover:bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                            class="py-2 px-1 rounded-xl bg-slate-900 border border-amber-500/40 hover:bg-amber-500/20 text-amber-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-1 transition shadow-sm">
                         <span>🏆</span> Ranking
                     </button>
                     <button type="button" onclick="window.ArcadeFrenesi.showInstructionsModal()" 
-                            class="py-1.5 px-1 rounded-xl bg-slate-900 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                            class="py-2 px-1 rounded-xl bg-slate-900 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-1 transition shadow-sm">
                         <span>📖</span> Manual
                     </button>
                     <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
-                       class="py-1.5 px-1 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition whitespace-nowrap shadow-sm"
+                       class="py-2 px-1 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1 transition whitespace-nowrap shadow-sm"
                        title="Volver al Dashboard">
                         <span>🏠</span> Salir
                     </a>
@@ -3310,19 +3310,19 @@
                         }
 
                         const isMe = socio.name === this.currentSocio;
-                        const meBadge = isMe ? `<span class="bg-amber-500 text-slate-950 px-1 py-0.2 rounded text-[7.5px] font-black uppercase ml-1 shadow-sm">TÚ</span>` : '';
+                        const meBadge = isMe ? `<span class="bg-amber-500 text-slate-950 px-1 py-0.2 rounded text-[9px] font-black uppercase ml-1 shadow-sm">TÚ</span>` : '';
 
                         items.push(`
-                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5">
-                                <span class="text-amber-400/80 font-mono text-[8.5px] font-bold">${badge}</span>
-                                <span class="${colorClass}">${socio.name}${meBadge}: <strong class="text-amber-300">${socio.score.toLocaleString()}</strong> pts</span>
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5">
+                                <span class="text-amber-400 font-mono text-[10.5px] font-bold">${badge}</span>
+                                <span class="${colorClass} text-[11px]">${socio.name}${meBadge}: <strong class="text-amber-300 font-black">${socio.score.toLocaleString()}</strong> pts</span>
                             </span>
                         `);
 
                         // Intercalar un mensaje picante cada 2 socios
                         if ((idx + 1) % 2 === 0 && piqueIdx < piques.length) {
                             items.push(`
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold text-[8.5px]">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold text-[10.5px]">
                                     🔥 ${piques[piqueIdx]}
                                 </span>
                             `);
@@ -3332,7 +3332,7 @@
 
                     while (piqueIdx < piques.length) {
                         items.push(`
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold text-[8.5px]">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold text-[10.5px]">
                                 🔥 ${piques[piqueIdx]}
                             </span>
                         `);

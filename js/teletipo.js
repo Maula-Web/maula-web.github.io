@@ -272,7 +272,7 @@
 
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: ¡a partir del nivel 3 caen elementos a distintas velocidades, superbonus Pleno al 15 en modo dobles y teletipo de piques!`,
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero actualizado: carátula con textos más grandes y legibles, elementos a distintas velocidades desde el nivel 3 y Pleno al 15!`,
                 url: 'juego.html'
             });
 

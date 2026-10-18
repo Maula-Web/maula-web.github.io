@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> A partir del nivel 3 caen elementos a distintas velocidades. ¡Bonus Pleno al 15 de +1000 pts en modo dobles y teletipo de piques!`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Carátula mejorada con tipografía más grande y legible en móvil, y elementos a distintas velocidades desde el nivel 3.`,
             url: 'juego.html'
         });
 
