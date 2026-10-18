@@ -270,6 +270,12 @@
                 items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
             }
 
+            // NOTICIA 2: NOVEDAD WEB - Maula Hero
+            items.push({
+                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Ya disponible el juego oficial <strong>Maula Hero</strong> en tu móvil. ¡Pon a prueba tus reflejos y compite por el récord de la Peña!`,
+                url: 'juego.html'
+            });
+
             // NOTICIAS 2 Y 3: MARCADORES Y RESULTADOS COMPLETOS DE LA JORNADA EN CURSO O RECIENTE
             if (activeMatchJ && Array.isArray(activeMatchJ.matches)) {
                 const validMatches = activeMatchJ.matches.filter(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-');
@@ -335,26 +341,44 @@
                 items.push(`🐷 <strong class="text-pink-300">¡Alerta PIG en J.${targetUpcomingJ.number}!:</strong> ${pigMatchStr} (Penalización: -1,00 € al fallo).`);
             }
 
-            // NOTICIA 14: Cenas oficiales de la Peña
-            items.push(`🍽️ <strong class="text-amber-300">Cenas de la Peña:</strong> 1ª Vuelta el Vie 29 Ene 2027 • Fin de Temporada el Vie 04 Jun 2027.`);
+            // NOTICIA 15: Cenas oficiales de la Peña
+            items.push({ text: `🍽️ <strong class="text-amber-300">Cenas de la Peña:</strong> 1ª Vuelta el Vie 29 Ene 2027 • Fin de Temporada el Vie 04 Jun 2027.`, url: 'dashboard_2.html' });
+
+            // NOTICIA 16: NOVEDAD WEB - Actualización Maula Hero
+            items.push({
+                text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Carátula integrada sin scroll, ranking animado con coronas y rana, y modo Dobles.`,
+                url: 'juego.html'
+            });
 
             // Duplicar items para scroll continuo infinito
-            const htmlItems = items.map((it, idx) => `
-                <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.handleTeletipoClick(${idx})">
-                    <span class="text-amber-400/80 font-mono text-[10px] sm:text-[11px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
-                    <span>${it}</span>
-                    <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>
-                </span>
-            `).join('');
+            const htmlItems = items.map((it, idx) => {
+                const text = typeof it === 'object' ? it.text : it;
+                const url = typeof it === 'object' && it.url ? it.url : '';
+                return `
+                    <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.handleTeletipoClick(${idx}, this)" data-url="${url}">
+                        <span class="text-amber-400/80 font-mono text-[10px] sm:text-[11px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
+                        <span>${text}</span>
+                        <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>
+                    </span>
+                `;
+            }).join('');
 
             container.innerHTML = htmlItems + htmlItems;
         }
     }
 
     // Navegación universal al hacer clic en cualquier noticia del teletipo
-    window.handleTeletipoClick = function(idx) {
+    window.handleTeletipoClick = function(idx, el) {
+        if (el) {
+            const url = el.getAttribute('data-url');
+            if (url) {
+                location.href = url;
+                return;
+            }
+        }
+
         if (window.DashboardApp && typeof window.DashboardApp.handleTickerClick === 'function') {
-            window.DashboardApp.handleTickerClick(idx);
+            window.DashboardApp.handleTickerClick(idx, el);
             return;
         }
 

@@ -1355,38 +1355,44 @@ class Dashboard2AppController {
 
         // 1. Jornada en curso / Próxima jornada
         if (isNextInProgress && nextJ) {
-            items.push(`⚽ <strong class="text-amber-400">Jornada ${nextJ.number} en juego:</strong> Marcadores disputándose en directo.`);
+            items.push({ text: `⚽ <strong class="text-amber-400">Jornada ${nextJ.number} en juego:</strong> Marcadores disputándose en directo.`, action: 'jornadas' });
         } else if (nextJ && nextJ.date) {
-            items.push(`⚽ <strong class="text-amber-400">Próxima Jornada ${nextJ.number}:</strong> Boleto fijado para el ${nextJ.date}.`);
+            items.push({ text: `⚽ <strong class="text-amber-400">Próxima Jornada ${nextJ.number}:</strong> Boleto fijado para el ${nextJ.date}.`, action: 'jornadas' });
         } else {
-            items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
+            items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
 
-        // 2. Líder de aciertos en vivo / Ganador de la jornada
+        // 2. NOVEDAD WEB: ¡Estreno oficial de Maula Hero!
+        items.push({
+            text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Estreno oficial del juego <strong>Maula Hero</strong> en tu móvil. ¡Pon a prueba tus reflejos y compite por el récord de la Peña!`,
+            url: 'juego.html'
+        });
+
+        // 3. Líder de aciertos en vivo / Ganador de la jornada
         if (isNextInProgress && liveWinnerHits !== null && liveWinnerHits >= 0) {
-            items.push(`👑 <strong class="text-amber-300">Líder provisional en directo:</strong> ${liveWinnerName} encabeza la jornada con ${liveWinnerHits} aciertos.`);
+            items.push({ text: `👑 <strong class="text-amber-300">Líder provisional en directo:</strong> ${liveWinnerName} encabeza la jornada con ${liveWinnerHits} aciertos.`, action: 'dobles' });
         } else if (outcome && outcome.winnerName) {
-            items.push(`👑 <strong class="text-amber-300">Ganador Jornada Anterior:</strong> ${outcome.winnerName} con ${outcome.winnerHits || 0} aciertos (¡hace la de dobles!).`);
+            items.push({ text: `👑 <strong class="text-amber-300">Ganador Jornada Anterior:</strong> ${outcome.winnerName} con ${outcome.winnerHits || 0} aciertos (¡hace la de dobles!).`, action: 'dobles' });
         } else {
-            items.push(`👑 <strong class="text-amber-300">Rellena Dobles:</strong> Asignado al mejor pronosticador de la jornada.`);
+            items.push({ text: `👑 <strong class="text-amber-300">Rellena Dobles:</strong> Asignado al mejor pronosticador de la jornada.`, action: 'dobles' });
         }
 
-        // 3. Sellador de la semana
+        // 4. Sellador de la semana
         if (isNextInProgress && liveLoserName) {
-            items.push(`✍️ <strong class="text-rose-400">Sellador provisional en juego:</strong> ${liveLoserName} ocupa el puesto de sellado.`);
+            items.push({ text: `✍️ <strong class="text-rose-400">Sellador provisional en juego:</strong> ${liveLoserName} ocupa el puesto de sellado.`, action: 'sellador' });
         } else if (outcome && outcome.loserName) {
-            items.push(`✍️ <strong class="text-rose-400">Sellador designado:</strong> ${outcome.loserName} acude a loterías a sellar el boleto colectivo.`);
+            items.push({ text: `✍️ <strong class="text-rose-400">Sellador designado:</strong> ${outcome.loserName} acude a loterías a sellar el boleto colectivo.`, action: 'sellador' });
         }
 
-        // 4. Podio General: 2º y 3º puesto
+        // 5. Podio General: 2º y 3º puesto
         if (sortedMembers && sortedMembers.length > 1) {
             const sec = sortedMembers[1];
             const thi = sortedMembers[2];
             const podioStr = thi ? `🥈 2º ${sec.name} (${sec.totalPoints || 0} pts) • 🥉 3º ${thi.name} (${thi.totalPoints || 0} pts)` : `🥈 2º ${sec.name} (${sec.totalPoints || 0} pts)`;
-            items.push(`🏅 <strong class="text-slate-300">Podio General:</strong> ${podioStr}.`);
+            items.push({ text: `🏅 <strong class="text-slate-300">Podio General:</strong> ${podioStr}.`, action: 'clasificacion' });
         }
 
-        // 5. Caja Real de la Peña
+        // 6. Caja Real de la Peña
         let summary = null;
         try {
             const cached = localStorage.getItem('maulas_bote2_summary');
@@ -1404,89 +1410,100 @@ class Dashboard2AppController {
         }
         const cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1091.52) : 1091.52;
         const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
-        items.push(`💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común.`);
+        items.push({ text: `💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común.`, action: 'bote' });
 
-        // 6. Partido PIG
+        // 7. Partido PIG
         const nextPigInfo = this.findPigMatch(nextJ);
         const nextHasPig = nextPigInfo !== null;
         const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2).replace('.', ',');
         if (nextHasPig && nextPigInfo && nextPigInfo.match) {
-            items.push(`🐷 <strong class="text-pink-300">¡Alerta PIG en J.${nextJ.number}!:</strong> ${nextPigInfo.match.home} vs ${nextPigInfo.match.away} (Penalización: -${penaltyVal} € al fallo).`);
+            items.push({ text: `🐷 <strong class="text-pink-300">¡Alerta PIG en J.${nextJ.number}!:</strong> ${nextPigInfo.match.home} vs ${nextPigInfo.match.away} (Penalización: -${penaltyVal} € al fallo).`, action: 'pig' });
         } else if (outcome && outcome.isPig) {
             const numAcertantes = outcome.pigAcertantes ? outcome.pigAcertantes.length : 0;
-            items.push(`🐷 <strong class="text-pink-300">Partido PIG previo:</strong> ${numAcertantes} socios acertaron y quedaron exentos.`);
+            items.push({ text: `🐷 <strong class="text-pink-300">Partido PIG previo:</strong> ${numAcertantes} socios acertaron y quedaron exentos.`, action: 'pig' });
         }
 
-        // 7. Límite para rellenar
-        items.push(`⏳ <strong class="text-amber-300">Límite para rellenar:</strong> Jueves a las 17:00h cierre estricto de quinielas en la web.`);
+        // 8. Límite para rellenar
+        items.push({ text: `⏳ <strong class="text-amber-300">Límite para rellenar:</strong> Jueves a las 17:00h cierre estricto de quinielas en la web.`, action: 'pronosticos' });
 
-        // 8. Estado de participación y envíos
+        // 9. Estado de participación y envíos
         const totalSocios = (this.members && this.members.length >= 19) ? this.members.length : (this.members ? this.members.length : 19);
         const sentCount = this.submittedMembers ? this.submittedMembers.length : 0;
-        items.push(`📋 <strong class="text-sky-300">Envíos de la Peña:</strong> ${sentCount} de ${totalSocios} socios han enviado su quiniela semanal.`);
+        items.push({ text: `📋 <strong class="text-sky-300">Envíos de la Peña:</strong> ${sentCount} de ${totalSocios} socios han enviado su quiniela semanal.`, action: 'submitted' });
 
-        // 9. Líder de la clasificación general
+        // 10. Líder de la clasificación general
         if (leader) {
             const diffPts = (leader.totalPoints || 0) - (secondLeaderPoints || 0);
             const diffStr = diffPts > 0 ? ` (+${diffPts} pts de ventaja)` : '';
-            items.push(`🏆 <strong class="text-amber-400">1º en la General:</strong> ${leader.name} lidera con ${leader.totalPoints || 0} pts${diffStr}.`);
+            items.push({ text: `🏆 <strong class="text-amber-400">1º en la General:</strong> ${leader.name} lidera con ${leader.totalPoints || 0} pts${diffStr}.`, action: 'clasificacion' });
         } else {
-            items.push(`🏆 <strong class="text-amber-400">Clasificación General:</strong> 19 socios en liza por el trofeo de la temporada.`);
+            items.push({ text: `🏆 <strong class="text-amber-400">Clasificación General:</strong> 19 socios en liza por el trofeo de la temporada.`, action: 'clasificacion' });
         }
 
-        // 10. Farolillo rojo (Rana)
+        // 11. Farolillo rojo (Rana)
         if (lastMember) {
-            items.push(`🐸 <strong class="text-rose-400">Farolillo Rojo:</strong> ${lastMember.name} ocupa la última posición con ${lastMember.totalPoints || 0} pts.`);
+            items.push({ text: `🐸 <strong class="text-rose-400">Farolillo Rojo:</strong> ${lastMember.name} ocupa la última posición con ${lastMember.totalPoints || 0} pts.`, action: 'clasificacion' });
         }
 
-        // 11. Premios conseguidos en la temporada
+        // 12. Premios conseguidos en la temporada
         const prizeMoneyFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(totalSeasonMoney || 0) : `${(totalSeasonMoney || 0).toFixed(2).replace('.', ',')} €`;
-        items.push(`🎁 <strong class="text-emerald-400">Premios Temporada 2026-27:</strong> ${prizeMoneyFmt} cobrados (${indivCount || 0} individuales y ${doblesCount || 0} en dobles).`);
+        items.push({ text: `🎁 <strong class="text-emerald-400">Premios Temporada 2026-27:</strong> ${prizeMoneyFmt} cobrados (${indivCount || 0} individuales y ${doblesCount || 0} en dobles).`, action: 'resumen' });
 
-        // 12. Resultados de partidos detallados de la jornada en curso o más reciente
+        // 13. Resultados de partidos detallados de la jornada en curso o más reciente
         const activeJ = (isNextInProgress && nextJ) ? nextJ : (playedJornadas && playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1] : null);
         if (activeJ && Array.isArray(activeJ.matches)) {
             const liveMatches = activeJ.matches.filter(m => m.result && m.result !== '' && m.result !== '-');
             if (liveMatches.length > 0) {
                 const jTag = isNextInProgress ? `Marcadores en juego (J.${activeJ.number})` : `Resultados Oficiales J.${activeJ.number}`;
                 const chunk1 = liveMatches.slice(0, 5).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
-                items.push(`⚽ <strong class="text-amber-300">${jTag}:</strong> ${chunk1}.`);
+                items.push({ text: `⚽ <strong class="text-amber-300">${jTag}:</strong> ${chunk1}.`, action: 'jornadas' });
                 if (liveMatches.length > 5) {
                     const chunk2 = liveMatches.slice(5, 10).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
-                    items.push(`⚽ <strong class="text-amber-300">Más resultados J.${activeJ.number}:</strong> ${chunk2}.`);
+                    items.push({ text: `⚽ <strong class="text-amber-300">Más resultados J.${activeJ.number}:</strong> ${chunk2}.`, action: 'jornadas' });
                 }
                 if (liveMatches.length > 10) {
                     const chunk3 = liveMatches.slice(10, 15).map(m => `${m.home} ${m.result} ${m.away}`).join(' • ');
-                    items.push(`⚽ <strong class="text-amber-300">Partidos 11-15 J.${activeJ.number}:</strong> ${chunk3}.`);
+                    items.push({ text: `⚽ <strong class="text-amber-300">Partidos 11-15 J.${activeJ.number}:</strong> ${chunk3}.`, action: 'jornadas' });
                 }
             } else {
-                items.push(`⚽ <strong class="text-slate-300">Jornada ${activeJ.number}:</strong> Partidos pendientes de inicio.`);
+                items.push({ text: `⚽ <strong class="text-slate-300">Jornada ${activeJ.number}:</strong> Partidos pendientes de inicio.`, action: 'jornadas' });
             }
         }
 
-        // 13. Superávit y balance neto de la peña
+        // 14. Superávit y balance neto de la peña
         const totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 694.71) : 694.71;
         const superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
         const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`;
-        items.push(`📈 <strong class="text-emerald-300">Superávit Peña:</strong> ${superavit >= 0 ? '+' : ''}${superavitFmt} a favor de la caja común.`);
+        items.push({ text: `📈 <strong class="text-emerald-300">Superávit Peña:</strong> ${superavit >= 0 ? '+' : ''}${superavitFmt} a favor de la caja común.`, action: 'bote' });
 
-        // 14. Próxima Cena de la Peña
-        items.push(`🍽️ <strong class="text-amber-300">Cenas de la Peña:</strong> 1ª Vuelta el Vie 29 Ene 2027 • Fin de Temporada el Vie 04 Jun 2027.`);
+        // 15. Próxima Cena de la Peña
+        items.push({ text: `🍽️ <strong class="text-amber-300">Cenas de la Peña:</strong> 1ª Vuelta el Vie 29 Ene 2027 • Fin de Temporada el Vie 04 Jun 2027.`, action: 'cenas' });
 
-        // Asegurar que siempre hay exactamente 15 elementos
+        // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
+        items.push({
+            text: `⚡ <strong class="text-cyan-400">Actualización Web:</strong> Carátula sin scroll en Maula Hero, ranking animado con coronas y rana, y modo Dobles.`,
+            url: 'juego.html'
+        });
+
+        // Asegurar que siempre hay un mínimo de elementos para rotación continua
         while (items.length < 15) {
-            items.push(`⭐ <strong class="text-amber-400">Peña Maulas:</strong> Pasión y rigor quinielístico desde 2004.`);
+            items.push({ text: `⭐ <strong class="text-amber-400">Peña Maulas:</strong> Pasión y rigor quinielístico desde 2004.`, action: 'jornadas' });
         }
-        const finalItems = items.slice(0, 15);
+        const finalItems = items;
 
         // Renderizar elementos con loop continuo infinito (duplicados exactamente una vez)
-        const renderItemHtml = (it, idx) => `
-            <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.DashboardApp && window.DashboardApp.handleTickerClick(${idx})">
-                <span class="text-amber-400/80 font-mono text-[10px] sm:text-[11px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
-                <span>${it}</span>
-                <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>
-            </span>
-        `;
+        const renderItemHtml = (it, idx) => {
+            const text = typeof it === 'object' ? it.text : it;
+            const url = typeof it === 'object' && it.url ? it.url : '';
+            const action = typeof it === 'object' && it.action ? it.action : '';
+            return `
+                <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.DashboardApp && window.DashboardApp.handleTickerClick(${idx}, this)" data-url="${url}" data-action="${action}">
+                    <span class="text-amber-400/80 font-mono text-[10px] sm:text-[11px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
+                    <span>${text}</span>
+                    <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>
+                </span>
+            `;
+        };
 
         const htmlList = finalItems.map((it, idx) => renderItemHtml(it, idx)).join('');
         container.innerHTML = htmlList + htmlList;
@@ -1495,29 +1512,55 @@ class Dashboard2AppController {
     /**
      * Navegación interactiva al hacer clic en un dato de la cinta
      */
-    handleTickerClick(idx) {
-        if (idx === 0 || idx === 11) { // Jornada / Partidos
+    handleTickerClick(idx, el) {
+        if (el) {
+            const url = el.getAttribute('data-url');
+            if (url) {
+                location.href = url;
+                return;
+            }
+            const action = el.getAttribute('data-action');
+            if (action === 'dobles') { this.openDoblesModal(); return; }
+            if (action === 'sellador') { location.href = 'bote_2.html?modal=gestion-jornada'; return; }
+            if (action === 'pig') { this.showPigOrRanaInfo(); return; }
+            if (action === 'submitted') { this.openSubmittedListModal(); return; }
+            if (action === 'cenas') { this.showInfo('cenas'); return; }
+            if (action === 'jornadas') { location.href = 'jornadas_2.html'; return; }
+            if (action === 'clasificacion') { location.href = 'clasificacion_2.html'; return; }
+            if (action === 'bote') { location.href = 'bote_2.html'; return; }
+            if (action === 'pronosticos') { location.href = 'pronosticos_2.html?openEditor=true'; return; }
+            if (action === 'resumen') { location.href = 'resumen_2.html'; return; }
+        }
+
+        // Fallback por índice legacy
+        if (idx === 0) {
             location.href = 'jornadas_2.html';
-        } else if (idx === 1 || idx === 3) { // Dobles
+        } else if (idx === 1) {
+            location.href = 'juego.html';
+        } else if (idx === 2) {
             this.openDoblesModal();
-        } else if (idx === 2) { // Sellador
+        } else if (idx === 3) {
             location.href = 'bote_2.html?modal=gestion-jornada';
-        } else if (idx === 4 || idx === 12) { // Bote / Superávit
-            location.href = 'bote_2.html';
-        } else if (idx === 5) { // PIG
-            this.showPigOrRanaInfo();
-        } else if (idx === 6) { // Rellenar
-            location.href = 'pronosticos_2.html?openEditor=true';
-        } else if (idx === 7) { // Envíos
-            this.openSubmittedListModal();
-        } else if (idx === 8 || idx === 9) { // Líder / Rana
+        } else if (idx === 4) {
             location.href = 'clasificacion_2.html';
-        } else if (idx === 10) { // Premios
+        } else if (idx === 5) {
+            location.href = 'bote_2.html';
+        } else if (idx === 6) {
+            this.showPigOrRanaInfo();
+        } else if (idx === 7) {
+            location.href = 'pronosticos_2.html?openEditor=true';
+        } else if (idx === 8) {
+            this.openSubmittedListModal();
+        } else if (idx === 9 || idx === 10) {
+            location.href = 'clasificacion_2.html';
+        } else if (idx === 11) {
             location.href = 'resumen_2.html';
-        } else if (idx === 13) { // Cenas
+        } else if (idx === 13) {
+            location.href = 'bote_2.html';
+        } else if (idx === 14) {
             this.showInfo('cenas');
-        } else if (idx === 14) { // Emilio
-            this.executePrank();
+        } else {
+            location.href = 'juego.html';
         }
     }
 
