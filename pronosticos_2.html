@@ -1143,6 +1143,13 @@
             }
         }
 
+        /* Ocultar icono en botón acciones en modo vertical */
+        @media (orientation: portrait) {
+            .btn-actions-icon {
+                display: none !important;
+            }
+        }
+
         /* Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }
@@ -1547,7 +1554,7 @@
         <!-- =====================================================================
              NIVEL 4: HUB DE CONTROL Y SELECTORES
              ===================================================================== -->
-        <section id="pronosticos-hub-section" class="glass-panel p-2.5 sm:p-4 border-amber-500/40 space-y-2 sm:space-y-3 order-4">
+        <section id="pronosticos-hub-section" class="glass-panel p-2.5 sm:p-4 border-amber-500/40 space-y-2 sm:space-y-3 order-4 relative z-30">
             <!-- Fila 1: Selector de Jornada ◀ [Sel] ▶ + Acciones en Móvil / Botones en Escritorio -->
             <div class="flex items-center justify-between gap-2 sm:gap-3 w-full">
                 <!-- Selector de Jornada -->
@@ -1570,9 +1577,9 @@
                 </div>
 
                 <!-- EN MÓVIL: Botón Desplegable de Acciones -->
-                <div class="relative lg:hidden shrink-0" id="mobile-quiniela-actions-container">
+                <div class="relative lg:hidden shrink-0 z-40" id="mobile-quiniela-actions-container">
                     <button type="button" onclick="window.toggleMobileQuinielaActions()" class="px-2.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold text-xs border border-amber-500/40 transition flex items-center gap-1 shadow-sm whitespace-nowrap">
-                        <span>⚙️</span>
+                        <span class="btn-actions-icon hidden landscape:inline">⚙️</span>
                         <span>Acciones</span>
                         <span class="text-[10px] text-amber-500 dark:text-amber-400">▼</span>
                     </button>
@@ -1644,7 +1651,7 @@
         <!-- =====================================================================
              NIVEL 5: PANEL GENERAL DE SELLADO (PRONÓSTICOS DE CADA SOCIO EN VERTICAL)
              ===================================================================== -->
-        <section class="glass-panel p-2.5 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-5">
+        <section class="glass-panel p-2.5 sm:p-5 border-amber-500/40 space-y-3 sm:space-y-4 order-5 relative z-10">
             
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2.5 sm:pb-3 border-b border-slate-200 dark:border-slate-800 gap-2 sm:gap-3">
                 <div class="flex items-center gap-2 sm:gap-2.5">
