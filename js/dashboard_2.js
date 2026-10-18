@@ -1481,7 +1481,7 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `⚡ <strong class="text-cyan-400">Actualización Web:</strong> Carátula sin scroll en Maula Hero, ranking animado con coronas y rana, y modo Dobles.`,
+            text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Nuevo teletipo de piques en la carátula, vidas blindadas en modo dobles y centrado vertical móvil.`,
             url: 'juego.html'
         });
 

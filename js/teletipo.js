@@ -346,7 +346,7 @@
 
             // NOTICIA 16: NOVEDAD WEB - Actualización Maula Hero
             items.push({
-                text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Carátula integrada sin scroll, ranking animado con coronas y rana, y modo Dobles.`,
+                text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Nuevo teletipo de piques en la carátula, vidas blindadas en modo dobles y centrado vertical móvil.`,
                 url: 'juego.html'
             });
 

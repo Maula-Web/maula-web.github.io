@@ -207,6 +207,24 @@
         .custom-scroll::-webkit-scrollbar { width: 5px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
         .custom-scroll::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
+
+        /* Estilos del Teletipo Animado de la Carátula */
+        .ticker-wrap {
+            mask-image: linear-gradient(to right, transparent, black 2.5%, black 97.5%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 2.5%, black 97.5%, transparent);
+        }
+        .ticker-move {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: ticker-slide-arcade 50s linear infinite;
+        }
+        .ticker-move:hover, .ticker-move:active, .ticker-move.is-paused {
+            animation-play-state: paused;
+        }
+        @keyframes ticker-slide-arcade {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
     </style>
 </head>
 <body class="bg-[#040711] text-slate-100 flex flex-col justify-between h-screen w-screen overflow-hidden">
@@ -390,6 +408,21 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         ACTIVO
                     </span>
+                </div>
+            </div>
+
+            <!-- Teletipo Arcade de Récords y Mensajes de Pique Maula -->
+            <div class="w-full bg-slate-950/85 rounded-xl border border-amber-500/35 px-2 py-0.5 overflow-hidden relative shadow-inner flex items-center shrink-0">
+                <div class="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500/30 to-rose-500/30 text-amber-300 font-black text-[8px] uppercase tracking-wider shrink-0 mr-1.5 border border-amber-500/40 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                    <span>PIQUE</span>
+                </div>
+                <div class="ticker-wrap flex-1 overflow-hidden relative h-4 flex items-center"
+                     ontouchstart="document.getElementById('caratula-ticker-content')?.classList.add('is-paused')"
+                     ontouchend="document.getElementById('caratula-ticker-content')?.classList.remove('is-paused')">
+                    <div id="caratula-ticker-content" class="ticker-move flex items-center whitespace-nowrap will-change-transform text-[9px] text-slate-300 font-medium">
+                        <!-- Generado dinámicamente con puntuaciones de todos los socios y piques -->
+                    </div>
                 </div>
             </div>
 
@@ -3117,6 +3150,96 @@
                         const best = (this.highScores[this.currentSocio]?.score || 0).toLocaleString();
                         elStartBest.textContent = `Récord: ${best}`;
                     }
+
+                    this.updateCaratulaTicker();
+                }
+
+                // TELETIPO ANIMADO DE LA CARÁTULA (PUNTUACIONES Y PIQUES)
+                updateCaratulaTicker() {
+                    const container = document.getElementById('caratula-ticker-content');
+                    if (!container) return;
+
+                    const scoresMap = { ...this.highScores };
+                    DEFAULT_MEMBERS.forEach(name => {
+                        if (!scoresMap[name]) {
+                            scoresMap[name] = { score: 0, maxCombo: 0, maxLevel: 1, games: 0 };
+                        }
+                    });
+
+                    const sorted = Object.entries(scoresMap)
+                        .map(([name, data]) => ({ name, score: data.score || 0, maxCombo: data.maxCombo || 0, games: data.games || 0 }))
+                        .sort((a, b) => b.score - a.score);
+
+                    const leader = sorted[0];
+                    const emilio = sorted.find(s => s.name === 'Emilio');
+                    const emilioScore = emilio ? emilio.score : 0;
+
+                    const piques = [
+                        "¿Vas a ser tú el más Maula de la Peña? 🐸",
+                        emilioScore > 0 ? `Yo no digo nada pero Emilio lleva ${emilioScore.toLocaleString()} pts... 🥾` : "Yo no digo nada pero Emilio te va ganando... 🥾",
+                        "¡Menos siesta y más reflejos al 1-X-2! ⚡",
+                        leader && leader.score > 0 ? `👑 ${leader.name} domina con ${leader.score.toLocaleString()} pts. ¡A por él!` : "¿Quién será el primer Líder Supremo de la Peña? 👑",
+                        "¿Te vas a quedar mirando o vas a sellar a tiempo? ⏰",
+                        "🧈 ¡El lingote de oro no se va a cazar solo!",
+                        "Dicen en el bar que el penalti te viene grande... ⚽",
+                        "Si pestañeas te comes el sellar tarde y Game Over 💥",
+                        "¡Cuidado con la rana que te deja a dos velas! 🐸",
+                        "¿Mucho presumir de quinielas pero en Maula Hero qué? 🎮"
+                    ];
+
+                    const items = [];
+                    let piqueIdx = 0;
+
+                    sorted.forEach((socio, idx) => {
+                        let badge = `#${idx + 1}`;
+                        let colorClass = 'text-slate-300';
+                        if (socio.score > 0) {
+                            if (idx === 0) { badge = '👑 1º'; colorClass = 'text-amber-300 font-black'; }
+                            else if (idx === 1) { badge = '🥈 2º'; colorClass = 'text-slate-200 font-bold'; }
+                            else if (idx === 2) { badge = '🥉 3º'; colorClass = 'text-amber-400 font-bold'; }
+                        } else if (idx === sorted.length - 1) {
+                            badge = '🐸';
+                            colorClass = 'text-emerald-400 font-bold';
+                        }
+
+                        const isMe = socio.name === this.currentSocio;
+                        const meBadge = isMe ? `<span class="bg-amber-500 text-slate-950 px-1 py-0.2 rounded text-[7.5px] font-black uppercase ml-1 shadow-sm">TÚ</span>` : '';
+
+                        items.push(`
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5">
+                                <span class="text-amber-400/80 font-mono text-[8.5px] font-bold">${badge}</span>
+                                <span class="${colorClass}">${socio.name}${meBadge}: <strong class="text-amber-300">${socio.score.toLocaleString()}</strong> pts</span>
+                            </span>
+                        `);
+
+                        // Intercalar un mensaje picante cada 2 socios
+                        if ((idx + 1) % 2 === 0 && piqueIdx < piques.length) {
+                            items.push(`
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold text-[8.5px]">
+                                    🔥 ${piques[piqueIdx]}
+                                </span>
+                            `);
+                            piqueIdx++;
+                        }
+                    });
+
+                    while (piqueIdx < piques.length) {
+                        items.push(`
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-bold text-[8.5px]">
+                                🔥 ${piques[piqueIdx]}
+                            </span>
+                        `);
+                        piqueIdx += 2;
+                    }
+
+                    const htmlContent = items.map(it => `
+                        <span class="inline-flex items-center">
+                            ${it}
+                            <span class="text-amber-500/40 font-black mx-1.5 text-xs select-none">•</span>
+                        </span>
+                    `).join('');
+
+                    container.innerHTML = htmlContent + htmlContent;
                 }
 
                 checkGameOver() {
