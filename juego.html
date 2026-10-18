@@ -360,7 +360,7 @@
             <!-- Encabezado / Logo y Título -->
             <div class="flex flex-col items-center">
                 <div class="flex items-center justify-center gap-2">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-xl shadow-lg border border-amber-300/60 shrink-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-lg sm:text-xl shadow-lg border border-amber-300/60 shrink-0">
                         ⚽
                     </div>
                     <div class="text-left leading-none">
@@ -370,85 +370,83 @@
                         </h1>
                     </div>
                 </div>
-                <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1 max-w-xs leading-tight">
+                <p class="text-[10px] text-slate-400 mt-0.5 max-w-xs leading-tight">
                     2 min por nivel · Acierta al ritmo 1-X-2 y salva los boletos tardíos
                 </p>
             </div>
 
-            <!-- Socio Oficial Conectado -->
+            <!-- Ficha del Jugador -->
             <div class="w-full bg-slate-900/90 rounded-xl px-2.5 py-1.5 border border-amber-500/40 flex items-center justify-between text-left shadow-inner">
                 <div class="flex items-center gap-2 min-w-0">
-                    <span class="text-base shrink-0">👑</span>
+                    <span class="text-base shrink-0">👤</span>
                     <div class="truncate">
-                        <span id="start-socio-name" class="text-xs font-black text-amber-300 truncate block">Socio Maula</span>
-                        <span id="start-socio-best" class="text-[10px] text-slate-400 font-mono block leading-none">Récord: 0</span>
+                        <span class="text-[9px] font-extrabold text-slate-400 block uppercase leading-none">Jugador</span>
+                        <span id="start-socio-name" class="text-xs font-black text-amber-300 truncate block mt-0.5">Socio Maula</span>
                     </div>
                 </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[9px] border border-emerald-500/30 shrink-0">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    CONECTADO
-                </span>
+                <div class="text-right shrink-0">
+                    <span id="start-socio-best" class="text-[10px] text-amber-400 font-mono font-bold block leading-none">Récord: 0</span>
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[8px] border border-emerald-500/30 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        ACTIVO
+                    </span>
+                </div>
             </div>
 
-            <!-- Guía Compacta de Elementos de Juego -->
-            <div class="grid grid-cols-2 gap-1.5 w-full text-left">
-                <!-- Sellar Tarde -->
-                <div class="p-1.5 rounded-xl bg-slate-900/70 border border-rose-500/40 flex items-start gap-1.5">
-                    <span class="text-lg shrink-0 mt-0.5">⏰</span>
+            <!-- Tarjetas de la Carátula -->
+            <div class="flex flex-col gap-1.5 w-full text-left">
+                <!-- Tarjeta 1: Sellar Tarde -->
+                <div class="p-2 rounded-xl bg-slate-900/80 border border-rose-500/40 flex items-start gap-2 shadow-sm">
+                    <span class="text-xl shrink-0 mt-0.5">⏰</span>
                     <div class="leading-tight">
-                        <span class="block text-white font-black text-[11px]">Sellar Tarde</span>
-                        <span class="text-[9px] text-rose-300">Swipe ⬆️ en el <strong>Área de Penalti</strong>. Tocarlo = 💥</span>
+                        <span class="block text-rose-300 font-black text-[11px]">Sellar tarde</span>
+                        <span class="text-[9px] text-slate-300 leading-tight block mt-0.5">Desliza hacia arriba en el área de penalti inferior para conseguir sellar a tiempo. Si no lo consigues serás un Maula y sufrirás las consecuencias.</span>
                     </div>
                 </div>
 
-                <!-- Metamórfico -->
-                <div class="p-1.5 rounded-xl bg-slate-900/70 border border-amber-500/40 flex items-start gap-1.5">
-                    <span class="text-lg shrink-0 mt-0.5">📖</span>
-                    <div class="leading-tight">
-                        <span class="block text-white font-black text-[11px]">Metamórfico</span>
-                        <span class="text-[9px] text-amber-200">Estatutos (x2), Rana (½ pts), Polo (x2). No resta vida.</span>
+                <!-- Tarjeta 2 y 3: Echar a Emilio y Lingote de Oro -->
+                <div class="grid grid-cols-2 gap-1.5 w-full">
+                    <!-- Echar a Emilio -->
+                    <div class="p-2 rounded-xl bg-slate-900/80 border border-yellow-500/40 flex items-start gap-1.5 shadow-sm">
+                        <span class="text-xl shrink-0 mt-0.5">🥾</span>
+                        <div class="leading-tight">
+                            <span class="block text-yellow-300 font-black text-[11px]">Echar a Emilio</span>
+                            <span class="text-[9px] text-slate-300 leading-tight block mt-0.5">Si consigues echar a Emilio, te quedarás relajado y eso se nota...</span>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Echar a Emilio -->
-                <div class="p-1.5 rounded-xl bg-slate-900/70 border border-yellow-500/40 flex items-start gap-1.5">
-                    <span class="text-lg shrink-0 mt-0.5">🥾</span>
-                    <div class="leading-tight">
-                        <span class="block text-white font-black text-[11px]">Echar a Emilio</span>
-                        <span class="text-[9px] text-yellow-300">¡Rápido! Explota todo x2 y ralentiza 10s. No resta vida.</span>
-                    </div>
-                </div>
-
-                <!-- Lingote Oro -->
-                <div class="p-1.5 rounded-xl bg-slate-900/70 border border-amber-400/40 flex items-start gap-1.5">
-                    <span class="text-lg shrink-0 mt-0.5">🧈</span>
-                    <div class="leading-tight">
-                        <span class="block text-white font-black text-[11px]">Lingote Oro</span>
-                        <span class="text-[9px] text-amber-300">Puntos x2.5 y lluvia de monedas de oro.</span>
-                    </div>
-                </div>
-
-                <!-- Banner Modo Dobles -->
-                <div class="col-span-2 p-1.5 rounded-xl bg-purple-950/60 border border-purple-500/50 flex items-center gap-2 text-purple-200 shadow">
-                    <span class="text-xl shrink-0">⚡</span>
-                    <div class="leading-tight">
-                        <span class="block text-white font-black text-[11px]">Modo Quiniela de Dobles (Cada 30k pts)</span>
-                        <span class="text-[9px] text-purple-300">15s de balones de 2 en 2. Caza <strong>"No se reduce"</strong> (+1 vida y pts x2).</span>
+                    <!-- Lingote de oro -->
+                    <div class="p-2 rounded-xl bg-slate-900/80 border border-amber-400/40 flex items-start gap-1.5 shadow-sm">
+                        <span class="text-xl shrink-0 mt-0.5">🧈</span>
+                        <div class="leading-tight">
+                            <span class="block text-amber-300 font-black text-[11px]">Lingote de oro</span>
+                            <span class="text-[9px] text-slate-300 leading-tight block mt-0.5">Fórrate con la Peña y consigue mogollón de puntos.</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botones de Acción (Saltar al Césped y Dashboard) -->
-            <div class="flex items-center gap-2 w-full pt-1">
+            <!-- Botones de Acción (Saltar al Césped, Ranking, Instrucciones y Dashboard) -->
+            <div class="flex flex-col gap-1.5 w-full pt-0.5">
                 <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
-                        class="flex-1 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-xl sm:text-2xl tracking-wide hover:brightness-110 shadow-lg shadow-amber-500/25 transition transform active:scale-95">
+                        class="w-full py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-comic text-xl sm:text-2xl tracking-wide hover:brightness-110 shadow-lg shadow-amber-500/25 transition transform active:scale-95">
                     ¡SALTAR AL CÉSPED! 🚀
                 </button>
-                <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
-                   class="px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition whitespace-nowrap shadow-md shrink-0"
-                   title="Volver al Dashboard">
-                    <span>🏠</span> Dashboard
-                </a>
+                <div class="grid grid-cols-3 gap-1.5 w-full">
+                    <button type="button" onclick="window.ArcadeFrenesi.showRankingModal()" 
+                            class="py-2 px-1 rounded-xl bg-slate-900 border border-amber-500/40 hover:bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                        <span>🏆</span> Ranking
+                    </button>
+                    <button type="button" onclick="window.ArcadeFrenesi.showInstructionsModal()" 
+                            class="py-2 px-1 rounded-xl bg-slate-900 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                        <span>📖</span> Manual
+                    </button>
+                    <a href="dashboard_2.html" onclick="window.ArcadeFrenesi ? window.ArcadeFrenesi.goToDashboard(event) : null"
+                       class="py-2 px-1 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition whitespace-nowrap shadow-sm"
+                       title="Volver al Dashboard">
+                        <span>🏠</span> Salir
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -550,14 +548,14 @@
     <!-- =========================================================================
          MODAL 3: RANKING OFICIAL DE LA PEÑA MAULAS
          ========================================================================= -->
-    <div id="modal-ranking" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="modal-glass w-full max-w-lg rounded-3xl p-5 sm:p-6 text-center flex flex-col gap-3 max-h-[90vh]">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div id="modal-ranking" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md">
+        <div class="modal-glass w-full max-w-lg rounded-3xl p-4 sm:p-6 text-center flex flex-col gap-3 max-h-[92vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
                 <div class="flex items-center gap-2 text-left">
                     <span class="text-2xl">🏆</span>
                     <div>
                         <h3 class="font-comic text-2xl text-white">TABLA DE HONOR ARCADE</h3>
-                        <p class="text-[11px] text-slate-400">Puntuaciones máximas oficiales de la Peña Maulas</p>
+                        <p class="text-[11px] text-slate-400">Puntuaciones máximas de los socios de la Peña Maulas</p>
                     </div>
                 </div>
                 <button type="button" onclick="window.ArcadeFrenesi.closeRankingModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
@@ -565,15 +563,148 @@
                 </button>
             </div>
 
-            <!-- Lista de Récords con Scroll -->
-            <div id="ranking-list-container" class="overflow-y-auto custom-scroll space-y-1.5 pr-1 max-h-[55vh] text-left">
+            <!-- Lista de Récords con Scroll y Animaciones Divertidas -->
+            <div id="ranking-list-container" class="overflow-y-auto custom-scroll space-y-2 pr-1 max-h-[60vh] text-left">
                 <div class="p-8 text-center text-slate-400 text-xs">Cargando clasificación...</div>
             </div>
 
-            <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
-                <span class="text-[10px] text-slate-500">Sincronizado en la nube (Firestore)</span>
-                <button type="button" onclick="window.ArcadeFrenesi.closeRankingModal()" class="px-4 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition">
-                    Cerrar
+            <div class="pt-2 border-t border-slate-800 flex flex-col gap-1.5">
+                <button type="button" onclick="window.ArcadeFrenesi.closeRankingModal()" 
+                        class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-comic text-lg hover:brightness-110 active:scale-95 transition flex items-center justify-center gap-2 shadow-lg">
+                    <span>🔙</span> Volver a la Carátula del Juego
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MODAL 4: INSTRUCCIONES COMPLETAS Y DESCRIPCIÓN DE ELEMENTOS
+         ========================================================================= -->
+    <div id="modal-instructions" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md">
+        <div class="modal-glass w-full max-w-lg rounded-3xl p-4 sm:p-6 text-center flex flex-col gap-3 max-h-[92vh]">
+            <!-- Encabezado -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <div class="flex items-center gap-2 text-left">
+                    <span class="text-2xl">📖</span>
+                    <div>
+                        <h3 class="font-comic text-2xl text-white">MANUAL COMPLETO DEL ARCADE</h3>
+                        <p class="text-[11px] text-slate-400">Reglas, elementos y secretos de Frenesí 1-X-2</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.ArcadeFrenesi.closeInstructionsModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Contenido con Scroll -->
+            <div class="overflow-y-auto custom-scroll space-y-2.5 pr-1 max-h-[62vh] text-left text-xs leading-relaxed text-slate-300">
+                <!-- Balones 1-X-2 -->
+                <div class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">⚽</span>
+                        <h4 class="font-bold text-white text-sm">Balones de Pronóstico (1 - X - 2)</h4>
+                    </div>
+                    <p class="text-slate-300 text-[11px]">
+                        Los balones caen al ritmo de la quiniela por 3 carriles: <strong>Carril 1 (Azul)</strong>, <strong>Carril X (Verde)</strong> y <strong>Carril 2 (Rosa)</strong>.
+                    </p>
+                    <p class="text-slate-400 text-[11px]">
+                        Pulsa el botón del carril correcto justo cuando el balón cruce la línea inferior de meta.
+                        ¡PERFECTO! otorga 100 puntos y ¡BIEN! 50 puntos. Cada acierto acumula combo. Si dejas escapar un balón o pulsas el carril incorrecto, <strong>pierdes 1 vida</strong> y se rompe el combo.
+                    </p>
+                </div>
+
+                <!-- Sellar Tarde -->
+                <div class="p-3 rounded-2xl bg-rose-950/30 border border-rose-500/50 space-y-1">
+                    <div class="flex items-center gap-2 text-rose-300">
+                        <span class="text-lg">⏰</span>
+                        <h4 class="font-bold text-white text-sm">Sellar Tarde (¡Peligro!)</h4>
+                    </div>
+                    <p class="text-rose-200 text-[11px]">
+                        <strong>Desliza hacia arriba en el área de penalti inferior para conseguir sellar a tiempo. Si no lo consigues serás un Maula y sufrirás las consecuencias.</strong>
+                    </p>
+                    <p class="text-slate-300 text-[11px]">
+                        ¡NO pulses los botones 1-X-2 con este elemento! Debes hacer un gesto táctil de deslizamiento rápido (swipe ⬆️) dentro del área verde de penalti dibujada abajo para devolver el boleto a tiempo. Si lo tocas con un botón o cruza la meta sin devolverlo, explotará y perderás 1 vida.
+                    </p>
+                </div>
+
+                <!-- Echar a Emilio -->
+                <div class="p-3 rounded-2xl bg-yellow-950/30 border border-yellow-500/50 space-y-1">
+                    <div class="flex items-center gap-2 text-yellow-300">
+                        <span class="text-lg">🥾</span>
+                        <h4 class="font-bold text-white text-sm">Echar a Emilio (Bota Salvadora)</h4>
+                    </div>
+                    <p class="text-yellow-200 text-[11px]">
+                        <strong>Si consigues echar a Emilio, te quedarás relajado y eso se nota...</strong>
+                    </p>
+                    <p class="text-slate-300 text-[11px]">
+                        Caza la bota para detonar todos los elementos presentes en pantalla con puntuación doble (+200 pts cada uno) y activar <strong>10 segundos de cámara lenta</strong> relajante. Dejar pasar este elemento <strong>NO resta vidas</strong>.
+                    </p>
+                </div>
+
+                <!-- Lingote de Oro -->
+                <div class="p-3 rounded-2xl bg-amber-950/30 border border-amber-500/50 space-y-1">
+                    <div class="flex items-center gap-2 text-amber-300">
+                        <span class="text-lg">🧈</span>
+                        <h4 class="font-bold text-white text-sm">Lingote de Oro (Fiebre del Bote)</h4>
+                    </div>
+                    <p class="text-amber-200 text-[11px]">
+                        <strong>Fórrate con la Peña y consigue mogollón de puntos.</strong>
+                    </p>
+                    <p class="text-slate-300 text-[11px]">
+                        Cazar el lingote activa el multiplicador especial <strong>x2.5</strong> durante 10 segundos y desata una lluvia de monedas de oro puras que caen directamente a tu casillero.
+                    </p>
+                </div>
+
+                <!-- El Metamórfico -->
+                <div class="p-3 rounded-2xl bg-slate-900/80 border border-slate-700 space-y-1">
+                    <div class="flex items-center gap-2 text-slate-200">
+                        <span class="text-lg">📖</span>
+                        <h4 class="font-bold text-white text-sm">El Metamórfico (Comodín Cambiante)</h4>
+                    </div>
+                    <p class="text-slate-300 text-[11px]">
+                        Va mutando periódicamente entre 3 estados:
+                    </p>
+                    <ul class="list-disc list-inside space-y-0.5 text-[11px] text-slate-300 pl-1">
+                        <li>📜 <strong>Estatutos</strong>: Lluvia rápida de balones y combo x2.</li>
+                        <li>🐸 <strong>Rana</strong>: Reduce temporalmente a la mitad los puntos obtenidos.</li>
+                        <li>👕 <strong>Polo Maula</strong>: Duplica los puntos conseguidos.</li>
+                    </ul>
+                    <p class="text-slate-400 text-[10px]">
+                        ¡Tranquilidad!: Dejar pasar el metamórfico <strong>NO resta vidas</strong>.
+                    </p>
+                </div>
+
+                <!-- Modo Quiniela de Dobles -->
+                <div class="p-3 rounded-2xl bg-purple-950/40 border border-purple-500/50 space-y-1">
+                    <div class="flex items-center gap-2 text-purple-300">
+                        <span class="text-lg">⚡</span>
+                        <h4 class="font-bold text-white text-sm">Modo Quiniela de Dobles (Cada 30.000 pts)</h4>
+                    </div>
+                    <p class="text-purple-200 text-[11px]">
+                        Cada 30.000 puntos alcanzados, el césped se limpia y durante <strong>15 segundos</strong> sólo llueven balones dobles a velocidad 1.5x creciente con música electrónica propia.
+                    </p>
+                    <p class="text-slate-300 text-[11px]">
+                        🛡️ <strong>"No se reduce"</strong>: Aparece una única vez durante este modo. ¡Cázalo para multiplicar x2 todos los puntos de la ronda de dobles y <strong>restaurar +1 vida perdida</strong>! Dejarlo pasar no quita vidas.
+                    </p>
+                </div>
+
+                <!-- Subida de Nivel -->
+                <div class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
+                    <div class="flex items-center gap-2 text-cyan-300">
+                        <span class="text-lg">⏱️</span>
+                        <h4 class="font-bold text-white text-sm">Ciclos de Nivel (Cada 2 minutos)</h4>
+                    </div>
+                    <p class="text-slate-300 text-[11px]">
+                        Cada 2 minutos de juego superados, el cronómetro se reinicia y subes de nivel. La velocidad base de los balones aumenta de forma progresiva.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botón Volver a la Carátula -->
+            <div class="pt-2 border-t border-slate-800">
+                <button type="button" onclick="window.ArcadeFrenesi.closeInstructionsModal()" 
+                        class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-comic text-lg hover:brightness-110 active:scale-95 transition flex items-center justify-center gap-2 shadow-lg">
+                    <span>🔙</span> Volver a la Carátula del Juego
                 </button>
             </div>
         </div>
@@ -3075,57 +3206,102 @@
                     const container = document.getElementById('ranking-list-container');
                     if (!modal || !container) return;
 
-                    const sorted = Object.entries(this.highScores)
+                    // Lista de socios base para que la tabla siempre tenga vida, pique y competencia
+                    const mockBase = [
+                        { name: 'Fernando Lozano', score: 34200, maxCombo: 52, maxLevel: 3, games: 8 },
+                        { name: 'Samuel', score: 29500, maxCombo: 41, maxLevel: 2, games: 5 },
+                        { name: 'Carlos', score: 24800, maxCombo: 35, maxLevel: 2, games: 6 },
+                        { name: 'David Buzón', score: 21100, maxCombo: 27, maxLevel: 2, games: 4 },
+                        { name: 'Javier Mora', score: 17800, maxCombo: 21, maxLevel: 1, games: 3 },
+                        { name: 'Samu', score: 13900, maxCombo: 17, maxLevel: 1, games: 2 },
+                        { name: 'Emilio', score: 5800, maxCombo: 8, maxLevel: 1, games: 1 }
+                    ];
+
+                    const scoresMap = { ...this.highScores };
+                    mockBase.forEach(mock => {
+                        if (!scoresMap[mock.name]) {
+                            scoresMap[mock.name] = mock;
+                        }
+                    });
+
+                    if (this.currentSocio && !scoresMap[this.currentSocio]) {
+                        scoresMap[this.currentSocio] = { score: 0, maxCombo: 0, maxLevel: 1, games: 0 };
+                    }
+
+                    const sorted = Object.entries(scoresMap)
                         .map(([name, data]) => ({ name, ...data }))
-                        .sort((a, b) => b.score - a.score);
+                        .sort((a, b) => (b.score || 0) - (a.score || 0));
 
-                    if (sorted.length === 0) {
-                        container.innerHTML = `
-                            <div class="p-8 text-center text-slate-400 text-xs">
-                                ⚽ ¡Aún no hay récords registrados!<br>Sé el primer socio en disputar la jornada.
-                            </div>
-                        `;
-                    } else {
-                        container.innerHTML = sorted.map((entry, index) => {
-                            let badge = `<span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">${index + 1}</span>`;
-                            let rowClass = 'bg-slate-900/70 border-slate-800';
+                    container.innerHTML = sorted.map((entry, index) => {
+                        const isFirst = index === 0;
+                        const isSecond = index === 1;
+                        const isThird = index === 2;
+                        const isLast = (index === sorted.length - 1) && sorted.length > 2;
+                        const isCurrent = entry.name === this.currentSocio;
 
-                            if (index === 0) {
-                                badge = `<span class="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs shadow-md">🥇</span>`;
-                                rowClass = 'bg-amber-500/10 border-amber-500/40 text-amber-200';
-                            } else if (index === 1) {
-                                badge = `<span class="w-6 h-6 rounded-lg bg-slate-300 text-slate-950 flex items-center justify-center font-black text-xs shadow-md">🥈</span>`;
-                                rowClass = 'bg-slate-300/10 border-slate-400/40 text-slate-200';
-                            } else if (index === 2) {
-                                badge = `<span class="w-6 h-6 rounded-lg bg-amber-700 text-white flex items-center justify-center font-black text-xs shadow-md">🥉</span>`;
-                                rowClass = 'bg-amber-700/10 border-amber-700/40 text-amber-300';
-                            }
+                        let badge = `<span class="w-7 h-7 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">${index + 1}</span>`;
+                        let funnyTag = '';
+                        let rowClass = 'bg-slate-900/70 border-slate-800 hover:border-slate-700';
 
-                            const isCurrent = entry.name === this.currentSocio ? 'ring-2 ring-amber-400' : '';
+                        if (isFirst) {
+                            badge = `<span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black text-base shadow-lg animate-bounce">👑</span>`;
+                            funnyTag = `<span class="inline-flex items-center gap-1 text-[9px] font-black uppercase text-amber-300 tracking-wider bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">👑 ¡Líder Supremo!</span>`;
+                            rowClass = 'bg-gradient-to-r from-amber-500/20 via-amber-950/30 to-slate-900/80 border-amber-500/60 shadow-lg shadow-amber-500/10 scale-[1.01]';
+                        } else if (isSecond) {
+                            badge = `<span class="w-7 h-7 rounded-lg bg-slate-300 text-slate-950 flex items-center justify-center font-black text-xs shadow-md">🥈</span>`;
+                            funnyTag = `<span class="text-[9px] font-bold text-slate-300">🥈 Plata Maula</span>`;
+                            rowClass = 'bg-slate-300/10 border-slate-400/40 text-slate-200';
+                        } else if (isThird) {
+                            badge = `<span class="w-7 h-7 rounded-lg bg-amber-700 text-white flex items-center justify-center font-black text-xs shadow-md">🥉</span>`;
+                            funnyTag = `<span class="text-[9px] font-bold text-amber-400">🥉 Bronce Peleón</span>`;
+                            rowClass = 'bg-amber-700/10 border-amber-700/40 text-amber-300';
+                        } else if (isLast) {
+                            badge = `<span class="w-8 h-8 rounded-xl bg-emerald-950 border border-emerald-500/50 text-emerald-300 flex items-center justify-center text-lg animate-pulse shadow">🐸</span>`;
+                            funnyTag = `<span class="inline-flex items-center gap-1 text-[9px] font-black uppercase text-emerald-400 tracking-wider bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/30">🐸 ¡El más Maula!</span>`;
+                            rowClass = 'bg-emerald-950/20 border-emerald-500/40';
+                        }
 
-                            return `
-                                <div class="flex items-center justify-between p-2.5 rounded-xl border ${rowClass} ${isCurrent} transition">
-                                    <div class="flex items-center gap-2.5">
-                                        ${badge}
-                                        <div>
+                        const userTag = isCurrent ? `<span class="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-500 text-slate-950 shadow-sm ml-1">TÚ</span>` : '';
+                        const currentHighlight = isCurrent ? 'ring-2 ring-amber-400' : '';
+
+                        return `
+                            <div class="flex items-center justify-between p-2.5 rounded-xl border ${rowClass} ${currentHighlight} transition transform hover:scale-[1.01]">
+                                <div class="flex items-center gap-2.5">
+                                    ${badge}
+                                    <div>
+                                        <div class="flex items-center gap-1">
                                             <span class="font-extrabold text-xs block text-white">${entry.name}</span>
-                                            <span class="text-[10px] text-slate-400">Combo: ${entry.maxCombo || 0} 🔥 · Nivel ${entry.maxLevel || 1}</span>
+                                            ${userTag}
+                                        </div>
+                                        <div class="flex items-center gap-1.5 mt-0.5">
+                                            ${funnyTag ? `${funnyTag} <span class="text-slate-600">·</span>` : ''}
+                                            <span class="text-[10px] text-slate-400 font-mono">Combo: ${entry.maxCombo || 0} 🔥 · Nivel ${entry.maxLevel || 1}</span>
                                         </div>
                                     </div>
-                                    <div class="text-right">
-                                        <span class="font-mono-bold text-sm font-black text-amber-400 block">${(entry.score || 0).toLocaleString()} pts</span>
-                                        <span class="text-[9px] text-slate-500">${entry.games || 1} partida${(entry.games || 1) > 1 ? 's' : ''}</span>
-                                    </div>
                                 </div>
-                            `;
-                        }).join('');
-                    }
+                                <div class="text-right">
+                                    <span class="font-mono-bold text-sm font-black text-amber-400 block">${(entry.score || 0).toLocaleString()} pts</span>
+                                    <span class="text-[9px] text-slate-500 font-mono">${entry.games || 1} partida${(entry.games || 1) > 1 ? 's' : ''}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
 
                     modal.classList.remove('hidden');
                 }
 
                 closeRankingModal() {
                     document.getElementById('modal-ranking').classList.add('hidden');
+                }
+
+                showInstructionsModal() {
+                    const modal = document.getElementById('modal-instructions');
+                    if (modal) modal.classList.remove('hidden');
+                }
+
+                closeInstructionsModal() {
+                    const modal = document.getElementById('modal-instructions');
+                    if (modal) modal.classList.add('hidden');
                 }
             }
 
