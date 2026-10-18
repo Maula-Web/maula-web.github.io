@@ -401,7 +401,7 @@
                     <span class="text-xl">📖🐸👕</span>
                     <div>
                         <span class="block text-white font-extrabold">El Metamórfico</span>
-                        <span class="text-[9px] text-slate-300 font-normal">Cambia: Estatutos (x2 lluvia), Rana (÷2 pts) o Polo (x2 pts)</span>
+                        <span class="text-[9px] text-slate-300 font-normal">Cambia: Estatutos (x2 lluvia), Rana (mitad de puntos) o Polo (x2 pts). ¡Se pueden dejar pasar sin perder vidas!</span>
                     </div>
                 </div>
 
@@ -1319,7 +1319,7 @@
                         this.buffs.frogPenaltyTime = 10;
                         this.playSound('frog');
                         this.createExplosion(x, y, '#22c55e', 25);
-                        this.addComicBanner('¡CROAC!', 'Maldición de la Rana: Puntos / 2 durante 10s', '#dcfce7', '#16a34a');
+                        this.addComicBanner('¡CROAC!', 'Maldición de la Rana: Mitad de puntos durante 10s', '#dcfce7', '#16a34a');
                     } else if (phase === 2) {
                         // 👕 POLO MAULA NEGRO CUELLO BLANCO: Puntos x2 durante 10 segundos
                         this.buffs.poloBonusTime = 10;
@@ -1924,7 +1924,7 @@
                         ctx.fillText('🐸', 0, -4);
                         ctx.font = '800 8px Plus Jakarta Sans, sans-serif';
                         ctx.fillStyle = '#22c55e';
-                        ctx.fillText('÷2 PUNTOS', 0, 14);
+                        ctx.fillText('MITAD PTS', 0, 14);
                     } else if (phase === 2) {
                         // 👕 POLO MAULA NEGRO CUELLO BLANCO
                         ctx.font = '22px sans-serif';
@@ -2294,7 +2294,7 @@
                             buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-[10px] font-extrabold text-amber-300">📖 Lluvia x2 (${Math.ceil(this.buffs.doubleSpawnTime)}s)</span>`;
                         }
                         if (this.buffs.frogPenaltyTime > 0) {
-                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-extrabold text-emerald-300">🐸 Puntos ÷2 (${Math.ceil(this.buffs.frogPenaltyTime)}s)</span>`;
+                            buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-extrabold text-emerald-300">🐸 Mitad de Puntos (${Math.ceil(this.buffs.frogPenaltyTime)}s)</span>`;
                         }
                         if (this.buffs.poloBonusTime > 0) {
                             buffsHtml += `<span class="buff-chip px-2 py-0.5 rounded-lg bg-white/20 border border-white/40 text-[10px] font-extrabold text-white">👕 Puntos x2 (${Math.ceil(this.buffs.poloBonusTime)}s)</span>`;
