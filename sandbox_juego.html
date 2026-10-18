@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PEÑA MAULAS - Arcade Frenesí 1-X-2</title>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090d16">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Tipografías de alta gama -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS v3 -->
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+
+    <!-- Firebase SDKs Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+
+    <style>
+        :root {
+            --color-bg: #050811;
+            --lane-1-color: #00d2ff;
+            --lane-x-color: #10b981;
+            --lane-2-color: #ff3366;
+            --gold-color: #f59e0b;
+            --trap-color: #a855f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .font-game {
+            font-family: 'Outfit', sans-serif;
+        }
+        .font-mono-bold {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+        }
+
+        /* Contenedor del Juego */
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 30%, rgba(30, 41, 59, 0.4) 0%, rgba(5, 8, 17, 0.95) 75%);
+        }
+
+        canvas#game-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-width: 520px;
+            image-rendering: auto;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Superposiciones de UI Flotantes */
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 520px;
+            z-index: 20;
+            pointer-events: none;
+        }
+        .hud-overlay * {
+            pointer-events: auto;
+        }
+
+        /* Botones de acción táctiles abajo */
+        .controls-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 520px;
+            z-index: 25;
+            padding: 0.75rem 1rem 1.25rem;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to top, rgba(5, 8, 17, 0.95) 0%, rgba(5, 8, 17, 0.75) 65%, transparent 100%);
+        }
+
+        .btn-pad {
+            flex: 1;
+            height: 72px;
+            border-radius: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .btn-pad:active, .btn-pad.is-pressed {
+            transform: scale(0.93) translateY(3px);
+            filter: brightness(1.35);
+        }
+
+        /* Estilos de botones por carril */
+        .btn-pad-1 {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.3) 0%, rgba(14, 116, 144, 0.45) 100%);
+            border-color: rgba(0, 210, 255, 0.6);
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        .btn-pad-1:active, .btn-pad-1.is-pressed {
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.8), inset 0 0 10px rgba(0, 210, 255, 0.6);
+        }
+
+        .btn-pad-x {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(4, 120, 87, 0.45) 100%);
+            border-color: rgba(16, 185, 129, 0.6);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        .btn-pad-x:active, .btn-pad-x.is-pressed {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.8), inset 0 0 10px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-pad-2 {
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.3) 0%, rgba(190, 18, 60, 0.45) 100%);
+            border-color: rgba(255, 51, 102, 0.6);
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        .btn-pad-2:active, .btn-pad-2.is-pressed {
+            box-shadow: 0 0 25px rgba(255, 51, 102, 0.8), inset 0 0 10px rgba(255, 51, 102, 0.6);
+        }
+
+        /* Modales estilizados */
+        .modal-glass {
+            background: rgba(11, 15, 26, 0.94);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.15);
+        }
+
+        /* Resplandor del modo fiebre */
+        .fever-glow {
+            animation: pulseFever 0.8s infinite alternate ease-in-out;
+        }
+        @keyframes pulseFever {
+            0% { box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.3), 0 0 15px rgba(245, 158, 11, 0.2); }
+            100% { box-shadow: inset 0 0 45px rgba(245, 158, 11, 0.6), 0 0 35px rgba(245, 158, 11, 0.4); }
+        }
+
+        /* Scroll personalizado */
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-[#050811] text-slate-100 flex flex-col justify-between h-screen w-screen overflow-hidden">
+
+    <!-- CONTENEDOR PRINCIPAL DEL JUEGO -->
+    <div id="game-wrapper" class="relative w-full h-full">
+
+        <!-- =====================================================================
+             HUD SUPERIOR (Puntuación, Combo, Vidas, Socio)
+             ===================================================================== -->
+        <header class="hud-overlay p-3 sm:p-4 flex flex-col gap-2">
+            <!-- Barra Superior: Info Peñista + Controles -->
+            <div class="flex items-center justify-between gap-2">
+                <!-- Selector / Badge de Socio -->
+                <button type="button" id="btn-open-socio-picker" onclick="window.ArcadeFrenesi.showSocioModal()" 
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-amber-500/30 text-xs font-bold transition shadow-lg">
+                    <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center font-black text-xs shadow" id="socio-avatar">
+                        👑
+                    </span>
+                    <span id="socio-display-name" class="text-amber-300 font-extrabold max-w-[120px] truncate">
+                        Socio Maula
+                    </span>
+                    <span class="text-[10px] text-slate-400">▼</span>
+                </button>
+
+                <!-- Estado del Bote / Récord Máximo Personal -->
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-mono-bold text-amber-400">
+                    <span class="text-xs">🏆</span>
+                    <span class="text-[10px] text-slate-400">RÉCORD:</span>
+                    <span id="hud-high-score">0</span>
+                </div>
+
+                <!-- Botones de Acción (Pausa, Ranking, Audio) -->
+                <div class="flex items-center gap-1.5">
+                    <button type="button" id="btn-toggle-sound" onclick="window.ArcadeFrenesi.toggleSound()" 
+                            class="w-8 h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
+                        <span id="sound-icon">🔊</span>
+                    </button>
+                    <button type="button" id="btn-open-ranking" onclick="window.ArcadeFrenesi.showRankingModal()" 
+                            class="w-8 h-8 rounded-xl bg-slate-900/80 border border-amber-500/50 hover:bg-amber-500/20 flex items-center justify-center text-xs transition" title="Ver Ranking de la Peña">
+                        <span>📊</span>
+                    </button>
+                    <button type="button" id="btn-pause-game" onclick="window.ArcadeFrenesi.togglePause()" 
+                            class="w-8 h-8 rounded-xl bg-slate-900/80 border border-slate-700 hover:border-amber-500 flex items-center justify-center text-xs transition">
+                        <span id="pause-icon">⏸️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel de Marcador Central: Puntos, Combo & Vidas -->
+            <div class="flex items-center justify-between px-3 py-2 rounded-2xl bg-slate-950/70 border border-slate-800 backdrop-blur-md shadow-xl">
+                <!-- Score Actual -->
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">PUNTOS</span>
+                    <span id="hud-score" class="font-mono-bold text-2xl sm:text-3xl font-black text-white leading-none tracking-tight">
+                        0
+                    </span>
+                </div>
+
+                <!-- Multiplicador & Combo -->
+                <div class="flex flex-col items-center">
+                    <span id="hud-multiplier" class="font-game text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase">
+                        x1 MULTI
+                    </span>
+                    <span id="hud-combo" class="text-xs font-extrabold text-amber-400 font-mono-bold mt-0.5">
+                        0 COMBO
+                    </span>
+                </div>
+
+                <!-- Vidas / Balones restantes -->
+                <div class="flex flex-col items-end">
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">VIDAS</span>
+                    <div id="hud-lives" class="flex items-center gap-1 mt-0.5">
+                        <span class="text-base text-emerald-400">⚽</span>
+                        <span class="text-base text-emerald-400">⚽</span>
+                        <span class="text-base text-emerald-400">⚽</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Fiebre / Modo Pleno al 15 -->
+            <div class="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                <div id="fever-progress-bar" class="h-full bg-gradient-to-r from-amber-500 via-emerald-400 to-amber-300 w-0 transition-all duration-150"></div>
+            </div>
+        </header>
+
+        <!-- =====================================================================
+             CANVAS PRINCIPAL DE RENDERIZADO (60/120 FPS)
+             ===================================================================== -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- =====================================================================
+             CONTROLES TÁCTILES INFERIORES (Móvil & PC Feedback)
+             ===================================================================== -->
+        <footer class="controls-overlay">
+            <!-- Botón Carril 1 -->
+            <button type="button" id="btn-input-1" 
+                    onpointerdown="window.ArcadeFrenesi.handleInput(0)" 
+                    class="btn-pad btn-pad-1">
+                <span class="font-game text-2xl sm:text-3xl font-black text-cyan-300 leading-none">1</span>
+                <span class="text-[10px] font-bold text-cyan-200/80 tracking-wider">LOCAL</span>
+                <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-cyan-400/60 hidden sm:inline">[A]</span>
+            </button>
+
+            <!-- Botón Carril X -->
+            <button type="button" id="btn-input-x" 
+                    onpointerdown="window.ArcadeFrenesi.handleInput(1)" 
+                    class="btn-pad btn-pad-x">
+                <span class="font-game text-2xl sm:text-3xl font-black text-emerald-300 leading-none">X</span>
+                <span class="text-[10px] font-bold text-emerald-200/80 tracking-wider">EMPATE</span>
+                <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-emerald-400/60 hidden sm:inline">[S]</span>
+            </button>
+
+            <!-- Botón Carril 2 -->
+            <button type="button" id="btn-input-2" 
+                    onpointerdown="window.ArcadeFrenesi.handleInput(2)" 
+                    class="btn-pad btn-pad-2">
+                <span class="font-game text-2xl sm:text-3xl font-black text-rose-300 leading-none">2</span>
+                <span class="text-[10px] font-bold text-rose-200/80 tracking-wider">VISITANTE</span>
+                <span class="absolute top-1.5 right-2 text-[9px] font-mono font-bold text-rose-400/60 hidden sm:inline">[D]</span>
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- =========================================================================
+         MODAL 1: PANTALLA DE INICIO / PRESENTACIÓN
+         ========================================================================= -->
+    <div id="modal-start" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+        <div class="modal-glass w-full max-w-md rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center gap-4 animate-scale-in">
+            <!-- Corona / Logo Arcade -->
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-4xl shadow-2xl border-2 border-amber-300/60">
+                ⚽
+            </div>
+
+            <div>
+                <span class="text-xs font-black uppercase tracking-widest text-amber-400">PEÑA MAULAS ARCADE</span>
+                <h1 class="text-3xl sm:text-4xl font-game font-black text-white tracking-tight mt-1">
+                    FRENESÍ 1-X-2
+                </h1>
+                <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+                    Acierta los signos al cruzar la línea de gol. ¡Esquiva las trampas y desata la Casilla Oro!
+                </p>
+            </div>
+
+            <!-- Selector de Socio que Juega -->
+            <div class="w-full bg-slate-900/90 rounded-2xl p-3 border border-slate-800 text-left">
+                <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                    ¿Quién va a jugar? (Guardará tu récord):
+                </label>
+                <select id="modal-socio-select" class="w-full bg-slate-950 text-amber-300 font-bold text-sm px-3 py-2 rounded-xl border border-amber-500/40 focus:outline-none">
+                    <!-- Inyectado por JS -->
+                </select>
+            </div>
+
+            <!-- Leyenda de Fichas -->
+            <div class="grid grid-cols-3 gap-2 w-full text-[11px] font-bold">
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-cyan-500/30 text-cyan-300 flex flex-col items-center">
+                    <span class="text-base">⚽</span>
+                    <span>1 - X - 2</span>
+                    <span class="text-[9px] text-slate-400 font-normal">Aciértalos</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-amber-500/40 text-amber-300 flex flex-col items-center">
+                    <span class="text-base">🏆</span>
+                    <span>Casilla Oro</span>
+                    <span class="text-[9px] text-slate-400 font-normal">x2 Puntos</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-rose-500/30 text-rose-300 flex flex-col items-center">
+                    <span class="text-base">💣</span>
+                    <span>Casilla Trampa</span>
+                    <span class="text-[9px] text-slate-400 font-normal">¡NO tocar!</span>
+                </div>
+            </div>
+
+            <!-- Selector de Música MP3 Propia (Opcional) -->
+            <div class="w-full text-left bg-slate-900/40 p-2.5 rounded-xl border border-slate-800 text-xs">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-slate-300 font-bold flex items-center gap-1.5">
+                        <span>🎵</span> Música MP3
+                    </span>
+                    <span class="text-[10px] text-amber-400" id="music-status-label">Sintetizador Activo</span>
+                </div>
+                <input type="file" id="mp3-file-input" accept="audio/mp3,audio/*" class="w-full text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer">
+            </div>
+
+            <!-- Botón Jugar -->
+            <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
+                    class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-game font-black text-lg tracking-wide hover:brightness-110 shadow-xl shadow-amber-500/25 transition transform active:scale-95">
+                ¡EMPEZAR PARTIDA! 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MODAL 2: GAME OVER / RESULTADOS
+         ========================================================================= -->
+    <div id="modal-gameover" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="modal-glass w-full max-w-md rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center gap-4">
+            <div id="gameover-badge" class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-3xl">
+                💀
+            </div>
+
+            <div>
+                <span class="text-xs font-black uppercase tracking-widest text-slate-400">FIN DEL PARTIDO</span>
+                <h2 class="text-3xl font-game font-black text-white mt-1">¡PITIDO FINAL!</h2>
+                <p id="gameover-subtitle" class="text-xs text-amber-400 font-bold mt-0.5">¡Gran partido de la jornada!</p>
+            </div>
+
+            <!-- Panel de Estadísticas Finales -->
+            <div class="w-full grid grid-cols-2 gap-2 text-left">
+                <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Puntos Conseguidos</span>
+                    <span id="final-score" class="font-mono-bold text-2xl font-black text-white">0</span>
+                </div>
+                <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Combo Máximo</span>
+                    <span id="final-combo" class="font-mono-bold text-2xl font-black text-amber-400">0</span>
+                </div>
+                <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Aciertos / Perfectos</span>
+                    <span id="final-hits" class="font-mono-bold text-lg font-black text-emerald-400">0</span>
+                </div>
+                <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Récord de <span id="final-socio-name">Socio</span></span>
+                    <span id="final-best" class="font-mono-bold text-lg font-black text-cyan-400">0</span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Post-Partida -->
+            <div class="flex items-center gap-2 w-full mt-2">
+                <button type="button" onclick="window.ArcadeFrenesi.startGame()" 
+                        class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-game font-black text-base shadow-lg hover:brightness-110 active:scale-95 transition">
+                    🔄 REINTENTAR
+                </button>
+                <button type="button" onclick="window.ArcadeFrenesi.showRankingModal()" 
+                        class="px-4 py-3 rounded-xl bg-slate-900 border border-amber-500/40 text-amber-300 font-bold text-sm hover:bg-slate-800 transition">
+                    🏆 Ranking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MODAL 3: RANKING OFICIAL DE LA PEÑA MAULAS
+         ========================================================================= -->
+    <div id="modal-ranking" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="modal-glass w-full max-w-lg rounded-3xl p-5 sm:p-6 text-center flex flex-col gap-3 max-h-[90vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2 text-left">
+                    <span class="text-2xl">🏆</span>
+                    <div>
+                        <h3 class="font-game font-black text-lg text-white">TABLA DE HONOR ARCADE</h3>
+                        <p class="text-[11px] text-slate-400">Puntuaciones máximas de los socios de la Peña</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.ArcadeFrenesi.closeRankingModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Lista de Récords con Scroll -->
+            <div id="ranking-list-container" class="overflow-y-auto custom-scroll space-y-1.5 pr-1 max-h-[55vh] text-left">
+                <!-- Inyectado por JS -->
+                <div class="p-8 text-center text-slate-400 text-xs">Cargando clasificación...</div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] text-slate-500">Sincronizado en la nube (Firestore)</span>
+                <button type="button" onclick="window.ArcadeFrenesi.closeRankingModal()" class="px-4 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elemento Audio Oculto para Música de Fondo -->
+    <audio id="bg-audio-player" loop preload="auto"></audio>
+
+    <!-- MOTOR DEL JUEGO ARCADE -->
+    <script>
+        /**
+         * ARCADE FRENESÍ 1-X-2 - Motor de Juego de Habilidad
+         * Peña Maulas Official Sandbox Game
+         */
+        (function () {
+            'use strict';
+
+            const DEFAULT_MEMBERS = [
+                "Alvaro", "Carlos", "David Buzón", "Edu", "Emilio",
+                "Fernando Lozano", "Fernando Ramírez", "Heradio", "JA Valdivieso", "Javier Mora",
+                "Juan Antonio", "Juanjo", "Luismi", "Marcelo", "Martín",
+                "Rafa", "Ramón", "Raúl Romera", "Samuel"
+            ];
+
+            // Colores temáticos por carril
+            const LANE_COLORS = [
+                { hex: '#00d2ff', rgb: [0, 210, 255], label: '1' },
+                { hex: '#10b981', rgb: [16, 185, 129], label: 'X' },
+                { hex: '#ff3366', rgb: [255, 51, 102], label: '2' }
+            ];
+
+            class FrenesiEngine {
+                constructor() {
+                    this.canvas = document.getElementById('game-canvas');
+                    this.ctx = this.canvas.getContext('2d');
+                    
+                    // Audio Context
+                    this.audioCtx = null;
+                    this.soundEnabled = true;
+                    this.bgMusicPlayer = document.getElementById('bg-audio-player');
+                    this.hasCustomMusic = false;
+
+                    // Estado del Juego
+                    this.isPlaying = false;
+                    this.isPaused = false;
+                    this.score = 0;
+                    this.combo = 0;
+                    this.maxCombo = 0;
+                    this.multiplier = 1;
+                    this.lives = 3;
+                    this.hitsCount = 0;
+                    this.perfectCount = 0;
+                    this.level = 1;
+                    
+                    // Notas y Partículas
+                    this.notes = [];
+                    this.particles = [];
+                    this.floatingTexts = [];
+                    this.lastSpawnTime = 0;
+                    this.spawnInterval = 1200; // ms
+                    this.baseSpeed = 3.8; // px per tick
+                    this.screenShake = 0;
+
+                    // Dimensiones y Layout
+                    this.width = 400;
+                    this.height = 700;
+                    this.targetY = 0; // Línea de impacto
+                    this.hitRadius = 38;
+
+                    // Socio actual y récords
+                    this.currentSocio = localStorage.getItem('maulas_arcade_current_socio') || 'Fernando Lozano';
+                    this.highScores = {};
+
+                    // Teclas presionadas
+                    this.activeKeys = {};
+
+                    this.initCanvas();
+                    this.initAudio();
+                    this.initEvents();
+                    this.loadHighScores();
+                    this.populateSocioDropdown();
+                    this.updateHUD();
+                }
+
+                initCanvas() {
+                    const resize = () => {
+                        const wrapper = document.getElementById('game-wrapper');
+                        const w = Math.min(wrapper.clientWidth, 520);
+                        const h = wrapper.clientHeight;
+                        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+                        this.width = w;
+                        this.height = h;
+                        this.canvas.width = w * dpr;
+                        this.canvas.height = h * dpr;
+                        this.ctx.scale(dpr, dpr);
+
+                        // La línea de impacto se sitúa a 115px del fondo (justo sobre los botones)
+                        this.targetY = this.height - 110;
+                    };
+                    window.addEventListener('resize', resize);
+                    resize();
+                }
+
+                initAudio() {
+                    // Inicializar Web Audio API con primer gesto de usuario
+                    const unlockAudio = () => {
+                        if (!this.audioCtx) {
+                            const AudioContext = window.AudioContext || window.webkitAudioContext;
+                            if (AudioContext) {
+                                this.audioCtx = new AudioContext();
+                            }
+                        }
+                        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+                            this.audioCtx.resume();
+                        }
+                    };
+                    window.addEventListener('pointerdown', unlockAudio, { once: true });
+                    window.addEventListener('keydown', unlockAudio, { once: true });
+
+                    // Selector de archivo MP3 opcional
+                    const fileInput = document.getElementById('mp3-file-input');
+                    if (fileInput) {
+                        fileInput.addEventListener('change', (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const url = URL.createObjectURL(file);
+                                this.bgMusicPlayer.src = url;
+                                this.hasCustomMusic = true;
+                                document.getElementById('music-status-label').textContent = '🎵 ' + file.name.slice(0, 18) + '...';
+                            }
+                        });
+                    }
+                }
+
+                playSound(type) {
+                    if (!this.soundEnabled || !this.audioCtx) return;
+                    try {
+                        const now = this.audioCtx.currentTime;
+                        const osc = this.audioCtx.createOscillator();
+                        const gain = this.audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(this.audioCtx.destination);
+
+                        if (type === 'hit_perfect') {
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(523.25, now); // C5
+                            osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.12); // C6
+                            gain.gain.setValueAtTime(0.25, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                            osc.start(now);
+                            osc.stop(now + 0.15);
+                        } else if (type === 'hit_good') {
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(440, now); // A4
+                            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                            gain.gain.setValueAtTime(0.2, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                            osc.start(now);
+                            osc.stop(now + 0.12);
+                        } else if (type === 'hit_gold') {
+                            // Arpegio celestial Tío Gilito
+                            [880, 1108.73, 1318.51, 1760].forEach((freq, i) => {
+                                const o = this.audioCtx.createOscillator();
+                                const g = this.audioCtx.createGain();
+                                o.connect(g);
+                                g.connect(this.audioCtx.destination);
+                                o.type = 'sine';
+                                o.frequency.setValueAtTime(freq, now + i * 0.04);
+                                g.gain.setValueAtTime(0.2, now + i * 0.04);
+                                g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.25);
+                                o.start(now + i * 0.04);
+                                o.stop(now + i * 0.04 + 0.25);
+                            });
+                        } else if (type === 'hit_trap' || type === 'miss') {
+                            // Ruido / explosión
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(120, now);
+                            osc.frequency.linearRampToValueAtTime(40, now + 0.25);
+                            gain.gain.setValueAtTime(0.3, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                            osc.start(now);
+                            osc.stop(now + 0.25);
+                        } else if (type === 'whistle') {
+                            // Silbato de árbitro
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(2200, now);
+                            osc.frequency.setValueAtTime(2400, now + 0.08);
+                            gain.gain.setValueAtTime(0.25, now);
+                            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                            osc.start(now);
+                            osc.stop(now + 0.3);
+                        }
+                    } catch (e) {
+                        console.warn("Audio error:", e);
+                    }
+                }
+
+                initEvents() {
+                    // Controles por Teclado
+                    window.addEventListener('keydown', (e) => {
+                        if (e.repeat) return;
+                        const key = e.key.toLowerCase();
+                        if (key === 'a' || key === '1' || key === 'arrowleft') {
+                            this.handleInput(0);
+                            this.highlightPad(0, true);
+                        } else if (key === 's' || key === 'x' || key === 'arrowdown') {
+                            this.handleInput(1);
+                            this.highlightPad(1, true);
+                        } else if (key === 'd' || key === '2' || key === 'arrowright') {
+                            this.handleInput(2);
+                            this.highlightPad(2, true);
+                        } else if (key === 'escape' || key === 'p') {
+                            this.togglePause();
+                        }
+                    });
+
+                    window.addEventListener('keyup', (e) => {
+                        const key = e.key.toLowerCase();
+                        if (key === 'a' || key === '1' || key === 'arrowleft') this.highlightPad(0, false);
+                        if (key === 's' || key === 'x' || key === 'arrowdown') this.highlightPad(1, false);
+                        if (key === 'd' || key === '2' || key === 'arrowright') this.highlightPad(2, false);
+                    });
+
+                    // Toque directo en el Canvas (Divide el ancho en 3 carriles)
+                    this.canvas.addEventListener('pointerdown', (e) => {
+                        if (!this.isPlaying || this.isPaused) return;
+                        const rect = this.canvas.getBoundingClientRect();
+                        const clientX = e.clientX - rect.left;
+                        const laneWidth = rect.width / 3;
+                        const laneIndex = Math.min(2, Math.max(0, Math.floor(clientX / laneWidth)));
+                        this.handleInput(laneIndex);
+                        this.highlightPad(laneIndex, true);
+                        setTimeout(() => this.highlightPad(laneIndex, false), 120);
+                    });
+                }
+
+                highlightPad(laneIndex, isPressed) {
+                    const ids = ['btn-input-1', 'btn-input-x', 'btn-input-2'];
+                    const el = document.getElementById(ids[laneIndex]);
+                    if (el) {
+                        if (isPressed) el.classList.add('is-pressed');
+                        else el.classList.remove('is-pressed');
+                    }
+                }
+
+                // INICIO DE PARTIDA
+                startGame() {
+                    const sel = document.getElementById('modal-socio-select');
+                    if (sel) {
+                        this.currentSocio = sel.value;
+                        localStorage.setItem('maulas_arcade_current_socio', this.currentSocio);
+                    }
+
+                    document.getElementById('modal-start').classList.add('hidden');
+                    document.getElementById('modal-gameover').classList.add('hidden');
+                    document.getElementById('modal-ranking').classList.add('hidden');
+
+                    this.score = 0;
+                    this.combo = 0;
+                    this.maxCombo = 0;
+                    this.multiplier = 1;
+                    this.lives = 3;
+                    this.hitsCount = 0;
+                    this.perfectCount = 0;
+                    this.level = 1;
+                    this.notes = [];
+                    this.particles = [];
+                    this.floatingTexts = [];
+                    this.lastSpawnTime = performance.now();
+                    this.spawnInterval = 1100;
+                    this.baseSpeed = 4.2;
+                    this.screenShake = 0;
+
+                    this.isPlaying = true;
+                    this.isPaused = false;
+
+                    this.playSound('whistle');
+                    this.startMusic();
+                    this.updateHUD();
+
+                    this.lastTick = performance.now();
+                    requestAnimationFrame(this.gameLoop.bind(this));
+                }
+
+                startMusic() {
+                    if (this.hasCustomMusic && this.bgMusicPlayer) {
+                        this.bgMusicPlayer.currentTime = 0;
+                        this.bgMusicPlayer.volume = 0.65;
+                        this.bgMusicPlayer.play().catch(e => console.log("Audio play delayed:", e));
+                    }
+                }
+
+                stopMusic() {
+                    if (this.bgMusicPlayer) {
+                        this.bgMusicPlayer.pause();
+                    }
+                }
+
+                togglePause() {
+                    if (!this.isPlaying) return;
+                    this.isPaused = !this.isPaused;
+                    const icon = document.getElementById('pause-icon');
+                    if (icon) icon.textContent = this.isPaused ? '▶️' : '⏸️';
+
+                    if (!this.isPaused) {
+                        this.lastTick = performance.now();
+                        requestAnimationFrame(this.gameLoop.bind(this));
+                        if (this.hasCustomMusic) this.bgMusicPlayer.play().catch(() => {});
+                    } else {
+                        if (this.hasCustomMusic) this.bgMusicPlayer.pause();
+                    }
+                }
+
+                toggleSound() {
+                    this.soundEnabled = !this.soundEnabled;
+                    const icon = document.getElementById('sound-icon');
+                    if (icon) icon.textContent = this.soundEnabled ? '🔊' : '🔇';
+                    if (this.bgMusicPlayer) this.bgMusicPlayer.muted = !this.soundEnabled;
+                }
+
+                // GENERACIÓN DE NOTAS (BALONES Y EVENTOS)
+                spawnNote() {
+                    const lane = Math.floor(Math.random() * 3);
+                    const rand = Math.random();
+
+                    let type = 'normal';
+                    // Ficha Casilla Oro (Tío Gilito): 10% probabilidad
+                    if (rand < 0.12) {
+                        type = 'gold';
+                    } 
+                    // Casilla Trampa: 14% probabilidad (a partir del nivel 2)
+                    else if (rand > 0.85 && this.level >= 2) {
+                        type = 'trap';
+                    }
+
+                    // Super Bonus Pleno al 15 cuando el combo es múltiplo de 14
+                    if (this.combo > 0 && this.combo % 14 === 0 && rand < 0.5) {
+                        type = 'pleno';
+                    }
+
+                    const note = {
+                        lane: lane,
+                        type: type,
+                        y: -40,
+                        speed: this.baseSpeed + (this.level * 0.35) + (Math.random() * 0.4),
+                        radius: type === 'pleno' ? 36 : 28,
+                        rotation: 0,
+                        rotSpeed: (Math.random() - 0.5) * 0.1,
+                        hit: false,
+                        trail: []
+                    };
+
+                    this.notes.push(note);
+                }
+
+                // GESTIÓN DE ENTRADA DEL USUARIO
+                handleInput(laneIndex) {
+                    if (!this.isPlaying || this.isPaused) return;
+
+                    // Vibración táctil en móvil
+                    if (navigator.vibrate) navigator.vibrate(25);
+
+                    // Buscar la nota más cercana a la línea de meta en este carril
+                    let closestNote = null;
+                    let minDist = Infinity;
+
+                    for (const note of this.notes) {
+                        if (note.lane === laneIndex && !note.hit) {
+                            const dist = Math.abs(note.y - this.targetY);
+                            if (dist < minDist && dist < 120) {
+                                minDist = dist;
+                                closestNote = note;
+                            }
+                        }
+                    }
+
+                    const laneX = this.getLaneX(laneIndex);
+
+                    if (closestNote) {
+                        closestNote.hit = true;
+
+                        // Caso 1: ¡CASILLA TRAMPA PULSADA! (Error grave)
+                        if (closestNote.type === 'trap') {
+                            this.lives--;
+                            this.combo = 0;
+                            this.multiplier = 1;
+                            this.screenShake = 16;
+                            this.playSound('hit_trap');
+                            this.createExplosion(laneX, closestNote.y, '#a855f7', 35);
+                            this.addFloatingText(laneX, closestNote.y - 20, '¡TRAMPA! -1 VIDA', '#ef4444');
+                            this.checkGameOver();
+                        }
+                        // Caso 2: Acierto en Balón Normal, Oro o Pleno
+                        else {
+                            this.hitsCount++;
+                            let points = 50;
+                            let ratingText = '¡BUENO!';
+                            let ratingColor = '#38bdf8';
+
+                            // Clasificación por precisión
+                            if (minDist <= 22) {
+                                points = 120;
+                                ratingText = '¡PERFECTO!';
+                                ratingColor = '#34d399';
+                                this.perfectCount++;
+                                this.playSound('hit_perfect');
+                            } else {
+                                this.playSound('hit_good');
+                            }
+
+                            // Modificadores de tipo de nota
+                            if (closestNote.type === 'gold') {
+                                points *= 2.5;
+                                ratingText = '🏆 ¡TÍO GILITO! x2.5';
+                                ratingColor = '#f59e0b';
+                                this.playSound('hit_gold');
+                                this.createCoinShower(laneX, closestNote.y);
+                            } else if (closestNote.type === 'pleno') {
+                                points = 500;
+                                ratingText = '🚨 ¡PLENO AL 15!';
+                                ratingColor = '#fbbf24';
+                                this.playSound('hit_gold');
+                                this.createFireworks(laneX, closestNote.y);
+                            }
+
+                            // Incrementar combo y multiplicador
+                            this.combo++;
+                            if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+
+                            if (this.combo >= 30) this.multiplier = 4;
+                            else if (this.combo >= 18) this.multiplier = 3;
+                            else if (this.combo >= 8) this.multiplier = 2;
+                            else this.multiplier = 1;
+
+                            const finalPoints = Math.round(points * this.multiplier);
+                            this.score += finalPoints;
+
+                            this.createHitSparks(laneX, closestNote.y, LANE_COLORS[laneIndex].hex);
+                            this.addFloatingText(laneX, closestNote.y - 25, `+${finalPoints} ${ratingText}`, ratingColor);
+
+                            // Subida de nivel progresivo
+                            if (this.hitsCount % 15 === 0) {
+                                this.level++;
+                                this.spawnInterval = Math.max(550, 1100 - (this.level * 70));
+                            }
+                        }
+                    } else {
+                        // Pulsación al aire en vacío (Pequeña penalización de combo si no había nada)
+                        this.createMissRipple(laneX, this.targetY);
+                    }
+
+                    this.updateHUD();
+                }
+
+                getLaneX(laneIndex) {
+                    const laneWidth = this.width / 3;
+                    return (laneIndex * laneWidth) + (laneWidth / 2);
+                }
+
+                // GAME LOOP PRINCIPAL
+                gameLoop(timestamp) {
+                    if (!this.isPlaying || this.isPaused) return;
+
+                    const dt = (timestamp - this.lastTick) / 1000;
+                    this.lastTick = timestamp;
+
+                    // 1. Spawning
+                    if (timestamp - this.lastSpawnTime > this.spawnInterval) {
+                        this.spawnNote();
+                        this.lastSpawnTime = timestamp;
+                    }
+
+                    // 2. Update Notes
+                    for (let i = this.notes.length - 1; i >= 0; i--) {
+                        const note = this.notes[i];
+                        note.y += note.speed;
+                        note.rotation += note.rotSpeed;
+
+                        // Rastro de cometa para notas
+                        if (Math.random() < 0.4) {
+                            note.trail.push({ x: this.getLaneX(note.lane), y: note.y, alpha: 0.6 });
+                        }
+                        for (let t = note.trail.length - 1; t >= 0; t--) {
+                            note.trail[t].alpha -= 0.04;
+                            if (note.trail[t].alpha <= 0) note.trail.splice(t, 1);
+                        }
+
+                        // ¿Ha pasado la línea de gol sin tocar?
+                        if (note.y > this.height + 40) {
+                            if (!note.hit) {
+                                if (note.type === 'trap') {
+                                    // ¡Dejar pasar una trampa es una evasión exitosa!
+                                    this.score += 60;
+                                    const lx = this.getLaneX(note.lane);
+                                    this.addFloatingText(lx, this.targetY, '🛡️ ¡TRAMPA ESQUIVADA! +60', '#a855f7');
+                                } else {
+                                    // Pérdida de vida por fallo
+                                    this.lives--;
+                                    this.combo = 0;
+                                    this.multiplier = 1;
+                                    this.screenShake = 10;
+                                    this.playSound('miss');
+                                    this.addFloatingText(this.getLaneX(note.lane), this.targetY, '¡FALLO!', '#94a3b8');
+                                    this.checkGameOver();
+                                }
+                                this.updateHUD();
+                            }
+                            this.notes.splice(i, 1);
+                        }
+                    }
+
+                    // 3. Update Particles & Texts
+                    for (let i = this.particles.length - 1; i >= 0; i--) {
+                        const p = this.particles[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.alpha -= p.decay;
+                        if (p.gravity) p.vy += p.gravity;
+                        if (p.alpha <= 0) this.particles.splice(i, 1);
+                    }
+
+                    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+                        const ft = this.floatingTexts[i];
+                        ft.y -= ft.vy;
+                        ft.alpha -= ft.decay;
+                        if (ft.alpha <= 0) this.floatingTexts.splice(i, 1);
+                    }
+
+                    if (this.screenShake > 0) {
+                        this.screenShake *= 0.88;
+                        if (this.screenShake < 0.4) this.screenShake = 0;
+                    }
+
+                    // 4. Render
+                    this.render();
+
+                    requestAnimationFrame(this.gameLoop.bind(this));
+                }
+
+                // RENDERIZADO VISUAL ULTRADETALLADO
+                render() {
+                    const ctx = this.ctx;
+                    ctx.save();
+
+                    // Sacudida de pantalla
+                    if (this.screenShake > 0) {
+                        const dx = (Math.random() - 0.5) * this.screenShake;
+                        const dy = (Math.random() - 0.5) * this.screenShake;
+                        ctx.translate(dx, dy);
+                    }
+
+                    ctx.clearRect(0, 0, this.width, this.height);
+
+                    // A) Fondo del Estadio & Perspectiva de Carriles
+                    this.drawLanesBackground(ctx);
+
+                    // B) Línea de Meta / Zona de Impacto
+                    this.drawTargetReceptors(ctx);
+
+                    // C) Dibujar Notas (Balones que caen)
+                    this.drawNotes(ctx);
+
+                    // D) Partículas & Textos Flotantes
+                    this.drawParticles(ctx);
+                    this.drawFloatingTexts(ctx);
+
+                    ctx.restore();
+                }
+
+                drawLanesBackground(ctx) {
+                    const laneW = this.width / 3;
+
+                    // Fondo de cuadrícula cibernética / césped neón
+                    for (let i = 0; i < 3; i++) {
+                        const x = i * laneW;
+                        const colorObj = LANE_COLORS[i];
+
+                        // Gradiente suave vertical
+                        const grad = ctx.createLinearGradient(0, 0, 0, this.height);
+                        grad.addColorStop(0, 'rgba(5, 8, 17, 0.4)');
+                        grad.addColorStop(0.7, `rgba(${colorObj.rgb.join(',')}, 0.05)`);
+                        grad.addColorStop(1, `rgba(${colorObj.rgb.join(',')}, 0.12)`);
+                        ctx.fillStyle = grad;
+                        ctx.fillRect(x, 0, laneW, this.height);
+
+                        // Divisores de carril con haz de luz
+                        if (i > 0) {
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+                            ctx.lineWidth = 1.5;
+                            ctx.beginPath();
+                            ctx.moveTo(x, 0);
+                            ctx.lineTo(x, this.height);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                drawTargetReceptors(ctx) {
+                    const laneW = this.width / 3;
+                    const y = this.targetY;
+
+                    // Línea horizontal guía resplandeciente
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([6, 6]);
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(this.width, y);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Receptores circulares en cada carril
+                    for (let i = 0; i < 3; i++) {
+                        const x = this.getLaneX(i);
+                        const c = LANE_COLORS[i];
+
+                        // Halo exterior
+                        ctx.save();
+                        ctx.shadowColor = c.hex;
+                        ctx.shadowBlur = 15;
+                        ctx.strokeStyle = c.hex;
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.arc(x, y, this.hitRadius, 0, Math.PI * 2);
+                        ctx.stroke();
+
+                        // Fondo circular translúcido
+                        ctx.fillStyle = `rgba(${c.rgb.join(',')}, 0.15)`;
+                        ctx.fill();
+
+                        // Glifo central (1, X, 2)
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = '900 22px Outfit, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(c.label, x, y);
+                        ctx.restore();
+                    }
+                }
+
+                drawNotes(ctx) {
+                    for (const note of this.notes) {
+                        const x = this.getLaneX(note.lane);
+                        const y = note.y;
+
+                        // Rastro de cometa
+                        for (const tr of note.trail) {
+                            ctx.fillStyle = `rgba(255, 255, 255, ${tr.alpha * 0.35})`;
+                            ctx.beginPath();
+                            ctx.arc(tr.x, tr.y, note.radius * 0.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+
+                        ctx.save();
+                        ctx.translate(x, y);
+                        ctx.rotate(note.rotation);
+
+                        if (note.type === 'normal') {
+                            this.renderClassicBall(ctx, note.radius, LANE_COLORS[note.lane].hex);
+                        } else if (note.type === 'gold') {
+                            this.renderGoldBall(ctx, note.radius);
+                        } else if (note.type === 'trap') {
+                            this.renderTrapBall(ctx, note.radius);
+                        } else if (note.type === 'pleno') {
+                            this.renderPlenoBall(ctx, note.radius);
+                        }
+
+                        ctx.restore();
+                    }
+                }
+
+                // BALÓN CLÁSICO CON DETALLES DE CUERO Y GLOBO NEÓN
+                renderClassicBall(ctx, radius, glowColor) {
+                    ctx.shadowColor = glowColor;
+                    ctx.shadowBlur = 18;
+
+                    // Esfera 3D con luz radial
+                    const grad = ctx.createRadialGradient(-radius * 0.35, -radius * 0.35, radius * 0.1, 0, 0, radius);
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.75, '#e2e8f0');
+                    grad.addColorStop(1, '#64748b');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pentágono central negro de cuero
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#0f172a';
+                    this.drawPentagon(ctx, 0, 0, radius * 0.42);
+
+                    // Acentos de costura
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 1.5;
+                    for (let a = 0; a < 5; a++) {
+                        const angle = (a * 2 * Math.PI) / 5 - Math.PI / 2;
+                        const px = Math.cos(angle) * (radius * 0.42);
+                        const py = Math.sin(angle) * (radius * 0.42);
+                        const ox = Math.cos(angle) * radius;
+                        const oy = Math.sin(angle) * radius;
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.lineTo(ox, oy);
+                        ctx.stroke();
+                    }
+                }
+
+                // CASILLA ORO (TÍO GILITO) - LINGOTE METÁLICO
+                renderGoldBall(ctx, radius) {
+                    ctx.shadowColor = '#f59e0b';
+                    ctx.shadowBlur = 24;
+
+                    // Gradiente dorado metálico
+                    const grad = ctx.createRadialGradient(-radius * 0.4, -radius * 0.4, radius * 0.15, 0, 0, radius);
+                    grad.addColorStop(0, '#fffbeb');
+                    grad.addColorStop(0.3, '#fef08a');
+                    grad.addColorStop(0.7, '#f59e0b');
+                    grad.addColorStop(1, '#b45309');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Borde irisado oro
+                    ctx.strokeStyle = '#fef08a';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    // Corona de Tío Gilito
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#78350f';
+                    ctx.font = `${radius * 0.9}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('👑', 0, 1);
+                }
+
+                // CASILLA TRAMPA (HUMO OSCURO, PINCHOS Y CALAVERA)
+                renderTrapBall(ctx, radius) {
+                    ctx.shadowColor = '#dc2626';
+                    ctx.shadowBlur = 22;
+
+                    // Esfera oscura con lava púrpura
+                    const grad = ctx.createRadialGradient(-radius * 0.3, -radius * 0.3, radius * 0.1, 0, 0, radius);
+                    grad.addColorStop(0, '#7f1d1d');
+                    grad.addColorStop(0.6, '#1e1b4b');
+                    grad.addColorStop(1, '#020617');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pinchos metálicos exteriores
+                    ctx.fillStyle = '#ef4444';
+                    for (let i = 0; i < 8; i++) {
+                        const ang = (i * Math.PI) / 4;
+                        const sx = Math.cos(ang) * (radius + 6);
+                        const sy = Math.sin(ang) * (radius + 6);
+                        ctx.beginPath();
+                        ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // Calavera central
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `${radius * 0.9}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('☠️', 0, 1);
+                }
+
+                // PLENO AL 15 (BOLA GIGANTE DE FUEGO)
+                renderPlenoBall(ctx, radius) {
+                    ctx.shadowColor = '#f59e0b';
+                    ctx.shadowBlur = 30;
+
+                    const grad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius);
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.4, '#f59e0b');
+                    grad.addColorStop(1, '#ef4444');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '900 18px Outfit, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('P15', 0, 0);
+                }
+
+                drawPentagon(ctx, x, y, r) {
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        const ang = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+                        const px = x + Math.cos(ang) * r;
+                        const py = y + Math.sin(ang) * r;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                // SISTEMA DE PARTÍCULAS & EFECTOS
+                createHitSparks(x, y, colorHex) {
+                    for (let i = 0; i < 18; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 2.5 + Math.random() * 5.5;
+                        this.particles.push({
+                            x: x,
+                            y: y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            radius: 2 + Math.random() * 3,
+                            color: colorHex,
+                            alpha: 1,
+                            decay: 0.035,
+                            gravity: 0.12
+                        });
+                    }
+                }
+
+                createCoinShower(x, y) {
+                    for (let i = 0; i < 24; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 3 + Math.random() * 6;
+                        this.particles.push({
+                            x: x,
+                            y: y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            radius: 3 + Math.random() * 3,
+                            color: '#f59e0b',
+                            alpha: 1,
+                            decay: 0.025,
+                            gravity: 0.18,
+                            isCoin: true
+                        });
+                    }
+                }
+
+                createFireworks(x, y) {
+                    const colors = ['#f59e0b', '#10b981', '#00d2ff', '#ec4899', '#ffffff'];
+                    for (let i = 0; i < 40; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 3 + Math.random() * 8;
+                        this.particles.push({
+                            x: x,
+                            y: y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            radius: 3 + Math.random() * 4,
+                            color: colors[Math.floor(Math.random() * colors.length)],
+                            alpha: 1,
+                            decay: 0.02,
+                            gravity: 0.1
+                        });
+                    }
+                }
+
+                createExplosion(x, y, color, count) {
+                    for (let i = 0; i < count; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 2 + Math.random() * 7;
+                        this.particles.push({
+                            x: x,
+                            y: y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            radius: 3 + Math.random() * 4,
+                            color: color,
+                            alpha: 1,
+                            decay: 0.03,
+                            gravity: 0.08
+                        });
+                    }
+                }
+
+                createMissRipple(x, y) {
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: 0,
+                        vy: 0,
+                        radius: 12,
+                        maxRadius: 45,
+                        color: 'rgba(255, 255, 255, 0.4)',
+                        alpha: 0.8,
+                        decay: 0.05,
+                        isRipple: true
+                    });
+                }
+
+                addFloatingText(x, y, text, color) {
+                    this.floatingTexts.push({
+                        x: x,
+                        y: y,
+                        text: text,
+                        color: color,
+                        alpha: 1,
+                        vy: 1.8,
+                        decay: 0.025
+                    });
+                }
+
+                drawParticles(ctx) {
+                    for (const p of this.particles) {
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+                        ctx.fillStyle = p.color;
+
+                        if (p.isRipple) {
+                            p.radius += 2.2;
+                            ctx.strokeStyle = p.color;
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                            ctx.stroke();
+                        } else {
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        ctx.restore();
+                    }
+                }
+
+                drawFloatingTexts(ctx) {
+                    for (const ft of this.floatingTexts) {
+                        ctx.save();
+                        ctx.globalAlpha = ft.alpha;
+                        ctx.fillStyle = ft.color;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                        ctx.shadowBlur = 6;
+                        ctx.font = '800 15px Plus Jakarta Sans, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(ft.text, ft.x, ft.y);
+                        ctx.restore();
+                    }
+                }
+
+                // GESTIÓN DE HUD Y PUNTUACIONES
+                updateHUD() {
+                    const elScore = document.getElementById('hud-score');
+                    if (elScore) elScore.textContent = this.score.toLocaleString();
+
+                    const elCombo = document.getElementById('hud-combo');
+                    if (elCombo) elCombo.textContent = `${this.combo} COMBO`;
+
+                    const elMulti = document.getElementById('hud-multiplier');
+                    if (elMulti) {
+                        elMulti.textContent = `x${this.multiplier} MULTI`;
+                        if (this.multiplier >= 3) {
+                            elMulti.className = 'font-game text-xs font-black px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 shadow-md fever-glow uppercase';
+                        } else {
+                            elMulti.className = 'font-game text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase';
+                        }
+                    }
+
+                    // Vidas (Balones)
+                    const elLives = document.getElementById('hud-lives');
+                    if (elLives) {
+                        let html = '';
+                        for (let i = 0; i < 3; i++) {
+                            if (i < this.lives) {
+                                html += '<span class="text-base text-emerald-400">⚽</span>';
+                            } else {
+                                html += '<span class="text-base text-slate-600 opacity-40">⚽</span>';
+                            }
+                        }
+                        elLives.innerHTML = html;
+                    }
+
+                    // Récord del socio actual
+                    const currentBest = this.highScores[this.currentSocio]?.score || 0;
+                    const elHighScore = document.getElementById('hud-high-score');
+                    if (elHighScore) elHighScore.textContent = currentBest.toLocaleString();
+
+                    // Barra de fiebre
+                    const bar = document.getElementById('fever-progress-bar');
+                    if (bar) {
+                        const progress = Math.min(100, (this.combo / 20) * 100);
+                        bar.style.width = `${progress}%`;
+                    }
+
+                    // Nombre del socio en header
+                    const elSocioName = document.getElementById('socio-display-name');
+                    if (elSocioName) elSocioName.textContent = this.currentSocio;
+                }
+
+                checkGameOver() {
+                    if (this.lives <= 0) {
+                        this.lives = 0;
+                        this.isPlaying = false;
+                        this.stopMusic();
+                        this.playSound('whistle');
+
+                        // Guardar puntuación si supera récord
+                        this.saveScore(this.currentSocio, this.score, this.maxCombo);
+
+                        // Mostrar modal Game Over
+                        document.getElementById('final-score').textContent = this.score.toLocaleString();
+                        document.getElementById('final-combo').textContent = this.maxCombo;
+                        document.getElementById('final-hits').textContent = `${this.hitsCount} (${this.perfectCount} perf.)`;
+                        document.getElementById('final-socio-name').textContent = this.currentSocio;
+                        document.getElementById('final-best').textContent = (this.highScores[this.currentSocio]?.score || this.score).toLocaleString();
+
+                        setTimeout(() => {
+                            document.getElementById('modal-gameover').classList.remove('hidden');
+                        }, 500);
+                    }
+                }
+
+                // GESTIÓN DE SOCIOS Y CLASIFICACIÓN
+                async populateSocioDropdown() {
+                    const select = document.getElementById('modal-socio-select');
+                    if (!select) return;
+
+                    let membersList = DEFAULT_MEMBERS;
+                    try {
+                        if (window.DataService) {
+                            const data = await window.DataService.getAll('members');
+                            if (data && data.length > 0) {
+                                membersList = data.map(m => m.name);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Usando socios por defecto:", e);
+                    }
+
+                    select.innerHTML = membersList.map(name => {
+                        const selected = name === this.currentSocio ? 'selected' : '';
+                        return `<option value="${name}" ${selected}>👑 ${name}</option>`;
+                    }).join('');
+
+                    select.addEventListener('change', (e) => {
+                        this.currentSocio = e.target.value;
+                        localStorage.setItem('maulas_arcade_current_socio', this.currentSocio);
+                        this.updateHUD();
+                    });
+                }
+
+                showSocioModal() {
+                    document.getElementById('modal-start').classList.remove('hidden');
+                }
+
+                // GUARDADO Y CARGA DE RÉCORDS (FIRESTORE + LOCALSTORAGE)
+                async loadHighScores() {
+                    // 1. Cargar desde LocalStorage inmediato
+                    try {
+                        const local = localStorage.getItem('maulas_arcade_frenesi_records');
+                        if (local) {
+                            this.highScores = JSON.parse(local);
+                        }
+                    } catch (e) {}
+
+                    // 2. Cargar desde Firestore Cloud
+                    try {
+                        if (window.firebase && window.firebase.firestore) {
+                            const db = window.firebase.firestore();
+                            const doc = await db.collection('game_records').doc('frenesi_highscores').get();
+                            if (doc.exists) {
+                                const cloudScores = doc.data().scores || {};
+                                // Mezclar manteniendo el valor más alto
+                                Object.keys(cloudScores).forEach(socio => {
+                                    if (!this.highScores[socio] || cloudScores[socio].score > this.highScores[socio].score) {
+                                        this.highScores[socio] = cloudScores[socio];
+                                    }
+                                });
+                                localStorage.setItem('maulas_arcade_frenesi_records', JSON.stringify(this.highScores));
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Modo offline en récords:", e);
+                    }
+                    this.updateHUD();
+                }
+
+                async saveScore(socio, newScore, maxCombo) {
+                    if (!socio) return;
+                    const prev = this.highScores[socio] || { score: 0, maxCombo: 0, games: 0 };
+                    
+                    const isNewRecord = newScore > prev.score;
+                    const recordData = {
+                        score: Math.max(prev.score, newScore),
+                        maxCombo: Math.max(prev.maxCombo, maxCombo),
+                        games: (prev.games || 0) + 1,
+                        lastPlayed: new Date().toISOString()
+                    };
+
+                    this.highScores[socio] = recordData;
+                    localStorage.setItem('maulas_arcade_frenesi_records', JSON.stringify(this.highScores));
+
+                    // Sincronizar en la nube si hay conexión
+                    try {
+                        if (window.firebase && window.firebase.firestore) {
+                            const db = window.firebase.firestore();
+                            await db.collection('game_records').doc('frenesi_highscores').set({
+                                scores: this.highScores,
+                                updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                            console.log("Récord sincronizado en Firestore Cloud.");
+                        }
+                    } catch (e) {
+                        console.warn("Guardado local (nube no disponible):", e);
+                    }
+
+                    this.updateHUD();
+                }
+
+                showRankingModal() {
+                    const modal = document.getElementById('modal-ranking');
+                    const container = document.getElementById('ranking-list-container');
+                    if (!modal || !container) return;
+
+                    // Ordenar socios por puntuación descendente
+                    const sorted = Object.entries(this.highScores)
+                        .map(([name, data]) => ({ name, ...data }))
+                        .sort((a, b) => b.score - a.score);
+
+                    if (sorted.length === 0) {
+                        container.innerHTML = `
+                            <div class="p-8 text-center text-slate-400 text-xs">
+                                ⚽ ¡Aún no hay récords registrados!<br>Sé el primer socio en disputar la jornada.
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = sorted.map((entry, index) => {
+                            let badge = `<span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">${index + 1}</span>`;
+                            let rowClass = 'bg-slate-900/70 border-slate-800';
+
+                            if (index === 0) {
+                                badge = `<span class="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs shadow-md">🥇</span>`;
+                                rowClass = 'bg-amber-500/10 border-amber-500/40 text-amber-200';
+                            } else if (index === 1) {
+                                badge = `<span class="w-6 h-6 rounded-lg bg-slate-300 text-slate-950 flex items-center justify-center font-black text-xs shadow-md">🥈</span>`;
+                                rowClass = 'bg-slate-300/10 border-slate-400/40 text-slate-200';
+                            } else if (index === 2) {
+                                badge = `<span class="w-6 h-6 rounded-lg bg-amber-700 text-white flex items-center justify-center font-black text-xs shadow-md">🥉</span>`;
+                                rowClass = 'bg-amber-700/10 border-amber-700/40 text-amber-300';
+                            }
+
+                            const isCurrent = entry.name === this.currentSocio ? 'ring-2 ring-amber-400' : '';
+
+                            return `
+                                <div class="flex items-center justify-between p-2.5 rounded-xl border ${rowClass} ${isCurrent} transition">
+                                    <div class="flex items-center gap-2.5">
+                                        ${badge}
+                                        <div>
+                                            <span class="font-extrabold text-xs block text-white">${entry.name}</span>
+                                            <span class="text-[10px] text-slate-400">Combo: ${entry.maxCombo || 0} 🔥</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="font-mono-bold text-sm font-black text-amber-400 block">${(entry.score || 0).toLocaleString()} pts</span>
+                                        <span class="text-[9px] text-slate-500">${entry.games || 1} partida${(entry.games || 1) > 1 ? 's' : ''}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+
+                    modal.classList.remove('hidden');
+                }
+
+                closeRankingModal() {
+                    document.getElementById('modal-ranking').classList.add('hidden');
+                }
+            }
+
+            // Instancia Global
+            window.addEventListener('DOMContentLoaded', () => {
+                window.ArcadeFrenesi = new FrenesiEngine();
+            });
+
+        })();
+    </script>
+</body>
+</html>
