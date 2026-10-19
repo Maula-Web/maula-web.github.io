@@ -1120,10 +1120,10 @@ class Dashboard2AppController {
         }
 
         if (elTotalPoints) elTotalPoints.textContent = totalPoints;
-        if (elTotalPointsLabel) elTotalPointsLabel.textContent = totalPoints === 1 ? 'pto' : 'pts';
+        if (elTotalPointsLabel) elTotalPointsLabel.textContent = totalPoints === 1 ? 'pto total' : 'pts totales';
         if (elRankBadge) {
             const displayRank = isNextInProgress ? liveRank : generalRank;
-            elRankBadge.textContent = `${displayRank}º`;
+            elRankBadge.textContent = `${displayRank}º puesto`;
             if (isNextInProgress) {
                 elRankBadge.className = 'px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap animate-pulse';
             } else {
@@ -1136,15 +1136,13 @@ class Dashboard2AppController {
             elMatrixLink.href = 'clasificacion_2.html?view=matrix';
         }
 
-        // 5. Semáforo de Acción (El elemento rey)
-        const elForecastStatusCard = document.getElementById('user-card-forecast-status');
+        // 5. Fila Estado de Quiniela y Sellado
+        const elForecastStatusLink = document.getElementById('user-card-forecast-status');
         const elForecastStatusIcon = document.getElementById('user-card-forecast-status-icon');
         const elForecastStatusText = document.getElementById('user-card-forecast-status-text');
-        const elForecastStatusDeadline = document.getElementById('user-card-forecast-deadline');
-        const elForecastStatusBtn = document.getElementById('user-card-forecast-status-btn');
         const elForecastStatusAction = document.getElementById('user-card-forecast-status-action');
 
-        if (elForecastStatusCard && elForecastStatusText) {
+        if (elForecastStatusLink && elForecastStatusText) {
             if (isNextInProgress) {
                 // CUANDO LA JORNADA ESTÁ EN JUEGO:
                 // Mostrar dato de quinielas disponibles, aún sin sellar
@@ -1175,27 +1173,15 @@ class Dashboard2AppController {
                     text = '0 quinielas disponibles sin sellar';
                 }
 
-                if (elForecastStatusIcon) elForecastStatusIcon.textContent = '⚽';
+                if (elForecastStatusIcon) elForecastStatusIcon.textContent = '📋';
                 elForecastStatusText.textContent = text;
-                if (elForecastStatusDeadline) {
-                    elForecastStatusDeadline.textContent = 'Jornada en juego · Consulta el panel de sellado';
-                }
-                elForecastStatusCard.className = 'p-2.5 sm:p-3 rounded-xl border border-sky-500/40 bg-sky-950/30 transition flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 shadow-md';
-                const jParam = targetJId ? `&jId=${encodeURIComponent(targetJId)}` : '';
-                const targetHref = `pronosticos_2.html?openEditor=true${jParam}`;
-
-                if (elForecastStatusBtn) {
-                    elForecastStatusBtn.href = targetHref;
-                    elForecastStatusBtn.className = 'w-full xs:w-auto px-3.5 py-1.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 shadow active:scale-95 shrink-0 whitespace-nowrap bg-sky-500 hover:bg-sky-400 text-slate-950';
-                }
+                elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-sky-950/30 hover:bg-sky-950/50 border border-sky-500/40 text-sky-200 transition group cursor-pointer text-xs shadow-sm';
                 if (elForecastStatusAction) {
                     elForecastStatusAction.textContent = 'Panel de sellado →';
+                    elForecastStatusAction.className = 'font-bold text-sky-400 group-hover:text-sky-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
                 }
-                elForecastStatusCard.onclick = (e) => {
-                    if (e.target.closest('#user-card-forecast-status-btn')) return;
-                    window.location.href = targetHref;
-                };
-                elForecastStatusCard.style.cursor = 'pointer';
+                const jParam = targetJId ? `&jId=${encodeURIComponent(targetJId)}` : '';
+                elForecastStatusLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
 
             } else {
                 // SÓLO DURANTE LA CUENTA ATRÁS:
@@ -1220,42 +1206,23 @@ class Dashboard2AppController {
 
                 const jNumStr = nextJ ? ` (J${nextJ.number})` : '';
                 const jParam = nextJ ? `&jId=${encodeURIComponent(nextJ.id)}` : '';
-                const targetHref = `pronosticos_2.html?openEditor=true${jParam}`;
-
-                if (elForecastStatusBtn) elForecastStatusBtn.href = targetHref;
-                elForecastStatusCard.onclick = (e) => {
-                    if (e.target.closest('#user-card-forecast-status-btn')) return;
-                    window.location.href = targetHref;
-                };
-                elForecastStatusCard.style.cursor = 'pointer';
-
-                const deadlineText = nextJ && nextJ.deadline ? nextJ.deadline : 'Jueves 17:00h';
+                elForecastStatusLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
 
                 if (userHasSubmitted) {
                     if (elForecastStatusIcon) elForecastStatusIcon.textContent = '✅';
                     elForecastStatusText.textContent = `Tu quiniela: Enviada${jNumStr}`;
-                    if (elForecastStatusDeadline) {
-                        elForecastStatusDeadline.textContent = `Cierra ${deadlineText} · ¡Boleto guardado!`;
-                    }
-                    elForecastStatusCard.className = 'p-2.5 sm:p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/25 transition flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 shadow-md';
-                    if (elForecastStatusBtn) {
-                        elForecastStatusBtn.className = 'w-full xs:w-auto px-3.5 py-1.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 shadow active:scale-95 shrink-0 whitespace-nowrap bg-slate-850 hover:bg-slate-800 text-emerald-300 border border-emerald-500/40';
-                    }
+                    elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-950/30 hover:bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 transition group cursor-pointer text-xs shadow-sm';
                     if (elForecastStatusAction) {
                         elForecastStatusAction.textContent = 'Ver / Modificar →';
+                        elForecastStatusAction.className = 'font-bold text-emerald-400 group-hover:text-emerald-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
                     }
                 } else {
                     if (elForecastStatusIcon) elForecastStatusIcon.textContent = '⏳';
                     elForecastStatusText.textContent = `Tu quiniela: Aún sin enviar${jNumStr}`;
-                    if (elForecastStatusDeadline) {
-                        elForecastStatusDeadline.textContent = `⚠️ Cierra ${deadlineText} · ¡No te descuides!`;
-                    }
-                    elForecastStatusCard.className = 'p-2.5 sm:p-3 rounded-xl border-2 border-amber-500/70 bg-gradient-to-r from-amber-950/50 via-slate-900 to-amber-950/50 transition flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 shadow-lg animate-pulse';
-                    if (elForecastStatusBtn) {
-                        elForecastStatusBtn.className = 'w-full xs:w-auto px-4 py-2 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95 shrink-0 whitespace-nowrap bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black';
-                    }
+                    elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-amber-950/40 hover:bg-amber-950/60 border border-amber-500/50 text-amber-300 transition group cursor-pointer text-xs shadow-sm animate-pulse';
                     if (elForecastStatusAction) {
-                        elForecastStatusAction.textContent = '✍️ Sellar mi quiniela →';
+                        elForecastStatusAction.textContent = 'Sellar ahora →';
+                        elForecastStatusAction.className = 'font-bold text-amber-400 group-hover:text-amber-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
                     }
                 }
             }

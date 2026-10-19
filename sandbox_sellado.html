@@ -805,6 +805,9 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     <button id="tab-btn-triples" onclick="SandboxManager.switchTab('triples')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-purple-400 hover:text-purple-300 hover:bg-purple-950/40 border border-purple-500/30 whitespace-nowrap">
                         <span>⚡</span> Simulador 9 Triples (25 Apuestas · MD)
                     </button>
+                    <button id="tab-btn-zen" onclick="SandboxManager.switchTab('zen')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-sky-400 hover:text-sky-300 hover:bg-sky-950/40 border border-sky-500/40 whitespace-nowrap shadow-sm">
+                        <span>📱</span> Dashboard Zen (Mínimo)
+                    </button>
                 </div>
 
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -1046,6 +1049,34 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 <!-- Marco de Juego Embebido -->
                 <div class="w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-[#040711]">
                     <iframe src="juego.html" class="w-full h-[760px] border-0" allow="autoplay"></iframe>
+                </div>
+            </div>
+
+            <!-- VISTA 6: DASHBOARD ZEN (MÍNIMO EXPERIMENTAL) -->
+            <div id="view-tab-zen" class="hidden space-y-4">
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-sky-950/40 via-slate-900/80 to-amber-950/40 border border-sky-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 border border-sky-300/50 flex items-center justify-center text-2xl shadow-lg shrink-0">
+                            📱
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30">ENTORNO DE PRUEBAS</span>
+                                <span class="text-sm text-white font-extrabold">Dashboard Mínimo Focalizado (Socio Zen)</span>
+                            </div>
+                            <p class="text-xs text-slate-300 mt-0.5">
+                                Vista experimental reducida a lo imprescindible: semáforo de sellado prominente, rendimiento gemelo, salseo en 1 línea y 0 scroll.
+                            </p>
+                        </div>
+                    </div>
+                    <a href="sandbox_dashboard.html" target="_blank" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 shrink-0 cursor-pointer active:scale-95">
+                        <span>🚀</span> Abrir en Pantalla Completa ↗
+                    </a>
+                </div>
+
+                <!-- Marco Embebido del Dashboard Zen -->
+                <div class="w-full max-w-lg mx-auto rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-[#090d16]">
+                    <iframe src="sandbox_dashboard.html" class="w-full h-[620px] border-0"></iframe>
                 </div>
             </div>
 
@@ -1770,7 +1801,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
 
             switchTab(tabId) {
                 this.currentTab = tabId;
-                const tabs = ['txt', 'socios', 'dobles', 'triples', 'arcade'];
+                const tabs = ['txt', 'socios', 'dobles', 'triples', 'arcade', 'zen'];
                 tabs.forEach(t => {
                     const btn = document.getElementById(`tab-btn-${t}`);
                     const view = document.getElementById(`view-tab-${t}`);
@@ -1780,6 +1811,8 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-purple-500/20 text-purple-300 border border-purple-500/40 whitespace-nowrap shadow';
                         } else if (t === 'arcade') {
                             btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/50 whitespace-nowrap shadow-md';
+                        } else if (t === 'zen') {
+                            btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/50 whitespace-nowrap shadow-md';
                         } else {
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap';
                         }

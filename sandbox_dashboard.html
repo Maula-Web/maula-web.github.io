@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PEÑA MAULAS - Sandbox Dashboard Mínimo</title>
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090d16">
+
+    <!-- Fonts & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/light-theme.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/db-service.js"></script>
+
+    <style>
+        :root {
+            --color-bg: #090d16;
+            --color-card: rgba(18, 24, 38, 0.85);
+            --color-card-border: rgba(255, 145, 0, 0.2);
+        }
+        body {
+            background-color: var(--color-bg);
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 145, 0, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(255, 145, 0, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: var(--color-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--color-card-border);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        @keyframes pulseGlowAmberLight {
+            0%, 100% {
+                border-color: rgba(217, 119, 6, 0.45);
+                box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15);
+            }
+            50% {
+                border-color: rgba(217, 119, 6, 0.95);
+                box-shadow: 0 4px 18px rgba(217, 119, 6, 0.35), 0 0 6px rgba(251, 191, 36, 0.5);
+            }
+        }
+    </style>
+</head>
+
+<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
+    <!-- Scripts base del sistema -->
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/bote_2_data.js"></script>
+    <script src="js/bote-engine.js"></script>
+
+    <!-- Contenedor Principal del Sandbox Dashboard -->
+    <div class="max-w-[800px] mx-auto space-y-3 pb-8">
+        
+        <!-- Barra de Navegación / Cabecera Sandbox -->
+        <nav class="glass-panel p-2.5 sm:p-3 border-emerald-500/40 flex items-center justify-between gap-2 shadow-lg">
+            <div class="flex items-center gap-2">
+                <a href="sandbox_sellado.html" class="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition text-xs font-bold" title="Volver al Sandbox">
+                    🧪
+                </a>
+                <a href="dashboard_2.html" class="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition text-xs font-bold" title="Volver al Dashboard Oficial">
+                    🏠
+                </a>
+                <div class="leading-tight">
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-black text-white text-xs sm:text-sm">SANDBOX DASHBOARD</span>
+                        <span class="text-[9px] font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.2 rounded border border-emerald-500/40">ZEN</span>
+                    </div>
+                    <span class="text-[9px] text-amber-400 font-mono">Modo ultra-minimalista para el Socio</span>
+                </div>
+            </div>
+
+            <!-- Controles de Modo Claro / Oscuro -->
+            <div class="flex items-center gap-1">
+                <button type="button" onclick="window.AppTheme && window.AppTheme.setTheme('light')" class="w-7 h-7 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-500 text-xs flex items-center justify-center" title="Modo Claro">☀️</button>
+                <button type="button" onclick="window.AppTheme && window.AppTheme.setTheme('dark')" class="w-7 h-7 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-500 text-xs flex items-center justify-center" title="Modo Oscuro">🌙</button>
+                <button onclick="location.reload(true);" class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs flex items-center justify-center font-bold" title="Recargar">🔄</button>
+            </div>
+        </nav>
+
+        <!-- Cabecera de Jornada y Cuenta Atrás -->
+        <div class="glass-panel p-3 border-amber-500/40 shadow-lg space-y-2">
+            <div class="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-base">⚽</span>
+                    <h2 id="zen-banner-title" class="text-white font-black text-sm sm:text-base uppercase tracking-tight">Jornada en Curso</h2>
+                    <span id="zen-cd-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Plazo Abierto</span>
+                </div>
+                <div id="zen-countdown" class="font-mono text-xs font-black text-amber-400 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800">
+                    --d --h --m --s
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 TARJETA MÍNIMA DEL SOCIO CONECTADO (SOCIO ZEN)
+                 ================================================================= -->
+            <div id="user-summary-card" class="p-3 sm:p-4 rounded-2xl bg-gradient-to-b from-slate-900/95 via-slate-950/95 to-slate-950/95 border-2 border-amber-500/50 shadow-2xl flex flex-col justify-between gap-2.5">
+                
+                <!-- 1. Cabecera: Socio Conectado + Bolsillo (Mi Bote) -->
+                <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span id="user-card-avatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 border border-amber-300 flex items-center justify-center text-xs sm:text-sm font-black shrink-0 shadow">FL</span>
+                        <div class="truncate">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Mi Cuenta</span>
+                            <h3 id="user-card-name" class="text-sm sm:text-base font-black text-white leading-tight truncate">Fernando Lozano</h3>
+                        </div>
+                        <div id="user-card-pig-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse flex items-center gap-1 shrink-0">
+                            <span>🐷</span> <span>PIG</span>
+                        </div>
+                    </div>
+
+                    <!-- Bolsillo Personal: Mi Bote -->
+                    <a id="user-card-bote-link" href="bote_2.html" class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-700/80 hover:border-amber-500/50 transition shrink-0 group shadow-inner">
+                        <span class="text-xs">💰</span>
+                        <div class="text-right leading-none">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase block">Mi Bote</span>
+                            <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-xs sm:text-sm group-hover:underline">-- €</strong>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 2. Semáforo de Acción (El elemento rey) -->
+                <div id="user-card-forecast-status" class="p-2.5 sm:p-3 rounded-xl border transition flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 shadow-md">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span id="user-card-forecast-status-icon" class="text-xl shrink-0">⏳</span>
+                        <div class="min-w-0">
+                            <span id="user-card-forecast-status-text" class="font-black text-xs sm:text-sm block leading-tight text-white">Comprobando estado...</span>
+                            <span id="user-card-forecast-deadline" class="text-[10px] text-slate-400 block mt-0.5 font-medium truncate">Cierra Jueves a las 17:00h</span>
+                        </div>
+                    </div>
+                    <a id="user-card-forecast-status-btn" href="pronosticos_2.html?openEditor=true" class="w-full xs:w-auto px-3.5 py-1.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 shadow active:scale-95 shrink-0 whitespace-nowrap">
+                        <span id="user-card-forecast-status-action">Sellar mi quiniela →</span>
+                    </a>
+                </div>
+
+                <!-- 3. Mi Estado: 2 Cajas Gemelas en Paralelo (Grid 2 Cols) -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Caja 1: Semana Actual / En Juego -->
+                    <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-emerald-500/30 flex flex-col justify-between gap-1 hover:border-emerald-500/50 transition">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                <span>⚽</span> En Juego
+                            </span>
+                            <span id="user-card-live-hits" class="text-base sm:text-xl font-black font-mono text-emerald-400 leading-none">--</span>
+                        </div>
+                        <div id="user-card-live-hits-label" class="text-[10px] sm:text-[11px] text-slate-300 font-semibold truncate">
+                            aciertos (0/15)
+                        </div>
+                        <a id="user-card-boleto-link" href="#" onclick="openUserBoletoModal(event)" class="text-[10px] sm:text-[11px] font-bold text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-0.5 pt-0.5 border-t border-slate-800/80 cursor-pointer">
+                            <span id="user-card-boleto-text">Ver mi boleto ↗</span>
+                        </a>
+                    </div>
+
+                    <!-- Caja 2: Clasificación General -->
+                    <div class="p-2 sm:p-2.5 rounded-xl bg-slate-950/70 border border-amber-500/30 flex flex-col justify-between gap-1 hover:border-amber-500/50 transition">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                <span>🏆</span> General
+                            </span>
+                            <span id="user-card-rank-badge" class="px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-mono font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">--º</span>
+                        </div>
+                        <div class="text-[10px] sm:text-[11px] text-slate-300 font-semibold truncate flex items-center gap-1">
+                            <span id="user-card-total-points" class="font-mono font-black text-amber-400 text-xs sm:text-sm">--</span>
+                            <span id="user-card-total-points-label">pts</span>
+                        </div>
+                        <a id="user-card-matrix-link" href="clasificacion_2.html?view=matrix" class="text-[10px] sm:text-[11px] font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-0.5 pt-0.5 border-t border-slate-800/80">
+                            <span>Puntuación por jornadas ↗</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4. Píldora Social: El Salseo de la Semana (1 sola línea horizontal) -->
+                <div class="px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs gap-2">
+                    <div class="flex items-center gap-1.5 min-w-0 truncate">
+                        <span class="text-xs">👑</span>
+                        <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">Dobles:</span>
+                        <strong id="mobile-dobles-names" class="text-amber-300 font-black text-[11px] sm:text-xs truncate">Cargando...</strong>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0 pl-2 border-l border-slate-800">
+                        <span class="text-xs">✍️</span>
+                        <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">Sella:</span>
+                        <strong id="mobile-sella-name" class="text-rose-400 font-black text-[11px] sm:text-xs">Cargando...</strong>
+                    </div>
+                </div>
+
+                <!-- Sub-pie discreto de tesorería común -->
+                <div class="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 px-0.5">
+                    <span>💰 Caja Real: <strong id="user-card-caja-amount" class="text-slate-400 font-mono">-- €</strong></span>
+                    <a href="bote_2.html" class="text-slate-400 hover:text-amber-400 underline">Auditoría bote →</a>
+                </div>
+            </div>
+
+            <!-- Progreso de Envíos de la Peña -->
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                <span class="text-slate-400">Envíos de la Peña:</span>
+                <span id="zen-submissions-count" class="font-mono font-bold text-emerald-400">0/19</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-1.5 border border-slate-800 overflow-hidden">
+                <div id="zen-progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: 0%;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL POPUP VISOR DE BOLETO -->
+    <div id="modal-user-boleto-view" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100095] flex items-center justify-center p-3 sm:p-4">
+        <div class="max-w-xl w-full p-5 sm:p-6 rounded-2xl bg-[#0b0f19] border-2 border-emerald-500/70 shadow-2xl text-slate-100 space-y-4 relative flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl p-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40">🎫</span>
+                    <div>
+                        <h3 id="modal-user-boleto-title" class="text-base sm:text-lg font-black text-emerald-400">Boleto del Socio</h3>
+                        <span id="modal-user-boleto-author" class="text-xs text-slate-400 font-medium">Pronóstico oficial de la jornada</span>
+                    </div>
+                </div>
+                <button type="button" onclick="closeUserBoletoModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center font-bold text-sm transition">✕</button>
+            </div>
+            <div id="modal-user-boleto-meta" class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs flex flex-wrap items-center justify-between gap-2 shrink-0"></div>
+            <div id="modal-user-boleto-matches-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1 min-h-0 text-xs divide-y divide-slate-800/60"></div>
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2 shrink-0">
+                <a href="pronosticos_2.html?openEditor=true" class="text-xs font-bold text-amber-400 hover:underline">✏️ Abrir en el panel completo →</a>
+                <button type="button" onclick="closeUserBoletoModal()" class="px-5 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-950 font-black rounded-xl text-xs sm:text-sm">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Inicialización y Lógica Sandbox Dashboard -->
+    <script>
+        let currentJornada = null;
+        let currentPronostico = null;
+        let membersData = [];
+
+        async function initZenDashboard() {
+            try {
+                // 1. Cargar datos básicos de Firebase o Local
+                const jSnap = await db.collection('jornadas').get();
+                const jornadas = [];
+                jSnap.forEach(doc => jornadas.push({ id: doc.id, ...doc.data() }));
+                jornadas.sort((a,b) => (a.number || 0) - (b.number || 0));
+
+                const mSnap = await db.collection('members').get();
+                membersData = [];
+                mSnap.forEach(doc => membersData.push({ id: doc.id, ...doc.data() }));
+
+                const pSnap = await db.collection('pronosticos').get();
+                const pronosticos = [];
+                pSnap.forEach(doc => pronosticos.push({ id: doc.id, ...doc.data() }));
+
+                // Buscar jornada activa
+                currentJornada = jornadas.find(j => j.active !== false) || jornadas[jornadas.length - 1];
+
+                // Buscar usuario Fernando Lozano
+                const userMember = membersData.find(m => m.name && m.name.toLowerCase().includes('fernando')) || membersData[0];
+
+                if (currentJornada) {
+                    document.getElementById('zen-banner-title').textContent = `Jornada ${currentJornada.number}`;
+                    
+                    // Cuenta atrás
+                    const dl = currentJornada.deadline || 'Jueves 17:00h';
+                    document.getElementById('user-card-forecast-deadline').textContent = `Cierra ${dl}`;
+
+                    // Pronóstico de Fernando
+                    currentPronostico = pronosticos.find(p => String(p.jId || p.jornadaId) === String(currentJornada.id) && String(p.mId || p.memberId) === String(userMember.id));
+
+                    const hasSubmitted = currentPronostico && (currentPronostico.selection || currentPronostico.forecast || []).filter(s => s && s !== '-').length >= 14;
+
+                    const statusCard = document.getElementById('user-card-forecast-status');
+                    const statusText = document.getElementById('user-card-forecast-status-text');
+                    const statusIcon = document.getElementById('user-card-forecast-status-icon');
+                    const statusBtn = document.getElementById('user-card-forecast-status-btn');
+                    const statusAction = document.getElementById('user-card-forecast-status-action');
+
+                    if (hasSubmitted) {
+                        statusIcon.textContent = '✅';
+                        statusText.textContent = `Tu quiniela: Enviada (J${currentJornada.number})`;
+                        statusCard.className = 'p-2.5 sm:p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/25 transition flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 shadow-md';
+                        statusBtn.className = 'w-full xs:w-auto px-3.5 py-1.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 shadow active:scale-95 shrink-0 whitespace-nowrap bg-slate-850 hover:bg-slate-800 text-emerald-300 border border-emerald-500/40';
+                        statusAction.textContent = 'Ver / Modificar →';
+                    } else {
+                        statusIcon.textContent = '⏳';
+                        statusText.textContent = `Tu quiniela: Aún sin enviar (J${currentJornada.number})`;
+                        statusCard.className = 'p-2.5 sm:p-3 rounded-xl border-2 border-amber-500/70 bg-gradient-to-r from-amber-950/50 via-slate-900 to-amber-950/50 transition flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 shadow-lg animate-pulse';
+                        statusBtn.className = 'w-full xs:w-auto px-4 py-2 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95 shrink-0 whitespace-nowrap bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black';
+                        statusAction.textContent = '✍️ Sellar mi quiniela →';
+                    }
+
+                    // Aciertos en juego
+                    let hits = 0;
+                    if (currentPronostico && currentJornada.matches && window.ScoringSystem) {
+                        const ev = window.ScoringSystem.evaluateMember(userMember, currentJornada, currentPronostico);
+                        if (ev && ev.hits >= 0) hits = ev.hits;
+                    }
+                    document.getElementById('user-card-live-hits').textContent = hits;
+
+                    // Envíos totales
+                    const submittedCount = pronosticos.filter(p => String(p.jId || p.jornadaId) === String(currentJornada.id) && (p.selection || p.forecast || []).filter(s => s && s !== '-').length >= 14).length;
+                    document.getElementById('zen-submissions-count').textContent = `${submittedCount}/19`;
+                    document.getElementById('zen-progress-bar').style.width = `${Math.round((submittedCount/19)*100)}%`;
+                }
+
+                // Bote personal
+                document.getElementById('user-card-bote-amount').textContent = '+14,50 €';
+                document.getElementById('user-card-caja-amount').textContent = '1.091,52 €';
+                document.getElementById('user-card-total-points').textContent = '96';
+                document.getElementById('user-card-rank-badge').textContent = '3º';
+
+                // Dobles y Sella mock info
+                document.getElementById('mobile-dobles-names').textContent = 'Fernando Lozano, Carlos R.';
+                document.getElementById('mobile-sella-name').textContent = 'Álvaro M.';
+
+            } catch (e) {
+                console.error('[Sandbox Dashboard Error]:', e);
+            }
+        }
+
+        function openUserBoletoModal(e) {
+            if (e) e.preventDefault();
+            const modal = document.getElementById('modal-user-boleto-view');
+            const metaEl = document.getElementById('modal-user-boleto-meta');
+            const listEl = document.getElementById('modal-user-boleto-matches-list');
+
+            if (!currentJornada || !currentPronostico) {
+                alert('No hay pronósticos registrados para visualizar en esta jornada.');
+                return;
+            }
+
+            const sel = currentPronostico.selection || currentPronostico.forecast || [];
+            let rowsHtml = '';
+            (currentJornada.matches || []).forEach((m, idx) => {
+                const s = sel[idx] || '-';
+                const res = m.result || '-';
+                const finished = res && res !== '' && res !== '-';
+                const hit = finished && (s === res);
+                rowsHtml += `
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
+                        <span class="font-bold text-slate-400 w-6">#${idx+1}</span>
+                        <span class="font-semibold text-white flex-1 truncate px-2">${m.home} vs ${m.away}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded font-mono font-bold bg-slate-800 text-amber-300 border border-slate-700">${s}</span>
+                            ${finished ? (hit ? '<span class="text-emerald-400 font-bold">✅</span>' : '<span class="text-rose-400 font-bold">❌</span>') : '<span class="text-slate-500">⏳</span>'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (listEl) listEl.innerHTML = rowsHtml;
+            if (metaEl) metaEl.innerHTML = `<span>Jornada ${currentJornada.number}</span><span class="text-emerald-400 font-bold">15 Pronósticos Oficiales</span>`;
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeUserBoletoModal() {
+            const modal = document.getElementById('modal-user-boleto-view');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', initZenDashboard);
+    </script>
+</body>
+</html>
