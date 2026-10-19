@@ -3357,6 +3357,17 @@
                         if (window.app.selMember) window.app.selMember.value = window.app.currentMemberId;
                     }
 
+                    // Soporte de parámetros URL (jId y openEditor para apertura directa desde Dashboard)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const paramJId = urlParams.get('jId');
+                    if (paramJId && window.app.jornadas) {
+                        const foundJ = window.app.jornadas.find(j => String(j.id) === String(paramJId) || String(j.number) === String(paramJId));
+                        if (foundJ) {
+                            window.app.currentJornadaId = String(foundJ.id);
+                            if (window.app.selJornada) window.app.selJornada.value = String(foundJ.id);
+                        }
+                    }
+
                     if (window.app._initialRenderDone) {
                         if (window.app.updateKPIsCustom) window.app.updateKPIsCustom();
                         return;
@@ -3366,6 +3377,14 @@
                     if (window.app.updateActiveSelectionUI) window.app.updateActiveSelectionUI();
                     window.app.renderSummaryTable();
                     if (window.app.updateKPIsCustom) window.app.updateKPIsCustom();
+
+                    if (urlParams.get('openEditor') === 'true') {
+                        setTimeout(() => {
+                            if (window.openEditorForCurrentMember) {
+                                window.openEditorForCurrentMember();
+                            }
+                        }, 250);
+                    }
                 } else if (attempts > 60) {
                     clearInterval(checkAppData);
                     if (window.app && window.app.renderSummaryTable && !window.app._initialRenderDone) {

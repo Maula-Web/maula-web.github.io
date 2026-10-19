@@ -561,7 +561,7 @@
                         </a>
                     </div>
 
-                    <!-- Fila 3: Puntos Totales en Clasificación + Enlace a Sellar / Clasificación -->
+                    <!-- Fila 3: Puntos Totales en Clasificación + Enlace a Clasificación -->
                     <div class="flex items-center justify-between gap-2 py-0.5 border-t border-slate-800/60">
                         <div class="flex items-baseline gap-1.5 min-w-0 flex-wrap">
                             <span class="text-xs sm:text-sm">🏆</span>
@@ -569,10 +569,21 @@
                             <span id="user-card-total-points-label" class="text-[11px] sm:text-xs text-slate-300 font-semibold truncate">pts totales</span>
                             <span id="user-card-rank-badge" class="px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-bold font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap">--º puesto</span>
                         </div>
-                        <a id="user-card-seal-link" href="pronosticos_2.html?openEditor=true" class="text-[11px] sm:text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
-                            <span id="user-card-seal-text">✍️ Sellar quiniela →</span>
+                        <a id="user-card-seal-link" href="clasificacion_2.html" class="text-[11px] sm:text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
+                            <span id="user-card-seal-text">🏆 Clasificación →</span>
                         </a>
                     </div>
+
+                    <!-- Fila 4: Estado de Quiniela y Sellado (Clickable -> Panel de sellado) -->
+                    <a id="user-card-forecast-status" href="pronosticos_2.html?openEditor=true" class="flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-850 border border-slate-700/60 transition group cursor-pointer text-xs shadow-sm">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <span id="user-card-forecast-status-icon" class="text-xs sm:text-sm shrink-0">📋</span>
+                            <span id="user-card-forecast-status-text" class="font-bold truncate text-[11px] sm:text-xs text-slate-200">Cargando estado...</span>
+                        </div>
+                        <span id="user-card-forecast-status-action" class="font-bold text-amber-400 group-hover:text-amber-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5">
+                            Panel de sellado →
+                        </span>
+                    </a>
 
                     <!-- Fila 4 (Inferior): Bote Personal y Caja Real -->
                     <div class="pt-1 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">

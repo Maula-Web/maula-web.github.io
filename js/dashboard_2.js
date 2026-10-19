@@ -1126,11 +1126,102 @@ class Dashboard2AppController {
         }
 
         if (elSealLink) {
-            const jParam = nextJ ? `&jId=${encodeURIComponent(nextJ.id)}` : '';
-            elSealLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
+            elSealLink.href = 'clasificacion_2.html';
         }
         if (elSealText) {
-            elSealText.textContent = isNextInProgress ? '✍️ Ver mi quiniela →' : '✍️ Sellar quiniela →';
+            elSealText.textContent = '🏆 Clasificación →';
+        }
+
+        // 5. Fila Estado de Quiniela y Sellado
+        const elForecastStatusLink = document.getElementById('user-card-forecast-status');
+        const elForecastStatusIcon = document.getElementById('user-card-forecast-status-icon');
+        const elForecastStatusText = document.getElementById('user-card-forecast-status-text');
+        const elForecastStatusAction = document.getElementById('user-card-forecast-status-action');
+
+        if (elForecastStatusLink && elForecastStatusText) {
+            if (isNextInProgress) {
+                // CUANDO LA JORNADA ESTÁ EN JUEGO:
+                // Mostrar dato de quinielas disponibles, aún sin sellar
+                const unsealedAvailable = (this.jornadas || []).filter(j => {
+                    if (!j || j.active === false) return false;
+                    const hasMatches = Array.isArray(j.matches) && j.matches.some(m => m && m.home && String(m.home).trim() !== '');
+                    if (!hasMatches) return false;
+                    const finishedCount = (j.matches || []).filter(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-').length;
+                    if (finishedCount >= 15) return false;
+                    if (finishedCount > 0) return false; // Ya en juego
+                    const isSealed = !!(j.selladoEnviado || j.selladoTicketId || j.isSealed || j.sellada || j.status === 'sealed' || j.status === 'closed');
+                    return !isSealed;
+                });
+
+                const count = unsealedAvailable.length;
+                let targetJId = null;
+                let text = '';
+
+                if (count === 1) {
+                    const target = unsealedAvailable[0];
+                    targetJId = target.id;
+                    text = `1 quiniela disponible, aún sin sellar (J${target.number})`;
+                } else if (count > 1) {
+                    targetJId = unsealedAvailable[0].id;
+                    const jList = unsealedAvailable.map(j => `J${j.number}`).join(', ');
+                    text = `${count} quinielas disponibles, aún sin sellar (${jList})`;
+                } else {
+                    text = '0 quinielas disponibles sin sellar';
+                }
+
+                if (elForecastStatusIcon) elForecastStatusIcon.textContent = '📋';
+                elForecastStatusText.textContent = text;
+                elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-sky-950/30 hover:bg-sky-950/50 border border-sky-500/40 text-sky-200 transition group cursor-pointer text-xs shadow-sm';
+                if (elForecastStatusAction) {
+                    elForecastStatusAction.textContent = 'Panel de sellado →';
+                    elForecastStatusAction.className = 'font-bold text-sky-400 group-hover:text-sky-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
+                }
+                const jParam = targetJId ? `&jId=${encodeURIComponent(targetJId)}` : '';
+                elForecastStatusLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
+
+            } else {
+                // SÓLO DURANTE LA CUENTA ATRÁS:
+                // Mostrar si la quiniela del socio conectado está enviada o no
+                let userHasSubmitted = false;
+                if (userMember && nextJ) {
+                    const nextJId = String(nextJ.id);
+                    const mId = String(userMember.id);
+                    let p = pronosticosMap.get(`${nextJId}_${mId}`);
+                    if (!p && Array.isArray(this.pronosticos)) {
+                        p = this.pronosticos.find(pr => {
+                            if (!pr) return false;
+                            const pj = String(pr.jId !== undefined && pr.jId !== null ? pr.jId : (pr.jornadaId !== undefined ? pr.jornadaId : ''));
+                            const pm = String(pr.mId !== undefined && pr.mId !== null ? pr.mId : (pr.memberId !== undefined ? pr.memberId : ''));
+                            return pj === nextJId && pm === mId;
+                        });
+                    }
+                    const sel = p ? (Array.isArray(p.selection) ? p.selection : (Array.isArray(p.forecast) ? p.forecast : [])) : [];
+                    const filled = sel.filter(s => s && String(s).trim() !== '' && String(s) !== '-').length;
+                    userHasSubmitted = filled >= 14;
+                }
+
+                const jNumStr = nextJ ? ` (J${nextJ.number})` : '';
+                const jParam = nextJ ? `&jId=${encodeURIComponent(nextJ.id)}` : '';
+                elForecastStatusLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
+
+                if (userHasSubmitted) {
+                    if (elForecastStatusIcon) elForecastStatusIcon.textContent = '✅';
+                    elForecastStatusText.textContent = `Tu quiniela: Enviada${jNumStr}`;
+                    elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-950/30 hover:bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 transition group cursor-pointer text-xs shadow-sm';
+                    if (elForecastStatusAction) {
+                        elForecastStatusAction.textContent = 'Ver / Modificar →';
+                        elForecastStatusAction.className = 'font-bold text-emerald-400 group-hover:text-emerald-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
+                    }
+                } else {
+                    if (elForecastStatusIcon) elForecastStatusIcon.textContent = '⏳';
+                    elForecastStatusText.textContent = `Tu quiniela: Aún sin enviar${jNumStr}`;
+                    elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-amber-950/40 hover:bg-amber-950/60 border border-amber-500/50 text-amber-300 transition group cursor-pointer text-xs shadow-sm animate-pulse';
+                    if (elForecastStatusAction) {
+                        elForecastStatusAction.textContent = 'Sellar ahora →';
+                        elForecastStatusAction.className = 'font-bold text-amber-400 group-hover:text-amber-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
+                    }
+                }
+            }
         }
 
         // 5. Fila Inferior: Caja Real y Bote Personal del Socio
