@@ -408,106 +408,86 @@
         }
 
         /* ==========================================================================
-           LAYOUT RESPONSIVO PARA MÓVIL EN VERTICAL (PORTRAIT)
+           LAYOUT RESPONSIVO PARA MÓVIL Y CUALQUIER DISPOSITIVO (PORTRAIT & LANDSCAPE)
            ========================================================================== */
-        @media (max-width: 767px) and (orientation: portrait) {
+        @media (max-width: 767px) {
             html, body {
-                height: 100%;
-                overflow-x: hidden;
-            }
-            body.mobile-details-folded {
-                overflow: hidden !important;
-                padding-bottom: 2.5rem !important; /* Espacio para el ticker */
-            }
-            body.mobile-details-folded #main-content {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                gap: 0.45rem !important;
-                padding-bottom: 0 !important;
-                margin-bottom: 0 !important;
-                overflow: hidden !important;
-            }
-            body.mobile-details-folded #live-jornada-banner {
-                flex: 1 1 auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                min-height: 0 !important;
-                padding: 0.65rem 0.75rem !important;
-                gap: 0.4rem !important;
-            }
-            body.mobile-details-folded #hero-pillars-grid {
-                flex: 1 1 auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                gap: 0.35rem !important;
-                min-height: 0 !important;
-            }
-            body.mobile-details-folded #user-summary-card {
-                flex: 1 1 auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                min-height: 0 !important;
-                padding: 0.45rem 0.6rem !important;
-            }
-            body.mobile-details-folded #mobile-dobles-sella-card {
-                flex: 0 0 auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                padding: 0.45rem 0.6rem !important;
-                min-height: 0 !important;
-            }
-            body.mobile-details-folded #hero-secondary-pillars {
-                display: none !important;
-            }
-            body.mobile-details-folded #live-banner-actions {
-                flex-shrink: 0 !important;
-            }
-            body.mobile-details-folded #live-banner-actions a {
-                padding-top: 0.6rem !important;
-                padding-bottom: 0.6rem !important;
-            }
-            body.mobile-details-folded #details-extra-section {
-                flex-shrink: 0 !important;
-                margin-bottom: 0.15rem !important;
-            }
-
-            /* Cuando se despliegan los detalles en móvil vertical: permitir scroll vertical fluido */
-            body.mobile-details-open {
-                overflow-y: auto !important;
-                height: auto !important;
-            }
-            body.mobile-details-open #main-content {
-                display: block !important;
                 height: auto !important;
                 min-height: 100% !important;
-                padding-bottom: 4rem !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
             }
-            body.mobile-details-open #live-jornada-banner {
-                display: block !important;
+            body {
+                padding-bottom: 4rem !important; /* Margen para que el ticker inferior nunca tape el contenido */
             }
-            body.mobile-details-open #hero-pillars-grid {
+            #main-content {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.65rem !important;
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+                padding-bottom: 1rem !important;
+                margin-bottom: 0 !important;
+            }
+            #live-jornada-banner {
+                flex: none !important;
+                height: auto !important;
+                min-height: auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.6rem !important;
+                padding: 0.75rem 0.85rem !important;
+            }
+            #hero-pillars-grid {
+                flex: none !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.65rem !important;
+                height: auto !important;
+                min-height: auto !important;
+            }
+            #user-summary-card {
+                flex: none !important;
+                height: auto !important;
+                min-height: auto !important;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 0.5rem !important;
+                padding: 0.65rem 0.75rem !important;
+                overflow: hidden !important;
             }
-            body.mobile-details-open #mobile-dobles-sella-card {
+            #mobile-dobles-sella-card {
+                flex: none !important;
+                height: auto !important;
+                min-height: auto !important;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 0.5rem !important;
+                padding: 0.65rem 0.75rem !important;
+                overflow: hidden !important;
             }
-            body.mobile-details-open #hero-secondary-pillars {
+            #hero-secondary-pillars {
                 display: none !important;
+            }
+            #live-banner-actions {
+                flex: none !important;
+                gap: 0.4rem !important;
+            }
+            #live-banner-actions a {
+                padding-top: 0.65rem !important;
+                padding-bottom: 0.65rem !important;
+            }
+            #details-extra-section {
+                flex: none !important;
+                height: auto !important;
+                min-height: auto !important;
+                margin-bottom: 0.5rem !important;
             }
         }
 
-        /* ==========================================================================
-           MODO HORIZONTAL / PAISAJE (SCROLL VERTICAL SIEMPRE HABILITADO)
-           ========================================================================== */
+        /* Landscape en móvil o tablet */
         @media (orientation: landscape) and (max-height: 650px), (orientation: landscape) and (max-width: 1024px) {
             html, body {
                 height: auto !important;
@@ -516,49 +496,35 @@
                 overflow-x: hidden !important;
                 -webkit-overflow-scrolling: touch !important;
             }
-            body.mobile-details-folded,
-            body.mobile-details-open,
             body {
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
-                height: auto !important;
-                min-height: 100vh !important;
                 padding-bottom: 4.5rem !important;
             }
-            #main-content,
-            body.mobile-details-folded #main-content,
-            body.mobile-details-open #main-content {
-                display: block !important;
+            #main-content {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.75rem !important;
                 height: auto !important;
                 min-height: auto !important;
                 overflow: visible !important;
-                overflow-y: visible !important;
-                padding-bottom: 3rem !important;
+                padding-bottom: 2rem !important;
             }
-            #live-jornada-banner,
-            body.mobile-details-folded #live-jornada-banner {
-                display: block !important;
+            #live-jornada-banner {
                 flex: none !important;
-                min-height: auto !important;
                 height: auto !important;
+                min-height: auto !important;
             }
-            #hero-pillars-grid,
-            body.mobile-details-folded #hero-pillars-grid {
+            #hero-pillars-grid {
+                flex: none !important;
                 display: flex !important;
                 flex-direction: column !important;
-                flex: none !important;
-                min-height: auto !important;
+                gap: 0.75rem !important;
                 height: auto !important;
-                gap: 0.5rem !important;
+                min-height: auto !important;
             }
-            #hero-secondary-pillars,
-            body.mobile-details-folded #hero-secondary-pillars {
+            #hero-secondary-pillars {
                 display: grid !important;
                 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
                 gap: 0.5rem !important;
-                flex: none !important;
-                min-height: auto !important;
-                height: auto !important;
             }
         }
 </style>
@@ -1371,37 +1337,16 @@
                     return;
                 }
 
-                // En móvil vertical (portrait)
-                if (det && det.open) {
-                    document.body.classList.remove('mobile-details-folded');
-                    document.body.classList.add('mobile-details-open');
-                    document.body.style.overflowY = 'auto';
-                    document.documentElement.style.overflowY = 'auto';
-                    if (main) {
-                        main.style.height = 'auto';
-                        main.style.minHeight = '100%';
-                        main.style.overflow = 'visible';
-                    }
-                } else {
-                    document.body.classList.remove('mobile-details-open');
-                    document.body.classList.add('mobile-details-folded');
-                    document.body.style.overflowY = '';
-                    document.documentElement.style.overflowY = '';
-
-                    // Medir altura real del viewport disponible en el dispositivo móvil
-                    var vh = window.innerHeight;
-                    var tickerH = ticker ? ticker.offsetHeight : 36;
-                    var topPadding = 8; // p-2 superior en móvil
-                    var bottomSafety = 6;
-                    var targetHeight = vh - tickerH - topPadding - bottomSafety;
-
-                    if (main && targetHeight > 420) {
-                        main.style.height = targetHeight + 'px';
-                        main.style.minHeight = targetHeight + 'px';
-                    } else if (main) {
-                        main.style.height = 'auto';
-                        main.style.minHeight = '100%';
-                    }
+                // En móvil (cualquier dispositivo como Samsung Galaxy, iPhone, etc.):
+                // Garantizar siempre scroll vertical natural y fluido sin colapsar ni solapar tarjetas
+                document.body.classList.remove('mobile-details-folded');
+                document.body.classList.add('mobile-details-open');
+                document.body.style.overflowY = 'auto';
+                document.documentElement.style.overflowY = 'auto';
+                if (main) {
+                    main.style.height = 'auto';
+                    main.style.minHeight = '100%';
+                    main.style.overflow = 'visible';
                 }
             }
 
