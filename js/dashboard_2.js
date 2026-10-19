@@ -1033,10 +1033,11 @@ class Dashboard2AppController {
             if (elPigReminder) elPigReminder.classList.add('hidden');
         }
 
-        // 3. Fila A: Aciertos de la Jornada en Curso (y enlace a la Matriz de desglose)
+        // 3. Fila A: Aciertos de la Jornada en Curso (y enlace al Boleto del Socio en esa jornada)
         const elLiveHits = document.getElementById('user-card-live-hits');
         const elLiveHitsLabel = document.getElementById('user-card-live-hits-label');
-        const elMatrixLink = document.getElementById('user-card-matrix-link');
+        const elBoletoLink = document.getElementById('user-card-boleto-link');
+        const elBoletoText = document.getElementById('user-card-boleto-text');
 
         let userLiveHits = 0;
         if (userMember && nextJ) {
@@ -1065,8 +1066,13 @@ class Dashboard2AppController {
                 elLiveHitsLabel.textContent = 'por disputar';
             }
         }
-        if (elMatrixLink) {
-            elMatrixLink.href = 'clasificacion_2.html?view=matrix';
+        if (elBoletoLink) {
+            const jParam = nextJ ? `&jId=${encodeURIComponent(nextJ.id)}` : '';
+            const mParam = userMember ? `&mId=${encodeURIComponent(userMember.id)}` : '';
+            elBoletoLink.href = `pronosticos_2.html?openEditor=true${jParam}${mParam}`;
+        }
+        if (elBoletoText) {
+            elBoletoText.textContent = '🎫 Ver mi boleto →';
         }
 
         // 4. Fila B: Puntos Totales Acumulados y Puesto en la Clasificación (y enlace a Sellar)
@@ -1125,11 +1131,9 @@ class Dashboard2AppController {
             }
         }
 
-        if (elSealLink) {
-            elSealLink.href = 'clasificacion_2.html';
-        }
-        if (elSealText) {
-            elSealText.textContent = '🏆 Clasificación →';
+        const elMatrixLink = document.getElementById('user-card-matrix-link');
+        if (elMatrixLink) {
+            elMatrixLink.href = 'clasificacion_2.html?view=matrix';
         }
 
         // 5. Fila Estado de Quiniela y Sellado
@@ -2553,6 +2557,168 @@ class Dashboard2AppController {
     }
 
     /**
+     * Modal para ver el Boleto individual del Socio conectado en la jornada
+     */
+    openUserBoletoModal(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const modal = document.getElementById('modal-user-boleto-view');
+        if (!modal) return;
+
+        const titleEl = document.getElementById('modal-user-boleto-title');
+        const authorEl = document.getElementById('modal-user-boleto-author');
+        const metaEl = document.getElementById('modal-user-boleto-meta');
+        const listEl = document.getElementById('modal-user-boleto-matches-list');
+        const editorLink = document.getElementById('modal-user-boleto-editor-link');
+
+        // Obtener usuario conectado
+        const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+        let user = null;
+        try { if (userStr) user = JSON.parse(userStr); } catch (err) {}
+        let userMember = null;
+        if (user && Array.isArray(this.members)) {
+            userMember = this.members.find(m => 
+                (user.id && String(m.id) === String(user.id)) ||
+                (user.email && m.email && m.email.toLowerCase() === user.email.toLowerCase()) ||
+                (user.name && m.name && m.name.toLowerCase() === user.name.toLowerCase()) ||
+                (user.phone && m.phone && m.phone.toLowerCase() === user.phone.toLowerCase())
+            );
+        }
+        if (!userMember && Array.isArray(this.members) && this.members.length > 0) {
+            userMember = this.members.find(m => m.name && m.name.toLowerCase().includes('fernando')) || this.members[0];
+        }
+
+        const targetJ = this.nextJornada;
+        const jNum = targetJ ? targetJ.number : '?';
+        const memberName = userMember ? (window.AppUtils ? window.AppUtils.getMemberName(userMember) : userMember.name) : 'Socio';
+
+        if (titleEl) {
+            titleEl.textContent = `Boleto de ${memberName} - Jornada ${jNum}`;
+        }
+        if (authorEl) {
+            authorEl.textContent = `Pronóstico individual oficial de la Peña`;
+        }
+
+        if (editorLink && targetJ && userMember) {
+            editorLink.href = `pronosticos_2.html?openEditor=true&jId=${encodeURIComponent(targetJ.id)}&mId=${encodeURIComponent(userMember.id)}`;
+        }
+
+        // Buscar pronóstico del usuario
+        let p = null;
+        if (targetJ && userMember) {
+            const nextJId = String(targetJ.id);
+            const mId = String(userMember.id);
+            if (this.pronosticosMap) {
+                p = this.pronosticosMap.get(`${nextJId}_${mId}`);
+            }
+            if (!p && Array.isArray(this.pronosticos)) {
+                p = this.pronosticos.find(pr => {
+                    if (!pr) return false;
+                    const pj = String(pr.jId !== undefined && pr.jId !== null ? pr.jId : (pr.jornadaId !== undefined ? pr.jornadaId : ''));
+                    const pm = String(pr.mId !== undefined && pr.mId !== null ? pr.mId : (pr.memberId !== undefined ? pr.memberId : ''));
+                    return pj === nextJId && pm === mId;
+                });
+            }
+        }
+
+        const matches = (targetJ && Array.isArray(targetJ.matches)) ? targetJ.matches : [];
+        const sel = p ? (Array.isArray(p.selection) ? p.selection : (Array.isArray(p.forecast) ? p.forecast : [])) : [];
+        const filled = sel.filter(s => s && String(s).trim() !== '' && String(s) !== '-').length;
+
+        if (!p || filled === 0) {
+            if (metaEl) {
+                metaEl.innerHTML = `
+                    <div class="flex items-center gap-2 text-amber-300">
+                        <span>⏳</span>
+                        <span>Aún no has registrado pronósticos para la Jornada ${jNum}.</span>
+                    </div>
+                `;
+            }
+            if (listEl) {
+                if (matches.length > 0) {
+                    listEl.innerHTML = matches.map((m, idx) => `
+                        <div class="py-2 px-1 flex items-center justify-between">
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="w-6 h-6 rounded bg-slate-800 text-slate-400 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">${idx + 1}</span>
+                                <span class="text-slate-300 truncate">${m.home || 'Local'} vs ${m.away || 'Visitante'}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-500 font-mono font-bold text-xs">-</span>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = `<div class="p-6 text-center text-slate-500 italic">No hay partidos cargados para la Jornada ${jNum}.</div>`;
+                }
+            }
+            modal.classList.remove('hidden');
+            return;
+        }
+
+        // Evaluar aciertos
+        let hits = 0;
+        let evaluated = 0;
+        const matchesRows = matches.map((m, idx) => {
+            const userSign = sel[idx] ? String(sel[idx]).trim() : '-';
+            const realResult = (m && m.result) ? String(m.result).trim() : '';
+            const hasResult = realResult !== '' && realResult !== '-' && realResult.toLowerCase() !== 'por definir';
+
+            let statusBadge = '<span class="text-slate-500 text-[10px] font-mono font-semibold">Pendiente</span>';
+            let bgClass = 'bg-slate-900/40';
+
+            if (hasResult) {
+                evaluated++;
+                const isHit = (userSign.toUpperCase() === realResult.toUpperCase());
+                if (isHit) {
+                    hits++;
+                    statusBadge = '<span class="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✅ Acertado</span>';
+                    bgClass = 'bg-emerald-950/20';
+                } else {
+                    statusBadge = '<span class="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">❌ Fallado</span>';
+                    bgClass = 'bg-rose-950/20';
+                }
+            }
+
+            const p15Tag = idx === 14 ? '<span class="px-1 py-0.2 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 ml-1">P15</span>' : '';
+
+            return `
+                <div class="py-1.5 px-2 flex items-center justify-between gap-2 rounded-lg ${bgClass} transition">
+                    <div class="flex items-center gap-2 truncate min-w-0">
+                        <span class="w-5 h-5 rounded bg-slate-800 text-slate-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">${idx + 1}</span>
+                        <span class="text-slate-200 text-xs truncate">${m.home || 'Local'} vs ${m.away || 'Visitante'}${p15Tag}</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono font-black text-xs border border-amber-500/40 shadow-sm min-w-[24px] text-center">${userSign}</span>
+                        ${hasResult ? `<span class="text-[10px] text-slate-400 font-mono">(${realResult})</span>` : ''}
+                        ${statusBadge}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (metaEl) {
+            metaEl.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-slate-300">Aciertos:</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-mono font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">${hits} / ${evaluated > 0 ? evaluated : 15}</span>
+                    ${evaluated > 0 && evaluated < 15 ? `<span class="text-[10px] text-slate-400 font-mono">(${evaluated} partidos finalizados)</span>` : ''}
+                </div>
+                <div class="text-[11px] text-slate-400 font-medium">
+                    15 pronósticos registrados
+                </div>
+            `;
+        }
+
+        if (listEl) {
+            listEl.innerHTML = matchesRows;
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    closeUserBoletoModal() {
+        const modal = document.getElementById('modal-user-boleto-view');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    /**
      * Listeners de interfaz
      */
     initUiListeners() {
@@ -2581,6 +2747,12 @@ class Dashboard2AppController {
             if (doblesModal && e.target === doblesModal) {
                 this.closeDoblesModal();
             }
+
+            // Cerrar modal de boleto del socio al pulsar sobre el fondo oscuro
+            const boletoModal = document.getElementById('modal-user-boleto-view');
+            if (boletoModal && e.target === boletoModal) {
+                this.closeUserBoletoModal();
+            }
         });
 
         // Cerrar modales al presionar la tecla Escape
@@ -2588,6 +2760,7 @@ class Dashboard2AppController {
             if (e.key === 'Escape') {
                 this.closeInfoModal();
                 this.closeDoblesModal();
+                this.closeUserBoletoModal();
                 const memModal = document.getElementById('modal-pending-members');
                 if (memModal) memModal.classList.add('hidden');
                 const dropdown = document.getElementById('nav-section-dropdown');
