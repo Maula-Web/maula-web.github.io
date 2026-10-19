@@ -185,14 +185,12 @@
         }
 
         /* Sección 'Ver más detalles': desplegada automáticamente en PC, plegable sólo en móviles */
-        @keyframes pulseGlowAmber {
+        @keyframes pulseChapa {
             0%, 100% {
-                border-color: rgba(245, 158, 11, 0.45);
-                box-shadow: 0 0 8px rgba(245, 158, 11, 0.25), inset 0 0 6px rgba(245, 158, 11, 0.1);
+                opacity: 1;
             }
             50% {
-                border-color: rgba(245, 158, 11, 0.95);
-                box-shadow: 0 0 20px rgba(245, 158, 11, 0.65), 0 0 4px rgba(251, 191, 36, 0.8), inset 0 0 12px rgba(245, 158, 11, 0.25);
+                opacity: 0.5;
             }
         }
 
@@ -200,50 +198,52 @@
             transition: all 0.3s ease;
         }
 
-        @keyframes pulseGlowAmberLight {
-            0%, 100% {
-                border-color: rgba(217, 119, 6, 0.45);
-                box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15), inset 0 0 6px rgba(245, 158, 11, 0.05);
-            }
-            50% {
-                border-color: rgba(217, 119, 6, 0.95);
-                box-shadow: 0 4px 18px rgba(217, 119, 6, 0.35), 0 0 6px rgba(251, 191, 36, 0.5), inset 0 0 10px rgba(245, 158, 11, 0.12);
-            }
-        }
-
         @media (max-width: 767px) {
             #details-extra-section {
-                border-width: 1.5px !important;
-                border-color: rgba(245, 158, 11, 0.45) !important;
+                border-width: 1px !important;
+                border-color: rgba(245, 158, 11, 0.25) !important;
                 background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 27, 75, 0.7) 100%) !important;
+                box-shadow: none !important;
             }
-            #details-extra-section:not([open]) {
-                animation: pulseGlowAmber 2.2s ease-in-out infinite !important;
+            #details-extra-section:not([open]) summary {
+                animation: pulseChapa 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+            }
+            #details-extra-section[open] summary {
+                animation: none !important;
             }
             #details-extra-section[open] {
-                border-color: rgba(245, 158, 11, 0.5) !important;
-                box-shadow: 0 0 15px rgba(245, 158, 11, 0.2) !important;
+                border-color: rgba(245, 158, 11, 0.35) !important;
+                box-shadow: none !important;
             }
 
             /* Adaptación modo claro móvil */
             html.light-theme #details-extra-section,
             body.light-theme #details-extra-section {
-                border-color: rgba(217, 119, 6, 0.45) !important;
+                border-color: rgba(217, 119, 6, 0.25) !important;
                 background: linear-gradient(135deg, #ffffff 0%, #fffdf8 100%) !important;
-                box-shadow: 0 4px 15px rgba(217, 119, 6, 0.1) !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
             }
-            html.light-theme #details-extra-section:not([open]),
-            body.light-theme #details-extra-section:not([open]) {
-                animation: pulseGlowAmberLight 2.2s ease-in-out infinite !important;
+            html.light-theme #details-extra-section:not([open]) summary,
+            body.light-theme #details-extra-section:not([open]) summary {
+                animation: pulseChapa 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+            }
+            html.light-theme #details-extra-section[open] summary,
+            body.light-theme #details-extra-section[open] summary {
+                animation: none !important;
             }
             html.light-theme #details-extra-section[open],
             body.light-theme #details-extra-section[open] {
-                border-color: rgba(217, 119, 6, 0.6) !important;
-                box-shadow: 0 4px 15px rgba(217, 119, 6, 0.15) !important;
+                border-color: rgba(217, 119, 6, 0.35) !important;
+                box-shadow: 0 1px 4px rgba(217, 119, 6, 0.08) !important;
             }
         }
 
-        /* Tipografía en modo claro para 'Ver Más Detalles' */
+        /* Tipografía y bordes en modo claro para 'Ver Más Detalles' */
+        html.light-theme #details-extra-section summary,
+        body.light-theme #details-extra-section summary {
+            background-color: rgba(245, 158, 11, 0.12) !important;
+            border-color: rgba(217, 119, 6, 0.3) !important;
+        }
         html.light-theme #details-extra-section summary span,
         html.light-theme #details-extra-section summary strong,
         body.light-theme #details-extra-section summary span,
