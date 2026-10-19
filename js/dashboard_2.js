@@ -453,7 +453,7 @@ class Dashboard2AppController {
                 if (maxLiveHits >= 0 && liveLeaders.length > 0) {
                     liveWinnerHits = maxLiveHits;
                     const leaderNames = liveLeaders.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
-                    currentWinnerName = leaderNames.slice(0, 2).join(', ') + (leaderNames.length > 2 ? ` (+${leaderNames.length - 2})` : '');
+                    currentWinnerName = leaderNames.join(', ');
                     
                     if (isNextInProgress) {
                         if (elWinnerSubtitle) {
@@ -488,13 +488,13 @@ class Dashboard2AppController {
 
             if (liveWinnerHits === null) {
                 // Jornada cerrada / no en juego: mostrar ganador de la última jornada cerrada
+                const eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
+                currentWinnerName = eligibles.filter(Boolean).join(', ') || 'Pendiente';
                 if (elWinnerSubtitle) {
                     const winJ = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
                     elWinnerSubtitle.innerHTML = `<span class="text-slate-300 font-bold">Ganador J${winJ}</span>`;
                 }
-                currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
                 if (elWinnerDetail) {
-                    const eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
                     const destJNum = targetJNum; // Próxima jornada
                     elWinnerDetail.innerHTML = `<span class="text-amber-300 font-semibold">Rellena los dobles de la Jornada ${destJNum}</span>${eligibles.length > 1 ? `<div class="text-[11px] text-slate-400 mt-0.5">Empate: ${eligibles.join(', ')}</div>` : ''}`;
                 }
@@ -561,6 +561,62 @@ class Dashboard2AppController {
                 }
                 if (elLoserDetail) {
                     elLoserDetail.innerHTML = `<span class="text-rose-300 font-medium">Sella la próxima Jornada ${nextSealJNum}</span> <span class="text-slate-400 text-[11px]">(Responsable de validar en loterías)</span>`;
+                }
+            }
+
+            // Sincronizar Tarjeta Unificada Móvil de Dobles y Sella (#mobile-dobles-sella-card)
+            const elMobileDoblesNames = document.getElementById('mobile-dobles-names');
+            const elMobileDoblesHitsBadge = document.getElementById('mobile-dobles-hits-badge');
+            const elMobileDoblesSubtitle = document.getElementById('mobile-dobles-subtitle');
+            const elMobileSellaName = document.getElementById('mobile-sella-name');
+            const elMobileSellaBadge = document.getElementById('mobile-sella-badge');
+            const elMobileSellaSubtitle = document.getElementById('mobile-sella-subtitle');
+
+            if (elMobileDoblesNames) elMobileDoblesNames.textContent = currentWinnerName;
+            if (elMobileDoblesHitsBadge) {
+                const hitsToShow = liveWinnerHits !== null ? liveWinnerHits : (lastJornadaOutcome.winnerHits !== undefined ? lastJornadaOutcome.winnerHits : null);
+                if (hitsToShow !== null && hitsToShow >= 0) {
+                    elMobileDoblesHitsBadge.classList.remove('hidden');
+                    elMobileDoblesHitsBadge.textContent = `${hitsToShow} ac.`;
+                    elMobileDoblesHitsBadge.className = isNextInProgress
+                        ? 'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse shrink-0'
+                        : 'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0';
+                } else {
+                    elMobileDoblesHitsBadge.classList.add('hidden');
+                }
+            }
+            if (elMobileDoblesSubtitle) {
+                if (isNextInProgress) {
+                    elMobileDoblesSubtitle.innerHTML = `<span class="text-emerald-400 font-semibold">Ganador provisional (J${nextJornadaNum}) · Rellenará dobles J${upcomingJornadaNum}</span>`;
+                } else {
+                    const winJ = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
+                    elMobileDoblesSubtitle.innerHTML = `<span class="text-slate-400 font-medium">Ganador J${winJ} · Rellena dobles J${targetJNum}</span>`;
+                }
+            }
+
+            const activeSellaName = (isNextInProgress && liveLoserName) ? liveLoserName : (lastJornadaOutcome.loserName || 'Pendiente');
+            if (elMobileSellaName) elMobileSellaName.textContent = activeSellaName;
+
+            if (elMobileSellaBadge) {
+                if (isNextInProgress && liveLoserName) {
+                    elMobileSellaBadge.classList.remove('hidden');
+                    const ptsText = (liveLoserPoints !== null && liveLoserPoints !== undefined) ? `${liveLoserPoints} pts` : '0 pts';
+                    elMobileSellaBadge.textContent = ptsText;
+                    elMobileSellaBadge.className = 'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse shrink-0';
+                } else if (lastJornadaOutcome.loserPoints !== undefined && lastJornadaOutcome.loserPoints !== null) {
+                    elMobileSellaBadge.classList.remove('hidden');
+                    elMobileSellaBadge.textContent = `${lastJornadaOutcome.loserPoints} pts`;
+                    elMobileSellaBadge.className = 'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0';
+                } else {
+                    elMobileSellaBadge.classList.add('hidden');
+                }
+            }
+
+            if (elMobileSellaSubtitle) {
+                if (isNextInProgress) {
+                    elMobileSellaSubtitle.textContent = `Sellaría J${upcomingJornadaNum}`;
+                } else {
+                    elMobileSellaSubtitle.textContent = `Sella J${targetJNum}`;
                 }
             }
 
@@ -948,13 +1004,6 @@ class Dashboard2AppController {
         const elPigBadge = document.getElementById('user-card-pig-badge');
         const elPigReminder = document.getElementById('user-card-pig-reminder');
         const elPigText = document.getElementById('user-card-pig-text');
-        const elStatVal = document.getElementById('user-card-stat-value');
-        const elStatLbl = document.getElementById('user-card-stat-label');
-        const elRankBadge = document.getElementById('user-card-rank-badge');
-        const elActionLink = document.getElementById('user-card-action-link');
-        const elActionText = document.getElementById('user-card-action-text');
-        const elBoteAmt = document.getElementById('user-card-bote-amount');
-        const elBoteLink = document.getElementById('user-card-bote-link');
 
         // 1. Nombre y Avatar
         const displayName = userMember 
@@ -984,7 +1033,49 @@ class Dashboard2AppController {
             if (elPigReminder) elPigReminder.classList.add('hidden');
         }
 
-        // 3. Puntuación / Aciertos, Puesto y Enlace Directo
+        // 3. Fila A: Aciertos de la Jornada en Curso (y enlace a la Matriz de desglose)
+        const elLiveHits = document.getElementById('user-card-live-hits');
+        const elLiveHitsLabel = document.getElementById('user-card-live-hits-label');
+        const elMatrixLink = document.getElementById('user-card-matrix-link');
+
+        let userLiveHits = 0;
+        if (userMember && nextJ) {
+            const p = pronosticosMap.get(`${nextJ.id}_${userMember.id}`);
+            if (p && window.ScoringSystem) {
+                const ev = window.ScoringSystem.evaluateMember(userMember, nextJ, p);
+                if (ev && ev.played && ev.hits >= 0) {
+                    userLiveHits = ev.hits;
+                }
+            }
+        }
+
+        if (elLiveHits) {
+            if (isNextInProgress || matchesWithResults > 0) {
+                elLiveHits.textContent = userLiveHits;
+                elLiveHits.className = 'text-sm sm:text-base font-black font-mono text-emerald-400 tracking-tight';
+            } else {
+                elLiveHits.textContent = nextJ ? `J.${nextJ.number}` : '--';
+                elLiveHits.className = 'text-xs sm:text-sm font-black font-mono text-amber-400 tracking-tight';
+            }
+        }
+        if (elLiveHitsLabel) {
+            if (isNextInProgress || matchesWithResults > 0) {
+                elLiveHitsLabel.textContent = `aciertos en juego (${matchesWithResults}/15)`;
+            } else {
+                elLiveHitsLabel.textContent = 'por disputar';
+            }
+        }
+        if (elMatrixLink) {
+            elMatrixLink.href = 'clasificacion_2.html?view=matrix';
+        }
+
+        // 4. Fila B: Puntos Totales Acumulados y Puesto en la Clasificación (y enlace a Sellar)
+        const elTotalPoints = document.getElementById('user-card-total-points');
+        const elTotalPointsLabel = document.getElementById('user-card-total-points-label');
+        const elRankBadge = document.getElementById('user-card-rank-badge');
+        const elSealLink = document.getElementById('user-card-seal-link');
+        const elSealText = document.getElementById('user-card-seal-text');
+
         let generalRank = 1;
         let totalPoints = 0;
         if (userMember) {
@@ -994,77 +1085,73 @@ class Dashboard2AppController {
             if (uStats) totalPoints = uStats.totalPoints || 0;
         }
 
-        if (isNextInProgress) {
-            // EN JUEGO: Nº de aciertos de la jornada en curso y puesto en la clasificación
-            let userLiveHits = 0;
-            let liveRank = generalRank;
-
-            if (userMember && matchesWithResults > 0 && nextJ) {
-                const p = pronosticosMap.get(`${nextJ.id}_${userMember.id}`);
-                if (p && window.ScoringSystem) {
-                    const ev = window.ScoringSystem.evaluateMember(userMember, nextJ, p);
-                    if (ev && ev.played && ev.hits >= 0) {
-                        userLiveHits = ev.hits;
+        // Si la jornada está en juego, calcular además su puesto en vivo
+        let liveRank = generalRank;
+        if (isNextInProgress && matchesWithResults > 0 && Array.isArray(this.members) && userMember) {
+            const liveLeaderboard = this.members.map(m => {
+                const mStat = memberStats[m.id];
+                const basePts = mStat ? mStat.totalPoints : 0;
+                const baseHits = mStat ? mStat.totalHits : 0;
+                const mp = pronosticosMap.get(`${nextJ.id}_${m.id}`);
+                let livePts = 0;
+                let liveHits = 0;
+                if (mp && window.ScoringSystem) {
+                    const mev = window.ScoringSystem.evaluateMember(m, nextJ, mp);
+                    if (mev && mev.played && mev.hits >= 0) {
+                        liveHits = mev.hits;
+                        livePts = mev.points;
                     }
                 }
+                return {
+                    id: m.id,
+                    totalLivePoints: basePts + livePts,
+                    totalLiveHits: baseHits + liveHits
+                };
+            }).sort((a, b) => b.totalLivePoints - a.totalLivePoints || b.totalLiveHits - a.totalLiveHits);
 
-                // Cálculo de clasificación en vivo acumulada
-                if (Array.isArray(this.members)) {
-                    const liveLeaderboard = this.members.map(m => {
-                        const mStat = memberStats[m.id];
-                        const basePts = mStat ? mStat.totalPoints : 0;
-                        const baseHits = mStat ? mStat.totalHits : 0;
-                        const mp = pronosticosMap.get(`${nextJ.id}_${m.id}`);
-                        let livePts = 0;
-                        let liveHits = 0;
-                        if (mp && window.ScoringSystem) {
-                            const mev = window.ScoringSystem.evaluateMember(m, nextJ, mp);
-                            if (mev && mev.played && mev.hits >= 0) {
-                                liveHits = mev.hits;
-                                livePts = mev.points;
-                            }
-                        }
-                        return {
-                            id: m.id,
-                            totalLivePoints: basePts + livePts,
-                            totalLiveHits: baseHits + liveHits
-                        };
-                    }).sort((a, b) => b.totalLivePoints - a.totalLivePoints || b.totalLiveHits - a.totalLiveHits);
-
-                    const foundLiveIndex = liveLeaderboard.findIndex(l => String(l.id) === String(userMember.id));
-                    if (foundLiveIndex !== -1) liveRank = foundLiveIndex + 1;
-                }
-            }
-
-            if (elStatVal) elStatVal.textContent = userLiveHits;
-            if (elStatLbl) elStatLbl.textContent = `aciertos en juego (${matchesWithResults}/15)`;
-            if (elRankBadge) {
-                elRankBadge.textContent = `🏆 ${liveRank}º en la clasificación`;
-                elRankBadge.className = 'px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap leading-none animate-pulse';
-            }
-            if (elActionLink) {
-                elActionLink.href = 'clasificacion_2.html?view=matrix';
-                elActionLink.className = 'text-[11px] sm:text-xs md:text-sm font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap';
-            }
-            if (elActionText) elActionText.textContent = '📊 Matriz de puntuación →';
-
-        } else {
-            // EN CUENTA ATRÁS: Puntos totales y puesto en la clasificación
-            if (elStatVal) elStatVal.textContent = totalPoints;
-            if (elStatLbl) elStatLbl.textContent = totalPoints === 1 ? 'punto total' : 'puntos totales';
-            if (elRankBadge) {
-                elRankBadge.textContent = `🏆 ${generalRank}º en la clasificación`;
-                elRankBadge.className = 'px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap leading-none';
-            }
-            if (elActionLink) {
-                const jParam = nextJ ? `&jId=${encodeURIComponent(nextJ.id)}` : '';
-                elActionLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
-                elActionLink.className = 'text-[11px] sm:text-xs md:text-sm font-bold text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap';
-            }
-            if (elActionText) elActionText.textContent = '✍️ Sellar mi quiniela →';
+            const foundLiveIndex = liveLeaderboard.findIndex(l => String(l.id) === String(userMember.id));
+            if (foundLiveIndex !== -1) liveRank = foundLiveIndex + 1;
         }
 
-        // 4. Cantidad de dinero en su bote personal con enlace directo al bote
+        if (elTotalPoints) elTotalPoints.textContent = totalPoints;
+        if (elTotalPointsLabel) elTotalPointsLabel.textContent = totalPoints === 1 ? 'pto total' : 'pts totales';
+        if (elRankBadge) {
+            const displayRank = isNextInProgress ? liveRank : generalRank;
+            elRankBadge.textContent = `🏆 ${displayRank}º en la clasificación`;
+            if (isNextInProgress) {
+                elRankBadge.className = 'px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap animate-pulse';
+            } else {
+                elRankBadge.className = 'px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-bold font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap';
+            }
+        }
+
+        if (elSealLink) {
+            const jParam = nextJ ? `&jId=${encodeURIComponent(nextJ.id)}` : '';
+            elSealLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
+        }
+        if (elSealText) {
+            elSealText.textContent = isNextInProgress ? '✍️ Ver mi quiniela →' : '✍️ Sellar quiniela →';
+        }
+
+        // 5. Fila Inferior: Caja Real y Bote Personal del Socio
+        const elCajaAmt = document.getElementById('user-card-caja-amount');
+        const elBoteAmt = document.getElementById('user-card-bote-amount');
+        const elBoteLink = document.getElementById('user-card-bote-link');
+
+        let summary = null;
+        if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
+            summary = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
+        }
+        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
+            const sd = window.BoteApp.getSeasonData();
+            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') summary = sd.summary;
+        }
+        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1091.52) : 1091.52;
+        const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro)
+            ? window.AppUtils.formatEuro(cajaReal)
+            : `${cajaReal.toFixed(2).replace('.', ',')} €`;
+        if (elCajaAmt) elCajaAmt.textContent = formattedCaja;
+
         let userSaldo = 0;
         let summaries = [];
         if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
@@ -1093,9 +1180,9 @@ class Dashboard2AppController {
         if (elBoteAmt) {
             elBoteAmt.textContent = formattedSaldo;
             if (userSaldo < 0) {
-                elBoteAmt.className = 'text-rose-400 font-mono font-black text-xs sm:text-sm md:text-base';
+                elBoteAmt.className = 'text-rose-400 font-mono font-black text-[11px] sm:text-xs md:text-sm';
             } else {
-                elBoteAmt.className = 'text-emerald-400 font-mono font-black text-xs sm:text-sm md:text-base';
+                elBoteAmt.className = 'text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm';
             }
         }
         if (elBoteLink && userMember) {

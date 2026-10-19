@@ -244,19 +244,16 @@
                 min-height: 0 !important;
                 padding: 0.45rem 0.6rem !important;
             }
-            body.mobile-details-folded #hero-secondary-pillars {
-                display: grid !important;
-                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-                gap: 0.3rem !important;
+            body.mobile-details-folded #mobile-dobles-sella-card {
                 flex: 0 0 auto !important;
-                min-height: 0 !important;
-            }
-            body.mobile-details-folded #hero-secondary-pillars > div {
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
+                padding: 0.45rem 0.6rem !important;
                 min-height: 0 !important;
-                padding: 0.35rem 0.45rem !important;
+            }
+            body.mobile-details-folded #hero-secondary-pillars {
+                display: none !important;
             }
             body.mobile-details-folded #live-banner-actions {
                 flex-shrink: 0 !important;
@@ -289,10 +286,13 @@
                 flex-direction: column !important;
                 gap: 0.5rem !important;
             }
-            body.mobile-details-open #hero-secondary-pillars {
-                display: grid !important;
-                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            body.mobile-details-open #mobile-dobles-sella-card {
+                display: flex !important;
+                flex-direction: column !important;
                 gap: 0.5rem !important;
+            }
+            body.mobile-details-open #hero-secondary-pillars {
+                display: none !important;
             }
         }
 
@@ -532,10 +532,10 @@
             <p id="live-banner-subtitle" class="hidden text-[11px] md:text-xs text-slate-400"></p>
 
             <!-- Grid de Pilares Vitales de la Peña: Tarjeta Socio Conectado (Ancho completo) + 3 Pilares Secundarios (Caja, Dobles, Sella) -->
-            <div id="hero-pillars-grid" class="flex flex-col gap-2 sm:gap-2.5 md:gap-3">
+            <div id="hero-pillars-grid" class="flex flex-col gap-2 sm:gap-2.5">
                 <!-- Ventana 1: Tarjeta Resumen del Socio Conectado (Ocupa todo el ancho) -->
-                <div id="user-summary-card" class="p-2 sm:p-2.5 md:p-3 lg:p-3.5 rounded-xl bg-gradient-to-r from-slate-950/90 via-slate-900/95 to-indigo-950/60 border border-indigo-500/40 shadow-lg flex flex-col justify-between">
-                    <!-- Fila Superior: Nombre del socio conectado y Badge PIG si existe -->
+                <div id="user-summary-card" class="p-2 sm:p-2.5 md:p-3 rounded-xl bg-gradient-to-r from-slate-950/95 via-slate-900/95 to-indigo-950/70 border border-indigo-500/40 shadow-lg flex flex-col justify-between gap-1.5">
+                    <!-- Fila 1 (Cabecera): Nombre del socio conectado y Badge PIG si existe -->
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
                             <span id="user-card-avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-xs font-bold shrink-0">👤</span>
@@ -545,51 +545,106 @@
                             </div>
                         </div>
                         <div id="user-card-pig-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse flex items-center gap-1 shrink-0">
-                            <span>🐷</span> <span class="hidden xs:inline">¡Jornada PIG!</span><span class="xs:hidden">PIG</span>
+                            <span>🐷</span> <span>¡Jornada PIG!</span>
                         </div>
                     </div>
 
-                    <!-- Fila Central: Puntuación/Aciertos, Puesto y Enlace Directo (Matriz o Sellar) -->
-                    <div class="flex items-center justify-between gap-2 my-auto py-1">
-                        <div class="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-wrap">
-                            <div class="flex items-baseline gap-1">
-                                <span id="user-card-stat-value" class="text-lg sm:text-xl md:text-2xl font-black font-mono text-emerald-400 tracking-tight leading-none">--</span>
-                                <span id="user-card-stat-label" class="text-[11px] sm:text-xs text-slate-300 font-semibold">aciertos</span>
-                            </div>
-                            <span id="user-card-rank-badge" class="px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap leading-none">
-                                --º puesto
-                            </span>
+                    <!-- Fila 2: Aciertos de la Jornada en Curso + Enlace a Matriz -->
+                    <div class="flex items-center justify-between gap-2 py-0.5 border-t border-slate-800/60">
+                        <div class="flex items-baseline gap-1.5 min-w-0">
+                            <span class="text-xs sm:text-sm">⚽</span>
+                            <span id="user-card-live-hits" class="text-sm sm:text-base font-black font-mono text-emerald-400 tracking-tight">--</span>
+                            <span id="user-card-live-hits-label" class="text-[11px] sm:text-xs text-slate-300 font-semibold truncate">aciertos en juego</span>
                         </div>
-                        <a id="user-card-action-link" href="#" class="text-[11px] sm:text-xs md:text-sm font-bold text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
-                            <span id="user-card-action-text">Sellar quiniela →</span>
+                        <a id="user-card-matrix-link" href="clasificacion_2.html?view=matrix" class="text-[11px] sm:text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
+                            <span>📊 Matriz desglose →</span>
                         </a>
                     </div>
 
-                    <!-- Fila Inferior: Bote Personal del Socio y Enlace directo al Bote -->
-                    <div class="pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
-                        <div class="flex items-center gap-1.5 truncate">
-                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">Bote personal:</span>
-                            <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-xs sm:text-sm md:text-base">-- €</strong>
+                    <!-- Fila 3: Puntos Totales en Clasificación + Enlace a Sellar / Clasificación -->
+                    <div class="flex items-center justify-between gap-2 py-0.5 border-t border-slate-800/60">
+                        <div class="flex items-baseline gap-1.5 min-w-0 flex-wrap">
+                            <span class="text-xs sm:text-sm">🏆</span>
+                            <span id="user-card-total-points" class="text-sm sm:text-base font-black font-mono text-amber-400 tracking-tight">--</span>
+                            <span id="user-card-total-points-label" class="text-[11px] sm:text-xs text-slate-300 font-semibold truncate">pts totales</span>
+                            <span id="user-card-rank-badge" class="px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-bold font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap">--º puesto</span>
                         </div>
-                        <a id="user-card-bote-link" href="bote_2.html" class="text-[10px] sm:text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline font-bold whitespace-nowrap flex items-center gap-0.5">
-                            <span>Mi Bote →</span>
+                        <a id="user-card-seal-link" href="pronosticos_2.html?openEditor=true" class="text-[11px] sm:text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
+                            <span id="user-card-seal-text">✍️ Sellar quiniela →</span>
                         </a>
+                    </div>
+
+                    <!-- Fila 4 (Inferior): Bote Personal y Caja Real -->
+                    <div class="pt-1 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
+                        <div class="flex items-center gap-1 truncate">
+                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">💰 Caja:</span>
+                            <strong id="user-card-caja-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">-- €</strong>
+                        </div>
+                        <div class="flex items-center gap-1 truncate">
+                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">👤 Mi Bote:</span>
+                            <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">-- €</strong>
+                            <a id="user-card-bote-link" href="bote_2.html" class="text-[10px] sm:text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline font-bold whitespace-nowrap ml-1">
+                                Ver →
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Recordatorio PIG (sólo visible si la jornada tiene PIG) -->
-                    <div id="user-card-pig-reminder" class="hidden mt-1 px-2 py-1 rounded bg-pink-950/60 border border-pink-500/30 text-[10px] sm:text-[11px] text-pink-200 flex items-center justify-between gap-1">
+                    <div id="user-card-pig-reminder" class="hidden px-2 py-0.5 rounded bg-pink-950/60 border border-pink-500/30 text-[10px] sm:text-[11px] text-pink-200 flex items-center justify-between gap-1">
                         <span id="user-card-pig-text" class="truncate">🐷 ¡Hay PIG esta jornada! Sella tu boleto para no pagar penalización.</span>
                         <a href="pronosticos_2.html?openEditor=true" class="text-pink-300 font-bold underline shrink-0 whitespace-nowrap">Sellar PIG →</a>
                     </div>
                 </div>
 
-                <!-- Fila 2: 3 Pilares Secundarios de la Peña (Caja, Dobles, Sella) en 3 columnas -->
-                <div id="hero-secondary-pillars" class="grid grid-cols-3 gap-1.5 sm:gap-2.5 md:gap-3">
+                <!-- Ventana 2: TARJETA UNIFICADA DE DOBLES Y SELLA (Sólo en móvil, ocupa todo el ancho) -->
+                <div id="mobile-dobles-sella-card" class="block md:hidden p-2 sm:p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30 shadow-md flex flex-col justify-between gap-1.5">
+                    <!-- Sección Dobles con todos los nombres -->
+                    <div onclick="window.DashboardApp && window.DashboardApp.openDoblesModal()" class="cursor-pointer group">
+                        <div class="flex items-center justify-between gap-1">
+                            <div class="flex items-center gap-1.5 min-w-0">
+                                <span class="text-[11px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1 shrink-0">
+                                    <span>👑</span> Dobles
+                                </span>
+                                <span id="mobile-dobles-hits-badge" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"></span>
+                            </div>
+                            <span class="text-amber-400 group-hover:text-amber-300 font-bold text-[10px] sm:text-[11px] shrink-0 group-hover:underline">Boleto →</span>
+                        </div>
+                        <!-- Nombres completos de todos los socios que rellenan dobles -->
+                        <div id="mobile-dobles-names" class="text-xs sm:text-sm font-black text-amber-300 leading-snug py-0.5 break-words">
+                            Cargando...
+                        </div>
+                        <div id="mobile-dobles-subtitle" class="text-[9px] sm:text-[10px] text-slate-400 font-medium">
+                            Ganador semanal
+                        </div>
+                    </div>
+
+                    <!-- Divisor sutil -->
+                    <div class="border-t border-slate-800/80"></div>
+
+                    <!-- Sección Sella -->
+                    <div class="flex items-center justify-between gap-1">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <span class="text-[11px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1 shrink-0">
+                                <span>✍️</span> Sella:
+                            </span>
+                            <span id="mobile-sella-name" class="text-xs sm:text-sm font-black text-rose-400 truncate">
+                                Cargando...
+                            </span>
+                            <span id="mobile-sella-badge" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0"></span>
+                        </div>
+                        <span id="mobile-sella-subtitle" class="text-[9px] sm:text-[10px] font-medium text-slate-400 whitespace-nowrap shrink-0">
+                            Sellaría sig.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Fila Escritorio: 3 Pilares Secundarios de la Peña (Caja, Dobles, Sella) en 3 columnas (Oculto en móvil) -->
+                <div id="hero-secondary-pillars" class="hidden md:grid md:grid-cols-3 gap-2 sm:gap-2.5 md:gap-3">
                     <!-- Pilar 1: 💰 Caja Real -->
                     <div class="p-2 sm:p-2.5 md:p-3 lg:p-3.5 rounded-xl bg-slate-950/70 border border-emerald-500/30 flex flex-col justify-between">
                         <div class="flex items-center justify-between gap-1">
                             <span class="text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate">
-                                <span>💰</span> <span class="hidden xs:inline">Caja Real</span><span class="xs:hidden">Caja</span>
+                                <span>💰</span> Caja Real
                             </span>
                             <a href="bote_2.html" class="text-[10px] sm:text-xs text-emerald-400 hover:underline font-bold px-1 sm:px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 shrink-0">Bote →</a>
                         </div>
@@ -597,7 +652,7 @@
                             -- €
                         </div>
                         <div class="text-[9px] sm:text-[11px] text-slate-400 font-medium truncate">
-                            Tesorería
+                            Tesorería sincronizada
                         </div>
                     </div>
 
@@ -614,11 +669,11 @@
                                 <span id="role-winner-hits-badge" class="hidden text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"></span>
                             </div>
                         </div>
-                        <div id="role-winner-name" class="text-xs sm:text-sm md:text-base lg:text-lg font-black text-amber-400 truncate tracking-tight my-auto py-0.5">
+                        <div id="role-winner-name" class="text-xs sm:text-sm md:text-base lg:text-lg font-black text-amber-400 leading-snug my-auto py-0.5 break-words">
                             Cargando...
                         </div>
                         <div class="flex items-center justify-between text-[9px] sm:text-[11px]">
-                            <span id="role-winner-subtitle" class="font-bold text-slate-300 whitespace-nowrap truncate">Ganador</span>
+                            <span id="role-winner-subtitle" class="font-bold text-slate-300 whitespace-nowrap truncate">Ganador semanal</span>
                         </div>
                         <span id="role-winner-detail" class="hidden"></span>
                     </div>
@@ -635,7 +690,7 @@
                             Cargando...
                         </div>
                         <div class="flex items-center justify-between text-[9px] sm:text-[11px]">
-                            <span id="role-loser-subtitle" class="font-bold text-slate-300 whitespace-nowrap truncate min-w-0">Sellaría sig.</span>
+                            <span id="role-loser-subtitle" class="font-bold text-slate-300 whitespace-nowrap truncate min-w-0">Sellaría la siguiente jornada</span>
                         </div>
                         <span id="role-loser-detail" class="hidden"></span>
                     </div>
