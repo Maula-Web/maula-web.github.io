@@ -20,7 +20,7 @@ class BoteManager {
             costeColumna: 0.75,
             costeDobles: 12.00,
             aportacionSemanal: 1.50,
-            costeExtraExento: 0.20,
+            costeExtraExento: 0.00,
             penalizacionMaula: 1.00,
             boteInicial: 0.00,
             temporadaActual: '2026-2027',
@@ -28,7 +28,7 @@ class BoteManager {
                 costeColumna: [{ date: '2026-08-01', value: 0.75 }],
                 costeDobles: [{ date: '2026-08-01', value: 12.00 }],
                 aportacionSemanal: [{ date: '2026-08-01', value: 1.50 }],
-                costeExtraExento: [{ date: '2026-08-01', value: 0.20 }]
+                costeExtraExento: [{ date: '2026-08-01', value: 0.00 }]
             }
         };
         this.cashPayments = []; // New - Tracks sellados paid in cash
@@ -170,7 +170,7 @@ class BoteManager {
             costeColumna: 0.75,
             costeDobles: 12.00,
             aportacionSemanal: 1.50,
-            costeExtraExento: 0.20
+            costeExtraExento: 0.00
         };
         for (const [k, defVal] of Object.entries(basePrices)) {
             if (!this.config.history[k] || !Array.isArray(this.config.history[k]) || this.config.history[k].length === 0) {

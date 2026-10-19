@@ -37,7 +37,7 @@ class BoteEngine {
             costeColumna: 0.75,
             costeDobles: 12.00,
             aportacionSemanal: 1.50,
-            costeExtraExento: 0.20,
+            costeExtraExento: 0.00,
             boteInicial: 738.68,
             penalizacionMaula: 1.00,
             penalizacionPIG: 1.00,
@@ -409,15 +409,8 @@ class BoteEngine {
             costs.columna = 0;
             costs.aportacion = 0;
         } else if (jornadaPlayed) {
-            if (infoRedist && infoRedist.payingCount > 0 && infoRedist.payingCount < numMembers) {
-                const numExempt = numMembers - infoRedist.payingCount;
-                const extraPerExempt = this.getHistoricalPrice('costeExtraExento', jDate) || 0.20;
-                costs.aportacion = baseAportacion + (numExempt * extraPerExempt);
-                costs.columna = baseColumna;
-            } else {
-                costs.aportacion = baseAportacion;
-                costs.columna = baseColumna;
-            }
+            costs.aportacion = baseAportacion;
+            costs.columna = baseColumna;
         }
 
         const matchesExtra = pronosticosExtra ? pronosticosExtra.filter(p =>
