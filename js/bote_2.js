@@ -1139,7 +1139,7 @@ class BoteAppController {
                 <span class="underline decoration-dotted decoration-slate-500">${exemptNames}</span>
                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                     <strong class="text-amber-400 block mb-1 font-bold">🎁 Socio Exento de Cuota</strong>
-                    Juega gratis esta jornada al haber obtenido premio o ganado en la jornada anterior.
+                    Juega gratis esta jornada al haber obtenido premio oficial de Loterías en la jornada anterior.
                 </div>
             </div>
         ` : '';
@@ -1378,7 +1378,7 @@ class BoteAppController {
                 icons += ' <span title="Ganador de esta jornada">👑</span>';
             }
             if (m.exento) {
-                icons += ' <span title="Juega gratis esta jornada (premio o ganador jornada previa)">🎁</span>';
+                icons += ' <span title="Juega gratis esta jornada (premio oficial en jornada previa)">🎁</span>';
             }
             if (m.isLoser || (jSummary.loserId && String(m.memberId) === String(jSummary.loserId))) {
                 icons += ' <span title="Maula de la jornada (menor puntuación, sella la próxima)">💀</span>';
@@ -1403,7 +1403,7 @@ class BoteAppController {
                                     <span>🎁</span> Cuota Gratis (Exento)
                                 </strong>
                                 <p class="leading-relaxed">
-                                    El socio no paga cuota semanal (0,00 €) al haber obtenido premio oficial o ganado en la jornada anterior.
+                                    El socio no paga cuota semanal (0,00 €) al haber obtenido premio oficial de Loterías del Estado en la jornada anterior.
                                 </p>
                             </div>
                         </div>

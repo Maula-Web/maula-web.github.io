@@ -114,8 +114,7 @@ class BoteEngine {
                 if (idx === 0) return false;
                 const prev = sortedJornadas[idx - 1];
                 const hadPrize = this.getPrizesForMemberJornada(m.id, prev, pronosticos) > 0;
-                const wasWinner = this.wasWinnerOfJornada(m.id, prev, members, sortedJornadas, pronosticos);
-                return hadPrize || wasWinner;
+                return hadPrize;
             }).map(m => m.id);
             return {
                 id: j.id,
@@ -396,8 +395,7 @@ class BoteEngine {
         if (jornadaIndex > 0) {
             const prevJornada = jornadas[jornadaIndex - 1];
             const hadPrize = this.getPrizesForMemberJornada(memberId, prevJornada, pronosticos) > 0;
-            const wasWinner = this.wasWinnerOfJornada(memberId, prevJornada, members, jornadas, pronosticos);
-            if (hadPrize || wasWinner) {
+            if (hadPrize) {
                 costs.exento = true;
             }
         }
