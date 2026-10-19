@@ -200,6 +200,17 @@
             transition: all 0.3s ease;
         }
 
+        @keyframes pulseGlowAmberLight {
+            0%, 100% {
+                border-color: rgba(217, 119, 6, 0.45);
+                box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15), inset 0 0 6px rgba(245, 158, 11, 0.05);
+            }
+            50% {
+                border-color: rgba(217, 119, 6, 0.95);
+                box-shadow: 0 4px 18px rgba(217, 119, 6, 0.35), 0 0 6px rgba(251, 191, 36, 0.5), inset 0 0 10px rgba(245, 158, 11, 0.12);
+            }
+        }
+
         @media (max-width: 767px) {
             #details-extra-section {
                 border-width: 1.5px !important;
@@ -213,6 +224,174 @@
                 border-color: rgba(245, 158, 11, 0.5) !important;
                 box-shadow: 0 0 15px rgba(245, 158, 11, 0.2) !important;
             }
+
+            /* Adaptación modo claro móvil */
+            html.light-theme #details-extra-section,
+            body.light-theme #details-extra-section {
+                border-color: rgba(217, 119, 6, 0.45) !important;
+                background: linear-gradient(135deg, #ffffff 0%, #fffdf8 100%) !important;
+                box-shadow: 0 4px 15px rgba(217, 119, 6, 0.1) !important;
+            }
+            html.light-theme #details-extra-section:not([open]),
+            body.light-theme #details-extra-section:not([open]) {
+                animation: pulseGlowAmberLight 2.2s ease-in-out infinite !important;
+            }
+            html.light-theme #details-extra-section[open],
+            body.light-theme #details-extra-section[open] {
+                border-color: rgba(217, 119, 6, 0.6) !important;
+                box-shadow: 0 4px 15px rgba(217, 119, 6, 0.15) !important;
+            }
+        }
+
+        /* Tipografía en modo claro para 'Ver Más Detalles' */
+        html.light-theme #details-extra-section summary span,
+        html.light-theme #details-extra-section summary strong,
+        body.light-theme #details-extra-section summary span,
+        body.light-theme #details-extra-section summary strong {
+            color: #92400e !important;
+        }
+
+        /* ==========================================================================
+           ADAPTACIÓN MODO CLARO DASHBOARD 2.0 (VISTA RESUMEN DEL SOCIO)
+           ========================================================================== */
+        html.light-theme #user-summary-card,
+        body.light-theme #user-summary-card {
+            background: linear-gradient(180deg, #ffffff 0%, #fffdf8 100%) !important;
+            border: 2px solid rgba(217, 119, 6, 0.45) !important;
+            box-shadow: 0 10px 25px -4px rgba(180, 83, 9, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-theme #user-card-name,
+        body.light-theme #user-card-name {
+            color: #0f172a !important;
+        }
+
+        html.light-theme #user-summary-card .border-slate-800\/80,
+        html.light-theme #user-summary-card .border-slate-800,
+        body.light-theme #user-summary-card .border-slate-800\/80,
+        body.light-theme #user-summary-card .border-slate-800 {
+            border-color: #e8dfcf !important;
+        }
+
+        html.light-theme #user-card-bote-link,
+        body.light-theme #user-card-bote-link {
+            background: #fbf8f2 !important;
+            border-color: #e8dfcf !important;
+        }
+        html.light-theme #user-card-bote-amount,
+        body.light-theme #user-card-bote-amount {
+            color: #047857 !important;
+        }
+
+        /* Semáforo en modo claro */
+        html.light-theme #user-card-forecast-status[class*="amber"],
+        body.light-theme #user-card-forecast-status[class*="amber"] {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+            border-color: #f59e0b !important;
+        }
+        html.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-status-text,
+        body.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-status-text {
+            color: #92400e !important;
+        }
+        html.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-deadline,
+        body.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-deadline {
+            color: #78350f !important;
+        }
+
+        html.light-theme #user-card-forecast-status[class*="emerald"],
+        body.light-theme #user-card-forecast-status[class*="emerald"] {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+            border-color: #10b981 !important;
+        }
+        html.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-status-text,
+        body.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-status-text {
+            color: #065f46 !important;
+        }
+        html.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-deadline,
+        body.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-deadline {
+            color: #047857 !important;
+        }
+
+        html.light-theme #user-card-forecast-status[class*="sky"],
+        body.light-theme #user-card-forecast-status[class*="sky"] {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+            border-color: #38bdf8 !important;
+        }
+        html.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-status-text,
+        body.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-status-text {
+            color: #0369a1 !important;
+        }
+        html.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-deadline,
+        body.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-deadline {
+            color: #0284c7 !important;
+        }
+
+        /* Cajas gemelas en modo claro */
+        html.light-theme #user-summary-card .border-emerald-500\/30,
+        body.light-theme #user-summary-card .border-emerald-500\/30 {
+            background: #f0fdf4 !important;
+            border-color: #a7f3d0 !important;
+        }
+        html.light-theme #user-card-live-hits,
+        body.light-theme #user-card-live-hits {
+            color: #047857 !important;
+        }
+        html.light-theme #user-card-live-hits-label,
+        body.light-theme #user-card-live-hits-label {
+            color: #334155 !important;
+        }
+        html.light-theme #user-card-boleto-link,
+        body.light-theme #user-card-boleto-link {
+            color: #047857 !important;
+            border-color: #d1fae5 !important;
+        }
+
+        html.light-theme #user-summary-card .border-amber-500\/30,
+        body.light-theme #user-summary-card .border-amber-500\/30 {
+            background: #fffdf0 !important;
+            border-color: #fde68a !important;
+        }
+        html.light-theme #user-card-rank-badge,
+        body.light-theme #user-card-rank-badge {
+            background: #fef3c7 !important;
+            color: #92400e !important;
+            border-color: #f59e0b !important;
+        }
+        html.light-theme #user-card-total-points,
+        body.light-theme #user-card-total-points {
+            color: #b45309 !important;
+        }
+        html.light-theme #user-card-total-points-label,
+        body.light-theme #user-card-total-points-label {
+            color: #475569 !important;
+        }
+        html.light-theme #user-card-matrix-link,
+        body.light-theme #user-card-matrix-link {
+            color: #0284c7 !important;
+            border-color: #fed7aa !important;
+        }
+
+        /* Píldora del Salseo en modo claro */
+        html.light-theme #user-summary-card .bg-slate-950\/80,
+        body.light-theme #user-summary-card .bg-slate-950\/80 {
+            background: #ffffff !important;
+            border-color: #e8dfcf !important;
+        }
+        html.light-theme #user-summary-card .border-l.border-slate-800,
+        body.light-theme #user-summary-card .border-l.border-slate-800 {
+            border-color: #e8dfcf !important;
+        }
+        html.light-theme #mobile-dobles-names,
+        body.light-theme #mobile-dobles-names {
+            color: #b45309 !important;
+        }
+        html.light-theme #mobile-sella-name,
+        body.light-theme #mobile-sella-name {
+            color: #be123c !important;
+        }
+        html.light-theme #user-card-caja-amount,
+        body.light-theme #user-card-caja-amount {
+            color: #0f172a !important;
         }
 
         @media (min-width: 768px) {

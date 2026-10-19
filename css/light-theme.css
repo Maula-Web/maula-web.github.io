@@ -2074,3 +2074,324 @@ html.text-size-xlarge span:not([class*="text-lg"]):not([class*="text-xl"]):not([
 .light-theme button[class*="bg-rose-600"] * {
     color: #ffffff !important;
 }
+
+/* =========================================================================
+   DASHBOARD 2.0: ADAPTACIÓN DE LA NUEVA ORGANIZACIÓN EN MODO CLARO
+   ========================================================================= */
+
+/* 1. Tarjeta Resumen del Socio Conectado (#user-summary-card) */
+.light-theme #user-summary-card,
+html.light-theme #user-summary-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fffdf8 100%) !important;
+    border: 2px solid rgba(217, 119, 6, 0.45) !important;
+    box-shadow: 0 10px 25px -4px rgba(180, 83, 9, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+.light-theme #user-card-name {
+    color: #0f172a !important;
+}
+
+.light-theme #user-summary-card span.uppercase {
+    color: #64748b !important;
+}
+
+.light-theme #user-summary-card .border-slate-800\/80,
+.light-theme #user-summary-card .border-slate-800 {
+    border-color: #e8dfcf !important;
+}
+
+/* Bolsillo Personal: Mi Bote */
+.light-theme #user-card-bote-link {
+    background: #fbf8f2 !important;
+    border: 1px solid #e8dfcf !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+.light-theme #user-card-bote-link:hover {
+    background: #fef8ee !important;
+    border-color: #d97706 !important;
+}
+.light-theme #user-card-bote-amount {
+    color: #047857 !important;
+}
+
+/* 2. Semáforo de Acción (El elemento rey) */
+/* Estado Cuenta Atrás: Pendiente de Sellar (Alerta Ámbar) */
+.light-theme #user-card-forecast-status[class*="amber"] {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+    border: 2px solid #f59e0b !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2) !important;
+}
+.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-status-text {
+    color: #92400e !important;
+}
+.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-deadline {
+    color: #78350f !important;
+}
+.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-status-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3) !important;
+}
+.light-theme #user-card-forecast-status[class*="amber"] #user-card-forecast-status-action {
+    color: #ffffff !important;
+}
+
+/* Estado Cuenta Atrás: Quiniela Enviada (Verde Esmeralda) */
+.light-theme #user-card-forecast-status[class*="emerald"] {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+    border: 1.5px solid #10b981 !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12) !important;
+}
+.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-status-text {
+    color: #065f46 !important;
+}
+.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-deadline {
+    color: #047857 !important;
+}
+.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-status-btn {
+    background: #ffffff !important;
+    border: 1.5px solid #059669 !important;
+    color: #047857 !important;
+}
+.light-theme #user-card-forecast-status[class*="emerald"] #user-card-forecast-status-action {
+    color: #047857 !important;
+}
+
+/* Estado En Juego: Quinielas disponibles (Azul Cielo / Sky) */
+.light-theme #user-card-forecast-status[class*="sky"] {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+    border: 1.5px solid #38bdf8 !important;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12) !important;
+}
+.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-status-text {
+    color: #0369a1 !important;
+}
+.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-deadline {
+    color: #0284c7 !important;
+}
+.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-status-btn {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+}
+.light-theme #user-card-forecast-status[class*="sky"] #user-card-forecast-status-action {
+    color: #ffffff !important;
+}
+
+/* 3. Cajas Gemelas de Rendimiento */
+/* Caja 1: En juego (Esmeralda) */
+.light-theme #user-summary-card .border-emerald-500\/30 {
+    background: #f0fdf4 !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.4) !important;
+}
+.light-theme #user-summary-card .border-emerald-500\/30 span:first-child {
+    color: #047857 !important;
+}
+.light-theme #user-card-live-hits {
+    color: #047857 !important;
+}
+.light-theme #user-card-live-hits-label {
+    color: #334155 !important;
+}
+.light-theme #user-card-boleto-link {
+    color: #047857 !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+.light-theme #user-card-boleto-link:hover {
+    color: #065f46 !important;
+}
+
+/* Caja 2: General (Ámbar / Oro) */
+.light-theme #user-summary-card .border-amber-500\/30 {
+    background: #fffdf0 !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.4) !important;
+}
+.light-theme #user-summary-card .border-amber-500\/30 span:first-child {
+    color: #92400e !important;
+}
+.light-theme #user-card-rank-badge {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border: 1px solid #f59e0b !important;
+}
+.light-theme #user-card-total-points {
+    color: #b45309 !important;
+}
+.light-theme #user-card-total-points-label {
+    color: #475569 !important;
+}
+.light-theme #user-card-matrix-link {
+    color: #0284c7 !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+.light-theme #user-card-matrix-link:hover {
+    color: #0369a1 !important;
+}
+
+/* 4. Píldora del Salseo (Dobles y Sella) */
+.light-theme #user-summary-card .bg-slate-950\/80 {
+    background: #ffffff !important;
+    border: 1.5px solid #e8dfcf !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+}
+.light-theme #user-summary-card .border-l.border-slate-800 {
+    border-color: #e8dfcf !important;
+}
+.light-theme #mobile-dobles-names {
+    color: #b45309 !important;
+}
+.light-theme #mobile-dobles-hits-badge {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border: 1px solid #f59e0b !important;
+}
+.light-theme #mobile-sella-name {
+    color: #be123c !important;
+}
+.light-theme #mobile-sella-badge {
+    background: #ffe4e6 !important;
+    color: #be123c !important;
+    border: 1px solid #fda4af !important;
+}
+
+/* 5. Sub-pie de Tesorería Común y PIG */
+.light-theme #user-card-caja-amount {
+    color: #0f172a !important;
+}
+.light-theme #user-summary-card a.text-slate-400 {
+    color: #b45309 !important;
+}
+.light-theme #user-card-pig-badge {
+    background: #fdf2f8 !important;
+    color: #be185d !important;
+    border: 1px solid #f472b6 !important;
+}
+.light-theme #user-card-pig-reminder {
+    background: #fdf2f8 !important;
+    color: #9d174d !important;
+    border: 1px solid #f472b6 !important;
+}
+
+/* 6. Indicadores y Cuenta Atrás del Hero Banner */
+.light-theme #live-banner-tag {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+    border: 1px solid #f59e0b !important;
+}
+.light-theme #cd-status-badge {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border: 1px solid #6ee7b7 !important;
+}
+.light-theme #countdown-timer-container .cd-digit {
+    background: #ffffff !important;
+    border: 1px solid #e5decb !important;
+    color: #b45309 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+.light-theme #countdown-timer-container #cd-secs {
+    color: #047857 !important;
+}
+.light-theme #countdown-timer-container .cd-unit {
+    color: #64748b !important;
+}
+.light-theme #cd-deadline-label {
+    color: #b45309 !important;
+}
+.light-theme #my-forecast-badge {
+    color: #b45309 !important;
+}
+.light-theme #submitted-count,
+.light-theme #total-members-count {
+    color: #0f172a !important;
+}
+.light-theme #submitted-percentage {
+    color: #047857 !important;
+}
+.light-theme #live-jornada-banner .w-full.bg-slate-950 {
+    background-color: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* 7. Grandes Botones de Acción (Desktop/Tablet) */
+.light-theme #btn-hero-rellenar {
+    background: #ecfdf5 !important;
+    border: 2px solid #059669 !important;
+    color: #047857 !important;
+}
+.light-theme #btn-hero-jornada {
+    background: #f0f9ff !important;
+    border: 2px solid #0284c7 !important;
+    color: #0369a1 !important;
+}
+.light-theme #btn-hero-clasificacion {
+    background: #faf5ff !important;
+    border: 2px solid #7c3aed !important;
+    color: #6d28d9 !important;
+}
+
+/* 8. Pilares Secundarios de Escritorio (Caja, Dobles, Sella) */
+.light-theme #hero-secondary-pillars > div:nth-child(1) {
+    background-color: #ffffff !important;
+    border: 1.5px solid #a7f3d0 !important;
+}
+.light-theme #dashboard-bote-total {
+    color: #047857 !important;
+}
+.light-theme #hero-secondary-pillars > div:nth-child(2) {
+    background-color: #ffffff !important;
+    border: 1.5px solid #fde68a !important;
+}
+.light-theme #role-winner-name {
+    color: #b45309 !important;
+}
+.light-theme #hero-secondary-pillars > div:nth-child(3) {
+    background-color: #ffffff !important;
+    border: 1.5px solid #fecdd3 !important;
+}
+.light-theme #role-loser-name {
+    color: #be123c !important;
+}
+
+/* 9. Modales de Visualización (Boleto del Socio y Dobles) */
+.light-theme #modal-user-boleto-view > div,
+.light-theme #modal-dobles-view > div {
+    background-color: #ffffff !important;
+    border: 2px solid rgba(217, 119, 6, 0.45) !important;
+    color: #0f172a !important;
+    box-shadow: 0 20px 45px -10px rgba(120, 80, 20, 0.2) !important;
+}
+.light-theme #modal-user-boleto-title {
+    color: #047857 !important;
+}
+.light-theme #modal-dobles-title {
+    color: #b45309 !important;
+}
+.light-theme #modal-user-boleto-view button[title="Cerrar"],
+.light-theme #modal-dobles-view button[title="Cerrar"] {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+.light-theme #modal-user-boleto-meta,
+.light-theme #modal-dobles-meta {
+    background-color: #fbf8f2 !important;
+    border: 1px solid #e8dfcf !important;
+    color: #334155 !important;
+}
+.light-theme #modal-user-boleto-matches-list,
+.light-theme #modal-dobles-matches-list {
+    border-color: #e8dfcf !important;
+}
+.light-theme #modal-user-boleto-matches-list > div,
+.light-theme #modal-dobles-matches-list > div {
+    border-color: #f1f5f9 !important;
+}
+.light-theme #modal-user-boleto-view .border-t,
+.light-theme #modal-dobles-view .border-t,
+.light-theme #modal-user-boleto-view .border-b,
+.light-theme #modal-dobles-view .border-b,
+.light-theme #modal-dobles-view .divide-slate-800\/60,
+.light-theme #modal-user-boleto-view .divide-slate-800\/60 {
+    border-color: #e8dfcf !important;
+}
+
