@@ -1412,7 +1412,7 @@
                 // Actualizar indicador y checkmarks en móvil
                 const mobileLabel = document.getElementById('mobile-active-view-label');
                 if (mobileLabel) {
-                    if (viewName === 'matrix') mobileLabel.innerHTML = '📊 Desglose';
+                    if (viewName === 'matrix') mobileLabel.innerHTML = '📊 Por Jornadas';
                     else if (viewName === 'chart') mobileLabel.innerHTML = '🚀 Escalada';
                     else mobileLabel.innerHTML = '🏅 Ranking';
                 }
