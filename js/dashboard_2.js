@@ -1606,9 +1606,17 @@ class Dashboard2AppController {
             action: 'inicio'
         });
 
+        // 2.c QUINIELA DE DOBLES JORNADA 16
+        items.push({
+            text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsables oficiales con derecho asignado: Heradio, Rafa y Fernando Lozano.`,
+            action: 'dobles'
+        });
+
         // 3. Líder de aciertos en vivo / Ganador de la jornada
         if (isNextInProgress && liveWinnerHits !== null && liveWinnerHits >= 0) {
             items.push({ text: `👑 <strong class="text-amber-300">Líder provisional en directo:</strong> ${liveWinnerName} encabeza la jornada con ${liveWinnerHits} aciertos.`, action: 'dobles' });
+        } else if (outcome && outcome.doblesEligibleNames && outcome.doblesEligibleNames.length > 1) {
+            items.push({ text: `✌️ <strong class="text-purple-300">Rellenan Dobles (J.${nextJ ? nextJ.number : ''}):</strong> ${outcome.doblesEligibleNames.join(', ')}.`, action: 'dobles' });
         } else if (outcome && outcome.winnerName) {
             items.push({ text: `👑 <strong class="text-amber-300">Ganador Jornada Anterior:</strong> ${outcome.winnerName} con ${outcome.winnerHits || 0} aciertos (¡hace la de dobles!).`, action: 'dobles' });
         } else {
@@ -2003,13 +2011,18 @@ class Dashboard2AppController {
         });
 
         // 6. Elegibles para siguientes dobles (Ganador + cualquiera con premio > 0)
-        const eligibleNextNames = results.filter(r => {
-            const isWinner = r.memberId === winnerCandidates[0].memberId;
-            const prizesMap = jornada.prizes || jornada.prizeRates || {};
-            let val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
-            if (typeof val === 'string') val = parseFloat(val.replace(',', '.').replace('€', '').trim());
-            return isWinner || (val > 0 && r.hasPronostico);
-        }).map(r => r.name);
+        let eligibleNextNames = [];
+        if (parseInt(jornada.number) === 14 && (jornada.season === '2026-2027' || !jornada.season)) {
+            eligibleNextNames = ["Fernando Lozano", "Heradio", "Rafa"];
+        } else {
+            eligibleNextNames = results.filter(r => {
+                const isWinner = r.memberId === winnerCandidates[0].memberId;
+                const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                let val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
+                if (typeof val === 'string') val = parseFloat(val.replace(',', '.').replace('€', '').trim());
+                return isWinner || (val > 0 && r.hasPronostico);
+            }).map(r => r.name);
+        }
 
         const prizeMoney = prizeWinners.reduce((sum, pw) => sum + (pw.prize || 0), 0);
         const doublesMoney = doublesResults.reduce((sum, dr) => sum + (dr.prize || 0), 0);

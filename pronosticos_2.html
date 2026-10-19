@@ -2173,6 +2173,21 @@
                 return window._eligibleDoublesCache.get(cacheKey);
             }
 
+            // Asignación explícita configurada en la jornada (campo doblesMembers)
+            if (Array.isArray(j.doblesMembers) && j.doblesMembers.length > 0) {
+                const list = window.app.members.filter(m => j.doblesMembers.some(id => String(id) === String(m.id)));
+                if (window._eligibleDoublesCache) window._eligibleDoublesCache.set(cacheKey, list);
+                return list;
+            }
+
+            // Jornada 16 (Temporada 2026-2027): Asignación acordada oficialmente para Heradio (8), Rafa (16) y Fernando Lozano (6)
+            if (parseInt(j.number) === 16 && (j.season === '2026-2027' || !j.season || String(j.id) === '1791829029011')) {
+                const j16AssignedIds = ['6', '8', '16'];
+                const list = window.app.members.filter(m => j16AssignedIds.includes(String(m.id)));
+                if (window._eligibleDoublesCache) window._eligibleDoublesCache.set(cacheKey, list);
+                return list;
+            }
+
             const list = [];
             if (typeof window.app.checkEligibility === 'function') {
                 for (const m of window.app.members) {
@@ -2210,6 +2225,12 @@
                         list.push(mem);
                     }
                 });
+            }
+
+            if (parseInt(j.number) === 16) {
+                // Seguridad adicional: asegurar que Luismi (id 13) no quede seleccionado en J16
+                const idxLuismi = list.findIndex(m => String(m.id) === '13');
+                if (idxLuismi !== -1) list.splice(idxLuismi, 1);
             }
 
             if (window._eligibleDoublesCache) {

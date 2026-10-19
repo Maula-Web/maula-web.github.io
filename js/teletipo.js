@@ -282,6 +282,12 @@
                 url: 'dashboard_2.html'
             });
 
+            // NOTICIA 2.c: QUINIELA DE DOBLES JORNADA 16
+            items.push({
+                text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsables oficiales con derecho asignado: Heradio, Rafa y Fernando Lozano.`,
+                url: 'pronosticos_2.html'
+            });
+
             // NOTICIAS 2 Y 3: MARCADORES Y RESULTADOS COMPLETOS DE LA JORNADA EN CURSO O RECIENTE
             if (activeMatchJ && Array.isArray(activeMatchJ.matches)) {
                 const validMatches = activeMatchJ.matches.filter(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-');

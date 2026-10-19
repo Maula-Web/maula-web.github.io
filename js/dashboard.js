@@ -777,21 +777,26 @@ class DashboardManager {
             .map(r => ({ name: r.name, hits: r.hits }));
 
         // All eligible for NEXT dobles: Absolute Winner + anyone with a monetary prize > 0
-        const eligibleNextNames = results
-            .filter(r => {
-                const isWinner = r.memberId === winnerCandidates[0].memberId;
-                const prizesMap = jornada.prizes || jornada.prizeRates || {};
-                const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
+        let eligibleNextNames = [];
+        if (parseInt(jornada.number) === 14 && (jornada.season === '2026-2027' || !jornada.season)) {
+            eligibleNextNames = ["Fernando Lozano", "Heradio", "Rafa"];
+        } else {
+            eligibleNextNames = results
+                .filter(r => {
+                    const isWinner = r.memberId === winnerCandidates[0].memberId;
+                    const prizesMap = jornada.prizes || jornada.prizeRates || {};
+                    const val = prizesMap[r.hits] || prizesMap[String(r.hits)] || 0;
 
-                let numVal = val;
-                if (typeof val === 'string') {
-                    numVal = parseFloat(val.replace(',', '.').replace('€', '').trim());
-                }
-                const hasPrize = numVal > 0;
+                    let numVal = val;
+                    if (typeof val === 'string') {
+                        numVal = parseFloat(val.replace(',', '.').replace('€', '').trim());
+                    }
+                    const hasPrize = numVal > 0;
 
-                return isWinner || (hasPrize && r.hasPronostico);
-            })
-            .map(r => r.name);
+                    return isWinner || (hasPrize && r.hasPronostico);
+                })
+                .map(r => r.name);
+        }
 
         // Remove duplicates and sort
         const doblesEligibleNames = [...new Set(eligibleNextNames)].sort();
