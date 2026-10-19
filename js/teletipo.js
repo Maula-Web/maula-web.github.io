@@ -276,6 +276,12 @@
                 url: 'juego.html'
             });
 
+            // NOTICIA 2.b: NOVEDAD WEB - Tarjeta personal del Socio Conectado
+            items.push({
+                text: `👤 <strong class="text-amber-400">Novedad Dashboard:</strong> Nueva tarjeta del Socio Conectado a pantalla completa con aciertos, puesto en clasificación, saldo de bote personal y alerta de PIG.`,
+                url: 'dashboard_2.html'
+            });
+
             // NOTICIAS 2 Y 3: MARCADORES Y RESULTADOS COMPLETOS DE LA JORNADA EN CURSO O RECIENTE
             if (activeMatchJ && Array.isArray(activeMatchJ.matches)) {
                 const validMatches = activeMatchJ.matches.filter(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-');

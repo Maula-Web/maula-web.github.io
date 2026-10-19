@@ -230,29 +230,44 @@
             }
             body.mobile-details-folded #hero-pillars-grid {
                 flex: 1 1 auto !important;
-                display: grid !important;
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-                grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
-                gap: 0.45rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                gap: 0.35rem !important;
                 min-height: 0 !important;
             }
-            body.mobile-details-folded #hero-pillars-grid > div {
+            body.mobile-details-folded #user-summary-card {
+                flex: 1 1 auto !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
                 min-height: 0 !important;
-                padding: 0.55rem 0.65rem !important;
+                padding: 0.45rem 0.6rem !important;
+            }
+            body.mobile-details-folded #hero-secondary-pillars {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 0.3rem !important;
+                flex: 0 0 auto !important;
+                min-height: 0 !important;
+            }
+            body.mobile-details-folded #hero-secondary-pillars > div {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                min-height: 0 !important;
+                padding: 0.35rem 0.45rem !important;
             }
             body.mobile-details-folded #live-banner-actions {
                 flex-shrink: 0 !important;
             }
             body.mobile-details-folded #live-banner-actions a {
-                padding-top: 0.7rem !important;
-                padding-bottom: 0.7rem !important;
+                padding-top: 0.6rem !important;
+                padding-bottom: 0.6rem !important;
             }
             body.mobile-details-folded #details-extra-section {
                 flex-shrink: 0 !important;
-                margin-bottom: 0.2rem !important;
+                margin-bottom: 0.15rem !important;
             }
 
             /* Cuando se despliegan los detalles en móvil vertical: permitir scroll vertical fluido */
@@ -270,8 +285,14 @@
                 display: block !important;
             }
             body.mobile-details-open #hero-pillars-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+            }
+            body.mobile-details-open #hero-secondary-pillars {
                 display: grid !important;
-                grid-template-rows: auto !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
             }
         }
 
@@ -314,17 +335,19 @@
             }
             #hero-pillars-grid,
             body.mobile-details-folded #hero-pillars-grid {
-                display: grid !important;
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-                grid-template-rows: auto !important;
+                display: flex !important;
+                flex-direction: column !important;
                 flex: none !important;
                 min-height: auto !important;
                 height: auto !important;
                 gap: 0.5rem !important;
             }
-            #hero-pillars-grid > div,
-            body.mobile-details-folded #hero-pillars-grid > div {
-                display: flex !important;
+            #hero-secondary-pillars,
+            body.mobile-details-folded #hero-secondary-pillars {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
+                flex: none !important;
                 min-height: auto !important;
                 height: auto !important;
             }
@@ -508,81 +531,114 @@
 
             <p id="live-banner-subtitle" class="hidden text-[11px] md:text-xs text-slate-400"></p>
 
-            <!-- Grid de los 4 Pilares Vitales de la Peña (Nivel 1: Caja y PIG | Nivel 2: Dobles y Sella) -->
-            <div id="hero-pillars-grid" class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-                <!-- Pilar 1: 💰 Caja de la Peña -->
-                <div class="p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-emerald-500/30 flex flex-col justify-between">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1">
-                            <span>💰</span> Caja Real
-                        </span>
-                        <a href="bote_2.html" class="text-[11px] sm:text-xs md:text-sm text-emerald-400 hover:underline font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30">Bote →</a>
+            <!-- Grid de Pilares Vitales de la Peña: Tarjeta Socio Conectado (Ancho completo) + 3 Pilares Secundarios (Caja, Dobles, Sella) -->
+            <div id="hero-pillars-grid" class="flex flex-col gap-2 sm:gap-2.5 md:gap-3">
+                <!-- Ventana 1: Tarjeta Resumen del Socio Conectado (Ocupa todo el ancho) -->
+                <div id="user-summary-card" class="p-2 sm:p-2.5 md:p-3 lg:p-3.5 rounded-xl bg-gradient-to-r from-slate-950/90 via-slate-900/95 to-indigo-950/60 border border-indigo-500/40 shadow-lg flex flex-col justify-between">
+                    <!-- Fila Superior: Nombre del socio conectado y Badge PIG si existe -->
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <span id="user-card-avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-xs font-bold shrink-0">👤</span>
+                            <div class="truncate">
+                                <span class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Socio Conectado</span>
+                                <h3 id="user-card-name" class="text-xs sm:text-sm md:text-base font-black text-amber-300 leading-tight truncate">Cargando...</h3>
+                            </div>
+                        </div>
+                        <div id="user-card-pig-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse flex items-center gap-1 shrink-0">
+                            <span>🐷</span> <span class="hidden xs:inline">¡Jornada PIG!</span><span class="xs:hidden">PIG</span>
+                        </div>
                     </div>
-                    <div id="dashboard-bote-total" class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black font-mono text-emerald-400 tracking-tight my-auto py-1">
-                        -- €
+
+                    <!-- Fila Central: Puntuación/Aciertos, Puesto y Enlace Directo (Matriz o Sellar) -->
+                    <div class="flex items-center justify-between gap-2 my-auto py-1">
+                        <div class="flex items-baseline gap-1.5 sm:gap-2 min-w-0 flex-wrap">
+                            <div class="flex items-baseline gap-1">
+                                <span id="user-card-stat-value" class="text-lg sm:text-xl md:text-2xl font-black font-mono text-emerald-400 tracking-tight leading-none">--</span>
+                                <span id="user-card-stat-label" class="text-[11px] sm:text-xs text-slate-300 font-semibold">aciertos</span>
+                            </div>
+                            <span id="user-card-rank-badge" class="px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap leading-none">
+                                --º puesto
+                            </span>
+                        </div>
+                        <a id="user-card-action-link" href="#" class="text-[11px] sm:text-xs md:text-sm font-bold text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
+                            <span id="user-card-action-text">Sellar quiniela →</span>
+                        </a>
                     </div>
-                    <div class="text-[11px] sm:text-xs text-slate-400 font-medium">
-                        Tesorería sincronizada
+
+                    <!-- Fila Inferior: Bote Personal del Socio y Enlace directo al Bote -->
+                    <div class="pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">Bote personal:</span>
+                            <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-xs sm:text-sm md:text-base">-- €</strong>
+                        </div>
+                        <a id="user-card-bote-link" href="bote_2.html" class="text-[10px] sm:text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline font-bold whitespace-nowrap flex items-center gap-0.5">
+                            <span>Mi Bote →</span>
+                        </a>
+                    </div>
+
+                    <!-- Recordatorio PIG (sólo visible si la jornada tiene PIG) -->
+                    <div id="user-card-pig-reminder" class="hidden mt-1 px-2 py-1 rounded bg-pink-950/60 border border-pink-500/30 text-[10px] sm:text-[11px] text-pink-200 flex items-center justify-between gap-1">
+                        <span id="user-card-pig-text" class="truncate">🐷 ¡Hay PIG esta jornada! Sella tu boleto para no pagar penalización.</span>
+                        <a href="pronosticos_2.html?openEditor=true" class="text-pink-300 font-bold underline shrink-0 whitespace-nowrap">Sellar PIG →</a>
                     </div>
                 </div>
 
-                <!-- Pilar 2: 🐷 Partido PIG -->
-                <div id="hero-pig-card" class="p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between">
-                    <div>
+                <!-- Fila 2: 3 Pilares Secundarios de la Peña (Caja, Dobles, Sella) en 3 columnas -->
+                <div id="hero-secondary-pillars" class="grid grid-cols-3 gap-1.5 sm:gap-2.5 md:gap-3">
+                    <!-- Pilar 1: 💰 Caja Real -->
+                    <div class="p-2 sm:p-2.5 md:p-3 lg:p-3.5 rounded-xl bg-slate-950/70 border border-emerald-500/30 flex flex-col justify-between">
                         <div class="flex items-center justify-between gap-1">
-                            <span id="hero-pig-title" class="text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1">
-                                <span>🐷</span> Partido PIG
+                            <span class="text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate">
+                                <span>💰</span> <span class="hidden xs:inline">Caja Real</span><span class="xs:hidden">Caja</span>
                             </span>
+                            <a href="bote_2.html" class="text-[10px] sm:text-xs text-emerald-400 hover:underline font-bold px-1 sm:px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 shrink-0">Bote →</a>
                         </div>
-                        <div class="flex items-center justify-start mt-1">
-                            <span id="hero-pig-badge" class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700 shrink-0">
-                                Sin PIG
-                            </span>
+                        <div id="dashboard-bote-total" class="text-base sm:text-xl md:text-2xl lg:text-3xl font-black font-mono text-emerald-400 tracking-tight my-auto py-0.5 truncate">
+                            -- €
+                        </div>
+                        <div class="text-[9px] sm:text-[11px] text-slate-400 font-medium truncate">
+                            Tesorería
                         </div>
                     </div>
-                    <div id="hero-pig-text" class="text-xs sm:text-sm md:text-base font-bold text-slate-200 leading-snug my-auto py-1">
-                        Sin derbi entre los 3 grandes
-                    </div>
-                    <div id="hero-pig-sub" class="text-[10px] sm:text-[11px] text-pink-300 font-medium min-h-[14px]"></div>
-                </div>
 
-                <!-- Pilar 3: 👑 Quién hace Dobles -->
-                <div onclick="window.DashboardApp && window.DashboardApp.openDoblesModal()" class="p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-amber-500/30 hover:border-amber-500/60 transition-colors flex flex-col justify-between cursor-pointer group">
-                    <div>
+                    <!-- Pilar 2: 👑 Dobles -->
+                    <div onclick="window.DashboardApp && window.DashboardApp.openDoblesModal()" class="p-2 sm:p-2.5 md:p-3 lg:p-3.5 rounded-xl bg-slate-950/70 border border-amber-500/30 hover:border-amber-500/60 transition-colors flex flex-col justify-between cursor-pointer group">
+                        <div>
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate">
+                                    <span>👑</span> Dobles
+                                </span>
+                                <span class="text-amber-400 group-hover:text-amber-300 font-bold flex items-center gap-0.5 group-hover:underline shrink-0 text-[10px] sm:text-xs">Boleto →</span>
+                            </div>
+                            <div class="flex items-center justify-start mt-0.5">
+                                <span id="role-winner-hits-badge" class="hidden text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"></span>
+                            </div>
+                        </div>
+                        <div id="role-winner-name" class="text-xs sm:text-sm md:text-base lg:text-lg font-black text-amber-400 truncate tracking-tight my-auto py-0.5">
+                            Cargando...
+                        </div>
+                        <div class="flex items-center justify-between text-[9px] sm:text-[11px]">
+                            <span id="role-winner-subtitle" class="font-bold text-slate-300 whitespace-nowrap truncate">Ganador</span>
+                        </div>
+                        <span id="role-winner-detail" class="hidden"></span>
+                    </div>
+
+                    <!-- Pilar 3: ✍️ Sella -->
+                    <div class="p-2 sm:p-2.5 md:p-3 lg:p-3.5 rounded-xl bg-slate-950/70 border border-rose-500/30 flex flex-col justify-between">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1">
-                                <span>👑</span> Dobles
+                            <span class="text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate">
+                                <span>✍️</span> Sella
                             </span>
-                            <span class="text-amber-400 group-hover:text-amber-300 font-bold flex items-center gap-0.5 group-hover:underline shrink-0 text-[11px] sm:text-xs md:text-sm">Boleto →</span>
+                            <span id="role-loser-badge" class="hidden text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0"></span>
                         </div>
-                        <div class="flex items-center justify-start mt-1">
-                            <span id="role-winner-hits-badge" class="hidden text-[10px] sm:text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"></span>
+                        <div id="role-loser-name" class="text-xs sm:text-sm md:text-base lg:text-lg font-black text-rose-400 truncate tracking-tight my-auto py-0.5">
+                            Cargando...
                         </div>
+                        <div class="flex items-center justify-between text-[9px] sm:text-[11px]">
+                            <span id="role-loser-subtitle" class="font-bold text-slate-300 whitespace-nowrap truncate min-w-0">Sellaría sig.</span>
+                        </div>
+                        <span id="role-loser-detail" class="hidden"></span>
                     </div>
-                    <div id="role-winner-name" class="text-lg sm:text-xl md:text-2xl font-black text-amber-400 truncate tracking-tight my-auto py-0.5">
-                        Cargando...
-                    </div>
-                    <div class="flex items-center justify-between text-[11px] sm:text-xs">
-                        <span id="role-winner-subtitle" class="font-bold text-slate-300 whitespace-nowrap">Ganador semanal</span>
-                    </div>
-                    <span id="role-winner-detail" class="hidden"></span>
-                </div>
-
-                <!-- Pilar 4: ✍️ Quién Sella -->
-                <div class="p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-rose-500/30 flex flex-col justify-between">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1">
-                            <span>✍️</span> Sella
-                        </span>
-                        <span id="role-loser-badge" class="hidden text-[10px] sm:text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0"></span>
-                    </div>
-                    <div id="role-loser-name" class="text-lg sm:text-xl md:text-2xl font-black text-rose-400 truncate tracking-tight my-auto py-1">
-                        Cargando...
-                    </div>
-                    <div class="flex items-center justify-between text-[11px] sm:text-xs">
-                        <span id="role-loser-subtitle" class="font-bold text-slate-300 whitespace-nowrap truncate min-w-0">Sellaría la siguiente jornada</span>
-                    </div>
-                    <span id="role-loser-detail" class="hidden"></span>
                 </div>
             </div>
 

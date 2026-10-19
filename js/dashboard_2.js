@@ -400,6 +400,9 @@ class Dashboard2AppController {
             this.renderSubmissionProgress(this.nextJornada, pronosticosMap);
             this.lastJornadaOutcome = lastJornadaOutcome;
 
+            // C.2. Tarjeta Resumen del Socio Conectado (Hero Pillar 1)
+            this.renderUserSummaryCard(this.nextJornada, isNextInProgress, targetJNum, matchesWithResults, sortedMembers, memberStats, pronosticosMap);
+
             // D. Widget 3: 👑 Ganador Semanal (Rellena Dobles) & Aciertos en Jornada en Juego
             const elWinnerName = document.getElementById('role-winner-name');
             const elWinnerSubtitle = document.getElementById('role-winner-subtitle');
@@ -913,6 +916,194 @@ class Dashboard2AppController {
     }
 
     /**
+     * Tarjeta Resumen del Socio Conectado (Hero Pillar 1 del Dashboard)
+     * Muestra datos personalizados del socio conectado:
+     * - Nombre arriba
+     * - Si jornada en juego: aciertos en directo y puesto en la clasificación + enlace a matriz
+     * - Si cuenta atrás: puntos totales acumulados y puesto en clasificación + enlace a sellar boleto
+     * - Bote personal con enlace directo a Mi Bote
+     * - Alerta y recordatorio de PIG si la jornada actual contiene Partido PIG
+     */
+    renderUserSummaryCard(nextJ, isNextInProgress, targetJNum, matchesWithResults, sortedMembers = [], memberStats = {}, pronosticosMap = new Map()) {
+        const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+        let user = null;
+        try { if (userStr) user = JSON.parse(userStr); } catch (e) {}
+
+        let userMember = null;
+        if (user && Array.isArray(this.members)) {
+            userMember = this.members.find(m => 
+                (user.id && String(m.id) === String(user.id)) ||
+                (user.email && m.email && m.email.toLowerCase() === user.email.toLowerCase()) ||
+                (user.name && m.name && m.name.toLowerCase() === user.name.toLowerCase()) ||
+                (user.phone && m.phone && m.phone.toLowerCase() === user.phone.toLowerCase())
+            );
+        }
+        // Fallback para testing o sin login: Fernando Lozano o primer socio
+        if (!userMember && Array.isArray(this.members) && this.members.length > 0) {
+            userMember = this.members.find(m => m.name && m.name.toLowerCase().includes('fernando')) || this.members[0];
+        }
+
+        const elCardName = document.getElementById('user-card-name');
+        const elCardAvatar = document.getElementById('user-card-avatar');
+        const elPigBadge = document.getElementById('user-card-pig-badge');
+        const elPigReminder = document.getElementById('user-card-pig-reminder');
+        const elPigText = document.getElementById('user-card-pig-text');
+        const elStatVal = document.getElementById('user-card-stat-value');
+        const elStatLbl = document.getElementById('user-card-stat-label');
+        const elRankBadge = document.getElementById('user-card-rank-badge');
+        const elActionLink = document.getElementById('user-card-action-link');
+        const elActionText = document.getElementById('user-card-action-text');
+        const elBoteAmt = document.getElementById('user-card-bote-amount');
+        const elBoteLink = document.getElementById('user-card-bote-link');
+
+        // 1. Nombre y Avatar
+        const displayName = userMember 
+            ? (window.AppUtils ? window.AppUtils.getMemberName(userMember) : userMember.name)
+            : 'Socio Peña';
+        if (elCardName) {
+            elCardName.textContent = displayName;
+            elCardName.title = userMember ? userMember.name : '';
+        }
+        if (elCardAvatar && userMember) {
+            const initial = (displayName || 'S').trim().charAt(0).toUpperCase();
+            elCardAvatar.textContent = initial || '👤';
+        }
+
+        // 2. Alerta y Recordatorio PIG (sólo si hay PIG en la jornada)
+        const nextPigInfo = nextJ ? this.findPigMatch(nextJ) : null;
+        const nextHasPig = nextPigInfo !== null;
+
+        if (nextHasPig && nextPigInfo && nextPigInfo.match) {
+            if (elPigBadge) elPigBadge.classList.remove('hidden');
+            if (elPigReminder) elPigReminder.classList.remove('hidden');
+            if (elPigText) {
+                elPigText.textContent = `🐷 ¡Hay PIG en J${nextJ ? nextJ.number : ''}! (${nextPigInfo.match.home} vs ${nextPigInfo.match.away}). Sella tu quiniela para no pagar penalización.`;
+            }
+        } else {
+            if (elPigBadge) elPigBadge.classList.add('hidden');
+            if (elPigReminder) elPigReminder.classList.add('hidden');
+        }
+
+        // 3. Puntuación / Aciertos, Puesto y Enlace Directo
+        let generalRank = 1;
+        let totalPoints = 0;
+        if (userMember) {
+            const idx = sortedMembers.findIndex(sm => String(sm.id) === String(userMember.id));
+            if (idx !== -1) generalRank = idx + 1;
+            const uStats = memberStats[userMember.id];
+            if (uStats) totalPoints = uStats.totalPoints || 0;
+        }
+
+        if (isNextInProgress) {
+            // EN JUEGO: Nº de aciertos de la jornada en curso y puesto en la clasificación
+            let userLiveHits = 0;
+            let liveRank = generalRank;
+
+            if (userMember && matchesWithResults > 0 && nextJ) {
+                const p = pronosticosMap.get(`${nextJ.id}_${userMember.id}`);
+                if (p && window.ScoringSystem) {
+                    const ev = window.ScoringSystem.evaluateMember(userMember, nextJ, p);
+                    if (ev && ev.played && ev.hits >= 0) {
+                        userLiveHits = ev.hits;
+                    }
+                }
+
+                // Cálculo de clasificación en vivo acumulada
+                if (Array.isArray(this.members)) {
+                    const liveLeaderboard = this.members.map(m => {
+                        const mStat = memberStats[m.id];
+                        const basePts = mStat ? mStat.totalPoints : 0;
+                        const baseHits = mStat ? mStat.totalHits : 0;
+                        const mp = pronosticosMap.get(`${nextJ.id}_${m.id}`);
+                        let livePts = 0;
+                        let liveHits = 0;
+                        if (mp && window.ScoringSystem) {
+                            const mev = window.ScoringSystem.evaluateMember(m, nextJ, mp);
+                            if (mev && mev.played && mev.hits >= 0) {
+                                liveHits = mev.hits;
+                                livePts = mev.points;
+                            }
+                        }
+                        return {
+                            id: m.id,
+                            totalLivePoints: basePts + livePts,
+                            totalLiveHits: baseHits + liveHits
+                        };
+                    }).sort((a, b) => b.totalLivePoints - a.totalLivePoints || b.totalLiveHits - a.totalLiveHits);
+
+                    const foundLiveIndex = liveLeaderboard.findIndex(l => String(l.id) === String(userMember.id));
+                    if (foundLiveIndex !== -1) liveRank = foundLiveIndex + 1;
+                }
+            }
+
+            if (elStatVal) elStatVal.textContent = userLiveHits;
+            if (elStatLbl) elStatLbl.textContent = `aciertos en juego (${matchesWithResults}/15)`;
+            if (elRankBadge) {
+                elRankBadge.textContent = `🏆 ${liveRank}º en la clasificación`;
+                elRankBadge.className = 'px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap leading-none animate-pulse';
+            }
+            if (elActionLink) {
+                elActionLink.href = 'clasificacion_2.html?view=matrix';
+                elActionLink.className = 'text-[11px] sm:text-xs md:text-sm font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap';
+            }
+            if (elActionText) elActionText.textContent = '📊 Matriz de puntuación →';
+
+        } else {
+            // EN CUENTA ATRÁS: Puntos totales y puesto en la clasificación
+            if (elStatVal) elStatVal.textContent = totalPoints;
+            if (elStatLbl) elStatLbl.textContent = totalPoints === 1 ? 'punto total' : 'puntos totales';
+            if (elRankBadge) {
+                elRankBadge.textContent = `🏆 ${generalRank}º en la clasificación`;
+                elRankBadge.className = 'px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap leading-none';
+            }
+            if (elActionLink) {
+                const jParam = nextJ ? `&jId=${encodeURIComponent(nextJ.id)}` : '';
+                elActionLink.href = `pronosticos_2.html?openEditor=true${jParam}`;
+                elActionLink.className = 'text-[11px] sm:text-xs md:text-sm font-bold text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap';
+            }
+            if (elActionText) elActionText.textContent = '✍️ Sellar mi quiniela →';
+        }
+
+        // 4. Cantidad de dinero en su bote personal con enlace directo al bote
+        let userSaldo = 0;
+        let summaries = [];
+        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
+            const sd = window.BoteApp.getSeasonData();
+            if (sd && Array.isArray(sd.memberSummaries)) summaries = sd.memberSummaries;
+        }
+        if (summaries.length === 0) {
+            const cached = localStorage.getItem('maulas_bote2_members');
+            if (cached) {
+                try { summaries = JSON.parse(cached) || []; } catch(e){}
+            }
+        }
+        if (summaries.length === 0 && window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries) {
+            summaries = window.BOTE_FALLBACK_DATA['2026-2027'].memberSummaries;
+        }
+
+        if (userMember && summaries.length > 0) {
+            const s = summaries.find(mem => String(mem.id) === String(userMember.id));
+            if (s && typeof s.saldo === 'number') userSaldo = s.saldo;
+        }
+
+        const formattedSaldo = (window.AppUtils && window.AppUtils.formatEuro)
+            ? window.AppUtils.formatEuro(userSaldo)
+            : `${userSaldo.toFixed(2).replace('.', ',')} €`;
+
+        if (elBoteAmt) {
+            elBoteAmt.textContent = formattedSaldo;
+            if (userSaldo < 0) {
+                elBoteAmt.className = 'text-rose-400 font-mono font-black text-xs sm:text-sm md:text-base';
+            } else {
+                elBoteAmt.className = 'text-emerald-400 font-mono font-black text-xs sm:text-sm md:text-base';
+            }
+        }
+        if (elBoteLink && userMember) {
+            elBoteLink.href = `bote_2.html?memberId=${encodeURIComponent(userMember.id)}`;
+        }
+    }
+
+    /**
      * Widget Híbrido Rotativo: 🐸 Último Clasificado (Rana) / 🐷 Partido PIG
      */
     renderPigWidget(outcome, nextJ, lastMember, penultimateDiff, playedCount, totalMembers, liveContext = {}) {
@@ -938,148 +1129,7 @@ class Dashboard2AppController {
         const targetJNum = liveContext.targetJNum || (nextJ ? nextJ.number : '');
         const pronosticosMap = liveContext.pronosticosMap || this.pronosticosMap;
 
-        // Actualizar indicador directo en el Cuadro de Mando Principal (Pilar 2)
-        const heroPigCard = document.getElementById('hero-pig-card');
-        const heroPigTitle = document.getElementById('hero-pig-title');
-        const heroPigBadge = document.getElementById('hero-pig-badge');
-        const heroPigText = document.getElementById('hero-pig-text');
-        const heroPigSub = document.getElementById('hero-pig-sub');
-
-        if (heroPigBadge && heroPigText) {
-            if (nextHasPig && nextPigInfo && nextPigInfo.match) {
-                // SÍ HAY PIG EN LA JORNADA ACTUAL
-                if (heroPigCard) {
-                    heroPigCard.className = 'p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-pink-500/40 flex flex-col justify-between';
-                }
-                if (heroPigTitle) {
-                    heroPigTitle.innerHTML = '<span>🐷</span> Partido PIG';
-                    heroPigTitle.className = 'text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1';
-                }
-                heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse shrink-0';
-                heroPigBadge.innerHTML = '¡HAY PIG!';
-
-                // Mostrar el partido
-                const matchName = `${nextPigInfo.match.home} vs ${nextPigInfo.match.away}`;
-                heroPigText.textContent = matchName;
-                heroPigText.title = matchName;
-                heroPigText.className = 'text-xs sm:text-sm md:text-base font-black text-pink-300 leading-snug my-auto py-1 truncate';
-
-                // Número de acertantes y de socios que han fallado (sin nombres)
-                const pigMatch = nextPigInfo.match;
-                const pigRes = pigMatch.result ? String(pigMatch.result).trim().toUpperCase() : '';
-                const isPigPlayed = pigRes !== '' && pigRes !== '-' && pigRes !== 'POR DEFINIR';
-
-                let pigHitsCount = 0;
-                let pigMissCount = 0;
-
-                if (isPigPlayed && this.members && pronosticosMap) {
-                    const normPigRes = window.ScoringSystem ? window.ScoringSystem.normalizeSign(pigRes) : pigRes;
-                    this.members.forEach(m => {
-                        const p = pronosticosMap.get(`${nextJ.id}_${m.id}`);
-                        if (p) {
-                            const predArr = (p && p.selection) || (p && p.forecast);
-                            const pred = predArr && predArr[nextPigInfo.index] ? String(predArr[nextPigInfo.index]).trim().toUpperCase() : '';
-                            if (pred) {
-                                if (pred === normPigRes || pred === pigRes) {
-                                    pigHitsCount++;
-                                } else {
-                                    pigMissCount++;
-                                }
-                            }
-                        }
-                    });
-                }
-
-                if (heroPigSub) {
-                    if (isPigPlayed) {
-                        heroPigSub.innerHTML = `<span class="text-emerald-400 font-bold">${pigHitsCount} acertantes</span> • <span class="text-rose-400 font-bold">${pigMissCount} fallos</span>`;
-                    } else {
-                        heroPigSub.innerHTML = `<span class="text-slate-400">Por disputar</span> • <span class="text-pink-300 font-semibold">Penalización fallo: -${penaltyVal} €</span>`;
-                    }
-                }
-            } else {
-                // NO TIENE PIG EN LA JORNADA ACTUAL
-                // Mostrar Rendimiento Colectivo (Media de Aciertos de la Peña y % de Eficacia)
-                if (heroPigCard) {
-                    heroPigCard.className = 'p-2.5 sm:p-3 md:p-3.5 lg:p-4 rounded-xl bg-slate-950/70 border border-sky-500/30 flex flex-col justify-between';
-                }
-
-                let totalLiveHits = 0;
-                let evaluatedCount = 0;
-                if (this.members && pronosticosMap && nextJ && matchesWithResults > 0) {
-                    this.members.forEach(m => {
-                        const p = pronosticosMap.get(`${nextJ.id}_${m.id}`);
-                        if (p && window.ScoringSystem) {
-                            const ev = window.ScoringSystem.evaluateMember(m, nextJ, p);
-                            if (ev && ev.played && ev.hits >= 0) {
-                                totalLiveHits += ev.hits;
-                                evaluatedCount++;
-                            }
-                        }
-                    });
-                }
-
-                if (matchesWithResults > 0 && evaluatedCount > 0) {
-                    // En juego: media en vivo de la jornada en curso
-                    const liveAvgHits = (totalLiveHits / evaluatedCount).toFixed(1).replace('.', ',');
-                    const maxPossibleHits = evaluatedCount * matchesWithResults;
-                    const efficacyPct = maxPossibleHits > 0 ? Math.round((totalLiveHits / maxPossibleHits) * 100) : 0;
-
-                    if (heroPigTitle) {
-                        heroPigTitle.innerHTML = `<span>📊</span> Media Peña (J${targetJNum})`;
-                        heroPigTitle.className = 'text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1';
-                        heroPigTitle.title = `Media de aciertos de la Peña en Jornada ${targetJNum}`;
-                    }
-
-                    heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0 flex items-center gap-1 animate-pulse';
-                    heroPigBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${efficacyPct}% Eficacia`;
-
-                    heroPigText.textContent = `${liveAvgHits} aciertos`;
-                    heroPigText.title = `Media: ${liveAvgHits} aciertos por socio (${totalLiveHits} aciertos en total)`;
-                    heroPigText.className = 'text-lg sm:text-xl md:text-2xl font-black text-sky-300 leading-snug my-auto py-1 font-mono tracking-tight';
-
-                    if (heroPigSub) {
-                        heroPigSub.innerHTML = `<span class="text-sky-300 font-semibold">${evaluatedCount} socios en juego</span> • <span class="text-slate-400">${matchesWithResults}/15 jugados</span>`;
-                    }
-                } else if (outcome && outcome.avgHits !== undefined) {
-                    // Entre jornadas: media oficial de la última jornada disputada
-                    const prevJNum = outcome.jornadaNumber || (targetJNum - 1);
-                    const avgStr = outcome.avgHits || '0,0';
-                    const effPct = outcome.efficacyPct !== undefined ? outcome.efficacyPct : 0;
-                    const sociosCount = outcome.evaluatedCount || 19;
-
-                    if (heroPigTitle) {
-                        heroPigTitle.innerHTML = `<span>📊</span> Media Peña (J${prevJNum})`;
-                        heroPigTitle.className = 'text-[11px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1';
-                        heroPigTitle.title = `Media oficial de la Peña en Jornada ${prevJNum}`;
-                    }
-
-                    heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 shrink-0';
-                    heroPigBadge.innerHTML = `${effPct}% Eficacia`;
-
-                    heroPigText.textContent = `${avgStr} aciertos`;
-                    heroPigText.title = `Media oficial de la peña en Jornada ${prevJNum}`;
-                    heroPigText.className = 'text-lg sm:text-xl md:text-2xl font-black text-sky-300 leading-snug my-auto py-1 font-mono tracking-tight';
-
-                    if (heroPigSub) {
-                        heroPigSub.innerHTML = `<span class="text-sky-300 font-semibold">${sociosCount} socios</span> • <span class="text-slate-400">J${targetJNum} sin PIG</span>`;
-                    }
-                } else {
-                    if (heroPigTitle) {
-                        heroPigTitle.innerHTML = `<span>📊</span> Media de la Peña`;
-                    }
-                    heroPigBadge.className = 'px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700 shrink-0';
-                    heroPigBadge.innerHTML = 'Sin PIG';
-
-                    heroPigText.textContent = 'Pendiente de inicio';
-                    heroPigText.className = 'text-xs sm:text-sm font-semibold text-slate-300 leading-snug my-auto py-1';
-                    if (heroPigSub) {
-                        heroPigSub.innerHTML = `<span class="text-slate-400">Jornada ${targetJNum} sin PIG</span>`;
-                    }
-                }
-            }
-        }
-
+        // Nota: El indicador del Cuadro de Mando Principal ahora se gestiona en renderUserSummaryCard
         // Comprobar si se han sellado todos los pronósticos de la nueva jornada
         const totalSocios = (this.members && this.members.length >= 19) ? this.members.length : (this.members ? this.members.length : 19);
         const allForecastsSubmitted = (this.submittedMembers && this.submittedMembers.length >= totalSocios) ||
@@ -1366,6 +1416,12 @@ class Dashboard2AppController {
         items.push({
             text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Estreno oficial del juego <strong>Maula Hero</strong> en tu móvil. ¡Pon a prueba tus reflejos y compite por el récord de la Peña!`,
             url: 'juego.html'
+        });
+
+        // 2.b NOVEDAD WEB: Tarjeta personal del Socio Conectado
+        items.push({
+            text: `👤 <strong class="text-amber-400">Novedad Dashboard:</strong> Nueva tarjeta del Socio Conectado a pantalla completa con aciertos, puesto en clasificación, saldo de bote personal y alerta de PIG.`,
+            action: 'inicio'
         });
 
         // 3. Líder de aciertos en vivo / Ganador de la jornada
