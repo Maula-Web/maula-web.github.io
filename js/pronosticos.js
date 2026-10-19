@@ -2284,14 +2284,16 @@ class PronosticoManager {
                 html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${C_DOUBLES}; background:${BG_DOUBLES_COL}; border-left:2px solid rgba(139,92,246,0.5); white-space:nowrap;">Quiniela Dobles</th>`;
             });
 
-            // Columna perfecta
+            // Columna perfecta / Columna Maula (Ocultada temporalmente a petición)
             let perfectColumn = null;
             let perfectHits = 0;
+            /* Ocultada temporalmente por no funcionar adecuadamente:
             const allResolved = sortedMembers.every(m => allForecasts.some(p => String(p.mId || p.memberId) === String(m.id)));
             if (allResolved) {
                 perfectColumn = this.calculatePerfectColumn(jornada);
                 html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:#fbbf24; background:rgba(234,179,8,0.15); border-left:2px solid rgba(234,179,8,0.5); white-space:nowrap;">⭐ COLUMNA MAULA</th>`;
             }
+            */
 
             // Resultado
             html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${C_AMBER}; border-left:2px solid ${BORDER_BLOCK}; white-space:nowrap;">RESULTADO</th>`;
