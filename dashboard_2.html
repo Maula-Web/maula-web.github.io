@@ -185,6 +185,36 @@
         }
 
         /* Sección 'Ver más detalles': desplegada automáticamente en PC, plegable sólo en móviles */
+        @keyframes pulseGlowAmber {
+            0%, 100% {
+                border-color: rgba(245, 158, 11, 0.45);
+                box-shadow: 0 0 8px rgba(245, 158, 11, 0.25), inset 0 0 6px rgba(245, 158, 11, 0.1);
+            }
+            50% {
+                border-color: rgba(245, 158, 11, 0.95);
+                box-shadow: 0 0 20px rgba(245, 158, 11, 0.65), 0 0 4px rgba(251, 191, 36, 0.8), inset 0 0 12px rgba(245, 158, 11, 0.25);
+            }
+        }
+
+        #details-extra-section {
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 767px) {
+            #details-extra-section {
+                border-width: 1.5px !important;
+                border-color: rgba(245, 158, 11, 0.45) !important;
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 27, 75, 0.7) 100%) !important;
+            }
+            #details-extra-section:not([open]) {
+                animation: pulseGlowAmber 2.2s ease-in-out infinite !important;
+            }
+            #details-extra-section[open] {
+                border-color: rgba(245, 158, 11, 0.5) !important;
+                box-shadow: 0 0 15px rgba(245, 158, 11, 0.2) !important;
+            }
+        }
+
         @media (min-width: 768px) {
             #details-extra-section {
                 display: block !important;
@@ -773,13 +803,13 @@
         <!-- =====================================================================
              DETALLES SECUNDARIOS Y ESTADÍSTICAS (DESPLEGABLE EN MÓVIL, FIJO EN PC)
              ===================================================================== -->
-        <details id="details-extra-section" class="glass-panel p-2.5 sm:p-3.5 md:p-6 border-slate-800 group/extra">
-            <summary class="md:hidden flex items-center justify-between cursor-pointer list-none text-xs font-bold text-slate-400 hover:text-amber-400 select-none py-2 px-1">
+        <details id="details-extra-section" class="glass-panel p-2.5 sm:p-3.5 md:p-6 border-slate-800 group/extra transition-all duration-300">
+            <summary class="md:hidden flex items-center justify-between cursor-pointer list-none text-xs font-bold text-amber-200 hover:text-amber-100 select-none py-1.5 px-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition-all shadow-sm">
                 <span class="flex items-center gap-2">
-                    <span>📊</span>
-                    <span>Ver Más Detalles: Cenas, Premios, Líder y Opciones</span>
+                    <span class="text-sm scale-110 drop-shadow">📊</span>
+                    <span class="font-extrabold text-amber-300 tracking-tight drop-shadow-sm">Ver Más Detalles: Cenas, Premios, Líder y Opciones</span>
                 </span>
-                <span class="text-slate-500 group-open/extra:rotate-180 transition-transform">▼</span>
+                <span class="text-amber-400 group-open/extra:rotate-180 transition-transform font-black text-xs">▼</span>
             </summary>
 
             <!-- Encabezado fijo visible sólo en PC (sustituye al summary interactivo de móvil) -->
