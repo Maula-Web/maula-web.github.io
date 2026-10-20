@@ -2390,7 +2390,8 @@ html.light-theme #user-summary-card {
     background-color: #ffffff !important;
     border: 1.5px solid #a7f3d0 !important;
 }
-.light-theme #dashboard-bote-total {
+.light-theme #dashboard-bote-total,
+.light-theme #dashboard-bote-caja-widget {
     color: #047857 !important;
 }
 .light-theme #hero-secondary-pillars > div:nth-child(2) {

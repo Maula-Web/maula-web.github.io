@@ -537,8 +537,8 @@
     <script src="js/scoring.js"></script>
     <script src="js/telegram-service.js"></script>
     <script src="js/dice-service.js"></script>
-    <script src="js/bote_2_data.js"></script>
-    <script src="js/bote-engine.js"></script>
+    <script src="js/bote_2_data.js?v=20261020_caja_v2"></script>
+    <script src="js/bote-engine.js?v=20261020_caja_v2"></script>
 
     <!-- Pantalla Restringida (Oculta por defecto para evaluador) -->
     <div id="restricted-screen" class="hidden"></div>
@@ -763,7 +763,7 @@
                     <!-- Fila 5 (Inferior): Bote Personal y Caja Real -->
                     <div class="pt-1 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
                         <div class="flex items-center gap-1 truncate">
-                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">💰 Caja:</span>
+                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">💰 Caja Real:</span>
                             <strong id="user-card-caja-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">1.016,72 €</strong>
                         </div>
                         <div class="flex items-center gap-1 truncate">
@@ -1021,6 +1021,13 @@
                                 💰 Desglose Bote
                             </span>
                             <span class="text-xs md:text-sm font-bold text-sky-400 cursor-pointer" onclick="window.DashboardApp && window.DashboardApp.showInfo('bote')">ℹ️</span>
+                        </div>
+                        <div class="mb-2 p-2 rounded-lg bg-slate-900 border border-emerald-500/30 flex items-center justify-between">
+                            <div>
+                                <span class="text-[9px] md:text-xs text-slate-400 block font-semibold uppercase tracking-wider">Caja Real:</span>
+                                <strong id="dashboard-bote-caja-widget" class="text-emerald-400 font-mono text-sm md:text-base lg:text-lg font-black">1.016,72 €</strong>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium text-right">Común peña</span>
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 md:gap-2 text-xs md:text-sm">
                             <div class="p-1.5 md:p-2 rounded-lg bg-slate-900 border border-slate-800">
@@ -1289,7 +1296,7 @@
     </footer>
 
     <!-- SCRIPT DE CONTROLADOR DASHBOARD 2.0 -->
-    <script src="js/dashboard_2.js"></script>
+    <script src="js/dashboard_2.js?v=20261020_caja_v2"></script>
     <!-- Seguridad: garantizar que el contenido principal siempre es visible y control dinámico de pantalla completa en móvil -->
     <script>
         (function () {

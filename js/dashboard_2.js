@@ -690,32 +690,21 @@ class Dashboard2AppController {
         // 1. Si BoteApp está instanciado en vivo en la ventana, usar sus datos calculados
         if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
             const sd = window.BoteApp.getSeasonData();
-            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') {
+            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number' && sd.summary.cajaReal > 0) {
                 return sd.summary;
             }
         }
 
-        // 2. Si hay caché en localStorage, verificar que no contenga el valor obsoleto anterior (1091.52)
-        try {
-            const cached = localStorage.getItem('maulas_bote2_summary');
-            if (cached) {
-                const parsed = JSON.parse(cached);
-                if (parsed && typeof parsed.cajaReal === 'number' && parsed.cajaReal !== 1091.52 && parsed.version === '2026_caja_balance_v1') {
-                    return parsed;
-                }
-            }
-        } catch (e) { }
-
-        // 3. Fuente canónica consolidada BOTE_FALLBACK_DATA (calculada exactamente del balance contable)
+        // 2. Fuente canónica consolidada BOTE_FALLBACK_DATA (calculada exactamente del balance contable)
         if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
             const s = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
             try {
-                localStorage.setItem('maulas_bote2_summary', JSON.stringify({ ...s, version: '2026_caja_balance_v1' }));
+                localStorage.setItem('maulas_bote2_summary', JSON.stringify({ ...s, version: '2026_caja_balance_v2' }));
             } catch (e) { }
             return s;
         }
 
-        // 4. Fallback de seguridad
+        // 3. Fallback de seguridad oficial de la Peña
         return {
             cajaReal: 1016.72,
             totalSaldosVirtuales: 694.71,
@@ -1521,6 +1510,7 @@ class Dashboard2AppController {
      */
     renderBoteWidget(playedJornadas) {
         const elTotal = document.getElementById('dashboard-bote-total');
+        const elCajaWidget = document.getElementById('dashboard-bote-caja-widget');
         const elNeto = document.getElementById('dashboard-bote-neto');
         const elPremios = document.getElementById('dashboard-bote-premios');
 
@@ -1529,7 +1519,9 @@ class Dashboard2AppController {
         const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
         const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
 
-        if (elTotal) elTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace(".", ",")} €`;
+        const formattedCaja = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace(".", ",")} €`;
+        if (elTotal) elTotal.textContent = formattedCaja;
+        if (elCajaWidget) elCajaWidget.textContent = formattedCaja;
         if (elNeto) elNeto.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toFixed(2).replace(".", ",")} €`;
         if (elPremios) elPremios.textContent = `${superavit >= 0 ? '+' : ''}${((typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace(".", ",")} €`)}`;
     }

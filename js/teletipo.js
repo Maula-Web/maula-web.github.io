@@ -111,22 +111,10 @@
                     cajaReal = sd.summary.cajaReal;
                     if (typeof sd.summary.superavit === 'number') superavit = sd.summary.superavit;
                 }
-            } else {
-                try {
-                    const cachedBote = localStorage.getItem('maulas_bote2_summary');
-                    if (cachedBote) {
-                        const parsed = JSON.parse(cachedBote);
-                        if (parsed && typeof parsed.cajaReal === 'number' && parsed.cajaReal !== 1091.52 && parsed.version === '2026_caja_balance_v1') {
-                            cajaReal = parsed.cajaReal;
-                            if (typeof parsed.superavit === 'number') superavit = parsed.superavit;
-                        }
-                    }
-                } catch (e) { }
-                if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
-                    const fb = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
-                    if (typeof fb.cajaReal === 'number') cajaReal = fb.cajaReal;
-                    if (typeof fb.superavit === 'number') superavit = fb.superavit;
-                }
+            } else if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
+                const fb = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
+                if (typeof fb.cajaReal === 'number') cajaReal = fb.cajaReal;
+                if (typeof fb.superavit === 'number') superavit = fb.superavit;
             }
             const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
             const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`;
