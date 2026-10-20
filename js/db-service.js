@@ -310,12 +310,19 @@ class DataService {
                 });
             }
 
+            const seasonJornadaIds = new Set(seasonJornadas.map(j => String(j.id)));
+
             return {
                 members: sortedMembers,
                 jornadas: seasonJornadas,
-                pronosticos: pronosticos || [],
+                pronosticos: (() => {
+                    return (pronosticos || []).filter(p => {
+                        if (!p) return false;
+                        const jId = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId !== undefined && p.jornadaId !== null ? p.jornadaId : ''));
+                        return seasonJornadaIds.has(jId);
+                    });
+                })(),
                 pronosticosExtra: (() => {
-                    const seasonJornadaIds = new Set(seasonJornadas.map(j => String(j.id)));
                     return (pronosticosExtra || []).filter(p => {
                         if (!p) return false;
                         const jId = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId !== undefined && p.jornadaId !== null ? p.jornadaId : ''));

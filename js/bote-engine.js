@@ -171,8 +171,8 @@ class BoteEngine {
                     if (!isJornadaPlayed) return;
 
                     const infoRedist = jornadaExemptions[jornadaIndex];
-                    const pronostico = this._pMap ? (this._pMap.get(`${jornada.id}_${mIdStr}`) || this._pMap.get(`${jornada.number}_${mIdStr}`)) : pronosticos.find(p =>
-                        (String(p.jId || p.jornadaId) === String(jornada.id) || parseInt(p.jId || p.jornadaId, 10) === parseInt(jornada.number, 10)) &&
+                    const pronostico = this._pMap ? (this._pMap.get(`${jornada.id}_${mIdStr}`) || (!jornada.id ? this._pMap.get(`${jornada.number}_${mIdStr}`) : null)) : pronosticos.find(p =>
+                        (String(p.jId || p.jornadaId) === String(jornada.id) || (!jornada.id && parseInt(p.jId || p.jornadaId, 10) === parseInt(jornada.number, 10))) &&
                         (String(p.mId || p.memberId) === mIdStr)
                     );
 
@@ -763,8 +763,8 @@ class BoteEngine {
         // Build member results for prevJornada
         const memberResults = (members || []).map(m => {
             const mIdStr = String(m.id);
-            const p = pronosticos ? (this._pMap ? (this._pMap.get(`${prevJornada.id}_${mIdStr}`) || this._pMap.get(`${prevJornada.number}_${mIdStr}`)) : pronosticos.find(pr =>
-                (String(pr.jId || pr.jornadaId) === String(prevJornada.id) || parseInt(pr.jId || pr.jornadaId) === prevJornada.number) &&
+            const p = pronosticos ? (this._pMap ? (this._pMap.get(`${prevJornada.id}_${mIdStr}`) || (!prevJornada.id ? this._pMap.get(`${prevJornada.number}_${mIdStr}`) : null)) : pronosticos.find(pr =>
+                String(pr.jId || pr.jornadaId) === String(prevJornada.id) &&
                 String(pr.mId || pr.memberId) === mIdStr
             )) : null;
 
@@ -860,8 +860,8 @@ class BoteEngine {
         // Build results for ALL members
         const memberResults = (members || []).map(m => {
             const mIdStr = String(m.id);
-            const p = pronosticos ? (this._pMap ? (this._pMap.get(`${prevJornada.id}_${mIdStr}`) || this._pMap.get(`${prevJornada.number}_${mIdStr}`)) : pronosticos.find(pr =>
-                (String(pr.jId || pr.jornadaId) === String(prevJornada.id) || parseInt(pr.jId || pr.jornadaId) === prevJornada.number) &&
+            const p = pronosticos ? (this._pMap ? (this._pMap.get(`${prevJornada.id}_${mIdStr}`) || (!prevJornada.id ? this._pMap.get(`${prevJornada.number}_${mIdStr}`) : null)) : pronosticos.find(pr =>
+                String(pr.jId || pr.jornadaId) === String(prevJornada.id) &&
                 String(pr.mId || pr.memberId) === mIdStr
             )) : null;
 
@@ -949,10 +949,11 @@ class BoteEngine {
         if (!prevJornada) return this.resolveTie(memberIds, jornadaNum - 1, type, jornadas, pronosticos);
 
         const scores = memberIds.map(mId => {
-            const pronostico = pronosticos ? pronosticos.find(p => 
-                (String(p.jId || p.jornadaId) === String(prevJornada.id) || parseInt(p.jId || p.jornadaId) === prevJornada.number) && 
-                String(p.mId || p.memberId) === String(mId)
-            ) : null;
+            const mIdStr = String(mId);
+            const pronostico = pronosticos ? (this._pMap ? (this._pMap.get(`${prevJornada.id}_${mIdStr}`) || (!prevJornada.id ? this._pMap.get(`${prevJornada.number}_${mIdStr}`) : null)) : pronosticos.find(p => 
+                String(p.jId || p.jornadaId) === String(prevJornada.id) && 
+                String(p.mId || p.memberId) === mIdStr
+            )) : null;
 
             if (!pronostico) return { mId: String(mId), points: -5 };
 

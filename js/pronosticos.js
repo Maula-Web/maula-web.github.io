@@ -901,7 +901,7 @@ class PronosticoManager {
 
         // DOUBLES LOGIC
         const hasExistingDoubles = (this.pronosticosExtra || []).some(p => 
-            (String(p.jId || p.jornadaId) === String(jornada.id) || String(p.jId || p.jornadaId) === String(jornada.number)) &&
+            String(p.jId || p.jornadaId) === String(jornada.id) &&
             p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
         );
         let isEligibleForDoubles = false;
@@ -2590,7 +2590,7 @@ class PronosticoManager {
                 const p = this.pronosticos.find(pred => {
                     const pJid = String(pred.jId !== undefined && pred.jId !== null ? pred.jId : (pred.jornadaId || ''));
                     const pMid = String(pred.mId !== undefined && pred.mId !== null ? pred.mId : (pred.memberId || ''));
-                    const matchJ = (pJid === String(prevJornada.id) || pJid === String(prevJornada.number));
+                    const matchJ = (pJid === String(prevJornada.id));
                     const matchM = (pMid === String(m.id));
                     return matchJ && matchM;
                 });
@@ -2747,7 +2747,7 @@ class PronosticoManager {
                 const p = this.pronosticos.find(pred => {
                     const pJid = String(pred.jId || pred.jornadaId || '');
                     const pMid = String(pred.mId || pred.memberId || '');
-                    return (pJid === String(checkJornada.id) || pJid === String(checkJornada.number)) && pMid === String(candidate.id);
+                    return pJid === String(checkJornada.id) && pMid === String(candidate.id);
                 });
 
                 let points = -5;
