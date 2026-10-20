@@ -2532,10 +2532,12 @@ class PronosticoManager {
             return { eligible: false };
         }
 
-        // Asignación explícita configurada en la jornada (campo doblesMembers)
         const currentJornada = (this.jornadas || []).find(j => parseInt(j.number) === parseInt(currentJornadaNum) || String(j.id) === String(currentJornadaNum));
-        if (currentJornada && Array.isArray(currentJornada.doblesMembers) && currentJornada.doblesMembers.length > 0) {
-            const isAssigned = currentJornada.doblesMembers.some(id => String(id) === String(memberId));
+
+        // Jornada 16: Asignación acordada oficialmente para Heradio (8), Rafa (16) y Fernando Lozano (6)
+        if (parseInt(currentJornadaNum) === 16 || (currentJornada && parseInt(currentJornada.number) === 16)) {
+            const j16AssignedIds = ['6', '8', '16'];
+            const isAssigned = j16AssignedIds.includes(String(memberId));
             return {
                 eligible: isAssigned,
                 isWinner: isAssigned,
@@ -2544,10 +2546,9 @@ class PronosticoManager {
             };
         }
 
-        // Jornada 16 (Temporada 2026-2027): Asignación acordada oficialmente para Heradio (8), Rafa (16) y Fernando Lozano (6)
-        if (parseInt(currentJornadaNum) === 16 || (currentJornada && (currentJornada.season === '2026-2027' || !currentJornada.season) && parseInt(currentJornada.number) === 16)) {
-            const j16AssignedIds = ['6', '8', '16'];
-            const isAssigned = j16AssignedIds.includes(String(memberId));
+        // Asignación explícita configurada en la jornada (campo doblesMembers)
+        if (currentJornada && Array.isArray(currentJornada.doblesMembers) && currentJornada.doblesMembers.length > 0) {
+            const isAssigned = currentJornada.doblesMembers.some(id => String(id) === String(memberId));
             return {
                 eligible: isAssigned,
                 isWinner: isAssigned,

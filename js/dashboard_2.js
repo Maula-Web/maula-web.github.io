@@ -488,7 +488,10 @@ class Dashboard2AppController {
 
             if (liveWinnerHits === null) {
                 // Jornada cerrada / no en juego: mostrar ganador de la última jornada cerrada
-                const eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
+                let eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
+                if (parseInt(targetJNum) === 16 || (this.nextJornada && parseInt(this.nextJornada.number) === 16)) {
+                    eligibles = ["Heradio", "Rafa", "Fernando Lozano"];
+                }
                 currentWinnerName = eligibles.filter(Boolean).join(', ') || 'Pendiente';
                 if (elWinnerSubtitle) {
                     const winJ = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
@@ -496,7 +499,7 @@ class Dashboard2AppController {
                 }
                 if (elWinnerDetail) {
                     const destJNum = targetJNum; // Próxima jornada
-                    elWinnerDetail.innerHTML = `<span class="text-amber-300 font-semibold">Rellena los dobles de la Jornada ${destJNum}</span>${eligibles.length > 1 ? `<div class="text-[11px] text-slate-400 mt-0.5">Empate: ${eligibles.join(', ')}</div>` : ''}`;
+                    elWinnerDetail.innerHTML = `<span class="text-amber-300 font-semibold">Rellena los dobles de la Jornada ${destJNum}</span>${eligibles.length > 1 ? `<div class="text-[11px] text-slate-400 mt-0.5">Empate / Asignados: ${eligibles.join(', ')}</div>` : ''}`;
                 }
             }
 
@@ -2012,8 +2015,8 @@ class Dashboard2AppController {
 
         // 6. Elegibles para siguientes dobles (Ganador + cualquiera con premio > 0)
         let eligibleNextNames = [];
-        if (parseInt(jornada.number) === 14 && (jornada.season === '2026-2027' || !jornada.season)) {
-            eligibleNextNames = ["Fernando Lozano", "Heradio", "Rafa"];
+        if (parseInt(jornada.number) === 14 || parseInt(jornada.number) === 15) {
+            eligibleNextNames = ["Heradio", "Rafa", "Fernando Lozano"];
         } else {
             eligibleNextNames = results.filter(r => {
                 const isWinner = r.memberId === winnerCandidates[0].memberId;
@@ -2382,7 +2385,10 @@ class Dashboard2AppController {
         }
 
         const jNumDisplay = targetJ ? targetJ.number : (targetJNum || '?');
-        const winnerName = (this.lastJornadaOutcome && this.lastJornadaOutcome.winnerName) ? this.lastJornadaOutcome.winnerName : 'Ganador semanal';
+        let winnerName = (this.lastJornadaOutcome && this.lastJornadaOutcome.winnerName) ? this.lastJornadaOutcome.winnerName : 'Ganador semanal';
+        if (parseInt(jNumDisplay) === 16) {
+            winnerName = 'Heradio, Rafa y Fernando Lozano';
+        }
         const loserName = (this.lastJornadaOutcome && this.lastJornadaOutcome.loserName) ? this.lastJornadaOutcome.loserName : 'Sellador';
 
         if (titleEl) {
@@ -2415,14 +2421,16 @@ class Dashboard2AppController {
                 }
             }
             if (statusEl) {
-                statusEl.innerHTML = `<span class="text-amber-400 font-medium">Responsable de rellenar: <strong>${winnerName}</strong></span>`;
+                statusEl.innerHTML = `<span class="text-amber-400 font-medium">Responsables de rellenar: <strong>${winnerName}</strong></span>`;
             }
             modal.classList.remove('hidden');
             return;
         }
 
         let authorName = winnerName;
-        if (extra.mId !== undefined || extra.memberId !== undefined) {
+        if (parseInt(jNumDisplay) === 16) {
+            authorName = 'Heradio, Rafa y Fernando Lozano';
+        } else if (extra.mId !== undefined || extra.memberId !== undefined) {
             const extraMid = String(extra.mId !== undefined ? extra.mId : extra.memberId);
             const authorMember = (this.members || []).find(m => String(m.id) === extraMid);
             if (authorMember && authorMember.name) {
@@ -2431,7 +2439,11 @@ class Dashboard2AppController {
         }
 
         if (authorEl) {
-            authorEl.textContent = `Rellenada por ${authorName} ${isForNext ? '(Próxima Jornada)' : '(Última disponible)'}`;
+            if (parseInt(jNumDisplay) === 16) {
+                authorEl.textContent = `Responsables oficiales: Heradio, Rafa y Fernando Lozano ${isForNext ? '(Próxima Jornada)' : ''}`;
+            } else {
+                authorEl.textContent = `Rellenada por ${authorName} ${isForNext ? '(Próxima Jornada)' : '(Última disponible)'}`;
+            }
         }
 
         const sel = extra.selection;

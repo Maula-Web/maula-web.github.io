@@ -431,6 +431,10 @@ class BoteEngine {
                     costs.jugaDobles = true;
                 }
             }
+        } else if (parseInt(jornada.number) === 16) {
+            // Asignación acordada oficialmente para Heradio (8), Rafa (16) y Fernando Lozano (6)
+            const j16AssignedIds = ['6', '8', '16'];
+            costs.jugaDobles = j16AssignedIds.includes(String(memberId));
         } else if (jornadaIndex > 0) {
             const prevJornada = jornadas[jornadaIndex - 1];
             const prevWinnerId = this.getWinnerOfJornada(prevJornada, members, jornadas, pronosticos);

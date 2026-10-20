@@ -1393,8 +1393,13 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     p15Oficial = this.formatP15(validExtras[0].selection[14]);
                     validExtras.forEach((extraItem, extraIdx) => {
                         const mId = String(extraItem.mId || extraItem.memberId || '');
-                        const author = this.members.find(m => String(m.id) === mId);
-                        const authorName = author ? (author.name || `Socio ${mId}`) : `Socio ${mId || extraIdx + 1}`;
+                        let authorName = '';
+                        if (parseInt(this.jornadaActual) === 16 && (mId === '13' || !mId)) {
+                            authorName = 'Heradio, Rafa, Fernando Lozano';
+                        } else {
+                            const author = this.members.find(m => String(m.id) === mId);
+                            authorName = author ? (author.name || `Socio ${mId}`) : `Socio ${mId || extraIdx + 1}`;
+                        }
                         const originLabel = `Dobles (${authorName})`;
                         const d16 = this.desarrollarDobles(extraItem.selection, Boolean(extraItem.isReduced), p15Oficial);
                         d16.forEach((item, combIdx) => {
