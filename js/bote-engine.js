@@ -431,20 +431,34 @@ class BoteEngine {
                     costs.jugaDobles = true;
                 }
             }
-        } else if (parseInt(jornada.number) === 16) {
-            // Asignación acordada oficialmente para Heradio (8), Rafa (16) y Fernando Lozano (6)
-            const j16AssignedIds = ['6', '8', '16'];
-            costs.jugaDobles = j16AssignedIds.includes(String(memberId));
         } else if (jornadaIndex > 0) {
-            const prevJornada = jornadas[jornadaIndex - 1];
+            let prevJornada = null;
+            for (let pi = jornadaIndex - 1; pi >= 0; pi--) {
+                const pj = jornadas[pi];
+                if (pj && pj.matches && pj.matches.filter(m => {
+                    const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+                    return r !== '' && r !== '-' && r !== 'por definir';
+                }).length >= 14) {
+                    prevJornada = pj;
+                    break;
+                }
+            }
+            if (!prevJornada) prevJornada = jornadas[jornadaIndex - 1];
             const prevWinnerId = this.getWinnerOfJornada(prevJornada, members, jornadas, pronosticos);
-
             const isPrevWinner = prevWinnerId && String(memberId) === String(prevWinnerId);
-            const hadPrize = this.getPrizesForMemberJornada(memberId, prevJornada, pronosticos) > 0;
-            const hasFilledExtra = matchesExtra.some(p => String(p.mId || p.memberId) === String(memberId));
 
-            if (isPrevWinner || hadPrize || hasFilledExtra) {
-                costs.jugaDobles = true;
+            if (parseInt(jornada.number) >= 16) {
+                // A partir de la Jornada 16: SÓLO el ganador único de la jornada anterior sella/rellena la quiniela de dobles
+                if (isPrevWinner) {
+                    costs.jugaDobles = true;
+                }
+            } else {
+                const hadPrize = this.getPrizesForMemberJornada(memberId, prevJornada, pronosticos) > 0;
+                const hasFilledExtra = matchesExtra.some(p => String(p.mId || p.memberId) === String(memberId));
+
+                if (isPrevWinner || hadPrize || hasFilledExtra) {
+                    costs.jugaDobles = true;
+                }
             }
         }
 

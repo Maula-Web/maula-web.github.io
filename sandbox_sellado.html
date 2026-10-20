@@ -1395,7 +1395,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                         const mId = String(extraItem.mId || extraItem.memberId || '');
                         let authorName = '';
                         if (parseInt(this.jornadaActual) === 16 && (mId === '13' || !mId)) {
-                            authorName = 'Heradio, Rafa, Fernando Lozano';
+                            authorName = 'Rafa';
                         } else {
                             const author = this.members.find(m => String(m.id) === mId);
                             authorName = author ? (author.name || `Socio ${mId}`) : `Socio ${mId || extraIdx + 1}`;

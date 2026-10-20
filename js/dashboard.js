@@ -778,8 +778,8 @@ class DashboardManager {
 
         // All eligible for NEXT dobles: Absolute Winner + anyone with a monetary prize > 0
         let eligibleNextNames = [];
-        if (parseInt(jornada.number) === 14 || parseInt(jornada.number) === 15) {
-            eligibleNextNames = ["Heradio", "Rafa", "Fernando Lozano"];
+        if (parseInt(jornada.number) >= 14) {
+            eligibleNextNames = [winner.name];
         } else {
             eligibleNextNames = results
                 .filter(r => {

@@ -284,7 +284,13 @@
 
             // NOTICIA 2.c: QUINIELA DE DOBLES JORNADA 16
             items.push({
-                text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsables oficiales con derecho asignado: Heradio, Rafa y Fernando Lozano.`,
+                text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsable oficial asignado: <strong>Rafa</strong> (único ganador de la J.14 tras desempate).`,
+                url: 'pronosticos_2.html'
+            });
+
+            // NOTICIA REGLAMENTO: NUEVA REGLA QUINIELA DE DOBLES
+            items.push({
+                text: `📜 <strong class="text-amber-400">Reglamento Dobles:</strong> A partir de la J.16, la quiniela de dobles la sellará exclusivamente el único ganador de la jornada anterior.`,
                 url: 'pronosticos_2.html'
             });
 

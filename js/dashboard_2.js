@@ -489,8 +489,8 @@ class Dashboard2AppController {
             if (liveWinnerHits === null) {
                 // Jornada cerrada / no en juego: mostrar ganador de la última jornada cerrada
                 let eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
-                if (parseInt(targetJNum) === 16 || (this.nextJornada && parseInt(this.nextJornada.number) === 16)) {
-                    eligibles = ["Heradio", "Rafa", "Fernando Lozano"];
+                if (parseInt(targetJNum) >= 16 || (this.nextJornada && parseInt(this.nextJornada.number) >= 16)) {
+                    eligibles = [lastJornadaOutcome.winnerName];
                 }
                 currentWinnerName = eligibles.filter(Boolean).join(', ') || 'Pendiente';
                 if (elWinnerSubtitle) {
@@ -1615,7 +1615,13 @@ class Dashboard2AppController {
 
         // 2.c QUINIELA DE DOBLES JORNADA 16
         items.push({
-            text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsables oficiales con derecho asignado: Heradio, Rafa y Fernando Lozano.`,
+            text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsable oficial asignado: <strong>Rafa</strong> (único ganador de la J.14 tras desempate).`,
+            action: 'dobles'
+        });
+
+        // 2.c2 REGLAMENTO QUINIELA DE DOBLES
+        items.push({
+            text: `📜 <strong class="text-amber-400">Reglamento Dobles:</strong> A partir de la J.16, la quiniela de dobles la sellará exclusivamente el único ganador de la jornada anterior.`,
             action: 'dobles'
         });
 
@@ -2021,10 +2027,11 @@ class Dashboard2AppController {
             return { name: r.name, hits: r.hits, prize: val || 0 };
         });
 
-        // 6. Elegibles para siguientes dobles (Ganador + cualquiera con premio > 0)
+        // 6. Elegibles para siguientes dobles (A partir de J16: únicamente el único ganador; histórico: Ganador + premio > 0)
         let eligibleNextNames = [];
-        if (parseInt(jornada.number) === 14 || parseInt(jornada.number) === 15) {
-            eligibleNextNames = ["Heradio", "Rafa", "Fernando Lozano"];
+        if (parseInt(jornada.number) >= 14) {
+            // J14 es la jornada previa que determina los dobles de J16
+            eligibleNextNames = [winner.name];
         } else {
             eligibleNextNames = results.filter(r => {
                 const isWinner = r.memberId === winnerCandidates[0].memberId;
@@ -2394,9 +2401,6 @@ class Dashboard2AppController {
 
         const jNumDisplay = targetJ ? targetJ.number : (targetJNum || '?');
         let winnerName = (this.lastJornadaOutcome && this.lastJornadaOutcome.winnerName) ? this.lastJornadaOutcome.winnerName : 'Ganador semanal';
-        if (parseInt(jNumDisplay) === 16) {
-            winnerName = 'Heradio, Rafa y Fernando Lozano';
-        }
         const loserName = (this.lastJornadaOutcome && this.lastJornadaOutcome.loserName) ? this.lastJornadaOutcome.loserName : 'Sellador';
 
         if (titleEl) {
@@ -2436,9 +2440,7 @@ class Dashboard2AppController {
         }
 
         let authorName = winnerName;
-        if (parseInt(jNumDisplay) === 16) {
-            authorName = 'Heradio, Rafa y Fernando Lozano';
-        } else if (extra.mId !== undefined || extra.memberId !== undefined) {
+        if (extra.mId !== undefined || extra.memberId !== undefined) {
             const extraMid = String(extra.mId !== undefined ? extra.mId : extra.memberId);
             const authorMember = (this.members || []).find(m => String(m.id) === extraMid);
             if (authorMember && authorMember.name) {
@@ -2447,11 +2449,7 @@ class Dashboard2AppController {
         }
 
         if (authorEl) {
-            if (parseInt(jNumDisplay) === 16) {
-                authorEl.textContent = `Responsables oficiales: Heradio, Rafa y Fernando Lozano ${isForNext ? '(Próxima Jornada)' : ''}`;
-            } else {
-                authorEl.textContent = `Rellenada por ${authorName} ${isForNext ? '(Próxima Jornada)' : '(Última disponible)'}`;
-            }
+            authorEl.textContent = `Rellenada por ${authorName} ${isForNext ? '(Próxima Jornada)' : '(Última disponible)'}`;
         }
 
         const sel = extra.selection;

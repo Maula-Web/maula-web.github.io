@@ -2173,10 +2173,17 @@
                 return window._eligibleDoublesCache.get(cacheKey);
             }
 
-            // Jornada 16: Asignación acordada oficialmente para Heradio (8), Rafa (16) y Fernando Lozano (6)
-            if (parseInt(j.number) === 16) {
-                const j16AssignedIds = ['6', '8', '16'];
-                const list = window.app.members.filter(m => j16AssignedIds.includes(String(m.id)));
+            // A partir de la Jornada 16: SÓLO el ganador único de la jornada previa sella/rellena la quiniela de dobles
+            if (parseInt(j.number) >= 16) {
+                const list = [];
+                if (window.app && typeof window.app.checkEligibility === 'function') {
+                    for (const m of window.app.members) {
+                        const elig = window.app.checkEligibility(j.number, m.id, true);
+                        if (elig && (elig.eligible || elig.isWinner)) {
+                            list.push(m);
+                        }
+                    }
+                }
                 if (window._eligibleDoublesCache) window._eligibleDoublesCache.set(cacheKey, list);
                 return list;
             }

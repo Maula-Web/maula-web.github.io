@@ -907,7 +907,10 @@ class PronosticoManager {
         let isEligibleForDoubles = false;
         if (typeof this.checkEligibility === 'function') {
             const eligibility = this.checkEligibility(jornada.number, this.currentMemberId, true);
-            isEligibleForDoubles = eligibility && (eligibility.eligible || eligibility.isWinner || eligibility.hasPrize);
+            const isNewRule = parseInt(jornada.number) >= 16;
+            isEligibleForDoubles = isNewRule
+                ? Boolean(eligibility && (eligibility.eligible || eligibility.isWinner))
+                : Boolean(eligibility && (eligibility.eligible || eligibility.isWinner || eligibility.hasPrize));
         }
         if (!isEligibleForDoubles && typeof window !== 'undefined' && typeof window.getEligibleDoublesMembers === 'function') {
             const dms = window.getEligibleDoublesMembers(jornada);
@@ -1712,8 +1715,11 @@ class PronosticoManager {
             }
             if (!isEligibleDoubles && precalculatedEligibleDoubles === null && typeof this.checkEligibility === 'function') {
                 const elig = this.checkEligibility(targetJornada.number, memberId, true);
-                if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) {
-                    isEligibleDoubles = true;
+                const isNewRule = parseInt(targetJornada.number) >= 16;
+                if (isNewRule) {
+                    if (elig && (elig.eligible || elig.isWinner)) isEligibleDoubles = true;
+                } else {
+                    if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) isEligibleDoubles = true;
                 }
             }
         } catch (e) {
@@ -2534,18 +2540,6 @@ class PronosticoManager {
 
         const currentJornada = (this.jornadas || []).find(j => parseInt(j.number) === parseInt(currentJornadaNum) || String(j.id) === String(currentJornadaNum));
 
-        // Jornada 16: Asignación acordada oficialmente para Heradio (8), Rafa (16) y Fernando Lozano (6)
-        if (parseInt(currentJornadaNum) === 16 || (currentJornada && parseInt(currentJornada.number) === 16)) {
-            const j16AssignedIds = ['6', '8', '16'];
-            const isAssigned = j16AssignedIds.includes(String(memberId));
-            return {
-                eligible: isAssigned,
-                isWinner: isAssigned,
-                hasPrize: false,
-                reason: isAssigned ? 'assigned' : 'not_assigned'
-            };
-        }
-
         // Asignación explícita configurada en la jornada (campo doblesMembers)
         if (currentJornada && Array.isArray(currentJornada.doblesMembers) && currentJornada.doblesMembers.length > 0) {
             const isAssigned = currentJornada.doblesMembers.some(id => String(id) === String(memberId));
@@ -2557,12 +2551,19 @@ class PronosticoManager {
             };
         }
 
-        // 1. Encontrar la jornada previa REAL
+        // 1. Encontrar la jornada previa REAL con resultados disputados
         const sortedJornadas = [...this.jornadas].sort((a, b) => a.number - b.number);
-        const prevJornada = sortedJornadas.filter(j => j.number < currentJornadaNum).pop();
+        const prevJornada = sortedJornadas.filter(j => 
+            j.number < currentJornadaNum && 
+            j.matches && 
+            j.matches.filter(m => {
+                const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+                return r !== '' && r !== '-' && r !== 'por definir';
+            }).length >= 14
+        ).pop();
 
         if (!prevJornada || !prevJornada.matches) {
-            console.log("DOUBLES: No hay jornada previa registrada.");
+            console.log("DOUBLES: No hay jornada previa registrada con resultados suficientes.");
             return { eligible: false };
         }
 
@@ -2655,7 +2656,10 @@ class PronosticoManager {
                     winnerCandidates = this.resolveTieEligibility(winnerCandidates, prevJornada.number);
                 }
 
-                // 7. El ganador es el primero de la lista
+                // 7. El ganador es el primero de la lista (desempate por ID si persiste)
+                if (winnerCandidates.length > 1) {
+                    winnerCandidates.sort((a, b) => Number(a.id) - Number(b.id));
+                }
                 if (winnerCandidates.length > 0 && winnerCandidates[0].points > -5) {
                     absoluteWinnerId = winnerCandidates[0].id;
                 }
@@ -2669,8 +2673,6 @@ class PronosticoManager {
         const absoluteWinnerId = cachedEval.absoluteWinnerId;
 
         // 8. Verificación para el socio actual:
-        // Criterio 1: GANADOR ABSOLUTO de la jornada anterior.
-        // Criterio 2: PREMIO ECONÓMICO (en su columna individual O en la columna de dobles).
         const myStats = leaderboard.find(l => String(l.id) === String(memberId));
         const isAbsoluteWinner = absoluteWinnerId && String(memberId) === String(absoluteWinnerId);
 
@@ -2683,24 +2685,32 @@ class PronosticoManager {
             } catch (e) {}
         }
 
-        // B) REGLA OFICIAL PEÑA MAULAS:
-        // El derecho a quiniela de dobles lo otorgan:
-        // 1) Ser el ganador absoluto de la jornada anterior (puntuación más alta tras desempates).
-        // 2) Haber obtenido premio económico en la columna INDIVIDUAL propia.
-        // Los premios obtenidos por la quiniela de dobles ingresan íntegros al bote común de la peña
-        // y NO otorgan derecho al socio a repetir la quiniela de dobles.
         const hasEconomicPrize = hasIndividualMoneyPrize;
-        const isEligible = isAbsoluteWinner || hasEconomicPrize;
+
+        // NUEVA REGLA (A partir de la Jornada 16):
+        // SÓLO puede haber UN socio que rellena/sella la quiniela de dobles: el ganador de la jornada anterior.
+        // Lo anterior (< Jornada 16) se conserva como estaba (ganador o premio económico individual).
+        const isNewRuleActive = parseInt(currentJornadaNum) >= 16;
+        let isEligible = false;
+        let eligibleReason = 'not_winner';
+
+        if (isNewRuleActive) {
+            isEligible = Boolean(isAbsoluteWinner);
+            eligibleReason = isEligible ? 'winner' : 'not_winner';
+        } else {
+            isEligible = isAbsoluteWinner || hasEconomicPrize;
+            eligibleReason = isEligible ? (isAbsoluteWinner ? 'winner' : 'prize') : 'not_winner';
+        }
 
         if (isEligible) {
-            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name} (${isAbsoluteWinner ? 'Ganador' : (hasIndividualMoneyPrize ? 'Premio Individual' : 'Premio Dobles')})`);
+            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name} (${isAbsoluteWinner ? 'Ganador Único' : (hasIndividualMoneyPrize ? 'Premio Individual' : 'Premio Dobles')})`);
         }
 
         return {
             eligible: isEligible,
             isWinner: isAbsoluteWinner,
-            hasPrize: hasEconomicPrize,
-            reason: isEligible ? (isAbsoluteWinner ? 'winner' : 'prize') : 'not_winner'
+            hasPrize: isNewRuleActive ? false : hasEconomicPrize,
+            reason: eligibleReason
         };
     }
 
@@ -2737,7 +2747,7 @@ class PronosticoManager {
                 const p = this.pronosticos.find(pred => {
                     const pJid = String(pred.jId || pred.jornadaId || '');
                     const pMid = String(pred.mId || pred.memberId || '');
-                    return pJid === String(checkJornada.id) && pMid === String(candidate.id);
+                    return (pJid === String(checkJornada.id) || pJid === String(checkJornada.number)) && pMid === String(candidate.id);
                 });
 
                 let points = -5;
