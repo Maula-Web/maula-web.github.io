@@ -1524,6 +1524,82 @@ class BoteAppController {
             `;
             tbody.appendChild(trDobles);
         }
+
+        // Fila de totales al pie de la tabla Detalle de la Jornada
+        const tfoot = document.getElementById('jornada-table-foot');
+        if (tfoot) {
+            if (jMovements.length === 0) {
+                tfoot.innerHTML = '';
+            } else {
+                const validAciertosMovs = jMovements.filter(m => typeof m.aciertos === 'number' && m.aciertos >= 0);
+                const totAciertos = validAciertosMovs.reduce((s, m) => s + m.aciertos, 0);
+                const avgAciertos = validAciertosMovs.length > 0 ? (totAciertos / validAciertosMovs.length).toFixed(1).replace('.', ',') : '-';
+
+                const totCuota = jMovements.reduce((s, m) => s + (m.exento ? 0 : (m.aportacion || 0)), 0);
+                const totPenalties = jMovements.reduce((s, m) => s + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0), 0);
+                const countPenalties = jMovements.reduce((cnt, m) => cnt + (m.penalizacionUnos > 0 ? 1 : 0) + (m.penalizacionBajosAciertos > 0 ? 1 : 0) + (m.penalizacionPIG > 0 ? 1 : 0) + (m.penalizacionMaula > 0 ? 1 : 0), 0);
+
+                const totPaga = jMovements.reduce((s, m) => s + (m.totalGastos !== undefined ? m.totalGastos : (m.totalPaga || 0)), 0);
+                const totPremiosInd = jMovements.reduce((s, m) => s + (m.premios || 0), 0);
+                const totPremios = totPremiosInd + (doblesPrize || 0);
+
+                const totReembolso = jMovements.reduce((s, m) => s + (m.sellado < 0 ? Math.abs(m.sellado) : 0), 0);
+                const totNetoMembers = jMovements.reduce((s, m) => s + (m.neto || 0), 0);
+                const totNeto = totNetoMembers + (doblesPrize || 0);
+                const totBoteFinal = jMovements.reduce((s, m) => s + (m.boteAcumulado || 0), 0);
+
+                const penaltiesFootHtml = totPenalties > 0
+                    ? `<div class="font-mono font-bold text-amber-400 whitespace-nowrap">+${totPenalties.toFixed(2).replace('.', ',')}&nbsp;€</div>`
+                      + `<span class="text-[10px] text-slate-400 font-normal">(${countPenalties} multa${countPenalties === 1 ? '' : 's'})</span>`
+                    : '<span class="text-slate-600 font-mono">-</span>';
+
+                const premiosFootHtml = totPremios > 0
+                    ? `<div class="font-mono font-bold text-emerald-400 whitespace-nowrap">+${totPremios.toFixed(2).replace('.', ',')}&nbsp;€</div>`
+                      + (doblesPrize > 0 && totPremiosInd > 0 ? `<span class="text-[10px] text-purple-300 font-normal block whitespace-nowrap">(${totPremiosInd.toFixed(2).replace('.', ',')}€ ind + ${doblesPrize.toFixed(2).replace('.', ',')}€ dob)</span>` : '')
+                    : '<span class="text-slate-600 font-mono">-</span>';
+
+                const reembolsoFootHtml = totReembolso > 0
+                    ? `<span class="font-mono font-bold text-purple-300 whitespace-nowrap">+${totReembolso.toFixed(2).replace('.', ',')}&nbsp;€</span>`
+                    : '<span class="text-slate-600 font-mono">-</span>';
+
+                const netoFootColor = totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400';
+
+                tfoot.innerHTML = `
+                    <tr class="bg-slate-900/95 border-t-2 border-emerald-500/50 font-bold text-xs sm:text-sm">
+                        <td class="py-3 px-2 sm:px-2.5 xl:px-3 whitespace-nowrap">
+                            <strong class="text-emerald-400 font-extrabold uppercase tracking-wider block">Σ Totales</strong>
+                            <span class="text-[11px] text-slate-400 font-normal block">${jMovements.length} socios${doblesPrize > 0 ? ' + Peña' : ''}</span>
+                        </td>
+                        <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-center whitespace-nowrap">
+                            <div class="font-bold text-white font-mono">${totAciertos}&nbsp;ac.</div>
+                            <div class="text-[10px] text-slate-400 font-normal">Ø ${avgAciertos}</div>
+                        </td>
+                        <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold text-slate-200 whitespace-nowrap">
+                            +${totCuota.toFixed(2).replace('.', ',')}&nbsp;€
+                        </td>
+                        <td class="py-3 px-1.5 sm:px-2 xl:px-2.5 text-center font-mono whitespace-nowrap">
+                            ${penaltiesFootHtml}
+                        </td>
+                        <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
+                            -${totPaga.toFixed(2).replace('.', ',')}&nbsp;€
+                        </td>
+                        <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold whitespace-nowrap">
+                            ${premiosFootHtml}
+                        </td>
+                        <td class="py-3 px-1.5 sm:px-2 xl:px-2.5 text-right font-mono whitespace-nowrap">
+                            ${reembolsoFootHtml}
+                        </td>
+                        <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold ${netoFootColor} whitespace-nowrap">
+                            ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€
+                        </td>
+                        <td class="py-3 px-2 sm:px-2.5 xl:px-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/80 whitespace-nowrap">
+                            <div>${totBoteFinal.toFixed(2).replace('.', ',')}&nbsp;€</div>
+                            <div class="text-[10px] text-slate-400 font-normal">Suma saldos</div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
     }
 
     sortJornada(column, thElement) {

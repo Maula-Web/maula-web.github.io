@@ -1159,6 +1159,62 @@ body.light-theme select option {
     color: #1d4ed8 !important;
 }
 
+/* G.2. Vista Jornadas: Pie de tabla Detalle de la Jornada (Totales) */
+.light-theme #jornada-table-foot {
+    background-color: #f8fafc !important;
+    border-top: 2px solid #059669 !important;
+}
+
+.light-theme #jornada-table-foot tr {
+    background-color: #f8fafc !important;
+}
+
+.light-theme #jornada-table-foot td {
+    border-color: #e2e8f0 !important;
+}
+
+.light-theme #jornada-table-foot strong.text-emerald-400 {
+    color: #047857 !important;
+}
+
+.light-theme #jornada-table-foot .text-white {
+    color: #0f172a !important;
+}
+
+.light-theme #jornada-table-foot .text-slate-200,
+.light-theme #jornada-table-foot .text-slate-300 {
+    color: #1e293b !important;
+}
+
+.light-theme #jornada-table-foot .text-slate-400,
+.light-theme #jornada-table-foot .text-slate-500 {
+    color: #64748b !important;
+}
+
+.light-theme #jornada-table-foot .text-amber-400 {
+    color: #b45309 !important;
+}
+
+.light-theme #jornada-table-foot .text-rose-400 {
+    color: #be123c !important;
+}
+
+.light-theme #jornada-table-foot .text-emerald-400 {
+    color: #047857 !important;
+}
+
+.light-theme #jornada-table-foot .text-purple-300 {
+    color: #6b21a8 !important;
+}
+
+.light-theme #jornada-table-foot td:last-child {
+    background-color: #fef3c7 !important;
+}
+
+.light-theme #jornada-table-foot td:last-child div {
+    color: #92400e !important;
+}
+
 /* H. Matriz Cuadrante: Estado de aciertos de socios penalizados */
 /* Requisito de usuario: Cuadro a rojo oscuro y texto a rosa claro */
 .light-theme #matriz-tbody .bg-rose-950\/70,

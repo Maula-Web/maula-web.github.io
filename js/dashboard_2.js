@@ -1621,6 +1621,12 @@ class Dashboard2AppController {
             url: 'bote_2.html'
         });
 
+        // 2.e NOVEDAD EN BOTE: Fila de totales en Detalle de la Jornada
+        items.push({
+            text: `📊 <strong class="text-amber-400">Novedad en Bote:</strong> Nueva fila de totales al pie de la tabla Detalle de la Jornada (aciertos, cuotas, penalizaciones, premios y saldos).`,
+            url: 'bote_2.html'
+        });
+
         // 3. Líder de aciertos en vivo / Ganador de la jornada
         if (isNextInProgress && liveWinnerHits !== null && liveWinnerHits >= 0) {
             items.push({ text: `👑 <strong class="text-amber-300">Líder provisional en directo:</strong> ${liveWinnerName} encabeza la jornada con ${liveWinnerHits} aciertos.`, action: 'dobles' });

@@ -294,6 +294,12 @@
                 url: 'bote_2.html'
             });
 
+            // NOTICIA 2.e: NOVEDAD EN BOTE - Fila de totales en Detalle de la Jornada
+            items.push({
+                text: `📊 <strong class="text-amber-400">Novedad en Bote:</strong> Nueva fila de totales al pie de la tabla Detalle de la Jornada (aciertos, cuotas, penalizaciones, premios y saldos).`,
+                url: 'bote_2.html'
+            });
+
             // NOTICIAS 2 Y 3: MARCADORES Y RESULTADOS COMPLETOS DE LA JORNADA EN CURSO O RECIENTE
             if (activeMatchJ && Array.isArray(activeMatchJ.matches)) {
                 const validMatches = activeMatchJ.matches.filter(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-');
