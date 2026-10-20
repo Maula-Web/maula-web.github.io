@@ -1627,6 +1627,12 @@ class Dashboard2AppController {
             url: 'bote_2.html'
         });
 
+        // 2.f AUDITORÍA FLUJO DE CAJA
+        items.push({
+            text: `📈 <strong class="text-amber-400">Flujo de Caja del Bote:</strong> Corregidas y auditadas las columnas de penalizaciones y cuotas reales de la tesorería.`,
+            url: 'bote_2.html'
+        });
+
         // 3. Líder de aciertos en vivo / Ganador de la jornada
         if (isNextInProgress && liveWinnerHits !== null && liveWinnerHits >= 0) {
             items.push({ text: `👑 <strong class="text-amber-300">Líder provisional en directo:</strong> ${liveWinnerName} encabeza la jornada con ${liveWinnerHits} aciertos.`, action: 'dobles' });

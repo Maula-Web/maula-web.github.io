@@ -327,9 +327,16 @@ class BoteAppController {
 
             let recaudacion = 0;
             let premios = 0;
+            let penalties = 0;
+            let cuotas = 0;
             jMovements.forEach(m => {
-                recaudacion += (m.pennaIn || 0);
-                premios += ((m.premios || 0) + (m.extraPrizes || 0));
+                const pen = (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0);
+                const cuot = m.exento ? 0 : (m.aportacion || 0);
+                const prem = (m.premios || 0) + (m.extraPrizes || 0);
+                penalties += pen;
+                cuotas += cuot;
+                premios += prem;
+                recaudacion += (cuot + pen);
             });
 
             // 1. Ganador real de ESTA jornada (el socio con más aciertos que ha ganado la jornada)
@@ -402,10 +409,12 @@ class BoteAppController {
                 numSocios: jMovements.length,
                 gastoSellado,
                 recaudacion,
+                cuotas,
+                penalties,
                 premios,
                 hasPrize: isPrizeJornada,
                 hasPig: isPigJornada,
-                totalIn: recaudacion,
+                totalIn: recaudacion + premios,
                 neto,
                 winnerId: winnerId,
                 winnerName: winnerName,
@@ -433,7 +442,7 @@ class BoteAppController {
         let cajaRealOficial = (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA[season] && window.BOTE_FALLBACK_DATA[season].summary && window.BOTE_FALLBACK_DATA[season].summary.cajaReal) || 829.48;
         if (season === '2026-2027') {
             const subsequentJornadas = jornadaSummaries.filter(j => (parseInt(j.number, 10) || 0) > 8);
-            const netSubsequent = subsequentJornadas.reduce((acc, j) => acc + ((j.recaudacion || 0) - (j.gastoSellado || 0)), 0);
+            const netSubsequent = subsequentJornadas.reduce((acc, j) => acc + (j.neto || 0), 0);
             cajaRealOficial = 829.48 + netSubsequent;
         }
 
@@ -508,6 +517,13 @@ class BoteAppController {
 
         if (res && res.jornadaSummaries) {
             res.jornadaSummaries.forEach(j => {
+                const jMovs = (res.movements || []).filter(m => m.jornadaNum === j.number || String(m.jornadaId) === String(j.id));
+                if (typeof j.penalties === 'undefined') {
+                    j.penalties = jMovs.reduce((sum, m) => sum + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0), 0);
+                }
+                if (typeof j.cuotas === 'undefined') {
+                    j.cuotas = jMovs.reduce((sum, m) => sum + (m.exento ? 0 : (m.aportacion || 0)), 0);
+                }
                 if (typeof j.hasPig === 'undefined') {
                     const jMovs = (res.movements || []).filter(m => m.jornadaNum === j.number || String(m.jornadaId) === String(j.id));
                     j.hasPig = !!(
@@ -2086,7 +2102,8 @@ class BoteAppController {
         const cuotaSemanal = jSummary.aportacionSemanal || 1.50;
         const cColumna = jSummary.costeColumna || 0.75;
         const cFondoComun = Math.max(0, cuotaSemanal - cColumna);
-        const totCuotas = numSocios * cuotaSemanal;
+        const totCuotas = jSummary.cuotas !== undefined ? jSummary.cuotas : jMovements.reduce((sum, m) => sum + (m.exento ? 0 : (m.aportacion || 0)), 0);
+        const exemptMovements = jMovements.filter(m => m.exento);
 
         // Desglose de premios
         const doblesPrize = jMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
@@ -2336,8 +2353,9 @@ class BoteAppController {
                 valA = a.numSocios * (a.aportacionSemanal || 1.50);
                 valB = b.numSocios * (b.aportacionSemanal || 1.50);
             } else if (fCol === 'penalties') {
-                valA = Math.max(0, a.recaudacion - (a.numSocios * (a.aportacionSemanal || 1.50)));
-                valB = Math.max(0, b.recaudacion - (b.numSocios * (b.aportacionSemanal || 1.50)));
+                valA = a.penalties !== undefined ? a.penalties : 0;
+                valB = b.penalties !== undefined ? b.penalties : 0;
+
             } else if (fCol === 'premios') {
                 valA = a.premios || 0;
                 valB = b.premios || 0;
@@ -2366,9 +2384,9 @@ class BoteAppController {
         });
 
         sortedJornadas.forEach(j => {
-            const aportacionSemanal = j.aportacionSemanal || 1.50;
-            const cuotasBase = j.numSocios * aportacionSemanal;
-            const penalties = Math.max(0, j.recaudacion - cuotasBase);
+            const jMovements = (data.movements || []).filter(m => m.jornadaNum === j.number || String(m.jornadaId) === String(j.id));
+            const cuotas = j.cuotas !== undefined ? j.cuotas : (jMovements.length > 0 ? jMovements.reduce((sum, m) => sum + (m.exento ? 0 : (m.aportacion || 0)), 0) : (j.numSocios * (j.aportacionSemanal || 1.50)));
+            const penalties = j.penalties !== undefined ? j.penalties : (jMovements.length > 0 ? jMovements.reduce((sum, m) => sum + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0), 0) : 0);
             totalCrecimiento += j.neto;
 
             const cInfo = cronoSaldos[j.number] || { netoAcum: j.neto, total: BOTE_INICIAL + j.neto };
@@ -2385,7 +2403,7 @@ class BoteAppController {
                     ${j.date}
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-emerald-400 cursor-pointer hover:bg-emerald-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'cuotas', ${j.number})" title="Clic para ver desglose de cuotas semanales">
-                    +${cuotasBase.toFixed(2).replace('.', ',')}&nbsp;€
+                    +${cuotas.toFixed(2).replace('.', ',')}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-amber-400 cursor-pointer hover:bg-amber-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'penalizaciones', ${j.number})" title="Clic para ver desglose de penalizaciones">
                     +${penalties.toFixed(2).replace('.', ',')}&nbsp;€
@@ -2448,8 +2466,16 @@ class BoteAppController {
         // Fila de totales en la tabla de Flujo de Caja
         const flujoTfoot = document.getElementById('flujo-table-foot');
         if (flujoTfoot) {
-            const totCuotas = data.jornadaSummaries.reduce((s, j) => s + (j.numSocios * (j.aportacionSemanal || 1.50)), 0);
-            const totPenalties = data.jornadaSummaries.reduce((s, j) => s + Math.max(0, j.recaudacion - (j.numSocios * (j.aportacionSemanal || 1.50))), 0);
+            const totCuotas = data.jornadaSummaries.reduce((s, j) => {
+                if (typeof j.cuotas === 'number') return s + j.cuotas;
+                const jMovs = (data.movements || []).filter(m => m.jornadaNum === j.number || String(m.jornadaId) === String(j.id));
+                return s + (jMovs.length > 0 ? jMovs.reduce((sum, m) => sum + (m.exento ? 0 : (m.aportacion || 0)), 0) : (j.numSocios * (j.aportacionSemanal || 1.50)));
+            }, 0);
+            const totPenalties = data.jornadaSummaries.reduce((s, j) => {
+                if (typeof j.penalties === 'number') return s + j.penalties;
+                const jMovs = (data.movements || []).filter(m => m.jornadaNum === j.number || String(m.jornadaId) === String(j.id));
+                return s + (jMovs.length > 0 ? jMovs.reduce((sum, m) => sum + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0), 0) : 0);
+            }, 0);
             const totPremios = data.jornadaSummaries.reduce((s, j) => s + (j.premios || 0), 0);
             const totSellado = data.jornadaSummaries.reduce((s, j) => s + (j.gastoSellado || 0), 0);
             const totNeto = data.jornadaSummaries.reduce((s, j) => s + (j.neto || 0), 0);

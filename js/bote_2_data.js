@@ -32,12 +32,12 @@ window.BOTE_FALLBACK_DATA = {
         "penalizacionPIG": 1,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 34.300000000000004,
+        "recaudacion": 34.3,
         "premios": 0,
         "hasPrize": false,
         "hasPig": true,
-        "totalIn": 34.300000000000004,
-        "neto": 8.050000000000004,
+        "totalIn": 34.3,
+        "neto": 8.05,
         "winnerId": "5",
         "winnerName": "Emilio",
         "numDobles": 1,
@@ -50,7 +50,9 @@ window.BOTE_FALLBACK_DATA = {
         "sealerId": "4",
         "sealerName": "Edu",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 5.8
       },
       {
         "id": "1786879897736",
@@ -64,12 +66,12 @@ window.BOTE_FALLBACK_DATA = {
         "penalizacionPIG": 1,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 32.099999999999994,
+        "recaudacion": 32.1,
         "premios": 0,
         "hasPrize": false,
         "hasPig": true,
-        "totalIn": 32.099999999999994,
-        "neto": 5.849999999999994,
+        "totalIn": 32.1,
+        "neto": 5.85,
         "winnerId": "4",
         "winnerName": "Edu",
         "numDobles": 1,
@@ -82,7 +84,9 @@ window.BOTE_FALLBACK_DATA = {
         "sealerId": "7",
         "sealerName": "Fernando Ramírez",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1.5
       },
       {
         "id": "1787065938995",
@@ -96,12 +100,12 @@ window.BOTE_FALLBACK_DATA = {
         "penalizacionPIG": 1,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 34.419999999999995,
+        "recaudacion": 32.1,
         "premios": 2.32,
         "hasPrize": true,
         "hasPig": true,
-        "totalIn": 34.419999999999995,
-        "neto": 10.489999999999995,
+        "totalIn": 34.42,
+        "neto": 8.17,
         "winnerId": "13",
         "winnerName": "Luismi",
         "numDobles": 1,
@@ -114,7 +118,9 @@ window.BOTE_FALLBACK_DATA = {
         "sealerId": "19",
         "sealerName": "Samuel",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1.5
       },
       {
         "id": 1787906956305,
@@ -128,12 +134,12 @@ window.BOTE_FALLBACK_DATA = {
         "penalizacionPIG": 1,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 35.5,
+        "recaudacion": 32.1,
         "premios": 3.4,
         "hasPrize": true,
         "hasPig": true,
         "totalIn": 35.5,
-        "neto": 12.65,
+        "neto": 9.25,
         "winnerId": "6",
         "winnerName": "Fernando Lozano",
         "numDobles": 1,
@@ -146,7 +152,9 @@ window.BOTE_FALLBACK_DATA = {
         "sealerId": "4",
         "sealerName": "Edu",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1.5
       },
       {
         "id": 1788451078976,
@@ -160,12 +168,12 @@ window.BOTE_FALLBACK_DATA = {
         "penalizacionPIG": 1,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 31.59999999999999,
+        "recaudacion": 31.6,
         "premios": 0,
         "hasPrize": false,
         "hasPig": true,
-        "totalIn": 31.59999999999999,
-        "neto": 5.349999999999991,
+        "totalIn": 31.6,
+        "neto": 5.35,
         "winnerId": "9",
         "winnerName": "JA Valdivieso",
         "numDobles": 1,
@@ -178,7 +186,9 @@ window.BOTE_FALLBACK_DATA = {
         "sealerId": "13",
         "sealerName": "Luismi",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1
       },
       {
         "id": 1789054862274,
@@ -192,12 +202,12 @@ window.BOTE_FALLBACK_DATA = {
         "penalizacionPIG": 1,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 46.60000000000001,
+        "recaudacion": 46.6,
         "premios": 0,
         "hasPrize": false,
         "hasPig": true,
-        "totalIn": 46.60000000000001,
-        "neto": 20.35000000000001,
+        "totalIn": 46.6,
+        "neto": 20.35,
         "winnerId": "11",
         "winnerName": "Juan Antonio",
         "numDobles": 1,
@@ -210,7 +220,9 @@ window.BOTE_FALLBACK_DATA = {
         "sealerId": "12",
         "sealerName": "Juanjo",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 16
       },
       {
         "id": "1790607234270",
@@ -224,12 +236,12 @@ window.BOTE_FALLBACK_DATA = {
         "penalizacionPIG": 1,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 291.2399999999999,
+        "recaudacion": 33.2,
         "premios": 258.04,
         "hasPrize": true,
         "hasPig": false,
-        "totalIn": 291.2399999999999,
-        "neto": 523.03,
+        "totalIn": 291.24,
+        "neto": 264.99,
         "winnerId": "4",
         "winnerName": "Edu",
         "numDobles": 1,
@@ -242,7 +254,9 @@ window.BOTE_FALLBACK_DATA = {
         "sealerId": "3",
         "sealerName": "David Buzón",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 2.6
       }
     ],
     "memberSummaries": [
@@ -10150,13 +10164,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 30.1,
         "premios": 0,
         "totalIn": 30.1,
-        "neto": 5.350000000000001,
+        "neto": 3.85,
         "winnerId": "2",
         "winnerName": "Carlos",
         "loserId": "15",
         "loserName": "Martín",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.6
       },
       {
         "number": 2,
@@ -10168,13 +10184,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 30,
         "premios": 28.84,
         "totalIn": 58.84,
-        "neto": 34.09,
+        "neto": 32.59,
         "winnerId": "9",
         "winnerName": "JA Valdivieso",
         "loserId": "14",
         "loserName": "Marcelo",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.5
       },
       {
         "number": 3,
@@ -10183,16 +10201,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 32.199999999999996,
+        "recaudacion": 32.2,
         "premios": 0,
-        "totalIn": 32.199999999999996,
-        "neto": 7.449999999999996,
+        "totalIn": 32.2,
+        "neto": 5.95,
         "winnerId": "2",
         "winnerName": "Carlos",
         "loserId": "18",
         "loserName": "Raúl Romera",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1.6
       },
       {
         "number": 5,
@@ -10204,13 +10224,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 13.08,
         "totalIn": 42.58,
-        "neto": 17.83,
+        "neto": 16.33,
         "winnerId": "2",
         "winnerName": "Carlos",
         "loserId": "17",
         "loserName": "Ramón",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 7,
@@ -10219,16 +10241,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 31.59999999999999,
+        "recaudacion": 31.6,
         "premios": 1,
-        "totalIn": 32.599999999999994,
-        "neto": 7.849999999999994,
+        "totalIn": 32.6,
+        "neto": 6.35,
         "winnerId": "2",
         "winnerName": "Carlos",
         "loserId": "17",
         "loserName": "Ramón",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1
       },
       {
         "number": 9,
@@ -10237,16 +10261,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 47.90000000000001,
+        "recaudacion": 47.9,
         "premios": 0,
-        "totalIn": 47.90000000000001,
-        "neto": 23.150000000000013,
+        "totalIn": 47.9,
+        "neto": 21.65,
         "winnerId": "5",
         "winnerName": "Emilio",
         "loserId": "6",
         "loserName": "Fernando Lozano",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 17.3
       },
       {
         "number": 11,
@@ -10258,13 +10284,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 31.7,
         "premios": 0,
         "totalIn": 31.7,
-        "neto": 6.949999999999999,
+        "neto": 5.45,
         "winnerId": "3",
         "winnerName": "David Buzón",
         "loserId": "19",
         "loserName": "Samuel",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 3.2
       },
       {
         "number": 14,
@@ -10276,13 +10304,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 0,
         "totalIn": 29.5,
-        "neto": 4.75,
+        "neto": 3.25,
         "winnerId": "16",
         "winnerName": "Rafa",
         "loserId": "13",
         "loserName": "Luismi",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 16,
@@ -10294,13 +10324,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 37.6,
         "premios": 0,
         "totalIn": 37.6,
-        "neto": 12.850000000000001,
+        "neto": 11.35,
         "winnerId": "1",
         "winnerName": "Alvaro",
         "loserId": "6",
         "loserName": "Fernando Lozano",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 9.1
       },
       {
         "number": 17,
@@ -10312,13 +10344,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 0,
         "totalIn": 29.5,
-        "neto": 4.75,
+        "neto": 3.25,
         "winnerId": "19",
         "winnerName": "Samuel",
         "loserId": "16",
         "loserName": "Rafa",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 19,
@@ -10330,13 +10364,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 0,
         "totalIn": 29.5,
-        "neto": 4.75,
+        "neto": 3.25,
         "winnerId": "9",
         "winnerName": "JA Valdivieso",
         "loserId": "16",
         "loserName": "Rafa",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 22,
@@ -10348,13 +10384,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 3.96,
         "totalIn": 33.46,
-        "neto": 8.71,
+        "neto": 7.21,
         "winnerId": "4",
         "winnerName": "Edu",
         "loserId": "5",
         "loserName": "Emilio",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 24,
@@ -10363,16 +10401,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 32.099999999999994,
+        "recaudacion": 32.1,
         "premios": 0,
-        "totalIn": 32.099999999999994,
-        "neto": 7.349999999999994,
+        "totalIn": 32.1,
+        "neto": 5.85,
         "winnerId": "7",
         "winnerName": "Fernando Ramírez",
         "loserId": "14",
         "loserName": "Marcelo",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1.5
       },
       {
         "number": 26,
@@ -10384,13 +10424,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 6.3,
         "totalIn": 35.8,
-        "neto": 11.049999999999997,
+        "neto": 9.55,
         "winnerId": "4",
         "winnerName": "Edu",
         "loserId": "10",
         "loserName": "Javier Mora",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 28,
@@ -10399,16 +10441,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 31.59999999999999,
+        "recaudacion": 31.6,
         "premios": 0,
-        "totalIn": 31.59999999999999,
-        "neto": 6.849999999999991,
+        "totalIn": 31.6,
+        "neto": 5.35,
         "winnerId": "3",
         "winnerName": "David Buzón",
         "loserId": "7",
         "loserName": "Fernando Ramírez",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1
       },
       {
         "number": 30,
@@ -10420,13 +10464,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 31,
         "premios": 0,
         "totalIn": 31,
-        "neto": 6.25,
+        "neto": 4.75,
         "winnerId": "2",
         "winnerName": "Carlos",
         "loserId": "5",
         "loserName": "Emilio",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 2.5
       },
       {
         "number": 32,
@@ -10438,13 +10484,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 32.5,
         "premios": 0,
         "totalIn": 32.5,
-        "neto": 7.75,
+        "neto": 6.25,
         "winnerId": "8",
         "winnerName": "Heradio",
         "loserId": "16",
         "loserName": "Rafa",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 4
       },
       {
         "number": 33,
@@ -10462,7 +10510,9 @@ window.BOTE_FALLBACK_DATA = {
         "loserId": "18",
         "loserName": "Raúl Romera",
         "noSellado": true,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 0,
+        "penalties": 0
       },
       {
         "number": 35,
@@ -10471,16 +10521,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 29.799999999999997,
+        "recaudacion": 29.8,
         "premios": 5.3,
-        "totalIn": 35.099999999999994,
-        "neto": 10.349999999999994,
+        "totalIn": 35.1,
+        "neto": 8.85,
         "winnerId": "3",
         "winnerName": "David Buzón",
         "loserId": "18",
         "loserName": "Raúl Romera",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.3
       },
       {
         "number": 37,
@@ -10489,16 +10541,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 33.29999999999999,
+        "recaudacion": 33.3,
         "premios": 0,
-        "totalIn": 33.29999999999999,
-        "neto": 8.54999999999999,
+        "totalIn": 33.3,
+        "neto": 7.05,
         "winnerId": "13",
         "winnerName": "Luismi",
         "loserId": "3",
         "loserName": "David Buzón",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 32.3,
+        "penalties": 1
       },
       {
         "number": 39,
@@ -10510,13 +10564,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 30,
         "premios": 8.17,
         "totalIn": 38.17,
-        "neto": 13.420000000000002,
+        "neto": 11.92,
         "winnerId": "13",
         "winnerName": "Luismi",
         "loserId": "17",
         "loserName": "Ramón",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.5
       },
       {
         "number": 40,
@@ -10525,16 +10581,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 31.699999999999992,
+        "recaudacion": 31.7,
         "premios": 87.67,
-        "totalIn": 119.36999999999999,
-        "neto": 94.61999999999999,
+        "totalIn": 119.37,
+        "neto": 93.12,
         "winnerId": "8",
         "winnerName": "Heradio",
         "loserId": "1",
         "loserName": "Alvaro",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 1.1
       },
       {
         "number": 42,
@@ -10543,16 +10601,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 34.099999999999994,
+        "recaudacion": 34.1,
         "premios": 0,
-        "totalIn": 34.099999999999994,
-        "neto": 9.349999999999994,
+        "totalIn": 34.1,
+        "neto": 7.85,
         "winnerId": "17",
         "winnerName": "Ramón",
         "loserId": "16",
         "loserName": "Rafa",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 3.5
       },
       {
         "number": 44,
@@ -10561,16 +10621,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 29.999999999999996,
+        "recaudacion": 30,
         "premios": 0,
-        "totalIn": 29.999999999999996,
-        "neto": 5.2499999999999964,
+        "totalIn": 30,
+        "neto": 3.75,
         "winnerId": "5",
         "winnerName": "Emilio",
         "loserId": "10",
         "loserName": "Javier Mora",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.5
       },
       {
         "number": 45,
@@ -10582,13 +10644,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 31.1,
         "premios": 0,
         "totalIn": 31.1,
-        "neto": 6.350000000000001,
+        "neto": 4.85,
         "winnerId": "15",
         "winnerName": "Martín",
         "loserId": "6",
         "loserName": "Fernando Lozano",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 2.6
       },
       {
         "number": 46,
@@ -10600,13 +10664,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 0,
         "totalIn": 29.5,
-        "neto": 4.75,
+        "neto": 3.25,
         "winnerId": "17",
         "winnerName": "Ramón",
         "loserId": "18",
         "loserName": "Raúl Romera",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 48,
@@ -10618,13 +10684,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 30,
         "premios": 3.39,
         "totalIn": 33.39,
-        "neto": 8.64,
+        "neto": 7.14,
         "winnerId": "14",
         "winnerName": "Marcelo",
         "loserId": "19",
         "loserName": "Samuel",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.5
       },
       {
         "number": 50,
@@ -10636,13 +10704,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 36,
         "premios": 0,
         "totalIn": 36,
-        "neto": 11.25,
+        "neto": 9.75,
         "winnerId": "17",
         "winnerName": "Ramón",
         "loserId": "10",
         "loserName": "Javier Mora",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 30.6,
+        "penalties": 5.4
       },
       {
         "number": 53,
@@ -10654,13 +10724,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 42.5,
         "premios": 0,
         "totalIn": 42.5,
-        "neto": 17.75,
+        "neto": 16.25,
         "winnerId": "15",
         "winnerName": "Martín",
         "loserId": "10",
         "loserName": "Javier Mora",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 14
       },
       {
         "number": 55,
@@ -10672,13 +10744,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 34.5,
         "premios": 0,
         "totalIn": 34.5,
-        "neto": 9.75,
+        "neto": 8.25,
         "winnerId": "2",
         "winnerName": "Carlos",
         "loserId": "16",
         "loserName": "Rafa",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 6
       },
       {
         "number": 59,
@@ -10690,13 +10764,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 30,
         "premios": 0,
         "totalIn": 30,
-        "neto": 5.25,
+        "neto": 3.75,
         "winnerId": "12",
         "winnerName": "Juanjo",
         "loserId": "4",
         "loserName": "Edu",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.5
       },
       {
         "number": 60,
@@ -10708,13 +10784,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.7,
         "premios": 4.22,
         "totalIn": 33.92,
-        "neto": 9.170000000000002,
+        "neto": 7.67,
         "winnerId": "14",
         "winnerName": "Marcelo",
         "loserId": "16",
         "loserName": "Rafa",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1.2
       },
       {
         "number": 61,
@@ -10723,16 +10801,18 @@ window.BOTE_FALLBACK_DATA = {
         "costeDobles": 12,
         "numSocios": 19,
         "gastoSellado": 26.25,
-        "recaudacion": 46.29999999999999,
+        "recaudacion": 46.3,
         "premios": 0,
-        "totalIn": 46.29999999999999,
-        "neto": 21.54999999999999,
+        "totalIn": 46.3,
+        "neto": 20.05,
         "winnerId": "14",
         "winnerName": "Marcelo",
         "loserId": "18",
         "loserName": "Raúl Romera",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 32.3,
+        "penalties": 14
       },
       {
         "number": 63,
@@ -10744,13 +10824,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 29.5,
         "premios": 0,
         "totalIn": 29.5,
-        "neto": 4.75,
+        "neto": 3.25,
         "winnerId": "5",
         "winnerName": "Emilio",
         "loserId": "10",
         "loserName": "Javier Mora",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 1
       },
       {
         "number": 64,
@@ -10762,13 +10844,15 @@ window.BOTE_FALLBACK_DATA = {
         "recaudacion": 32.1,
         "premios": 0,
         "totalIn": 32.1,
-        "neto": 7.350000000000001,
+        "neto": 5.85,
         "winnerId": "1",
         "winnerName": "Alvaro",
         "loserId": "4",
         "loserName": "Edu",
         "noSellado": false,
-        "sustitutoSellado": null
+        "sustitutoSellado": null,
+        "cuotas": 28.5,
+        "penalties": 3.6
       }
     ],
     "memberSummaries": [

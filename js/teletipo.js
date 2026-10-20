@@ -300,6 +300,12 @@
                 url: 'bote_2.html'
             });
 
+            // NOTICIA 2.f: AUDITORÍA FLUJO DE CAJA
+            items.push({
+                text: `📈 <strong class="text-amber-400">Flujo de Caja del Bote:</strong> Corregidas y auditadas las columnas de penalizaciones y cuotas reales de la tesorería.`,
+                url: 'bote_2.html'
+            });
+
             // NOTICIAS 2 Y 3: MARCADORES Y RESULTADOS COMPLETOS DE LA JORNADA EN CURSO O RECIENTE
             if (activeMatchJ && Array.isArray(activeMatchJ.matches)) {
                 const validMatches = activeMatchJ.matches.filter(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-');
