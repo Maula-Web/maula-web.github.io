@@ -10,13 +10,13 @@ window.BOTE_FALLBACK_DATA = {
       "penalizacionPIG": 1
     },
     "summary": {
-      "cajaReal": 1016.72,
+      "cajaReal": 1021.64,
       "totalSaldosVirtuales": 694.71,
       "totalIngresos": 1200.47,
       "totalGastos": 183.75,
       "totalGastosSocios": 242,
-      "totalPremios": 263.76,
-      "superavit": 322.01,
+      "totalPremios": 268.68,
+      "superavit": 326.93,
       "jornadasJugadasCount": 8
     },
     "jornadaSummaries": [
@@ -203,11 +203,11 @@ window.BOTE_FALLBACK_DATA = {
         "numSocios": 19,
         "gastoSellado": 26.25,
         "recaudacion": 46.6,
-        "premios": 0,
-        "hasPrize": false,
+        "premios": 4.92,
+        "hasPrize": true,
         "hasPig": true,
-        "totalIn": 46.6,
-        "neto": 20.35,
+        "totalIn": 51.52,
+        "neto": 25.27,
         "winnerId": "11",
         "winnerName": "Juan Antonio",
         "numDobles": 1,
@@ -4958,7 +4958,7 @@ window.BOTE_FALLBACK_DATA = {
         "id": 9,
         "name": "JA Valdivieso",
         "phone": "Valdi",
-        "totIn": 12.09,
+        "totIn": 17.01,
         "totOut": 12.1,
         "saldo": -0.010000000000000453,
         "breakdown": {
@@ -4968,7 +4968,7 @@ window.BOTE_FALLBACK_DATA = {
           "pig": 1,
           "maula": 0,
           "manuales": 12.09,
-          "premios": 0
+          "premios": 4.92
         },
         "movements": [
           {

@@ -706,12 +706,12 @@ class Dashboard2AppController {
 
         // 3. Fallback de seguridad oficial de la Peña
         return {
-            cajaReal: 1016.72,
+            cajaReal: 1021.64,
             totalSaldosVirtuales: 694.71,
-            superavit: 322.01,
+            superavit: 326.93,
             totalIngresos: 1200.47,
             totalGastos: 183.75,
-            totalPremios: 263.76
+            totalPremios: 268.68
         };
     }
 
@@ -1269,7 +1269,7 @@ class Dashboard2AppController {
         const elBoteLink = document.getElementById('user-card-bote-link');
 
         const summary = this.getBoteOfficialSummary();
-        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1016.72;
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
         const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro)
             ? window.AppUtils.formatEuro(cajaReal)
             : `${cajaReal.toFixed(2).replace('.', ',')} €`;
@@ -1515,7 +1515,7 @@ class Dashboard2AppController {
         const elPremios = document.getElementById('dashboard-bote-premios');
 
         const summary = this.getBoteOfficialSummary();
-        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1016.72;
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
         const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
         const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
 
@@ -1665,7 +1665,7 @@ class Dashboard2AppController {
 
         // 6. Caja Real de la Peña
         const summary = this.getBoteOfficialSummary();
-        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1016.72;
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
         const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
         items.push({ text: `💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común (Saldos + Premios + Cuotas + Multas − Sellados).`, action: 'bote' });
 

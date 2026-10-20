@@ -103,8 +103,8 @@
             const activeMatchJ = inProgressJ || lastPlayedJ;
 
             // 2. Calcular tesorería oficial (Caja Real y Superávit)
-            let cajaReal = 1016.72;
-            let superavit = 322.01;
+            let cajaReal = 1021.64;
+            let superavit = 326.93;
             if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
                 const sd = window.BoteApp.getSeasonData();
                 if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') {
