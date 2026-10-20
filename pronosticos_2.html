@@ -2234,11 +2234,6 @@
                 });
             }
 
-            if (parseInt(j.number) === 16) {
-                // Seguridad adicional: asegurar que Luismi (id 13) no quede seleccionado en J16
-                const idxLuismi = list.findIndex(m => String(m.id) === '13');
-                if (idxLuismi !== -1) list.splice(idxLuismi, 1);
-            }
 
             if (window._eligibleDoublesCache) {
                 window._eligibleDoublesCache.set(cacheKey, list);
