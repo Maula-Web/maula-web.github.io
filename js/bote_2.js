@@ -659,6 +659,46 @@ class BoteAppController {
                 mobSup.className = `text-[9px] font-bold truncate ${superavit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
         }
+
+        // Desglose de movimientos y balance contable (#card-desglose-balance-bote)
+        const cardBreakdownSaldos = document.getElementById('card-breakdown-saldos');
+        const cardBreakdownPremios = document.getElementById('card-breakdown-premios');
+        const cardBreakdownCuotas = document.getElementById('card-breakdown-cuotas');
+        const cardBreakdownPenalizaciones = document.getElementById('card-breakdown-penalizaciones');
+        const cardBreakdownSellados = document.getElementById('card-breakdown-sellados');
+
+        if (cardBreakdownSaldos) {
+            const val = actualSumaSaldos;
+            cardBreakdownSaldos.textContent = `${val >= 0 ? '+' : ''}${val.toFixed(2).replace('.', ',')} €`;
+        }
+
+        const actualTotalPremios = (data.memberSummaries && data.memberSummaries.length > 0)
+            ? data.memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.premios || 0) : 0), 0)
+            : (s.totalPremios || 0);
+        if (cardBreakdownPremios) {
+            cardBreakdownPremios.textContent = `+${actualTotalPremios.toFixed(2).replace('.', ',')} €`;
+        }
+
+        const actualTotalCuotas = (data.memberSummaries && data.memberSummaries.length > 0)
+            ? data.memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.cuotas || 0) : 0), 0)
+            : 0;
+        if (cardBreakdownCuotas) {
+            cardBreakdownCuotas.textContent = `+${actualTotalCuotas.toFixed(2).replace('.', ',')} €`;
+        }
+
+        const actualTotalPenalizaciones = (data.memberSummaries && data.memberSummaries.length > 0)
+            ? data.memberSummaries.reduce((sum, m) => sum + (m.breakdown ? ((m.breakdown.unos || 0) + (m.breakdown.bajos || 0) + (m.breakdown.pig || 0) + (m.breakdown.maula || 0)) : 0), 0)
+            : 0;
+        if (cardBreakdownPenalizaciones) {
+            cardBreakdownPenalizaciones.textContent = `+${actualTotalPenalizaciones.toFixed(2).replace('.', ',')} €`;
+        }
+
+        const actualTotalSellados = (data.jornadaSummaries && data.jornadaSummaries.length > 0)
+            ? data.jornadaSummaries.reduce((sum, j) => sum + (j.gastoSellado || 0), 0)
+            : (s.totalGastos || 0);
+        if (cardBreakdownSellados) {
+            cardBreakdownSellados.textContent = `-${actualTotalSellados.toFixed(2).replace('.', ',')} €`;
+        }
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
         if (bJornadas) bJornadas.textContent = data.jornadaSummaries.length;
 

@@ -288,6 +288,12 @@
                 url: 'pronosticos_2.html'
             });
 
+            // NOTICIA 2.d: NOVEDAD EN BOTE - Tarjeta Balance y Desglose Contable
+            items.push({
+                text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Nueva tarjeta con el balance contable completo: saldos de socios, premios, cuotas, penalizaciones y sellados.`,
+                url: 'bote_2.html'
+            });
+
             // NOTICIAS 2 Y 3: MARCADORES Y RESULTADOS COMPLETOS DE LA JORNADA EN CURSO O RECIENTE
             if (activeMatchJ && Array.isArray(activeMatchJ.matches)) {
                 const validMatches = activeMatchJ.matches.filter(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-');

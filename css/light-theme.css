@@ -2395,3 +2395,62 @@ html.light-theme #user-summary-card {
     border-color: #e8dfcf !important;
 }
 
+
+/* =========================================================================
+   Tarjeta Desglose de Balance y Movimientos del Bote (#card-desglose-balance-bote)
+   ========================================================================= */
+.light-theme #card-desglose-balance-bote,
+html.light-theme #card-desglose-balance-bote {
+    background-color: #ffffff !important;
+    border-color: #e8dfcf !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+.light-theme #card-desglose-balance-bote h3 {
+    color: #0f172a !important;
+}
+
+.light-theme #card-desglose-balance-bote .border-b {
+    border-color: #e2e8f0 !important;
+}
+
+.light-theme #card-desglose-balance-bote .breakdown-item-aporta {
+    background-color: #f0fdf4 !important;
+    border-color: #bbf7d0 !important;
+}
+
+.light-theme #card-desglose-balance-bote .breakdown-item-resta {
+    background-color: #fff1f2 !important;
+    border-color: #fecdd3 !important;
+}
+
+.light-theme #card-desglose-balance-bote .breakdown-label {
+    color: #334155 !important;
+}
+
+.light-theme #card-desglose-balance-bote .breakdown-subtext {
+    color: #64748b !important;
+}
+
+.light-theme #card-desglose-balance-bote .badge-aporta {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #047857 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+.light-theme #card-desglose-balance-bote .badge-resta {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    color: #be123c !important;
+    border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+.light-theme #card-breakdown-saldos,
+.light-theme #card-breakdown-premios,
+.light-theme #card-breakdown-cuotas,
+.light-theme #card-breakdown-penalizaciones {
+    color: #047857 !important;
+}
+
+.light-theme #card-breakdown-sellados {
+    color: #be123c !important;
+}

@@ -1615,6 +1615,12 @@ class Dashboard2AppController {
             action: 'dobles'
         });
 
+        // 2.d NOVEDAD EN BOTE: Tarjeta Balance y Desglose Contable
+        items.push({
+            text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Nueva tarjeta con el balance contable completo: saldos de socios, premios, cuotas, penalizaciones y sellados.`,
+            url: 'bote_2.html'
+        });
+
         // 3. Líder de aciertos en vivo / Ganador de la jornada
         if (isNextInProgress && liveWinnerHits !== null && liveWinnerHits >= 0) {
             items.push({ text: `👑 <strong class="text-amber-300">Líder provisional en directo:</strong> ${liveWinnerName} encabeza la jornada con ${liveWinnerHits} aciertos.`, action: 'dobles' });
