@@ -1244,7 +1244,7 @@ class Dashboard2AppController {
             const sd = window.BoteApp.getSeasonData();
             if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') summary = sd.summary;
         }
-        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1091.52) : 1091.52;
+        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1016.72) : 1016.72;
         const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro)
             ? window.AppUtils.formatEuro(cajaReal)
             : `${cajaReal.toFixed(2).replace('.', ',')} €`;
@@ -1513,7 +1513,7 @@ class Dashboard2AppController {
             }
         }
 
-        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1091.52) : 1091.52;
+        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1016.72) : 1016.72;
         let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 694.71) : 694.71;
         let superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
 
@@ -1675,9 +1675,9 @@ class Dashboard2AppController {
             const sd = window.BoteApp.getSeasonData();
             if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') summary = sd.summary;
         }
-        const cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1091.52) : 1091.52;
+        const cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1016.72) : 1016.72;
         const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
-        items.push({ text: `💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común.`, action: 'bote' });
+        items.push({ text: `💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común (Saldos + Premios + Cuotas + Multas − Sellados).`, action: 'bote' });
 
         // 7. Partido PIG
         const nextPigInfo = this.findPigMatch(nextJ);

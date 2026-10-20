@@ -10,13 +10,13 @@ window.BOTE_FALLBACK_DATA = {
       "penalizacionPIG": 1
     },
     "summary": {
-      "cajaReal": 1091.52,
+      "cajaReal": 1016.72,
       "totalSaldosVirtuales": 694.71,
       "totalIngresos": 1200.47,
       "totalGastos": 183.75,
       "totalGastosSocios": 242,
       "totalPremios": 263.76,
-      "superavit": 396.81,
+      "superavit": 322.01,
       "jornadasJugadasCount": 8
     },
     "jornadaSummaries": [

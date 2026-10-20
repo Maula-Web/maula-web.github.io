@@ -103,8 +103,8 @@
             const activeMatchJ = inProgressJ || lastPlayedJ;
 
             // 2. Calcular tesorería oficial (Caja Real y Superávit)
-            let cajaReal = 1091.52;
-            let superavit = 396.81;
+            let cajaReal = 1016.72;
+            let superavit = 322.01;
             try {
                 const cachedBote = localStorage.getItem('maulas_bote2_summary');
                 if (cachedBote) {
@@ -280,6 +280,12 @@
             items.push({
                 text: `👤 <strong class="text-amber-400">Novedad Dashboard:</strong> Nueva tarjeta del Socio Conectado a pantalla completa con aciertos, puesto en clasificación, saldo de bote personal y alerta de PIG.`,
                 url: 'dashboard_2.html'
+            });
+
+            // NOTICIA 2.d: CAJA REAL OFICIAL Y BALANCE CONTABLE
+            items.push({
+                text: `💰 <strong class="text-amber-400">Caja Real Oficial:</strong> Fijada en <strong>${cajaFmt}</strong> (suma de tarjetas: Saldos + Premios + Cuotas + Penalizaciones − Sellados).`,
+                url: 'bote_2.html'
             });
 
             // NOTICIA 2.c: QUINIELA DE DOBLES JORNADA 16

@@ -1435,8 +1435,8 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 - **Scroll Horizontal/Apaisado en Dashboard**: Corregido el bloqueo de desplazamiento vertical cuando el dispositivo móvil se orienta en horizontal (`overflow-y: auto`, eliminación de cerrojos rígidos de altura).
 
 ### B. Corrección de Tesorería y Resultados en Vivo en Teletipo
-- **Caja Real Oficial Unificada**: Fijada en **1.091,52 €** con superávit de **+396,81 €** en todos los fallbacks, widgets y en el teletipo.
-- **Eliminación del Parpadeo en Bote**: Se actualizaron los valores estáticos iniciales de `bote_2.html`, eliminando la transición visual errónea de 829,48 € a 1.091,52 €.
+- **Caja Real Oficial Unificada**: Establecida por regla oficial como la suma exacta de las tarjetas del balance y desglose contable: `Saldos de socios (+694,71 €) + Premios temporada (+263,76 €) + Cuotas semanales (+212,10 €) + Penalizaciones (+29,90 €) − Sellados (183,75 €) = 1.016,72 €` con superávit de `+322,01 €` en todos los módulos, fallbacks, widgets y teletipo de noticias.
+- **Eliminación del Parpadeo en Bote**: Se actualizaron los valores estáticos iniciales de `bote_2.html` a `1.016,72 €` / `+322,01 €`, sincronizando la carga instantánea sin saltos numéricos.
 - **Partidos y Resultados Reales**: El teletipo detecta con precisión la jornada en curso/reciente mostrando marcadores y signos en bloques limpios de 5 partidos (ej. partidos 1-5, 6-10, 11-15).
 - **Limpieza de Contenido**: Se suprimieron avisos de bromas ("echar a Emilio") o reglas teóricas, dando prioridad al podio general, líder, farolillo rojo y sellador de la semana.
 

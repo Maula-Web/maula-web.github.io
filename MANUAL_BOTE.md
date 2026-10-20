@@ -11,8 +11,16 @@ Cada socio tiene su propio bote personal que se actualiza semanalmente según:
 - **Ingresos**: Aportaciones semanales, premios obtenidos, ingresos manuales (Bizum, transferencias)
 - **Gastos**: Coste de columnas, penalizaciones, sellados
 
-### 2. **Bote Total de la Peña**
-Es la suma de todos los botes individuales más el bote inicial de temporadas anteriores.
+### 2. **Caja Real y Bote Total de la Peña**
+La **Caja Real** es la tesorería física total de la Peña calculada oficialmente como la suma de las tarjetas del balance y desglose contable:
+- **🟢 Suma total de saldos de socios** (huchas virtuales acumuladas)
+- **🟢 Más Premios oficiales de la temporada** (Loterías del Estado)
+- **🟢 Más Cuotas semanales** (aportaciones fijas de quiniela)
+- **🟢 Más Penalizaciones** (unos, bajas notas, PIG y Maula)
+- **🔴 Menos Gastos de sellado** reales pagados en administración LAE
+
+El **Superávit Común de la Peña** es el fondo colectivo resultante:
+\text{Superávit} = \text{Caja Real} - \text{Suma Saldos Socios} = \text{Premios} + \text{Cuotas} + \text{Penalizaciones} - \text{Sellados}
 
 ### 3. **Aportación Semanal**
 Cada socio aporta **1,50 €** semanalmente a la Peña. Este dinero se utiliza para:

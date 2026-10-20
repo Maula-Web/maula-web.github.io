@@ -437,14 +437,15 @@ class BoteAppController {
         const totalIngresos = memberSummaries.reduce((sum, m) => sum + m.totIn, 0);
         const totalGastosSocios = memberSummaries.reduce((sum, m) => sum + (m.totOut || 0), 0);
         const totalGastoSellado = jornadaSummaries.reduce((acc, j) => acc + (j.gastoSellado || 0), 0);
-        const totalGastos = totalGastoSellado > 0 ? totalGastoSellado : 157.50;
-        const totalPremios = memberSummaries.reduce((sum, m) => sum + m.breakdown.premios, 0);
-        let cajaRealOficial = (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA[season] && window.BOTE_FALLBACK_DATA[season].summary && window.BOTE_FALLBACK_DATA[season].summary.cajaReal) || 829.48;
-        if (season === '2026-2027') {
-            const subsequentJornadas = jornadaSummaries.filter(j => (parseInt(j.number, 10) || 0) > 8);
-            const netSubsequent = subsequentJornadas.reduce((acc, j) => acc + (j.neto || 0), 0);
-            cajaRealOficial = 829.48 + netSubsequent;
-        }
+        const totalGastos = totalGastoSellado > 0 ? totalGastoSellado : 183.75;
+        const totalPremios = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.premios || 0) : 0), 0);
+        const totalCuotas = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.cuotas || 0) : 0), 0);
+        const totalPenalizaciones = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? ((m.breakdown.unos || 0) + (m.breakdown.bajos || 0) + (m.breakdown.pig || 0) + (m.breakdown.maula || 0)) : 0), 0);
+
+        // REGLA OFICIAL DE LA PEÑA: La Caja Real es la suma de las tarjetas del balance y desglose contable
+        // (Suma saldos socios + Premios temporada + Cuotas semanales + Penalizaciones - Sellados)
+        const cajaRealOficial = totalSaldosVirtuales + totalPremios + totalCuotas + totalPenalizaciones - totalGastos;
+        const superavitOficial = cajaRealOficial - totalSaldosVirtuales;
 
         const seasonModel = {
             season,
@@ -456,7 +457,7 @@ class BoteAppController {
                 totalGastos,
                 totalGastosSocios,
                 totalPremios,
-                superavit: cajaRealOficial - totalSaldosVirtuales,
+                superavit: superavitOficial,
                 jornadasJugadasCount: jornadaSummaries.length
             },
             jornadaSummaries,
@@ -714,6 +715,11 @@ class BoteAppController {
             : (s.totalGastos || 0);
         if (cardBreakdownSellados) {
             cardBreakdownSellados.textContent = `-${actualTotalSellados.toFixed(2).replace('.', ',')} €`;
+        }
+
+        const cardBreakdownTotalCaja = document.getElementById('card-breakdown-total-caja');
+        if (cardBreakdownTotalCaja) {
+            cardBreakdownTotalCaja.textContent = (s.cajaReal || 0).toFixed(2).replace('.', ',') + ' €';
         }
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
         if (bJornadas) bJornadas.textContent = data.jornadaSummaries.length;
