@@ -683,6 +683,49 @@ class Dashboard2AppController {
     /**
      * Banner de estado en vivo en la parte superior
      */
+    /**
+     * Obtención centralizada de tesorería y caja real del Bote
+     */
+    getBoteOfficialSummary() {
+        // 1. Si BoteApp está instanciado en vivo en la ventana, usar sus datos calculados
+        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
+            const sd = window.BoteApp.getSeasonData();
+            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') {
+                return sd.summary;
+            }
+        }
+
+        // 2. Si hay caché en localStorage, verificar que no contenga el valor obsoleto anterior (1091.52)
+        try {
+            const cached = localStorage.getItem('maulas_bote2_summary');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed && typeof parsed.cajaReal === 'number' && parsed.cajaReal !== 1091.52 && parsed.version === '2026_caja_balance_v1') {
+                    return parsed;
+                }
+            }
+        } catch (e) { }
+
+        // 3. Fuente canónica consolidada BOTE_FALLBACK_DATA (calculada exactamente del balance contable)
+        if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
+            const s = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
+            try {
+                localStorage.setItem('maulas_bote2_summary', JSON.stringify({ ...s, version: '2026_caja_balance_v1' }));
+            } catch (e) { }
+            return s;
+        }
+
+        // 4. Fallback de seguridad
+        return {
+            cajaReal: 1016.72,
+            totalSaldosVirtuales: 694.71,
+            superavit: 322.01,
+            totalIngresos: 1200.47,
+            totalGastos: 183.75,
+            totalPremios: 263.76
+        };
+    }
+
     renderLiveBanner(nextJ, inProgress, targetJNum, playedJornadas) {
         const banner = document.getElementById('live-jornada-banner');
         const icon = document.getElementById('live-banner-icon');
@@ -1236,15 +1279,8 @@ class Dashboard2AppController {
         const elBoteAmt = document.getElementById('user-card-bote-amount');
         const elBoteLink = document.getElementById('user-card-bote-link');
 
-        let summary = null;
-        if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
-            summary = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
-        }
-        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
-            const sd = window.BoteApp.getSeasonData();
-            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') summary = sd.summary;
-        }
-        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1016.72) : 1016.72;
+        const summary = this.getBoteOfficialSummary();
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1016.72;
         const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro)
             ? window.AppUtils.formatEuro(cajaReal)
             : `${cajaReal.toFixed(2).replace('.', ',')} €`;
@@ -1488,34 +1524,10 @@ class Dashboard2AppController {
         const elNeto = document.getElementById('dashboard-bote-neto');
         const elPremios = document.getElementById('dashboard-bote-premios');
 
-        // Fuente de verdad canónica: BOTE_FALLBACK_DATA (siempre disponible, nunca se recalcula)
-        let summary = null;
-        if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
-            summary = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
-        }
-
-        // Si BoteEngine está activo en vivo (en bote_2.html), usa sus datos calculados de Firestore
-        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
-            const sd = window.BoteApp.getSeasonData();
-            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') {
-                summary = sd.summary;
-            }
-        }
-        if (!summary || window.BoteApp === undefined) {
-            const cached = localStorage.getItem('maulas_bote2_summary');
-            if (cached) {
-                try {
-                    const parsed = JSON.parse(cached);
-                    if (parsed && typeof parsed.cajaReal === 'number') {
-                        summary = parsed;
-                    }
-                } catch (e) { }
-            }
-        }
-
-        let cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1016.72) : 1016.72;
-        let totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 694.71) : 694.71;
-        let superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
+        const summary = this.getBoteOfficialSummary();
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1016.72;
+        const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
+        const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
 
         if (elTotal) elTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace(".", ",")} €`;
         if (elNeto) elNeto.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toFixed(2).replace(".", ",")} €`;
@@ -1660,22 +1672,8 @@ class Dashboard2AppController {
         }
 
         // 6. Caja Real de la Peña
-        let summary = null;
-        try {
-            const cached = localStorage.getItem('maulas_bote2_summary');
-            if (cached) {
-                const parsed = JSON.parse(cached);
-                if (parsed && typeof parsed.cajaReal === 'number') summary = parsed;
-            }
-        } catch (e) { }
-        if (!summary && window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
-            summary = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
-        }
-        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
-            const sd = window.BoteApp.getSeasonData();
-            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') summary = sd.summary;
-        }
-        const cajaReal = summary ? (typeof summary.cajaReal === 'number' ? summary.cajaReal : 1016.72) : 1016.72;
+        const summary = this.getBoteOfficialSummary();
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1016.72;
         const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
         items.push({ text: `💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común (Saldos + Premios + Cuotas + Multas − Sellados).`, action: 'bote' });
 

@@ -471,6 +471,7 @@ class BoteAppController {
             const officialSummary = {
                 ...seasonModel.summary,
                 superavit: seasonModel.summary.cajaReal - seasonModel.summary.totalSaldosVirtuales,
+                version: '2026_caja_balance_v1',
                 updatedAt: new Date().toISOString()
             };
             localStorage.setItem('maulas_bote2_summary', JSON.stringify(officialSummary));
@@ -490,6 +491,7 @@ class BoteAppController {
             const officialSummary = {
                 ...s,
                 superavit: s.cajaReal - s.totalSaldosVirtuales,
+                version: '2026_caja_balance_v1',
                 updatedAt: new Date().toISOString()
             };
             localStorage.setItem('maulas_bote2_summary', JSON.stringify(officialSummary));
