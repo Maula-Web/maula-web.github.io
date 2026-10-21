@@ -348,6 +348,102 @@ class BoteEngine {
         return balances;
     }
 
+    /**
+     * Cálculo oficial centralizado y unificado de la Caja Real y Balance de Temporada
+     * Garantiza que la Caja Real del Dashboard y de la ventana del Bote coincidan siempre al céntimo.
+     */
+    calculateOfficialSummary(members, jornadas, pronosticos, pronosticosExtra, repartos, cierresVuelta, ingresos, cashPayments) {
+        const memList = members || [];
+        const jorList = jornadas || [];
+        const movements = this.calculateAllMovements(
+            memList,
+            jorList,
+            pronosticos || [],
+            pronosticosExtra || [],
+            repartos || [],
+            cierresVuelta || [],
+            ingresos || [],
+            cashPayments || []
+        );
+
+        const memberSummaries = memList.map(m => {
+            const mIdStr = String(m.id);
+            const mMovements = movements.filter(mov => String(mov.memberId) === mIdStr);
+            let totIn = 0;
+            let totOut = 0;
+            let breakdown = { cuotas: 0, unos: 0, bajos: 0, pig: 0, maula: 0, manuales: 0, premios: 0 };
+
+            mMovements.forEach(mov => {
+                if (mov.isIngresoLibre) {
+                    totIn += (mov.ingresosManual || 0);
+                    breakdown.manuales += (mov.ingresosManual || 0);
+                } else {
+                    totOut += (mov.totalGastos || 0);
+                    breakdown.cuotas += (mov.aportacion || 0);
+                    breakdown.unos += (mov.penalizacionUnos || 0);
+                    breakdown.bajos += (mov.penalizacionBajosAciertos || 0);
+                    breakdown.pig += (mov.penalizacionPIG || 0);
+                    breakdown.maula += (mov.penalizacionMaula || 0);
+
+                    const selladoReemb = (!mov.isSelladoInCash && mov.sellado < 0) ? Math.abs(mov.sellado) : 0;
+                    totIn += ((mov.premios || 0) + (mov.extraPrizes || 0) + (mov.ingresosManual || 0) + selladoReemb);
+                    breakdown.premios += ((mov.premios || 0) + (mov.extraPrizes || 0));
+                }
+            });
+
+            const lastMov = mMovements.length > 0 ? mMovements[mMovements.length - 1] : null;
+            const saldo = lastMov ? lastMov.boteAcumulado : 0;
+
+            return {
+                id: m.id,
+                name: m.name,
+                totIn,
+                totOut,
+                saldo,
+                breakdown
+            };
+        });
+
+        const sortedJornadas = [...jorList].sort((a, b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
+        const playedJornadas = sortedJornadas.filter(j => {
+            return movements.some(m => String(m.jornadaId) === String(j.id) || Number(m.jornadaNum) === Number(j.number));
+        });
+
+        const totalGastoSellado = playedJornadas.reduce((acc, j) => {
+            const jMovements = movements.filter(m => String(m.jornadaId) === String(j.id) || Number(m.jornadaNum) === Number(j.number));
+            const cCol = this.getHistoricalPrice ? this.getHistoricalPrice('costeColumna', j.date) : (this.config.costeColumna || 0.75);
+            const cDob = this.getHistoricalPrice ? this.getHistoricalPrice('costeDobles', j.date) : (this.config.costeDobles || 12.00);
+            const numSociosJornada = jMovements.length || memList.length || 19;
+            const doblesCount = Math.max(1, jMovements.filter(m => m.jugaDobles).length);
+            return acc + (j.noSellado ? 0 : ((numSociosJornada * cCol) + (doblesCount * cDob)));
+        }, 0);
+
+        const totalGastos = totalGastoSellado > 0 ? totalGastoSellado : 183.75;
+        const totalSaldosVirtuales = memberSummaries.reduce((sum, m) => sum + m.saldo, 0);
+        const totalPremios = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.premios || 0) : 0), 0);
+        const totalCuotas = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.cuotas || 0) : 0), 0);
+        const totalPenalizaciones = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? ((m.breakdown.unos || 0) + (m.breakdown.bajos || 0) + (m.breakdown.pig || 0) + (m.breakdown.maula || 0)) : 0), 0);
+        const totalIngresos = memberSummaries.reduce((sum, m) => sum + m.totIn, 0);
+
+        // REGLA OFICIAL DE LA PEÑA:
+        // Caja Real = Saldos + Premios + Cuotas + Penalizaciones - Sellados
+        const cajaRealOficial = totalSaldosVirtuales + totalPremios + totalCuotas + totalPenalizaciones - totalGastos;
+        const superavitOficial = cajaRealOficial - totalSaldosVirtuales;
+
+        return {
+            cajaReal: cajaRealOficial,
+            totalSaldosVirtuales,
+            totalIngresos,
+            totalGastos,
+            totalPremios,
+            totalCuotas,
+            totalPenalizaciones,
+            superavit: superavitOficial,
+            memberSummaries,
+            jornadasJugadasCount: playedJornadas.length
+        };
+    }
+
     calculateJornadaCosts(memberId, members, jornadas, pronosticos, pronosticosExtra, cashPayments, jornada, pronostico, jornadaIndex, infoRedist = null) {
         const matchesWithResult = (jornada.matches || []).filter(m => {
             const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();

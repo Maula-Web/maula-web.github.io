@@ -102,20 +102,29 @@
             // Jornada activa prioritaria para mostrar resultados en el ticker
             const activeMatchJ = inProgressJ || lastPlayedJ;
 
-            // 2. Calcular tesorería oficial (Caja Real y Superávit)
+            // 2. Calcular tesorería oficial (Caja Real y Superávit) - Siempre manda el Bote
             let cajaReal = 1021.64;
             let superavit = 326.93;
-            if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
-                const sd = window.BoteApp.getSeasonData();
-                if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') {
-                    cajaReal = sd.summary.cajaReal;
-                    if (typeof sd.summary.superavit === 'number') superavit = sd.summary.superavit;
+            try {
+                const savedSummary = localStorage.getItem('maulas_bote2_summary');
+                if (savedSummary) {
+                    const parsed = JSON.parse(savedSummary);
+                    if (parsed && typeof parsed.cajaReal === 'number') {
+                        cajaReal = parsed.cajaReal;
+                        if (typeof parsed.superavit === 'number') superavit = parsed.superavit;
+                    }
+                } else if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
+                    const sd = window.BoteApp.getSeasonData();
+                    if (sd && sd.summary && typeof sd.summary.cajaReal === 'number') {
+                        cajaReal = sd.summary.cajaReal;
+                        if (typeof sd.summary.superavit === 'number') superavit = sd.summary.superavit;
+                    }
+                } else if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
+                    const fb = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
+                    if (typeof fb.cajaReal === 'number') cajaReal = fb.cajaReal;
+                    if (typeof fb.superavit === 'number') superavit = fb.superavit;
                 }
-            } else if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
-                const fb = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
-                if (typeof fb.cajaReal === 'number') cajaReal = fb.cajaReal;
-                if (typeof fb.superavit === 'number') superavit = fb.superavit;
-            }
+            } catch(e) {}
             const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
             const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`;
 

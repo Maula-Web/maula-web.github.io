@@ -470,7 +470,7 @@ class BoteAppController {
             ingresos: ingresos.filter(i => (i.season || '2026-2027') === season)
         };
 
-        // Guardar automáticamente en localStorage como fuente oficial de la web
+        // Guardar automáticamente en localStorage y Firestore como fuente oficial absoluta de la web
         try {
             const officialSummary = {
                 ...seasonModel.summary,
@@ -480,6 +480,17 @@ class BoteAppController {
             };
             localStorage.setItem('maulas_bote2_summary', JSON.stringify(officialSummary));
             localStorage.setItem('maulas_bote2_members', JSON.stringify(memberSummaries));
+
+            if (window.DataService && typeof window.DataService.save === 'function') {
+                window.DataService.save('config', {
+                    id: 'bote_official_summary',
+                    ...officialSummary
+                }).catch(err => console.warn('[Bote 2] Error guardando bote_official_summary en Firestore:', err));
+            }
+
+            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+                window.dispatchEvent(new CustomEvent('maulas_bote_summary_updated', { detail: officialSummary }));
+            }
         } catch (e) {
             console.warn('Error guardando maulas_bote2_summary en localStorage:', e);
         }
@@ -501,6 +512,17 @@ class BoteAppController {
             localStorage.setItem('maulas_bote2_summary', JSON.stringify(officialSummary));
             if (sd.memberSummaries && Array.isArray(sd.memberSummaries)) {
                 localStorage.setItem('maulas_bote2_members', JSON.stringify(sd.memberSummaries));
+            }
+
+            if (window.DataService && typeof window.DataService.save === 'function') {
+                window.DataService.save('config', {
+                    id: 'bote_official_summary',
+                    ...officialSummary
+                }).catch(err => console.warn('[Bote 2] Error guardando bote_official_summary en Firestore:', err));
+            }
+
+            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+                window.dispatchEvent(new CustomEvent('maulas_bote_summary_updated', { detail: officialSummary }));
             }
         } catch (e) {
             console.warn('Error guardando maulas_bote2_summary en localStorage:', e);

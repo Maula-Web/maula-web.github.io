@@ -111,6 +111,9 @@ class Dashboard2AppController {
                 window.ScoringSystem.getConfig();
             }
 
+            // Sincronización oficial absoluta de Caja Real y Tesorería del Bote (Siempre manda el Bote)
+            await this.syncOfficialBoteSummary();
+
             // Cargar configuración de Bote para obtener penalización PIG codificada
             try {
                 let boteConfig = null;
@@ -657,7 +660,10 @@ class Dashboard2AppController {
             // J. Widget 9: Broma de Emilio
             this.handlePrankDisplay();
 
-            // K. Cinta Inferior de Noticias (Ticker Telediario con 15 datos dinámicos)
+            // Garantizar sincronización exacta de la Caja Real del Bote en todos los indicadores
+        this.updateCajaRealDisplays();
+
+        // K. Cinta Inferior de Noticias (Ticker Telediario con 15 datos dinámicos)
             this.renderNewsTicker({
                 outcome: lastJornadaOutcome,
                 nextJ: this.nextJornada,
@@ -684,10 +690,104 @@ class Dashboard2AppController {
      * Banner de estado en vivo en la parte superior
      */
     /**
+     * Sincronización oficial absoluta de la Caja Real y Bote
+     * Regla de Oro: Siempre manda el Bote. El Dashboard nunca mostrará una cantidad diferente a la del Bote.
+     */
+    async syncOfficialBoteSummary() {
+        // 1. Prioridad Máxima: Si BoteApp está instanciado en vivo en la ventana
+        if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
+            const sd = window.BoteApp.getSeasonData();
+            if (sd && sd.summary && typeof sd.summary.cajaReal === 'number' && sd.summary.cajaReal > 0) {
+                this.boteOfficialSummary = sd.summary;
+                return;
+            }
+        }
+
+        // 2. Prioridad 2: Resumen oficial publicado por Bote en localStorage
+        try {
+            const local = localStorage.getItem('maulas_bote2_summary');
+            if (local) {
+                const parsed = JSON.parse(local);
+                if (parsed && typeof parsed.cajaReal === 'number' && parsed.cajaReal > 0) {
+                    this.boteOfficialSummary = parsed;
+                }
+            }
+        } catch (e) { }
+
+        // 3. Prioridad 3: Resumen oficial persistido por Bote en Firestore (config/bote_official_summary)
+        if (window.DataService) {
+            try {
+                const remote = await window.DataService.getDoc('config', 'bote_official_summary');
+                if (remote && typeof remote.cajaReal === 'number' && remote.cajaReal > 0) {
+                    this.boteOfficialSummary = remote;
+                    try {
+                        localStorage.setItem('maulas_bote2_summary', JSON.stringify(remote));
+                    } catch (e) { }
+                    return;
+                }
+            } catch (e) { }
+        }
+
+        // 4. Prioridad 4: Si tenemos DataService y BoteEngine, calcular en directo con las jornadas reales
+        if (window.BoteEngine && window.DataService && Array.isArray(this.members) && this.members.length > 0) {
+            try {
+                let boteConfig = null;
+                try {
+                    boteConfig = await window.DataService.getDoc('config', 'bote_config');
+                } catch (e) { }
+                if (!boteConfig) {
+                    const localCfg = localStorage.getItem('bote_config');
+                    if (localCfg) {
+                        try { boteConfig = JSON.parse(localCfg); } catch (e) { }
+                    }
+                }
+                const engine = new window.BoteEngine(boteConfig || {});
+                const [cashPayments, repartos, cierresVuelta, ingresos] = await Promise.all([
+                    window.DataService.getAll('reembolsos_efectivo').catch(() => []),
+                    window.DataService.getAll('repartos').catch(() => []),
+                    window.DataService.getAll('cierres_vuelta').catch(() => []),
+                    window.DataService.getAll('ingresos').catch(() => [])
+                ]);
+
+                if (typeof engine.calculateOfficialSummary === 'function') {
+                    const calculated = engine.calculateOfficialSummary(
+                        this.members,
+                        this.jornadas,
+                        this.pronosticos,
+                        this.pronosticosExtra,
+                        repartos,
+                        cierresVuelta,
+                        ingresos,
+                        cashPayments
+                    );
+                    if (calculated && typeof calculated.cajaReal === 'number' && calculated.cajaReal > 0) {
+                        this.boteOfficialSummary = calculated;
+                        try {
+                            localStorage.setItem('maulas_bote2_summary', JSON.stringify(calculated));
+                            if (calculated.memberSummaries) {
+                                localStorage.setItem('maulas_bote2_members', JSON.stringify(calculated.memberSummaries));
+                            }
+                        } catch (e) { }
+                        return;
+                    }
+                }
+            } catch (errCalc) {
+                console.warn('[Dashboard 2.0] Error calculando Bote con BoteEngine:', errCalc);
+            }
+        }
+    }
+
+    /**
      * Obtención centralizada de tesorería y caja real del Bote
+     * La fuente de la verdad es siempre la emitida y calculada por el Bote.
      */
     getBoteOfficialSummary() {
-        // 1. Si BoteApp está instanciado en vivo en la ventana, usar sus datos calculados
+        // 1. Resumen oficial sincronizado directamente del Bote
+        if (this.boteOfficialSummary && typeof this.boteOfficialSummary.cajaReal === 'number' && this.boteOfficialSummary.cajaReal > 0) {
+            return this.boteOfficialSummary;
+        }
+
+        // 2. Si BoteApp está instanciado en vivo en la ventana, usar sus datos calculados
         if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
             const sd = window.BoteApp.getSeasonData();
             if (sd && sd.summary && typeof sd.summary.cajaReal === 'number' && sd.summary.cajaReal > 0) {
@@ -695,16 +795,23 @@ class Dashboard2AppController {
             }
         }
 
-        // 2. Fuente canónica consolidada BOTE_FALLBACK_DATA (calculada exactamente del balance contable)
+        // 3. Si existe en localStorage publicado por Bote
+        try {
+            const local = localStorage.getItem('maulas_bote2_summary');
+            if (local) {
+                const parsed = JSON.parse(local);
+                if (parsed && typeof parsed.cajaReal === 'number' && parsed.cajaReal > 0) {
+                    return parsed;
+                }
+            }
+        } catch (e) { }
+
+        // 4. Fuente canónica consolidada BOTE_FALLBACK_DATA (solo si no hay ninguna fuente previa)
         if (window.BOTE_FALLBACK_DATA && window.BOTE_FALLBACK_DATA['2026-2027'] && window.BOTE_FALLBACK_DATA['2026-2027'].summary) {
-            const s = window.BOTE_FALLBACK_DATA['2026-2027'].summary;
-            try {
-                localStorage.setItem('maulas_bote2_summary', JSON.stringify({ ...s, version: '2026_caja_balance_v2' }));
-            } catch (e) { }
-            return s;
+            return window.BOTE_FALLBACK_DATA['2026-2027'].summary;
         }
 
-        // 3. Fallback de seguridad oficial de la Peña
+        // 5. Fallback de seguridad oficial de la Peña
         return {
             cajaReal: 1021.64,
             totalSaldosVirtuales: 694.71,
@@ -713,6 +820,32 @@ class Dashboard2AppController {
             totalGastos: 183.75,
             totalPremios: 268.68
         };
+    }
+
+    /**
+     * Actualiza todos los elementos de la interfaz del Dashboard con la Caja Real oficial del Bote
+     */
+    updateCajaRealDisplays() {
+        const summary = this.getBoteOfficialSummary();
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
+        const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
+        const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
+
+        const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
+        const formattedNeto = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toFixed(2).replace('.', ',')} €`;
+        const formattedSup = `${superavit >= 0 ? '+' : ''}${((window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`)}`;
+
+        const elTotal = document.getElementById('dashboard-bote-total');
+        const elCajaWidget = document.getElementById('dashboard-bote-caja-widget');
+        const elNeto = document.getElementById('dashboard-bote-neto');
+        const elPremios = document.getElementById('dashboard-bote-premios');
+        const elCajaAmt = document.getElementById('user-card-caja-amount');
+
+        if (elTotal) elTotal.textContent = formattedCaja;
+        if (elCajaWidget) elCajaWidget.textContent = formattedCaja;
+        if (elNeto) elNeto.textContent = formattedNeto;
+        if (elPremios) elPremios.textContent = formattedSup;
+        if (elCajaAmt) elCajaAmt.textContent = formattedCaja;
     }
 
     renderLiveBanner(nextJ, inProgress, targetJNum, playedJornadas) {
@@ -1280,6 +1413,9 @@ class Dashboard2AppController {
         if (window.BoteApp && typeof window.BoteApp.getSeasonData === 'function') {
             const sd = window.BoteApp.getSeasonData();
             if (sd && Array.isArray(sd.memberSummaries)) summaries = sd.memberSummaries;
+        }
+        if (summaries.length === 0 && this.boteOfficialSummary && Array.isArray(this.boteOfficialSummary.memberSummaries)) {
+            summaries = this.boteOfficialSummary.memberSummaries;
         }
         if (summaries.length === 0) {
             const cached = localStorage.getItem('maulas_bote2_members');
@@ -2765,6 +2901,24 @@ class Dashboard2AppController {
      * Listeners de interfaz
      */
     initUiListeners() {
+        // Escucha en tiempo real de actualizaciones de la Caja Real y Bote Oficial
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'maulas_bote2_summary') {
+                try {
+                    const newSummary = JSON.parse(e.newValue);
+                    if (newSummary && typeof newSummary.cajaReal === 'number') {
+                        this.boteOfficialSummary = newSummary;
+                        this.updateCajaRealDisplays();
+                    }
+                } catch(err) {}
+            }
+        });
+        window.addEventListener('maulas_bote_summary_updated', (e) => {
+            if (e.detail && typeof e.detail.cajaReal === 'number') {
+                this.boteOfficialSummary = e.detail;
+                this.updateCajaRealDisplays();
+            }
+        });
         // Cierre de dropdown al hacer clic fuera y cierre de modales al pulsar backdrop
         document.addEventListener('click', (e) => {
             const dropdown = document.getElementById('nav-section-dropdown');
