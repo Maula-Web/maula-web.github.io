@@ -22,6 +22,10 @@ class BoteAppController {
         this.matrizMode = 'visual'; // 'visual' | 'financiero'
         this.memberFilter = 'all'; // 'all' | 'positive' | 'negative'
         this.searchQuery = '';
+        this.premiosGrouping = 'socio'; // 'socio' | 'jornada' | 'desglosado'
+        this.premiosSortBy = 'jornada';  // 'jornada' | 'cantidad' | 'socio'
+        this.premiosSortOrder = 'desc';  // 'desc' | 'asc'
+        this.premiosTypeFilter = 'all';  // 'all' | 'individual' | 'dobles'
         this.isLive = false;
         this.liveData = null;
         this.rawSeasonData = null;
@@ -2549,26 +2553,116 @@ class BoteAppController {
         this.renderFlujoDeCaja();
     }
 
+    setPremiosGrouping(grouping) {
+        this.premiosGrouping = grouping;
+        this.updatePremiosControlsUI();
+        this.renderPremiosDobles();
+    }
+
+    setPremiosSort(sortBy) {
+        if (this.premiosSortBy === sortBy) {
+            this.premiosSortOrder = this.premiosSortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.premiosSortBy = sortBy;
+            this.premiosSortOrder = (sortBy === 'socio') ? 'asc' : 'desc';
+        }
+        this.updatePremiosControlsUI();
+        this.renderPremiosDobles();
+    }
+
+    togglePremiosSortOrder() {
+        this.premiosSortOrder = this.premiosSortOrder === 'asc' ? 'desc' : 'asc';
+        this.updatePremiosControlsUI();
+        this.renderPremiosDobles();
+    }
+
+    setPremiosTypeFilter(type) {
+        this.premiosTypeFilter = type;
+        this.updatePremiosControlsUI();
+        this.renderPremiosDobles();
+    }
+
+    updatePremiosControlsUI() {
+        // 1. Selector de agrupación
+        const btnSocio = document.getElementById('btn-premios-group-socio');
+        const btnJornada = document.getElementById('btn-premios-group-jornada');
+        const btnDesglosado = document.getElementById('btn-premios-group-desglosado');
+        const activeGroupClass = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 bg-orange-500 text-slate-950 border border-orange-400 shadow-sm';
+        const inactiveGroupClass = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 hover:bg-slate-800/80';
+
+        if (btnSocio) btnSocio.className = this.premiosGrouping === 'socio' ? activeGroupClass : inactiveGroupClass;
+        if (btnJornada) btnJornada.className = this.premiosGrouping === 'jornada' ? activeGroupClass : inactiveGroupClass;
+        if (btnDesglosado) btnDesglosado.className = this.premiosGrouping === 'desglosado' ? activeGroupClass : inactiveGroupClass;
+
+        // 2. Botones de ordenación
+        const btnSortJornada = document.getElementById('btn-premios-sort-jornada');
+        const btnSortCantidad = document.getElementById('btn-premios-sort-cantidad');
+        const btnSortSocio = document.getElementById('btn-premios-sort-socio');
+        const iconJ = document.getElementById('icon-sort-jornada');
+        const iconC = document.getElementById('icon-sort-cantidad');
+        const iconS = document.getElementById('icon-sort-socio');
+
+        const activeSortClass = 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-amber-500/30 text-amber-300 border border-amber-500 shadow-sm';
+        const inactiveSortClass = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1 hover:bg-slate-800/80';
+
+        if (btnSortJornada) btnSortJornada.className = this.premiosSortBy === 'jornada' ? activeSortClass : inactiveSortClass;
+        if (btnSortCantidad) btnSortCantidad.className = this.premiosSortBy === 'cantidad' ? activeSortClass : inactiveSortClass;
+        if (btnSortSocio) btnSortSocio.className = this.premiosSortBy === 'socio' ? activeSortClass : inactiveSortClass;
+
+        const arrow = this.premiosSortOrder === 'asc' ? '▲' : '▼';
+        if (iconJ) {
+            iconJ.classList.toggle('hidden', this.premiosSortBy !== 'jornada');
+            if (this.premiosSortBy === 'jornada') iconJ.textContent = arrow;
+        }
+        if (iconC) {
+            iconC.classList.toggle('hidden', this.premiosSortBy !== 'cantidad');
+            if (this.premiosSortBy === 'cantidad') iconC.textContent = arrow;
+        }
+        if (iconS) {
+            iconS.classList.toggle('hidden', this.premiosSortBy !== 'socio');
+            if (this.premiosSortBy === 'socio') iconS.textContent = arrow;
+        }
+
+        const labelOrder = document.getElementById('label-sort-order');
+        const iconOrder = document.getElementById('icon-sort-order');
+        if (labelOrder) labelOrder.textContent = this.premiosSortOrder === 'asc' ? 'Ascendente' : 'Descendente';
+        if (iconOrder) iconOrder.textContent = this.premiosSortOrder === 'asc' ? '↑' : '↓';
+
+        // 3. Filtro por tipo
+        const btnFAll = document.getElementById('btn-filter-type-all');
+        const btnFIndiv = document.getElementById('btn-filter-type-individual');
+        const btnFDobles = document.getElementById('btn-filter-type-dobles');
+        const activeFilterClass = 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        const inactiveFilterClass = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-transparent hover:border-slate-700 transition-all';
+
+        if (btnFAll) btnFAll.className = this.premiosTypeFilter === 'all' ? activeFilterClass : inactiveFilterClass;
+        if (btnFIndiv) btnFIndiv.className = this.premiosTypeFilter === 'individual' ? activeFilterClass : inactiveFilterClass;
+        if (btnFDobles) btnFDobles.className = this.premiosTypeFilter === 'dobles' ? activeFilterClass : inactiveFilterClass;
+    }
+
     renderPremiosDobles() {
-        const gridDobles = document.getElementById('premios-dobles-grid');
-        const gridIndiv = document.getElementById('premios-individuales-grid');
+        const dynamicContainer = document.getElementById('premios-dynamic-container');
         const badgeDobles = document.getElementById('total-premios-dobles-badge');
         const badgeIndiv = document.getElementById('total-premios-individuales-badge');
         const badgeGlobal = document.getElementById('total-premios-global-badge');
+        const resultsCountEl = document.getElementById('premios-results-count');
 
         const data = this.getSeasonData();
 
         // 1. Premios de Quinielas de Dobles (Fondo de la Peña)
-        // Se extraen de las jornadas donde la quiniela reducida de dobles realmente obtuvo premio (extraPrizes > 0)
         const doblesPrizes = [];
-        data.movements.forEach(m => {
+        (data.movements || []).forEach(m => {
             if ((m.extraPrizes || 0) > 0) {
-                if (!doblesPrizes.some(x => x.jornadaNum === m.jornadaNum)) {
+                if (!doblesPrizes.some(x => x.jornadaNum === m.jornadaNum && x.memberId === m.memberId)) {
                     doblesPrizes.push({
+                        id: `dobles_${m.jornadaNum}_${m.memberId || 'colectivo'}`,
+                        type: 'dobles',
+                        typeLabel: 'Quiniela de Dobles (Peña)',
+                        badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
                         jornadaNum: m.jornadaNum,
-                        date: m.jornadaDate || m.date,
+                        date: m.jornadaDate || m.date || '',
                         memberId: m.memberId,
-                        memberName: m.memberName,
+                        memberName: m.memberName || 'Equipo Dobles',
                         previousJornada: m.jornadaNum - 1,
                         hits: m.extraHits || 10,
                         amount: m.extraPrizes
@@ -2577,62 +2671,18 @@ class BoteAppController {
             }
         });
 
-        let totDobles = doblesPrizes.reduce((sum, p) => sum + p.amount, 0);
-
-        if (gridDobles) {
-            if (doblesPrizes.length > 0) {
-                gridDobles.innerHTML = doblesPrizes.map(p => `
-                    <div class="p-4 rounded-xl bg-slate-900/90 border border-purple-500/30 space-y-3 hover:border-purple-500/60 transition-all">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                                    🟣 Quiniela de Dobles
-                                </span>
-                                <strong class="text-white text-sm sm:text-base">Jornada ${p.jornadaNum}</strong>
-                            </div>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                                ${p.hits} Aciertos
-                            </span>
-                        </div>
-                        <div class="text-xs text-slate-400">
-                            Pronosticada por: <strong class="text-white">${p.memberName}</strong> 
-                            <span class="text-slate-500">(Ganador de J${p.previousJornada})</span>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 flex justify-between items-center text-xs">
-                            <span class="text-emerald-300 font-medium">Destino del premio:</span>
-                            <strong class="text-emerald-400 font-bold flex items-center gap-1">🏦 Bote de la Peña</strong>
-                        </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                            <span class="text-slate-400">Premio Oficial LAE:</span>
-                            <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
-                        </div>
-                        <button onclick="window.BoteApp.showReducedBreakdown(${p.memberId}, ${p.jornadaNum})" class="w-full py-2 px-3 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
-                            <span>🔍</span> Ver Desglose de Reducción (16 Apuestas)
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                gridDobles.innerHTML = `
-                    <div class="col-span-full p-6 rounded-xl bg-slate-900/60 border border-purple-500/20 text-center space-y-2">
-                        <div class="text-2xl">🟣</div>
-                        <div class="text-sm font-semibold text-purple-200">Sin premios en Quinielas de Dobles esta temporada</div>
-                        <p class="text-xs text-slate-400 max-w-md mx-auto">
-                            Cuando la quiniela reducida de 7 dobles (16 apuestas) consiga 10 o más aciertos, aquí se mostrarán los premios obtenidos y el desglose completo de la reducción.
-                        </p>
-                    </div>
-                `;
-            }
-        }
-
         // 2. Premios por Pronóstico Individual de Socios
         const indivPrizes = [];
-        data.movements.forEach(m => {
-            if (m.premios > 0 && !m.isIngresoLibre) {
-                // Evitar duplicados por socio/jornada
+        (data.movements || []).forEach(m => {
+            if ((m.premios || 0) > 0 && !m.isIngresoLibre) {
                 if (!indivPrizes.some(x => x.memberId === m.memberId && x.jornadaNum === m.jornadaNum)) {
                     indivPrizes.push({
+                        id: `indiv_${m.jornadaNum}_${m.memberId}`,
+                        type: 'individual',
+                        typeLabel: 'Pronóstico Individual',
+                        badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
                         jornadaNum: m.jornadaNum,
-                        date: m.jornadaDate || m.date,
+                        date: m.jornadaDate || m.date || '',
                         memberId: m.memberId,
                         memberName: m.memberName,
                         hits: m.aciertos || 10,
@@ -2642,53 +2692,316 @@ class BoteAppController {
             }
         });
 
-        // Asegurar que si el conjunto viene filtrado o en fallback, figuren los premios individuales reales
-        if (indivPrizes.length === 0) {
+        // Asegurar fallback si el conjunto viene vacío en modo offline / pruebas
+        if (indivPrizes.length === 0 && doblesPrizes.length === 0) {
             indivPrizes.push(
-                { jornadaNum: 3, date: "30/08/2026", memberId: 13, memberName: "Luismi", hits: 10, amount: 2.32 },
-                { jornadaNum: 4, date: "06/09/2026", memberId: 6, memberName: "Fernando Lozano", hits: 10, amount: 3.40 }
+                { id: 'indiv_3_13', type: 'individual', typeLabel: 'Pronóstico Individual', badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30', jornadaNum: 3, date: "30/08/2026", memberId: 13, memberName: "Luismi", hits: 10, amount: 2.32 },
+                { id: 'indiv_4_6', type: 'individual', typeLabel: 'Pronóstico Individual', badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30', jornadaNum: 4, date: "06/09/2026", memberId: 6, memberName: "Fernando Lozano", hits: 10, amount: 3.40 }
             );
         }
 
-        let totIndiv = indivPrizes.reduce((sum, p) => sum + p.amount, 0);
+        const totDobles = doblesPrizes.reduce((sum, p) => sum + p.amount, 0);
+        const totIndiv = indivPrizes.reduce((sum, p) => sum + p.amount, 0);
+        const totGlobal = totDobles + totIndiv;
 
-        if (gridIndiv) {
-            gridIndiv.innerHTML = indivPrizes.map(p => `
-                <div class="p-4 rounded-xl bg-slate-900/90 border border-blue-500/30 space-y-3 hover:border-blue-500/60 transition-all">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                                🔵 Pronóstico Socio
-                            </span>
-                            <strong class="text-white text-sm sm:text-base">Jornada ${p.jornadaNum}</strong>
-                        </div>
-                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                            ${p.hits} Aciertos
-                        </span>
-                    </div>
-                    <div class="text-xs text-slate-400">
-                        Ganador: <strong class="text-white">${p.memberName}</strong> 
-                        <span class="text-slate-500">(Columna individual de 14 partidos)</span>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 flex justify-between items-center text-xs">
-                        <span class="text-emerald-300 font-medium">Destino del premio:</span>
-                        <strong class="text-emerald-400 font-bold flex items-center gap-1">🏦 Bote de la Peña</strong>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                        <span class="text-slate-400">Premio Oficial LAE:</span>
-                        <strong class="font-mono text-emerald-400 text-sm sm:text-base font-extrabold">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
-                    </div>
-                    <button onclick="window.BoteApp.goToJornada(${p.jornadaNum})" class="w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
-                        <span>📋</span> Ver Jornada ${p.jornadaNum} (${p.hits} aciertos)
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        // Actualizar badges superiores
+        // Actualizar badges superiores oficiales
         if (badgeDobles) badgeDobles.textContent = totDobles > 0 ? `+${totDobles.toFixed(2).replace('.', ',')} €` : `0,00 €`;
         if (badgeIndiv) badgeIndiv.textContent = totIndiv > 0 ? `+${totIndiv.toFixed(2).replace('.', ',')} €` : `0,00 €`;
-        if (badgeGlobal) badgeGlobal.textContent = (totDobles + totIndiv) > 0 ? `+${(totDobles + totIndiv).toFixed(2).replace('.', ',')} €` : `0,00 €`;
+        if (badgeGlobal) badgeGlobal.textContent = totGlobal > 0 ? `+${totGlobal.toFixed(2).replace('.', ',')} €` : `0,00 €`;
+
+        // Consolidar lista de todos los premios
+        let allPrizes = [...doblesPrizes, ...indivPrizes];
+
+        // Aplicar filtro por tipo si corresponde
+        if (this.premiosTypeFilter === 'individual') {
+            allPrizes = allPrizes.filter(p => p.type === 'individual');
+        } else if (this.premiosTypeFilter === 'dobles') {
+            allPrizes = allPrizes.filter(p => p.type === 'dobles');
+        }
+
+        const totalFilteredAmount = allPrizes.reduce((sum, p) => sum + p.amount, 0);
+        if (resultsCountEl) {
+            resultsCountEl.innerHTML = `<span class="text-amber-400 font-bold">${allPrizes.length}</span> ${allPrizes.length === 1 ? 'premio' : 'premios'} · Total: <strong class="text-emerald-400">+${totalFilteredAmount.toFixed(2).replace('.', ',')} €</strong>`;
+        }
+
+        this.updatePremiosControlsUI();
+
+        if (!dynamicContainer) {
+            return;
+        }
+
+        // Si no hay premios que mostrar tras el filtro
+        if (allPrizes.length === 0) {
+            dynamicContainer.innerHTML = `
+                <div class="glass-panel p-8 text-center space-y-2 border-slate-700/60">
+                    <div class="text-3xl">🎁</div>
+                    <h4 class="text-base font-bold text-slate-200">No se encontraron premios para el filtro seleccionado</h4>
+                    <p class="text-xs text-slate-400 max-w-md mx-auto">Prueba a seleccionar "Todos" en el tipo de boleto o cambiar el modo de agrupación.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // =========================================================================
+        // MODO 1: AGRUPADOS POR SOCIO
+        // =========================================================================
+        if (this.premiosGrouping === 'socio') {
+            const socioMap = new Map();
+            allPrizes.forEach(p => {
+                const key = String(p.memberId || p.memberName);
+                if (!socioMap.has(key)) {
+                    socioMap.set(key, {
+                        memberId: p.memberId,
+                        memberName: p.memberName,
+                        totalAmount: 0,
+                        prizes: []
+                    });
+                }
+                const group = socioMap.get(key);
+                group.totalAmount += p.amount;
+                group.prizes.push(p);
+            });
+
+            let socioList = Array.from(socioMap.values());
+
+            // Ordenar grupos de socios
+            if (this.premiosSortBy === 'cantidad') {
+                socioList.sort((a, b) => this.premiosSortOrder === 'asc' ? (a.totalAmount - b.totalAmount) : (b.totalAmount - a.totalAmount));
+            } else if (this.premiosSortBy === 'socio') {
+                socioList.sort((a, b) => this.premiosSortOrder === 'asc' ? a.memberName.localeCompare(b.memberName, 'es') : b.memberName.localeCompare(a.memberName, 'es'));
+            } else {
+                // 'jornada': ordena según la jornada más reciente en que premió
+                socioList.sort((a, b) => {
+                    const maxA = Math.max(...a.prizes.map(p => p.jornadaNum));
+                    const maxB = Math.max(...b.prizes.map(p => p.jornadaNum));
+                    return this.premiosSortOrder === 'asc' ? (maxA - maxB) : (maxB - maxA);
+                });
+            }
+
+            dynamicContainer.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${socioList.map(s => {
+                        const count = s.prizes.length;
+                        return `
+                            <div class="glass-panel p-4 sm:p-5 rounded-2xl border-slate-700/60 hover:border-amber-500/50 transition-all flex flex-col justify-between space-y-4 shadow-md">
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 font-black flex items-center justify-center text-sm shadow-md">
+                                            ${s.memberName ? s.memberName.charAt(0).toUpperCase() : 'S'}
+                                        </div>
+                                        <div>
+                                            <h4 class="text-base font-black text-white dark:text-white leading-tight">${s.memberName}</h4>
+                                            <span class="text-xs text-slate-400 font-medium">${count} ${count === 1 ? 'premio obtenido' : 'premios obtenidos'}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Total Ganado</span>
+                                        <strong class="font-mono text-emerald-400 text-lg sm:text-xl font-extrabold">+${s.totalAmount.toFixed(2).replace('.', ',')} €</strong>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Desglose de premios:</span>
+                                    <div class="divide-y divide-slate-800/80 rounded-xl bg-slate-950/60 border border-slate-800/80 p-2 sm:p-2.5 space-y-1">
+                                        ${s.prizes.map(p => `
+                                            <div class="pt-1.5 first:pt-0 flex items-center justify-between text-xs gap-2">
+                                                <div class="flex items-center gap-2 truncate">
+                                                    <span class="font-bold text-amber-300 font-mono">J.${p.jornadaNum}</span>
+                                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${p.badgeClass}">${p.type === 'dobles' ? 'Dobles' : 'Individual'}</span>
+                                                    <span class="text-slate-400 text-[11px]">${p.hits} aciertos</span>
+                                                </div>
+                                                <div class="flex items-center gap-2 shrink-0">
+                                                    <strong class="font-mono text-emerald-400 font-bold">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
+                                                    ${p.type === 'dobles' ? `
+                                                        <button onclick="window.BoteApp.showReducedBreakdown(${p.memberId}, ${p.jornadaNum})" class="text-[10px] text-purple-400 hover:text-purple-200 underline font-semibold" title="Ver reducción">Ver 16 ap.</button>
+                                                    ` : `
+                                                        <button onclick="window.BoteApp.goToJornada(${p.jornadaNum})" class="text-[10px] text-blue-400 hover:text-blue-200 underline font-semibold" title="Ver jornada">Ver J.${p.jornadaNum}</button>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            return;
+        }
+
+        // =========================================================================
+        // MODO 2: AGRUPADOS POR JORNADA
+        // =========================================================================
+        if (this.premiosGrouping === 'jornada') {
+            const jornadaMap = new Map();
+            allPrizes.forEach(p => {
+                const key = p.jornadaNum;
+                if (!jornadaMap.has(key)) {
+                    jornadaMap.set(key, {
+                        jornadaNum: p.jornadaNum,
+                        date: p.date,
+                        totalAmount: 0,
+                        prizes: []
+                    });
+                }
+                const group = jornadaMap.get(key);
+                group.totalAmount += p.amount;
+                group.prizes.push(p);
+            });
+
+            let jornadaList = Array.from(jornadaMap.values());
+
+            // Ordenar grupos de jornadas
+            if (this.premiosSortBy === 'cantidad') {
+                jornadaList.sort((a, b) => this.premiosSortOrder === 'asc' ? (a.totalAmount - b.totalAmount) : (b.totalAmount - a.totalAmount));
+            } else if (this.premiosSortBy === 'socio') {
+                jornadaList.sort((a, b) => {
+                    const nameA = a.prizes[0] ? a.prizes[0].memberName : '';
+                    const nameB = b.prizes[0] ? b.prizes[0].memberName : '';
+                    return this.premiosSortOrder === 'asc' ? nameA.localeCompare(nameB, 'es') : nameB.localeCompare(nameA, 'es');
+                });
+            } else {
+                // 'jornada': número de jornada
+                jornadaList.sort((a, b) => this.premiosSortOrder === 'asc' ? (a.jornadaNum - b.jornadaNum) : (b.jornadaNum - a.jornadaNum));
+            }
+
+            dynamicContainer.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${jornadaList.map(j => {
+                        const count = j.prizes.length;
+                        return `
+                            <div class="glass-panel p-4 sm:p-5 rounded-2xl border-slate-700/60 hover:border-amber-500/50 transition-all flex flex-col justify-between space-y-4 shadow-md">
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white font-black flex items-center justify-center text-sm shadow-md font-mono">
+                                            J${j.jornadaNum}
+                                        </div>
+                                        <div>
+                                            <h4 class="text-base font-black text-white dark:text-white leading-tight">Jornada ${j.jornadaNum}</h4>
+                                            <span class="text-xs text-slate-400">${j.date || 'Temporada 2026-2027'} · ${count} ${count === 1 ? 'acertante' : 'acertantes'}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Premios Jornada</span>
+                                        <strong class="font-mono text-emerald-400 text-lg sm:text-xl font-extrabold">+${j.totalAmount.toFixed(2).replace('.', ',')} €</strong>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Acertantes premiados:</span>
+                                    <div class="divide-y divide-slate-800/80 rounded-xl bg-slate-950/60 border border-slate-800/80 p-2 sm:p-2.5 space-y-1">
+                                        ${j.prizes.map(p => `
+                                            <div class="pt-1.5 first:pt-0 flex items-center justify-between text-xs gap-2">
+                                                <div class="flex items-center gap-2 truncate">
+                                                    <strong class="text-white dark:text-white font-bold truncate">${p.memberName}</strong>
+                                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${p.badgeClass}">${p.type === 'dobles' ? 'Dobles' : 'Individual'}</span>
+                                                    <span class="text-slate-400 text-[11px]">${p.hits} ac.</span>
+                                                </div>
+                                                <div class="flex items-center gap-2 shrink-0">
+                                                    <strong class="font-mono text-emerald-400 font-bold">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
+                                                    ${p.type === 'dobles' ? `
+                                                        <button onclick="window.BoteApp.showReducedBreakdown(${p.memberId}, ${p.jornadaNum})" class="text-[10px] text-purple-400 hover:text-purple-200 underline font-semibold" title="Ver reducción">Ver 16 ap.</button>
+                                                    ` : `
+                                                        <button onclick="window.BoteApp.goToJornada(${p.jornadaNum})" class="text-[10px] text-blue-400 hover:text-blue-200 underline font-semibold" title="Ver jornada">Ver J.${p.jornadaNum}</button>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                                    <span class="text-slate-400">Destino del premio: <strong class="text-emerald-400">🏦 Bote de la Peña</strong></span>
+                                    <button onclick="window.BoteApp.goToJornada(${j.jornadaNum})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all">
+                                        Ir a Jornada ${j.jornadaNum} →
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            return;
+        }
+
+        // =========================================================================
+        // MODO 3: DESGLOSADOS (Con ordenación por Jornada, por Cantidad o por Socio)
+        // =========================================================================
+        const desglosadosList = [...allPrizes];
+
+        if (this.premiosSortBy === 'cantidad') {
+            desglosadosList.sort((a, b) => {
+                const diff = this.premiosSortOrder === 'asc' ? (a.amount - b.amount) : (b.amount - a.amount);
+                return diff !== 0 ? diff : (b.jornadaNum - a.jornadaNum);
+            });
+        } else if (this.premiosSortBy === 'socio') {
+            desglosadosList.sort((a, b) => {
+                const diff = this.premiosSortOrder === 'asc' ? a.memberName.localeCompare(b.memberName, 'es') : b.memberName.localeCompare(a.memberName, 'es');
+                return diff !== 0 ? diff : (b.jornadaNum - a.jornadaNum);
+            });
+        } else {
+            // 'jornada': número de jornada
+            desglosadosList.sort((a, b) => {
+                const diff = this.premiosSortOrder === 'asc' ? (a.jornadaNum - b.jornadaNum) : (b.jornadaNum - a.jornadaNum);
+                return diff !== 0 ? diff : (b.amount - a.amount);
+            });
+        }
+
+        dynamicContainer.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                ${desglosadosList.map(p => {
+                    const isDobles = p.type === 'dobles';
+                    const borderHover = isDobles ? 'hover:border-purple-500/70' : 'hover:border-blue-500/70';
+                    const borderColor = isDobles ? 'border-purple-500/30' : 'border-blue-500/30';
+                    return `
+                        <div class="glass-panel p-4 rounded-xl ${borderColor} ${borderHover} space-y-3 transition-all flex flex-col justify-between shadow-md">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${p.badgeClass}">
+                                        ${isDobles ? '🟣 Quiniela de Dobles' : '🔵 Pronóstico Socio'}
+                                    </span>
+                                    <strong class="text-white dark:text-white text-sm font-mono font-bold">Jornada ${p.jornadaNum}</strong>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    ${p.hits} Aciertos
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg ${isDobles ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40' : 'bg-blue-600/30 text-blue-300 border border-blue-500/40'} flex items-center justify-center text-xs font-bold shrink-0">
+                                    ${p.memberName ? p.memberName.charAt(0).toUpperCase() : 'S'}
+                                </div>
+                                <div class="truncate">
+                                    <span class="text-[11px] text-slate-400 block">${isDobles ? 'Pronosticada por:' : 'Ganador individual:'}</span>
+                                    <strong class="text-white dark:text-white text-sm font-black truncate block">${p.memberName}</strong>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 flex justify-between items-center text-xs">
+                                <span class="text-emerald-300 font-medium">Destino del premio:</span>
+                                <strong class="text-emerald-400 font-bold flex items-center gap-1">🏦 Bote de la Peña</strong>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
+                                <span class="text-slate-400">Premio Oficial LAE:</span>
+                                <strong class="font-mono text-emerald-400 text-base sm:text-lg font-black">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
+                            </div>
+
+                            ${isDobles ? `
+                                <button onclick="window.BoteApp.showReducedBreakdown(${p.memberId}, ${p.jornadaNum})" class="w-full py-2 px-3 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                                    <span>🔍</span> Ver Desglose de Reducción (16 Apuestas)
+                                </button>
+                            ` : `
+                                <button onclick="window.BoteApp.goToJornada(${p.jornadaNum})" class="w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                                    <span>📋</span> Ver Jornada ${p.jornadaNum} (${p.hits} aciertos)
+                                </button>
+                            `}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
     }
 
     showReducedBreakdown(memberId, jornadaNum) {
@@ -4644,3 +4957,7 @@ document.addEventListener('click', (e) => {
         dropdown.classList.add('hidden');
     }
 });
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = BoteAppController;
+}

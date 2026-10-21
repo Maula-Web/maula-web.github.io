@@ -1646,42 +1646,67 @@
                 </div>
             </div>
 
-            <!-- BLOQUE 1: QUINIELAS DE DOBLES (PEÑA) -->
-            <div class="glass-panel p-4 sm:p-5 space-y-4 border-purple-500/30">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-800 gap-2">
-                    <div>
-                        <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                            <span>🟣</span> Historial de Premios en Quinielas de Dobles (Bote Peña)
-                        </h3>
-                        <p class="text-xs text-slate-400">Quinielas reducidas de 7 dobles (16 apuestas) sufragadas al 100% por la Peña. Los premios ingresan íntegramente en el Bote de la Peña.</p>
+            <!-- PANEL DE CONTROL Y FILTROS DE PREMIOS -->
+            <div class="glass-panel p-3.5 sm:p-5 border-amber-500/30 space-y-3.5 shadow-lg">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
+                    <!-- 1. Selector de Agrupación -->
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1">
+                            <span>🔍</span> Mostrar:
+                        </span>
+                        <div class="inline-flex p-1 rounded-xl bg-slate-950/80 dark:bg-slate-950/80 border border-slate-700/80 gap-1 shadow-inner" role="group" aria-label="Modo de agrupación">
+                            <button type="button" id="btn-premios-group-socio" onclick="window.BoteApp.setPremiosGrouping('socio')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 bg-orange-500 text-slate-950 border border-orange-400 shadow-sm">
+                                <span>👥</span> Por Socio
+                            </button>
+                            <button type="button" id="btn-premios-group-jornada" onclick="window.BoteApp.setPremiosGrouping('jornada')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 hover:bg-slate-800/80">
+                                <span>📅</span> Por Jornada
+                            </button>
+                            <button type="button" id="btn-premios-group-desglosado" onclick="window.BoteApp.setPremiosGrouping('desglosado')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 hover:bg-slate-800/80">
+                                <span>📋</span> Desglosados
+                            </button>
+                        </div>
                     </div>
-                    <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold self-start sm:self-center">
-                        🏦 Bote de la Peña
-                    </span>
+
+                    <!-- 2. Controles de Ordenación (activos para Desglosados) -->
+                    <div id="premios-sort-controls" class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1">
+                            <span>⇅</span> Ordenar:
+                        </span>
+                        <div class="inline-flex p-1 rounded-xl bg-slate-950/80 dark:bg-slate-950/80 border border-slate-700/80 gap-1 shadow-inner">
+                            <button type="button" id="btn-premios-sort-jornada" onclick="window.BoteApp.setPremiosSort('jornada')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                <span>📅</span> Jornada <span id="icon-sort-jornada" class="text-[10px]">▼</span>
+                            </button>
+                            <button type="button" id="btn-premios-sort-cantidad" onclick="window.BoteApp.setPremiosSort('cantidad')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1 hover:bg-slate-800/80">
+                                <span>💶</span> Cantidad <span id="icon-sort-cantidad" class="text-[10px] hidden">▼</span>
+                            </button>
+                            <button type="button" id="btn-premios-sort-socio" onclick="window.BoteApp.setPremiosSort('socio')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1 hover:bg-slate-800/80">
+                                <span>👤</span> Socio <span id="icon-sort-socio" class="text-[10px] hidden">▲</span>
+                            </button>
+                        </div>
+                        <button type="button" id="btn-premios-toggle-order" onclick="window.BoteApp.togglePremiosSortOrder()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 text-slate-300 hover:text-white text-xs font-mono font-bold transition-all flex items-center gap-1" title="Invertir dirección del orden">
+                            <span id="label-sort-order">Descendente</span>
+                            <span id="icon-sort-order">↓</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4" id="premios-dobles-grid">
-                    <!-- Inyectado por JS -->
+                <!-- 3. Filtro por Tipo de Premio y Resumen de Conteo -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2.5 border-t border-slate-800/80 text-xs gap-2">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-slate-400 font-medium">Tipo de boleto:</span>
+                        <button type="button" onclick="window.BoteApp.setPremiosTypeFilter('all')" id="btn-filter-type-all" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40">Todos</button>
+                        <button type="button" onclick="window.BoteApp.setPremiosTypeFilter('individual')" id="btn-filter-type-individual" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-transparent hover:border-slate-700 transition-all">🔵 Individual (Socios)</button>
+                        <button type="button" onclick="window.BoteApp.setPremiosTypeFilter('dobles')" id="btn-filter-type-dobles" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-transparent hover:border-slate-700 transition-all">🟣 Dobles (Peña)</button>
+                    </div>
+                    <div id="premios-results-count" class="text-slate-400 font-mono text-xs font-semibold self-start sm:self-center">
+                        Cargando premios...
+                    </div>
                 </div>
             </div>
 
-            <!-- BLOQUE 2: PRONÓSTICOS INDIVIDUALES DE SOCIOS -->
-            <div class="glass-panel p-4 sm:p-5 space-y-4 border-blue-500/30">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-800 gap-2">
-                    <div>
-                        <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                            <span>🔵</span> Historial de Premios por Pronóstico Individual de Socios
-                        </h3>
-                        <p class="text-xs text-slate-400">Premios oficiales obtenidos por los socios con su quiniela individual semanal de 14 partidos (10 o más aciertos). Todos los importes ingresan en el Bote de la Peña.</p>
-                    </div>
-                    <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-bold self-start sm:self-center">
-                        🏦 Bote de la Peña
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4" id="premios-individuales-grid">
-                    <!-- Inyectado por JS -->
-                </div>
+            <!-- CONTENEDOR DINÁMICO DE PREMIOS (Inyectado por JS según agrupación) -->
+            <div id="premios-dynamic-container" class="space-y-4">
+                <!-- Inyectado por JS -->
             </div>
 
             <div class="glass-panel p-4 sm:p-5 space-y-4">

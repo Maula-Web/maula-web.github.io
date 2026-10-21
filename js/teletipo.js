@@ -306,6 +306,12 @@
                 url: 'bote_2.html'
             });
 
+            // NOTICIA 2.e2: NOVEDAD EN BOTE - Explorador de Premios
+            items.push({
+                text: `🎁 <strong class="text-amber-400">Novedad en Bote:</strong> Nuevo explorador de premios obtenidos: vista agrupada por socio, por jornada o desglosada (ordenada por jornada, cantidad o socio).`,
+                url: 'bote_2.html'
+            });
+
             // NOTICIA 2.f: AUDITORÍA FLUJO DE CAJA
             items.push({
                 text: `📈 <strong class="text-amber-400">Flujo de Caja del Bote:</strong> Corregidas y auditadas las columnas de penalizaciones y cuotas reales de la tesorería.`,

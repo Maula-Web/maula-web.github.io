@@ -2517,3 +2517,40 @@ html.light-theme #card-desglose-balance-bote {
     color: #b45309 !important;
     border-color: rgba(245, 158, 11, 0.35) !important;
 }
+
+
+/* ==========================================================================
+   Explorador de Premios (Dobles & Premios) en Modo Claro
+   ========================================================================== */
+.light-theme #view-premios .bg-slate-950\/80,
+.light-theme #view-premios .bg-slate-950,
+.light-theme #view-premios .bg-slate-900,
+.light-theme #view-premios .bg-slate-900\/90,
+.light-theme #view-premios .bg-slate-900\/80,
+.light-theme #view-premios .bg-slate-900\/60 {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+.light-theme #view-premios .border-slate-800,
+.light-theme #view-premios .border-slate-800\/80,
+.light-theme #view-premios .border-slate-700,
+.light-theme #view-premios .border-slate-700\/80 {
+    border-color: #e2e8f0 !important;
+}
+
+.light-theme #view-premios .text-slate-400,
+.light-theme #view-premios .text-slate-300 {
+    color: #475569 !important;
+}
+
+.light-theme #view-premios .text-white {
+    color: #0f172a !important;
+}
+
+.light-theme #view-premios .hover\:bg-slate-800\/80:hover,
+.light-theme #view-premios .hover\:bg-slate-800:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
