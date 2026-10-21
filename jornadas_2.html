@@ -783,6 +783,9 @@
                             <button type="button" onclick="window.JornadasApp.openImportMatchesModal(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-300 text-slate-200 flex items-center gap-2">
                                 <span>📋</span> Importar Partidos
                             </button>
+                            <button type="button" onclick="window.JornadasApp.openImportMDModal(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-cyan-500/10 hover:text-cyan-300 text-slate-200 flex items-center gap-2">
+                                <span>📰</span> Importar Análisis MD
+                            </button>
                             <button type="button" onclick="window.JornadasApp.openAuditModal(); window.toggleMobileJornadaActions(false);" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-500/10 hover:text-sky-300 text-slate-200 flex items-center gap-2">
                                 <span>🔍</span> Verificación Total
                             </button>
@@ -794,6 +797,9 @@
                 <div class="hidden lg:flex items-center gap-1 sm:gap-1.5 flex-nowrap justify-end shrink-0">
                     <button type="button" onclick="window.JornadasApp.openAuditModal()" class="px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Auditar integridad y detectar discrepancias de toda la temporada">
                         <span>🔍</span> <span class="hidden 2xl:inline">Verificación Total</span><span class="2xl:hidden">Auditoría</span>
+                    </button>
+                    <button type="button" onclick="window.JornadasApp.openImportMDModal()" class="px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Consultar e Importar Análisis de Mundo Deportivo">
+                        <span>📰</span> <span class="hidden xl:inline">Importar </span><span>Análisis MD</span>
                     </button>
                     <button type="button" onclick="window.JornadasApp.openImportMatchesModal()" class="px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Importar Partidos oficiales">
                         <span>📋</span> <span class="hidden xl:inline">Importar </span><span>Partidos</span>
@@ -1200,6 +1206,115 @@
                         <button type="button" onclick="window.JornadasApp.confirmImportResults()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow">✅ Aplicar Resultados Oficiales</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL: IMPORTAR Y SINCRONIZAR ANÁLISIS DE MUNDO DEPORTIVO
+         ===================================================================== -->
+    <div id="modal-import-md" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-2 sm:p-4 z-[100080]">
+        <div class="modal-dialog-panel w-full max-w-3xl border border-cyan-500/50 p-2.5 sm:p-4 animate-modal max-h-[96vh] flex flex-col shadow-2xl rounded-2xl">
+            <!-- Cabecera -->
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-base p-1.5 rounded-xl bg-cyan-500/20 text-cyan-400">📰</span>
+                    <div>
+                        <h2 class="text-sm sm:text-base font-black text-white">Análisis Mundo Deportivo y Clasificaciones</h2>
+                        <p class="text-[10px] sm:text-xs text-slate-400">Informes tácticos, porcentajes 1X2 estimados y clasificaciones de 1ª y 2ª División</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.JornadasApp.closeImportMDModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition font-bold text-xs" title="Cerrar ventana">✕</button>
+            </div>
+
+            <!-- Contenido scrollable -->
+            <div class="flex-1 overflow-y-auto py-2.5 space-y-3 custom-scrollbar">
+                <!-- Tarjeta de estado y sincronización -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-cyan-950/70 via-slate-900 to-slate-950 border border-cyan-500/40 space-y-2.5 shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="space-y-0.5">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                                <h3 id="md-modal-title-status" class="text-xs sm:text-sm font-extrabold text-white">Sincronización en Directo</h3>
+                            </div>
+                            <p id="md-modal-info-text" class="text-[11px] sm:text-xs text-slate-300 leading-snug">
+                                Conecta con el fichero maestro de análisis táctico y clasificaciones oficiales de la Peña.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span id="md-modal-badge-jornada" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Jornada --</span>
+                            <span id="md-modal-badge-matches" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">--/15 Partidos</span>
+                        </div>
+                    </div>
+
+                    <!-- Botón de recarga / sincronización -->
+                    <div class="pt-1 flex flex-wrap items-center gap-2">
+                        <button type="button" id="btn-sync-md-data" onclick="window.JornadasApp.refreshMDAnalysis(true)" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black transition shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                            <span id="btn-sync-md-spinner" class="hidden animate-spin text-sm">⏳</span>
+                            <span id="btn-sync-md-icon" class="text-sm">🔄</span>
+                            <span id="btn-sync-md-text">Actualizar / Sincronizar Ahora</span>
+                        </button>
+                    </div>
+
+                    <div id="md-modal-status-feedback" class="text-[11px] font-semibold text-cyan-400 text-center pt-0.5"></div>
+                </div>
+
+                <!-- Resumen de metadatos -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="block text-[10px] text-slate-400 font-semibold uppercase">Cierre Oficial</span>
+                        <span id="md-modal-cierre" class="font-bold text-amber-400">--</span>
+                    </div>
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="block text-[10px] text-slate-400 font-semibold uppercase">Clasif. 1ª Div</span>
+                        <span id="md-modal-primera" class="font-bold text-emerald-400">-- equipos</span>
+                    </div>
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="block text-[10px] text-slate-400 font-semibold uppercase">Clasif. 2ª Div</span>
+                        <span id="md-modal-segunda" class="font-bold text-emerald-400">-- equipos</span>
+                    </div>
+                    <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="block text-[10px] text-slate-400 font-semibold uppercase">Última Actualiz.</span>
+                        <span id="md-modal-updated" class="font-mono text-[11px] text-slate-300">--</span>
+                    </div>
+                </div>
+
+                <!-- Lista de partidos analizados -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between px-1">
+                        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                            <span>📋</span> Partidos y Pronósticos Recomendados
+                        </h4>
+                        <span class="text-[10px] text-slate-400">Fuente: El Mundo Deportivo</span>
+                    </div>
+                    <div id="md-modal-matches-list" class="divide-y divide-slate-800/80 bg-slate-950 rounded-xl border border-slate-800 p-1 text-xs max-h-72 overflow-y-auto custom-scrollbar">
+                        <div class="p-3 text-center text-slate-400 text-xs">Cargando análisis...</div>
+                    </div>
+                </div>
+
+                <!-- Ayuda de terminal / automatización -->
+                <details class="rounded-xl border border-slate-800 bg-slate-900/60 p-2.5 text-xs space-y-2 group">
+                    <summary class="font-bold text-slate-300 cursor-pointer flex items-center justify-between select-none">
+                        <span class="flex items-center gap-1.5 text-slate-400 group-hover:text-amber-400 transition">
+                            <span>⚙️</span> ¿Cómo volver a raspar directamente desde la terminal?
+                        </span>
+                        <span class="text-[10px] text-amber-400 font-mono">Ver comando</span>
+                    </summary>
+                    <div class="pt-2 text-slate-300 text-[11px] space-y-1.5 border-t border-slate-800/80">
+                        <p>Para extraer los últimos análisis directamente desde la web de Mundo Deportivo y recalcular el cotejo de partidos:</p>
+                        <div class="flex items-center justify-between gap-2 p-2 rounded bg-slate-950 font-mono text-[11px] text-cyan-300 border border-slate-800">
+                            <code>node scripts/fetch_md_analysis.js --force</code>
+                            <button type="button" onclick="navigator.clipboard.writeText('node scripts/fetch_md_analysis.js --force'); this.innerText='¡Copiado!'; setTimeout(() => this.innerText='Copiar', 2000)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-white text-[10px] transition shrink-0">Copiar</button>
+                        </div>
+                        <p class="text-[10px] text-slate-400 italic">Nota: El flujo de GitHub Actions también se ejecuta automáticamente cada fin de semana antes del cierre.</p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Pie -->
+            <div class="pt-2 border-t border-slate-800 flex items-center justify-between shrink-0">
+                <span class="text-[10px] text-slate-400">Disponible en vista de escritorio y panel de pronósticos</span>
+                <button type="button" onclick="window.JornadasApp.closeImportMDModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition">Cerrar</button>
             </div>
         </div>
     </div>

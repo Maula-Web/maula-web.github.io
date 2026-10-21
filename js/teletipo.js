@@ -306,6 +306,12 @@
                 url: 'bote_2.html'
             });
 
+            // NOTICIA: IMPORTACIÓN DE ANÁLISIS MUNDO DEPORTIVO EN QUINIELA
+            items.push({
+                text: `📰 <strong class="text-cyan-400">Novedad Quiniela:</strong> Nuevo botón 'Importar Análisis MD' en el panel de Quiniela para sincronizar y consultar en 1 clic los análisis, porcentajes 1X2 y clasificaciones de Mundo Deportivo.`,
+                url: 'jornadas_2.html'
+            });
+
             // NOTICIA 2.e2: NOVEDAD EN BOTE - Explorador de Premios
             items.push({
                 text: `🎁 <strong class="text-amber-400">Novedad en Bote:</strong> Nuevo explorador de premios obtenidos: vista agrupada por socio, por jornada o desglosada (ordenada por jornada, cantidad o socio).`,

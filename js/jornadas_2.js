@@ -1476,6 +1476,134 @@ class Jornadas2AppController {
     // IMPORTACIÓN INTELIGENTE DE PARTIDOS Y RESULTADOS 2.0
     // =========================================================================
 
+    openImportMDModal() {
+        const modal = document.getElementById('modal-import-md');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            this.refreshMDAnalysis(false);
+        }
+    }
+
+    closeImportMDModal() {
+        const modal = document.getElementById('modal-import-md');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    async refreshMDAnalysis(force = false) {
+        const btn = document.getElementById('btn-sync-md-data');
+        const spinner = document.getElementById('btn-sync-md-spinner');
+        const icon = document.getElementById('btn-sync-md-icon');
+        const text = document.getElementById('btn-sync-md-text');
+        const statusBox = document.getElementById('md-modal-status-feedback');
+        const matchesContainer = document.getElementById('md-modal-matches-list');
+
+        if (force) {
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (icon) icon.classList.add('hidden');
+            if (text) text.textContent = 'Sincronizando...';
+            if (statusBox) statusBox.textContent = 'Consultando última versión sincronizada...';
+            sessionStorage.removeItem('maulas_md_analysis');
+        }
+
+        try {
+            const url = `datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status} al leer analisis_mundodeportivo.json`);
+
+            const data = await res.json();
+            try {
+                sessionStorage.setItem('maulas_md_analysis', JSON.stringify(data));
+            } catch (e) {}
+
+            // Actualizar badges
+            const bJornada = document.getElementById('md-modal-badge-jornada');
+            const bMatches = document.getElementById('md-modal-badge-matches');
+            const cCierre = document.getElementById('md-modal-cierre');
+            const cPrimera = document.getElementById('md-modal-primera');
+            const cSegunda = document.getElementById('md-modal-segunda');
+            const cUpdated = document.getElementById('md-modal-updated');
+
+            if (bJornada) bJornada.textContent = `Jornada ${data.detectedJornadaNum || '16'}`;
+            if (bMatches) bMatches.textContent = `${data.matchCountWithTarget || (data.matches ? data.matches.length : 0)}/15 Partidos`;
+            if (cCierre) cCierre.textContent = data.closingSchedule || 'Sábado 13:00';
+            if (cPrimera) cPrimera.textContent = `${(data.standings && data.standings.primera) ? data.standings.primera.length : 20} equipos`;
+            if (cSegunda) cSegunda.textContent = `${(data.standings && data.standings.segunda) ? data.standings.segunda.length : 22} equipos`;
+            if (cUpdated) {
+                if (data.updatedAt) {
+                    try {
+                        const d = new Date(data.updatedAt);
+                        cUpdated.textContent = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                    } catch(e) {
+                        cUpdated.textContent = data.updatedAt;
+                    }
+                } else {
+                    cUpdated.textContent = 'Actual';
+                }
+            }
+
+            // Renderizar lista de 15 partidos
+            if (matchesContainer) {
+                if (Array.isArray(data.matches) && data.matches.length > 0) {
+                    matchesContainer.innerHTML = data.matches.map(m => {
+                        const rec = m.recommended || '-';
+                        let pillClass = 'bg-sky-500/20 text-sky-400 border border-sky-500/40';
+                        if (rec === '1') pillClass = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+                        else if (rec === '2') pillClass = 'bg-amber-500/20 text-amber-400 border border-amber-500/40';
+
+                        // Porcentajes si existen
+                        let pctStr = '';
+                        if (m.percentages && m.percentages.quinielista) {
+                            const p = m.percentages.quinielista;
+                            pctStr = `<span class="text-[10px] text-slate-400 font-mono hidden sm:inline">(1: ${p['1']}% | X: ${p['X']}% | 2: ${p['2']}%)</span>`;
+                        }
+
+                        return `
+                            <div class="p-2 sm:p-2.5 hover:bg-slate-900/60 transition flex flex-col gap-1.5">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="w-6 h-6 rounded-lg bg-slate-800 text-amber-400 font-extrabold text-[11px] flex items-center justify-center shrink-0">P${m.num}</span>
+                                        <span class="font-black text-white text-xs truncate">${m.home} - ${m.away}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        ${pctStr}
+                                        <span class="px-2 py-0.5 rounded text-xs font-black ${pillClass}">${rec}</span>
+                                    </div>
+                                </div>
+                                ${m.comment ? `<p class="text-[11px] text-slate-300 leading-snug line-clamp-3">${m.comment}</p>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    matchesContainer.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">No hay análisis disponibles para mostrar.</div>`;
+                }
+            }
+
+            if (statusBox) {
+                statusBox.textContent = force ? '✅ Análisis MD sincronizado correctamente con éxito.' : '';
+                if (force) {
+                    setTimeout(() => {
+                        if (statusBox) statusBox.textContent = '';
+                    }, 4000);
+                }
+            }
+        } catch (err) {
+            console.error('[JornadasApp] Error cargando análisis MD:', err);
+            if (statusBox) {
+                statusBox.textContent = '⚠️ No se pudo sincronizar el archivo de análisis: ' + err.message;
+            }
+        } finally {
+            if (btn) btn.disabled = false;
+            if (spinner) spinner.classList.add('hidden');
+            if (icon) icon.classList.remove('hidden');
+            if (text) text.textContent = 'Actualizar / Sincronizar Ahora';
+        }
+    }
+
     openImportMatchesModal() {
         const modal = document.getElementById('modal-import-matches');
         const step1 = document.getElementById('import-matches-step-1');

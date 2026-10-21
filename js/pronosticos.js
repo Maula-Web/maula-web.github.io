@@ -3519,16 +3519,18 @@ class PronosticoManager {
     // MUNDO DEPORTIVO ANALYSIS, RECOMMENDATIONS & STANDINGS INTEGRATION
     // =========================================================================
 
-    async loadMDAnalysisData() {
+    async loadMDAnalysisData(force = false) {
         try {
-            const cached = sessionStorage.getItem('maulas_md_analysis');
-            if (cached) {
-                try {
-                    this.mdAnalysisData = JSON.parse(cached);
-                    return;
-                } catch(e) {}
+            if (!force) {
+                const cached = sessionStorage.getItem('maulas_md_analysis');
+                if (cached) {
+                    try {
+                        this.mdAnalysisData = JSON.parse(cached);
+                        return;
+                    } catch(e) {}
+                }
             }
-            const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?v=20261017_v1`);
+            const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`);
             if (res.ok) {
                 this.mdAnalysisData = await res.json();
                 try {
