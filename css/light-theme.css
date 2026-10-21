@@ -2620,3 +2620,22 @@ html.light-theme #card-desglose-balance-bote {
 .light-theme #modal-import-md #md-modal-matches-list .text-slate-400 {
     color: #64748b !important;
 }
+
+/* ==========================================================================
+   INDICADOR DE SOCIO QUE RELLENA LA QUINIELA DE DOBLES EN MODO CLARO
+   ========================================================================== */
+.light-theme #modal-dobles-view .bg-purple-950\/40,
+.light-theme #editor-view-doubles .bg-purple-900\/40 {
+    background-color: #f5f3ff !important;
+    border-color: #ddd6fe !important;
+}
+
+.light-theme #modal-dobles-view .text-amber-300,
+.light-theme #editor-doubles-author-badge {
+    color: #92400e !important;
+}
+
+.light-theme #modal-dobles-view .text-purple-300\/80,
+.light-theme #editor-view-doubles .text-purple-300\/80 {
+    color: #6b21a8 !important;
+}

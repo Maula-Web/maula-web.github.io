@@ -3380,7 +3380,7 @@ class BoteAppController {
         const content = document.getElementById('reducida-modal-content');
 
         if (title) title.textContent = `Desglose Reducción - Jornada ${targetData.jornadaNum} - ${targetData.memberName}`;
-        if (subtitle) subtitle.textContent = `16 apuestas combinadas (7 dobles) - Coste ${cDob.toFixed(2).replace('.', ',')} € asumido íntegramente por la Peña`;
+        if (subtitle) subtitle.innerHTML = `✍️ Rellenada por: <strong class="text-amber-300 font-bold">${targetData.memberName}</strong> • 16 apuestas combinadas (7 dobles) - Coste ${cDob.toFixed(2).replace('.', ',')} € asumido por la Peña`;
         if (content) content.innerHTML = html;
 
         this.openModal('modal-reducida-detalle');

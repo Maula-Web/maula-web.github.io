@@ -1828,6 +1828,18 @@
                                         </div>
                                     </div>
 
+                                    <!-- Identificación destacada del socio que rellena los dobles -->
+                                    <div class="mb-3 p-2.5 rounded-xl bg-purple-900/40 border border-purple-500/40 flex items-center justify-between gap-2 shadow-inner">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-base p-1 rounded-lg bg-purple-500/30 text-purple-200 shrink-0">✍️</span>
+                                            <div class="min-w-0">
+                                                <span class="text-[10px] uppercase font-bold text-purple-300/80 block">Socio que rellena esta quiniela:</span>
+                                                <strong id="editor-doubles-author-badge" class="text-sm font-black text-amber-300 truncate block">Socio</strong>
+                                            </div>
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-200 border border-purple-500/30 shrink-0">Oficial</span>
+                                    </div>
+
                                     <select id="sel-method" class="w-full p-2.5 bg-slate-900 border border-purple-500/50 text-white rounded-xl font-bold text-xs focus:outline-none focus:border-purple-400">
                                         <option value="directo">Apuestas Directas</option>
                                         <option value="reducida-1">Reducida 1: 4 Triples (9 apuestas)</option>
@@ -2348,6 +2360,10 @@
                 const jNum = j ? `Jornada ${j.number}` : '';
                 if (titleEl) {
                     titleEl.innerHTML = `Boleto: <span class="text-amber-400 font-black">${mName}</span> ${isDoublesEligible ? '<span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-purple-500/25 text-purple-300 border border-purple-500/50 font-black shadow-sm">✌️ Dobles</span>' : ''}`;
+                }
+                const doublesAuthorBadge = document.getElementById('editor-doubles-author-badge');
+                if (doublesAuthorBadge) {
+                    doublesAuthorBadge.textContent = mName;
                 }
                 if (subEl) {
                     subEl.textContent = isDoublesEligible 
