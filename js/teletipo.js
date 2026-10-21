@@ -290,7 +290,7 @@
 
             // NOTICIA REGLAMENTO: NUEVA REGLA QUINIELA DE DOBLES
             items.push({
-                text: `📜 <strong class="text-amber-400">Reglamento Dobles:</strong> A partir de la J.16, la quiniela de dobles la sellará exclusivamente el único ganador de la jornada anterior.`,
+                text: `📜 <strong class="text-amber-400">Reglamento Dobles:</strong> Sella dobles el ganador único previo. Si quien hizo los dobles previos obtuvo premio económico oficial, también sella dobles (2 boletos si son distintos).`,
                 url: 'pronosticos_2.html'
             });
 

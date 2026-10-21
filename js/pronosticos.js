@@ -908,9 +908,7 @@ class PronosticoManager {
         if (typeof this.checkEligibility === 'function') {
             const eligibility = this.checkEligibility(jornada.number, this.currentMemberId, true);
             const isNewRule = parseInt(jornada.number) >= 16;
-            isEligibleForDoubles = isNewRule
-                ? Boolean(eligibility && (eligibility.eligible || eligibility.isWinner))
-                : Boolean(eligibility && (eligibility.eligible || eligibility.isWinner || eligibility.hasPrize));
+            isEligibleForDoubles = Boolean(eligibility && (eligibility.eligible || eligibility.isWinner || eligibility.hasPrize));
         }
         if (!isEligibleForDoubles && typeof window !== 'undefined' && typeof window.getEligibleDoublesMembers === 'function') {
             const dms = window.getEligibleDoublesMembers(jornada);
@@ -1716,11 +1714,7 @@ class PronosticoManager {
             if (!isEligibleDoubles && precalculatedEligibleDoubles === null && typeof this.checkEligibility === 'function') {
                 const elig = this.checkEligibility(targetJornada.number, memberId, true);
                 const isNewRule = parseInt(targetJornada.number) >= 16;
-                if (isNewRule) {
-                    if (elig && (elig.eligible || elig.isWinner)) isEligibleDoubles = true;
-                } else {
-                    if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) isEligibleDoubles = true;
-                }
+                if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) isEligibleDoubles = true;
             }
         } catch (e) {
             console.error("Error al comprobar elegibilidad de dobles para LED:", e);
@@ -2687,29 +2681,77 @@ class PronosticoManager {
 
         const hasEconomicPrize = hasIndividualMoneyPrize;
 
+        // B) Premio económico en quiniela de dobles de la jornada previa:
+        let hasDoublesMoneyPrize = false;
+        if (this.pronosticosExtra && Array.isArray(this.pronosticosExtra)) {
+            const memberPrevExtra = this.pronosticosExtra.find(p =>
+                String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId) === String(prevJornada.id) &&
+                String(p.mId !== undefined && p.mId !== null ? p.mId : p.memberId) === String(memberId)
+            );
+            if (memberPrevExtra && memberPrevExtra.selection && Array.isArray(memberPrevExtra.selection)) {
+                const legacyPrizes = (prevJornada.prizes && typeof prevJornada.prizes === 'object' && Object.keys(prevJornada.prizes).length > 0)
+                    ? prevJornada.prizes
+                    : (prevJornada.prizeRates || {});
+                const doubleCount = memberPrevExtra.selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+                const isReduced = memberPrevExtra.isReduced || (doubleCount === 7);
+                const ev = (typeof ScoringSystem !== 'undefined' && typeof ScoringSystem.evaluateForecast === 'function')
+                    ? ScoringSystem.evaluateForecast(memberPrevExtra.selection, officialResults, jDate, { isReduced })
+                    : null;
+
+                let dPrize = 0;
+                if (ev && ev.breakdown) {
+                    Object.keys(ev.breakdown).forEach(h => {
+                        const count = ev.breakdown[h];
+                        if (count > 0 && legacyPrizes[h]) {
+                            dPrize += count * parseFloat(legacyPrizes[h] || 0);
+                        }
+                    });
+                } else if (ev) {
+                    const cat = ev.officialHits;
+                    let actualMinHits = prevJornada.minHitsToWin || 10;
+                    if (legacyPrizes && Object.keys(legacyPrizes).length > 0) {
+                        actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
+                    }
+                    if (cat >= actualMinHits) {
+                        dPrize += parseFloat(legacyPrizes[cat] || 0);
+                    }
+                }
+                if (dPrize > 0) hasDoublesMoneyPrize = true;
+            }
+        }
+        if (!hasDoublesMoneyPrize && typeof BoteEngine !== 'undefined' && typeof BoteEngine.getDoublesPrizeForMember === 'function') {
+            try {
+                if (BoteEngine.getDoublesPrizeForMember(memberId, prevJornada, this.pronosticosExtra) > 0) {
+                    hasDoublesMoneyPrize = true;
+                }
+            } catch (e) {}
+        }
+
         // NUEVA REGLA (A partir de la Jornada 16):
-        // SÓLO puede haber UN socio que rellena/sella la quiniela de dobles: el ganador de la jornada anterior.
-        // Lo anterior (< Jornada 16) se conserva como estaba (ganador o premio económico individual).
+        // Sella la quiniela de dobles el ganador único de la jornada anterior.
+        // MATIZ REGLAMENTARIO: Si un socio hizo la quiniela de dobles en la jornada anterior y obtuvo premio económico oficial (> 0 €),
+        // también podrá sellar otra quiniela de dobles en la jornada siguiente aunque no sea el ganador.
+        // Si el ganador único y el premiado en dobles son la misma persona, se sella una única quiniela de dobles.
         const isNewRuleActive = parseInt(currentJornadaNum) >= 16;
         let isEligible = false;
         let eligibleReason = 'not_winner';
 
         if (isNewRuleActive) {
-            isEligible = Boolean(isAbsoluteWinner);
-            eligibleReason = isEligible ? 'winner' : 'not_winner';
+            isEligible = Boolean(isAbsoluteWinner || hasDoublesMoneyPrize);
+            eligibleReason = isAbsoluteWinner ? 'winner' : (hasDoublesMoneyPrize ? 'doubles_prize' : 'not_winner');
         } else {
             isEligible = isAbsoluteWinner || hasEconomicPrize;
             eligibleReason = isEligible ? (isAbsoluteWinner ? 'winner' : 'prize') : 'not_winner';
         }
 
         if (isEligible) {
-            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name} (${isAbsoluteWinner ? 'Ganador Único' : (hasIndividualMoneyPrize ? 'Premio Individual' : 'Premio Dobles')})`);
+            console.log(`✅ ACCESO CONCEDIDO A DOBLES para ${this.members.find(m => String(m.id) === String(memberId))?.name} (${isAbsoluteWinner ? 'Ganador Único' : (hasDoublesMoneyPrize ? 'Premio en Dobles Previo' : 'Premio Individual')})`);
         }
 
         return {
             eligible: isEligible,
             isWinner: isAbsoluteWinner,
-            hasPrize: isNewRuleActive ? false : hasEconomicPrize,
+            hasPrize: isNewRuleActive ? hasDoublesMoneyPrize : hasEconomicPrize,
             reason: eligibleReason
         };
     }

@@ -1450,7 +1450,7 @@
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/40 flex items-center gap-1">
                                 <span>✌️</span> Quiniela Dobles
                             </span>
-                            <span class="text-xs font-bold font-mono text-purple-500 dark:text-purple-400">12,00 €</span>
+                            <span id="kpi-dobles-cost-header" class="text-xs font-bold font-mono text-purple-500 dark:text-purple-400">12,00 €</span>
                         </div>
 
                         <div class="flex items-center gap-2">
@@ -1464,8 +1464,8 @@
                                         <span>✌️</span> Boleto Colectivo de Dobles
                                     </strong>
                                     <div class="text-slate-300 text-[11px] leading-relaxed space-y-1.5">
-                                        <p>La combinación de dobles autorizada por la peña (Reducida 2: 7 dobles = 16 apuestas = 12,00 €).</p>
-                                        <p class="text-purple-300">El socio responsable de dobles es el ganador de la jornada previa o el siguiente por orden de desempate.</p>
+                                        <p>La combinación de dobles autorizada por la peña (Reducida 2: 7 dobles = 16 apuestas = 12,00 € por quiniela).</p>
+                                        <p class="text-purple-300">Responsable: ganador de la jornada previa. Además, si quien hizo los dobles previos obtuvo premio económico oficial, también sella dobles.</p>
                                     </div>
                                 </div>
                             </div>
@@ -1488,7 +1488,7 @@
 
                         <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex justify-between">
                             <span>Coste Oficial</span>
-                            <span class="text-purple-500 dark:text-purple-400 font-bold font-mono">12,00 €</span>
+                            <span id="kpi-dobles-cost-footer" class="text-purple-500 dark:text-purple-400 font-bold font-mono">12,00 €</span>
                         </div>
                     </div>
                 </div>
@@ -2173,16 +2173,30 @@
                 return window._eligibleDoublesCache.get(cacheKey);
             }
 
-            // A partir de la Jornada 16: SÓLO el ganador único de la jornada previa sella/rellena la quiniela de dobles
+            // A partir de la Jornada 16: El ganador único y cualquier socio que haya obtenido premio económico en los dobles previos sellan dobles
             if (parseInt(j.number) >= 16) {
                 const list = [];
                 if (window.app && typeof window.app.checkEligibility === 'function') {
                     for (const m of window.app.members) {
                         const elig = window.app.checkEligibility(j.number, m.id, true);
-                        if (elig && (elig.eligible || elig.isWinner)) {
+                        if (elig && (elig.eligible || elig.isWinner || elig.hasPrize)) {
                             list.push(m);
                         }
                     }
+                }
+                // Si ya existe una quiniela de dobles guardada para esta jornada, su autor también es responsable legítimo
+                if (window.app && window.app.pronosticosExtra && Array.isArray(window.app.pronosticosExtra)) {
+                    const jExtras = window.app.pronosticosExtra.filter(p =>
+                        (String(p.jId || p.jornadaId) === String(j.id)) &&
+                        p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')
+                    );
+                    jExtras.forEach(pe => {
+                        const mId = String(pe.mId !== undefined && pe.mId !== null ? pe.mId : pe.memberId);
+                        const mem = window.app.members.find(m => String(m.id) === mId);
+                        if (mem && !list.some(em => String(em.id) === String(mem.id))) {
+                            list.push(mem);
+                        }
+                    });
                 }
                 if (window._eligibleDoublesCache) window._eligibleDoublesCache.set(cacheKey, list);
                 return list;
@@ -3100,6 +3114,12 @@
                     }
                 }
 
+                const costDoblesStr = `${(Math.max(1, eligibleList.length) * 12).toFixed(2).replace('.', ',')} €`;
+                const costHeaderEl = document.getElementById('kpi-dobles-cost-header');
+                const costFooterEl = document.getElementById('kpi-dobles-cost-footer');
+                if (costHeaderEl) costHeaderEl.textContent = costDoblesStr;
+                if (costFooterEl) costFooterEl.textContent = costDoblesStr;
+
                 // Renderizar botones individuales si hay múltiples responsables de dobles
                 const doublesBtnsContainer = document.getElementById('kpi-dobles-buttons-container');
                 if (doublesBtnsContainer) {
@@ -3200,7 +3220,7 @@
                     }
                     mobDoblesResp.textContent = respName;
                 }
-                if (mobDoblesCost) mobDoblesCost.textContent = '12,00 €';
+                if (mobDoblesCost) mobDoblesCost.textContent = `${(Math.max(1, eligibleList.length) * 12).toFixed(2).replace('.', ',')} €`;
 
                 const mobSocioName = document.getElementById('kpi-mobile-socio-name');
                 const mobSocioStatus = document.getElementById('kpi-mobile-socio-status');

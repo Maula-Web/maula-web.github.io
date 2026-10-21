@@ -37,9 +37,12 @@ Para cada jornada, el sistema calcula automáticamente:
    - **Exención**: Si el socio ganó la jornada anterior, juega GRATIS
    - El coste se reparte entre el resto de socios
 
-2. **Coste de Columna de Dobles**: 12,00 € (compartido)
-   - Solo la juega el ganador de la jornada anterior
-   - Se paga con las aportaciones semanales de todos los socios (1,50 € × 19 socios = 28,50 €)
+2. **Coste de Columna de Dobles**: 12,00 € (o 24,00 € si hay 2 quinielas de dobles) (compartido)
+   - A partir de la Jornada 16, la juega el **único ganador** de la jornada anterior (resolviendo empates hacia atrás).
+   - **Matiz por Premio Económico**: Si el socio que rellenó la quiniela de dobles en la jornada anterior obtuvo premio económico oficial (> 0 €), conserva el derecho a sellar otra quiniela de dobles en la siguiente jornada aunque no sea el ganador ordinario:
+     - Si es un socio distinto al ganador ordinario, se sellan **2 quinielas de dobles** independientes (12,00 € cada una = 24,00 € total de dobles a cargo del fondo común).
+     - Si coincide que es la misma persona, se sella **1 única quiniela de dobles** (12,00 €).
+   - Se paga con las aportaciones semanales de todos los socios del fondo común.
 
 3. **Penalización por Número de Unos**:
    - 10 unos = +1,10 €
@@ -49,8 +52,8 @@ Para cada jornada, el sistema calcula automáticamente:
    - 14 unos = +2,00 €
 
 4. **Sellado de Quinielas**:
-   - El perdedor de la jornada anterior sella las quinielas
-   - Paga de su bolsillo: (19 socios × 0,75 €) + 12,00 € = **26,25 €**
+   - El perdedor de la jornada anterior sella las quinielas en la administración
+   - Paga de su bolsillo: (19 socios × 0,75 €) + coste de dobles (12,00 € o 24,00 €) = **26,25 €** (o **38,25 €** con 2 dobles)
    - La Peña le reembolsa esta cantidad:
      - **Opción A**: Se ingresa en su bote personal (suma al total de la Peña)
      - **Opción B**: Se ingresa en su cuenta bancaria (resta del total de la Peña)

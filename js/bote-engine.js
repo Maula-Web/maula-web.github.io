@@ -448,8 +448,9 @@ class BoteEngine {
             const isPrevWinner = prevWinnerId && String(memberId) === String(prevWinnerId);
 
             if (parseInt(jornada.number) >= 16) {
-                // A partir de la Jornada 16: SÓLO el ganador único de la jornada anterior sella/rellena la quiniela de dobles
-                if (isPrevWinner) {
+                // A partir de la Jornada 16: El ganador único o quien obtuvo premio económico en los dobles de la jornada anterior sella/rellena la quiniela de dobles
+                const hadDoublesPrize = this.getDoublesPrizeForMember(memberId, prevJornada, pronosticosExtra) > 0;
+                if (isPrevWinner || hadDoublesPrize) {
                     costs.jugaDobles = true;
                 }
             } else {
@@ -545,11 +546,19 @@ class BoteEngine {
                     (matchesExtra || []).map(p => String(p.mId || p.memberId || '')).filter(Boolean)
                 );
                 if (prevWinnerId) extraMemberIds.add(String(prevWinnerId));
-                members.forEach(m => {
-                    if (this.getPrizesForMemberJornada(m.id, prevJornada, pronosticos) > 0) {
-                        extraMemberIds.add(String(m.id));
-                    }
-                });
+                if (parseInt(jornada.number) >= 16) {
+                    members.forEach(m => {
+                        if (this.getDoublesPrizeForMember(m.id, prevJornada, pronosticosExtra) > 0) {
+                            extraMemberIds.add(String(m.id));
+                        }
+                    });
+                } else {
+                    members.forEach(m => {
+                        if (this.getPrizesForMemberJornada(m.id, prevJornada, pronosticos) > 0) {
+                            extraMemberIds.add(String(m.id));
+                        }
+                    });
+                }
                 numExtras = Math.max(1, extraMemberIds.size);
             }
             const totalCDob = numExtras * cDob;
@@ -740,6 +749,63 @@ class BoteEngine {
         });
 
         return totalExtraPrize;
+    }
+
+    getDoublesPrizeForMember(memberId, jornada, pronosticosExtra) {
+        if (!jornada || !jornada.matches || jornada.matches.length < 14) return 0;
+        const filledMatches = (jornada.matches || []).filter(m => {
+            const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+            return r !== '' && r !== '-' && r !== 'por definir';
+        });
+        if (filledMatches.length < 14) return 0;
+
+        const mIdStr = String(memberId);
+        const extras = (pronosticosExtra || []).filter(p =>
+            String(p.jId !== undefined && p.jId !== null ? p.jId : p.jornadaId) === String(jornada.id) &&
+            String(p.mId !== undefined && p.mId !== null ? p.mId : p.memberId) === mIdStr
+        );
+        if (extras.length === 0) return 0;
+
+        const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
+        const officialResults = (jornada.matches || []).map(m => (m.result !== undefined ? m.result : (m.r || '')));
+        const legacyPrizes = (jornada.prizes && typeof jornada.prizes === 'object' && Object.keys(jornada.prizes).length > 0)
+            ? jornada.prizes
+            : (jornada.prizeRates || {});
+
+        let memberExtraPrize = 0;
+        extras.forEach(p => {
+            const selection = p.selection || p.forecast;
+            if (!selection || !Array.isArray(selection)) return;
+
+            const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+            const isReduced = p.isReduced || (doubleCount === 7);
+
+            const ev = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced }) : null;
+
+            if (ev && ev.breakdown) {
+                Object.keys(ev.breakdown).forEach(h => {
+                    const count = ev.breakdown[h];
+                    if (count > 0 && legacyPrizes[h]) {
+                        memberExtraPrize += count * parseFloat(legacyPrizes[h] || 0);
+                    }
+                });
+            } else if (ev) {
+                const cat = ev.officialHits;
+                let actualMinHits = jornada.minHitsToWin || 10;
+                if (legacyPrizes && Object.keys(legacyPrizes).length > 0) {
+                    actualMinHits = Math.min(...Object.keys(legacyPrizes).map(Number));
+                }
+                if (cat >= actualMinHits) {
+                    memberExtraPrize += parseFloat(legacyPrizes[cat] || 0);
+                }
+            }
+        });
+
+        return memberExtraPrize;
+    }
+
+    static getDoublesPrizeForMember(memberId, jornada, pronosticosExtra) {
+        return BoteEngine.prototype.getDoublesPrizeForMember.call({}, memberId, jornada, pronosticosExtra);
     }
 
     getWinnerOfJornada(prevJornada, members, jornadas, pronosticos) {
