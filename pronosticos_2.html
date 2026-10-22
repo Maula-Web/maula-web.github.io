@@ -980,7 +980,7 @@
                 flex-direction: column !important;
                 align-items: stretch !important;
                 width: 100% !important;
-                padding: 0.75rem 0.85rem !important;
+                padding: 0.65rem 0.65rem !important;
                 gap: 0.5rem !important;
                 border-radius: 1rem !important;
                 overflow: visible !important;
@@ -994,30 +994,57 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                gap: 0.4rem !important;
+                gap: 0.35rem !important;
                 overflow: visible !important;
+            }
+            #modal-editor-boleto .p-match-num {
+                min-width: 1.35rem !important;
+                font-size: 0.8rem !important;
             }
             #modal-editor-boleto .match-team {
                 min-width: 0 !important;
                 flex: 1 1 0 !important;
+                overflow: visible !important;
+                gap: 0.3rem !important;
+            }
+            #modal-editor-boleto .match-team.home-team {
+                justify-content: flex-end !important;
+                text-align: right !important;
+            }
+            #modal-editor-boleto .match-team.away-team {
+                justify-content: flex-start !important;
+                text-align: left !important;
+            }
+            #modal-editor-boleto .team-logo {
+                width: 18px !important;
+                height: 18px !important;
             }
             #modal-editor-boleto .team-name {
                 max-width: none !important;
-                font-size: 0.85rem !important;
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
+                font-size: 0.82rem !important;
+                line-height: 1.15 !important;
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+                word-break: break-word !important;
             }
             #modal-editor-boleto .p-row-actions {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
+                gap: 0.4rem !important;
                 width: 100% !important;
                 padding-top: 0.45rem !important;
                 border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
             }
             .light-theme #modal-editor-boleto .p-row-actions {
                 border-top-color: rgba(0, 0, 0, 0.08) !important;
+            }
+            #modal-editor-boleto .p-row-actions .md-mobile-toggle-btn {
+                margin: 0 auto !important;
+                padding: 4px 8px !important;
+                font-size: 0.7rem !important;
+                flex-shrink: 0 !important;
             }
             #modal-editor-boleto .p-others {
                 order: initial !important;
@@ -1027,7 +1054,7 @@
             }
             #modal-editor-boleto .p-options {
                 flex: 0 0 auto !important;
-                gap: 6px !important;
+                gap: 5px !important;
             }
             #modal-editor-boleto .p-percentages {
                 flex: 0 0 auto !important;

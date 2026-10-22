@@ -403,8 +403,8 @@
 
             // NOTICIA 16: NOVEDAD WEB - Actualización Maula Hero
             items.push({
-                text: `⚡ <strong class="text-cyan-400">Actualización Maula Hero:</strong> Nuevo teletipo de piques en la carátula, vidas blindadas en modo dobles y centrado vertical móvil.`,
-                url: 'juego.html'
+                text: `📱 <strong class="text-cyan-400">Novedad en Sellado Móvil:</strong> Nombres de equipos 100% visibles sin recortes, botón de análisis integrado e identificación del autor en Dobles.`,
+                url: 'pronosticos_2.html'
             });
 
             // Duplicar items para scroll continuo infinito

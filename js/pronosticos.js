@@ -842,7 +842,6 @@ class PronosticoManager {
                     </div>
                     ${isPigMatch ? '<span style="font-size:0.75rem; background:#ffecb3; color:#e65100; border-radius:4px; padding:2px 6px; font-weight:bold; margin-left:6px;" title="Partido de Interés General">🐷 PIG</span>' : ''}
                     ${hitBadgeHtml}
-                    ${mobileBtnHtml}
                 </div>
 
                 <div class="p-row-actions">
@@ -852,6 +851,7 @@ class PronosticoManager {
                         <div class="chk-option ${val === '2' ? 'selected' : ''} ${val === '2' && hitStatus === true ? 'opt-hit' : ''} ${val === '2' && hitStatus === false ? 'opt-miss' : ''}" onclick="window.app.selectOption(this, '2')">2</div>
                     </div>
 
+                    ${mobileBtnHtml}
                     ${percHtml}
                 </div>
 
@@ -3043,7 +3043,6 @@ class PronosticoManager {
                             </div>
                         </div>
                         ${hitBadgeHtml}
-                        ${mobileBtnHtml}
                     </div>
                 </div>
 
@@ -3051,6 +3050,7 @@ class PronosticoManager {
                     <div class="prediction-inputs" data-idx="${idx}">
                         ${isP15 ? this.renderP15Inputs(idx, selections[idx], isLocked) : this.renderMultiSelectButtons(idx, selections[idx], isLocked, false, hitStatus, mResult)}
                     </div>
+                    ${mobileBtnHtml}
                     ${percHtml}
                 </div>
 
