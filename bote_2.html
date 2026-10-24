@@ -385,6 +385,41 @@
     
         @media (max-width: 767px) { .desktop-only-flex { display: none !important; } }
         @media (min-width: 768px) { .desktop-only-flex { display: flex !important; } }
+
+        /* =========================================================================
+           APROVECHAMIENTO MÁXIMO DEL ANCHO DE PANTALLA EN PC (WIDESCREEN / ULTRA-WIDE)
+           ========================================================================= */
+        @media (min-width: 1024px) {
+            body {
+                padding: 0.75rem 1rem !important;
+            }
+            #bote2-main-content {
+                max-width: 98vw !important;
+                width: 98vw !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            body {
+                padding: 0.75rem 1.25rem !important;
+            }
+            #bote2-main-content {
+                max-width: 98.5vw !important;
+                width: 98.5vw !important;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            body {
+                padding: 0.75rem 1.5rem !important;
+            }
+            #bote2-main-content {
+                max-width: 99vw !important;
+                width: 99vw !important;
+            }
+        }
 </style>
 </head>
 
@@ -398,7 +433,7 @@
     <!-- =====================================================================
          CONTENIDO PRINCIPAL: BOTE & TESORERÍA
          ===================================================================== -->
-    <div id="bote2-main-content" class="max-w-[1500px] mx-auto space-y-4 sm:space-y-6">
+    <div id="bote2-main-content" class="w-full max-w-[1500px] lg:max-w-[98vw] 2xl:max-w-[99vw] mx-auto space-y-4 sm:space-y-6">
 
         <!-- NAVBAR SUPERIOR MAULAS 2.0 (NAVEGACIÓN UNIVERSAL Y SELECTOR DE SECCIÓN) -->
         <nav class="glass-panel main-navbar-sticky sticky top-0 p-2 sm:p-2.5 xl:p-3 border-amber-500/40 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 z-[100] shadow-xl">
@@ -1737,7 +1772,7 @@
 
     <!-- MODAL 1: 📄 EXTRACTO BANCARIO DEL SOCIO -->
     <div id="modal-extracto-socio" onclick="if(event.target === this) window.BoteApp.closeModal('modal-extracto-socio')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-5xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
+        <div class="glass-panel w-full max-w-5xl 2xl:max-w-7xl max-h-[90vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center font-bold text-lg sm:text-xl" id="extracto-avatar">
@@ -1810,7 +1845,7 @@
 
     <!-- MODAL 3: 📋 GESTIONAR INGRESOS REGISTRADOS -->
     <div id="modal-gestion-ingresos" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-ingresos')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-5xl lg:max-w-6xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
+        <div class="glass-panel w-full max-w-5xl lg:max-w-6xl 2xl:max-w-7xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -1857,7 +1892,7 @@
 
     <!-- MODAL 4: 🛠️ GESTIONAR SELLADO DE JORNADA (Reembolso Bote vs Bizum y Sustituto) -->
     <div id="modal-gestion-jornada" onclick="if(event.target === this) window.BoteApp.closeModal('modal-gestion-jornada')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-y-auto">
-        <div class="glass-panel w-full max-w-5xl lg:max-w-6xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
+        <div class="glass-panel w-full max-w-5xl lg:max-w-6xl 2xl:max-w-7xl max-h-[85vh] flex flex-col border-orange-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -2159,7 +2194,7 @@
 
     <!-- MODAL 8: 📋 DESGLOSE DE QUINIELA REDUCIDA (7 DOBLES) -->
     <div id="modal-reducida-detalle" onclick="if(event.target === this) window.BoteApp.closeModal('modal-reducida-detalle')" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[10005] hidden items-start justify-center py-2 sm:py-4 px-1 sm:px-3 overflow-y-auto">
-        <div class="glass-panel w-full max-w-[98vw] 2xl:max-w-[1720px] max-h-[96vh] flex flex-col border-purple-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
+        <div class="glass-panel w-full max-w-[98vw] 2xl:max-w-[98vw] max-h-[96vh] flex flex-col border-purple-500/40 bg-slate-950 shadow-2xl rounded-2xl overflow-hidden m-auto">
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-purple-950/40 to-slate-900 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold text-lg sm:text-xl">
