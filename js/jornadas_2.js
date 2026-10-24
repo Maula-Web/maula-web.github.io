@@ -1614,6 +1614,11 @@ class Jornadas2AppController {
         if (step2) step2.classList.add('hidden');
         if (errorBox) errorBox.classList.add('hidden');
 
+        const confirmBtn = document.getElementById('btn-confirm-import-matches');
+        if (confirmBtn) {
+            confirmBtn.textContent = '✅ Confirmar y Crear Jornada';
+        }
+
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -1780,7 +1785,10 @@ class Jornadas2AppController {
         }
 
         if (confirmBtn) {
-            confirmBtn.textContent = `✅ Confirmar y Crear Jornada ${candidate.number}`;
+            const alreadyExists = this.jornadas.some(j => parseInt(j.number, 10) === parseInt(candidate.number, 10));
+            confirmBtn.textContent = alreadyExists
+                ? `⚠️ Confirmar y Actualizar Jornada ${candidate.number}`
+                : `✅ Confirmar y Crear Jornada ${candidate.number}`;
         }
     }
 
@@ -1845,11 +1853,23 @@ class Jornadas2AppController {
                 `;
             }).join('');
         }
+
+        const confirmBtn = document.getElementById('btn-confirm-import-matches');
+        if (confirmBtn) {
+            const alreadyExists = this.jornadas.some(j => parseInt(j.number, 10) === parseInt(res.jNum, 10));
+            confirmBtn.textContent = alreadyExists
+                ? `⚠️ Confirmar y Actualizar Jornada ${res.jNum}`
+                : `✅ Confirmar y Crear Jornada ${res.jNum}`;
+        }
     }
 
     backToMatchesTextInput() {
         document.getElementById('import-matches-step-1').classList.remove('hidden');
         document.getElementById('import-matches-step-2').classList.add('hidden');
+        const confirmBtn = document.getElementById('btn-confirm-import-matches');
+        if (confirmBtn) {
+            confirmBtn.textContent = '✅ Confirmar y Crear Jornada';
+        }
     }
 
     async confirmCreateJornadaFromImport() {
