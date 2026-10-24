@@ -390,6 +390,13 @@ class BoteAppController {
 
             const neto = recaudacion - gastoSellado + premios;
 
+            const matchesWithResult = (j.matches || []).filter(m => {
+                const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
+                return r !== '' && r !== '-' && r !== 'por definir';
+            });
+            const hasResults = matchesWithResult.length > 0;
+            const isCompleted = matchesWithResult.length >= 14 || j.status === 'completed' || j.status === 'closed' || j.finalizada === true;
+
             const isPigJornada = !!(
                 (j.matches && j.matches.some(m => m && ((typeof window.AppUtils !== 'undefined' && window.AppUtils.isPigMatch(m.home, m.away)) || (typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away))))) ||
                 jMovements.some(m => (m.penalizacionPIG || 0) > 0) ||
@@ -401,6 +408,8 @@ class BoteAppController {
             const isPrizeJornada = premios > 0 || (j.premios || 0) > 0;
 
             return {
+                hasResults,
+                isCompleted,
                 id: j.id,
                 number: j.number,
                 date: j.date,
@@ -1126,12 +1135,19 @@ class BoteAppController {
 
             const prizeIcon = (j.hasPrize || j.premios > 0) ? '🏆' : '';
             const pigIcon = j.hasPig ? '🐷' : '';
+            let statusBadge = '';
+            if (!j.hasResults) {
+                statusBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">⏳ Sellada</span>';
+            } else if (!j.isCompleted) {
+                statusBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 animate-pulse">⚽ En juego</span>';
+            }
 
             btn.innerHTML = `
                 <span>J${j.number}</span>
                 <span class="opacity-70 text-[11px]">(${j.date})</span>
                 ${prizeIcon}
                 ${pigIcon}
+                ${statusBadge}
             `;
             carousel.appendChild(btn);
         });
@@ -1243,11 +1259,12 @@ class BoteAppController {
                             <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-700 whitespace-nowrap">${jSummary.date}</span>
                             ${jSummary.premios > 0 ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30 whitespace-nowrap flex items-center gap-1">🏆 Jornada Premiada</span>' : ''}
                             ${jSummary.hasPig ? '<span class="px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-400 text-xs font-bold border border-pink-500/30 whitespace-nowrap flex items-center gap-1">🐷 Partido PIG</span>' : ''}
+                            ${!jSummary.hasResults ? '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30 whitespace-nowrap flex items-center gap-1">⏳ Boleto Sellado (Pendiente de inicio)</span>' : (!jSummary.isCompleted ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30 whitespace-nowrap flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> En juego</span>' : '')}
                         </div>
                         <div class="flex flex-wrap items-center gap-3 mt-2 text-xs sm:text-sm">
                             <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50 whitespace-nowrap">
                                 <span class="text-emerald-400 font-bold">👑 Ganador:</span> 
-                                <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || 'N/A'}</span>
+                                <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || (jSummary.hasResults ? 'En juego...' : 'Pendiente de inicio')}</span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                     <strong class="text-emerald-400 block mb-1 font-bold">👑 Ganador de la Jornada</strong>
                                     Socio con más aciertos en esta jornada. Jugará gratis (🎁) y pronosticará la quiniela de 7 dobles en la siguiente jornada (coste de ${(jSummary.costeDobles !== undefined ? jSummary.costeDobles : (this.config.costeDobles || 10.50)).toFixed(2).replace('.', ',')} € pagado al 100% por la peña).
@@ -1258,7 +1275,7 @@ class BoteAppController {
                             <span class="text-slate-600">•</span>
                             <div class="group relative cursor-help flex items-center gap-1.5 text-slate-300 hover:z-50 whitespace-nowrap">
                                 <span class="text-rose-400 font-bold">💀 Sellador:</span> 
-                                <span class="underline decoration-dotted decoration-slate-500">${jSummary.loserName || 'N/A'}</span>
+                                <span class="underline decoration-dotted decoration-slate-500">${jSummary.sealerName || jSummary.loserName || 'N/A'}</span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                     <strong class="text-rose-400 block mb-1 font-bold">💀 Sellador Oficial</strong>
                                     Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de ${jSummary.gastoSellado.toFixed(2).replace('.', ',')} € en su hucha personal o por Bizum.
@@ -1482,7 +1499,7 @@ class BoteAppController {
                     <strong class="text-white">${m.memberName}</strong>${icons}
                 </td>
                 <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-center font-bold text-white whitespace-nowrap">
-                    ${m.aciertos !== undefined ? m.aciertos : '-'}
+                    ${jSummary.hasResults ? (m.aciertos !== undefined ? m.aciertos : '-') : '<span class="text-slate-500 font-normal">⏳</span>'}
                 </td>
                 <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono text-slate-300 whitespace-nowrap">
                     ${m.exento ? `

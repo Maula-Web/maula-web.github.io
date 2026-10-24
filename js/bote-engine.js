@@ -167,8 +167,17 @@ class BoteEngine {
                         const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
                         return r !== '' && r !== '-' && r !== 'por definir';
                     });
-                    const isJornadaPlayed = matchesWithResult.length > 0 || jornada.status === 'completed' || jornada.status === 'closed' || jornada.finalizada === true;
-                    if (!isJornadaPlayed) return;
+                    const hasResults = matchesWithResult.length > 0;
+                    const isJornadaCompleted = matchesWithResult.length >= 14 || jornada.status === 'completed' || jornada.status === 'closed' || jornada.finalizada === true;
+
+                    // Comprobar si la jornada ya está sellada o con pronósticos enviados por la peña
+                    const hasPredictions = pronosticos && pronosticos.some(p =>
+                        (String(p.jId || p.jornadaId) === String(jornada.id) || (!jornada.id && parseInt(p.jId || p.jornadaId, 10) === parseInt(jornada.number, 10))) &&
+                        p.selection && Array.isArray(p.selection) && p.selection.length > 0
+                    );
+                    const isJornadaSealed = Boolean(jornada.sellada || jornada.isSealed || jornada.status === 'sealed' || hasPredictions);
+                    const isJornadaEligible = hasResults || isJornadaCompleted || isJornadaSealed;
+                    if (!isJornadaEligible) return;
 
                     const infoRedist = jornadaExemptions[jornadaIndex];
                     const pronostico = this._pMap ? (this._pMap.get(`${jornada.id}_${mIdStr}`) || (!jornada.id ? this._pMap.get(`${jornada.number}_${mIdStr}`) : null)) : pronosticos.find(p =>
@@ -449,7 +458,14 @@ class BoteEngine {
             const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
             return r !== '' && r !== '-' && r !== 'por definir';
         });
-        const jornadaPlayed = matchesWithResult.length > 0 || jornada.status === 'completed' || jornada.status === 'closed' || jornada.finalizada === true;
+        const hasResults = matchesWithResult.length > 0;
+        const isJornadaCompleted = matchesWithResult.length >= 14 || jornada.status === 'completed' || jornada.status === 'closed' || jornada.finalizada === true;
+        const hasPredictions = pronosticos && pronosticos.some(p =>
+            (String(p.jId || p.jornadaId) === String(jornada.id) || (!jornada.id && parseInt(p.jId || p.jornadaId, 10) === parseInt(jornada.number, 10))) &&
+            p.selection && Array.isArray(p.selection) && p.selection.length > 0
+        );
+        const isJornadaSealed = Boolean(jornada.sellada || jornada.isSealed || jornada.status === 'sealed' || hasPredictions);
+        const jornadaPlayed = hasResults || isJornadaCompleted || isJornadaSealed;
         const jDate = window.AppUtils.parseDate(jornada.date);
         const numMembers = members.length;
 
@@ -485,7 +501,7 @@ class BoteEngine {
 
         const currentSelection = pronostico.selection || pronostico.forecast;
         if (jornada.matches && currentSelection) {
-            costs.aciertos = this.calculateAciertos(jornada.matches, currentSelection);
+            costs.aciertos = hasResults ? this.calculateAciertos(jornada.matches, currentSelection) : 0;
         }
 
         if (jornadaIndex > 0) {
@@ -559,12 +575,14 @@ class BoteEngine {
             }
         }
 
-        if (jornadaPlayed && currentSelection && Array.isArray(currentSelection)) {
+                // REGLA: Las penalizaciones solo se activan cuando se rellene el primer resultado de un partido (hasResults === true)
+        if (hasResults && currentSelection && Array.isArray(currentSelection)) {
             const first14 = currentSelection.slice(0, 14);
             const numUnos = first14.filter(f => f === '1').length;
             costs.penalizacionUnos = this.calculateHistoricalPenalty('unos', numUnos, jDate);
 
-            if (costs.aciertos <= 3) {
+            // Bajos aciertos (<= 3): solo al completarse la jornada (al menos 14 partidos disputados)
+            if (isJornadaCompleted && costs.aciertos <= 3) {
                 costs.penalizacionBajosAciertos = this.calculateHistoricalPenalty('bajos_aciertos', costs.aciertos, jDate);
             }
 
@@ -662,8 +680,9 @@ class BoteEngine {
             costs.sellado = -((numMembers * cCol) + totalCDob);
         }
 
-        let isCurrentLoser = false;
-        if (jornadaPlayed) {
+                let isCurrentLoser = false;
+        // Ganador y Maula solo se liquidan cuando la jornada ha concluido
+        if (isJornadaCompleted) {
             if (this.wasWinnerOfJornada(memberId, jornada, members, jornadas, pronosticos)) {
                 costs.isWinner = true;
             }

@@ -56,7 +56,9 @@ class BoteManager {
 
     isJornadaPlayed(j) {
         if (!j) return false;
-        if (j.status === 'completed' || j.status === 'closed' || j.finalizada === true) return true;
+        if (j.status === 'completed' || j.status === 'closed' || j.finalizada === true || j.sellada || j.isSealed) return true;
+        const hasPredictions = this.pronosticos && this.pronosticos.some(p => String(p.jId || p.jornadaId) === String(j.id) || Number(p.jId || p.jornadaId) === Number(j.number));
+        if (hasPredictions) return true;
         return Array.isArray(j.matches) && j.matches.some(m => {
             const r = String(m.result !== undefined ? m.result : (m.r || '')).trim().toLowerCase();
             return r !== '' && r !== '-' && r !== 'por definir';

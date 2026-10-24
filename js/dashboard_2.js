@@ -1892,8 +1892,8 @@ class Dashboard2AppController {
 
         // 16. NOVEDAD WEB: Actualización de mecánicas de Maula Hero
         items.push({
-            text: `📱 <strong class="text-cyan-400">Novedad en Sellado Móvil:</strong> Nombres de equipos 100% visibles sin recortes, botón de análisis integrado e identificación del autor en Dobles.`,
-            url: 'pronosticos_2.html'
+            text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Entrada anticipada de jornadas selladas con coste de sellado y cuotas, activando penalizaciones con el 1º partido.`,
+            url: 'bote_2.html'
         });
 
         // Asegurar que siempre hay un mínimo de elementos para rotación continua
