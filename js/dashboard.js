@@ -776,10 +776,14 @@ class DashboardManager {
             .sort((a, b) => b.hits - a.hits)
             .map(r => ({ name: r.name, hits: r.hits }));
 
-        // All eligible for NEXT dobles: Absolute Winner + anyone with a monetary prize > 0
+        // All eligible for NEXT dobles: Absolute Winner + anyone with a monetary prize > 0 (con excepción de premio en dobles desde J16)
         let eligibleNextNames = [];
         if (parseInt(jornada.number) >= 14) {
             eligibleNextNames = [winner.name];
+            const prizeDoublesAuthors = doublesResults.filter(dr => dr.prize > 0).map(dr => dr.name);
+            if (prizeDoublesAuthors.length > 0) {
+                eligibleNextNames.push(...prizeDoublesAuthors);
+            }
         } else {
             eligibleNextNames = results
                 .filter(r => {

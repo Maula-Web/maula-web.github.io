@@ -417,9 +417,11 @@ class Dashboard2AppController {
             let currentWinnerName = lastJornadaOutcome.winnerName || 'Pendiente';
             let liveLoserName = null;
             let liveLoserPoints = null;
+            let liveLeadersCount = 0;
             const nextJornadaNum = targetJNum;
             const upcomingJornadaNum = targetJNum + 1; // La jornada posterior para la que sellarán/rellenarán si targetJNum está en juego
 
+            let maxLivePoints = -9999;
             let maxLiveHits = -1;
             let minLiveHits = 999;
             let minLivePoints = 9999;
@@ -433,11 +435,12 @@ class Dashboard2AppController {
                     if (p && window.ScoringSystem) {
                         const ev = window.ScoringSystem.evaluateMember(m, this.nextJornada, p);
                         if (ev && ev.played && ev.hits >= 0) {
-                            // Evaluación para líder/ganador
-                            if (ev.hits > maxLiveHits) {
+                            // Evaluación para líder/ganador (primero por puntos, luego por aciertos)
+                            if (ev.points > maxLivePoints || (ev.points === maxLivePoints && ev.hits > maxLiveHits)) {
+                                maxLivePoints = ev.points;
                                 maxLiveHits = ev.hits;
                                 liveLeaders = [{ member: m, hits: ev.hits, points: ev.points }];
-                            } else if (ev.hits === maxLiveHits) {
+                            } else if (ev.points === maxLivePoints && ev.hits === maxLiveHits) {
                                 liveLeaders.push({ member: m, hits: ev.hits, points: ev.points });
                             }
 
@@ -453,17 +456,33 @@ class Dashboard2AppController {
                     }
                 });
 
-                if (maxLiveHits >= 0 && liveLeaders.length > 0) {
-                    liveWinnerHits = maxLiveHits;
-                    const leaderNames = liveLeaders.map(l => window.AppUtils ? window.AppUtils.getMemberName(l.member) : l.member.name);
-                    currentWinnerName = leaderNames.join(', ');
-                    
+                if (liveLeaders.length > 0) {
+                    liveLeadersCount = liveLeaders.length;
+                    // Regla de Único Ganador: si hay varios líderes provisionales empatados, desempatar hacia atrás mediante historial oficial
+                    let winnerLiveCandidates = liveLeaders.map(l => ({
+                        memberId: l.member.id,
+                        member: l.member,
+                        points: l.points,
+                        hits: l.hits
+                    }));
+
+                    if (winnerLiveCandidates.length > 1) {
+                        winnerLiveCandidates = this.resolveTie(winnerLiveCandidates, history, 'points', 'max');
+                    }
+                    // Si el empate persiste tras el historial, desempatar por menor ID (socio más antiguo gana)
+                    winnerLiveCandidates.sort((a, b) => a.memberId - b.memberId);
+
+                    const chosenWinner = winnerLiveCandidates[0];
+                    currentWinnerName = window.AppUtils ? window.AppUtils.getMemberName(chosenWinner.member) : chosenWinner.member.name;
+                    liveWinnerHits = chosenWinner.hits;
+
                     if (isNextInProgress) {
                         if (elWinnerSubtitle) {
                             elWinnerSubtitle.innerHTML = `<span class="inline-flex items-center gap-1 text-emerald-400 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Ganador provisional (J${nextJornadaNum})</span>`;
                         }
                         if (elWinnerDetail) {
-                            elWinnerDetail.innerHTML = `<span class="text-amber-300 font-medium">Rellenará dobles en J${upcomingJornadaNum}</span> <span class="text-slate-400 text-[11px]">(${liveLeaders.length > 1 ? `Empate a ${liveWinnerHits} ac.` : 'Liderando en vivo'})</span>`;
+                            const tieDetail = liveLeadersCount > 1 ? ` (desempate • ${liveWinnerHits} ac.)` : ' (liderando en vivo)';
+                            elWinnerDetail.innerHTML = `<span class="text-amber-300 font-medium">Rellenará dobles en J${upcomingJornadaNum}</span> <span class="text-slate-400 text-[11px]">${tieDetail}</span>`;
                         }
                     }
                 }
@@ -490,11 +509,10 @@ class Dashboard2AppController {
             }
 
             if (liveWinnerHits === null) {
-                // Jornada cerrada / no en juego: mostrar ganador de la última jornada cerrada
-                let eligibles = lastJornadaOutcome.doblesEligibleNames || [lastJornadaOutcome.winnerName];
-                if (parseInt(targetJNum) >= 16 || (this.nextJornada && parseInt(this.nextJornada.number) >= 16)) {
-                    eligibles = [lastJornadaOutcome.winnerName];
-                }
+                // Jornada cerrada / no en juego: mostrar ganador de la última jornada cerrada (respetando la excepción de premio económico en dobles si existe)
+                let eligibles = (lastJornadaOutcome.doblesEligibleNames && lastJornadaOutcome.doblesEligibleNames.length > 0)
+                    ? lastJornadaOutcome.doblesEligibleNames
+                    : [lastJornadaOutcome.winnerName];
                 currentWinnerName = eligibles.filter(Boolean).join(', ') || 'Pendiente';
                 if (elWinnerSubtitle) {
                     const winJ = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
@@ -502,7 +520,7 @@ class Dashboard2AppController {
                 }
                 if (elWinnerDetail) {
                     const destJNum = targetJNum; // Próxima jornada
-                    elWinnerDetail.innerHTML = `<span class="text-amber-300 font-semibold">Rellena los dobles de la Jornada ${destJNum}</span>${eligibles.length > 1 ? `<div class="text-[11px] text-slate-400 mt-0.5">Empate / Asignados: ${eligibles.join(', ')}</div>` : ''}`;
+                    elWinnerDetail.innerHTML = `<span class="text-amber-300 font-semibold">Rellena los dobles de la Jornada ${destJNum}</span>${eligibles.length > 1 ? `<div class="text-[11px] text-slate-400 mt-0.5">Asignados (Ganador + Premio Dobles): ${eligibles.join(', ')}</div>` : ''}`;
                 }
             }
 
@@ -593,7 +611,8 @@ class Dashboard2AppController {
             }
             if (elMobileDoblesSubtitle) {
                 if (isNextInProgress) {
-                    elMobileDoblesSubtitle.innerHTML = `<span class="text-emerald-400 font-semibold">Ganador provisional (J${nextJornadaNum}) · Rellenará dobles J${upcomingJornadaNum}</span>`;
+                    const tieText = (liveLeadersCount > 1) ? ' (desempate)' : '';
+                    elMobileDoblesSubtitle.innerHTML = `<span class="text-emerald-400 font-semibold">Ganador provisional (J${nextJornadaNum}) · Rellenará dobles J${upcomingJornadaNum}${tieText}</span>`;
                 } else {
                     const winJ = lastJornadaOutcome.jornadaNumber || (playedJornadas.length > 0 ? playedJornadas[playedJornadas.length - 1].number : (targetJNum - 1));
                     elMobileDoblesSubtitle.innerHTML = `<span class="text-slate-400 font-medium">Ganador J${winJ} · Rellena dobles J${targetJNum}</span>`;
@@ -1761,6 +1780,12 @@ class Dashboard2AppController {
             action: 'dobles'
         });
 
+        // 2.c3 DESEMPATE EN VIVO EN DOBLES
+        items.push({
+            text: `👑 <strong class="text-amber-400">Dashboard en Vivo:</strong> La ventana de Dobles resuelve en directo el desempate por historial para presentar al único ganador provisional.`,
+            action: 'dobles'
+        });
+
         // 2.d NOVEDAD EN BOTE: Tarjeta Balance y Desglose Contable
         items.push({
             text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Nueva tarjeta con el balance contable completo: saldos de socios, premios, cuotas, penalizaciones y sellados.`,
@@ -2175,11 +2200,16 @@ class Dashboard2AppController {
             return { name: r.name, hits: r.hits, prize: val || 0 };
         });
 
-        // 6. Elegibles para siguientes dobles (A partir de J16: únicamente el único ganador; histórico: Ganador + premio > 0)
+        // 6. Elegibles para siguientes dobles (A partir de J16: únicamente el único ganador; excepción: si el autor de dobles previos obtuvo premio económico > 0 €)
         let eligibleNextNames = [];
         if (parseInt(jornada.number) >= 14) {
-            // J14 es la jornada previa que determina los dobles de J16
+            // A partir de J16 (determinado desde J14 en adelante): único ganador oficial tras desempate
             eligibleNextNames = [winner.name];
+            // Excepción por Premio Económico: Si la quiniela de dobles de esta jornada obtuvo premio económico oficial (> 0 €), su autor también tiene derecho
+            const prizeDoublesAuthors = doublesResults.filter(dr => dr.prize > 0).map(dr => dr.name);
+            if (prizeDoublesAuthors.length > 0) {
+                eligibleNextNames.push(...prizeDoublesAuthors);
+            }
         } else {
             eligibleNextNames = results.filter(r => {
                 const isWinner = r.memberId === winnerCandidates[0].memberId;
@@ -2545,6 +2575,9 @@ class Dashboard2AppController {
 
         const jNumDisplay = targetJ ? targetJ.number : (targetJNum || '?');
         let defaultResponsibleName = (this.lastJornadaOutcome && this.lastJornadaOutcome.winnerName) ? this.lastJornadaOutcome.winnerName : 'Ganador semanal';
+        if (this.lastJornadaOutcome && this.lastJornadaOutcome.doblesEligibleNames && this.lastJornadaOutcome.doblesEligibleNames.length > 0) {
+            defaultResponsibleName = this.lastJornadaOutcome.doblesEligibleNames.join(', ');
+        }
         const loserName = (this.lastJornadaOutcome && this.lastJornadaOutcome.loserName) ? this.lastJornadaOutcome.loserName : 'Sellador oficial';
 
         if (titleEl) {

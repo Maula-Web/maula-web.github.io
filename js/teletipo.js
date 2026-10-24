@@ -303,6 +303,12 @@
                 url: 'pronosticos_2.html'
             });
 
+            // NOTICIA DASHBOARD: DESEMPATE EN VIVO EN DOBLES
+            items.push({
+                text: `👑 <strong class="text-amber-400">Dashboard en Vivo:</strong> La ventana de Dobles resuelve en directo el desempate por historial para presentar al único ganador provisional.`,
+                url: 'dashboard_2.html'
+            });
+
             // NOTICIA 2.d: NOVEDAD EN BOTE - Tarjeta Balance y Desglose Contable
             items.push({
                 text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Nueva tarjeta con el balance contable completo: saldos de socios, premios, cuotas, penalizaciones y sellados.`,
