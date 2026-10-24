@@ -1,143 +1,106 @@
 {
   "success": true,
   "source": "El País Sorteos",
-  "dateStr": "domingo 18/10/2026",
+  "dateStr": "domingo 25/10/2026",
   "matches": [
     {
       "num": 1,
-      "home": "Espanyol (m)",
-      "away": "At. Madrid (m)",
+      "home": "Rayo Vallecano (m)",
+      "away": "Elche (m)",
       "result": "2"
     },
     {
       "num": 2,
-      "home": "Villarreal (m)",
-      "away": "Elche (m)",
-      "result": "X"
-    },
-    {
-      "num": 3,
-      "home": "Betis (m)",
-      "away": "Barcelona (m)",
+      "home": "Valencia (m)",
+      "away": "Villarreal (m)",
       "result": "2"
     },
     {
+      "num": 3,
+      "home": "At. Madrid (m)",
+      "away": "Deportivo (m)",
+      "result": ""
+    },
+    {
       "num": 4,
-      "home": "Valencia (m)",
-      "away": "Athletic Club (m)",
-      "result": "X"
+      "home": "Athletic Club (m)",
+      "away": "Getafe (m)",
+      "result": ""
     },
     {
       "num": 5,
       "home": "Celta (m)",
-      "away": "Alavés (m)",
-      "result": "1"
+      "away": "Betis (m)",
+      "result": ""
     },
     {
       "num": 6,
-      "home": "Málaga (m)",
-      "away": "Real Sociedad (m)",
-      "result": "2"
+      "home": "Real Sociedad (m)",
+      "away": "Levante (m)",
+      "result": ""
     },
     {
       "num": 7,
-      "home": "Real Madrid (m)",
-      "away": "Sevilla (m)",
-      "result": "1"
+      "home": "Sevilla (m)",
+      "away": "Osasuna (m)",
+      "result": ""
     },
     {
       "num": 8,
-      "home": "Eibar (m)",
+      "home": "Leganés (m)",
       "away": "Mallorca (m)",
       "result": "X"
     },
     {
       "num": 9,
-      "home": "Las Palmas (m)",
-      "away": "Castellón (m)",
-      "result": "2"
+      "home": "Almería (m)",
+      "away": "R. Oviedo (m)",
+      "result": ""
     },
     {
       "num": 10,
-      "home": "Burgos (m)",
-      "away": "Sabadell (m)",
-      "result": "1"
+      "home": "Sabadell (m)",
+      "away": "Tenerife (m)",
+      "result": ""
     },
     {
       "num": 11,
-      "home": "Athletic Club (f)",
-      "away": "Valencia (f)",
+      "home": "Logroño (f)",
+      "away": "Badalona W. (f)",
       "result": "1"
     },
     {
       "num": 12,
-      "home": "Real Madrid (f)",
-      "away": "RCD Espanyol (f)",
-      "result": "1"
+      "home": "Deportivo (f)",
+      "away": "Alavés (f)",
+      "result": ""
     },
     {
       "num": 13,
       "home": "Eibar (f)",
-      "away": "Deportivo (f)",
-      "result": "2"
+      "away": "Madrid CFF (f)",
+      "result": ""
     },
     {
       "num": 14,
-      "home": "Atlético de Madrid (f)",
-      "away": "Madrid CFF (f)",
+      "home": "Real Madrid (f)",
+      "away": "Tenerife (f)",
       "result": "1"
     },
     {
       "num": 15,
-      "home": "Getafe (m)",
-      "away": "Rayo Vallecano (m)",
-      "result": "1-1"
+      "home": "Barcelona (m)",
+      "away": "Real Madrid (m)",
+      "result": ""
     }
   ],
   "prizes": {
     "10": 0,
-    "11": 2.22,
-    "12": 12.76,
-    "13": 165.26,
-    "14": 11162.13,
-    "15": 80778.13
+    "11": 0,
+    "12": 0,
+    "13": 0,
+    "14": 0,
+    "15": 0
   },
-  "prizesDetails": [
-    {
-      "category": "15",
-      "label": "Pleno al 15",
-      "winners": 18,
-      "amount": 80778.13
-    },
-    {
-      "category": "14",
-      "label": "1� (14 Aciertos)",
-      "winners": 50,
-      "amount": 11162.13
-    },
-    {
-      "category": "13",
-      "label": "2� (13 Aciertos)",
-      "winners": 1583,
-      "amount": 165.26
-    },
-    {
-      "category": "12",
-      "label": "3� (12 Aciertos)",
-      "winners": 20502,
-      "amount": 12.76
-    },
-    {
-      "category": "11",
-      "label": "4� (11 Aciertos)",
-      "winners": 117869,
-      "amount": 2.22
-    },
-    {
-      "category": "10",
-      "label": "5� (10 Aciertos)",
-      "winners": 371994,
-      "amount": 0
-    }
-  ]
+  "prizesDetails": []
 }
