@@ -309,9 +309,9 @@
                 url: 'dashboard_2.html'
             });
 
-            // NOTICIA PRONÓSTICOS: REACTIVACIÓN DE LA COLUMNA MAULA
+            // NOTICIA PRONÓSTICOS: COLUMNA MAULA YA OPERATIVA
             items.push({
-                text: `⭐ <strong class="text-amber-400">Columna Maula Histórica:</strong> Reactivada y fijada en todas las jornadas anteriores con cálculo retrospectivo progresivo y congelación inmutable.`,
+                text: `⭐ <strong class="text-amber-400">Columna Maula ya operativa:</strong> Ya puedes consultar la quiniela colectiva en la tabla de pronósticos, con selección por expertos históricos y congelación inmutable para toda la jornada.`,
                 url: 'pronosticos_2.html'
             });
 
