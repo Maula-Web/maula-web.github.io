@@ -808,9 +808,6 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                     <button id="tab-btn-zen" onclick="SandboxManager.switchTab('zen')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-sky-400 hover:text-sky-300 hover:bg-sky-950/40 border border-sky-500/40 whitespace-nowrap shadow-sm">
                         <span>📱</span> Dashboard Zen (Mínimo)
                     </button>
-                    <button id="tab-btn-marcelo" onclick="SandboxManager.switchTab('marcelo')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 border border-emerald-500/40 whitespace-nowrap shadow-sm">
-                        <span>📑</span> Hoja Marcelo (Bote)
-                    </button>
                 </div>
 
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -1080,36 +1077,6 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 <!-- Marco Embebido del Dashboard Zen -->
                 <div class="w-full max-w-lg mx-auto rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-[#090d16]">
                     <iframe src="sandbox_dashboard.html" class="w-full h-[620px] border-0"></iframe>
-                </div>
-            </div>
-
-            <!-- VISTA 7: HOJA MARCELO (BOTE / TESORERO) -->
-            <div id="view-tab-marcelo" class="hidden space-y-4">
-                <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900/80 to-amber-950/40 border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 border border-emerald-300/50 flex items-center justify-center text-2xl shadow-lg shrink-0">
-                            📑
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ENTORNO DE PRUEBAS</span>
-                                <span class="text-sm text-white font-extrabold">Plantilla Oficial del Tesorero (Hoja Marcelo)</span>
-                            </div>
-                            <p class="text-xs text-slate-300 mt-0.5">
-                                Réplica idéntica de la hoja de cálculo de Marcelo con histórico de jornadas, sellados, vueltas, premios y desglose socio a socio.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                        <a href="bote_2.html?sandbox=1&view=marcelo" target="_blank" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 shrink-0 cursor-pointer active:scale-95">
-                            <span>🚀</span> Abrir en el Bote ↗
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Marco Embebido de la Hoja Marcelo del Bote -->
-                <div class="w-full rounded-2xl overflow-hidden border border-emerald-500/30 shadow-2xl bg-[#090d16]">
-                    <iframe src="bote_2.html?sandbox=1&view=marcelo" class="w-full h-[780px] border-0" id="iframe-sandbox-marcelo"></iframe>
                 </div>
             </div>
 
@@ -1834,7 +1801,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
 
             switchTab(tabId) {
                 this.currentTab = tabId;
-                const tabs = ['txt', 'socios', 'dobles', 'triples', 'arcade', 'zen', 'marcelo'];
+                const tabs = ['txt', 'socios', 'dobles', 'triples', 'arcade', 'zen'];
                 tabs.forEach(t => {
                     const btn = document.getElementById(`tab-btn-${t}`);
                     const view = document.getElementById(`view-tab-${t}`);
@@ -1846,8 +1813,6 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                             btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/50 whitespace-nowrap shadow-md';
                         } else if (t === 'zen') {
                             btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/50 whitespace-nowrap shadow-md';
-                        } else if (t === 'marcelo') {
-                            btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 whitespace-nowrap shadow-md';
                         } else {
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap';
                         }

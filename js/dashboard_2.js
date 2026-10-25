@@ -1827,7 +1827,7 @@ class Dashboard2AppController {
 
         // 2.d NOVEDAD HOJA DE MARCELO: Reconstrucción Histórica
         items.push({
-            text: `📑 <strong class="text-emerald-400">Hoja de Marcelo:</strong> Nuevo selector histórico para ver y recalcular al céntimo los botes, sumas, restas y caja real a cualquier jornada anterior.`,
+            text: `📑 <strong class="text-emerald-400">Oficial en el Bote:</strong> Ya disponible para todos los socios la <strong>Hoja de Marcelo</strong> con auditoría completa de botes, sumas, restas, caja real y selector histórico.`,
             url: 'bote_2.html'
         });
 

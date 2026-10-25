@@ -5022,45 +5022,15 @@ class BoteAppController {
         const tab = document.getElementById('nav-tab-marcelo');
         if (!tab) return;
 
-        let isAuthorized = false;
+        // La Hoja de Marcelo es pública y oficial en el Bote para todos los socios
+        tab.classList.remove('hidden');
 
-        // 1. Parámetros en URL (?sandbox=1 o ?marcelo=1 o ?view=marcelo)
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('sandbox') === '1' || urlParams.get('marcelo') === '1' || urlParams.get('view') === 'marcelo') {
-                isAuthorized = true;
-                sessionStorage.setItem('maulas_sandbox_marcelo', '1');
-            }
-        } catch (e) {}
-
-        // 2. Sesión activa en Sandbox
-        if (sessionStorage.getItem('maulas_sandbox_marcelo') === '1') {
-            isAuthorized = true;
-        }
-
-        // 3. Socio conectado = Fernando Lozano (ID 6)
-        try {
-            const rawUser = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-            if (rawUser) {
-                const u = JSON.parse(rawUser);
-                const uid = String(u.id || '');
-                const email = (u.email || '').toLowerCase();
-                const name = (u.name || '').toLowerCase();
-                if (uid === '6' || email.includes('lozano') || name.includes('lozano') || name.includes('fernando')) {
-                    isAuthorized = true;
-                }
-            }
-        } catch (e) {}
-
-        if (isAuthorized) {
-            tab.classList.remove('hidden');
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('view') === 'marcelo') {
+            if (urlParams.get('view') === 'marcelo' || urlParams.get('tab') === 'marcelo') {
                 setTimeout(() => this.switchView('marcelo'), 80);
             }
-        } else {
-            tab.classList.add('hidden');
-        }
+        } catch (e) {}
     }
 
     renderHojaMarcelo() {
