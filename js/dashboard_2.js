@@ -1564,9 +1564,14 @@ class Dashboard2AppController {
         let isPigMode = false;
         let isNextPigAlert = false;
 
+        const nextPigHasResult = !!(nextPigInfo && nextPigInfo.match && nextPigInfo.match.result &&
+            String(nextPigInfo.match.result).trim() !== '' &&
+            String(nextPigInfo.match.result).trim() !== '-' &&
+            String(nextPigInfo.match.result).toLowerCase() !== 'por definir');
+
         if (nextHasPig) {
             isPigMode = true;
-            isNextPigAlert = true;
+            isNextPigAlert = !nextPigHasResult;
         } else if (!areAllForecastsSealed && outcome && outcome.isPig) {
             isPigMode = true;
             isNextPigAlert = false;
@@ -1617,14 +1622,46 @@ class Dashboard2AppController {
                     </div>
                 `;
             } else {
-                if (statusLabel) {
-                    statusLabel.className = 'text-xs text-amber-400 block font-bold';
-                    statusLabel.textContent = 'Resultados del PIG de la última jornada:';
-                }
+                let acertantes = [];
+                let perdedores = [];
+                let matchDesc = '';
 
-                const acertantes = outcome.pigAcertantes || [];
-                const perdedores = outcome.pigFallantes || [];
-                const matchDesc = outcome.pigInfo && outcome.pigInfo.match ? `Partido ${outcome.pigInfo.index + 1}: ${outcome.pigInfo.match.home} vs ${outcome.pigInfo.match.away}` : '';
+                if (nextHasPig && nextPigHasResult) {
+                    if (statusLabel) {
+                        statusLabel.className = 'text-xs text-amber-400 block font-bold';
+                        statusLabel.textContent = `Resultados del PIG en vivo (Jornada ${nextJ ? nextJ.number : ''}):`;
+                    }
+                    if (elBadgeText) elBadgeText.textContent = 'Resultado PIG';
+                    const pigM = nextPigInfo.match;
+                    matchDesc = `Partido ${nextPigInfo.index + 1}: ${pigM.home} vs ${pigM.away} (${pigM.result})`;
+                    const normRes = window.ScoringSystem ? window.ScoringSystem.normalizeSign(pigM.result) : (pigM.result || '').trim().toUpperCase();
+                    const resStr = String(pigM.result).trim().toUpperCase();
+
+                    (this.members || []).forEach(m => {
+                        const mName = window.AppUtils ? window.AppUtils.getMemberName(m) : (m.phone || m.name);
+                        const p = pronosticosMap ? (pronosticosMap.get(`${nextJ.id}_${m.id}`) || pronosticosMap.get(`${nextJ.number}_${m.id}`)) : null;
+                        const sel = p ? (p.selection || p.forecast || []) : [];
+                        const pred = sel[nextPigInfo.index] ? String(sel[nextPigInfo.index]).trim().toUpperCase() : '';
+                        let hit = false;
+                        if (pred) {
+                            if (nextPigInfo.index === 14) {
+                                hit = (pred === resStr || pred === normRes);
+                            } else {
+                                hit = pred.includes(normRes);
+                            }
+                        }
+                        if (hit) acertantes.push(mName);
+                        else perdedores.push(mName);
+                    });
+                } else {
+                    if (statusLabel) {
+                        statusLabel.className = 'text-xs text-amber-400 block font-bold';
+                        statusLabel.textContent = 'Resultados del PIG de la última jornada:';
+                    }
+                    acertantes = outcome ? (outcome.pigAcertantes || []) : [];
+                    perdedores = outcome ? (outcome.pigFallantes || []) : [];
+                    matchDesc = outcome && outcome.pigInfo && outcome.pigInfo.match ? `Partido ${outcome.pigInfo.index + 1}: ${outcome.pigInfo.match.home} vs ${outcome.pigInfo.match.away}` : '';
+                }
 
                 content.innerHTML = `
                     <div class="space-y-1.5 text-xs">
@@ -1847,6 +1884,12 @@ class Dashboard2AppController {
         items.push({
             text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsable oficial asignado: <strong>Rafa</strong> (único ganador de la J.14 tras desempate).`,
             action: 'dobles'
+        });
+
+        // 2.c.2 RESULTADO PIG JORNADA 16
+        items.push({
+            text: `🐷 <strong class="text-pink-400">Resultado PIG J.16 (El Clásico):</strong> Barcelona 1 - 2 Real Madrid. 5 acertantes exentos y 14 socios penalizados (-1,00 € al Bote).`,
+            action: 'jornadas'
         });
 
         // 2.c2 REGLAMENTO QUINIELA DE DOBLES

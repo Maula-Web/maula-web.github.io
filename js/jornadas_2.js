@@ -645,6 +645,8 @@ class Jornadas2AppController {
 
                 elPigDesgloseContent.innerHTML = pigDesgloseHtml;
                 elPigDesgloseContainer.classList.remove('hidden');
+                const detailsEl = elPigDesgloseContainer.querySelector('details');
+                if (detailsEl) detailsEl.open = true;
             } else {
                 // Partido PIG aún no disputado
                 elPigDesgloseContainer.classList.add('hidden');

@@ -1184,10 +1184,16 @@ class BoteEngine {
 
     checkIsPIG(match) {
         if (!match || !match.home || !match.away) return false;
+        if (typeof window !== 'undefined' && window.AppUtils && typeof window.AppUtils.isPigMatch === 'function') {
+            return window.AppUtils.isPigMatch(match.home, match.away);
+        }
+        if (typeof AppUtils !== 'undefined' && typeof AppUtils.isPigMatch === 'function') {
+            return AppUtils.isPigMatch(match.home, match.away);
+        }
         // Female teams are never PIG
         const isFemale = (n) => /\(\s*F\s*\)/i.test(String(n)) || /femenino/i.test(String(n)) || /\bfem\b/i.test(String(n));
         if (isFemale(match.home) || isFemale(match.away)) return false;
-        const pigTeams = ['real madrid', 'at. madrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético'];
+        const pigTeams = ['real madrid', 'rmadrid', 'r.madrid', 'r madrid', 'at. madrid', 'atmadrid', 'barcelona', 'fc barcelona', 'atlético de madrid', 'atlético', 'atletico'];
         const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
         const h = norm(match.home);
         const a = norm(match.away);

@@ -321,6 +321,12 @@
                 url: 'pronosticos_2.html'
             });
 
+            // NOTICIA 2.g: RESULTADO PIG JORNADA 16
+            items.push({
+                text: `🐷 <strong class="text-pink-400">Resultado PIG J.16 (El Clásico):</strong> Barcelona 1 - 2 Real Madrid. 5 acertantes exentos de multa y 14 socios penalizados (-1,00 € al Bote).`,
+                url: 'jornadas_2.html'
+            });
+
             // NOTICIA REGLAMENTO: NUEVA REGLA QUINIELA DE DOBLES
             items.push({
                 text: `📜 <strong class="text-amber-400">Reglamento Dobles:</strong> Sella dobles el ganador único previo. Si quien hizo los dobles previos obtuvo premio económico oficial, también sella dobles (2 boletos si son distintos).`,
