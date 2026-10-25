@@ -1,0 +1,157 @@
+/* =========================================================================
+   PEÑA MAULAS - MODO FÁCIL (EXPERIENCIA ESENCIAL Y MINIMALISTA)
+   =========================================================================
+   Se activa cuando la etiqueta <html> o <body> tiene la clase .mode-easy.
+   Oculta la complejidad técnica, pantallas secundarias y tablas masivas,
+   dejando visible únicamente:
+   1. Rellenar y enviar la quiniela de la jornada.
+   2. Saber si se debe dinero y el saldo en el bote personal.
+   3. Ver la clasificación general y aciertos.
+   ========================================================================= */
+
+/* --- 1. MENÚ SUPERIOR Y NAVEGACIÓN --- */
+/* Ocultar hojas complejas: Admin, Socios, Votaciones y Resumen Big Data */
+.mode-easy [data-version-link="admin"],
+.mode-easy [data-version-link="socios"],
+.mode-easy [data-version-link="votaciones"],
+.mode-easy [data-version-link="resumen"],
+.mode-easy nav a[href*="admin_2.html"],
+.mode-easy nav a[href*="admin.html"],
+.mode-easy nav a[href*="administracion.html"],
+.mode-easy nav a[href*="socios_2.html"],
+.mode-easy nav a[href*="socios.html"],
+.mode-easy nav a[href*="votaciones_2.html"],
+.mode-easy nav a[href*="votaciones.html"],
+.mode-easy nav a[href*="resumen_2.html"],
+.mode-easy nav a[href*="resumen-temporada.html"],
+.mode-easy #btn-version-v1,
+.mode-easy #btn-version-v2,
+.mode-easy #version-switcher-container,
+.mode-easy #version-switcher-container-mobile {
+    display: none !important;
+}
+
+/* Centrar la botonera simplificada del menú */
+.mode-easy nav .no-scrollbar {
+    justify-content: center !important;
+}
+
+/* --- 2. DASHBOARD (INICIO) --- */
+/* Ocultar sección de detalles secundarios (cenas, desglose bote peña, radiografía) */
+.mode-easy #details-extra-section,
+.mode-easy #hero-secondary-pillars,
+.mode-easy #official-bote-alert,
+.mode-easy #news-ticker-bar {
+    display: none !important;
+}
+
+/* Retirar el margen inferior forzado por el teletipo */
+.mode-easy body.has-ticker,
+.mode-easy body {
+    padding-bottom: 2rem !important;
+}
+
+/* Destacar la tarjeta del socio conectado como eje central */
+.mode-easy #user-summary-card {
+    border-width: 2px !important;
+    border-color: rgba(16, 185, 129, 0.6) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 25px rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Ocultar enlace a matriz de jornadas desde la tarjeta del socio */
+.mode-easy #user-card-matrix-link {
+    display: none !important;
+}
+
+/* --- 3. BOTE Y TESORERÍA (bote_2.html) --- */
+/* Ocultar pestañas de auditoría avanzada: Matriz, Flujo, Dobles y Hoja Marcelo */
+.mode-easy #nav-tab-marcelo,
+.mode-easy #nav-tabs button[data-view="matriz"],
+.mode-easy #nav-tabs button[data-view="flujo"],
+.mode-easy #nav-tabs button[data-view="premios"],
+.mode-easy #nav-tabs button[data-view="jornadas"],
+.mode-easy #card-breakdown-total-caja,
+.mode-easy #card-caja-real-compact,
+.mode-easy #view-matriz,
+.mode-easy #view-flujo,
+.mode-easy #view-premios,
+.mode-easy #view-marcelo,
+.mode-easy #view-jornadas,
+.mode-easy #section-breakdown-balance {
+    display: none !important;
+}
+
+/* Banner explicativo en Bote en Modo Fácil */
+.mode-easy-bote-banner {
+    display: none;
+}
+.mode-easy .mode-easy-bote-banner {
+    display: flex !important;
+}
+
+/* --- 4. CLASIFICACIÓN (clasificacion_2.html) --- */
+/* Ocultar desglose horizontal de 38 jornadas y gráficos complejos */
+.mode-easy #tab-btn-matrix,
+.mode-easy #tab-btn-chart,
+.mode-easy #view-matrix,
+.mode-easy #view-chart,
+.mode-easy #mobile-clasificacion-controls-container,
+.mode-easy #mobile-check-matrix,
+.mode-easy #mobile-check-chart {
+    display: none !important;
+}
+
+/* --- 5. PRONÓSTICOS Y QUINIELA (pronosticos_2.html) --- */
+/* Ocultar herramientas de exportación SELAE y desgloses secundarios */
+.mode-easy #kpi-card-censo,
+.mode-easy #kpi-card-dobles,
+.mode-easy .top-announcement-bar,
+.mode-easy #btn-export-txt,
+.mode-easy #btn-export-pdf,
+.mode-easy #modal-editor-boleto .p-percentages,
+.mode-easy #modal-editor-boleto #md-analysis-sidebar,
+.mode-easy #modal-editor-boleto .md-mobile-toggle-btn {
+    display: none !important;
+}
+
+/* --- 6. ESTILOS DEL INTERRUPTOR MODO FÁCIL / PRO --- */
+#ui-mode-switcher-container {
+    background: rgba(2, 6, 23, 0.85);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.light-theme #ui-mode-switcher-container,
+.light-theme #ui-mode-switcher-container-mobile {
+    background-color: #f5efe4 !important;
+    border-color: #e5decb !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Botón inactivo en Modo Claro */
+.light-theme [data-ui-mode-btn]:not(.bg-gradient-to-r) {
+    color: #64748b !important;
+}
+.light-theme [data-ui-mode-btn]:hover {
+    color: #0f172a !important;
+}
+
+/* Píldora de aviso de Modo Fácil */
+.badge-mode-easy {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.mode-easy .badge-mode-easy {
+    display: inline-flex !important;
+}

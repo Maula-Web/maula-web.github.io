@@ -303,6 +303,12 @@
                 url: 'bote_2.html'
             });
 
+            // NOTICIA 2.f: EXPERIMENTAL MODO FÁCIL
+            items.push({
+                text: `⚡ <strong class="text-amber-400">En Desarrollo:</strong> Nuevo Modo Fácil simplificado en fase beta privada de pruebas para una experiencia más rápida y directa.`,
+                url: 'dashboard_2.html'
+            });
+
             // NOTICIA 2.d: CAJA REAL OFICIAL Y BALANCE CONTABLE
             items.push({
                 text: `💰 <strong class="text-amber-400">Caja Real Oficial:</strong> Fijada en <strong>${cajaFmt}</strong> (suma de tarjetas: Saldos + Premios + Cuotas + Penalizaciones − Sellados).`,

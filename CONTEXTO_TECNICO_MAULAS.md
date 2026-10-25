@@ -1525,6 +1525,26 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 54. SELECTOR DE MODO FÁCIL (ESENCIAL) VS MODO PRO (COMPLETO) [FASE BETA EVALUADOR]
+- **Filosofía y Objetivo**:
+  - Distinción entre dos perfiles de uso: el *Modo Pro* (experiencia 100% completa con todas las herramientas de auditoría, balances, matrices, exportaciones y administración) y el *Modo Fácil* (experiencia minimalista ultrarrápida para responder en 10 segundos a: *¿he rellenado?*, *¿debo dinero?* y *¿cómo voy en la clasificación?*).
+- **Acceso Exclusivo en Fase Beta**:
+  - El selector visual `[ ⚡ Fácil | 🚀 Pro ]` se inyecta en el menú superior (tanto en PC como en móvil) **únicamente** para el usuario evaluador (Fernando Lozano, ID 6) o mediante parámetros URL (`?eval=1`, `?modo=facil`). Para el resto de los socios, la interfaz permanece al 100% en Modo Pro sin alteraciones.
+- **Controlador Global `AppUIMode` (`js/utils.js`)**:
+  - Persiste la preferencia en `localStorage.getItem('maulas_ui_mode')` (`easy` vs `pro`).
+  - Aplica o retira la clase global `.mode-easy` en `document.documentElement` y `document.body`.
+  - Dispara el evento `maulas-ui-mode-changed` y gestiona la guarda de navegación para redirigir suavemente al dashboard si se intentan abrir páginas restringidas en Modo Fácil.
+- **Reglas de Ocultación y Simplificación (`css/mode-easy.css`)**:
+  - **Menú**: Se ocultan por completo los accesos a *Admin*, *Socios*, *Votaciones* y *Resumen*. El menú queda reducido a 4 accesos directos esenciales (*Inicio*, *Quiniela*, *Clasificación*, *Bote*).
+  - **Dashboard**: Se oculta la sección secundaria `#details-extra-section` (cenas, radiografías, Maula Hero), los 3 pilares secundarios y el teletipo inferior. La tarjeta personal `#user-summary-card` y los botones de acción directa cobran protagonismo estelar.
+  - **Bote**: Se ocultan las 5 pestañas de auditoría avanzada (*Matriz Cuadrante*, *Flujo de Caja*, *Dobles & Premios*, *Hoja Marcelo*, *Jornadas*), dejando la vista limpia de saldos y extractos de socios.
+  - **Clasificación**: Se oculta la matriz histórica de 38 jornadas y gráficos de bump chart, mostrando únicamente el podio y la tabla general limpia de puntuaciones.
+  - **Quiniela**: Se ocultan herramientas complejas de exportación SELAE y análisis laterales, permitiendo rellenar el boleto de 14 partidos + Pleno al 15 con máxima rapidez.
+- **Soporte Dual en Modo Claro y Oscuro**:
+  - Integrado en `css/light-theme.css` para garantizar armonía estética y contraste óptimo en ambos temas.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

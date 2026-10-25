@@ -1837,6 +1837,12 @@ class Dashboard2AppController {
             url: 'bote_2.html'
         });
 
+        // 2.f EXPERIMENTAL MODO FÁCIL
+        items.push({
+            text: `⚡ <strong class="text-amber-400">En Desarrollo:</strong> Nuevo Modo Fácil simplificado en fase beta privada de pruebas para una experiencia más rápida y directa.`,
+            url: 'dashboard_2.html'
+        });
+
         // 2.c QUINIELA DE DOBLES JORNADA 16
         items.push({
             text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsable oficial asignado: <strong>Rafa</strong> (único ganador de la J.14 tras desempate).`,

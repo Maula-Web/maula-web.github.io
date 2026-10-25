@@ -414,8 +414,10 @@ body.light-theme {
 /* Contenedores de interruptores de versión y tema */
 .light-theme #version-switcher-container,
 .light-theme #theme-switcher-container,
+.light-theme #ui-mode-switcher-container,
 .light-theme #version-switcher-container-mobile,
-.light-theme #theme-switcher-container-mobile {
+.light-theme #theme-switcher-container-mobile,
+.light-theme #ui-mode-switcher-container-mobile {
     background-color: #f5efe4 !important;
     border-color: #e5decb !important;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
@@ -426,7 +428,8 @@ body.light-theme {
 .light-theme #btn-theme-light:not(.bg-gradient-to-r),
 .light-theme #btn-theme-dark:not(.bg-gradient-to-r),
 .light-theme [data-version-btn]:not(.bg-gradient-to-r),
-.light-theme [data-theme-btn]:not(.bg-gradient-to-r) {
+.light-theme [data-theme-btn]:not(.bg-gradient-to-r),
+.light-theme [data-ui-mode-btn]:not(.bg-gradient-to-r) {
     color: #64748b !important;
 }
 
@@ -435,7 +438,8 @@ body.light-theme {
 .light-theme #btn-theme-light:hover,
 .light-theme #btn-theme-dark:hover,
 .light-theme [data-version-btn]:hover,
-.light-theme [data-theme-btn]:hover {
+.light-theme [data-theme-btn]:hover,
+.light-theme [data-ui-mode-btn]:hover {
     color: #0f172a !important;
 }
 

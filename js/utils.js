@@ -1214,6 +1214,203 @@ window.AppTextScale = {
     }
 };
 
+
+// =========================================================================
+// GESTOR DE MODO DE INTERFAZ: FÁCIL (ESENCIAL) VS PRO (COMPLETO)
+// =========================================================================
+window.AppUIMode = {
+    isTargetUser() {
+        // 1. Forzar por parámetro en URL para testeo directo
+        try {
+            if (typeof window !== 'undefined' && window.location) {
+                const p = new URLSearchParams(window.location.search);
+                if (p.get('eval') === '1' || p.get('admin') === '1' || p.get('fernando') === '1' || p.get('facil') === '1' || p.get('modo') === 'facil' || p.get('modo') === 'pro') {
+                    return true;
+                }
+            }
+        } catch (e) {}
+
+        // 2. Comprobar si el usuario activo es Fernando Lozano (ID 6)
+        try {
+            if (window.AppVersion && typeof window.AppVersion.isFernandoLozano === 'function') {
+                if (window.AppVersion.isFernandoLozano()) return true;
+            }
+            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            if (userStr) {
+                const u = JSON.parse(userStr);
+                const uid = String(u.id || '');
+                const umail = (u.email || '').toLowerCase().trim();
+                const uname = (u.name || '').toLowerCase().trim();
+                const uphone = (u.phone || '').toLowerCase().trim();
+                if (uid === '6' || umail.includes('lozano') || uname.includes('fernando') || uname.includes('lozano') || uphone.includes('lozano')) {
+                    return true;
+                }
+            }
+        } catch (e) {}
+
+        return false;
+    },
+
+    getMode() {
+        if (!this.isTargetUser()) return 'pro';
+        try {
+            const p = new URLSearchParams(window.location.search);
+            if (p.get('modo') === 'facil' || p.get('facil') === '1') return 'easy';
+            if (p.get('modo') === 'pro') return 'pro';
+        } catch (e) {}
+        return localStorage.getItem('maulas_ui_mode') === 'easy' ? 'easy' : 'pro';
+    },
+
+    setMode(mode) {
+        if (!this.isTargetUser()) return;
+        const targetMode = mode === 'easy' ? 'easy' : 'pro';
+        localStorage.setItem('maulas_ui_mode', targetMode);
+        this.applyMode(targetMode);
+        this.updateButtons(targetMode);
+        try {
+            window.dispatchEvent(new CustomEvent('maulas-ui-mode-changed', { detail: { mode: targetMode } }));
+        } catch (e) {}
+    },
+
+    applyMode(mode) {
+        const isEasy = (mode === 'easy') && this.isTargetUser();
+        const root = document.documentElement;
+        const body = document.body;
+
+        if (isEasy) {
+            root.classList.add('mode-easy');
+            if (body) body.classList.add('mode-easy');
+        } else {
+            root.classList.remove('mode-easy');
+            if (body) body.classList.remove('mode-easy');
+        }
+
+        // Asegurar que el CSS de modo fácil esté enlazado
+        if (typeof document !== 'undefined' && !document.getElementById('css-mode-easy')) {
+            const link = document.createElement('link');
+            link.id = 'css-mode-easy';
+            link.rel = 'stylesheet';
+            link.href = 'css/mode-easy.css';
+            document.head.appendChild(link);
+        }
+    },
+
+    updateButtons(mode) {
+        const isEasy = mode === 'easy';
+        const dskEasy = document.getElementById('btn-ui-mode-easy');
+        const dskPro = document.getElementById('btn-ui-mode-pro');
+        const mobEasy = document.querySelector('#ui-mode-switcher-container-mobile [data-ui-mode-btn="easy"]');
+        const mobPro = document.querySelector('#ui-mode-switcher-container-mobile [data-ui-mode-btn="pro"]');
+
+        const activeClasses = 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-950 shadow';
+        const inactiveClasses = 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white';
+
+        const mobActiveClasses = 'px-1.5 py-0.5 rounded text-xs font-bold transition bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-950 shadow';
+        const mobInactiveClasses = 'px-1.5 py-0.5 rounded text-xs transition text-slate-400';
+
+        if (dskEasy && dskPro) {
+            dskEasy.className = isEasy ? activeClasses : inactiveClasses;
+            dskPro.className = !isEasy ? 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow' : inactiveClasses;
+        }
+
+        if (mobEasy && mobPro) {
+            mobEasy.className = isEasy ? mobActiveClasses : mobInactiveClasses;
+            mobPro.className = !isEasy ? 'px-1.5 py-0.5 rounded text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow' : mobInactiveClasses;
+        }
+    },
+
+    injectControls() {
+        if (!this.isTargetUser()) {
+            const existDsk = document.getElementById('ui-mode-switcher-container');
+            if (existDsk) existDsk.remove();
+            const existMob = document.getElementById('ui-mode-switcher-container-mobile');
+            if (existMob) existMob.remove();
+            return;
+        }
+
+        if (document.getElementById('ui-mode-switcher-container')) return;
+
+        const currentMode = this.getMode();
+        const isEasy = currentMode === 'easy';
+
+        // 1. Selector Escritorio (>= md)
+        const themeDesktop = document.getElementById('theme-switcher-container');
+        if (themeDesktop && themeDesktop.parentElement) {
+            const container = document.createElement('div');
+            container.id = 'ui-mode-switcher-container';
+            container.className = 'flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-amber-500/40 text-xs font-bold shadow-inner';
+            container.title = 'Modo de Interfaz (Básico vs Pro Completo)';
+            container.innerHTML = `
+                <button type="button" id="btn-ui-mode-easy" data-ui-mode-btn="easy" onclick="window.AppUIMode.setMode('easy')"
+                        class="${isEasy ? 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-950 shadow' : 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white'}"
+                        title="Modo Fácil: solo datos y botones estrictamente necesarios">
+                    <span>⚡</span>
+                    <span class="inline">Fácil</span>
+                </button>
+                <button type="button" id="btn-ui-mode-pro" data-ui-mode-btn="pro" onclick="window.AppUIMode.setMode('pro')"
+                        class="${!isEasy ? 'px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow' : 'px-2 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white'}"
+                        title="Modo Pro: web completa con todas las herramientas de auditoría">
+                    <span>🚀</span>
+                    <span class="inline">Pro</span>
+                </button>
+            `;
+            themeDesktop.parentElement.insertBefore(container, themeDesktop);
+        }
+
+        // 2. Selector Móvil (< md)
+        const themeMobile = document.getElementById('theme-switcher-container-mobile');
+        if (themeMobile && themeMobile.parentElement) {
+            const containerMobile = document.createElement('div');
+            containerMobile.id = 'ui-mode-switcher-container-mobile';
+            containerMobile.className = 'flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-amber-500/40 text-[11px] font-bold shadow-inner';
+            containerMobile.title = 'Modo de Interfaz';
+            containerMobile.innerHTML = `
+                <button type="button" data-ui-mode-btn="easy" onclick="window.AppUIMode.setMode('easy')"
+                        class="${isEasy ? 'px-1.5 py-0.5 rounded text-xs font-bold transition bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-950 shadow' : 'px-1.5 py-0.5 rounded text-xs transition text-slate-400'}"
+                        title="Modo Fácil">⚡</button>
+                <button type="button" data-ui-mode-btn="pro" onclick="window.AppUIMode.setMode('pro')"
+                        class="${!isEasy ? 'px-1.5 py-0.5 rounded text-xs font-bold transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow' : 'px-1.5 py-0.5 rounded text-xs transition text-slate-400'}"
+                        title="Modo Pro">🚀</button>
+            `;
+            themeMobile.parentElement.insertBefore(containerMobile, themeMobile);
+        }
+    },
+
+    checkNavigationGuard() {
+        if (!this.isTargetUser() || this.getMode() !== 'easy') return;
+        try {
+            const restricted = [
+                'admin_2.html', 'administracion.html', 'admin.html',
+                'socios_2.html', 'socios.html',
+                'votaciones_2.html', 'votaciones.html',
+                'resumen_2.html', 'resumen-temporada.html'
+            ];
+            const currFile = (window.location.pathname || '').split('/').pop() || '';
+            if (restricted.includes(currFile)) {
+                console.log('[Modo Fácil] Redirigiendo desde página restringida a dashboard_2.html');
+                window.location.replace('dashboard_2.html?notice=modo_facil');
+            }
+        } catch (e) {}
+    },
+
+    init() {
+        const mode = this.getMode();
+        this.applyMode(mode);
+        this.checkNavigationGuard();
+
+        const onReady = () => {
+            this.injectControls();
+            this.updateButtons(this.getMode());
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', onReady);
+        } else {
+            onReady();
+        }
+    }
+};
+
 // Inicializar de inmediato para evitar parpadeos
 if (typeof window !== 'undefined') {
     if (window.AppVersion) {
@@ -1226,6 +1423,9 @@ if (typeof window !== 'undefined') {
     if (window.AppTextScale) {
         window.AppTextScale.applyScale(window.AppTextScale.getScale());
     }
+    if (window.AppUIMode) {
+        window.AppUIMode.init();
+    }
 }
 
 // Inicializar al cargar el DOM
@@ -1234,6 +1434,7 @@ if (typeof document !== 'undefined') {
         if (window.AppVersion) window.AppVersion.init();
         if (window.AppTheme) window.AppTheme.init();
         if (window.AppTextScale) window.AppTextScale.init();
+        if (window.AppUIMode) window.AppUIMode.init();
 
         // Auto-centrar la pestaña activa del menú en pantallas de móvil (solo el contenedor, nunca la ventana)
         try {
