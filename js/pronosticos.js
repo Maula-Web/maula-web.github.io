@@ -2284,16 +2284,19 @@ class PronosticoManager {
                 html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${C_DOUBLES}; background:${BG_DOUBLES_COL}; border-left:2px solid rgba(139,92,246,0.5); white-space:nowrap;">Quiniela Dobles</th>`;
             });
 
-            // Columna perfecta / Columna Maula (Ocultada temporalmente a petición)
+            // Columna perfecta / Columna Maula (Reactivada con cálculo histórico blindado y congelación inmutable)
             let perfectColumn = null;
             let perfectHits = 0;
-            /* Ocultada temporalmente por no funcionar adecuadamente:
             const allResolved = sortedMembers.every(m => allForecasts.some(p => String(p.mId || p.memberId) === String(m.id)));
-            if (allResolved) {
+            const isJornadaStarted = jornada.matches && jornada.matches.some(m => m.result && m.result !== '' && m.result !== '-' && String(m.result).toLowerCase() !== 'por definir');
+            const isJornadaClosed = jornada.status === 'completed' || jornada.status === 'closed' || jornada.finalizada === true;
+
+            if (allResolved || isJornadaStarted || isJornadaClosed || (Array.isArray(jornada.columnaMaula) && jornada.columnaMaula.length === 15)) {
                 perfectColumn = this.calculatePerfectColumn(jornada);
-                html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:#fbbf24; background:rgba(234,179,8,0.15); border-left:2px solid rgba(234,179,8,0.5); white-space:nowrap;">⭐ COLUMNA MAULA</th>`;
+                const colMaulaColor = isLightTheme ? '#b45309' : '#fbbf24';
+                const colMaulaBorder = isLightTheme ? 'rgba(217,119,6,0.5)' : 'rgba(234,179,8,0.5)';
+                html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${colMaulaColor}; background:${BG_PERFECT}; border-left:2px solid ${colMaulaBorder}; white-space:nowrap;">⭐ COLUMNA MAULA</th>`;
             }
-            */
 
             // Resultado
             html += `<th style="${thBase} writing-mode:vertical-lr; transform:rotate(180deg); text-align:center; height:${hMem}; width:${wMem}; min-width:${wMem}; font-size:${fSizeBase}; color:${C_AMBER}; border-left:2px solid ${BORDER_BLOCK}; white-space:nowrap;">RESULTADO</th>`;
@@ -2377,14 +2380,15 @@ class PronosticoManager {
                 if (perfectColumn) {
                     const sign = perfectColumn[idx] || '-';
                     let bg = BG_PERFECT;
-                    let colorSign = '#fbbf24';
-                    let borderExtra = 'border-left:2px solid rgba(234,179,8,0.5);';
-                    const isHit = officialResult && sign === officialResult;
+                    const colMaulaColor = isLightTheme ? '#b45309' : '#fbbf24';
+                    const colMaulaBorder = isLightTheme ? 'rgba(217,119,6,0.5)' : 'rgba(234,179,8,0.5)';
+                    let borderExtra = `border-left:2px solid ${colMaulaBorder};`;
+                    const isHit = officialResult && (sign === officialResult || (idx < 14 && typeof sign === 'string' && sign.includes(officialResult)));
                     if (isHit) {
                         bg = isLightTheme ? '#fef08a' : 'rgba(234,179,8,0.3)';
                         perfectHits++;
                     }
-                    html += `<td style="background:${bg}; ${borderExtra} border-right:1px solid rgba(234,179,8,0.3); ${blockBorderStyle} padding:${padCell}; text-align:center; min-width:${wMem}; font-weight:900; font-size:${fSizeSign}; color:${colorSign}; font-family:'JetBrains Mono',monospace;">${sign}</td>`;
+                    html += `<td style="background:${bg}; ${borderExtra} border-right:1px solid rgba(234,179,8,0.3); ${blockBorderStyle} padding:${padCell}; text-align:center; min-width:${wMem}; font-weight:900; font-size:${fSizeSign}; color:${colMaulaColor}; font-family:'JetBrains Mono',monospace;">${sign}</td>`;
                 }
 
                 const resVal = officialResult || '-';
@@ -2422,7 +2426,9 @@ class PronosticoManager {
             });
 
             if (perfectColumn) {
-                html += `<td style="${footCellBase} color:#fbbf24; border-left:2px solid rgba(234,179,8,0.5);">${perfectHits}</td>`;
+                const colMaulaColor = isLightTheme ? '#b45309' : '#fbbf24';
+                const colMaulaBorder = isLightTheme ? 'rgba(217,119,6,0.5)' : 'rgba(234,179,8,0.5)';
+                html += `<td style="${footCellBase} color:${colMaulaColor}; border-left:2px solid ${colMaulaBorder};">${perfectHits}</td>`;
             }
             html += `<td style="background:${BG_RESULT_CELL}; border-left:2px solid ${BORDER_BLOCK};"></td>`;
             html += `</tr></tfoot></table>`;
@@ -3415,51 +3421,95 @@ class PronosticoManager {
     }
 
     calculatePerfectColumn(currentJornada) {
-        // To build the perfect column, we need to analyze historical performance per match index
-        const memberPerformancePerMatch = {}; // { memberId: [hits_at_idx_0, hits_at_idx_1, ...] }
-        const currentClassification = [...this.members].map(m => {
-            const forecasts = this.pronosticos.filter(p => String(p.mId || p.memberId) === String(m.id));
+        if (!currentJornada) return null;
+
+        // 1. INMUTABILIDAD GARANTIZADA: Si la columna ya ha sido fijada para esta jornada, devolverla directamente
+        if (Array.isArray(currentJornada.columnaMaula) && currentJornada.columnaMaula.length === 15) {
+            return currentJornada.columnaMaula;
+        }
+
+        // Comprobar si ya existe en almacenamiento local persistente
+        const cachedKey = `maulas_columna_maula_${currentJornada.id}`;
+        try {
+            const cached = localStorage.getItem(cachedKey);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length === 15) {
+                    currentJornada.columnaMaula = parsed;
+                    return parsed;
+                }
+            }
+        } catch (e) {}
+
+        const currentJNum = parseInt(currentJornada.number) || 0;
+
+        // 2. AISLAMIENTO HISTÓRICO: Excluir tajantemente la jornada actual y cualquier jornada futura
+        // Ningún partido ni resultado de la jornada en juego puede alterar retroactivamente al experto ni a la clasificación
+        const isPriorJornada = (j) => {
+            if (!j) return false;
+            if (String(j.id) === String(currentJornada.id)) return false;
+            const jNum = parseInt(j.number);
+            if (currentJNum > 0 && !isNaN(jNum) && jNum >= currentJNum) return false;
+            return true;
+        };
+
+        const priorJornadas = (this.jornadas || []).filter(isPriorJornada);
+
+        // 3. Clasificación General acumulada HASTA la jornada anterior (usada exclusivamente para desempates)
+        const priorClassification = [...(this.members || [])].map(m => {
+            const forecasts = (this.pronosticos || []).filter(p => String(p.mId || p.memberId) === String(m.id));
             let totalPoints = 0;
             forecasts.forEach(p => {
-                const j = this.jornadas.find(jor => String(jor.id) === String(p.jId || p.jornadaId));
+                const j = priorJornadas.find(jor => String(jor.id) === String(p.jId || p.jornadaId));
                 if (j && j.matches) {
                     const results = j.matches.map(mt => mt.result);
-                    if (results.some(r => r)) {
-                        const ev = ScoringSystem.evaluateForecast(p.selection || [], results);
-                        totalPoints += ev.points;
+                    if (results.some(r => r && r !== '-' && String(r).toLowerCase() !== 'por definir')) {
+                        const ev = (window.ScoringSystem && typeof window.ScoringSystem.evaluateForecast === 'function')
+                            ? window.ScoringSystem.evaluateForecast(p.selection || [], results)
+                            : null;
+                        if (ev && typeof ev.points === 'number') totalPoints += ev.points;
                     }
                 }
             });
             return { id: m.id, points: totalPoints };
         }).sort((a, b) => b.points - a.points);
 
-        // 1. Calculate how many times each member hit each match index
-        this.members.forEach(m => {
+        // 4. Rendimiento histórico por casilla de cada socio HASTA la jornada anterior
+        const memberPerformancePerMatch = {};
+        (this.members || []).forEach(m => {
             memberPerformancePerMatch[m.id] = Array(15).fill(0);
-            const mForecasts = this.pronosticos.filter(p => String(p.mId || p.memberId) === String(m.id));
+            const mForecasts = (this.pronosticos || []).filter(p => String(p.mId || p.memberId) === String(m.id));
 
             mForecasts.forEach(p => {
-                const j = this.jornadas.find(jor => String(jor.id) === String(p.jId || p.jornadaId));
+                const j = priorJornadas.find(jor => String(jor.id) === String(p.jId || p.jornadaId));
                 if (j && j.matches) {
                     const results = j.matches.map(mt => mt.result);
-                    if (results.some(r => r)) {
+                    if (results.some(r => r && r !== '-' && String(r).toLowerCase() !== 'por definir')) {
                         (p.selection || []).forEach((sel, idx) => {
-                            if (sel && sel === results[idx]) memberPerformancePerMatch[m.id][idx]++;
+                            const res = results[idx];
+                            if (sel && res && (sel === res || (idx < 14 && typeof sel === 'string' && sel.includes(res)))) {
+                                memberPerformancePerMatch[m.id][idx]++;
+                            }
                         });
                     }
                 }
             });
         });
 
+        // 5. Pronósticos registrados para la jornada actual
+        const currentJForecasts = (this.pronosticos || []).filter(p => {
+            const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+            return pJ === String(currentJornada.id) || pJ === String(currentJornada.number);
+        });
+
         const perfectCol = [];
-        const currentJForecasts = this.pronosticos.filter(p => String(p.jId || p.jornadaId) === String(currentJornada.id));
 
         for (let i = 0; i < 15; i++) {
-            // Find member(s) with max historical hits for this specific match index i
+            // Buscar socios con récord de aciertos en la casilla i en jornadas anteriores
             let maxHits = -1;
             let expertIds = [];
-            this.members.forEach(m => {
-                const hits = memberPerformancePerMatch[m.id][i];
+            (this.members || []).forEach(m => {
+                const hits = memberPerformancePerMatch[m.id] ? memberPerformancePerMatch[m.id][i] : 0;
                 if (hits > maxHits) {
                     maxHits = hits;
                     expertIds = [m.id];
@@ -3468,22 +3518,38 @@ class PronosticoManager {
                 }
             });
 
-            const currentSignFrequency = {}; // Sign -> count of experts choosing it
+            // Si nadie tiene aciertos previos en esta casilla (primeras jornadas o casilla difícil), consenso de todos
+            if (expertIds.length === 0 || maxHits <= 0) {
+                expertIds = (this.members || []).map(m => m.id);
+            }
+
+            // Frecuencia de los signos elegidos por los expertos en la jornada actual
+            const currentSignFrequency = {};
             expertIds.forEach(eid => {
                 const p = currentJForecasts.find(f => String(f.mId || f.memberId) === String(eid));
                 if (p && p.selection && p.selection[i]) {
-                    const s = p.selection[i];
-                    currentSignFrequency[s] = (currentSignFrequency[s] || 0) + 1;
+                    const s = String(p.selection[i]).trim();
+                    if (s && s !== '-') {
+                        currentSignFrequency[s] = (currentSignFrequency[s] || 0) + 1;
+                    }
                 }
             });
 
             const signs = Object.keys(currentSignFrequency);
             if (signs.length === 0) {
-                perfectCol.push('-');
+                // Fallback de seguridad: buscar si algún socio ha pronosticado en esta casilla
+                let fallbackSign = '-';
+                for (const p of currentJForecasts) {
+                    if (p && p.selection && p.selection[i] && String(p.selection[i]).trim() !== '-') {
+                        fallbackSign = String(p.selection[i]).trim();
+                        break;
+                    }
+                }
+                perfectCol.push(fallbackSign);
                 continue;
             }
 
-            // Find sign(s) with max frequency among experts
+            // Signo o signos con mayor frecuencia entre los expertos
             let maxFreq = -1;
             let topSigns = [];
             signs.forEach(s => {
@@ -3498,17 +3564,34 @@ class PronosticoManager {
             if (topSigns.length === 1) {
                 perfectCol.push(topSigns[0]);
             } else {
-                // Tie-break: Sign chosen by the best-ranked member among those who chose a topSign
+                // Desempate: signo del socio mejor clasificado en la General histórica (hasta la jornada anterior)
                 let finalSign = topSigns[0];
-
-                for (const rank of currentClassification) {
+                for (const rank of priorClassification) {
                     const p = currentJForecasts.find(f => String(f.mId || f.memberId) === String(rank.id));
-                    if (p && p.selection && p.selection[i] && topSigns.includes(p.selection[i])) {
-                        finalSign = p.selection[i];
+                    if (p && p.selection && p.selection[i] && topSigns.includes(String(p.selection[i]).trim())) {
+                        finalSign = String(p.selection[i]).trim();
                         break;
                     }
                 }
                 perfectCol.push(finalSign);
+            }
+        }
+
+        // 6. CONGELACIÓN INMUTABLE: Si todos los socios ya pronosticaron o la jornada comenzó/concluyó, fijar la columna
+        const allResolved = (this.members || []).every(m => currentJForecasts.some(p => String(p.mId || p.memberId) === String(m.id)));
+        const isStarted = currentJornada.matches && currentJornada.matches.some(m => m.result && m.result !== '' && m.result !== '-' && String(m.result).toLowerCase() !== 'por definir');
+        const isClosed = currentJornada.status === 'completed' || currentJornada.status === 'closed' || currentJornada.finalizada === true;
+
+        if (allResolved || isStarted || isClosed) {
+            currentJornada.columnaMaula = perfectCol;
+            try {
+                localStorage.setItem(cachedKey, JSON.stringify(perfectCol));
+            } catch (e) {}
+
+            // Sincronizar en Firestore para fijarla permanentemente en todos los dispositivos
+            if (window.DataService && typeof window.DataService.update === 'function' && currentJornada.id) {
+                window.DataService.update('jornadas', String(currentJornada.id), { columnaMaula: perfectCol })
+                    .catch(e => console.warn('Aviso sincronizando columnaMaula en Firestore:', e));
             }
         }
 

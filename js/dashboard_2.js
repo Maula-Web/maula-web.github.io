@@ -1786,6 +1786,12 @@ class Dashboard2AppController {
             action: 'dobles'
         });
 
+        // 2.c4 REACTIVACIÓN DE LA COLUMNA MAULA
+        items.push({
+            text: `⭐ <strong class="text-amber-400">Columna Maula Reactivada:</strong> La quiniela colectiva de la peña vuelve a la tabla de pronósticos con cálculo histórico blindado y congelación inmutable para toda la jornada.`,
+            url: 'pronosticos_2.html'
+        });
+
         // 2.d NOVEDAD EN BOTE: Tarjeta Balance y Desglose Contable
         items.push({
             text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Nueva tarjeta con el balance contable completo: saldos de socios, premios, cuotas, penalizaciones y sellados.`,
