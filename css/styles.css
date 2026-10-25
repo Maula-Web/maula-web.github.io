@@ -4694,3 +4694,32 @@ body.has-ticker {
 .marcelo-cell-neutral {
     color: #94a3b8 !important;
 }
+
+/* Columna Bote 100% Opaca en Modo Oscuro (Evita transparencias al hacer scroll horizontal) */
+.marcelo-bote-pos {
+    background-color: #03231a !important;
+    color: #34d399 !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+}
+
+tr:hover .marcelo-bote-pos {
+    background-color: #063528 !important;
+}
+
+.marcelo-bote-neg {
+    background-color: #330610 !important;
+    color: #fb7185 !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+}
+
+tr:hover .marcelo-bote-neg {
+    background-color: #480a18 !important;
+}
+
+/* Sombra divisoria para la columna BOTE fija al hacer scroll */
+#hoja-marcelo-container td.sticky.left-\[200px\],
+#hoja-marcelo-container th.sticky.left-\[200px\] {
+    box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.45);
+}

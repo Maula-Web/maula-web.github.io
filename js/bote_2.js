@@ -5177,7 +5177,7 @@ class BoteAppController {
                 `;
             }).join('');
 
-            const boteClass = bote >= 0 ? 'text-emerald-400 bg-emerald-950/40 font-black' : 'text-rose-400 bg-rose-950/50 font-black';
+            const boteClass = bote >= 0 ? 'marcelo-bote-pos' : 'marcelo-bote-neg';
 
             return `
                 <tr class="hover:bg-slate-900/80 transition-colors">

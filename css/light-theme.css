@@ -2705,6 +2705,34 @@ html.light-theme #card-desglose-balance-bote {
     color: #64748b !important;
 }
 
+/* Columna Bote 100% Opaca en Tema Claro (Evita transparencias al hacer scroll horizontal) */
+.light-theme .marcelo-bote-pos {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+}
+
+.light-theme tr:hover .marcelo-bote-pos {
+    background-color: #a7f3d0 !important;
+}
+
+.light-theme .marcelo-bote-neg {
+    background-color: #ffe4e6 !important;
+    color: #9f1239 !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+}
+
+.light-theme tr:hover .marcelo-bote-neg {
+    background-color: #fecdd3 !important;
+}
+
+.light-theme #hoja-marcelo-container td.sticky.left-\[200px\],
+.light-theme #hoja-marcelo-container th.sticky.left-\[200px\] {
+    box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.08);
+}
+
 /* =========================================================================
    ADAPTACIÓN DE MODAL IN-APP ALERTS Y MÓDULO ADMIN AL TEMA CLARO
    ========================================================================= */
