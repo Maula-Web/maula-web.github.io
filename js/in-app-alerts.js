@@ -345,7 +345,7 @@
             // Formato de saldo con coma decimal
             const formattedSaldo = (window.AppUtils && window.AppUtils.formatEuro)
                 ? window.AppUtils.formatEuro(userSaldo)
-                : `${userSaldo.toFixed(2).replace('.', ',')} €`;
+                : `${userSaldo.toSpanishFormat()} €`;
 
             // Detectar si el socio es el Tesorero (Marcelo regulariza en repartos, no le salta alerta de deuda)
             const isTesorero = uid === '14' || (name.toLowerCase().includes('marcelo') && !name.toLowerCase().includes('mor'));

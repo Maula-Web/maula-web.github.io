@@ -125,8 +125,8 @@
                     if (typeof fb.superavit === 'number') superavit = fb.superavit;
                 }
             } catch(e) {}
-            const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
-            const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`;
+            const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toSpanishFormat()} €`;
+            const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toSpanishFormat()} €`;
 
             // 3. Calcular clasificación real y estadísticas deportivas
             const memberStats = {};
@@ -294,6 +294,12 @@
             // NOTICIA 2.d: NOVEDAD HOJA DE MARCELO - Reconstrucción Histórica
             items.push({
                 text: `📑 <strong class="text-emerald-400">Hoja de Marcelo:</strong> Nuevo selector histórico para ver y recalcular al céntimo los botes, sumas, restas y caja real a cualquier jornada anterior.`,
+                url: 'bote_2.html'
+            });
+
+            // NOTICIA 2.e: SEPARADOR DE MILES EN CANTIDADES
+            items.push({
+                text: `💶 <strong class="text-amber-400">Mejora Visual:</strong> Todas las cantidades y botes de la web cuentan ahora con separador de miles con punto (ej. 1.028,30 €) para mayor claridad.`,
                 url: 'bote_2.html'
             });
 

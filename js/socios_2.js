@@ -292,7 +292,7 @@ class SociosAppController {
         const isDeud = saldo < -0.009 && !isTes;
 
         const saldoPrefix = saldo >= 0 ? "+" : "";
-        const saldoTxt = `${saldoPrefix}${saldo.toFixed(2).replace(".", ",")} €`;
+        const saldoTxt = `${saldoPrefix}${saldo.toSpanishFormat()} €`;
 
         if (isTes) {
             return {

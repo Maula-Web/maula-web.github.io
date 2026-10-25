@@ -1,3 +1,24 @@
+// =========================================================================
+// PROTOCOLOS GLOBALES DE FORMATEO NUMÉRICO ESPAÑOL (SEPARADOR DE MILES)
+// =========================================================================
+if (!Number.prototype.toSpanishFormat) {
+    Number.prototype.toSpanishFormat = function(decimals = 2) {
+        const d = (typeof decimals === 'number' && !isNaN(decimals)) ? decimals : 2;
+        const num = Number(this);
+        if (isNaN(num)) return '0,00';
+        const parts = num.toFixed(d).split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return parts.length > 1 ? `${parts[0]},${parts[1]}` : parts[0];
+    };
+}
+if (!String.prototype.toSpanishFormat) {
+    String.prototype.toSpanishFormat = function(decimals = 2) {
+        const num = parseFloat(this.replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.'));
+        if (isNaN(num)) return this.toString();
+        return num.toSpanishFormat(decimals);
+    };
+}
+
 /**
  * Bote 2 Controller - Nueva Arquitectura de Tesorería y Contabilidad
  * ===================================================================
@@ -683,7 +704,7 @@ class BoteAppController {
         const bJornadas = document.getElementById('badge-jornadas-count');
 
         if (cardCaja) {
-            const val = (s.cajaReal || 0).toFixed(2).replace('.', ',') + ' €';
+            const val = (s.cajaReal || 0).toSpanishFormat() + ' €';
             cardCaja.textContent = val;
             const cComp = document.getElementById('card-caja-real-compact');
             if (cComp) cComp.textContent = val;
@@ -693,9 +714,9 @@ class BoteAppController {
         const actualSumaSaldos = (data.memberSummaries && data.memberSummaries.length > 0)
             ? data.memberSummaries.reduce((sum, m) => sum + (m.saldo || 0), 0)
             : (s.totalSaldosVirtuales || 0);
-        if (cardSuma) cardSuma.textContent = actualSumaSaldos.toFixed(2).replace('.', ',') + ' €';
+        if (cardSuma) cardSuma.textContent = actualSumaSaldos.toSpanishFormat() + ' €';
         if (cardIn) {
-            const val = (s.totalIngresos || 0).toFixed(2).replace('.', ',') + ' €';
+            const val = (s.totalIngresos || 0).toSpanishFormat() + ' €';
             cardIn.textContent = val;
             const cComp = document.getElementById('card-total-ingresos-compact');
             if (cComp) cComp.textContent = val;
@@ -703,7 +724,7 @@ class BoteAppController {
             if (mobIn) mobIn.textContent = val;
         }
         if (cardOut) {
-            const val = (s.totalGastos || 0).toFixed(2).replace('.', ',') + ' €';
+            const val = (s.totalGastos || 0).toSpanishFormat() + ' €';
             cardOut.textContent = val;
             const cComp = document.getElementById('card-total-gastos-compact');
             if (cComp) cComp.textContent = val;
@@ -711,7 +732,7 @@ class BoteAppController {
             if (mobOut) mobOut.textContent = val;
         }
         if (cardPrem) {
-            const val = (s.totalPremios || 0).toFixed(2).replace('.', ',') + ' €';
+            const val = (s.totalPremios || 0).toSpanishFormat() + ' €';
             cardPrem.textContent = val;
             const cComp = document.getElementById('card-total-premios-compact');
             if (cComp) cComp.textContent = val;
@@ -720,7 +741,7 @@ class BoteAppController {
         }
         if (cardSuperavit) {
             const superavit = (s.cajaReal || 0) - actualSumaSaldos;
-            const supFormatted = `${superavit >= 0 ? '+' : ''}${superavit.toFixed(2).replace('.', ',')} €`;
+            const supFormatted = `${superavit >= 0 ? '+' : ''}${superavit.toSpanishFormat()} €`;
             cardSuperavit.textContent = supFormatted;
             const mobSup = document.getElementById('kpi-mobile-superavit');
             if (mobSup) {
@@ -738,40 +759,40 @@ class BoteAppController {
 
         if (cardBreakdownSaldos) {
             const val = actualSumaSaldos;
-            cardBreakdownSaldos.textContent = `${val >= 0 ? '+' : ''}${val.toFixed(2).replace('.', ',')} €`;
+            cardBreakdownSaldos.textContent = `${val >= 0 ? '+' : ''}${val.toSpanishFormat()} €`;
         }
 
         const actualTotalPremios = (data.memberSummaries && data.memberSummaries.length > 0)
             ? data.memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.premios || 0) : 0), 0)
             : (s.totalPremios || 0);
         if (cardBreakdownPremios) {
-            cardBreakdownPremios.textContent = `+${actualTotalPremios.toFixed(2).replace('.', ',')} €`;
+            cardBreakdownPremios.textContent = `+${actualTotalPremios.toSpanishFormat()} €`;
         }
 
         const actualTotalCuotas = (data.memberSummaries && data.memberSummaries.length > 0)
             ? data.memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.cuotas || 0) : 0), 0)
             : 0;
         if (cardBreakdownCuotas) {
-            cardBreakdownCuotas.textContent = `+${actualTotalCuotas.toFixed(2).replace('.', ',')} €`;
+            cardBreakdownCuotas.textContent = `+${actualTotalCuotas.toSpanishFormat()} €`;
         }
 
         const actualTotalPenalizaciones = (data.memberSummaries && data.memberSummaries.length > 0)
             ? data.memberSummaries.reduce((sum, m) => sum + (m.breakdown ? ((m.breakdown.unos || 0) + (m.breakdown.bajos || 0) + (m.breakdown.pig || 0) + (m.breakdown.maula || 0)) : 0), 0)
             : 0;
         if (cardBreakdownPenalizaciones) {
-            cardBreakdownPenalizaciones.textContent = `+${actualTotalPenalizaciones.toFixed(2).replace('.', ',')} €`;
+            cardBreakdownPenalizaciones.textContent = `+${actualTotalPenalizaciones.toSpanishFormat()} €`;
         }
 
         const actualTotalSellados = (data.jornadaSummaries && data.jornadaSummaries.length > 0)
             ? data.jornadaSummaries.reduce((sum, j) => sum + (j.gastoSellado || 0), 0)
             : (s.totalGastos || 0);
         if (cardBreakdownSellados) {
-            cardBreakdownSellados.textContent = `-${actualTotalSellados.toFixed(2).replace('.', ',')} €`;
+            cardBreakdownSellados.textContent = `-${actualTotalSellados.toSpanishFormat()} €`;
         }
 
         const cardBreakdownTotalCaja = document.getElementById('card-breakdown-total-caja');
         if (cardBreakdownTotalCaja) {
-            cardBreakdownTotalCaja.textContent = (s.cajaReal || 0).toFixed(2).replace('.', ',') + ' €';
+            cardBreakdownTotalCaja.textContent = (s.cajaReal || 0).toSpanishFormat() + ' €';
         }
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
         if (bJornadas) bJornadas.textContent = data.jornadaSummaries.length;
@@ -784,9 +805,9 @@ class BoteAppController {
             const cDob = latestJ ? latestJ.costeDobles : (this.config.costeDobles !== undefined ? this.config.costeDobles : 12.00);
             const sencillasTotal = numSocios * cCol;
             const totalSellado = sencillasTotal + cDob;
-            const totalSelladoAcum = (s.totalGastos || 0).toFixed(2).replace('.', ',');
-            const totalSociosGastos = (s.totalGastosSocios || 199.50).toFixed(2).replace('.', ',');
-            gastosTooltip.innerHTML = `<strong>Gasto acumulado de sellado en lotería:</strong> ${totalSelladoAcum} € (${data.jornadaSummaries.length} jornadas).<br><span class="text-slate-400 text-[11px] block mt-1">• Por jornada: ${numSocios} quinielas sencillas + 1 reducida de 7 dobles = ${totalSellado.toFixed(2).replace('.', ',')} €.<br>• Cuotas y multas descontadas a socios en huchas: ${totalSociosGastos} €.</span>`;
+            const totalSelladoAcum = (s.totalGastos || 0).toSpanishFormat();
+            const totalSociosGastos = (s.totalGastosSocios || 199.50).toSpanishFormat();
+            gastosTooltip.innerHTML = `<strong>Gasto acumulado de sellado en lotería:</strong> ${totalSelladoAcum} € (${data.jornadaSummaries.length} jornadas).<br><span class="text-slate-400 text-[11px] block mt-1">• Por jornada: ${numSocios} quinielas sencillas + 1 reducida de 7 dobles = ${totalSellado.toSpanishFormat()} €.<br>• Cuotas y multas descontadas a socios en huchas: ${totalSociosGastos} €.</span>`;
         }
     }
 
@@ -856,7 +877,7 @@ class BoteAppController {
                         </span>
                         <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-400/60 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-amber-300 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>💰</span> Tío Gilito (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                                <span>💰</span> Tío Gilito (+${m.saldo.toSpanishFormat()} €)
                             </strong>
                             <p class="leading-relaxed">
                                 Saldo excelente (> 50 €) en su hucha virtual. Modo Tío Gilito activado: máxima solvencia para la temporada.
@@ -873,7 +894,7 @@ class BoteAppController {
                         </span>
                         <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-emerald-400 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>🟢</span> Al Corriente (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                                <span>🟢</span> Al Corriente (+${m.saldo.toSpanishFormat()} €)
                             </strong>
                             <p class="leading-relaxed">
                                 Saldo adecuado (15 € - 50 €) en su hucha virtual para cubrir las cuotas de las próximas jornadas.
@@ -890,7 +911,7 @@ class BoteAppController {
                         </span>
                         <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-amber-300 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>🟡</span> Al Corriente (+${m.saldo.toFixed(2).replace(".", ",")} €)
+                                <span>🟡</span> Al Corriente (+${m.saldo.toSpanishFormat()} €)
                             </strong>
                             <p class="leading-relaxed">
                                 Saldo regular (5 € - 15 €) en su hucha virtual.
@@ -910,7 +931,7 @@ class BoteAppController {
                         </span>
                         <div class="invisible group-hover/status:visible opacity-0 group-hover/status:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-2 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>${icon}</span> ${badgeLabel} (${m.saldo.toFixed(2).replace(".", ",")} €)
+                                <span>${icon}</span> ${badgeLabel} (${m.saldo.toSpanishFormat()} €)
                             </strong>
                             <p class="leading-relaxed">
                                 ${isDeudaNegativa ? "El socio tiene saldo negativo en su hucha. Se requiere una recarga mediante Bizum a Marcelo para regularizar." : "Saldo bajo (< 5 €). Conviene hacer un Bizum a Marcelo para no quedarse en descubierto."}
@@ -941,13 +962,13 @@ class BoteAppController {
                     </div>
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-medium text-slate-300 text-xs sm:text-sm whitespace-nowrap">
-                    +${m.totIn.toFixed(2).replace('.', ',')}&nbsp;€
+                    +${m.totIn.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-medium text-slate-400 text-xs sm:text-sm whitespace-nowrap">
-                    -${m.totOut.toFixed(2).replace('.', ',')}&nbsp;€
+                    -${m.totOut.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-extrabold ${saldoColor} text-sm sm:text-base whitespace-nowrap">
-                    ${m.saldo.toFixed(2).replace('.', ',')}&nbsp;€
+                    ${m.saldo.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-center whitespace-nowrap">
                     ${statusBadge}
@@ -977,13 +998,13 @@ class BoteAppController {
                         <span class="text-[11px] text-slate-500 block">${members.length} socio${members.length === 1 ? '' : 's'}</span>
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-slate-200 text-xs sm:text-sm whitespace-nowrap">
-                        +${totIn.toFixed(2).replace('.', ',')}&nbsp;€
+                        +${totIn.toSpanishFormat()}&nbsp;€
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-slate-300 text-xs sm:text-sm whitespace-nowrap">
-                        -${totOut.toFixed(2).replace('.', ',')}&nbsp;€
+                        -${totOut.toSpanishFormat()}&nbsp;€
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-extrabold ${totSaldoColor} text-sm sm:text-base whitespace-nowrap">
-                        ${totSaldo.toFixed(2).replace('.', ',')}&nbsp;€
+                        ${totSaldo.toSpanishFormat()}&nbsp;€
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-center whitespace-nowrap text-xs font-semibold">
                         <span class="text-emerald-400">✅ ${numPos}</span>
@@ -1247,7 +1268,7 @@ class BoteAppController {
         const doblesPrize = jMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
         const doblesBtn = (doblesPrize > 0) ? `
             <button onclick="window.BoteApp.showReducedBreakdown('${jSummary.doblesPlayerId || jSummary.winnerId || ''}', ${jSummary.number})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold transition-all shadow-sm whitespace-nowrap" title="Ver desglose oficial de las 16 apuestas reducidas premiadas">
-                <span>📋</span> Ver Reducción Premiada (+${doblesPrize.toFixed(2).replace('.', ',')} €)
+                <span>📋</span> Ver Reducción Premiada (+${doblesPrize.toSpanishFormat()} €)
             </button>
         ` : '';
 
@@ -1282,7 +1303,7 @@ class BoteAppController {
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.winnerName || (jSummary.hasResults ? 'En juego...' : 'Pendiente de inicio')}</span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                     <strong class="text-emerald-400 block mb-1 font-bold">👑 Ganador de la Jornada</strong>
-                                    Socio con más aciertos en esta jornada. Jugará gratis (🎁) y pronosticará la quiniela de 7 dobles en la siguiente jornada (coste de ${(jSummary.costeDobles !== undefined ? jSummary.costeDobles : (this.config.costeDobles || 10.50)).toFixed(2).replace('.', ',')} € pagado al 100% por la peña).
+                                    Socio con más aciertos en esta jornada. Jugará gratis (🎁) y pronosticará la quiniela de 7 dobles en la siguiente jornada (coste de ${(jSummary.costeDobles !== undefined ? jSummary.costeDobles : (this.config.costeDobles || 10.50)).toSpanishFormat()} € pagado al 100% por la peña).
                                 </div>
                             </div>
                             ${doblesBtn}
@@ -1293,7 +1314,7 @@ class BoteAppController {
                                 <span class="underline decoration-dotted decoration-slate-500">${jSummary.sealerName || jSummary.loserName || 'N/A'}</span>
                                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                     <strong class="text-rose-400 block mb-1 font-bold">💀 Sellador Oficial</strong>
-                                    Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de ${jSummary.gastoSellado.toFixed(2).replace('.', ',')} € en su hucha personal o por Bizum.
+                                    Socio encargado de sellar físicamente los boletos en la administración de lotería. Recibe el reembolso íntegro de ${jSummary.gastoSellado.toSpanishFormat()} € en su hucha personal o por Bizum.
                                 </div>
                             </div>
                         </div>
@@ -1302,7 +1323,7 @@ class BoteAppController {
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center relative z-20">
                         <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Recaudado ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-emerald-400 font-mono">+${jSummary.recaudacion.toFixed(2).replace('.', ',')}&nbsp;€</span>
+                            <span class="text-xs sm:text-sm font-extrabold text-emerald-400 font-mono">+${jSummary.recaudacion.toSpanishFormat()}&nbsp;€</span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-emerald-400 block mb-1 font-bold">📥 Recaudación de la Jornada</strong>
                                 Suma de cuotas semanales de los 19 socios más las penalizaciones aplicadas por exceso de unos, bajos aciertos o fallos en PIG.
@@ -1310,15 +1331,15 @@ class BoteAppController {
                         </div>
                         <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Coste Sellado ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2).replace('.', ',')}&nbsp;€</span>
+                            <span class="text-xs sm:text-sm font-extrabold text-rose-400 font-mono">-${jSummary.gastoSellado.toSpanishFormat()}&nbsp;€</span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-rose-400 block mb-1 font-bold">🎟️ Gasto Oficial de Sellado</strong>
-                                Coste total pagado en la administración de loterías: ${jSummary.numSocios} quinielas sencillas (${(jSummary.numSocios * jSummary.costeColumna).toFixed(2).replace('.', ',')} €) + ${(jSummary.numDobles || 1) > 1 ? `${jSummary.numDobles} quinielas reducidas de 7 dobles` : '1 quiniela reducida de 7 dobles'} (${((jSummary.numDobles || 1) * jSummary.costeDobles).toFixed(2).replace('.', ',')} €) = ${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €.
+                                Coste total pagado en la administración de loterías: ${jSummary.numSocios} quinielas sencillas (${(jSummary.numSocios * jSummary.costeColumna).toSpanishFormat()} €) + ${(jSummary.numDobles || 1) > 1 ? `${jSummary.numDobles} quinielas reducidas de 7 dobles` : '1 quiniela reducida de 7 dobles'} (${((jSummary.numDobles || 1) * jSummary.costeDobles).toSpanishFormat()} €) = ${jSummary.gastoSellado.toSpanishFormat()} €.
                             </div>
                         </div>
                         <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Premios ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-amber-400 font-mono">+${jSummary.premios.toFixed(2).replace('.', ',')}&nbsp;€</span>
+                            <span class="text-xs sm:text-sm font-extrabold text-amber-400 font-mono">+${jSummary.premios.toSpanishFormat()}&nbsp;€</span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-amber-400 block mb-1 font-bold">🏆 Premios Oficiales LAE</strong>
                                 Importe oficial de premios de Loterías del Estado en esta jornada (por pronósticos individuales o por la quiniela de dobles).
@@ -1326,10 +1347,10 @@ class BoteAppController {
                         </div>
                         <div class="group relative cursor-help p-2 sm:p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:z-50 transition-colors whitespace-nowrap">
                             <span class="text-[11px] text-slate-400 block font-semibold flex items-center justify-center gap-1">Neto Peña ℹ️</span>
-                            <span class="text-xs sm:text-sm font-extrabold ${netoColor} font-mono">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2).replace('.', ',')}&nbsp;€</span>
+                            <span class="text-xs sm:text-sm font-extrabold ${netoColor} font-mono">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toSpanishFormat()}&nbsp;€</span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-emerald-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal whitespace-normal">
                                 <strong class="text-emerald-400 block mb-1 font-bold">📈 Superávit Neto Semanal</strong>
-                                Margen neto semanal que se incorpora a la hucha colectiva de la peña tras descontar los ${jSummary.gastoSellado.toFixed(2).replace('.', ',')} € de sellado oficial.
+                                Margen neto semanal que se incorpora a la hucha colectiva de la peña tras descontar los ${jSummary.gastoSellado.toSpanishFormat()} € de sellado oficial.
                             </div>
                         </div>
                     </div>
@@ -1394,14 +1415,14 @@ class BoteAppController {
                 penaltyChips.push(`
                     <div class="group relative cursor-help inline-block whitespace-nowrap">
                         <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[11px] font-semibold border border-amber-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
-                            +1️⃣ ${m.penalizacionUnos.toFixed(2).replace('.', ',')}€
+                            +1️⃣ ${m.penalizacionUnos.toSpanishFormat()}€
                         </span>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-amber-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-amber-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>1️⃣</span> Multa por Exceso de Unos (+1)
                             </strong>
                             <p class="leading-relaxed">
-                                Penalización de <strong>+${m.penalizacionUnos.toFixed(2).replace('.', ',')} €</strong> aplicada por pronosticar 10 o más signos "1" en la quiniela semanal. Se abona íntegramente al fondo común de la peña.
+                                Penalización de <strong>+${m.penalizacionUnos.toSpanishFormat()} €</strong> aplicada por pronosticar 10 o más signos "1" en la quiniela semanal. Se abona íntegramente al fondo común de la peña.
                             </p>
                         </div>
                     </div>
@@ -1411,14 +1432,14 @@ class BoteAppController {
                 penaltyChips.push(`
                     <div class="group relative cursor-help inline-block whitespace-nowrap">
                         <span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[11px] font-semibold border border-rose-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
-                            📉 ${m.penalizacionBajosAciertos.toFixed(2).replace('.', ',')}€
+                            📉 ${m.penalizacionBajosAciertos.toSpanishFormat()}€
                         </span>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-rose-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-rose-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>📉</span> Multa por Bajos Aciertos
                             </strong>
                             <p class="leading-relaxed">
-                                Penalización de <strong>+${m.penalizacionBajosAciertos.toFixed(2).replace('.', ',')} €</strong> aplicada por obtener entre 0 y 3 aciertos en los 14 primeros partidos del boleto semanal.
+                                Penalización de <strong>+${m.penalizacionBajosAciertos.toSpanishFormat()} €</strong> aplicada por obtener entre 0 y 3 aciertos en los 14 primeros partidos del boleto semanal.
                             </p>
                         </div>
                     </div>
@@ -1428,14 +1449,14 @@ class BoteAppController {
                 penaltyChips.push(`
                     <div class="group relative cursor-help inline-block whitespace-nowrap">
                         <span class="px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400 text-[11px] font-semibold border border-pink-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
-                            🐷 ${m.penalizacionPIG.toFixed(2).replace('.', ',')}€
+                            🐷 ${m.penalizacionPIG.toSpanishFormat()}€
                         </span>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-pink-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-pink-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>🐷</span> Fallo en Partido de Interés General (PIG)
                             </strong>
                             <p class="leading-relaxed">
-                                Multa de <strong>+${m.penalizacionPIG.toFixed(2).replace('.', ',')} €</strong> por no acertar el resultado en el partido fijado como Partido de Interés General de la jornada.
+                                Multa de <strong>+${m.penalizacionPIG.toSpanishFormat()} €</strong> por no acertar el resultado en el partido fijado como Partido de Interés General de la jornada.
                             </p>
                         </div>
                     </div>
@@ -1445,14 +1466,14 @@ class BoteAppController {
                 penaltyChips.push(`
                     <div class="group relative cursor-help inline-block whitespace-nowrap">
                         <span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[11px] font-semibold border border-purple-500/30 inline-flex items-center gap-0.5 shadow-sm hover:brightness-125 transition-all whitespace-nowrap">
-                            💀 ${m.penalizacionMaula.toFixed(2).replace('.', ',')}€
+                            💀 ${m.penalizacionMaula.toSpanishFormat()}€
                         </span>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${posClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-purple-400 block mb-1 font-bold flex items-center gap-1.5">
                                 <span>💀</span> Penalización Maula de la Jornada
                             </strong>
                             <p class="leading-relaxed">
-                                Multa de <strong>+${m.penalizacionMaula.toFixed(2).replace('.', ',')} €</strong> aplicada al socio que ha quedado en última posición de aciertos en la jornada.
+                                Multa de <strong>+${m.penalizacionMaula.toSpanishFormat()} €</strong> aplicada al socio que ha quedado en última posición de aciertos en la jornada.
                             </p>
                         </div>
                     </div>
@@ -1465,7 +1486,7 @@ class BoteAppController {
             // Reembolso sellado con opción de elegir entre Bote del socio o por Bizum con tarjeta explicativa
             let selladoCol = '<span class="text-slate-600">-</span>';
             if (m.sellado < 0) {
-                const sellVal = Math.abs(m.sellado).toFixed(2).replace('.', ',');
+                const sellVal = Math.abs(m.sellado).toSpanishFormat();
                 const selladoPosClass = rowIdx < 10 ? 'right-0 top-full mt-1.5' : 'right-0 bottom-full mb-1.5';
                 selladoCol = `
                     <div class="group relative cursor-help inline-flex flex-col gap-1 items-end whitespace-nowrap">
@@ -1529,24 +1550,24 @@ class BoteAppController {
                                 </p>
                             </div>
                         </div>
-                    ` : `<span class="whitespace-nowrap font-mono text-slate-300">${m.aportacion.toFixed(2).replace('.', ',')}&nbsp;€</span>`}
+                    ` : `<span class="whitespace-nowrap font-mono text-slate-300">${m.aportacion.toSpanishFormat()}&nbsp;€</span>`}
                 </td>
                 <td class="py-2.5 px-1.5 sm:px-2 xl:px-2.5 text-center">
                     ${penaltiesHtml}
                 </td>
                 <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
-                    -${(m.totalGastos || 0).toFixed(2).replace('.', ',')}&nbsp;€
+                    -${(m.totalGastos || 0).toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold ${m.premios > 0 ? 'text-emerald-400' : 'text-slate-600'} whitespace-nowrap">
                     ${m.premios > 0 ? `
                         <div class="group relative cursor-help inline-flex flex-col items-end whitespace-nowrap">
-                            <span class="whitespace-nowrap font-mono">+${m.premios.toFixed(2).replace('.', ',')}&nbsp;€</span>
+                            <span class="whitespace-nowrap font-mono">+${m.premios.toSpanishFormat()}&nbsp;€</span>
                             <span class="text-[9px] font-sans font-semibold text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all whitespace-nowrap">
                                 🔵 Individual ℹ️
                             </span>
                             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute ${prizePosClass} w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-blue-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                                 <strong class="text-blue-400 block mb-1 font-bold flex items-center gap-1.5">
-                                    <span>🔵</span> Premio Oficial Individual (+${m.premios.toFixed(2).replace('.', ',')} €)
+                                    <span>🔵</span> Premio Oficial Individual (+${m.premios.toSpanishFormat()} €)
                                 </strong>
                                 <p class="leading-relaxed">
                                     Premio oficial de Loterías del Estado conseguido por el boleto individual del socio (${m.aciertos} aciertos). El importe ingresa íntegramente en el Bote de la Peña y el socio disfruta de cuota gratis la jornada siguiente.
@@ -1559,10 +1580,10 @@ class BoteAppController {
                     ${selladoCol}
                 </td>
                 <td class="py-2.5 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold ${m.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} whitespace-nowrap">
-                    ${m.neto >= 0 ? '+' : ''}${m.neto.toFixed(2).replace('.', ',')}&nbsp;€
+                    ${m.neto >= 0 ? '+' : ''}${m.neto.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-2.5 xl:px-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/60 whitespace-nowrap">
-                    ${m.boteAcumulado.toFixed(2).replace('.', ',')}&nbsp;€
+                    ${m.boteAcumulado.toSpanishFormat()}&nbsp;€
                 </td>
             `;
             tbody.appendChild(tr);
@@ -1581,18 +1602,18 @@ class BoteAppController {
                     </div>
                 </td>
                 <td class="p-2.5 sm:px-4 text-center font-bold text-purple-300 whitespace-nowrap">10 ac.</td>
-                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400 whitespace-nowrap">${jSummary.costeDobles.toFixed(2).replace('.', ',')}&nbsp;€ (Peña)</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400 whitespace-nowrap">${jSummary.costeDobles.toSpanishFormat()}&nbsp;€ (Peña)</td>
                 <td class="p-2.5 sm:px-4 text-center text-slate-500 whitespace-nowrap">-</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono text-slate-500 whitespace-nowrap">-</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono font-black text-emerald-400 whitespace-nowrap">
                     <div class="group relative cursor-help inline-flex flex-col items-end whitespace-nowrap">
-                        <span class="whitespace-nowrap font-mono">+${doblesPrize.toFixed(2).replace('.', ',')}&nbsp;€</span>
+                        <span class="whitespace-nowrap font-mono">+${doblesPrize.toSpanishFormat()}&nbsp;€</span>
                         <span class="text-[9px] font-sans font-semibold text-purple-300 bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30 shadow-sm flex items-center gap-1 hover:brightness-125 transition-all whitespace-nowrap">
                             🟣 Bote Peña ℹ️
                         </span>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute right-0 bottom-full mb-1.5 w-64 sm:w-72 p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs z-[99999] pointer-events-auto text-left font-normal normal-case whitespace-normal">
                             <strong class="text-purple-300 block mb-1 font-bold flex items-center gap-1.5">
-                                <span>🟣</span> Premio Reducción de Dobles (+${doblesPrize.toFixed(2).replace('.', ',')} €)
+                                <span>🟣</span> Premio Reducción de Dobles (+${doblesPrize.toSpanishFormat()} €)
                             </strong>
                             <p class="leading-relaxed">
                                 Premio oficial conseguido por las 16 apuestas reducidas (7 dobles) financiadas por la peña. Este importe entra directamente al fondo de la caja común.
@@ -1601,7 +1622,7 @@ class BoteAppController {
                     </div>
                 </td>
                 <td class="p-2.5 sm:px-4 text-center text-slate-500 whitespace-nowrap">-</td>
-                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">+${doblesPrize.toFixed(2).replace('.', ',')}&nbsp;€</td>
+                <td class="p-2.5 sm:px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">+${doblesPrize.toSpanishFormat()}&nbsp;€</td>
                 <td class="p-2.5 sm:px-4 text-right text-slate-400 text-[11px] font-sans whitespace-nowrap">Ingresado en Bote Peña</td>
             `;
             tbody.appendChild(trDobles);
@@ -1615,7 +1636,7 @@ class BoteAppController {
             } else {
                 const validAciertosMovs = jMovements.filter(m => typeof m.aciertos === 'number' && m.aciertos >= 0);
                 const totAciertos = validAciertosMovs.reduce((s, m) => s + m.aciertos, 0);
-                const avgAciertos = validAciertosMovs.length > 0 ? (totAciertos / validAciertosMovs.length).toFixed(1).replace('.', ',') : '-';
+                const avgAciertos = validAciertosMovs.length > 0 ? (totAciertos / validAciertosMovs.length).toSpanishFormat(1) : '-';
 
                 const totCuota = jMovements.reduce((s, m) => s + (m.exento ? 0 : (m.aportacion || 0)), 0);
                 const totPenalties = jMovements.reduce((s, m) => s + (m.penalizacionUnos || 0) + (m.penalizacionBajosAciertos || 0) + (m.penalizacionPIG || 0) + (m.penalizacionMaula || 0), 0);
@@ -1631,17 +1652,17 @@ class BoteAppController {
                 const totBoteFinal = jMovements.reduce((s, m) => s + (m.boteAcumulado || 0), 0);
 
                 const penaltiesFootHtml = totPenalties > 0
-                    ? `<div class="font-mono font-bold text-amber-400 whitespace-nowrap">+${totPenalties.toFixed(2).replace('.', ',')}&nbsp;€</div>`
+                    ? `<div class="font-mono font-bold text-amber-400 whitespace-nowrap">+${totPenalties.toSpanishFormat()}&nbsp;€</div>`
                       + `<span class="text-[10px] text-slate-400 font-normal">(${countPenalties} multa${countPenalties === 1 ? '' : 's'})</span>`
                     : '<span class="text-slate-600 font-mono">-</span>';
 
                 const premiosFootHtml = totPremios > 0
-                    ? `<div class="font-mono font-bold text-emerald-400 whitespace-nowrap">+${totPremios.toFixed(2).replace('.', ',')}&nbsp;€</div>`
-                      + (doblesPrize > 0 && totPremiosInd > 0 ? `<span class="text-[10px] text-purple-300 font-normal block whitespace-nowrap">(${totPremiosInd.toFixed(2).replace('.', ',')}€ ind + ${doblesPrize.toFixed(2).replace('.', ',')}€ dob)</span>` : '')
+                    ? `<div class="font-mono font-bold text-emerald-400 whitespace-nowrap">+${totPremios.toSpanishFormat()}&nbsp;€</div>`
+                      + (doblesPrize > 0 && totPremiosInd > 0 ? `<span class="text-[10px] text-purple-300 font-normal block whitespace-nowrap">(${totPremiosInd.toSpanishFormat()}€ ind + ${doblesPrize.toSpanishFormat()}€ dob)</span>` : '')
                     : '<span class="text-slate-600 font-mono">-</span>';
 
                 const reembolsoFootHtml = totReembolso > 0
-                    ? `<span class="font-mono font-bold text-purple-300 whitespace-nowrap">+${totReembolso.toFixed(2).replace('.', ',')}&nbsp;€</span>`
+                    ? `<span class="font-mono font-bold text-purple-300 whitespace-nowrap">+${totReembolso.toSpanishFormat()}&nbsp;€</span>`
                     : '<span class="text-slate-600 font-mono">-</span>';
 
                 const netoFootColor = totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400';
@@ -1657,13 +1678,13 @@ class BoteAppController {
                             <div class="text-[10px] text-slate-400 font-normal">Ø ${avgAciertos}</div>
                         </td>
                         <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold text-slate-200 whitespace-nowrap">
-                            +${totCuota.toFixed(2).replace('.', ',')}&nbsp;€
+                            +${totCuota.toSpanishFormat()}&nbsp;€
                         </td>
                         <td class="py-3 px-1.5 sm:px-2 xl:px-2.5 text-center font-mono whitespace-nowrap">
                             ${penaltiesFootHtml}
                         </td>
                         <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
-                            -${totPaga.toFixed(2).replace('.', ',')}&nbsp;€
+                            -${totPaga.toSpanishFormat()}&nbsp;€
                         </td>
                         <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold whitespace-nowrap">
                             ${premiosFootHtml}
@@ -1672,10 +1693,10 @@ class BoteAppController {
                             ${reembolsoFootHtml}
                         </td>
                         <td class="py-3 px-1 sm:px-1.5 xl:px-2 text-right font-mono font-bold ${netoFootColor} whitespace-nowrap">
-                            ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€
+                            ${totNeto >= 0 ? '+' : ''}${totNeto.toSpanishFormat()}&nbsp;€
                         </td>
                         <td class="py-3 px-2 sm:px-2.5 xl:px-3 text-right font-mono font-extrabold text-amber-400 bg-slate-900/80 whitespace-nowrap">
-                            <div>${totBoteFinal.toFixed(2).replace('.', ',')}&nbsp;€</div>
+                            <div>${totBoteFinal.toSpanishFormat()}&nbsp;€</div>
                             <div class="text-[10px] text-slate-400 font-normal">Suma saldos</div>
                         </td>
                     </tr>
@@ -1820,7 +1841,7 @@ class BoteAppController {
 
             const mem = newSustitutoId ? data.memberSummaries.find(m => String(m.id) === String(newSustitutoId)) : null;
             if (mem) {
-                alert(`✅ Sustituto guardado: ${mem.name} selló la Jornada ${jSummary.number}. El gasto del sellado (-${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €) y su reembolso (+${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €) se han asignado a su cuenta.`);
+                alert(`✅ Sustituto guardado: ${mem.name} selló la Jornada ${jSummary.number}. El gasto del sellado (-${jSummary.gastoSellado.toSpanishFormat()} €) y su reembolso (+${jSummary.gastoSellado.toSpanishFormat()} €) se han asignado a su cuenta.`);
             } else {
                 alert(`✅ Sellado restaurado: La Jornada ${jSummary.number} vuelve a tener como sellador a su Maula oficial (${jSummary.maulaName || jSummary.loserName}).`);
             }
@@ -1887,7 +1908,7 @@ class BoteAppController {
                     ${m.name}
                 </td>
                 <td class="p-2 sm:p-2.5 text-right font-mono font-black text-amber-400 border-r border-slate-800 bg-slate-950/40 text-sm sm:text-base">
-                    ${m.saldo.toFixed(2).replace('.', ',')} €
+                    ${m.saldo.toSpanishFormat()} €
                 </td>
             `;
 
@@ -1912,11 +1933,11 @@ class BoteAppController {
                         if (penalties > 0) {
                             // Bonificación por altos aciertos (verde) con penalización adicional (pestaña roja con ⚠️)
                             cellContent = `
-                                <div class="inline-flex items-center rounded-lg border border-emerald-500/70 overflow-hidden font-mono shadow-sm text-sm sm:text-base group/chip" title="Bonificación por ${mov.aciertos} aciertos + Penalización (+${penalties.toFixed(2).replace('.', ',')} €)">
+                                <div class="inline-flex items-center rounded-lg border border-emerald-500/70 overflow-hidden font-mono shadow-sm text-sm sm:text-base group/chip" title="Bonificación por ${mov.aciertos} aciertos + Penalización (+${penalties.toSpanishFormat()} €)">
                                     <span class="bg-emerald-500/25 text-emerald-300 font-extrabold px-2 py-0.5 flex items-center gap-0.5">
                                         ${mov.aciertos}${isWin ? '👑' : ''}
                                     </span>
-                                    <span class="bg-rose-950 text-rose-300 font-black px-1.5 py-0.5 border-l border-rose-500/60 text-xs flex items-center gap-0.5" title="Penalización adicional: +${penalties.toFixed(2).replace('.', ',')} €">
+                                    <span class="bg-rose-950 text-rose-300 font-black px-1.5 py-0.5 border-l border-rose-500/60 text-xs flex items-center gap-0.5" title="Penalización adicional: +${penalties.toSpanishFormat()} €">
                                         ⚠️
                                     </span>
                                 </div>
@@ -1946,7 +1967,7 @@ class BoteAppController {
                         `;
                     } else if (penalties > 0) {
                         cellContent = `
-                            <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg bg-rose-950/70 text-rose-300 border border-rose-500/50 font-bold shadow-sm text-sm sm:text-base font-mono" title="Penalización: +${penalties.toFixed(2).replace('.', ',')} €">
+                            <div class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg bg-rose-950/70 text-rose-300 border border-rose-500/50 font-bold shadow-sm text-sm sm:text-base font-mono" title="Penalización: +${penalties.toSpanishFormat()} €">
                                 ${mov.aciertos !== undefined ? mov.aciertos : '-'}
                             </div>
                         `;
@@ -1961,10 +1982,10 @@ class BoteAppController {
                     // Modo Financiero: Neto en euros de la jornada
                     const isPos = mov.neto >= 0;
                     const bonusBadge = hasBonus ? `<span class="text-[10px] text-emerald-400 font-bold" title="Bonificación altos aciertos (${mov.aciertos} ac)">✨</span>` : '';
-                    const penaltyBadge = (hasBonus && penalties > 0) ? `<span class="text-[10px] text-rose-400 font-bold" title="Con penalización (+${penalties.toFixed(2).replace('.', ',')}€)">⚠️</span>` : '';
+                    const penaltyBadge = (hasBonus && penalties > 0) ? `<span class="text-[10px] text-rose-400 font-bold" title="Con penalización (+${penalties.toSpanishFormat()}€)">⚠️</span>` : '';
                     cellContent = `
                         <span class="font-mono font-extrabold ${isPos ? 'text-emerald-400' : 'text-rose-400'} text-xs sm:text-sm inline-flex items-center gap-0.5">
-                            ${isPos ? '+' : ''}${mov.neto.toFixed(2).replace('.', ',')}€${bonusBadge}${penaltyBadge}
+                            ${isPos ? '+' : ''}${mov.neto.toSpanishFormat()}€${bonusBadge}${penaltyBadge}
                         </span>
                     `;
                 }
@@ -1981,7 +2002,7 @@ class BoteAppController {
                 <tr class="text-xs sm:text-sm">
                     <td class="p-2 sm:p-2.5 text-left sticky-left-col bg-slate-950 font-bold text-orange-400 border-r border-slate-800">Totales Jornada</td>
                     <td class="p-2 sm:p-2.5 text-right font-mono font-extrabold text-white border-r border-slate-800 bg-slate-950 text-xs sm:text-sm">
-                        ${data.summary.totalSaldosVirtuales.toFixed(2).replace('.', ',')} €
+                        ${data.summary.totalSaldosVirtuales.toSpanishFormat()} €
                     </td>
             `;
 
@@ -2015,15 +2036,15 @@ class BoteAppController {
 
         title.textContent = `${member.name} - Jornada ${jornadaNum}`;
 
-        const selladoText = mov.sellado < 0 ? `+${Math.abs(mov.sellado).toFixed(2).replace('.', ',')} € (${mov.isSelladoInCash ? 'Bizum' : 'Bote'})` : '-';
+        const selladoText = mov.sellado < 0 ? `+${Math.abs(mov.sellado).toSpanishFormat()} € (${mov.isSelladoInCash ? 'Bizum' : 'Bote'})` : '-';
         const hasBonus = typeof mov.aciertos === 'number' && mov.aciertos >= 10;
         const penalties = (mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0);
 
         let penaltyDetails = [];
-        if (mov.penalizacionUnos > 0) penaltyDetails.push(`Exceso de Unos (+${mov.penalizacionUnos.toFixed(2).replace('.', ',')} €)`);
-        if (mov.penalizacionPIG > 0) penaltyDetails.push(`Fallo en PIG 🐷 (+${mov.penalizacionPIG.toFixed(2).replace('.', ',')} €)`);
-        if (mov.penalizacionBajosAciertos > 0) penaltyDetails.push(`Bajos Aciertos (+${mov.penalizacionBajosAciertos.toFixed(2).replace('.', ',')} €)`);
-        if (mov.penalizacionMaula > 0) penaltyDetails.push(`Penalización Maula (+${mov.penalizacionMaula.toFixed(2).replace('.', ',')} €)`);
+        if (mov.penalizacionUnos > 0) penaltyDetails.push(`Exceso de Unos (+${mov.penalizacionUnos.toSpanishFormat()} €)`);
+        if (mov.penalizacionPIG > 0) penaltyDetails.push(`Fallo en PIG 🐷 (+${mov.penalizacionPIG.toSpanishFormat()} €)`);
+        if (mov.penalizacionBajosAciertos > 0) penaltyDetails.push(`Bajos Aciertos (+${mov.penalizacionBajosAciertos.toSpanishFormat()} €)`);
+        if (mov.penalizacionMaula > 0) penaltyDetails.push(`Penalización Maula (+${mov.penalizacionMaula.toSpanishFormat()} €)`);
 
         let bonusBanner = '';
         if (hasBonus) {
@@ -2036,7 +2057,7 @@ class BoteAppController {
                         </div>
                         <div class="flex items-center justify-between text-rose-300 text-[11px] font-semibold pt-1 border-t border-emerald-500/20">
                             <span class="flex items-center gap-1">⚠️ Penalización aplicada:</span>
-                            <span class="font-bold font-mono">+${penalties.toFixed(2).replace('.', ',')} €</span>
+                            <span class="font-bold font-mono">+${penalties.toSpanishFormat()} €</span>
                         </div>
                     </div>
                 `;
@@ -2058,18 +2079,18 @@ class BoteAppController {
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Cuota Base:</span>
-                <strong class="text-slate-300">${mov.exento ? 'GRATIS' : mov.aportacion.toFixed(2).replace('.', ',') + ' €'}</strong>
+                <strong class="text-slate-300">${mov.exento ? 'GRATIS' : mov.aportacion.toSpanishFormat() + ' €'}</strong>
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Penalizaciones:</span>
                 <div class="text-right">
-                    <strong class="${penalties > 0 ? 'text-rose-400' : 'text-slate-400'} font-mono">${penalties > 0 ? '+' + penalties.toFixed(2).replace('.', ',') + ' €' : '-'}</strong>
+                    <strong class="${penalties > 0 ? 'text-rose-400' : 'text-slate-400'} font-mono">${penalties > 0 ? '+' + penalties.toSpanishFormat() + ' €' : '-'}</strong>
                     ${penaltyDetails.length > 0 ? `<div class="text-[10px] text-rose-300/80 font-normal mt-0.5 leading-tight">${penaltyDetails.join('<br>')}</div>` : ''}
                 </div>
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Premios:</span>
-                <strong class="text-emerald-400">${mov.premios > 0 ? '+' + mov.premios.toFixed(2).replace('.', ',') + ' €' : '-'}</strong>
+                <strong class="text-emerald-400">${mov.premios > 0 ? '+' + mov.premios.toSpanishFormat() + ' €' : '-'}</strong>
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Reembolso Sellado:</span>
@@ -2077,11 +2098,11 @@ class BoteAppController {
             </div>
             <div class="flex justify-between py-1 border-b border-slate-800">
                 <span class="text-slate-400">Neto Jornada:</span>
-                <strong class="${mov.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${mov.neto >= 0 ? '+' : ''}${mov.neto.toFixed(2).replace('.', ',')} €</strong>
+                <strong class="${mov.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${mov.neto >= 0 ? '+' : ''}${mov.neto.toSpanishFormat()} €</strong>
             </div>
             <div class="flex justify-between pt-1">
                 <span class="text-amber-400 font-bold">Saldo Tras J${jornadaNum}:</span>
-                <strong class="text-amber-400 font-mono">${mov.boteAcumulado.toFixed(2).replace('.', ',')} €</strong>
+                <strong class="text-amber-400 font-mono">${mov.boteAcumulado.toSpanishFormat()} €</strong>
             </div>
         `;
 
@@ -2132,7 +2153,7 @@ class BoteAppController {
             body.innerHTML = `
                 <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-2 text-amber-200">
                     <div class="text-[11px] font-semibold text-amber-300">Fondo de Apertura (Agosto 2026)</div>
-                    <div class="text-base font-black font-mono mt-0.5 text-amber-400">+${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</div>
+                    <div class="text-base font-black font-mono mt-0.5 text-amber-400">+${BOTE_INICIAL.toSpanishFormat()} €</div>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Concepto:</span>
@@ -2184,28 +2205,28 @@ class BoteAppController {
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Cuota semanal por socio:</span>
-                    <strong class="text-emerald-400 font-mono">${cuotaSemanal.toFixed(2).replace('.', ',')} € / socio</strong>
+                    <strong class="text-emerald-400 font-mono">${cuotaSemanal.toSpanishFormat()} € / socio</strong>
                 </div>
                 <div class="p-2 my-1.5 rounded-lg bg-slate-900/60 border border-slate-800 text-[11px] space-y-1">
                     <div class="flex justify-between text-slate-300">
                         <span>• Columna individual:</span>
-                        <span class="font-mono">${cColumna.toFixed(2).replace('.', ',')} €</span>
+                        <span class="font-mono">${cColumna.toSpanishFormat()} €</span>
                     </div>
                     <div class="flex justify-between text-slate-300">
                         <span>• Quiniela dobles + bote:</span>
-                        <span class="font-mono">${cFondoComun.toFixed(2).replace('.', ',')} €</span>
+                        <span class="font-mono">${cFondoComun.toSpanishFormat()} €</span>
                     </div>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Cálculo recaudación:</span>
-                    <strong class="text-slate-300 font-mono">${numSocios} × ${cuotaSemanal.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-slate-300 font-mono">${numSocios} × ${cuotaSemanal.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs">
                     <span class="text-emerald-400 font-bold">Total Cuotas Semanales:</span>
-                    <strong class="text-emerald-400 font-mono text-sm">+${totCuotas.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-emerald-400 font-mono text-sm">+${totCuotas.toSpanishFormat()} €</strong>
                 </div>
                 <div class="pt-2 text-[11px] text-slate-400 leading-relaxed">
-                    Aportación íntegra de los socios para financiar el sellado de las columnas individuales (${(numSocios * cColumna).toFixed(2).replace('.', ',')} €), la quiniela de 7 dobles (${(jSummary.costeDobles || 12.00).toFixed(2).replace('.', ',')} €) y generar el superávit semanal del bote común.
+                    Aportación íntegra de los socios para financiar el sellado de las columnas individuales (${(numSocios * cColumna).toSpanishFormat()} €), la quiniela de 7 dobles (${(jSummary.costeDobles || 12.00).toSpanishFormat()} €) y generar el superávit semanal del bote común.
                 </div>
             `;
         } else if (type === 'penalizaciones') {
@@ -2213,23 +2234,23 @@ class BoteAppController {
             body.innerHTML = `
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">1️⃣ Multa de Unos (≥10):</span>
-                    <strong class="text-amber-400 font-mono">+${totUnos.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-amber-400 font-mono">+${totUnos.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">📉 Bajos Aciertos (0-3 ac):</span>
-                    <strong class="text-rose-400 font-mono">+${totBajos.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-rose-400 font-mono">+${totBajos.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">🐷 Fallo en PIG:</span>
-                    <strong class="text-pink-400 font-mono">+${totPig.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-pink-400 font-mono">+${totPig.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">💀 Maula de la jornada:</span>
-                    <strong class="text-purple-400 font-mono">+${totMaula.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-purple-400 font-mono">+${totMaula.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs">
                     <span class="text-amber-300 font-bold">Total Penalizaciones:</span>
-                    <strong class="text-amber-400 font-mono text-sm">+${totPenalties.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-amber-400 font-mono text-sm">+${totPenalties.toSpanishFormat()} €</strong>
                 </div>
                 <div class="pt-2 text-[11px] text-slate-400">
                     Las penalizaciones ingresan íntegramente en la caja de la Peña aumentando el superávit semanal.
@@ -2243,7 +2264,7 @@ class BoteAppController {
                     premiosHtml += `
                         <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                             <span class="text-purple-300 font-semibold flex items-center gap-1">🟣 Quiniela Dobles:</span>
-                            <strong class="text-emerald-400 font-mono">+${doblesPrize.toFixed(2).replace('.', ',')} €</strong>
+                            <strong class="text-emerald-400 font-mono">+${doblesPrize.toSpanishFormat()} €</strong>
                         </div>
                     `;
                 }
@@ -2251,7 +2272,7 @@ class BoteAppController {
                     premiosHtml += `
                         <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                             <span class="text-blue-300 font-medium truncate max-w-[170px]">🔵 ${ip.memberName} (${ip.aciertos || 10} ac):</span>
-                            <strong class="text-emerald-400 font-mono">+${ip.premios.toFixed(2).replace('.', ',')} €</strong>
+                            <strong class="text-emerald-400 font-mono">+${ip.premios.toSpanishFormat()} €</strong>
                         </div>
                     `;
                 });
@@ -2259,7 +2280,7 @@ class BoteAppController {
                     ${premiosHtml}
                     <div class="flex justify-between pt-1.5 text-xs">
                         <span class="text-emerald-400 font-bold">Total Premios Oficiales:</span>
-                        <strong class="text-emerald-400 font-mono text-sm">+${jSummary.premios.toFixed(2).replace('.', ',')} €</strong>
+                        <strong class="text-emerald-400 font-mono text-sm">+${jSummary.premios.toSpanishFormat()} €</strong>
                     </div>
                     <div class="pt-2 text-[11px] text-slate-400">
                         Premios oficiales de Loterías y Apuestas del Estado en esta jornada.
@@ -2278,11 +2299,11 @@ class BoteAppController {
             body.innerHTML = `
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">${numSocios} Quinielas Sencillas:</span>
-                    <strong class="text-slate-200 font-mono">${numSocios} × ${cuotaBase.toFixed(2).replace('.', ',')} € = ${totCuotas.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-slate-200 font-mono">${numSocios} × ${cuotaBase.toSpanishFormat()} € = ${totCuotas.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">1 Reducida (7 Dobles):</span>
-                    <strong class="text-purple-300 font-mono">${cDob.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-purple-300 font-mono">${cDob.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Socio encargado:</span>
@@ -2290,7 +2311,7 @@ class BoteAppController {
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs">
                     <span class="text-rose-400 font-bold">Total Sellado Lotería:</span>
-                    <strong class="text-rose-400 font-mono text-sm">-${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-rose-400 font-mono text-sm">-${jSummary.gastoSellado.toSpanishFormat()} €</strong>
                 </div>
                 <div class="pt-2 text-[11px] text-slate-400">
                     Importe real abonado físicamente en la administración de lotería.
@@ -2301,20 +2322,20 @@ class BoteAppController {
             body.innerHTML = `
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-emerald-400 font-medium">+ Recaudado (Cuotas + Multas):</span>
-                    <strong class="text-emerald-400 font-mono">+${jSummary.recaudacion.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-emerald-400 font-mono">+${jSummary.recaudacion.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-rose-400 font-medium">- Coste Sellado Lotería:</span>
-                    <strong class="text-rose-400 font-mono">-${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-rose-400 font-mono">-${jSummary.gastoSellado.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-amber-400 font-medium">+ Premios Oficiales:</span>
-                    <strong class="text-amber-400 font-mono">+${jSummary.premios.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-amber-400 font-mono">+${jSummary.premios.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs border-t border-slate-700">
                     <span class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-black">Superávit Neto Semanal:</span>
                     <strong class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono text-base font-extrabold">
-                        ${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2).replace('.', ',')} €
+                        ${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toSpanishFormat()} €
                     </strong>
                 </div>
                 <div class="pt-2 text-[11px] text-slate-400">
@@ -2328,17 +2349,17 @@ class BoteAppController {
             body.innerHTML = `
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-amber-300 font-semibold">🌱 Bote Inicial (Agosto 2026):</span>
-                    <strong class="text-amber-400 font-mono">+${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-amber-400 font-mono">+${BOTE_INICIAL.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="${crecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-medium">Margen Neto Acumulado (J1-J${jornadaNum}):</span>
                     <strong class="${crecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono">
-                        ${crecimiento >= 0 ? '+' : ''}${crecimiento.toFixed(2).replace('.', ',')} €
+                        ${crecimiento >= 0 ? '+' : ''}${crecimiento.toSpanishFormat()} €
                     </strong>
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs border-t border-slate-700">
                     <span class="text-white font-black text-sm">Bote Total en Caja:</span>
-                    <strong class="text-amber-400 font-mono text-base font-extrabold">${totalCaja.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-amber-400 font-mono text-base font-extrabold">${totalCaja.toSpanishFormat()} €</strong>
                 </div>
                 <div class="pt-2 text-[11px] text-slate-400">
                     Saldo total real de la peña acumulado en cuenta bancaria y caja física.
@@ -2361,11 +2382,11 @@ class BoteAppController {
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-800 text-xs">
                     <span class="text-slate-400">Recaudado / Sellado:</span>
-                    <strong class="text-slate-300 font-mono">+${jSummary.recaudacion.toFixed(2).replace('.', ',')} € / -${jSummary.gastoSellado.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="text-slate-300 font-mono">+${jSummary.recaudacion.toSpanishFormat()} € / -${jSummary.gastoSellado.toSpanishFormat()} €</strong>
                 </div>
                 <div class="flex justify-between pt-1.5 text-xs">
                     <span class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">Neto Semanal Peña:</span>
-                    <strong class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono text-sm">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toFixed(2).replace('.', ',')} €</strong>
+                    <strong class="${jSummary.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono text-sm">${jSummary.neto >= 0 ? '+' : ''}${jSummary.neto.toSpanishFormat()} €</strong>
                 </div>
             `;
         }
@@ -2401,8 +2422,8 @@ class BoteAppController {
             <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-slate-400 font-medium cursor-pointer" colspan="4" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">
                 <span class="text-amber-300 font-bold">Saldo inicial de la Temporada</span> <span class="text-slate-400 text-[11px]">(Remanente temporadas anteriores)</span>
             </td>
-            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-300 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">+${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
-            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-amber-500/15 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">${BOTE_INICIAL.toFixed(2).replace('.', ',')} €</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-300 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">+${BOTE_INICIAL.toSpanishFormat()} €</td>
+            <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-amber-500/15 cursor-pointer hover:underline whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'inicial', 0)">${BOTE_INICIAL.toSpanishFormat()} €</td>
         `;
         tbody.appendChild(tr0);
 
@@ -2469,24 +2490,24 @@ class BoteAppController {
                     ${j.date}
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-emerald-400 cursor-pointer hover:bg-emerald-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'cuotas', ${j.number})" title="Clic para ver desglose de cuotas semanales">
-                    +${cuotas.toFixed(2).replace('.', ',')}&nbsp;€
+                    +${cuotas.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-amber-400 cursor-pointer hover:bg-amber-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'penalizaciones', ${j.number})" title="Clic para ver desglose de penalizaciones">
-                    +${penalties.toFixed(2).replace('.', ',')}&nbsp;€
+                    +${penalties.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono cursor-pointer hover:bg-emerald-500/15 rounded transition-colors whitespace-nowrap ${j.premios > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600'}" onclick="window.BoteApp.showFlujoPopover(event, 'premios', ${j.number})" title="Clic para ver desglose de premios">
-                    ${j.premios > 0 ? '+' + j.premios.toFixed(2).replace('.', ',') + '&nbsp;€' : '-'}
+                    ${j.premios > 0 ? '+' + j.premios.toSpanishFormat() + '&nbsp;€' : '-'}
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono text-rose-400 cursor-pointer hover:bg-rose-500/15 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'sellado', ${j.number})" title="Clic para ver desglose del ticket de sellado">
-                    -${j.gastoSellado.toFixed(2).replace('.', ',')}&nbsp;€
+                    -${j.gastoSellado.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold cursor-pointer hover:bg-slate-800 rounded transition-colors whitespace-nowrap ${j.neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}" onclick="window.BoteApp.showFlujoPopover(event, 'neto', ${j.number})" title="Clic para ver la fórmula del superávit neto">
-                    ${j.neto >= 0 ? '+' : ''}${j.neto.toFixed(2).replace('.', ',')}&nbsp;€
+                    ${j.neto >= 0 ? '+' : ''}${j.neto.toSpanishFormat()}&nbsp;€
                 </td>
                 <td class="py-2.5 px-2 sm:px-3 lg:px-4 text-right font-mono font-extrabold text-amber-400 bg-slate-900/40 cursor-pointer hover:bg-amber-500/20 rounded transition-colors whitespace-nowrap" onclick="window.BoteApp.showFlujoPopover(event, 'acumulado', ${j.number}, ${currentCrecimiento})" title="Clic para ver el desglose del bote acumulado">
-                    <div>${boteTotalJornada.toFixed(2).replace('.', ',')}&nbsp;€</div>
+                    <div>${boteTotalJornada.toSpanishFormat()}&nbsp;€</div>
                     <div class="text-[10px] ${currentCrecimiento >= 0 ? 'text-emerald-400/80' : 'text-rose-400/80'} font-normal">
-                        (Crec: ${currentCrecimiento >= 0 ? '+' : ''}${currentCrecimiento.toFixed(2).replace('.', ',')}&nbsp;€)
+                        (Crec: ${currentCrecimiento >= 0 ? '+' : ''}${currentCrecimiento.toSpanishFormat()}&nbsp;€)
                     </div>
                 </td>
             `;
@@ -2500,17 +2521,17 @@ class BoteAppController {
         const cardCrecimientoSub = document.getElementById('flujo-crecimiento-sub');
         const cardBoteTotalTooltip = document.getElementById('flujo-bote-total-tooltip-text');
 
-        if (cardBoteInicial) cardBoteInicial.textContent = BOTE_INICIAL.toFixed(2).replace('.', ',') + ' €';
+        if (cardBoteInicial) cardBoteInicial.textContent = BOTE_INICIAL.toSpanishFormat() + ' €';
         if (cardCrecimiento) {
-            cardCrecimiento.textContent = (totalCrecimiento >= 0 ? '+' : '') + totalCrecimiento.toFixed(2).replace('.', ',') + ' €';
+            cardCrecimiento.textContent = (totalCrecimiento >= 0 ? '+' : '') + totalCrecimiento.toSpanishFormat() + ' €';
             cardCrecimiento.className = `text-lg sm:text-xl font-extrabold ${totalCrecimiento >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono`;
         }
         if (cardCrecimientoSub && data.jornadaSummaries) {
             cardCrecimientoSub.textContent = `Margen ganado en ${data.jornadaSummaries.length} jornadas`;
         }
-        if (cardBoteTotal) cardBoteTotal.textContent = (BOTE_INICIAL + totalCrecimiento).toFixed(2).replace('.', ',') + ' €';
+        if (cardBoteTotal) cardBoteTotal.textContent = (BOTE_INICIAL + totalCrecimiento).toSpanishFormat() + ' €';
         if (cardBoteTotalTooltip) {
-            cardBoteTotalTooltip.textContent = `Resultado exacto de sumar el Saldo Inicial (${BOTE_INICIAL.toFixed(2).replace('.', ',')} €) más el crecimiento neto acumulado (${totalCrecimiento >= 0 ? '+' : ''}${totalCrecimiento.toFixed(2).replace('.', ',')} €).`;
+            cardBoteTotalTooltip.textContent = `Resultado exacto de sumar el Saldo Inicial (${BOTE_INICIAL.toSpanishFormat()} €) más el crecimiento neto acumulado (${totalCrecimiento >= 0 ? '+' : ''}${totalCrecimiento.toSpanishFormat()} €).`;
         }
 
         // Tarjeta de Coste Sellado Semanal (dinámica según parámetros)
@@ -2525,9 +2546,9 @@ class BoteAppController {
         const cardSelladoSub = document.getElementById('flujo-coste-sellado-sub');
         const cardSelladoTooltip = document.getElementById('flujo-sellado-tooltip-text');
 
-        if (cardSellado) cardSellado.textContent = `${totalSellado.toFixed(2).replace('.', ',')} € / jor`;
+        if (cardSellado) cardSellado.textContent = `${totalSellado.toSpanishFormat()} € / jor`;
         if (cardSelladoSub) cardSelladoSub.textContent = `${numSocios} sencillas + 1 dobles`;
-        if (cardSelladoTooltip) cardSelladoTooltip.textContent = `${numSocios} quinielas sencillas (${sencillasTotal.toFixed(2).replace('.', ',')} €) + 1 quiniela reducida de 7 dobles (${cDob.toFixed(2).replace('.', ',')} €) = ${totalSellado.toFixed(2).replace('.', ',')} € por jornada.`;
+        if (cardSelladoTooltip) cardSelladoTooltip.textContent = `${numSocios} quinielas sencillas (${sencillasTotal.toSpanishFormat()} €) + 1 quiniela reducida de 7 dobles (${cDob.toSpanishFormat()} €) = ${totalSellado.toSpanishFormat()} € por jornada.`;
 
         // Fila de totales en la tabla de Flujo de Caja
         const flujoTfoot = document.getElementById('flujo-table-foot');
@@ -2558,24 +2579,24 @@ class BoteAppController {
                         Temporada
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
-                        +${totCuotas.toFixed(2).replace('.', ',')}&nbsp;€
+                        +${totCuotas.toSpanishFormat()}&nbsp;€
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-amber-400 whitespace-nowrap">
-                        +${totPenalties.toFixed(2).replace('.', ',')}&nbsp;€
+                        +${totPenalties.toSpanishFormat()}&nbsp;€
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold ${totPremios > 0 ? 'text-emerald-400' : 'text-slate-500'} whitespace-nowrap">
-                        ${totPremios > 0 ? '+' + totPremios.toFixed(2).replace('.', ',') + '&nbsp;€' : '-'}
+                        ${totPremios > 0 ? '+' + totPremios.toSpanishFormat() + '&nbsp;€' : '-'}
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
-                        -${totSellado.toFixed(2).replace('.', ',')}&nbsp;€
+                        -${totSellado.toSpanishFormat()}&nbsp;€
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black ${totNetoColor} whitespace-nowrap">
-                        ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€
+                        ${totNeto >= 0 ? '+' : ''}${totNeto.toSpanishFormat()}&nbsp;€
                     </td>
                     <td class="py-3 px-2 sm:px-3 lg:px-4 text-right font-mono font-black text-amber-400 bg-slate-900/80 whitespace-nowrap">
-                        <div>${boteFinalTotal.toFixed(2).replace('.', ',')}&nbsp;€</div>
+                        <div>${boteFinalTotal.toSpanishFormat()}&nbsp;€</div>
                         <div class="text-[10px] ${totNeto >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-normal">
-                            (Crec: ${totNeto >= 0 ? '+' : ''}${totNeto.toFixed(2).replace('.', ',')}&nbsp;€)
+                            (Crec: ${totNeto >= 0 ? '+' : ''}${totNeto.toSpanishFormat()}&nbsp;€)
                         </div>
                     </td>
                 </tr>
@@ -2759,9 +2780,9 @@ class BoteAppController {
         const totGlobal = totDobles + totIndiv;
 
         // Actualizar badges superiores oficiales
-        if (badgeDobles) badgeDobles.textContent = totDobles > 0 ? `+${totDobles.toFixed(2).replace('.', ',')} €` : `0,00 €`;
-        if (badgeIndiv) badgeIndiv.textContent = totIndiv > 0 ? `+${totIndiv.toFixed(2).replace('.', ',')} €` : `0,00 €`;
-        if (badgeGlobal) badgeGlobal.textContent = totGlobal > 0 ? `+${totGlobal.toFixed(2).replace('.', ',')} €` : `0,00 €`;
+        if (badgeDobles) badgeDobles.textContent = totDobles > 0 ? `+${totDobles.toSpanishFormat()} €` : `0,00 €`;
+        if (badgeIndiv) badgeIndiv.textContent = totIndiv > 0 ? `+${totIndiv.toSpanishFormat()} €` : `0,00 €`;
+        if (badgeGlobal) badgeGlobal.textContent = totGlobal > 0 ? `+${totGlobal.toSpanishFormat()} €` : `0,00 €`;
 
         // Consolidar lista de todos los premios
         let allPrizes = [...doblesPrizes, ...indivPrizes];
@@ -2775,7 +2796,7 @@ class BoteAppController {
 
         const totalFilteredAmount = allPrizes.reduce((sum, p) => sum + p.amount, 0);
         if (resultsCountEl) {
-            resultsCountEl.innerHTML = `<span class="text-amber-400 font-bold">${allPrizes.length}</span> ${allPrizes.length === 1 ? 'premio' : 'premios'} · Total: <strong class="text-emerald-400">+${totalFilteredAmount.toFixed(2).replace('.', ',')} €</strong>`;
+            resultsCountEl.innerHTML = `<span class="text-amber-400 font-bold">${allPrizes.length}</span> ${allPrizes.length === 1 ? 'premio' : 'premios'} · Total: <strong class="text-emerald-400">+${totalFilteredAmount.toSpanishFormat()} €</strong>`;
         }
 
         this.updatePremiosControlsUI();
@@ -2850,7 +2871,7 @@ class BoteAppController {
                                     </div>
                                     <div class="text-right">
                                         <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Total Ganado</span>
-                                        <strong class="font-mono text-emerald-400 text-lg sm:text-xl font-extrabold">+${s.totalAmount.toFixed(2).replace('.', ',')} €</strong>
+                                        <strong class="font-mono text-emerald-400 text-lg sm:text-xl font-extrabold">+${s.totalAmount.toSpanishFormat()} €</strong>
                                     </div>
                                 </div>
 
@@ -2865,7 +2886,7 @@ class BoteAppController {
                                                     <span class="text-slate-400 text-[11px]">${p.hits} aciertos</span>
                                                 </div>
                                                 <div class="flex items-center gap-2 shrink-0">
-                                                    <strong class="font-mono text-emerald-400 font-bold">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
+                                                    <strong class="font-mono text-emerald-400 font-bold">+${p.amount.toSpanishFormat()} €</strong>
                                                     ${p.type === 'dobles' ? `
                                                         <button onclick="window.BoteApp.showReducedBreakdown(${p.memberId}, ${p.jornadaNum})" class="text-[10px] text-purple-400 hover:text-purple-200 underline font-semibold" title="Ver reducción">Ver 16 ap.</button>
                                                     ` : `
@@ -2938,7 +2959,7 @@ class BoteAppController {
                                     </div>
                                     <div class="text-right">
                                         <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Premios Jornada</span>
-                                        <strong class="font-mono text-emerald-400 text-lg sm:text-xl font-extrabold">+${j.totalAmount.toFixed(2).replace('.', ',')} €</strong>
+                                        <strong class="font-mono text-emerald-400 text-lg sm:text-xl font-extrabold">+${j.totalAmount.toSpanishFormat()} €</strong>
                                     </div>
                                 </div>
 
@@ -2953,7 +2974,7 @@ class BoteAppController {
                                                     <span class="text-slate-400 text-[11px]">${p.hits} ac.</span>
                                                 </div>
                                                 <div class="flex items-center gap-2 shrink-0">
-                                                    <strong class="font-mono text-emerald-400 font-bold">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
+                                                    <strong class="font-mono text-emerald-400 font-bold">+${p.amount.toSpanishFormat()} €</strong>
                                                     ${p.type === 'dobles' ? `
                                                         <button onclick="window.BoteApp.showReducedBreakdown(${p.memberId}, ${p.jornadaNum})" class="text-[10px] text-purple-400 hover:text-purple-200 underline font-semibold" title="Ver reducción">Ver 16 ap.</button>
                                                     ` : `
@@ -3039,7 +3060,7 @@ class BoteAppController {
 
                             <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
                                 <span class="text-slate-400">Premio Oficial LAE:</span>
-                                <strong class="font-mono text-emerald-400 text-base sm:text-lg font-black">+${p.amount.toFixed(2).replace('.', ',')} €</strong>
+                                <strong class="font-mono text-emerald-400 text-base sm:text-lg font-black">+${p.amount.toSpanishFormat()} €</strong>
                             </div>
 
                             ${isDobles ? `
@@ -3258,7 +3279,7 @@ class BoteAppController {
                                 const pVal = prizes[h] || 0;
                                 return `
                                     <span class="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-200 border border-purple-500/30 text-xs font-bold flex items-center gap-1">
-                                        <span>🏆</span> ${count} de ${h} aciertos: <strong class="text-emerald-400 ml-1">+${(count * pVal).toFixed(2).replace('.', ',')} €</strong>
+                                        <span>🏆</span> ${count} de ${h} aciertos: <strong class="text-emerald-400 ml-1">+${(count * pVal).toSpanishFormat()} €</strong>
                                     </span>
                                 `;
                             }).join('') || '<span class="text-xs text-slate-500">Sin premios oficiales (menos de 10 aciertos)</span>'}
@@ -3267,7 +3288,7 @@ class BoteAppController {
                 </div>
                 <div class="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex flex-col justify-center items-center text-center">
                     <span class="text-[11px] text-emerald-400 font-semibold uppercase tracking-wider">Premio Total Ganado</span>
-                    <span class="text-2xl font-black text-emerald-400 font-mono mt-0.5">+${totalPrizeValue.toFixed(2).replace('.', ',')} €</span>
+                    <span class="text-2xl font-black text-emerald-400 font-mono mt-0.5">+${totalPrizeValue.toSpanishFormat()} €</span>
                 </div>
             </div>
 
@@ -3277,7 +3298,7 @@ class BoteAppController {
                     <span>🟣</span> ¿Cómo funciona la Reducción Autorizada R2 (7 dobles - 16 apuestas)?
                 </strong>
                 <p class="leading-relaxed">
-                    La quiniela base pronosticada por <strong>${targetData.memberName}</strong> contiene 7 dobles (que al directo serían 128 apuestas = 96,00 €). El método oficial de reducción autorizada de LAE optimiza la jugada en exactamente <strong>16 apuestas estratégicas (coste ${cDob.toFixed(2).replace('.', ',')} € pagado al 100% por la peña)</strong> asegurando el 100% al 13 si se aciertan los 14 signos y altas garantías de 14. En la tabla se compara el <strong>pronóstico base</strong> junto a las <strong>16 apuestas</strong> generadas y el <strong>resultado oficial</strong> de cada partido.
+                    La quiniela base pronosticada por <strong>${targetData.memberName}</strong> contiene 7 dobles (que al directo serían 128 apuestas = 96,00 €). El método oficial de reducción autorizada de LAE optimiza la jugada en exactamente <strong>16 apuestas estratégicas (coste ${cDob.toSpanishFormat()} € pagado al 100% por la peña)</strong> asegurando el 100% al 13 si se aciertan los 14 signos y altas garantías de 14. En la tabla se compara el <strong>pronóstico base</strong> junto a las <strong>16 apuestas</strong> generadas y el <strong>resultado oficial</strong> de cada partido.
                 </p>
             </div>
 
@@ -3412,7 +3433,7 @@ class BoteAppController {
         const content = document.getElementById('reducida-modal-content');
 
         if (title) title.textContent = `Desglose Reducción - Jornada ${targetData.jornadaNum} - ${targetData.memberName}`;
-        if (subtitle) subtitle.innerHTML = `✍️ Rellenada por: <strong class="text-amber-300 font-bold">${targetData.memberName}</strong> • 16 apuestas combinadas (7 dobles) - Coste ${cDob.toFixed(2).replace('.', ',')} € asumido por la Peña`;
+        if (subtitle) subtitle.innerHTML = `✍️ Rellenada por: <strong class="text-amber-300 font-bold">${targetData.memberName}</strong> • 16 apuestas combinadas (7 dobles) - Coste ${cDob.toSpanishFormat()} € asumido por la Peña`;
         if (content) content.innerHTML = html;
 
         this.openModal('modal-reducida-detalle');
@@ -3451,7 +3472,7 @@ class BoteAppController {
             tr.innerHTML = `
                 <td class="p-3 text-slate-400 whitespace-nowrap">${i.fecha || 'N/A'}</td>
                 <td class="p-3 font-bold text-white">${mem ? mem.name : `Socio #${i.memberId}`}</td>
-                <td class="p-3 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">+${parseFloat(i.cantidad || 0).toFixed(2).replace('.', ',')} €</td>
+                <td class="p-3 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">+${parseFloat(i.cantidad || 0).toSpanishFormat()} €</td>
                 <td class="p-3 capitalize text-slate-300 whitespace-nowrap">${i.metodo || 'bizum'}</td>
                 <td class="p-3 text-slate-400">${i.concepto || 'Aportación manual'}</td>
                 <td class="p-3 text-center whitespace-nowrap">
@@ -3518,7 +3539,7 @@ class BoteAppController {
                         ${hasSustituto ? '<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold border border-amber-500/30 whitespace-nowrap">🔄 Sustituto</span>' : ''}
                     </div>
                 </td>
-                <td class="p-3 text-right font-mono font-bold text-white whitespace-nowrap">${j.gastoSellado.toFixed(2).replace('.', ',')} €</td>
+                <td class="p-3 text-right font-mono font-bold text-white whitespace-nowrap">${j.gastoSellado.toSpanishFormat()} €</td>
                 <td class="p-3 text-center whitespace-nowrap">
                     <div class="group relative cursor-help inline-flex flex-col items-center gap-0.5">
                         <div class="inline-flex items-center gap-2 bg-slate-900 border border-purple-500/40 hover:border-purple-400 rounded-lg px-2.5 py-1 transition-colors">
@@ -3538,7 +3559,7 @@ class BoteAppController {
                                 <span>🔄</span> Reembolso de Sellado: Bote vs Bizum
                             </strong>
                             <p class="leading-relaxed">
-                                • <strong class="text-amber-400">Bote:</strong> Se ingresan los <strong>+${j.gastoSellado.toFixed(2).replace('.', ',')} €</strong> en la hucha virtual de ${actualSealer ? actualSealer.name : 'este socio'} (aumenta su saldo del bote).<br>
+                                • <strong class="text-amber-400">Bote:</strong> Se ingresan los <strong>+${j.gastoSellado.toSpanishFormat()} €</strong> en la hucha virtual de ${actualSealer ? actualSealer.name : 'este socio'} (aumenta su saldo del bote).<br>
                                 • <strong class="text-emerald-400">Bizum:</strong> Reembolso externo liquidado por Bizum/efectivo. No se modifica su saldo del bote.
                             </p>
                         </div>
@@ -3578,19 +3599,19 @@ class BoteAppController {
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <span class="text-[11px] text-slate-400 block font-semibold">Total Ingresado</span>
-                    <span class="text-sm sm:text-base font-extrabold text-emerald-400 font-mono">+${member.totIn.toFixed(2).replace('.', ',')} €</span>
+                    <span class="text-sm sm:text-base font-extrabold text-emerald-400 font-mono">+${member.totIn.toSpanishFormat()} €</span>
                 </div>
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <span class="text-[11px] text-slate-400 block font-semibold">Total Gastado</span>
-                    <span class="text-sm sm:text-base font-extrabold text-rose-400 font-mono">-${member.totOut.toFixed(2).replace('.', ',')} €</span>
+                    <span class="text-sm sm:text-base font-extrabold text-rose-400 font-mono">-${member.totOut.toSpanishFormat()} €</span>
                 </div>
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <span class="text-[11px] text-slate-400 block font-semibold">Premios Cobrados</span>
-                    <span class="text-sm sm:text-base font-extrabold text-amber-400 font-mono">+${member.breakdown.premios.toFixed(2).replace('.', ',')} €</span>
+                    <span class="text-sm sm:text-base font-extrabold text-amber-400 font-mono">+${member.breakdown.premios.toSpanishFormat()} €</span>
                 </div>
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <span class="text-[11px] text-slate-400 block font-semibold">Saldo Disponible</span>
-                    <span class="text-sm sm:text-base font-extrabold ${member.saldo >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono">${member.saldo.toFixed(2).replace('.', ',')} €</span>
+                    <span class="text-sm sm:text-base font-extrabold ${member.saldo >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-mono">${member.saldo.toSpanishFormat()} €</span>
                 </div>
             </div>
 
@@ -3637,9 +3658,9 @@ class BoteAppController {
             else if (m.isSealer || m.sellado < 0) acText += ' 🎟️';
 
             let inBreakdown = [];
-            if (m.premios > 0) inBreakdown.push(`<span class="text-[10px] text-blue-300 font-bold bg-blue-500/20 px-1 py-0.5 rounded border border-blue-500/30">🔵 Premio Indiv: +${m.premios.toFixed(2).replace('.', ',')} €</span>`);
-            if (m.ingresosManual > 0) inBreakdown.push(`<span class="text-[10px] text-emerald-300 font-semibold">📥 Ingreso: +${m.ingresosManual.toFixed(2).replace('.', ',')} €</span>`);
-            if (m.sellado < 0 && !m.isSelladoInCash) inBreakdown.push(`<span class="text-[10px] text-purple-300 font-semibold">💀 Sellado: +${Math.abs(m.sellado).toFixed(2).replace('.', ',')} €</span>`);
+            if (m.premios > 0) inBreakdown.push(`<span class="text-[10px] text-blue-300 font-bold bg-blue-500/20 px-1 py-0.5 rounded border border-blue-500/30">🔵 Premio Indiv: +${m.premios.toSpanishFormat()} €</span>`);
+            if (m.ingresosManual > 0) inBreakdown.push(`<span class="text-[10px] text-emerald-300 font-semibold">📥 Ingreso: +${m.ingresosManual.toSpanishFormat()} €</span>`);
+            if (m.sellado < 0 && !m.isSelladoInCash) inBreakdown.push(`<span class="text-[10px] text-purple-300 font-semibold">💀 Sellado: +${Math.abs(m.sellado).toSpanishFormat()} €</span>`);
 
             const inSubHtml = inBreakdown.length > 0 ? `<div class="flex flex-col items-end gap-0.5 mt-0.5">${inBreakdown.join('')}</div>` : '';
 
@@ -3649,13 +3670,13 @@ class BoteAppController {
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs text-slate-400 whitespace-nowrap">${m.jornadaDate || m.date}</td>
                     <td class="px-2 sm:px-2.5 py-2 sm:py-2.5 text-center font-bold text-white whitespace-nowrap">${acText}</td>
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-medium text-emerald-400 whitespace-nowrap">
-                        ${inVal > 0 ? `<div>+${inVal.toFixed(2).replace('.', ',')}&nbsp;€</div>${inSubHtml}` : '-'}
+                        ${inVal > 0 ? `<div>+${inVal.toSpanishFormat()}&nbsp;€</div>${inSubHtml}` : '-'}
                     </td>
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-medium text-rose-400 whitespace-nowrap">
-                        ${outVal > 0 ? '-' + outVal.toFixed(2).replace('.', ',') + '&nbsp;€' : '0,00&nbsp;€'}
+                        ${outVal > 0 ? '-' + outVal.toSpanishFormat() + '&nbsp;€' : '0,00&nbsp;€'}
                     </td>
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-extrabold ${m.boteAcumulado >= 0 ? 'text-emerald-400' : 'text-rose-400'} bg-slate-900/40 whitespace-nowrap">
-                        ${m.boteAcumulado.toFixed(2).replace('.', ',')}&nbsp;€
+                        ${m.boteAcumulado.toSpanishFormat()}&nbsp;€
                     </td>
                 </tr>
             `;
@@ -3793,7 +3814,7 @@ class BoteAppController {
             this.renderGestionIngresos();
             alert(isEditing
                 ? `¡Ingreso actualizado con éxito!`
-                : `¡Ingreso de ${cant.toFixed(2).replace('.', ',')} € registrado con éxito!`);
+                : `¡Ingreso de ${cant.toSpanishFormat()} € registrado con éxito!`);
         } catch (err) {
             console.error("Error guardando ingreso:", err);
             alert("Hubo un error al guardar el ingreso en la base de datos.");
@@ -3998,14 +4019,14 @@ class BoteAppController {
             const item = datesMap.get(d);
             const isBaseline = (d === '2026-08-01');
             const priceBadges = [];
-            if (item.prices.aportacionSemanal !== undefined) priceBadges.push(`Aportación: ${parseFloat(item.prices.aportacionSemanal).toFixed(2).replace('.', ',')} €`);
-            if (item.prices.costeColumna !== undefined) priceBadges.push(`Columna: ${parseFloat(item.prices.costeColumna).toFixed(2).replace('.', ',')} €`);
-            if (item.prices.costeDobles !== undefined) priceBadges.push(`Dobles: ${parseFloat(item.prices.costeDobles).toFixed(2).replace('.', ',')} €`);
-            if (item.prices.costeExtraExento !== undefined) priceBadges.push(`Extra exento: ${parseFloat(item.prices.costeExtraExento).toFixed(2).replace('.', ',')} €`);
+            if (item.prices.aportacionSemanal !== undefined) priceBadges.push(`Aportación: ${parseFloat(item.prices.aportacionSemanal).toSpanishFormat()} €`);
+            if (item.prices.costeColumna !== undefined) priceBadges.push(`Columna: ${parseFloat(item.prices.costeColumna).toSpanishFormat()} €`);
+            if (item.prices.costeDobles !== undefined) priceBadges.push(`Dobles: ${parseFloat(item.prices.costeDobles).toSpanishFormat()} €`);
+            if (item.prices.costeExtraExento !== undefined) priceBadges.push(`Extra exento: ${parseFloat(item.prices.costeExtraExento).toSpanishFormat()} €`);
 
             const penaltyBadges = [];
-            if (item.penalties.maula !== undefined) penaltyBadges.push(`Maula: ${parseFloat(item.penalties.maula).toFixed(2).replace('.', ',')} €`);
-            if (item.penalties.pig !== undefined) penaltyBadges.push(`PIG: ${parseFloat(item.penalties.pig).toFixed(2).replace('.', ',')} €`);
+            if (item.penalties.maula !== undefined) penaltyBadges.push(`Maula: ${parseFloat(item.penalties.maula).toSpanishFormat()} €`);
+            if (item.penalties.pig !== undefined) penaltyBadges.push(`PIG: ${parseFloat(item.penalties.pig).toSpanishFormat()} €`);
             if (item.penalties.bajos_aciertos !== undefined) penaltyBadges.push(`Bajos aciertos`);
             if (item.penalties.unos !== undefined) penaltyBadges.push(`Exceso unos`);
 
@@ -4230,25 +4251,25 @@ class BoteAppController {
         const curMaula = this.engine ? this.engine.calculateHistoricalPenalty('maula', null, fechaVigencia) : (this.config.penalizacionMaula || 1.00);
         const curPIG = this.engine ? this.engine.calculateHistoricalPenalty('pig', null, fechaVigencia) : (this.config.penalizacionPIG || 1.00);
 
-        if (diff(newAportacion, curAportacion)) changes.push(`• Aportación semanal: ${curAportacion.toFixed(2).replace('.', ',')} € ➔ ${newAportacion.toFixed(2).replace('.', ',')} €`);
-        if (diff(newCosteColumna, curCosteColumna)) changes.push(`• Coste columna normal: ${curCosteColumna.toFixed(2).replace('.', ',')} € ➔ ${newCosteColumna.toFixed(2).replace('.', ',')} €`);
-        if (diff(newCosteDobles, curCosteDobles)) changes.push(`• Coste dobles reducida: ${curCosteDobles.toFixed(2).replace('.', ',')} € ➔ ${newCosteDobles.toFixed(2).replace('.', ',')} €`);
-        if (diff(newExtraExento, curExtraExento)) changes.push(`• Extra socio exento: ${curExtraExento.toFixed(2).replace('.', ',')} € ➔ ${newExtraExento.toFixed(2).replace('.', ',')} €`);
-        if (diff(newBoteInicial, this.config.boteInicial)) changes.push(`• Bote Inicial temporada: ${(this.config.boteInicial || 0).toFixed(2).replace('.', ',')} € ➔ ${newBoteInicial.toFixed(2).replace('.', ',')} €`);
-        if (diff(newMaula, curMaula)) changes.push(`• Penalización Maula: ${curMaula.toFixed(2).replace('.', ',')} € ➔ ${newMaula.toFixed(2).replace('.', ',')} €`);
-        if (diff(newPIG, curPIG)) changes.push(`• Penalización PIG: ${curPIG.toFixed(2).replace('.', ',')} € ➔ ${newPIG.toFixed(2).replace('.', ',')} €`);
+        if (diff(newAportacion, curAportacion)) changes.push(`• Aportación semanal: ${curAportacion.toSpanishFormat()} € ➔ ${newAportacion.toSpanishFormat()} €`);
+        if (diff(newCosteColumna, curCosteColumna)) changes.push(`• Coste columna normal: ${curCosteColumna.toSpanishFormat()} € ➔ ${newCosteColumna.toSpanishFormat()} €`);
+        if (diff(newCosteDobles, curCosteDobles)) changes.push(`• Coste dobles reducida: ${curCosteDobles.toSpanishFormat()} € ➔ ${newCosteDobles.toSpanishFormat()} €`);
+        if (diff(newExtraExento, curExtraExento)) changes.push(`• Extra socio exento: ${curExtraExento.toSpanishFormat()} € ➔ ${newExtraExento.toSpanishFormat()} €`);
+        if (diff(newBoteInicial, this.config.boteInicial)) changes.push(`• Bote Inicial temporada: ${(this.config.boteInicial || 0).toSpanishFormat()} € ➔ ${newBoteInicial.toSpanishFormat()} €`);
+        if (diff(newMaula, curMaula)) changes.push(`• Penalización Maula: ${curMaula.toSpanishFormat()} € ➔ ${newMaula.toSpanishFormat()} €`);
+        if (diff(newPIG, curPIG)) changes.push(`• Penalización PIG: ${curPIG.toSpanishFormat()} € ➔ ${newPIG.toSpanishFormat()} €`);
 
         for (let i = 0; i <= 3; i++) {
             const curLow = this.engine ? this.engine.calculateHistoricalPenalty('bajos_aciertos', i, fechaVigencia) : 0;
             if (diff(newLowValues[i], curLow)) {
-                changes.push(`• Penalización ${i} aciertos: ${curLow.toFixed(2).replace('.', ',')} € ➔ ${newLowValues[i].toFixed(2).replace('.', ',')} €`);
+                changes.push(`• Penalización ${i} aciertos: ${curLow.toSpanishFormat()} € ➔ ${newLowValues[i].toSpanishFormat()} €`);
             }
         }
 
         for (let i = 10; i <= 15; i++) {
             const curUnos = this.engine ? this.engine.calculateHistoricalPenalty('unos', i, fechaVigencia) : 0;
             if (diff(newUnosValues[i], curUnos)) {
-                changes.push(`• Penalización ${i} unos: ${curUnos.toFixed(2).replace('.', ',')} € ➔ ${newUnosValues[i].toFixed(2).replace('.', ',')} €`);
+                changes.push(`• Penalización ${i} unos: ${curUnos.toSpanishFormat()} € ➔ ${newUnosValues[i].toSpanishFormat()} €`);
             }
         }
 
@@ -4379,7 +4400,7 @@ class BoteAppController {
         const total = parseFloat(inputTotal.value) || 0;
         const perMember = total / numSocios;
 
-        info.textContent = `Importe por socio: ${perMember.toFixed(2).replace('.', ',')} € / socio (${numSocios} socios)`;
+        info.textContent = `Importe por socio: ${perMember.toSpanishFormat()} € / socio (${numSocios} socios)`;
     }
 
     async submitReparto(e) {
@@ -4401,7 +4422,7 @@ class BoteAppController {
         const concepto = (inputConcepto && inputConcepto.value.trim()) || 'Reparto de Ganancias';
         const fecha = (inputFecha && inputFecha.value) || new Date().toISOString().split('T')[0];
 
-        if (!confirm(`¿Confirmas realizar un reparto de ${total.toFixed(2).replace('.', ',')} € (${perMember.toFixed(2).replace('.', ',')} € a cada uno de los ${numSocios} socios) con fecha ${fecha}?`)) {
+        if (!confirm(`¿Confirmas realizar un reparto de ${total.toSpanishFormat()} € (${perMember.toSpanishFormat()} € a cada uno de los ${numSocios} socios) con fecha ${fecha}?`)) {
             return;
         }
 
@@ -4436,7 +4457,7 @@ class BoteAppController {
 
             this.closeModal('modal-reparto');
             this.renderAll();
-            alert(`✅ Reparto de ${total.toFixed(2).replace('.', ',')} € registrado con éxito (${perMember.toFixed(2).replace('.', ',')} € abonados al saldo de cada socio).`);
+            alert(`✅ Reparto de ${total.toSpanishFormat()} € registrado con éxito (${perMember.toSpanishFormat()} € abonados al saldo de cada socio).`);
         } catch (err) {
             console.error('Error saving reparto:', err);
             alert('Hubo un error al registrar el reparto en la base de datos.');
@@ -4515,7 +4536,7 @@ class BoteAppController {
         let csv = 'ID,Socio,Total In,Total Out,Saldo Actual\n';
         const sorted = [...data.memberSummaries].sort((a, b) => parseInt(a.id) - parseInt(b.id));
         sorted.forEach(m => {
-            csv += `${m.id},"${m.name}",${m.totIn.toFixed(2).replace('.', ',')},${m.totOut.toFixed(2).replace('.', ',')},${m.saldo.toFixed(2).replace('.', ',')}\n`;
+            csv += `${m.id},"${m.name}",${m.totIn.toSpanishFormat()},${m.totOut.toSpanishFormat()},${m.saldo.toSpanishFormat()}\n`;
         });
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -4715,9 +4736,9 @@ class BoteAppController {
                             label: (context) => {
                                 const m = members[context.dataIndex];
                                 return [
-                                    ` Saldo: ${m.saldo.toFixed(2).replace('.', ',')} €`,
-                                    ` Ingresos: +${m.totIn.toFixed(2).replace('.', ',')} €`,
-                                    ` Gastos & Multas: -${m.totOut.toFixed(2).replace('.', ',')} €`
+                                    ` Saldo: ${m.saldo.toSpanishFormat()} €`,
+                                    ` Ingresos: +${m.totIn.toSpanishFormat()} €`,
+                                    ` Gastos & Multas: -${m.totOut.toSpanishFormat()} €`
                                 ];
                             }
                         }
@@ -4865,7 +4886,7 @@ class BoteAppController {
                         borderWidth: 1,
                         padding: 10,
                         callbacks: {
-                            label: (context) => ` ${context.dataset.label}: ${context.raw >= 0 ? '+' : ''}${context.raw.toFixed(2).replace('.', ',')} €`
+                            label: (context) => ` ${context.dataset.label}: ${context.raw >= 0 ? '+' : ''}${context.raw.toSpanishFormat()} €`
                         }
                     }
                 },
@@ -4968,8 +4989,8 @@ class BoteAppController {
                                 const val = context.raw;
                                 const diff = val - BOTE_INICIAL;
                                 return [
-                                    ` Bote Acumulado: ${val.toFixed(2).replace('.', ',')} €`,
-                                    ` Crecimiento Neto: ${diff >= 0 ? '+' : ''}${diff.toFixed(2).replace('.', ',')} €`
+                                    ` Bote Acumulado: ${val.toSpanishFormat()} €`,
+                                    ` Crecimiento Neto: ${diff >= 0 ? '+' : ''}${diff.toSpanishFormat()} €`
                                 ];
                             }
                         }
@@ -5172,7 +5193,7 @@ class BoteAppController {
                 else if (typeof aciertos === 'number' && aciertos <= 3 && aciertos > 0) aciertosClass = 'marcelo-cell-low';
 
                 return `
-                    <td class="p-1 border border-slate-800 text-right font-mono font-bold text-xs ${costClass}">${cost.toFixed(2).replace('.', ',')}</td>
+                    <td class="p-1 border border-slate-800 text-right font-mono font-bold text-xs ${costClass}">${cost.toSpanishFormat()}</td>
                     <td class="p-1 border border-slate-800 text-center font-mono font-bold text-xs ${aciertosClass}">${aciertos}</td>
                 `;
             }).join('');
@@ -5183,10 +5204,10 @@ class BoteAppController {
                 <tr class="hover:bg-slate-900/80 transition-colors">
                     <td class="sticky left-0 z-20 bg-slate-950 border border-slate-800 p-1.5 text-center font-bold text-slate-300 text-xs min-w-[75px]">${selladosStr}</td>
                     <td class="sticky left-[75px] z-20 bg-slate-950 border border-slate-800 p-1.5 text-left font-bold text-white text-xs min-w-[125px] whitespace-nowrap">${m.name}</td>
-                    <td class="sticky left-[200px] z-20 border border-slate-800 p-1.5 text-right font-mono text-xs min-w-[85px] ${boteClass}">${bote.toFixed(2).replace('.', ',')} €</td>
-                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${inicio.toFixed(2).replace('.', ',')}</td>
-                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${suma.toFixed(2).replace('.', ',')}</td>
-                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${resta.toFixed(2).replace('.', ',')}</td>
+                    <td class="sticky left-[200px] z-20 border border-slate-800 p-1.5 text-right font-mono text-xs min-w-[85px] ${boteClass}">${bote.toSpanishFormat()} €</td>
+                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${inicio.toSpanishFormat()}</td>
+                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${suma.toSpanishFormat()}</td>
+                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${resta.toSpanishFormat()}</td>
                     ${jCells}
                     <td class="p-1 border border-slate-800/60 bg-slate-950/40 text-slate-600 text-center text-xs">-</td>
                     <td class="p-1 border border-slate-800/60 bg-slate-950/40 text-slate-600 text-center text-xs">-</td>
@@ -5206,14 +5227,14 @@ class BoteAppController {
         `).join('') + `<th class="p-1 text-center border border-emerald-800/60 bg-emerald-950 text-slate-400 font-bold text-[11px]">J${nextJornadaNum}</th><th class="p-1 text-center border border-emerald-800/60 bg-emerald-950 text-slate-400 font-bold text-[11px]">Ac.</th>`;
 
         const jFootRec = jornadas.map(j => `
-            <td class="p-1 border border-emerald-700/80 bg-emerald-900/80 text-right font-mono font-black text-amber-300 text-xs marcelo-totales-cell">${(j.recaudacion || 0).toFixed(2).replace('.', ',')}</td>
+            <td class="p-1 border border-emerald-700/80 bg-emerald-900/80 text-right font-mono font-black text-amber-300 text-xs marcelo-totales-cell">${(j.recaudacion || 0).toSpanishFormat()}</td>
             <td class="p-1 border border-emerald-700/80 bg-emerald-900/80 text-center font-mono text-emerald-300 text-xs marcelo-totales-cell">-</td>
         `).join('') + `<td class="p-1 border border-emerald-800/60 bg-emerald-950/70 text-center text-slate-500 font-mono text-xs marcelo-totales-cell marcelo-empty-cell">0,00</td><td class="p-1 border border-emerald-800/60 bg-emerald-950/70 text-center text-slate-500 font-mono text-xs marcelo-totales-cell marcelo-empty-cell">-</td>`;
 
         // Filas de Liquidación 100% integradas en la misma tabla física para alineación exacta
         const jSelladoHeaderRow = jornadas.map(j => `
             <td class="p-1.5 border border-slate-700 bg-slate-900 text-slate-300 font-mono font-bold text-center text-xs marcelo-sellado-header-cell" colspan="2">
-                ${(j.gastoSellado || 26.25).toFixed(2).replace('.', ',')} €
+                ${(j.gastoSellado || 26.25).toSpanishFormat()} €
             </td>
         `).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs marcelo-empty-cell" colspan="2">0,00 €</td>';
 
@@ -5225,13 +5246,13 @@ class BoteAppController {
 
         const rowRecaudacion = jornadas.map(j => `
             <td class="p-1.5 border border-slate-700 bg-slate-900/80 text-amber-300 font-mono font-bold text-center text-xs marcelo-recaudacion-cell" colspan="2">
-                ${(j.recaudacion || 0).toFixed(2).replace('.', ',')} €
+                ${(j.recaudacion || 0).toSpanishFormat()} €
             </td>
         `).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs marcelo-empty-cell" colspan="2">0,00 €</td>';
 
         const rowSellado = jornadas.map(j => `
             <td class="p-1.5 border border-slate-700 bg-slate-900/80 text-slate-200 font-mono font-bold text-center text-xs marcelo-sellado-cell" colspan="2">
-                ${(j.gastoSellado || 26.25).toFixed(2).replace('.', ',')} €
+                ${(j.gastoSellado || 26.25).toSpanishFormat()} €
             </td>
         `).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs marcelo-empty-cell" colspan="2">0,00 €</td>';
 
@@ -5240,14 +5261,14 @@ class BoteAppController {
             const col = v >= 0 ? 'text-emerald-400 bg-emerald-950/40 marcelo-vueltas-pos' : 'text-rose-400 bg-rose-950/50 marcelo-vueltas-neg';
             return `
                 <td class="p-1.5 border border-slate-700 font-mono font-black text-center text-xs ${col}" colspan="2">
-                    ${v >= 0 ? '+' : ''}${v.toFixed(2).replace('.', ',')} €
+                    ${v >= 0 ? '+' : ''}${v.toSpanishFormat()} €
                 </td>
             `;
         }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs marcelo-empty-cell" colspan="2">0,00 €</td>';
 
         const rowPremios = jornadas.map(j => {
             const p = j.premios || 0;
-            const txt = p > 0 ? `${p.toFixed(2).replace('.', ',')} €` : '-';
+            const txt = p > 0 ? `${p.toSpanishFormat()} €` : '-';
             const col = p > 0 ? 'text-amber-300 bg-amber-950/50 font-black marcelo-premio-cell' : 'text-slate-500 bg-slate-950/30 marcelo-nopremio-cell';
             return `
                 <td class="p-1.5 border border-slate-700 font-mono text-center text-xs ${col}" colspan="2">
@@ -5261,7 +5282,7 @@ class BoteAppController {
             const col = v >= 0 ? 'text-emerald-300 bg-emerald-950/40 marcelo-botemaula-pos' : 'text-rose-300 bg-rose-950/40 marcelo-botemaula-neg';
             return `
                 <td class="p-1.5 border border-slate-700 font-mono font-bold text-center text-xs ${col}" colspan="2">
-                    ${v >= 0 ? '+' : ''}${v.toFixed(2).replace('.', ',')} €
+                    ${v >= 0 ? '+' : ''}${v.toSpanishFormat()} €
                 </td>
             `;
         }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs marcelo-empty-cell" colspan="2">0,00 €</td>';
@@ -5319,10 +5340,10 @@ class BoteAppController {
                         <tr class="bg-emerald-950 marcelo-totales-row">
                             <td class="sticky left-0 z-20 bg-emerald-950 border border-emerald-700 p-2 text-center text-slate-400 text-xs min-w-[75px] marcelo-totales-cell">-</td>
                             <td class="sticky left-[75px] z-20 bg-emerald-950 border border-emerald-700 p-2 text-left font-black text-white text-xs min-w-[125px] marcelo-totales-cell">TOTALES</td>
-                            <td class="sticky left-[200px] z-20 bg-emerald-900 border border-emerald-700 p-2 text-right font-mono font-black text-amber-300 text-xs min-w-[85px] marcelo-totales-cell marcelo-totales-bote">${totalBote.toFixed(2).replace('.', ',')} €</td>
-                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs marcelo-totales-cell">${totalInicio.toFixed(2).replace('.', ',')}</td>
-                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs marcelo-totales-cell">${totalSuma.toFixed(2).replace('.', ',')}</td>
-                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs marcelo-totales-cell">${totalResta.toFixed(2).replace('.', ',')}</td>
+                            <td class="sticky left-[200px] z-20 bg-emerald-900 border border-emerald-700 p-2 text-right font-mono font-black text-amber-300 text-xs min-w-[85px] marcelo-totales-cell marcelo-totales-bote">${totalBote.toSpanishFormat()} €</td>
+                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs marcelo-totales-cell">${totalInicio.toSpanishFormat()}</td>
+                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs marcelo-totales-cell">${totalSuma.toSpanishFormat()}</td>
+                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs marcelo-totales-cell">${totalResta.toSpanishFormat()}</td>
                             ${jFootRec}
                         </tr>
                     </tbody>
@@ -5385,25 +5406,25 @@ class BoteAppController {
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-3 border-t border-slate-800 marcelo-summary-cards">
                     <div class="p-3 rounded-xl bg-slate-900/90 border border-emerald-500/40 shadow marcelo-card">
                         <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Vueltas Acumuladas</div>
-                        <div class="text-xl font-mono font-black text-white mt-1">${totalVueltas.toFixed(2).replace('.', ',')} €</div>
+                        <div class="text-xl font-mono font-black text-white mt-1">${totalVueltas.toSpanishFormat()} €</div>
                         <div class="text-[10px] text-slate-400 mt-0.5">Bote Maula Penalizaciones</div>
                     </div>
                     <div class="p-3 rounded-xl bg-slate-900/90 border border-amber-500/40 shadow marcelo-card">
                         <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Bote Premios</div>
-                        <div class="text-xl font-mono font-black text-white mt-1">${totalPremios.toFixed(2).replace('.', ',')} €</div>
+                        <div class="text-xl font-mono font-black text-white mt-1">${totalPremios.toSpanishFormat()} €</div>
                         <div class="text-[10px] text-slate-400 mt-0.5">Premios oficiales cobrados</div>
                     </div>
                     <div class="p-3 rounded-xl bg-slate-900/90 border border-orange-500/40 shadow marcelo-card">
                         <div class="text-[11px] font-bold text-orange-400 uppercase tracking-wider">Bote Común (Superávit)</div>
-                        <div class="text-xl font-mono font-black text-amber-300 mt-1">${totalBoteComun.toFixed(2).replace('.', ',')} €</div>
+                        <div class="text-xl font-mono font-black text-amber-300 mt-1">${totalBoteComun.toSpanishFormat()} €</div>
                         <div class="text-[10px] text-slate-400 mt-0.5">Vueltas + Premios</div>
                     </div>
                     <div class="p-3 rounded-xl bg-gradient-to-br from-emerald-950/60 to-slate-900 border-2 border-emerald-400 shadow-xl marcelo-card marcelo-card-caja-real">
                         <div class="text-[11px] font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1 marcelo-caja-title">
                             <span>💰</span> Total Caja Real
                         </div>
-                        <div class="text-xl sm:text-2xl font-mono font-black text-emerald-400 mt-1 marcelo-caja-val">${cajaReal.toFixed(2).replace('.', ',')} €</div>
-                        <div class="text-[10px] text-slate-400 mt-0.5 marcelo-caja-sub">Saldos (${totalBote.toFixed(2).replace('.', ',')} €) + Bote Común</div>
+                        <div class="text-xl sm:text-2xl font-mono font-black text-emerald-400 mt-1 marcelo-caja-val">${cajaReal.toSpanishFormat()} €</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5 marcelo-caja-sub">Saldos (${totalBote.toSpanishFormat()} €) + Bote Común</div>
                         ${isHistoricalMode ? `<div class="text-[10px] font-black text-amber-400 uppercase mt-1 marcelo-caja-hist">Reconstruido hasta J${activeCutoff}</div>` : ''}
                     </div>
                 </div>

@@ -1,3 +1,24 @@
+// =========================================================================
+// PROTOCOLOS GLOBALES DE FORMATEO NUMÉRICO ESPAÑOL (SEPARADOR DE MILES)
+// =========================================================================
+if (!Number.prototype.toSpanishFormat) {
+    Number.prototype.toSpanishFormat = function(decimals = 2) {
+        const d = (typeof decimals === 'number' && !isNaN(decimals)) ? decimals : 2;
+        const num = Number(this);
+        if (isNaN(num)) return '0,00';
+        const parts = num.toFixed(d).split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return parts.length > 1 ? `${parts[0]},${parts[1]}` : parts[0];
+    };
+}
+if (!String.prototype.toSpanishFormat) {
+    String.prototype.toSpanishFormat = function(decimals = 2) {
+        const num = parseFloat(this.replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.'));
+        if (isNaN(num)) return this.toString();
+        return num.toSpanishFormat(decimals);
+    };
+}
+
 /**
  * Dashboard 2.0 Controller - Peña Maulas PWA
  * =========================================================================
@@ -850,9 +871,9 @@ class Dashboard2AppController {
         const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
         const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
 
-        const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
-        const formattedNeto = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toFixed(2).replace('.', ',')} €`;
-        const formattedSup = `${superavit >= 0 ? '+' : ''}${((window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`)}`;
+        const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toSpanishFormat()} €`;
+        const formattedNeto = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toSpanishFormat()} €`;
+        const formattedSup = `${superavit >= 0 ? '+' : ''}${((window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toSpanishFormat()} €`)}`;
 
         const elTotal = document.getElementById('dashboard-bote-total');
         const elCajaWidget = document.getElementById('dashboard-bote-caja-widget');
@@ -1424,7 +1445,7 @@ class Dashboard2AppController {
         const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
         const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro)
             ? window.AppUtils.formatEuro(cajaReal)
-            : `${cajaReal.toFixed(2).replace('.', ',')} €`;
+            : `${cajaReal.toSpanishFormat()} €`;
         if (elCajaAmt) elCajaAmt.textContent = formattedCaja;
 
         let userSaldo = 0;
@@ -1453,7 +1474,7 @@ class Dashboard2AppController {
 
         const formattedSaldo = (window.AppUtils && window.AppUtils.formatEuro)
             ? window.AppUtils.formatEuro(userSaldo)
-            : `${userSaldo.toFixed(2).replace('.', ',')} €`;
+            : `${userSaldo.toSpanishFormat()} €`;
 
         if (elBoteAmt) {
             elBoteAmt.textContent = formattedSaldo;
@@ -1513,7 +1534,7 @@ class Dashboard2AppController {
         const footRight = document.getElementById('pig-foot-right');
         if (!content) return;
 
-        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2).replace('.', ',');
+        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toSpanishFormat();
         const nextPigInfo = this.findPigMatch(nextJ);
         const nextHasPig = nextPigInfo !== null;
         const nextMatchDesc = (nextPigInfo && nextPigInfo.match) ? `(P.${nextPigInfo.index + 1}: ${nextPigInfo.match.home} vs ${nextPigInfo.match.away})` : '';
@@ -1704,11 +1725,11 @@ class Dashboard2AppController {
         const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
         const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
 
-        const formattedCaja = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace(".", ",")} €`;
+        const formattedCaja = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(cajaReal) : `${cajaReal.toSpanishFormat()} €`;
         if (elTotal) elTotal.textContent = formattedCaja;
         if (elCajaWidget) elCajaWidget.textContent = formattedCaja;
-        if (elNeto) elNeto.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toFixed(2).replace(".", ",")} €`;
-        if (elPremios) elPremios.textContent = `${superavit >= 0 ? '+' : ''}${((typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace(".", ",")} €`)}`;
+        if (elNeto) elNeto.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSaldos) : `${totalSaldos.toSpanishFormat()} €`;
+        if (elPremios) elPremios.textContent = `${superavit >= 0 ? '+' : ''}${((typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(superavit) : `${superavit.toSpanishFormat()} €`)}`;
     }
 
     /**
@@ -1721,8 +1742,8 @@ class Dashboard2AppController {
         const elIndivCount = document.getElementById('season-indiv-count');
         const elDoblesCount = document.getElementById('season-dobles-count');
 
-        if (elWeeklyTotal) elWeeklyTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(outcome.totalMoney || 0) : `${(outcome.totalMoney || 0).toFixed(2).replace(".", ",")} €`;
-        if (elSeasonTotal) elSeasonTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSeasonMoney) : `${totalSeasonMoney.toFixed(2).replace(".", ",")} €`;
+        if (elWeeklyTotal) elWeeklyTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(outcome.totalMoney || 0) : `${(outcome.totalMoney || 0).toSpanishFormat()} €`;
+        if (elSeasonTotal) elSeasonTotal.textContent = (typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(totalSeasonMoney) : `${totalSeasonMoney.toSpanishFormat()} €`;
         if (elIndivCount) elIndivCount.textContent = indivCount;
         if (elDoblesCount) elDoblesCount.textContent = doblesCount;
 
@@ -1730,14 +1751,14 @@ class Dashboard2AppController {
             const indivs = (outcome.prizeWinners || []).map(pw => `
                 <div class="flex items-center justify-between py-0.5 border-b border-slate-900">
                     <span class="text-slate-200 font-semibold">${pw.name}</span>
-                    <span class="text-emerald-400 font-mono font-bold">${pw.hits} aciertos ${pw.prize ? `(+${(typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(pw.prize) : pw.prize.toFixed(2).replace(".", ",") + " €"})` : ''}</span>
+                    <span class="text-emerald-400 font-mono font-bold">${pw.hits} aciertos ${pw.prize ? `(+${(typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(pw.prize) : pw.prize.toSpanishFormat() + " €"})` : ''}</span>
                 </div>
             `);
 
             const dobles = (outcome.doublesResults || []).filter(dr => dr.prize > 0).map(dw => `
                 <div class="flex items-center justify-between py-0.5 border-b border-slate-900 text-amber-300">
                     <span class="font-semibold">👑 Dobles (${dw.name})</span>
-                    <span class="font-mono font-bold text-emerald-400">${dw.hits} ac. (+${(typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(dw.prize) : dw.prize.toFixed(2).replace(".", ",") + " €"})</span>
+                    <span class="font-mono font-bold text-emerald-400">${dw.hits} ac. (+${(typeof AppUtils !== "undefined" && AppUtils.formatEuro) ? AppUtils.formatEuro(dw.prize) : dw.prize.toSpanishFormat() + " €"})</span>
                 </div>
             `);
 
@@ -1807,6 +1828,12 @@ class Dashboard2AppController {
         // 2.d NOVEDAD HOJA DE MARCELO: Reconstrucción Histórica
         items.push({
             text: `📑 <strong class="text-emerald-400">Hoja de Marcelo:</strong> Nuevo selector histórico para ver y recalcular al céntimo los botes, sumas, restas y caja real a cualquier jornada anterior.`,
+            url: 'bote_2.html'
+        });
+
+        // 2.e SEPARADOR DE MILES EN CANTIDADES
+        items.push({
+            text: `💶 <strong class="text-amber-400">Mejora Visual:</strong> Todas las cantidades y botes de la web cuentan ahora con separador de miles con punto (ej. 1.028,30 €) para mayor claridad.`,
             url: 'bote_2.html'
         });
 
@@ -1893,13 +1920,13 @@ class Dashboard2AppController {
         // 6. Caja Real de la Peña
         const summary = this.getBoteOfficialSummary();
         const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
-        const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toFixed(2).replace('.', ',')} €`;
+        const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toSpanishFormat()} €`;
         items.push({ text: `💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común (Saldos + Premios + Cuotas + Multas − Sellados).`, action: 'bote' });
 
         // 7. Partido PIG
         const nextPigInfo = this.findPigMatch(nextJ);
         const nextHasPig = nextPigInfo !== null;
-        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2).replace('.', ',');
+        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toSpanishFormat();
         if (nextHasPig && nextPigInfo && nextPigInfo.match) {
             items.push({ text: `🐷 <strong class="text-pink-300">¡Alerta PIG en J.${nextJ.number}!:</strong> ${nextPigInfo.match.home} vs ${nextPigInfo.match.away} (Penalización: -${penaltyVal} € al fallo).`, action: 'pig' });
         } else if (outcome && outcome.isPig) {
@@ -1930,7 +1957,7 @@ class Dashboard2AppController {
         }
 
         // 12. Premios conseguidos en la temporada
-        const prizeMoneyFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(totalSeasonMoney || 0) : `${(totalSeasonMoney || 0).toFixed(2).replace('.', ',')} €`;
+        const prizeMoneyFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(totalSeasonMoney || 0) : `${(totalSeasonMoney || 0).toSpanishFormat()} €`;
         items.push({ text: `🎁 <strong class="text-emerald-400">Premios Temporada 2026-27:</strong> ${prizeMoneyFmt} cobrados (${indivCount || 0} individuales y ${doblesCount || 0} en dobles).`, action: 'resumen' });
 
         // 13. Resultados de partidos detallados de la jornada en curso o más reciente
@@ -1957,7 +1984,7 @@ class Dashboard2AppController {
         // 14. Superávit y balance neto de la peña
         const totalSaldos = summary ? (typeof summary.totalSaldosVirtuales === 'number' ? summary.totalSaldosVirtuales : 694.71) : 694.71;
         const superavit = summary ? (typeof summary.superavit === 'number' ? summary.superavit : (cajaReal - totalSaldos)) : (cajaReal - totalSaldos);
-        const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toFixed(2).replace('.', ',')} €`;
+        const superavitFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(superavit) : `${superavit.toSpanishFormat()} €`;
         items.push({ text: `📈 <strong class="text-emerald-300">Superávit Peña:</strong> ${superavit >= 0 ? '+' : ''}${superavitFmt} a favor de la caja común.`, action: 'bote' });
 
         // 15. Próxima Cena de la Peña
@@ -2274,7 +2301,7 @@ class Dashboard2AppController {
         const validResults = results.filter(r => r.hasPronostico && r.hits >= 0);
         const totalHitsSum = validResults.reduce((sum, r) => sum + r.hits, 0);
         const avgHitsNum = validResults.length > 0 ? (totalHitsSum / validResults.length) : 0;
-        const avgHits = avgHitsNum.toFixed(1).replace('.', ',');
+        const avgHits = avgHitsNum.toSpanishFormat(1);
         const efficacyPct = validResults.length > 0 ? Math.round((totalHitsSum / (validResults.length * 15)) * 100) : 0;
 
         return {
@@ -2389,7 +2416,7 @@ class Dashboard2AppController {
 
         if (!modal || !bodyEl) return;
 
-        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toFixed(2).replace(".", ",");
+        const penaltyVal = (this.pigPenalty !== undefined ? this.pigPenalty : 1.00).toSpanishFormat();
 
         const infoMap = {
             rana: {

@@ -3,6 +3,28 @@
  * Centralizes logic used across Jornadas, RSS Import, and PDF Import.
  */
 
+// =========================================================================
+// PROTOCOLOS GLOBALES DE FORMATEO NUMÉRICO ESPAÑOL (SEPARADOR DE MILES)
+// =========================================================================
+if (!Number.prototype.toSpanishFormat) {
+    Number.prototype.toSpanishFormat = function(decimals = 2) {
+        const d = (typeof decimals === 'number' && !isNaN(decimals)) ? decimals : 2;
+        const num = Number(this);
+        if (isNaN(num)) return '0,00';
+        const parts = num.toFixed(d).split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return parts.length > 1 ? `${parts[0]},${parts[1]}` : parts[0];
+    };
+}
+if (!String.prototype.toSpanishFormat) {
+    String.prototype.toSpanishFormat = function(decimals = 2) {
+        const num = parseFloat(this.replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.'));
+        if (isNaN(num)) return this.toString();
+        return num.toSpanishFormat(decimals);
+    };
+}
+
+
 // --- HIGH-PERFORMANCE STATIC LOOKUP TABLES & CACHES ---
 const TEAM_LOGOS_MAP = {
     'alavés': 'escudos/primera/Deportivo-Alavés-S.A.D..png',
@@ -546,22 +568,18 @@ var AppUtils = window.AppUtils || {
      * Formats a number as Euro currency (Spanish format: 1.234,56 €)
      */
     formatEuro(value) {
-        if (value === null || value === undefined || isNaN(value)) return '0,00 €';
+        if (value === null || value === undefined || isNaN(Number(value))) return '0,00 €';
         const num = Number(value);
-        const parts = num.toFixed(2).split('.');
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        return `${parts[0]},${parts[1]} €`;
+        return `${num.toSpanishFormat(2)} €`;
     },
 
     /**
      * Formats a number in Spanish notation (1.234,56)
      */
     formatNumberEs(value, decimals = 2) {
-        if (value === null || value === undefined || isNaN(value)) return '0,00';
+        if (value === null || value === undefined || isNaN(Number(value))) return '0,00';
         const num = Number(value);
-        const parts = num.toFixed(decimals).split('.');
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        return `${parts[0]},${parts[1]}`;
+        return num.toSpanishFormat(decimals);
     },
 
     /**
@@ -1313,3 +1331,10 @@ if (typeof window !== 'undefined') {
     };
 }
 
+// Exponer helpers globales de formato español
+if (typeof window !== 'undefined') {
+    window.formatNumberEs = AppUtils.formatNumberEs;
+    window.formatEuro = AppUtils.formatEuro;
+    window.formatMoney = AppUtils.formatEuro;
+    window.formatCurrency = AppUtils.formatEuro;
+}

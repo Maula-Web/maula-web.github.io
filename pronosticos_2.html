@@ -3157,7 +3157,7 @@
                     }
                 }
 
-                const costDoblesStr = `${(Math.max(1, eligibleList.length) * 12).toFixed(2).replace('.', ',')} €`;
+                const costDoblesStr = `${(Math.max(1, eligibleList.length) * 12).toSpanishFormat()} €`;
                 const costHeaderEl = document.getElementById('kpi-dobles-cost-header');
                 const costFooterEl = document.getElementById('kpi-dobles-cost-footer');
                 if (costHeaderEl) costHeaderEl.textContent = costDoblesStr;
@@ -3263,7 +3263,7 @@
                     }
                     mobDoblesResp.textContent = respName;
                 }
-                if (mobDoblesCost) mobDoblesCost.textContent = `${(Math.max(1, eligibleList.length) * 12).toFixed(2).replace('.', ',')} €`;
+                if (mobDoblesCost) mobDoblesCost.textContent = `${(Math.max(1, eligibleList.length) * 12).toSpanishFormat()} €`;
 
                 const mobSocioName = document.getElementById('kpi-mobile-socio-name');
                 const mobSocioStatus = document.getElementById('kpi-mobile-socio-status');

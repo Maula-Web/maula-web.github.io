@@ -194,7 +194,7 @@ window.TelegramService = {
                 else if (idx === 2) medal = '🥉 ';
                 else medal = '🔹 ';
 
-                msg += `${medal}${r.name}: *${r.hits}* ac. (${r.points} pts)${r.prize > 0 ? ` 💰 *${r.prize.toFixed(2).replace(".", ",")} €*` : ''}\n`;
+                msg += `${medal}${r.name}: *${r.hits}* ac. (${r.points} pts)${r.prize > 0 ? ` 💰 *${r.prize.toSpanishFormat()} €*` : ''}\n`;
             });
 
             msg += `\n🍺 Quiniela de dobles: *${eligibleNames}*`;
@@ -244,7 +244,7 @@ window.TelegramService = {
                             rate = Number(rate) || 0;
                             if (count > 0 && rate > 0) {
                                 extraPrize += count * rate;
-                                breakdownDetails.push(`${count} de ${cat} (${(count * rate).toFixed(2).replace('.', ',')} €)`);
+                                breakdownDetails.push(`${count} de ${cat} (${(count * rate).toSpanishFormat()} €)`);
                             }
                         });
                     } else if (hCount >= minHits) {
@@ -255,14 +255,14 @@ window.TelegramService = {
                         rate = Number(rate) || 0;
                         if (rate > 0) {
                             extraPrize = rate;
-                            breakdownDetails.push(`1 de ${hCount} (${rate.toFixed(2).replace('.', ',')} €)`);
+                            breakdownDetails.push(`1 de ${hCount} (${rate.toSpanishFormat()} €)`);
                         }
                     }
 
                     totalDoblesPrize += extraPrize;
                     let line = `🔹 Resultado: *${hCount}* aciertos`;
                     if (extraPrize > 0) {
-                        line += ` 💰 *${extraPrize.toFixed(2).replace('.', ',')} €*`;
+                        line += ` 💰 *${extraPrize.toSpanishFormat()} €*`;
                         if (breakdownDetails.length > 0) {
                             line += ` _[${breakdownDetails.join(', ')}]_`;
                         }
@@ -279,12 +279,12 @@ window.TelegramService = {
             if (totalJornadaPremios > 0) {
                 msg += `\n*💰 PREMIOS CONSEGUIDOS EN LA JORNADA:*\n`;
                 sociosConPremio.forEach(r => {
-                    msg += `💵 ${r.name}: *${r.prize.toFixed(2).replace('.', ',')} €* (${r.hits} aciertos)\n`;
+                    msg += `💵 ${r.name}: *${r.prize.toSpanishFormat()} €* (${r.hits} aciertos)\n`;
                 });
                 if (totalDoblesPrize > 0) {
-                    msg += `🎰 Quiniela de dobles: *${totalDoblesPrize.toFixed(2).replace('.', ',')} €*\n`;
+                    msg += `🎰 Quiniela de dobles: *${totalDoblesPrize.toSpanishFormat()} €*\n`;
                 }
-                msg += `👉 *Total al bote de la peña:* *${totalJornadaPremios.toFixed(2).replace('.', ',')} €*\n`;
+                msg += `👉 *Total al bote de la peña:* *${totalJornadaPremios.toSpanishFormat()} €*\n`;
             }
 
 

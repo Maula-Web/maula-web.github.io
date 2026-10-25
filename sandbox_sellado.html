@@ -3102,7 +3102,7 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
 
                 this.apuestasGeneradas = [...apuestasSocios, ...nuevas25];
                 const totalAp = this.apuestasGeneradas.length; // 19 + 25 = 44
-                const importeTotal = (totalAp * 0.75).toFixed(2).replace('.', ',');
+                const importeTotal = (totalAp * 0.75).toSpanishFormat();
 
                 // Actualizar KPIs de la Sandbox principal
                 const kpiDobles = document.getElementById('kpi-dobles');

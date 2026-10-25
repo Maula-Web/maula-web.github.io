@@ -1017,7 +1017,7 @@ class PronosticoManager {
         else if (onesCount >= 14) penalty = 1.00;
 
         if (penalty > 0) {
-            msg = `💰 Penalización: +${penalty.toFixed(2).replace(".", ",")} € (${onesCount} unos en 14 signos)`;
+            msg = `💰 Penalización: +${penalty.toSpanishFormat()} € (${onesCount} unos en 14 signos)`;
             color = "#ef6c00"; // Orange
         } else {
             msg = `✅ Sin penalización (${onesCount} unos)`;

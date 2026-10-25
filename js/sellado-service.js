@@ -251,7 +251,7 @@
             }
 
             const totalBets = fileContent ? fileContent.split(/\r?\n/).filter(l => l.trim().length > 0).length : 35;
-            const costeSelladoStr = (totalBets * 0.75).toFixed(2).replace('.', ',');
+            const costeSelladoStr = (totalBets * 0.75).toSpanishFormat();
             const fileName = `${ticketId}.txt`;
             const subject = `[${ticketId}] Sellado Jornada ${jornada.number} - ${totalBets} Apuestas (P15: ${p15Oficial})`;
             const body = `Hola,\n\nSe adjunta el archivo oficial con los pronósticos de la Peña Los Maulas para la Jornada ${jornada.number}.\n\n- Referencia de sellado: ${ticketId}\n- Total apuestas: ${totalBets} columnas simples (Soporte Digital / ASD)\n- Pleno al 15 oficial: ${p15Oficial}\n- Importe oficial: ${costeSelladoStr} € (a descontar del saldo en depósito)\n\nRogamos validación en Terminal Oficial SELAE y confirmación con resguardo indicando esta misma referencia.\n\nSaludos,\nPeña Los Maulas`;
