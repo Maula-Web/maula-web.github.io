@@ -19,25 +19,25 @@
       "num": 3,
       "home": "At. Madrid (m)",
       "away": "Deportivo (m)",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 4,
       "home": "Athletic Club (m)",
       "away": "Getafe (m)",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 5,
       "home": "Celta (m)",
       "away": "Betis (m)",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 6,
       "home": "Real Sociedad (m)",
       "away": "Levante (m)",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 7,
@@ -55,13 +55,13 @@
       "num": 9,
       "home": "Almería (m)",
       "away": "R. Oviedo (m)",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 10,
       "home": "Sabadell (m)",
       "away": "Tenerife (m)",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 11,
@@ -73,13 +73,13 @@
       "num": 12,
       "home": "Deportivo (f)",
       "away": "Alavés (f)",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 13,
       "home": "Eibar (f)",
       "away": "Madrid CFF (f)",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 14,
@@ -91,7 +91,7 @@
       "num": 15,
       "home": "Barcelona (m)",
       "away": "Real Madrid (m)",
-      "result": ""
+      "result": "1-2"
     }
   ],
   "prizes": {
