@@ -4665,3 +4665,32 @@ body.has-ticker {
     color: #d8b4fe;
 }
 
+
+/* =========================================================================
+   HOJA DE CONTROL DE MARCELO (PLANTILLA TESORERO - SANDBOX)
+   ========================================================================= */
+.marcelo-cell-blue {
+    background-color: rgba(14, 165, 233, 0.18) !important;
+    color: #7dd3fc !important;
+}
+.marcelo-cell-red {
+    background-color: rgba(244, 63, 94, 0.28) !important;
+    color: #fda4af !important;
+    font-weight: 800 !important;
+}
+.marcelo-cell-pink {
+    background-color: rgba(236, 72, 153, 0.22) !important;
+    color: #f472b6 !important;
+}
+.marcelo-cell-yellow {
+    background-color: rgba(234, 179, 8, 0.28) !important;
+    color: #fde047 !important;
+    font-weight: 900 !important;
+}
+.marcelo-cell-low {
+    background-color: rgba(249, 115, 22, 0.22) !important;
+    color: #fdba74 !important;
+}
+.marcelo-cell-neutral {
+    color: #94a3b8 !important;
+}

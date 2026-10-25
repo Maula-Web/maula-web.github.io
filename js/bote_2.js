@@ -99,6 +99,7 @@ class BoteAppController {
         // 3. Renderizar vista inicial
         this.renderAll();
         this.populateSocioSelect();
+        this.checkMarceloTabVisibility();
 
         // Si se recibe el parámetro de apertura directa de Reembolso / Gestión Jornada
         try {
@@ -606,7 +607,9 @@ class BoteAppController {
         });
 
         // Actualizar gráficos según la vista activa
-        if (viewName === 'flujo') {
+        if (viewName === 'marcelo') {
+            this.renderHojaMarcelo();
+        } else if (viewName === 'flujo') {
             setTimeout(() => this.renderFlujoChart(), 60);
         } else if (viewName === 'jornadas') {
             setTimeout(() => this.renderJornadasChart(), 60);
@@ -634,7 +637,8 @@ class BoteAppController {
             ['renderFlujoDeCaja', () => this.renderFlujoDeCaja()],
             ['renderPremiosDobles', () => this.renderPremiosDobles()],
             ['renderGestionIngresos', () => this.renderGestionIngresos()],
-            ['renderModalGestionJornada', () => this.renderModalGestionJornada()]
+            ['renderModalGestionJornada', () => this.renderModalGestionJornada()],
+            ['renderHojaMarcelo', () => this.renderHojaMarcelo()]
         ];
 
         for (const [name, fn] of tasks) {
@@ -4981,6 +4985,263 @@ class BoteAppController {
             }
         });
     }
+
+    checkMarceloTabVisibility() {
+        const tab = document.getElementById('nav-tab-marcelo');
+        if (!tab) return;
+
+        let isAuthorized = false;
+
+        // 1. Parámetros en URL (?sandbox=1 o ?marcelo=1 o ?view=marcelo)
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('sandbox') === '1' || urlParams.get('marcelo') === '1' || urlParams.get('view') === 'marcelo') {
+                isAuthorized = true;
+                sessionStorage.setItem('maulas_sandbox_marcelo', '1');
+            }
+        } catch (e) {}
+
+        // 2. Sesión activa en Sandbox
+        if (sessionStorage.getItem('maulas_sandbox_marcelo') === '1') {
+            isAuthorized = true;
+        }
+
+        // 3. Socio conectado = Fernando Lozano (ID 6)
+        try {
+            const rawUser = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
+            if (rawUser) {
+                const u = JSON.parse(rawUser);
+                const uid = String(u.id || '');
+                const email = (u.email || '').toLowerCase();
+                const name = (u.name || '').toLowerCase();
+                if (uid === '6' || email.includes('lozano') || name.includes('lozano') || name.includes('fernando')) {
+                    isAuthorized = true;
+                }
+            }
+        } catch (e) {}
+
+        if (isAuthorized) {
+            tab.classList.remove('hidden');
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('view') === 'marcelo') {
+                setTimeout(() => this.switchView('marcelo'), 80);
+            }
+        } else {
+            tab.classList.add('hidden');
+        }
+    }
+
+    renderHojaMarcelo() {
+        const container = document.getElementById('hoja-marcelo-container');
+        if (!container) return;
+
+        const data = this.getSeasonData();
+        if (!data || !data.memberSummaries || data.memberSummaries.length === 0) {
+            container.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">No hay datos financieros disponibles para generar la hoja.</div>';
+            return;
+        }
+
+        // 1. Socios ordenados estrictamente por ID oficial (1 al 19)
+        const members = [...data.memberSummaries].sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
+
+        // 2. Jornadas ordenadas cronológicamente
+        const jornadas = [...(data.jornadaSummaries || [])].sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
+
+        let totalInicio = 0;
+        let totalSuma = 0;
+        let totalResta = 0;
+        let totalBote = 0;
+
+        // Renderizado de filas de socios
+        const rowsHtml = members.map(m => {
+            const sealJornadas = jornadas.filter(j => String(j.sealerId) === String(m.id)).map(j => 'J' + j.number);
+            const selladosStr = sealJornadas.length > 0 ? sealJornadas.join(', ') : '-';
+            const initMov = (m.movements || []).find(mv => mv.isIngresoLibre && (mv.description || '').toUpperCase().includes('INICIAL'));
+            const inicio = initMov ? (initMov.ingresosManual || 0) : 0;
+            const suma = m.totIn !== undefined ? m.totIn : inicio;
+            const resta = m.totOut !== undefined ? m.totOut : 0;
+            const bote = m.saldo;
+
+            totalInicio += inicio;
+            totalSuma += suma;
+            totalResta += resta;
+            totalBote += bote;
+
+            const jCells = jornadas.map(j => {
+                const mov = (m.movements || []).find(mv => mv.jornadaNum === j.number || String(mv.jornadaId) === String(j.id));
+                const cost = mov ? (mov.totalGastos || 0) : 0;
+                const aciertos = mov && typeof mov.aciertos === 'number' ? mov.aciertos : '-';
+                const penalties = mov ? ((mov.penalizacionUnos || 0) + (mov.penalizacionBajosAciertos || 0) + (mov.penalizacionPIG || 0) + (mov.penalizacionMaula || 0)) : 0;
+                const isExempt = mov ? (mov.exento || mov.isSealer || cost === 0) : false;
+
+                let costClass = 'marcelo-cell-blue';
+                if (isExempt) costClass = 'marcelo-cell-pink';
+                else if (penalties > 0) costClass = 'marcelo-cell-red';
+
+                let aciertosClass = 'marcelo-cell-neutral';
+                if (typeof aciertos === 'number' && aciertos >= 10) aciertosClass = 'marcelo-cell-yellow';
+                else if (typeof aciertos === 'number' && aciertos <= 3 && aciertos > 0) aciertosClass = 'marcelo-cell-low';
+
+                return `
+                    <td class="p-1 border border-slate-800 text-right font-mono font-bold text-xs ${costClass}">${cost.toFixed(2).replace('.', ',')}</td>
+                    <td class="p-1 border border-slate-800 text-center font-mono font-bold text-xs ${aciertosClass}">${aciertos}</td>
+                `;
+            }).join('');
+
+            const boteClass = bote >= 0 ? 'text-emerald-400 bg-emerald-950/40 font-black' : 'text-rose-400 bg-rose-950/50 font-black';
+
+            return `
+                <tr class="hover:bg-slate-900/80 transition-colors">
+                    <td class="sticky left-0 z-20 bg-slate-950 border border-slate-800 p-1.5 text-center font-bold text-slate-300 text-xs min-w-[75px]">${selladosStr}</td>
+                    <td class="sticky left-[75px] z-20 bg-slate-950 border border-slate-800 p-1.5 text-left font-bold text-white text-xs min-w-[125px] whitespace-nowrap">${m.name}</td>
+                    <td class="sticky left-[200px] z-20 border border-slate-800 p-1.5 text-right font-mono text-xs min-w-[85px] ${boteClass}">${bote.toFixed(2).replace('.', ',')} €</td>
+                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${inicio.toFixed(2).replace('.', ',')}</td>
+                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${suma.toFixed(2).replace('.', ',')}</td>
+                    <td class="p-1.5 border border-slate-800 bg-slate-900/60 text-right font-mono text-slate-300 text-xs min-w-[75px]">${resta.toFixed(2).replace('.', ',')}</td>
+                    ${jCells}
+                    <td class="p-1 border border-slate-800/60 bg-slate-950/40 text-slate-600 text-center text-xs">-</td>
+                    <td class="p-1 border border-slate-800/60 bg-slate-950/40 text-slate-600 text-center text-xs">-</td>
+                </tr>
+            `;
+        }).join('');
+
+        const nextJornadaNum = jornadas.length > 0 ? (jornadas[jornadas.length - 1].number + 1) : 1;
+
+        const jHeaders1 = jornadas.map(j => `
+            <th class="p-1.5 text-center border border-emerald-700/80 bg-emerald-900 text-white font-extrabold text-xs min-w-[90px]" colspan="2">${j.date || ('J' + j.number)}</th>
+        `).join('') + `<th class="p-1.5 text-center border border-emerald-800/60 bg-emerald-950/70 text-slate-400 font-bold text-xs min-w-[90px]" colspan="2">J${nextJornadaNum}</th>`;
+
+        const jHeaders2 = jornadas.map(j => `
+            <th class="p-1 text-center border border-emerald-700/60 bg-emerald-800 text-emerald-200 font-black text-[11px] min-w-[48px]">J${j.number}</th>
+            <th class="p-1 text-center border border-emerald-700/60 bg-emerald-800 text-emerald-200 font-bold text-[11px] min-w-[36px]">Ac.</th>
+        `).join('') + `<th class="p-1 text-center border border-emerald-800/60 bg-emerald-950 text-slate-400 font-bold text-[11px]">J${nextJornadaNum}</th><th class="p-1 text-center border border-emerald-800/60 bg-emerald-950 text-slate-400 font-bold text-[11px]">Ac.</th>`;
+
+        const jFootRec = jornadas.map(j => `
+            <td class="p-1 border border-emerald-700/80 bg-emerald-900/80 text-right font-mono font-black text-amber-300 text-xs">${(j.recaudacion || 0).toFixed(2).replace('.', ',')}</td>
+            <td class="p-1 border border-emerald-700/80 bg-emerald-900/80 text-center font-mono text-emerald-300 text-xs">-</td>
+        `).join('') + `<td class="p-1 border border-emerald-800/60 bg-emerald-950/70 text-center text-slate-500 font-mono text-xs">0,00</td><td class="p-1 border border-emerald-800/60 bg-emerald-950/70 text-center text-slate-500 font-mono text-xs">-</td>`;
+
+        // Subtabla inferior
+        const jLabelsBottom = jornadas.map(j => `<th class="p-1.5 border border-emerald-700 bg-emerald-900 text-white font-extrabold text-xs text-center" colspan="2">J${j.number}</th>`).join('') + `<th class="p-1.5 border border-emerald-800 bg-emerald-950 text-slate-400 font-bold text-xs text-center" colspan="2">J${nextJornadaNum}</th>`;
+        const rowRecaudacion = jornadas.map(j => `<td class="p-1.5 border border-slate-700 bg-slate-900/80 text-amber-300 font-mono font-bold text-center text-xs" colspan="2">${(j.recaudacion || 0).toFixed(2).replace('.', ',')}</td>`).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+        const rowSellado = jornadas.map(j => `<td class="p-1.5 border border-slate-700 bg-slate-900/80 text-slate-200 font-mono font-bold text-center text-xs" colspan="2">${(j.gastoSellado || 26.25).toFixed(2).replace('.', ',')}</td>`).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+        const rowVueltas = jornadas.map(j => {
+            const v = (j.recaudacion || 0) - (j.gastoSellado || 26.25);
+            const col = v >= 0 ? 'text-emerald-400 bg-emerald-950/40' : 'text-rose-400 bg-rose-950/50';
+            return `<td class="p-1.5 border border-slate-700 font-mono font-black text-center text-xs ${col}" colspan="2">${v.toFixed(2).replace('.', ',')}</td>`;
+        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+        const rowPremios = jornadas.map(j => {
+            const p = j.premios || 0;
+            const txt = p > 0 ? `${p.toFixed(2).replace('.', ',')}` : '-';
+            const col = p > 0 ? 'text-amber-300 bg-amber-950/50 font-black' : 'text-slate-500 bg-slate-950/30';
+            return `<td class="p-1.5 border border-slate-700 font-mono text-center text-xs ${col}" colspan="2">${txt}</td>`;
+        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+        const rowBoteMaula = jornadas.map(j => {
+            const v = (j.recaudacion || 0) - (j.gastoSellado || 26.25);
+            return `<td class="p-1.5 border border-slate-700 font-mono font-bold text-emerald-300 bg-emerald-950/40 text-center text-xs" colspan="2">${v.toFixed(2).replace('.', ',')}</td>`;
+        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+
+        const totalVueltas = jornadas.reduce((s, j) => s + ((j.recaudacion || 0) - (j.gastoSellado || 26.25)), 0);
+        const totalPremios = jornadas.reduce((s, j) => s + (j.premios || 0), 0);
+        const totalBoteComun = totalVueltas + totalPremios;
+        const cajaReal = (data.summary && typeof data.summary.cajaReal === 'number') ? data.summary.cajaReal : (totalBote + totalBoteComun);
+
+        container.innerHTML = `
+            <div class="overflow-x-auto max-h-[78vh] relative select-none">
+                <table class="w-full text-xs font-mono border-collapse bg-slate-950">
+                    <thead class="sticky top-0 z-30 shadow-md">
+                        <tr>
+                            <th class="sticky left-0 z-40 bg-emerald-900 text-white font-black p-2 border border-emerald-700 text-center min-w-[75px]" rowspan="2">SELLADOS</th>
+                            <th class="sticky left-[75px] z-40 bg-emerald-900 text-white font-black p-2 border border-emerald-700 text-left min-w-[125px]" rowspan="2">MAULA</th>
+                            <th class="sticky left-[200px] z-40 bg-emerald-800 text-amber-300 font-black p-2 border border-emerald-700 text-right min-w-[85px]" rowspan="2">BOTE</th>
+                            <th class="bg-emerald-900 text-white font-bold p-2 border border-emerald-700 text-right min-w-[75px]" rowspan="2">INICIO</th>
+                            <th class="bg-emerald-900 text-white font-bold p-2 border border-emerald-700 text-right min-w-[75px]" rowspan="2">SUMA</th>
+                            <th class="bg-emerald-900 text-white font-bold p-2 border border-emerald-700 text-right min-w-[75px]" rowspan="2">RESTA</th>
+                            ${jHeaders1}
+                        </tr>
+                        <tr>
+                            ${jHeaders2}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        ${rowsHtml}
+                    </tbody>
+                    <tfoot class="sticky bottom-0 z-30 font-black border-t-2 border-emerald-500 shadow-xl">
+                        <tr class="bg-emerald-950">
+                            <td class="sticky left-0 z-40 bg-emerald-950 border border-emerald-700 p-2 text-center text-slate-400 text-xs min-w-[75px]">-</td>
+                            <td class="sticky left-[75px] z-40 bg-emerald-950 border border-emerald-700 p-2 text-left font-black text-white text-xs min-w-[125px]">TOTALES</td>
+                            <td class="sticky left-[200px] z-40 bg-emerald-900 border border-emerald-700 p-2 text-right font-mono font-black text-amber-300 text-xs min-w-[85px]">${totalBote.toFixed(2).replace('.', ',')} €</td>
+                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs">${totalInicio.toFixed(2).replace('.', ',')}</td>
+                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs">${totalSuma.toFixed(2).replace('.', ',')}</td>
+                            <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs">${totalResta.toFixed(2).replace('.', ',')}</td>
+                            ${jFootRec}
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <!-- SUBTABLA INFERIOR: LIQUIDACIÓN OFICIAL DE JORNADAS -->
+                <div class="mt-4 pt-3 border-t-2 border-emerald-500/40">
+                    <table class="w-full text-xs font-mono border-collapse bg-slate-950">
+                        <thead>
+                            <tr>
+                                <th class="sticky left-0 z-30 bg-emerald-900 text-white font-black p-2 border border-emerald-700 text-left min-w-[435px]">LIQUIDACIÓN DE JORNADAS</th>
+                                ${jLabelsBottom}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-amber-300">Recaudación</td>
+                                ${rowRecaudacion}
+                            </tr>
+                            <tr>
+                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-slate-300">Sellado Oficial</td>
+                                ${rowSellado}
+                            </tr>
+                            <tr>
+                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-black text-emerald-400">Vueltas</td>
+                                ${rowVueltas}
+                            </tr>
+                            <tr>
+                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-amber-400">Premios</td>
+                                ${rowPremios}
+                            </tr>
+                            <tr>
+                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-emerald-300">Bote Maula Penalizaciones</td>
+                                ${rowBoteMaula}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- BLOQUE RESUMEN DEL BOTE (Cajas estilo Marcelo) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-3 border-t border-slate-800">
+                    <div class="p-3 rounded-xl bg-slate-900/90 border border-emerald-500/40 shadow">
+                        <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Vueltas Acumuladas</div>
+                        <div class="text-xl font-mono font-black text-white mt-1">${totalVueltas.toFixed(2).replace('.', ',')} €</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Bote Maula Penalizaciones</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900/90 border border-amber-500/40 shadow">
+                        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Bote Premios</div>
+                        <div class="text-xl font-mono font-black text-white mt-1">${totalPremios.toFixed(2).replace('.', ',')} €</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Premios oficiales cobrados</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900/90 border border-orange-500/40 shadow">
+                        <div class="text-[11px] font-bold text-orange-400 uppercase tracking-wider">Bote Común (Superávit)</div>
+                        <div class="text-xl font-mono font-black text-amber-300 mt-1">${totalBoteComun.toFixed(2).replace('.', ',')} €</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Vueltas + Premios</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-gradient-to-br from-emerald-950/60 to-slate-900 border-2 border-emerald-400 shadow-xl">
+                        <div class="text-[11px] font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1">
+                            <span>💰</span> Total Caja Real
+                        </div>
+                        <div class="text-xl sm:text-2xl font-mono font-black text-emerald-400 mt-1">${cajaReal.toFixed(2).replace('.', ',')} €</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Saldos (${totalBote.toFixed(2).replace('.', ',')} €) + Bote Común</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
 }
 
 // Inicialización automática
