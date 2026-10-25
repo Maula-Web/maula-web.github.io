@@ -1466,6 +1466,36 @@ class Dashboard2AppController {
         if (elBoteLink && userMember) {
             elBoteLink.href = `bote_2.html?memberId=${encodeURIComponent(userMember.id)}`;
         }
+
+        // 6. Evaluación de Avisos Emergentes Programados (In-App Alerts)
+        if (window.InAppAlerts && userMember) {
+            let hasSubmitted = false;
+            if (this.nextJornada) {
+                const nextJId = String(this.nextJornada.id !== undefined ? this.nextJornada.id : this.nextJornada.number);
+                const userMid = String(userMember.id);
+                if (pronosticosMap && pronosticosMap.has(`${nextJId}_${userMid}`)) {
+                    hasSubmitted = true;
+                } else if (Array.isArray(this.pronosticos)) {
+                    hasSubmitted = this.pronosticos.some(pr => {
+                        const pj = String(pr.jId !== undefined ? pr.jId : (pr.jornadaId || ''));
+                        const pm = String(pr.mId !== undefined ? pr.mId : (pr.memberId || ''));
+                        return pj === nextJId && pm === userMid;
+                    });
+                }
+            }
+
+            const isSealer = this.nextJornada && String(this.nextJornada.sealerId) === String(userMember.id);
+            const isDobles = this.nextJornada && (String(this.nextJornada.doblesPlayerId) === String(userMember.id) || (this.currentDoblesSealer && String(this.currentDoblesSealer.id) === String(userMember.id)));
+
+            window.InAppAlerts.evaluateAndShow({
+                userMember: userMember,
+                userSaldo: userSaldo,
+                nextJornada: this.nextJornada,
+                hasSubmittedPrediction: hasSubmitted,
+                isSealer: !!isSealer,
+                isDoblesResponsable: !!isDobles
+            });
+        }
     }
 
     /**
@@ -1765,6 +1795,12 @@ class Dashboard2AppController {
         // 2.b NOVEDAD WEB: Tarjeta personal del Socio Conectado
         items.push({
             text: `👤 <strong class="text-amber-400">Novedad Dashboard:</strong> Nueva tarjeta del Socio Conectado a pantalla completa con aciertos, puesto en clasificación, saldo de bote personal y alerta de PIG.`,
+            action: 'inicio'
+        });
+
+        // 2.c NOVEDAD WEB: Avisos Emergentes Directos
+        items.push({
+            text: `💬 <strong class="text-amber-400">Novedad Web:</strong> Avisos emergentes automáticos al entrar a la web para informar de saldo deudor, quiniela pendiente o responsabilidades semanales.`,
             action: 'inicio'
         });
 

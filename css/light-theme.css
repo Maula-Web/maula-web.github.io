@@ -2704,3 +2704,58 @@ html.light-theme #card-desglose-balance-bote {
 .light-theme .marcelo-cell-neutral {
     color: #64748b !important;
 }
+
+/* =========================================================================
+   ADAPTACIÓN DE MODAL IN-APP ALERTS Y MÓDULO ADMIN AL TEMA CLARO
+   ========================================================================= */
+.light-theme #in-app-alert-modal {
+    background-color: rgba(15, 23, 42, 0.65) !important;
+}
+.light-theme #in-app-alert-modal .glass-panel {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3) !important;
+}
+.light-theme #in-app-alert-modal h3 {
+    color: #0f172a !important;
+}
+.light-theme #in-app-alert-modal div.text-slate-300 {
+    color: #334155 !important;
+}
+.light-theme #in-app-alert-modal button[title="Cerrar aviso"] {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+}
+.light-theme #in-app-alert-modal button[title="Cerrar aviso"]:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+.light-theme #in-app-alert-modal button:last-child {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #in-app-alert-modal button:last-child:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* Módulo de Administración de Avisos en Tema Claro */
+.light-theme #module-inapp .bg-slate-900\/60 {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+.light-theme #module-inapp select,
+.light-theme #module-inapp input[type="text"],
+.light-theme #module-inapp textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #module-inapp select:focus,
+.light-theme #module-inapp input[type="text"]:focus,
+.light-theme #module-inapp textarea:focus {
+    border-color: #f59e0b !important;
+    outline: none !important;
+}

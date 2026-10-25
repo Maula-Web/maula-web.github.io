@@ -285,6 +285,12 @@
                 url: 'dashboard_2.html'
             });
 
+            // NOTICIA 2.c: NOVEDAD WEB - Avisos Emergentes Directos
+            items.push({
+                text: `💬 <strong class="text-amber-400">Novedad Web:</strong> Avisos emergentes automáticos al conectarse para informar de saldo deudor, quiniela pendiente o responsabilidades semanales.`,
+                url: 'dashboard_2.html'
+            });
+
             // NOTICIA 2.d: CAJA REAL OFICIAL Y BALANCE CONTABLE
             items.push({
                 text: `💰 <strong class="text-amber-400">Caja Real Oficial:</strong> Fijada en <strong>${cajaFmt}</strong> (suma de tarjetas: Saldos + Premios + Cuotas + Penalizaciones − Sellados).`,
