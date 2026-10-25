@@ -28,6 +28,7 @@ class BoteAppController {
         this.premiosTypeFilter = 'all';  // 'all' | 'individual' | 'dobles'
         this.isLive = false;
         this.liveData = null;
+        this.marceloCutoffJornada = null; // null = temporada completa / última jornada
         this.rawSeasonData = null;
         this.engine = null;
         this.sociosViewMode = 'table';
@@ -625,6 +626,16 @@ class BoteAppController {
         this.renderJornadaDetail();
         this.updateJornadaSlider();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    setMarceloCutoff(jNum) {
+        if (!jNum || jNum === 'all') {
+            this.marceloCutoffJornada = null;
+        } else {
+            const num = parseInt(jNum, 10);
+            this.marceloCutoffJornada = isNaN(num) ? null : num;
+        }
+        this.renderHojaMarcelo();
     }
 
     renderAll() {
@@ -5041,26 +5052,104 @@ class BoteAppController {
             return;
         }
 
-        // 1. Socios ordenados estrictamente por ID oficial (1 al 19)
-        const members = [...data.memberSummaries].sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
+        // 1. Todas las jornadas disponibles ordenadas cronológicamente
+        const allJornadas = [...(data.jornadaSummaries || [])].sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
+        if (allJornadas.length === 0) {
+            container.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">No hay jornadas registradas para generar la hoja.</div>';
+            return;
+        }
 
-        // 2. Jornadas ordenadas cronológicamente
-        const jornadas = [...(data.jornadaSummaries || [])].sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
+        const maxJornadaNum = allJornadas[allJornadas.length - 1].number;
+        let activeCutoff = maxJornadaNum;
+        if (this.marceloCutoffJornada !== null && this.marceloCutoffJornada !== undefined) {
+            const parsed = parseInt(this.marceloCutoffJornada, 10);
+            if (!isNaN(parsed) && allJornadas.some(j => parseInt(j.number, 10) === parsed)) {
+                activeCutoff = parsed;
+            }
+        }
+        const isHistoricalMode = (activeCutoff !== maxJornadaNum);
+
+        // Actualizar el selector en la cabecera si existe
+        const selCutoff = document.getElementById('sel-marcelo-cutoff');
+        if (selCutoff) {
+            const opts = [
+                `<option value="all" ${!isHistoricalMode ? 'selected' : ''}>⭐ Temporada Completa (Hasta J${maxJornadaNum})</option>`,
+                ...allJornadas.map(j => {
+                    const isSel = isHistoricalMode && activeCutoff === parseInt(j.number, 10);
+                    return `<option value="${j.number}" ${isSel ? 'selected' : ''}>Hasta Jornada ${j.number} (${j.date || 'J' + j.number})</option>`;
+                })
+            ];
+            selCutoff.innerHTML = opts.join('');
+        }
+
+        // Jornadas filtradas que se mostrarán y calcularán (desde la J1 hasta activeCutoff)
+        const jornadas = allJornadas.filter(j => parseInt(j.number, 10) <= activeCutoff);
+        const cutoffJornada = allJornadas.find(j => parseInt(j.number, 10) === activeCutoff) || jornadas[jornadas.length - 1];
+
+        // Función auxiliar para parsear fechas
+        const parseDate = (d) => {
+            if (!d) return null;
+            if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
+            const s = String(d).trim();
+            const dmy = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+            if (dmy) return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10));
+            const ymd = s.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+            if (ymd) return new Date(parseInt(ymd[1], 10), parseInt(ymd[2], 10) - 1, parseInt(ymd[3], 10));
+            const dt = new Date(s);
+            return isNaN(dt.getTime()) ? null : dt;
+        };
+        const cutoffDate = cutoffJornada ? parseDate(cutoffJornada.date) : null;
+
+        // Socios ordenados estrictamente por ID oficial (1 al 19)
+        const members = [...data.memberSummaries].sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
 
         let totalInicio = 0;
         let totalSuma = 0;
         let totalResta = 0;
         let totalBote = 0;
 
-        // Renderizado de filas de socios
+        // Renderizado de filas de socios con reconstrucción dinámica a la jornada de corte
         const rowsHtml = members.map(m => {
             const sealJornadas = jornadas.filter(j => String(j.sealerId) === String(m.id)).map(j => 'J' + j.number);
             const selladosStr = sealJornadas.length > 0 ? sealJornadas.join(', ') : '-';
             const initMov = (m.movements || []).find(mv => mv.isIngresoLibre && (mv.description || '').toUpperCase().includes('INICIAL'));
             const inicio = initMov ? (initMov.ingresosManual || 0) : 0;
-            const suma = m.totIn !== undefined ? m.totIn : inicio;
-            const resta = m.totOut !== undefined ? m.totOut : 0;
-            const bote = m.saldo;
+
+            // Resta: suma de costes de las jornadas mostradas (J1 a Jn)
+            const resta = jornadas.reduce((acc, j) => {
+                const mov = (m.movements || []).find(mv => mv.jornadaNum === j.number || String(mv.jornadaId) === String(j.id));
+                return acc + (mov ? (mov.totalGastos || 0) : 0);
+            }, 0);
+
+            // Suma: inicio + aportaciones manuales hasta la fecha de corte + reembolsos de sellado hasta la jornada de corte
+            let suma = inicio;
+            const eligibleMovs = (m.movements || []).filter(mv => {
+                if (mv.type === 'jornada') {
+                    return parseInt(mv.jornadaNum, 10) <= activeCutoff;
+                }
+                if (mv.isIngresoLibre && (mv.description || '').toUpperCase().includes('INICIAL')) {
+                    return false; // ya contabilizado en inicio
+                }
+                if (mv.date && cutoffDate) {
+                    const md = parseDate(mv.date);
+                    if (md) return md.getTime() <= (cutoffDate.getTime() + 86400000 - 1);
+                }
+                return false;
+            });
+
+            eligibleMovs.forEach(mv => {
+                if (mv.isIngresoLibre) {
+                    suma += (mv.ingresosManual || 0);
+                } else if (mv.type === 'jornada') {
+                    const selladoReemb = (!mv.isSelladoInCash && mv.sellado < 0) ? Math.abs(mv.sellado) : 0;
+                    suma += selladoReemb;
+                } else if (mv.type === 'reparto') {
+                    suma += (mv.neto || 0);
+                }
+            });
+
+            // En la Hoja de Marcelo, BOTE = SUMA - RESTA
+            const bote = suma - resta;
 
             totalInicio += inicio;
             totalSuma += suma;
@@ -5105,7 +5194,7 @@ class BoteAppController {
             `;
         }).join('');
 
-        const nextJornadaNum = jornadas.length > 0 ? (jornadas[jornadas.length - 1].number + 1) : 1;
+        const nextJornadaNum = activeCutoff + 1;
 
         const jHeaders1 = jornadas.map(j => `
             <th class="p-1.5 text-center border border-emerald-700/80 bg-emerald-900 text-white font-extrabold text-xs min-w-[90px]" colspan="2">${j.date || ('J' + j.number)}</th>
@@ -5180,9 +5269,28 @@ class BoteAppController {
         const totalVueltas = jornadas.reduce((s, j) => s + ((j.recaudacion || 0) - (j.gastoSellado || 26.25)), 0);
         const totalPremios = jornadas.reduce((s, j) => s + (j.premios || 0), 0);
         const totalBoteComun = totalVueltas + totalPremios;
-        const cajaReal = (data.summary && typeof data.summary.cajaReal === 'number') ? data.summary.cajaReal : (totalBote + totalBoteComun);
+        const cajaReal = totalBote + totalBoteComun;
+
+        const bannerHtml = isHistoricalMode ? `
+            <div id="marcelo-historical-banner" class="p-3 bg-amber-500/15 border border-amber-500/40 rounded-xl text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-lg mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-base sm:text-lg">⏮️</span>
+                    <div>
+                        <strong class="text-amber-300 font-bold">Modo Reconstrucción Histórica Activo (Corte: Jornada ${activeCutoff})</strong>
+                        <p class="text-amber-200/80 text-[11px]">
+                            Estás visualizando los cálculos tal y como estaban en la <strong>Jornada ${activeCutoff} (${cutoffJornada ? (cutoffJornada.date || '') : ''})</strong>.
+                            Mostrando todas las jornadas desde la J1 hasta la J${activeCutoff}. Botes, recaudaciones, vueltas y caja real calculados a esa fecha.
+                        </p>
+                    </div>
+                </div>
+                <button onclick="window.BoteApp.setMarceloCutoff('all')" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1 self-start sm:self-auto">
+                    <span>🔄</span> Ver Temporada Completa
+                </button>
+            </div>
+        ` : '';
 
         container.innerHTML = `
+            ${bannerHtml}
             <div class="overflow-x-auto max-h-[82vh] relative select-none custom-scroll">
                 <table class="w-full text-xs font-mono border-collapse bg-slate-950 table-auto">
                     <!-- CABECERA PRINCIPAL CON FECHAS Y JORNADAS -->
@@ -5296,6 +5404,7 @@ class BoteAppController {
                         </div>
                         <div class="text-xl sm:text-2xl font-mono font-black text-emerald-400 mt-1">${cajaReal.toFixed(2).replace('.', ',')} €</div>
                         <div class="text-[10px] text-slate-400 mt-0.5">Saldos (${totalBote.toFixed(2).replace('.', ',')} €) + Bote Común</div>
+                        ${isHistoricalMode ? `<div class="text-[10px] font-black text-amber-400 uppercase mt-1">Reconstruido hasta J${activeCutoff}</div>` : ''}
                     </div>
                 </div>
             </div>

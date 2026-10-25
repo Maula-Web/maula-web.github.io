@@ -1804,6 +1804,12 @@ class Dashboard2AppController {
             action: 'inicio'
         });
 
+        // 2.d NOVEDAD HOJA DE MARCELO: Reconstrucción Histórica
+        items.push({
+            text: `📑 <strong class="text-emerald-400">Hoja de Marcelo:</strong> Nuevo selector histórico para ver y recalcular al céntimo los botes, sumas, restas y caja real a cualquier jornada anterior.`,
+            url: 'bote_2.html'
+        });
+
         // 2.c QUINIELA DE DOBLES JORNADA 16
         items.push({
             text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsable oficial asignado: <strong>Rafa</strong> (único ganador de la J.14 tras desempate).`,

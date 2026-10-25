@@ -2759,3 +2759,25 @@ html.light-theme #card-desglose-balance-bote {
     border-color: #f59e0b !important;
     outline: none !important;
 }
+
+/* Selector de Jornada de Corte de Marcelo en Tema Claro */
+.light-theme #marcelo-cutoff-container {
+    background-color: #f8fafc !important;
+    border-color: #10b981 !important;
+}
+.light-theme #sel-marcelo-cutoff {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #marcelo-historical-banner {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+.light-theme #marcelo-historical-banner strong {
+    color: #78350f !important;
+}
+.light-theme #marcelo-historical-banner p {
+    color: #92400e !important;
+}
