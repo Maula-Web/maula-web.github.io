@@ -1422,7 +1422,7 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
-## 46. SIMPLIFICACIÓN MÓVIL, TELETIPO EN VIVO, MODO CLARO Y RADIOGRAFÍA (CASILLAS ORO/TRAMPA)
+## 48. SIMPLIFICACIÓN MÓVIL, TELETIPO EN VIVO, MODO CLARO Y RADIOGRAFÍA (CASILLAS ORO/TRAMPA)
 
 ### A. Simplificación Integral en Móviles y Recuperación de Espacio Vertical
 - **Menú y Teletipo Siempre Visibles**: El menú superior (`nav`) y el teletipo informativo permanecen anclados y visibles en todas las hojas tanto en PC como en móvil, permitiendo navegación inmediata en cualquier punto del scroll.
@@ -1453,6 +1453,75 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 - **Glow en Casillas Estadísticas**: Las tarjetas de información de la parrilla (1 a 14) reciben resplandor luminoso (*Glow*):
   - `.casilla-card-gold`: Resplandor dorado cálido (`box-shadow: 0 0 20px rgba(245, 158, 11, 0.45)...`).
   - `.casilla-card-trap`: Resplandor carmesí de peligro (`box-shadow: 0 0 20px rgba(244, 63, 94, 0.45)...`).
+
+---
+
+---
+
+## 49. AISLAMIENTO HISTÓRICO Y CONGELACIÓN INMUTABLE DE LA COLUMNA MAULA
+- **Reactivación Oficial de la Columna Maula**:
+  - Tras resolver discrepancias de sincronización en temporadas pasadas, se reactivó la Columna Maula como referencia comparativa para toda la peña.
+- **Mecanismo de Congelación Inmutable**:
+  - Los 15 signos de la Columna Maula para cada jornada quedan sellados y blindados en el histórico una vez que la jornada se da por disputada.
+  - Esto garantiza que ningún recálculo en caliente, importación retroactiva o actualización de pesos estadísticos pueda alterar las predicciones históricas que la Columna Maula emitió en su momento.
+- **Aislamiento por Jornada**:
+  - Cada jornada almacena su snapshot propio de signos y aciertos dentro de `pronosticosExtra` en Firestore y en el archivo estático consolidado, asegurando perfecta trazabilidad en clasificaciones y estadísticas históricas.
+
+---
+
+## 50. HOJA DE CONTROL OFICIAL DEL TESORERO (RÉPLICA DIGITAL DE MARCELO)
+- **Motivación y Arquitectura**:
+  - El tesorero de la Peña (Marcelo Pérez) mantiene históricamente un libro de cálculo oficial en Excel con una estructura muy querida y comprensible para todos los socios: filas por socio con Bote Inicial, Sumas (cuotas semanales + penalizaciones), Restas (premios personales cobrados) y saldo neto, expandido por columnas semanales con los importes netos de cada jornada.
+  - En la parte inferior, una sección de Liquidación detalla las vueltas acumuladas de la peña (*Bote Maula*), los premios oficiales cobrados por la peña (*Bote Premios*), el fondo común (*Superávit / Bote Común*) y la *Caja Real* total.
+  - Se desarrolló la réplica web idéntica interactiva en `bote_2.html` (`#view-marcelo`) y `js/bote_2.js` (`renderHojaMarcelo`), calculada al vuelo en vivo con el motor oficial `BoteEngine`.
+- **Estructura de Tabla Unificada**:
+  - Para evitar desfases de scroll o descuadres de alineación entre la tabla de socios y la sección inferior de liquidación, ambas zonas se fusionaron en un único `<table>` con cabecera fija y múltiples bloques `<tbody>`. De este modo, cada columna de liquidación de jornada (J.1, J.2, etc.) coincide con precisión micrométrica vertical con las columnas de los socios superiores.
+- **Columna BOTE Congelada y 100% Opaca (Sticky Column)**:
+  - La columna fija `BOTE` (`.marcelo-totales-bote`) cuenta con posicionamiento adhesivo (`sticky left-[200px] z-20`) y fondos 100% sólidos opacos (`bg-slate-900` en socios y `bg-emerald-900` en totales en modo oscuro; `bg-slate-200` y `bg-emerald-800` en modo claro). Esto erradica por completo cualquier efecto de transparencia o solapamiento numérico al desplazarse horizontalmente por las jornadas.
+- **Soporte Dual Riguroso (Modo Oscuro & Modo Claro)**:
+  - En Modo Claro (`.light-theme`), se aplicaron reglas específicas en `css/light-theme.css`:
+    - Fila de Totales Generales (Fila 22): fondo verde oscuro legible (`#064e3b`), texto en blanco nítido (`#ffffff`) y borde contrastado.
+    - Celdas de Premios, Vueltas y Liquidación: fondos pastel contrastados (`#ecfdf5`, `#fffbeb`, `#eff6ff`) con texto tipográfico oscuro de alta legibilidad (`#0f172a`).
+    - Tarjeta inferior *Total Caja Real*: degradado esmeralda suave, texto en verde oscuro institucional y badges perfectamente contrastados.
+- **Selector de Jornada de Corte Histórico (`sel-marcelo-cutoff`)**:
+  - Permite a cualquier socio o auditor seleccionar hasta qué jornada auditar (ej. «Hasta Jornada 5», «Hasta Jornada 10», etc.).
+  - El motor recalcula instantáneamente todas las fórmulas, sumas, restas, botes, vueltas, premios cobrados y la Caja Real acumulada exactamente a como estaba al finalizar dicha jornada, mostrando un indicador de auditoría histórica.
+- **Publicación Oficial y Desacople del Sandbox**:
+  - Tras la validación exhaustiva, la Hoja de Marcelo se retiró de `sandbox_sellado.html` y se publicó de forma oficial en `bote_2.html` como una pestaña visible para todos los socios de la Peña Maulas (`#nav-tab-marcelo`).
+
+---
+
+## 51. SISTEMA DE AVISOS EMERGENTES IN-APP CONFIGURABLES EN ADMINISTRACIÓN
+- **Módulo Controlador (`js/in-app-alerts.js`)**:
+  - Sistema de modales emergentes no invasivos que se disparan de forma inteligente al iniciar sesión un socio o acceder al dashboard principal.
+- **Mensajes Preconfigurados (Nivel A)**:
+  1. ⚠️ **Aviso de Saldo Deudor / Bote Bajo**: Detecta si el saldo del socio es negativo o inferior a 5,00 € y le recuerda regularizar su aportación por Bizum.
+  2. 📝 **Recordatorio de Quiniela Pendiente**: Notifica al socio si aún no ha enviado su pronóstico para la jornada próxima dentro del plazo límite.
+  3. 👑 / ✍️ **Responsabilidad Semanal**: Avisa al socio si le corresponde la quiniela de dobles (ganador previo) o el sellado oficial en loterías.
+- **Panel de Configuración en Administración (`administracion.html`)**:
+  - Permite al administrador activar/desactivar individualmente cada aviso, editar el texto del mensaje dinámicamente y elegir su frecuencia de repetición (`siempre`, `una vez por sesión`, `una vez por semana`, `una sola vez`), persistiendo los ajustes en Firestore / localStorage.
+
+---
+
+## 52. FORMATEO NUMÉRICO UNIVERSAL EN ESPAÑOL (SEPARADOR DE MILES CON PUNTO)
+- **Extensión de Prototipos Nativos (`js/utils.js`)**:
+  - Implementación de `Number.prototype.toSpanishFormat(decimals = 2)` y `String.prototype.toSpanishFormat(decimals = 2)`:
+    - Inserta puntos (`.`) como separadores de miles y coma (`,`) como separador decimal (ej. `1028.3` $\rightarrow$ `1.028,30 €`, `1235.55` $\rightarrow$ `1.235,55 €`, `-1250.5` $\rightarrow$ `-1.250,50 €`).
+    - Manejo robusto de números negativos, números menores a 1.000 (sin puntos superfluos) y cantidades de precisión configurable (1 decimal para medias, 0 para enteros/porcentajes).
+- **Actualización de Helpers Globales**:
+  - `AppUtils.formatEuro(val)` y `AppUtils.formatNumberEs(val, decimals)` migrados al motor `toSpanishFormat`, expuestos en `window.formatEuro` y `window.formatNumberEs`.
+- **Refactorización Masiva**:
+  - Se sustituyeron más de 340 expresiones dispersas (`.toFixed(2).replace('.', ',')`) en todos los controladores: `bote_2.js`, `bote.js`, `dashboard_2.js`, `dashboard.js`, `socios_2.js`, `in-app-alerts.js`, `teletipo.js`, `telegram-service.js`, `sellado-service.js`, `resultados.js`, `resumen-temporada.js`, `pronosticos.js`, `pronosticos_2.html` y `sandbox_sellado.html`.
+- **Inmunidad en Formularios**:
+  - Los campos editables numéricos (`<input type="number">`) y las operaciones aritméticas de cálculo conservan el tipo `float`/número puro, aplicándose el formato español exclusivamente en capas de presentación visual e interfaces.
+
+---
+
+## 53. VELOCIDAD PAUSADA DEL TELETIPO Y CICLO DE SERVICE WORKER (v2.33)
+- **Velocidad del Teletipo**:
+  - Se incrementó la duración de la animación en `js/teletipo.js` para reducir la velocidad del ticker, permitiendo una lectura sosegada de los resultados, clasificaciones y noticias en dispositivos móviles y de escritorio.
+- **Ciclo PWA de Caché**:
+  - El Service Worker avanzó escalonadamente de `maulas-pwa-v2.27` a `maulas-pwa-v2.33`, forzando la renovación instantánea del App Shell en navegadores móviles (iOS Safari, Android Chrome).
 
 ---
 

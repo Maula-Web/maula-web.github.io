@@ -71,25 +71,43 @@ Para cada jornada, el sistema calcula automáticamente:
    - Efectivo
    - Se registran manualmente con fecha, cantidad y concepto
 
-## Vistas Disponibles
+## Vistas Disponibles (Bote 2.0 Pro)
 
-### 1. Vista General
-Muestra un resumen por socio:
-- Total de ingresos acumulados
-- Total de gastos acumulados
-- Bote actual
-- Botón para ver detalle completo
+### 1. 👥 Socios (Cuentas y Extractos)
+Muestra la lista de los 19 socios ordenados por su ID oficial:
+- Ingresos acumulados (bote inicial, Bizums, cuotas).
+- Gastos y penalizaciones aplicadas (unos, bajos aciertos, PIG, maula).
+- Premios cobrados y saldo actual en el bote.
+- Botón **Extracto** para auditar detalladamente socio a socio.
 
-### 2. Vista por Jornada
-Muestra el detalle de cada jornada:
-- Resumen de la jornada (ingresos, gastos, neto)
-- Tabla con todos los socios y sus movimientos
-- Indicadores especiales:
-  - 🎁 = Juega gratis (ganó la jornada anterior)
-  - 2️⃣ = Juega columna de dobles
+### 2. 🗓️ Jornadas
+Detalle contable jornada a jornada:
+- Cuotas recaudadas, sellado del boleto, penalizaciones y neto de la jornada.
+- Desglose por socio de aciertos, penalizaciones y premios.
+- Indicadores: 🎁 Gratis (ganador previo), 2️⃣ Dobles, 💀 Maula, 🎟️ Sellador.
 
-### 3. Vista por Socio
-Lista de todos los socios con acceso rápido a su detalle completo.
+### 3. 🗂️ Matriz Cuadrante
+Radiografía matricial completa (socios x jornadas):
+- Vista cruzada de aportaciones, pagos y penalizaciones de toda la temporada.
+- Identificación de ganadores, perdedores y selladores semanales.
+
+### 4. 📈 Flujo de Caja
+Evolución cronológica de la tesorería de la Peña:
+- Gráficos interactivos de ingresos vs. gastos acumulados.
+- Análisis de balance neto y proyecciones de gasto en sellados.
+
+### 5. 🏆 Dobles & Premios
+Seguimiento exhaustivo de la quiniela de dobles y premios:
+- Historial de apuestas de dobles (16 apuestas condicionadas / 8 dobles reducidos).
+- Registro oficial de premios cobrados y asignación de responsables.
+
+### 6. 📑 Hoja Marcelo (Oficial Tesorería)
+Réplica digital idéntica de la plantilla Excel del tesorero Marcelo Pérez:
+- Columnas fijas de Bote inicial, Sumas (cuotas + multas), Restas (premios) y Saldo neto.
+- Desglose semanal jornada por jornada con alineación vertical estricta.
+- Bloque de Liquidación inferior: Vueltas acumuladas (*Bote Maula*), *Bote Premios*, *Superávit* y *Total Caja Real*.
+- Selector de Jornada de Corte Histórico: permite reconstruir y auditar las cuentas a cualquier jornada pasada.
+- Formato con separadores de miles estándar español (ej. 1.028,30 €).
 
 ## Configuración
 
