@@ -242,6 +242,9 @@ class PronosticoManager {
 
         this.populateDropdowns();
 
+        // Sincronizar y congelar automáticamente las Columnas Maula de jornadas históricas (Opción A)
+        this.syncHistoricalColumnasMaulas().catch(err => console.warn('[Pronosticos] Error sincronizando columnas históricas:', err));
+
         // 1. Auto-selección inmediata del usuario autenticado en la sesión
         const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
         if (userStr) {
@@ -3418,6 +3421,73 @@ class PronosticoManager {
 
         this.updateDoublesCounters();
         this.doublesStatus.innerHTML = '<span style="color:blue;">✅ Copiado desde base. Revisa y guarda.</span>';
+    }
+
+    /**
+     * Sincroniza y congela de forma automática y progresiva (Opción A)
+     * las Columnas Maula de todas las jornadas históricas anteriores en Firestore.
+     */
+    async syncHistoricalColumnasMaulas() {
+        if (!Array.isArray(this.jornadas) || this.jornadas.length === 0) return;
+        if (!Array.isArray(this.members) || this.members.length === 0) return;
+        if (!Array.isArray(this.pronosticos) || this.pronosticos.length === 0) return;
+
+        const syncKey = 'maulas_columnas_maulas_synced_v1';
+        const closedJornadas = this.jornadas.filter(j => 
+            j && (j.status === 'completed' || j.status === 'closed' || j.finalizada === true || (j.matches && j.matches.some(m => m.result && m.result !== '-' && String(m.result).toLowerCase() !== 'por definir')))
+        );
+
+        const needsSync = closedJornadas.some(j => !Array.isArray(j.columnaMaula) || j.columnaMaula.length !== 15);
+        if (!needsSync) return;
+
+        console.log(`[Pronosticos] Iniciando recálculo y congelación histórica de Columnas Maula para ${closedJornadas.length} jornadas...`);
+
+        // Ordenar en orden cronológico ascendente estricto: J1, J2, J3...
+        const sortedJornadas = [...closedJornadas].sort((a, b) => (parseInt(a.number) || 0) - (parseInt(b.number) || 0));
+
+        let updatedCount = 0;
+        for (const j of sortedJornadas) {
+            // Si ya tiene columna congelada válida de 15 signos, no volver a calcularla
+            if (Array.isArray(j.columnaMaula) && j.columnaMaula.length === 15) continue;
+
+            const localKey = `maulas_columna_maula_${j.id}`;
+            let col = null;
+            try {
+                const stored = localStorage.getItem(localKey);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length === 15) col = parsed;
+                }
+            } catch(e) {}
+
+            if (!col) {
+                col = this.calculatePerfectColumn(j);
+            }
+
+            if (Array.isArray(col) && col.length === 15) {
+                j.columnaMaula = col;
+                try {
+                    localStorage.setItem(localKey, JSON.stringify(col));
+                } catch(e) {}
+
+                // Guardar en Firestore para que quede fija en todos los dispositivos de la peña
+                if (window.DataService && typeof window.DataService.update === 'function' && j.id) {
+                    try {
+                        await window.DataService.update('jornadas', String(j.id), { columnaMaula: col });
+                        updatedCount++;
+                    } catch(errUpd) {
+                        console.warn(`[Pronosticos] Error guardando columnaMaula para J${j.number}:`, errUpd);
+                    }
+                }
+            }
+        }
+
+        if (updatedCount > 0) {
+            console.log(`✅ [Pronosticos] ${updatedCount} Columnas Maula históricas congeladas con éxito en Firestore.`);
+        }
+        try {
+            localStorage.setItem(syncKey, 'true');
+        } catch(e) {}
     }
 
     calculatePerfectColumn(currentJornada) {

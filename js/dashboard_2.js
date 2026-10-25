@@ -1788,7 +1788,7 @@ class Dashboard2AppController {
 
         // 2.c4 REACTIVACIÓN DE LA COLUMNA MAULA
         items.push({
-            text: `⭐ <strong class="text-amber-400">Columna Maula Reactivada:</strong> La quiniela colectiva de la peña vuelve a la tabla de pronósticos con cálculo histórico blindado y congelación inmutable para toda la jornada.`,
+            text: `⭐ <strong class="text-amber-400">Columna Maula Histórica:</strong> Reactivada y fijada en todas las jornadas anteriores con cálculo retrospectivo progresivo y congelación inmutable.`,
             url: 'pronosticos_2.html'
         });
 
