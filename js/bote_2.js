@@ -5121,25 +5121,61 @@ class BoteAppController {
             <td class="p-1 border border-emerald-700/80 bg-emerald-900/80 text-center font-mono text-emerald-300 text-xs">-</td>
         `).join('') + `<td class="p-1 border border-emerald-800/60 bg-emerald-950/70 text-center text-slate-500 font-mono text-xs">0,00</td><td class="p-1 border border-emerald-800/60 bg-emerald-950/70 text-center text-slate-500 font-mono text-xs">-</td>`;
 
-        // Subtabla inferior
-        const jLabelsBottom = jornadas.map(j => `<th class="p-1.5 border border-emerald-700 bg-emerald-900 text-white font-extrabold text-xs text-center" colspan="2">J${j.number}</th>`).join('') + `<th class="p-1.5 border border-emerald-800 bg-emerald-950 text-slate-400 font-bold text-xs text-center" colspan="2">J${nextJornadaNum}</th>`;
-        const rowRecaudacion = jornadas.map(j => `<td class="p-1.5 border border-slate-700 bg-slate-900/80 text-amber-300 font-mono font-bold text-center text-xs" colspan="2">${(j.recaudacion || 0).toFixed(2).replace('.', ',')}</td>`).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
-        const rowSellado = jornadas.map(j => `<td class="p-1.5 border border-slate-700 bg-slate-900/80 text-slate-200 font-mono font-bold text-center text-xs" colspan="2">${(j.gastoSellado || 26.25).toFixed(2).replace('.', ',')}</td>`).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+        // Filas de Liquidación 100% integradas en la misma tabla física para alineación exacta
+        const jSelladoHeaderRow = jornadas.map(j => `
+            <td class="p-1.5 border border-slate-700 bg-slate-900 text-slate-300 font-mono font-bold text-center text-xs" colspan="2">
+                ${(j.gastoSellado || 26.25).toFixed(2).replace('.', ',')} €
+            </td>
+        `).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00 €</td>';
+
+        const jLabelsBottom = jornadas.map(j => `
+            <th class="p-1.5 border border-emerald-700 bg-emerald-900 text-white font-extrabold text-xs text-center" colspan="2">
+                J${j.number}
+            </th>
+        `).join('') + `<th class="p-1.5 border border-emerald-800 bg-emerald-950 text-slate-400 font-bold text-xs text-center" colspan="2">J${nextJornadaNum}</th>`;
+
+        const rowRecaudacion = jornadas.map(j => `
+            <td class="p-1.5 border border-slate-700 bg-slate-900/80 text-amber-300 font-mono font-bold text-center text-xs" colspan="2">
+                ${(j.recaudacion || 0).toFixed(2).replace('.', ',')} €
+            </td>
+        `).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00 €</td>';
+
+        const rowSellado = jornadas.map(j => `
+            <td class="p-1.5 border border-slate-700 bg-slate-900/80 text-slate-200 font-mono font-bold text-center text-xs" colspan="2">
+                ${(j.gastoSellado || 26.25).toFixed(2).replace('.', ',')} €
+            </td>
+        `).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00 €</td>';
+
         const rowVueltas = jornadas.map(j => {
             const v = (j.recaudacion || 0) - (j.gastoSellado || 26.25);
             const col = v >= 0 ? 'text-emerald-400 bg-emerald-950/40' : 'text-rose-400 bg-rose-950/50';
-            return `<td class="p-1.5 border border-slate-700 font-mono font-black text-center text-xs ${col}" colspan="2">${v.toFixed(2).replace('.', ',')}</td>`;
-        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+            return `
+                <td class="p-1.5 border border-slate-700 font-mono font-black text-center text-xs ${col}" colspan="2">
+                    ${v >= 0 ? '+' : ''}${v.toFixed(2).replace('.', ',')} €
+                </td>
+            `;
+        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00 €</td>';
+
         const rowPremios = jornadas.map(j => {
             const p = j.premios || 0;
-            const txt = p > 0 ? `${p.toFixed(2).replace('.', ',')}` : '-';
+            const txt = p > 0 ? `${p.toFixed(2).replace('.', ',')} €` : '-';
             const col = p > 0 ? 'text-amber-300 bg-amber-950/50 font-black' : 'text-slate-500 bg-slate-950/30';
-            return `<td class="p-1.5 border border-slate-700 font-mono text-center text-xs ${col}" colspan="2">${txt}</td>`;
-        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+            return `
+                <td class="p-1.5 border border-slate-700 font-mono text-center text-xs ${col}" colspan="2">
+                    ${txt}
+                </td>
+            `;
+        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">-</td>';
+
         const rowBoteMaula = jornadas.map(j => {
             const v = (j.recaudacion || 0) - (j.gastoSellado || 26.25);
-            return `<td class="p-1.5 border border-slate-700 font-mono font-bold text-emerald-300 bg-emerald-950/40 text-center text-xs" colspan="2">${v.toFixed(2).replace('.', ',')}</td>`;
-        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00</td>';
+            const col = v >= 0 ? 'text-emerald-300 bg-emerald-950/40' : 'text-rose-300 bg-rose-950/40';
+            return `
+                <td class="p-1.5 border border-slate-700 font-mono font-bold text-center text-xs ${col}" colspan="2">
+                    ${v >= 0 ? '+' : ''}${v.toFixed(2).replace('.', ',')} €
+                </td>
+            `;
+        }).join('') + '<td class="p-1.5 border border-slate-800 bg-slate-950 text-slate-600 font-mono text-center text-xs" colspan="2">0,00 €</td>';
 
         const totalVueltas = jornadas.reduce((s, j) => s + ((j.recaudacion || 0) - (j.gastoSellado || 26.25)), 0);
         const totalPremios = jornadas.reduce((s, j) => s + (j.premios || 0), 0);
@@ -5147,8 +5183,9 @@ class BoteAppController {
         const cajaReal = (data.summary && typeof data.summary.cajaReal === 'number') ? data.summary.cajaReal : (totalBote + totalBoteComun);
 
         container.innerHTML = `
-            <div class="overflow-x-auto max-h-[78vh] relative select-none">
-                <table class="w-full text-xs font-mono border-collapse bg-slate-950">
+            <div class="overflow-x-auto max-h-[82vh] relative select-none custom-scroll">
+                <table class="w-full text-xs font-mono border-collapse bg-slate-950 table-auto">
+                    <!-- CABECERA PRINCIPAL CON FECHAS Y JORNADAS -->
                     <thead class="sticky top-0 z-30 shadow-md">
                         <tr>
                             <th class="sticky left-0 z-40 bg-emerald-900 text-white font-black p-2 border border-emerald-700 text-center min-w-[75px]" rowspan="2">SELLADOS</th>
@@ -5163,57 +5200,80 @@ class BoteAppController {
                             ${jHeaders2}
                         </tr>
                     </thead>
+
+                    <!-- 1. FILAS DE LOS 19 SOCIOS -->
                     <tbody class="divide-y divide-slate-800">
                         ${rowsHtml}
                     </tbody>
-                    <tfoot class="sticky bottom-0 z-30 font-black border-t-2 border-emerald-500 shadow-xl">
+
+                    <!-- 2. TOTALES CONSOLIDADOS DE LA MATRIZ (FILA 22 DE MARCELO) -->
+                    <tbody class="border-t-2 border-emerald-500 font-black">
                         <tr class="bg-emerald-950">
-                            <td class="sticky left-0 z-40 bg-emerald-950 border border-emerald-700 p-2 text-center text-slate-400 text-xs min-w-[75px]">-</td>
-                            <td class="sticky left-[75px] z-40 bg-emerald-950 border border-emerald-700 p-2 text-left font-black text-white text-xs min-w-[125px]">TOTALES</td>
-                            <td class="sticky left-[200px] z-40 bg-emerald-900 border border-emerald-700 p-2 text-right font-mono font-black text-amber-300 text-xs min-w-[85px]">${totalBote.toFixed(2).replace('.', ',')} €</td>
+                            <td class="sticky left-0 z-20 bg-emerald-950 border border-emerald-700 p-2 text-center text-slate-400 text-xs min-w-[75px]">-</td>
+                            <td class="sticky left-[75px] z-20 bg-emerald-950 border border-emerald-700 p-2 text-left font-black text-white text-xs min-w-[125px]">TOTALES</td>
+                            <td class="sticky left-[200px] z-20 bg-emerald-900 border border-emerald-700 p-2 text-right font-mono font-black text-amber-300 text-xs min-w-[85px]">${totalBote.toFixed(2).replace('.', ',')} €</td>
                             <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs">${totalInicio.toFixed(2).replace('.', ',')}</td>
                             <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs">${totalSuma.toFixed(2).replace('.', ',')}</td>
                             <td class="p-2 border border-emerald-700 bg-emerald-950 text-right font-mono text-emerald-200 text-xs">${totalResta.toFixed(2).replace('.', ',')}</td>
                             ${jFootRec}
                         </tr>
-                    </tfoot>
+                    </tbody>
+
+                    <!-- 3. SECCIÓN LIQUIDACIÓN DE JORNADAS (100% ALINEADA EN LA MISMA TABLA) -->
+                    <tbody class="border-t-4 border-emerald-600/70">
+                        <!-- Fila Sellado Oficial -->
+                        <tr class="bg-slate-900/60">
+                            <td colspan="6" class="sticky left-0 z-20 bg-slate-900 p-2 border border-slate-700 text-slate-300 font-bold text-left px-3 text-xs tracking-wide">
+                                Sellado Oficial por Jornada (Coste Boleto)
+                            </td>
+                            ${jSelladoHeaderRow}
+                        </tr>
+                        <!-- Cabecera de Jornadas para la Liquidación (Idéntica a Fila 25 de Marcelo) -->
+                        <tr class="bg-emerald-950">
+                            <td colspan="6" class="sticky left-0 z-20 bg-emerald-950 p-2 border border-emerald-700 text-emerald-300 font-black text-left px-3 text-xs uppercase tracking-wider">
+                                📊 LIQUIDACIÓN ECONÓMICA DE JORNADAS
+                            </td>
+                            ${jLabelsBottom}
+                        </tr>
+                        <!-- Fila Recaudación -->
+                        <tr class="hover:bg-slate-900/80 transition-colors">
+                            <td colspan="6" class="sticky left-0 z-20 bg-slate-950 border border-slate-800 p-2 font-bold text-amber-300 text-xs text-left px-3">
+                                Recaudación (Aportaciones + Penalizaciones)
+                            </td>
+                            ${rowRecaudacion}
+                        </tr>
+                        <!-- Fila Sellado Oficial Real -->
+                        <tr class="hover:bg-slate-900/80 transition-colors">
+                            <td colspan="6" class="sticky left-0 z-20 bg-slate-950 border border-slate-800 p-2 font-bold text-slate-300 text-xs text-left px-3">
+                                Sellado Oficial LAE (Gasto Real)
+                            </td>
+                            ${rowSellado}
+                        </tr>
+                        <!-- Fila Vueltas -->
+                        <tr class="hover:bg-slate-900/80 transition-colors">
+                            <td colspan="6" class="sticky left-0 z-20 bg-slate-950 border border-slate-800 p-2 font-black text-emerald-400 text-xs text-left px-3">
+                                Vueltas Netas (Recaudación − Sellado)
+                            </td>
+                            ${rowVueltas}
+                        </tr>
+                        <!-- Fila Premios -->
+                        <tr class="hover:bg-slate-900/80 transition-colors">
+                            <td colspan="6" class="sticky left-0 z-20 bg-slate-950 border border-slate-800 p-2 font-bold text-amber-400 text-xs text-left px-3">
+                                Premios Oficiales LAE
+                            </td>
+                            ${rowPremios}
+                        </tr>
+                        <!-- Fila Bote Maula Penalizaciones -->
+                        <tr class="hover:bg-slate-900/80 transition-colors">
+                            <td colspan="6" class="sticky left-0 z-20 bg-slate-950 border border-slate-800 p-2 font-bold text-emerald-300 text-xs text-left px-3">
+                                Bote Maula Penalizaciones (Vueltas Acumuladas)
+                            </td>
+                            ${rowBoteMaula}
+                        </tr>
+                    </tbody>
                 </table>
 
-                <!-- SUBTABLA INFERIOR: LIQUIDACIÓN OFICIAL DE JORNADAS -->
-                <div class="mt-4 pt-3 border-t-2 border-emerald-500/40">
-                    <table class="w-full text-xs font-mono border-collapse bg-slate-950">
-                        <thead>
-                            <tr>
-                                <th class="sticky left-0 z-30 bg-emerald-900 text-white font-black p-2 border border-emerald-700 text-left min-w-[435px]">LIQUIDACIÓN DE JORNADAS</th>
-                                ${jLabelsBottom}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-amber-300">Recaudación</td>
-                                ${rowRecaudacion}
-                            </tr>
-                            <tr>
-                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-slate-300">Sellado Oficial</td>
-                                ${rowSellado}
-                            </tr>
-                            <tr>
-                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-black text-emerald-400">Vueltas</td>
-                                ${rowVueltas}
-                            </tr>
-                            <tr>
-                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-amber-400">Premios</td>
-                                ${rowPremios}
-                            </tr>
-                            <tr>
-                                <td class="sticky left-0 z-20 bg-slate-900 border border-slate-700 p-2 font-bold text-emerald-300">Bote Maula Penalizaciones</td>
-                                ${rowBoteMaula}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- BLOQUE RESUMEN DEL BOTE (Cajas estilo Marcelo) -->
+                <!-- 4. BLOQUE RESUMEN DEL BOTE (Cajas estilo Marcelo en Margen Inferior) -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-3 border-t border-slate-800">
                     <div class="p-3 rounded-xl bg-slate-900/90 border border-emerald-500/40 shadow">
                         <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Vueltas Acumuladas</div>
@@ -5241,7 +5301,6 @@ class BoteAppController {
             </div>
         `;
     }
-
 }
 
 // Inicialización automática
