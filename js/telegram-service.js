@@ -146,13 +146,97 @@ window.TelegramService = {
             maulaCandidates.sort((a, b) => b.id - a.id);
             const loser = maulaCandidates[0];
 
+            // 5. Evaluate Extras / Doubles
+            const extras = pronosticosExtra.filter(p => (
+                (p.jId !== undefined && p.jId !== null ? String(p.jId) : String(p.jornadaId || '')) === String(currentJ.id) ||
+                (p.jId !== undefined && p.jId !== null ? String(p.jId) : String(p.jornadaId || '')) === String(currentJ.number)
+            ));
+            let totalDoblesPrize = 0;
+            const doublesOutputLines = [];
+            const prizeDoublesAuthors = [];
+
+            if (extras.length > 0) {
+                extras.forEach(p => {
+                    const mId = p.mId !== undefined && p.mId !== null ? p.mId : p.memberId;
+                    const authorMember = members.find(m => String(m.id) === String(mId));
+                    const authorName = authorMember ? AppUtils.getMemberName(authorMember) : 'Socio';
+
+                    const sel = p.selection || p.forecast || [];
+                    const doubleCount = sel.filter((s, i) => i < 14 && s && s.length > 1).length;
+                    const isReduced = p.isReduced || (doubleCount === 7);
+                    let ev = null;
+                    if (window.ScoringSystem && typeof window.ScoringSystem.evaluateForecast === 'function') {
+                        ev = window.ScoringSystem.evaluateForecast(sel, officialResults, jDate, { isReduced });
+                    }
+
+                    let hCount = 0;
+                    sel.forEach((s, idx) => {
+                        if (idx < 14 && officialResults[idx] && s && s.includes(officialResults[idx])) hCount++;
+                    });
+
+                    let extraPrize = 0;
+                    const breakdownDetails = [];
+                    const jPrizes = currentJ.prizeRates || currentJ.prizes || {};
+
+                    if (ev && ev.breakdown) {
+                        [15, 14, 13, 12, 11, 10].forEach(cat => {
+                            const count = ev.breakdown[cat] || 0;
+                            let rate = jPrizes[cat] !== undefined ? jPrizes[cat] : jPrizes[String(cat)];
+                            if (typeof rate === 'string') {
+                                rate = parseFloat(rate.replace(/\./g, '').replace(',', '.').replace('€', '').trim()) || 0;
+                            }
+                            rate = Number(rate) || 0;
+                            if (count > 0 && rate > 0) {
+                                extraPrize += count * rate;
+                                breakdownDetails.push(`${count} de ${cat} (${(count * rate).toSpanishFormat()} €)`);
+                            }
+                        });
+                    } else if (hCount >= minHits) {
+                        let rate = jPrizes[hCount] !== undefined ? jPrizes[hCount] : jPrizes[String(hCount)];
+                        if (typeof rate === 'string') {
+                            rate = parseFloat(rate.replace(/\./g, '').replace(',', '.').replace('€', '').trim()) || 0;
+                        }
+                        rate = Number(rate) || 0;
+                        if (rate > 0) {
+                            extraPrize = rate;
+                            breakdownDetails.push(`1 de ${hCount} (${rate.toSpanishFormat()} €)`);
+                        }
+                    }
+
+                    if (extraPrize > 0 && authorMember) {
+                        prizeDoublesAuthors.push(authorName);
+                    }
+
+                    totalDoblesPrize += extraPrize;
+                    const lineLabel = extras.length > 1 ? `🔹 ${authorName}` : `🔹 Resultado`;
+                    let line = `${lineLabel}: *${hCount}* aciertos`;
+                    if (extraPrize > 0) {
+                        line += ` 💰 *${extraPrize.toSpanishFormat()} €*`;
+                        if (breakdownDetails.length > 0) {
+                            line += ` _[${breakdownDetails.join(', ')}]_`;
+                        }
+                    }
+                    doublesOutputLines.push(line);
+                });
+            }
+
             // --- ELIGIBLE FOR NEXT DOBLES ---
-            const eligibleForNext = currentResults
-                .filter(r => r.id === winner.id || (r.hits >= minHits && r.played))
-                .map(r => r.name);
+            let eligibleForNext = [];
+            if (parseInt(currentJ.number, 10) >= 14) {
+                // A partir de J16 (determinado desde J14 en adelante): único ganador oficial tras desempate
+                eligibleForNext = [winner.name];
+                // Excepción por Premio Económico: Si la quiniela de dobles de esta jornada obtuvo premio económico oficial (> 0 €), su autor también repite
+                if (prizeDoublesAuthors.length > 0) {
+                    eligibleForNext.push(...prizeDoublesAuthors);
+                }
+            } else {
+                eligibleForNext = currentResults
+                    .filter(r => r.id === winner.id || (r.hits >= minHits && r.played))
+                    .map(r => r.name);
+            }
             const eligibleNames = [...new Set(eligibleForNext)].sort().join(", ");
 
-            // 5. Build Message
+            // 6. Build Message
             let msg = `🏆 *PEÑA MAULAS - JORNADA ${currentJ.number}* 🏆\n`;
             msg += `📅 _${currentJ.date}_\n\n`;
 
@@ -208,66 +292,10 @@ window.TelegramService = {
                 msg += `❌ Fallan: ${fallantes.length > 0 ? fallantes.join(", ") : 'Ninguno'}\n`;
             }
 
-            // Extras / Doubles
-            const extras = pronosticosExtra.filter(p => (
-                (p.jId !== undefined && p.jId !== null ? String(p.jId) : String(p.jornadaId || '')) === String(currentJ.id) ||
-                (p.jId !== undefined && p.jId !== null ? String(p.jId) : String(p.jornadaId || '')) === String(currentJ.number)
-            ));
-            let totalDoblesPrize = 0;
-            if (extras.length > 0) {
+            if (doublesOutputLines.length > 0) {
                 msg += `\n*✨ ACIERTOS QUINIELA DE DOBLES:*\n`;
-                extras.forEach(p => {
-                    const sel = p.selection || p.forecast || [];
-                    const doubleCount = sel.filter((s, i) => i < 14 && s && s.length > 1).length;
-                    const isReduced = p.isReduced || (doubleCount === 7);
-                    let ev = null;
-                    if (window.ScoringSystem && typeof window.ScoringSystem.evaluateForecast === 'function') {
-                        ev = window.ScoringSystem.evaluateForecast(sel, officialResults, jDate, { isReduced });
-                    }
-
-                    let hCount = 0;
-                    sel.forEach((s, idx) => {
-                        if (idx < 14 && officialResults[idx] && s && s.includes(officialResults[idx])) hCount++;
-                    });
-
-                    let extraPrize = 0;
-                    const breakdownDetails = [];
-                    const jPrizes = currentJ.prizeRates || currentJ.prizes || {};
-
-                    if (ev && ev.breakdown) {
-                        [15, 14, 13, 12, 11, 10].forEach(cat => {
-                            const count = ev.breakdown[cat] || 0;
-                            let rate = jPrizes[cat] !== undefined ? jPrizes[cat] : jPrizes[String(cat)];
-                            if (typeof rate === 'string') {
-                                rate = parseFloat(rate.replace(/\./g, '').replace(',', '.').replace('€', '').trim()) || 0;
-                            }
-                            rate = Number(rate) || 0;
-                            if (count > 0 && rate > 0) {
-                                extraPrize += count * rate;
-                                breakdownDetails.push(`${count} de ${cat} (${(count * rate).toSpanishFormat()} €)`);
-                            }
-                        });
-                    } else if (hCount >= minHits) {
-                        let rate = jPrizes[hCount] !== undefined ? jPrizes[hCount] : jPrizes[String(hCount)];
-                        if (typeof rate === 'string') {
-                            rate = parseFloat(rate.replace(/\./g, '').replace(',', '.').replace('€', '').trim()) || 0;
-                        }
-                        rate = Number(rate) || 0;
-                        if (rate > 0) {
-                            extraPrize = rate;
-                            breakdownDetails.push(`1 de ${hCount} (${rate.toSpanishFormat()} €)`);
-                        }
-                    }
-
-                    totalDoblesPrize += extraPrize;
-                    let line = `🔹 Resultado: *${hCount}* aciertos`;
-                    if (extraPrize > 0) {
-                        line += ` 💰 *${extraPrize.toSpanishFormat()} €*`;
-                        if (breakdownDetails.length > 0) {
-                            line += ` _[${breakdownDetails.join(', ')}]_`;
-                        }
-                    }
-                    msg += `${line}\n`;
+                doublesOutputLines.forEach(l => {
+                    msg += `${l}\n`;
                 });
             }
 
