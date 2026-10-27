@@ -2528,11 +2528,16 @@ html.light-theme #card-desglose-balance-bote {
 .light-theme #card-breakdown-saldos,
 .light-theme #card-breakdown-premios,
 .light-theme #card-breakdown-cuotas,
-.light-theme #card-breakdown-penalizaciones {
+.light-theme #card-breakdown-penalizaciones,
+.light-theme #calc-caja-saldos,
+.light-theme #calc-caja-premios,
+.light-theme #calc-caja-cuotas,
+.light-theme #calc-caja-penalizaciones {
     color: #047857 !important;
 }
 
-.light-theme #card-breakdown-sellados {
+.light-theme #card-breakdown-sellados,
+.light-theme #calc-caja-sellados {
     color: #be123c !important;
 }
 

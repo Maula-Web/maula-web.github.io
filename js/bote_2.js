@@ -794,6 +794,29 @@ class BoteAppController {
         if (cardBreakdownTotalCaja) {
             cardBreakdownTotalCaja.textContent = (s.cajaReal || 0).toSpanishFormat() + ' €';
         }
+
+        // Actualizar línea de 'Cálculo oficial de Caja Real' para sincronizar con las tarjetas
+        const calcCajaSaldos = document.getElementById('calc-caja-saldos');
+        const calcCajaPremios = document.getElementById('calc-caja-premios');
+        const calcCajaCuotas = document.getElementById('calc-caja-cuotas');
+        const calcCajaPenalizaciones = document.getElementById('calc-caja-penalizaciones');
+        const calcCajaSellados = document.getElementById('calc-caja-sellados');
+
+        if (calcCajaSaldos) {
+            calcCajaSaldos.textContent = `${actualSumaSaldos >= 0 ? '+' : ''}${actualSumaSaldos.toSpanishFormat()} €`;
+        }
+        if (calcCajaPremios) {
+            calcCajaPremios.textContent = `+${actualTotalPremios.toSpanishFormat()} €`;
+        }
+        if (calcCajaCuotas) {
+            calcCajaCuotas.textContent = `+${actualTotalCuotas.toSpanishFormat()} €`;
+        }
+        if (calcCajaPenalizaciones) {
+            calcCajaPenalizaciones.textContent = `+${actualTotalPenalizaciones.toSpanishFormat()} €`;
+        }
+        if (calcCajaSellados) {
+            calcCajaSellados.textContent = `${actualTotalSellados.toSpanishFormat()} €`;
+        }
         if (bSocios) bSocios.textContent = data.memberSummaries.length;
         if (bJornadas) bJornadas.textContent = data.jornadaSummaries.length;
 

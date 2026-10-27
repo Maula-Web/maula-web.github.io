@@ -1850,6 +1850,12 @@ class Dashboard2AppController {
             action: 'inicio'
         });
 
+        // NOTICIA BOTE: Sincronización del Cálculo Oficial de Caja Real
+        items.push({
+            text: '💰 <strong class="text-amber-400">Auditoría del Bote:</strong> Sincronización dinámica de la fórmula de Cálculo de Caja Real con las tarjetas contables de saldos, premios, cuotas, penalizaciones y sellados.',
+            action: 'bote'
+        });
+
         // 1.d VELOCIDAD Y ANUNCIOS DE SOCIOS EN TELETIPO
         items.push({
             text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios (1 por semana, 3 días de vigencia) desde Administración.',
