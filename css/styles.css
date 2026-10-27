@@ -4521,6 +4521,66 @@ button:not(:disabled):active {
     -webkit-backdrop-filter: blur(16px);
 }
 
+/* Ajuste de controles móviles (< 768px) para evitar desbordamiento del botón Salir (puerta) */
+@media (max-width: 767px) {
+    .main-navbar-sticky {
+        padding: 0.375rem 0.5rem !important;
+        box-sizing: border-box !important;
+    }
+    .main-navbar-sticky > div:first-child {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.25rem !important;
+        min-width: 0 !important;
+    }
+    .main-navbar-sticky > div:first-child > a {
+        min-width: 0 !important;
+        flex-shrink: 1 !important;
+        gap: 0.375rem !important;
+    }
+    .main-navbar-sticky > div:first-child > a img {
+        width: 2rem !important;
+        height: 2rem !important;
+        flex-shrink: 0 !important;
+    }
+    .main-navbar-sticky > div:first-child > a span:first-child {
+        font-size: 0.8125rem !important;
+        white-space: nowrap !important;
+    }
+    .main-navbar-sticky .flex.md\:hidden {
+        gap: 0.25rem !important;
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
+    }
+    #version-switcher-container-mobile,
+    #theme-switcher-container-mobile {
+        padding: 0.125rem !important;
+        font-size: 0.625rem !important;
+        flex-shrink: 0 !important;
+    }
+    #version-switcher-container-mobile button,
+    #theme-switcher-container-mobile button {
+        padding: 0.125rem 0.35rem !important;
+        font-size: 0.625rem !important;
+        line-height: 1 !important;
+    }
+    .main-navbar-sticky .flex.md\:hidden button[title="Actualizar"],
+    .main-navbar-sticky .flex.md\:hidden button[title="Cerrar sesión"] {
+        width: 1.625rem !important;
+        height: 1.625rem !important;
+        font-size: 0.75rem !important;
+        flex-shrink: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+}
+
 /* =========================================================================
    TELETIPO / TICKER INFERIOR EN TODAS LAS HOJAS
    ========================================================================= */

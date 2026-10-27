@@ -1844,6 +1844,12 @@ class Dashboard2AppController {
             items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
 
+        // 1.c MEJORA ERGONOMÍA MÓVIL: Menú Superior
+        items.push({
+            text: '📱 <strong class="text-amber-400">Mejora Móvil:</strong> Menú superior y botones de acción (actualizar y cerrar sesión) reajustados para visualización perfecta en cualquier móvil sin cortes.',
+            action: 'inicio'
+        });
+
         // 1.b NOVEDAD RESULTADOS: Matriz Panorámica en PC
         items.push({
             text: '🗂️ <strong class="text-amber-400">Novedad Resultados (PC):</strong> Nueva vista de <strong>Matriz Panorámica</strong> en pantalla única con todos los resultados 1X2, P15 y PIGs de la temporada.',

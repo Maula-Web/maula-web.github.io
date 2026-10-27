@@ -553,10 +553,10 @@
         <!-- NAVBAR SUPERIOR MAULAS 2.0 (NAVEGACIÓN UNIVERSAL Y SELECTOR DE SECCIÓN) -->
         <nav class="glass-panel main-navbar-sticky sticky top-0 p-2 sm:p-2.5 xl:p-3 border-amber-500/40 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 z-[100] shadow-xl">
             <!-- Fila Superior: Brand + Usuario + Controles -->
-            <div class="flex items-center justify-between gap-2 w-full md:w-auto flex-shrink-0">
+            <div class="flex items-center justify-between gap-1 sm:gap-2 w-full md:w-auto min-w-0">
                 <!-- Brand / Logo & Temporada -->
-                <a href="dashboard_2.html" class="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
-                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-9 h-9 sm:w-11 sm:h-11 xl:w-12 xl:h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform flex-shrink-0">
+                <a href="dashboard_2.html" class="flex items-center gap-1.5 sm:gap-2.5 group shrink min-w-0">
+                    <img src="LOGO_MAULAS.png?v=2" alt="Peña Maulas" class="w-8 h-8 sm:w-11 sm:h-11 xl:w-12 xl:h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform shrink-0">
                     <div class="leading-tight flex flex-col justify-center">
                         <div class="flex items-center gap-1.5">
                             <span class="font-black text-white text-sm sm:text-base tracking-wide whitespace-nowrap group-hover:text-amber-400 transition-colors">PEÑA MAULAS</span>
@@ -567,7 +567,7 @@
                 </a>
 
                 <!-- Controles Compactos para Móvil (< md) -->
-                <div class="flex md:hidden items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                <div class="flex md:hidden items-center gap-0.5 sm:gap-1.5 shrink-0 ml-auto">
                     <!-- Selector Versión Móvil -->
                     <div class="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-amber-500/40 text-[11px] font-bold shadow-inner" id="version-switcher-container-mobile">
                         <button type="button" data-version-btn="v1" onclick="window.AppVersion && window.AppVersion.switchMode('v1')" class="px-1.5 py-0.5 rounded text-[11px] font-semibold transition text-slate-400" title="1.0 Clásica">1.0</button>
@@ -581,10 +581,10 @@
                     </div>
 
                     <!-- Botón Actualizar Móvil -->
-                    <button onclick="if(window.Auth && window.Auth.forceAppUpdate){window.Auth.forceAppUpdate();}else{location.reload(true);}" class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs flex items-center justify-center font-bold" title="Actualizar">🔄</button>
+                    <button onclick="if(window.Auth && window.Auth.forceAppUpdate){window.Auth.forceAppUpdate();}else{location.reload(true);}" class="w-6 h-6 sm:w-7 sm:h-7 shrink-0 rounded-lg bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs flex items-center justify-center font-bold" title="Actualizar">🔄</button>
 
                     <!-- Botón Salir Móvil -->
-                    <button onclick="if(window.Auth && window.Auth.logout){window.Auth.logout();}else{sessionStorage.clear();localStorage.clear();location.href='login.html';}" class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-rose-400 border border-slate-700 text-xs flex items-center justify-center font-bold" title="Cerrar sesión">🚪</button>
+                    <button onclick="if(window.Auth && window.Auth.logout){window.Auth.logout();}else{sessionStorage.clear();localStorage.clear();location.href='login.html';}" class="w-6 h-6 sm:w-7 sm:h-7 shrink-0 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-rose-400 border border-slate-700 text-xs flex items-center justify-center font-bold" title="Cerrar sesión">🚪</button>
                 </div>
             </div>
 
