@@ -1876,7 +1876,7 @@ class Dashboard2AppController {
 
         // 2.f EXPERIMENTAL MODO FÁCIL
         items.push({
-            text: `⚡ <strong class="text-amber-400">En Desarrollo:</strong> Nuevo Modo Fácil simplificado en fase beta privada de pruebas para una experiencia más rápida y directa.`,
+            text: `⚡ <strong class="text-amber-400">En Desarrollo:</strong> Tarjetas de balance y tesorería optimizadas en cuadrícula ergonómica compacta (2-2-1) en móviles.`,
             url: 'dashboard_2.html'
         });
 

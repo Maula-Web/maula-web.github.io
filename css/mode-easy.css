@@ -155,3 +155,11 @@
 .mode-easy .badge-mode-easy {
     display: inline-flex !important;
 }
+
+/* --- 7. TARJETA DE BALANCE EN MODO FÁCIL (DISTRIBUCIÓN 2, 2 Y 1) --- */
+.mode-easy #card-desglose-balance-bote .breakdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.mode-easy #card-desglose-balance-bote .breakdown-item-resta {
+    grid-column: span 2 / span 2 !important;
+}
