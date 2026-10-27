@@ -1661,6 +1661,15 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 63. REUBICACIÓN DEL BOTÓN 'VER BOTE' EN LÍNEA PROPIA EN MODO FÁCIL MÓVIL (v2.54)
+- **Bajada a segunda línea independiente (css/mode-easy.css)**:
+  - En la tarjeta del socio (user-summary-card) dentro de Modo Fácil en móvil (max-width: 767px), la fila de tesorería (#user-card-treasury-row) contenía en una sola línea 💰 Caja, 👤 Mi Bote y el botón destacado Ver bote →, provocando compresión horizontal.
+  - Se aplicó lex-wrap: wrap !important a #user-card-treasury-row y se expandió el botón .btn-destacado-bote / #user-card-bote-link a width: 100% !important con justify-content: center !important, de modo que:
+    * **Línea superior**: Muestra 💰 Caja: [cantidad] a la izquierda y 👤 Mi Bote: [cantidad] a la derecha con holgura y separación óptima.
+    * **Línea inferior**: Muestra el botón destacado Ver bote → en su propia fila completa, centrado y con ergonomía táctil idónea sin provocar desbordamientos ni scroll vertical.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

@@ -1880,7 +1880,7 @@ class Dashboard2AppController {
 
         // NOTICIA REDISTRIBUCIÓN Y AJUSTES MODO FÁCIL MÓVIL
         items.push({
-            text: '📱 <strong class="text-amber-400">Modo Fácil Móvil:</strong> Reorganización limpia de cabecera de jornada sin solapes, barra inferior simétrica de 5 accesos esenciales sin recortes, cohesión vertical y pantalla única sin scroll (v2.53).',
+            text: '📱 <strong class="text-amber-400">Modo Fácil Móvil:</strong> Reorganización limpia de cabecera de jornada sin solapes, botón \'Ver bote\' reubicado en línea propia para mayor ergonomía y pantalla única sin scroll (v2.54).',
             action: 'inicio'
         });
 
