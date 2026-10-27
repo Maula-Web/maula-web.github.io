@@ -321,9 +321,9 @@
                 url: 'bote_2.html'
             });
 
-            // NOTICIA 2.c: QUINIELA DE DOBLES JORNADA 16
+            // NOTICIA 2.c: QUINIELA DE DOBLES JORNADA 18
             items.push({
-                text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.16:</strong> Responsable oficial asignado: <strong>Rafa</strong> (único ganador de la J.14 tras desempate).`,
+                text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.18:</strong> Responsables oficiales asignados: <strong>Samu</strong> (ganador único J.16 tras desempate) y <strong>Rafa</strong> (premio oficial de 5,61 € en dobles J.16).`,
                 url: 'pronosticos_2.html'
             });
 
