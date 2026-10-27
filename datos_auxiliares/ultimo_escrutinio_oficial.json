@@ -1,97 +1,112 @@
 {
   "success": true,
-  "source": "El País Sorteos",
-  "dateStr": "domingo 25/10/2026",
+  "source": "RTVE Loterías",
+  "dateStr": "Domingo, 25 OCT 2026",
   "matches": [
     {
       "num": 1,
+      "result": "2",
       "home": "Rayo Vallecano (m)",
       "away": "Elche (m)",
-      "result": "2"
+      "score": "0 - 3"
     },
     {
       "num": 2,
+      "result": "2",
       "home": "Valencia (m)",
       "away": "Villarreal (m)",
-      "result": "2"
+      "score": "1 - 2"
     },
     {
       "num": 3,
+      "result": "1",
       "home": "At. Madrid (m)",
       "away": "Deportivo (m)",
-      "result": "1"
+      "score": "1 - 0"
     },
     {
       "num": 4,
+      "result": "1",
       "home": "Athletic Club (m)",
       "away": "Getafe (m)",
-      "result": "1"
+      "score": "4 - 0"
     },
     {
       "num": 5,
+      "result": "X",
       "home": "Celta (m)",
       "away": "Betis (m)",
-      "result": "X"
+      "score": "0 - 0"
     },
     {
       "num": 6,
+      "result": "1",
       "home": "Real Sociedad (m)",
       "away": "Levante (m)",
-      "result": "1"
+      "score": "2 - 1"
     },
     {
       "num": 7,
+      "result": "1",
       "home": "Sevilla (m)",
       "away": "Osasuna (m)",
-      "result": ""
+      "score": "2 - 0"
     },
     {
       "num": 8,
-      "home": "Leganés (m)",
+      "result": "X",
+      "home": "Legan�s (m)",
       "away": "Mallorca (m)",
-      "result": "X"
+      "score": "1 - 1"
     },
     {
       "num": 9,
-      "home": "Almería (m)",
+      "result": "X",
+      "home": "Almer�a (m)",
       "away": "R. Oviedo (m)",
-      "result": "X"
+      "score": "2 - 2"
     },
     {
       "num": 10,
+      "result": "X",
       "home": "Sabadell (m)",
       "away": "Tenerife (m)",
-      "result": "X"
+      "score": "1 - 1"
     },
     {
       "num": 11,
-      "home": "Logroño (f)",
+      "result": "1",
+      "home": "Logro�o (f)",
       "away": "Badalona W. (f)",
-      "result": "1"
+      "score": "1 - 0"
     },
     {
       "num": 12,
+      "result": "1",
       "home": "Deportivo (f)",
-      "away": "Alavés (f)",
-      "result": "1"
+      "away": "Alav�s (f)",
+      "score": "2 - 1"
     },
     {
       "num": 13,
+      "result": "X",
       "home": "Eibar (f)",
       "away": "Madrid CFF (f)",
-      "result": "X"
+      "score": "2 - 2"
     },
     {
       "num": 14,
+      "result": "1",
       "home": "Real Madrid (f)",
       "away": "Tenerife (f)",
-      "result": "1"
+      "score": "3 - 2"
     },
     {
       "num": 15,
+      "result": "1-2",
       "home": "Barcelona (m)",
       "away": "Real Madrid (m)",
-      "result": "1-2"
+      "score": "1 - 2"
     }
   ],
   "prizes": {
