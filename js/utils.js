@@ -1443,19 +1443,30 @@ if (typeof document !== 'undefined') {
         // Auto-centrar la pestaña activa del menú en pantallas de móvil (solo el contenedor, nunca la ventana)
         try {
             if (window.innerWidth < 1024) {
-                const activeNavTab = document.querySelector('nav a[class*="bg-amber-500"], nav a[class*="bg-amber-500/20"]');
-                if (activeNavTab) {
-                    const navContainer = activeNavTab.closest('.overflow-x-auto') || activeNavTab.parentElement;
-                    if (navContainer) {
-                        setTimeout(() => {
-                            const targetScroll = activeNavTab.offsetLeft - (navContainer.clientWidth / 2) + (activeNavTab.clientWidth / 2);
-                            navContainer.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
-                            // Bloquear y resetear cualquier desplazamiento horizontal de la ventana global
-                            if (window.scrollX !== 0 || document.documentElement.scrollLeft !== 0) {
-                                window.scrollTo({ left: 0 });
-                                document.documentElement.scrollLeft = 0;
-                            }
-                        }, 100);
+                const isEasyMode = document.documentElement.classList.contains('mode-easy') || (document.body && document.body.classList.contains('mode-easy'));
+                const navContainer = document.querySelector('nav .overflow-x-auto') || document.querySelector('nav .no-scrollbar');
+                if (navContainer) {
+                    if (isEasyMode) {
+                        // En Modo Fácil, mantener siempre el menú anclado al inicio para no cortar 'Inicio'
+                        navContainer.scrollLeft = 0;
+                    } else {
+                        const activeNavTab = document.querySelector('nav a[class*="bg-amber-500"], nav a[class*="bg-amber-500/20"]');
+                        if (activeNavTab) {
+                            setTimeout(() => {
+                                // Si es la primera pestaña (Inicio), no desplazar
+                                const firstLink = navContainer.querySelector('a');
+                                if (activeNavTab === firstLink || activeNavTab.dataset.versionLink === 'dashboard') {
+                                    navContainer.scrollLeft = 0;
+                                    return;
+                                }
+                                const targetScroll = activeNavTab.offsetLeft - (navContainer.clientWidth / 2) + (activeNavTab.clientWidth / 2);
+                                navContainer.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
+                                if (window.scrollX !== 0 || document.documentElement.scrollLeft !== 0) {
+                                    window.scrollTo({ left: 0 });
+                                    document.documentElement.scrollLeft = 0;
+                                }
+                            }, 100);
+                        }
                     }
                 }
             }

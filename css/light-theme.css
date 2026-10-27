@@ -2252,12 +2252,28 @@ html.light-theme #user-summary-card {
 .light-theme #user-card-live-hits-label {
     color: #334155 !important;
 }
+.light-theme .btn-destacado-boleto,
 .light-theme #user-card-boleto-link {
-    color: #047857 !important;
-    border-color: rgba(16, 185, 129, 0.25) !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border: 1.5px solid #047857 !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35) !important;
 }
+.light-theme .btn-destacado-boleto:hover,
 .light-theme #user-card-boleto-link:hover {
-    color: #065f46 !important;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ffffff !important;
+}
+
+.light-theme .btn-destacado-dobles {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    border: 1.5px solid #b45309 !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35) !important;
+}
+.light-theme .btn-destacado-dobles:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+    color: #ffffff !important;
 }
 
 /* Caja 2: General (Ámbar / Oro) */

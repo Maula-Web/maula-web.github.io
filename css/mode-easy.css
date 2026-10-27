@@ -31,9 +31,12 @@
     display: none !important;
 }
 
-/* Centrar la botonera simplificada del menú */
-.mode-easy nav .no-scrollbar {
-    justify-content: center !important;
+/* Anclar la botonera simplificada del menú a la izquierda para evitar cortes en 'Inicio' */
+.mode-easy nav .no-scrollbar,
+.mode-easy nav .overflow-x-auto {
+    justify-content: flex-start !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
 }
 
 /* --- 2. DASHBOARD (INICIO) --- */
@@ -136,24 +139,24 @@
     color: #0f172a !important;
 }
 
-/* Píldora de aviso de Modo Fácil */
+/* Píldora de aviso de Modo Fácil - OCULTA SIEMPRE POR DEFECTO, SOLO VISIBLE EN .mode-easy */
 .badge-mode-easy {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    display: none !important;
 }
 
-.mode-easy .badge-mode-easy {
+:is(.mode-easy, html.mode-easy, body.mode-easy) .badge-mode-easy {
     display: inline-flex !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    padding: 3px 10px !important;
+    border-radius: 9999px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    align-items: center !important;
+    gap: 4px !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important;
 }
 
 /* --- 7. TARJETA DE BALANCE EN MODO FÁCIL (DISTRIBUCIÓN 2, 2 Y 1) --- */
@@ -162,4 +165,106 @@
 }
 .mode-easy #card-desglose-balance-bote .breakdown-item-resta {
     grid-column: span 2 / span 2 !important;
+}
+
+/* --- 8. REALCE DE BOTONES, ACCESOS Y TIPOGRAFÍAS EN MODO FÁCIL --- */
+/* Textos más legibles y claros */
+.mode-easy #user-card-name {
+    font-size: 1.15rem !important;
+}
+.mode-easy #user-card-live-hits {
+    font-size: 1.15rem !important;
+}
+.mode-easy #live-banner-title {
+    font-size: 1.25rem !important;
+}
+
+/* Botón Destacado 'Ver mi boleto' */
+.btn-destacado-boleto {
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.3) 0%, rgba(4, 120, 87, 0.4) 100%);
+    border: 1.5px solid rgba(52, 211, 153, 0.6);
+    color: #6ee7b7;
+    transition: all 0.2s ease;
+}
+.mode-easy .btn-destacado-boleto {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #34d399 !important;
+    font-size: 0.85rem !important;
+    font-weight: 900 !important;
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
+}
+.mode-easy .btn-destacado-boleto:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-color: #a7f3d0 !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6) !important;
+    transform: translateY(-1px);
+}
+
+/* Botón Destacado 'Boleto' en Dobles */
+.btn-destacado-dobles {
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.3) 0%, rgba(180, 83, 9, 0.4) 100%);
+    border: 1.5px solid rgba(251, 191, 36, 0.6);
+    color: #fde68a;
+    transition: all 0.2s ease;
+}
+.mode-easy .btn-destacado-dobles {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #fbbf24 !important;
+    font-size: 0.85rem !important;
+    font-weight: 900 !important;
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45) !important;
+}
+.mode-easy .btn-destacado-dobles:hover {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    border-color: #fef3c7 !important;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6) !important;
+    transform: translateY(-1px);
+}
+
+/* Estado de quiniela y panel de sellado */
+.mode-easy #user-card-forecast-status {
+    padding: 0.75rem 1rem !important;
+    border-width: 2px !important;
+    border-color: rgba(245, 158, 11, 0.7) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+.mode-easy #user-card-forecast-status-action {
+    font-size: 0.85rem !important;
+    font-weight: 900 !important;
+    background: rgba(245, 158, 11, 0.25) !important;
+    padding: 0.3rem 0.75rem !important;
+    border-radius: 0.5rem !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.6) !important;
+    color: #fef3c7 !important;
+}
+
+/* Grandes Botones de Acción Directa (Quiniela, Jornada, Clasificación) */
+.mode-easy .btn-hero-action {
+    padding: 0.9rem 0.5rem !important;
+    border-width: 2.5px !important;
+    font-size: 0.95rem !important;
+    font-weight: 900 !important;
+    border-radius: 0.85rem !important;
+}
+.mode-easy .btn-hero-quiniela {
+    background: linear-gradient(135deg, #065f46 0%, #022c22 100%) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5) !important;
+}
+.mode-easy .btn-hero-jornada {
+    background: linear-gradient(135deg, #075985 0%, #082f49 100%) !important;
+    border-color: #0ea5e9 !important;
+    box-shadow: 0 6px 22px rgba(14, 165, 233, 0.5) !important;
+}
+.mode-easy .btn-hero-clasificacion {
+    background: linear-gradient(135deg, #6b21a8 0%, #3b0764 100%) !important;
+    border-color: #a855f7 !important;
+    box-shadow: 0 6px 22px rgba(168, 85, 247, 0.5) !important;
 }

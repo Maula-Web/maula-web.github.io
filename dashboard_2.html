@@ -672,21 +672,24 @@
         <div id="live-jornada-banner" class="glass-panel p-3 sm:p-4 md:p-6 lg:p-7 border-amber-500/40 relative shadow-xl space-y-2.5 sm:space-y-3.5 md:space-y-5">
             <!-- Fila Superior: Siguiente Jornada + Cuenta Atrás / Tiempo Límite -->
             <div class="border-b border-slate-800/80 pb-2 md:pb-3 space-y-1.5 md:space-y-2">
-                <!-- Badges y Cuenta Atrás Digital -->
-                <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1.5 md:gap-2 flex-wrap">
-                        <span id="live-banner-icon" class="text-base sm:text-lg md:text-2xl shrink-0">⚽</span>
-                        <span id="live-banner-tag" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded text-[10px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono">
-                            Próxima Jornada
-                        </span>
-                        <span id="cd-status-badge" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400"></span>
-                            <span>Plazo Abierto</span>
-                        </span>
+                <!-- Fila 1: Balón + Próxima Jornada + Plazo Abierto en la MISMA línea horizontal -->
+                <div class="flex items-center gap-1.5 md:gap-2 flex-nowrap overflow-x-auto no-scrollbar">
+                    <span id="live-banner-icon" class="text-base sm:text-lg md:text-2xl shrink-0">⚽</span>
+                    <span id="live-banner-tag" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded text-[10px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono whitespace-nowrap shrink-0">
+                        Próxima Jornada
+                    </span>
+                    <span id="cd-status-badge" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 whitespace-nowrap shrink-0">
+                        <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400"></span>
+                        <span>Plazo Abierto</span>
+                    </span>
+                </div>
+
+                <!-- Fila 2: Chapa Modo Fácil (izquierda) y Reloj digital bajado ligeramente (derecha) a la misma altura -->
+                <div class="flex items-center justify-between gap-2 pt-0.5">
+                    <div class="flex items-center">
                         <span class="badge-mode-easy hidden">⚡ Modo Fácil</span>
                     </div>
-
-                    <!-- Cuenta atrás digital con tamaño dinámico (grande en cuenta atrás, compacta en juego) -->
+                    <!-- Cuenta atrás digital con tamaño dinámico -->
                     <div id="countdown-timer-container" class="countdown-idle flex items-center justify-end font-mono font-black text-white shrink-0">
                         <span class="bg-slate-950/80 rounded border border-slate-800 text-amber-400 font-mono cd-digit" id="cd-days">--</span><span class="text-slate-500 cd-unit">d</span>
                         <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-hours">--</span><span class="text-slate-500 cd-unit">h</span>
@@ -695,7 +698,7 @@
                     </div>
                 </div>
 
-                <!-- Título Completo de la Jornada y Fecha Límite -->
+                <!-- Fila 3: Título Completo de la Jornada y Fecha Límite -->
                 <div class="flex items-center justify-between gap-2 flex-wrap pt-0.5">
                     <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base md:text-xl lg:text-2xl uppercase tracking-tight">
                         Jornada 15
@@ -712,28 +715,25 @@
             <div id="hero-pillars-grid" class="flex flex-col gap-2 sm:gap-2.5">
                 <!-- Ventana 1: Tarjeta Resumen del Socio Conectado (Ocupa todo el ancho) -->
                 <div id="user-summary-card" class="p-2 sm:p-2.5 md:p-3 rounded-xl bg-gradient-to-r from-slate-950/95 via-slate-900/95 to-indigo-950/70 border border-indigo-500/40 shadow-lg flex flex-col justify-between gap-1.5">
-                    <!-- Fila 1 (Cabecera): Nombre del socio conectado y Badge PIG si existe -->
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <!-- Fila 1: Nombre del socio conectado, Jornada/Aciertos y Botón Destacado 'Ver mi boleto' en la MISMA línea -->
+                    <div class="flex items-center justify-between gap-2 min-w-0">
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
                             <span id="user-card-avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-xs font-bold shrink-0">👤</span>
-                            <div class="truncate">
-                                <span class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Socio Conectado</span>
+                            <div class="flex items-baseline gap-1.5 min-w-0 truncate">
                                 <h3 id="user-card-name" class="text-xs sm:text-sm md:text-base font-black text-amber-300 leading-tight truncate">Cargando...</h3>
+                                <div class="flex items-center gap-1 text-[11px] sm:text-xs shrink-0 font-medium">
+                                    <span class="text-slate-500">•</span>
+                                    <span id="user-card-live-hits" class="font-mono font-black text-amber-400">--</span>
+                                    <span id="user-card-live-hits-label" class="text-slate-400 text-[10px] sm:text-[11px] hidden xs:inline">por disputar</span>
+                                </div>
+                            </div>
+                            <div id="user-card-pig-badge" class="hidden px-1.5 py-0.2 rounded-full text-[9px] sm:text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse flex items-center gap-1 shrink-0">
+                                <span>🐷</span> <span>PIG</span>
                             </div>
                         </div>
-                        <div id="user-card-pig-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse flex items-center gap-1 shrink-0">
-                            <span>🐷</span> <span>¡Jornada PIG!</span>
-                        </div>
-                    </div>
 
-                    <!-- Fila 2: Aciertos de la Jornada en Curso + Enlace al Boleto del Socio -->
-                    <div class="flex items-center justify-between gap-2 py-0.5 border-t border-slate-800/60">
-                        <div class="flex items-baseline gap-1.5 min-w-0">
-                            <span class="text-xs sm:text-sm">⚽</span>
-                            <span id="user-card-live-hits" class="text-sm sm:text-base font-black font-mono text-emerald-400 tracking-tight">--</span>
-                            <span id="user-card-live-hits-label" class="text-[11px] sm:text-xs text-slate-300 font-semibold truncate">aciertos en juego</span>
-                        </div>
-                        <a id="user-card-boleto-link" href="pronosticos_2.html?openEditor=true" onclick="if(window.DashboardApp && window.DashboardApp.openUserBoletoModal){window.DashboardApp.openUserBoletoModal(event);}" class="text-[11px] sm:text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer">
+                        <!-- Botón Destacado 'Ver mi boleto' -->
+                        <a id="user-card-boleto-link" href="pronosticos_2.html?openEditor=true" onclick="if(window.DashboardApp && window.DashboardApp.openUserBoletoModal){window.DashboardApp.openUserBoletoModal(event);}" class="btn-destacado-boleto px-2.5 py-1 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/40 text-emerald-300 hover:text-white border border-emerald-500/60 font-black text-[11px] sm:text-xs shadow-md shadow-emerald-500/10 flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer transition-all active:scale-95">
                             <span id="user-card-boleto-text">🎫 Ver mi boleto →</span>
                         </a>
                     </div>
@@ -795,7 +795,7 @@
                                 </span>
                                 <span id="mobile-dobles-hits-badge" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"></span>
                             </div>
-                            <span class="text-amber-400 group-hover:text-amber-300 font-bold text-[10px] sm:text-[11px] shrink-0 group-hover:underline">Boleto →</span>
+                            <span class="btn-destacado-dobles px-2.5 py-1 rounded-lg bg-amber-500/25 hover:bg-amber-500/40 text-amber-300 hover:text-white border border-amber-500/60 font-black text-[11px] sm:text-xs shadow-md shadow-amber-500/10 flex items-center gap-1 shrink-0 whitespace-nowrap transition-all active:scale-95"><span>🎫 Boleto</span> <span>→</span></span>
                         </div>
                         <!-- Nombres completos de todos los socios que rellenan dobles -->
                         <div id="mobile-dobles-names" class="text-xs sm:text-sm font-black text-amber-300 leading-snug py-0.5 break-words">
@@ -851,7 +851,7 @@
                                 <span class="text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1 truncate">
                                     <span>👑</span> Dobles
                                 </span>
-                                <span class="text-amber-400 group-hover:text-amber-300 font-bold flex items-center gap-0.5 group-hover:underline shrink-0 text-[10px] sm:text-xs">Boleto →</span>
+                                <span class="btn-destacado-dobles px-2.5 py-1 rounded-lg bg-amber-500/25 hover:bg-amber-500/40 text-amber-300 hover:text-white border border-amber-500/60 font-black text-[11px] sm:text-xs shadow-md shadow-amber-500/10 flex items-center gap-1 shrink-0 whitespace-nowrap transition-all active:scale-95"><span>🎫 Boleto</span> <span>→</span></span>
                             </div>
                             <div class="flex items-center justify-start mt-0.5">
                                 <span id="role-winner-hits-badge" class="hidden text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"></span>
