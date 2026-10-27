@@ -42,10 +42,22 @@
 /* --- 2. DASHBOARD (INICIO) --- */
 /* Ocultar sección de detalles secundarios (cenas, desglose bote peña, radiografía) */
 .mode-easy #details-extra-section,
-.mode-easy #hero-secondary-pillars,
 .mode-easy #official-bote-alert,
 .mode-easy #news-ticker-bar {
     display: none !important;
+}
+
+/* En móvil ocultar pilares secundarios de escritorio */
+@media (max-width: 767px) {
+    .mode-easy #hero-secondary-pillars {
+        display: none !important;
+    }
+}
+/* En PC (>= 768px) en Modo Fácil: MOSTRAR los 3 pilares (Caja, Dobles, Sella) */
+@media (min-width: 768px) {
+    .mode-easy #hero-secondary-pillars {
+        display: grid !important;
+    }
 }
 
 /* Retirar el margen inferior forzado por el teletipo */
@@ -179,14 +191,16 @@
     font-size: 1.25rem !important;
 }
 
-/* Botón Destacado 'Ver mi boleto' */
-.btn-destacado-boleto {
+/* Botón Destacado 'Ver mi boleto' y 'Ver mi bote' */
+.btn-destacado-boleto,
+.btn-destacado-bote {
     background: linear-gradient(135deg, rgba(5, 150, 105, 0.3) 0%, rgba(4, 120, 87, 0.4) 100%);
     border: 1.5px solid rgba(52, 211, 153, 0.6);
     color: #6ee7b7;
     transition: all 0.2s ease;
 }
-.mode-easy .btn-destacado-boleto {
+.mode-easy .btn-destacado-boleto,
+.mode-easy .btn-destacado-bote {
     background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
     color: #ffffff !important;
     border: 2px solid #34d399 !important;
@@ -196,7 +210,8 @@
     border-radius: 0.75rem !important;
     box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
 }
-.mode-easy .btn-destacado-boleto:hover {
+.mode-easy .btn-destacado-boleto:hover,
+.mode-easy .btn-destacado-bote:hover {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border-color: #a7f3d0 !important;
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6) !important;
@@ -247,11 +262,33 @@
 
 /* Grandes Botones de Acción Directa (Quiniela, Jornada, Clasificación) */
 .mode-easy .btn-hero-action {
-    padding: 0.9rem 0.5rem !important;
+    padding: 0.85rem 0.5rem !important;
     border-width: 2.5px !important;
     font-size: 0.95rem !important;
     font-weight: 900 !important;
     border-radius: 0.85rem !important;
+}
+/* En móvil (< 640px) en Modo Fácil: Icono arriba y texto completo debajo sin recortes */
+@media (max-width: 639px) {
+    .mode-easy .btn-hero-action {
+        padding: 0.55rem 0.2rem !important;
+        font-size: 0.78rem !important;
+        flex-direction: column !important;
+        gap: 0.15rem !important;
+        min-width: 0 !important;
+    }
+    .mode-easy .btn-hero-action span.shrink-0 {
+        font-size: 1.25rem !important;
+        margin-bottom: 0.1rem !important;
+    }
+    .mode-easy .btn-hero-action span.truncate {
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: normal !important;
+        line-height: 1.15 !important;
+        font-size: 0.78rem !important;
+        text-align: center !important;
+    }
 }
 .mode-easy .btn-hero-quiniela {
     background: linear-gradient(135deg, #065f46 0%, #022c22 100%) !important;

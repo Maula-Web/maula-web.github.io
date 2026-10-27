@@ -274,9 +274,20 @@
         }
 
         html.light-theme #user-card-bote-link,
-        body.light-theme #user-card-bote-link {
-            background: #fbf8f2 !important;
-            border-color: #e8dfcf !important;
+        body.light-theme #user-card-bote-link,
+        html.light-theme .btn-destacado-bote,
+        body.light-theme .btn-destacado-bote {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: #ffffff !important;
+            border: 1.5px solid #047857 !important;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35) !important;
+        }
+        html.light-theme #user-card-bote-link:hover,
+        body.light-theme #user-card-bote-link:hover,
+        html.light-theme .btn-destacado-bote:hover,
+        body.light-theme .btn-destacado-bote:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+            color: #ffffff !important;
         }
         html.light-theme #user-card-bote-amount,
         body.light-theme #user-card-bote-amount {
@@ -669,43 +680,41 @@
         <!-- =====================================================================
              CUADRO DE MANDO PRINCIPAL: ESTADO ACTUAL DE LA PEÑA (TARJETA HERO ÚNICA)
              ===================================================================== -->
-        <div id="live-jornada-banner" class="glass-panel p-3 sm:p-4 md:p-6 lg:p-7 border-amber-500/40 relative shadow-xl space-y-2.5 sm:space-y-3.5 md:space-y-5">
+        <div id="live-jornada-banner" class="glass-panel p-2.5 sm:p-3 md:p-3.5 lg:p-4 border-amber-500/40 relative shadow-xl space-y-2 md:space-y-2.5">
             <!-- Fila Superior: Siguiente Jornada + Cuenta Atrás / Tiempo Límite -->
-            <div class="border-b border-slate-800/80 pb-2 md:pb-3 space-y-1.5 md:space-y-2">
-                <!-- Fila 1: Balón + Próxima Jornada + Plazo Abierto en la MISMA línea horizontal -->
-                <div class="flex items-center gap-1.5 md:gap-2 flex-nowrap overflow-x-auto no-scrollbar">
-                    <span id="live-banner-icon" class="text-base sm:text-lg md:text-2xl shrink-0">⚽</span>
-                    <span id="live-banner-tag" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded text-[10px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono whitespace-nowrap shrink-0">
-                        Próxima Jornada
-                    </span>
-                    <span id="cd-status-badge" class="px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 whitespace-nowrap shrink-0">
-                        <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400"></span>
-                        <span>Plazo Abierto</span>
-                    </span>
-                </div>
-
-                <!-- Fila 2: Chapa Modo Fácil (izquierda) y Reloj digital bajado ligeramente (derecha) a la misma altura -->
-                <div class="flex items-center justify-between gap-2 pt-0.5">
-                    <div class="flex items-center">
+            <div class="border-b border-slate-800/80 pb-2 md:pb-2.5">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-3">
+                    
+                    <!-- Fila 1 móvil / Bloque izquierdo en PC: Balón + Título Jornada + Chapas -->
+                    <div class="flex items-center gap-1.5 md:gap-2 flex-wrap min-w-0">
+                        <span id="live-banner-icon" class="text-base sm:text-lg md:text-xl lg:text-2xl shrink-0">⚽</span>
+                        <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-tight shrink-0">
+                            Jornada 15
+                        </h2>
+                        <span id="live-banner-tag" class="px-2 md:px-2.5 py-0.5 rounded text-[10px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono whitespace-nowrap shrink-0">
+                            Próxima Jornada
+                        </span>
+                        <span id="cd-status-badge" class="px-2 md:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 whitespace-nowrap shrink-0">
+                            <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400"></span>
+                            <span>Plazo Abierto</span>
+                        </span>
                         <span class="badge-mode-easy hidden">⚡ Modo Fácil</span>
                     </div>
-                    <!-- Cuenta atrás digital con tamaño dinámico -->
-                    <div id="countdown-timer-container" class="countdown-idle flex items-center justify-end font-mono font-black text-white shrink-0">
-                        <span class="bg-slate-950/80 rounded border border-slate-800 text-amber-400 font-mono cd-digit" id="cd-days">--</span><span class="text-slate-500 cd-unit">d</span>
-                        <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-hours">--</span><span class="text-slate-500 cd-unit">h</span>
-                        <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-mins">--</span><span class="text-slate-500 cd-unit">m</span>
-                        <span class="bg-slate-950/80 rounded border border-slate-800 text-emerald-400 font-mono cd-digit" id="cd-secs">--</span><span class="text-slate-500 cd-unit">s</span>
-                    </div>
-                </div>
 
-                <!-- Fila 3: Título Completo de la Jornada y Fecha Límite -->
-                <div class="flex items-center justify-between gap-2 flex-wrap pt-0.5">
-                    <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base md:text-xl lg:text-2xl uppercase tracking-tight">
-                        Jornada 15
-                    </h2>
-                    <div class="text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-400 font-mono">
-                        Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
+                    <!-- Fila 2 móvil / Bloque derecho en PC: Reloj Digital y Límite -->
+                    <div class="flex items-center justify-between md:justify-end gap-2 md:gap-3 shrink-0 pt-0.5 md:pt-0">
+                        <!-- Cuenta atrás digital con tamaño dinámico -->
+                        <div id="countdown-timer-container" class="countdown-idle flex items-center justify-end font-mono font-black text-white shrink-0">
+                            <span class="bg-slate-950/80 rounded border border-slate-800 text-amber-400 font-mono cd-digit" id="cd-days">--</span><span class="text-slate-500 cd-unit">d</span>
+                            <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-hours">--</span><span class="text-slate-500 cd-unit">h</span>
+                            <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-mins">--</span><span class="text-slate-500 cd-unit">m</span>
+                            <span class="bg-slate-950/80 rounded border border-slate-800 text-emerald-400 font-mono cd-digit" id="cd-secs">--</span><span class="text-slate-500 cd-unit">s</span>
+                        </div>
+                        <div class="text-[10px] sm:text-xs md:text-xs lg:text-sm text-slate-400 font-mono whitespace-nowrap">
+                            Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -768,11 +777,13 @@
                             <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">💰 Caja Real:</span>
                             <strong id="user-card-caja-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">1.021,64 €</strong>
                         </div>
-                        <div class="flex items-center gap-1 truncate">
-                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">👤 Mi Bote:</span>
-                            <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">-- €</strong>
-                            <a id="user-card-bote-link" href="bote_2.html" class="text-[10px] sm:text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline font-bold whitespace-nowrap ml-1">
-                                Ver →
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <div class="flex items-center gap-1">
+                                <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">👤 Mi Bote:</span>
+                                <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">-- €</strong>
+                            </div>
+                            <a id="user-card-bote-link" href="bote_2.html" class="btn-destacado-bote px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/40 text-emerald-300 hover:text-white border border-emerald-500/60 font-black text-[10px] sm:text-xs shadow-md shadow-emerald-500/10 flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer transition-all active:scale-95 ml-1" title="Ver mi saldo y desglose completo en el Bote">
+                                <span>💰</span><span>Ver mi bote →</span>
                             </a>
                         </div>
                     </div>
@@ -912,19 +923,19 @@
              ===================================================================== -->
         <div class="grid grid-cols-3 gap-1.5 sm:gap-3 md:gap-4" id="live-banner-actions">
             <!-- Botón 1: Rellenar Quiniela (Verde Esmeralda) -->
-            <a href="pronosticos_2.html?openEditor=true" id="btn-hero-rellenar" class="btn-hero-action btn-hero-quiniela py-2.5 sm:py-3.5 md:py-4 px-1.5 sm:px-3 md:px-5 rounded-xl font-black text-xs sm:text-sm md:text-base lg:text-lg transition-all flex items-center justify-center gap-1 sm:gap-2 text-center select-none active:scale-95 shadow-md">
+            <a href="pronosticos_2.html?openEditor=true" id="btn-hero-rellenar" class="btn-hero-action btn-hero-quiniela py-2.5 sm:py-3 md:py-3 px-1.5 sm:px-3 md:px-5 rounded-xl font-black text-xs sm:text-sm md:text-base lg:text-lg transition-all flex items-center justify-center gap-1 sm:gap-2 text-center select-none active:scale-95 shadow-md">
                 <span class="text-base sm:text-lg md:text-2xl shrink-0">✍️</span>
                 <span class="truncate"><span class="hidden sm:inline">Rellenar </span>Quiniela</span>
             </a>
 
             <!-- Botón 2: Ver Jornada Actual / Resultados (Azul Eléctrico) -->
-            <a href="jornadas_2.html" id="btn-hero-jornada" class="btn-hero-action btn-hero-jornada py-2.5 sm:py-3.5 md:py-4 px-1.5 sm:px-3 md:px-5 rounded-xl font-black text-xs sm:text-sm md:text-base lg:text-lg transition-all flex items-center justify-center gap-1 sm:gap-2 text-center select-none active:scale-95 shadow-md">
+            <a href="jornadas_2.html" id="btn-hero-jornada" class="btn-hero-action btn-hero-jornada py-2.5 sm:py-3 md:py-3 px-1.5 sm:px-3 md:px-5 rounded-xl font-black text-xs sm:text-sm md:text-base lg:text-lg transition-all flex items-center justify-center gap-1 sm:gap-2 text-center select-none active:scale-95 shadow-md">
                 <span class="text-base sm:text-lg md:text-2xl shrink-0">⚽</span>
-                <span class="truncate"><span class="hidden sm:inline">Ver </span>Jornada Actual</span>
+                <span class="truncate"><span class="hidden sm:inline">Ver </span>Jornada<span class="hidden sm:inline"> Actual</span></span>
             </a>
 
             <!-- Botón 3: Clasificación Actual (Púrpura / Trofeo) -->
-            <a href="clasificacion_2.html?view=matrix" id="btn-hero-clasificacion" class="btn-hero-action btn-hero-clasificacion py-2.5 sm:py-3.5 md:py-4 px-1.5 sm:px-3 md:px-5 rounded-xl font-black text-xs sm:text-sm md:text-base lg:text-lg transition-all flex items-center justify-center gap-1 sm:gap-2 text-center select-none active:scale-95 shadow-md">
+            <a href="clasificacion_2.html?view=matrix" id="btn-hero-clasificacion" class="btn-hero-action btn-hero-clasificacion py-2.5 sm:py-3 md:py-3 px-1.5 sm:px-3 md:px-5 rounded-xl font-black text-xs sm:text-sm md:text-base lg:text-lg transition-all flex items-center justify-center gap-1 sm:gap-2 text-center select-none active:scale-95 shadow-md">
                 <span class="text-base sm:text-lg md:text-2xl shrink-0">🏆</span>
                 <span class="truncate">Clasificación<span class="hidden md:inline"> Actual</span></span>
             </a>
@@ -950,7 +961,7 @@
         <!-- =====================================================================
              DETALLES SECUNDARIOS Y ESTADÍSTICAS (DESPLEGABLE EN MÓVIL, FIJO EN PC)
              ===================================================================== -->
-        <details id="details-extra-section" class="glass-panel p-2.5 sm:p-3.5 md:p-6 border-slate-800 group/extra transition-all duration-300">
+        <details id="details-extra-section" class="glass-panel p-2.5 sm:p-3 md:p-3.5 lg:p-4 border-slate-800 group/extra transition-all duration-300">
             <summary class="md:hidden flex items-center justify-between cursor-pointer list-none text-xs font-bold text-amber-200 hover:text-amber-100 select-none py-1.5 px-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition-all shadow-sm">
                 <span class="flex items-center gap-2">
                     <span class="text-sm scale-110 drop-shadow">📊</span>
@@ -960,7 +971,7 @@
             </summary>
 
             <!-- Encabezado fijo visible sólo en PC (sustituye al summary interactivo de móvil) -->
-            <div class="hidden md:flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+            <div class="hidden md:flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
                 <div class="flex items-center gap-2.5">
                     <span class="text-xl">📊</span>
                     <div>
@@ -971,9 +982,9 @@
                 <span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg">Temporada 2026-2027</span>
             </div>
 
-            <div class="pt-2 md:pt-0 space-y-3.5 md:space-y-5 border-t md:border-t-0 border-slate-800/80 mt-1 md:mt-0">
+            <div class="pt-2 md:pt-0 space-y-2.5 md:space-y-3 border-t md:border-t-0 border-slate-800/80 mt-1 md:mt-0">
                 <!-- Calendario de Cenas de la Peña -->
-                <div class="p-2.5 sm:p-3 md:p-4 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div class="p-2 sm:p-2.5 md:p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
                         <span class="text-base sm:text-lg md:text-2xl">🍽️</span>
                         <div>
@@ -994,9 +1005,9 @@
                 </div>
 
                 <!-- Grid de Widgets Estadísticos -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-2.5">
                     <!-- Líder Temporada -->
-                    <div class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div class="p-2.5 md:p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
                             <span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
                                 🏆 Líder General
@@ -1017,7 +1028,7 @@
                     </div>
 
                     <!-- Detalle Tesorería Bote -->
-                    <div class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div class="p-2.5 md:p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
                             <span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                                 💰 Desglose Bote
@@ -1048,7 +1059,7 @@
                     </div>
 
                     <!-- Premios Semana y Temporada -->
-                    <div class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div class="p-2.5 md:p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
                             <span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40">
                                 🎁 Premios
@@ -1071,7 +1082,7 @@
                     </div>
 
                     <!-- Rana / PIG Detalle Híbrido -->
-                    <div id="pig-hybrid-widget" class="p-3.5 md:p-4 lg:p-5 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+                    <div id="pig-hybrid-widget" class="p-2.5 md:p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
                             <span id="pig-badge" class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
                                 <span id="pig-badge-icon">🐸</span> <span id="pig-badge-text">Último Clasificado</span>
@@ -1098,7 +1109,7 @@
                 </div>
 
                 <!-- Broma de Emilio -->
-                <div id="prank-container" class="p-3 sm:p-4 md:p-5 rounded-xl bg-rose-950/20 border border-rose-500/40 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div id="prank-container" class="p-2.5 sm:p-3 md:p-3 rounded-xl bg-rose-950/20 border border-rose-500/40 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl md:text-3xl shrink-0">🚩</span>
                         <div>
