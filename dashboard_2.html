@@ -692,32 +692,35 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-3">
                     
                     <!-- Fila 1 móvil / Bloque izquierdo en PC: Balón + Título Jornada + Chapas -->
-                    <div class="flex items-center gap-1.5 md:gap-2 flex-wrap min-w-0">
+                    <div class="flex items-center gap-1 sm:gap-1.5 md:gap-2 min-w-0 flex-nowrap sm:flex-wrap">
                         <span id="live-banner-icon" class="text-base sm:text-lg md:text-xl lg:text-2xl shrink-0">⚽</span>
-                        <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-tight shrink-0">
+                        <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-tight shrink-0 whitespace-nowrap">
                             Jornada 15
                         </h2>
-                        <span id="live-banner-tag" class="px-2 md:px-2.5 py-0.5 rounded text-[10px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono whitespace-nowrap shrink-0">
+                        <span id="live-banner-tag" class="px-1.5 sm:px-2 md:px-2.5 py-0.5 rounded text-[9.5px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono whitespace-nowrap shrink-0">
                             Próxima Jornada
                         </span>
-                        <span id="cd-status-badge" class="px-2 md:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 whitespace-nowrap shrink-0">
+                        <span id="cd-status-badge" class="px-1.5 sm:px-2 md:px-2.5 py-0.5 rounded-full text-[9.5px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 whitespace-nowrap shrink-0">
                             <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400"></span>
                             <span>Plazo Abierto</span>
                         </span>
-                        <span class="badge-mode-easy hidden">⚡ Modo Fácil</span>
+                        <span class="badge-mode-easy hidden md:inline-flex">⚡ Modo Fácil</span>
                     </div>
 
                     <!-- Fila 2 móvil / Bloque derecho en PC: Reloj Digital y Límite -->
-                    <div class="flex items-center justify-between md:justify-end gap-2 md:gap-3 shrink-0 pt-0.5 md:pt-0">
-                        <!-- Cuenta atrás digital con tamaño dinámico -->
-                        <div id="countdown-timer-container" class="countdown-idle flex items-center justify-end font-mono font-black text-white shrink-0">
-                            <span class="bg-slate-950/80 rounded border border-slate-800 text-amber-400 font-mono cd-digit" id="cd-days">--</span><span class="text-slate-500 cd-unit">d</span>
-                            <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-hours">--</span><span class="text-slate-500 cd-unit">h</span>
-                            <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-mins">--</span><span class="text-slate-500 cd-unit">m</span>
-                            <span class="bg-slate-950/80 rounded border border-slate-800 text-emerald-400 font-mono cd-digit" id="cd-secs">--</span><span class="text-slate-500 cd-unit">s</span>
-                        </div>
-                        <div class="text-[10px] sm:text-xs md:text-xs lg:text-sm text-slate-400 font-mono whitespace-nowrap">
-                            Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
+                    <div id="live-banner-time-block" class="flex items-center justify-between md:justify-end gap-1 sm:gap-2 md:gap-3 shrink-0 pt-0.5 md:pt-0">
+                        <span class="badge-mode-easy hidden md:hidden">⚡ Modo Fácil</span>
+                        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                            <!-- Cuenta atrás digital con tamaño dinámico -->
+                            <div id="countdown-timer-container" class="countdown-idle flex items-center justify-end font-mono font-black text-white shrink-0">
+                                <span class="bg-slate-950/80 rounded border border-slate-800 text-amber-400 font-mono cd-digit" id="cd-days">--</span><span class="text-slate-500 cd-unit">d</span>
+                                <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-hours">--</span><span class="text-slate-500 cd-unit">h</span>
+                                <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-mins">--</span><span class="text-slate-500 cd-unit">m</span>
+                                <span class="bg-slate-950/80 rounded border border-slate-800 text-emerald-400 font-mono cd-digit" id="cd-secs">--</span><span class="text-slate-500 cd-unit">s</span>
+                            </div>
+                            <div id="cd-deadline-container" class="text-[10.5px] sm:text-xs md:text-xs lg:text-sm text-slate-300 font-mono font-bold whitespace-nowrap shrink-0">
+                                Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
+                            </div>
                         </div>
                     </div>
 
@@ -770,28 +773,26 @@
                     <a id="user-card-forecast-status" href="pronosticos_2.html?openEditor=true" class="flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-850 border border-slate-700/60 transition group cursor-pointer text-xs shadow-sm">
                         <div class="flex items-center gap-1.5 min-w-0">
                             <span id="user-card-forecast-status-icon" class="text-xs sm:text-sm shrink-0">📋</span>
-                            <span id="user-card-forecast-status-text" class="font-bold truncate text-[11px] sm:text-xs text-slate-200">Cargando estado...</span>
+                            <span id="user-card-forecast-status-text" class="font-bold text-xs sm:text-sm text-slate-100 whitespace-nowrap">Cargando estado...</span>
                         </div>
-                        <span id="user-card-forecast-status-action" class="font-bold text-amber-400 group-hover:text-amber-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5">
-                            Panel de sellado →
+                        <span id="user-card-forecast-status-action" class="font-bold text-amber-400 group-hover:text-amber-300 group-hover:underline text-[11px] sm:text-xs shrink-0 whitespace-nowrap ml-1.5">
+                            Sellar →
                         </span>
                     </a>
 
-                    <!-- Fila 5 (Inferior): Bote Personal y Caja Real -->
-                    <div class="pt-1 border-t border-slate-800/80 flex items-center justify-between text-xs gap-2">
-                        <div class="flex items-center gap-1 truncate">
-                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">💰 Caja Real:</span>
-                            <strong id="user-card-caja-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">1.021,64 €</strong>
+                    <!-- Fila 5 (Inferior): Bote Personal y Caja Real (Visible sin recortes) -->
+                    <div id="user-card-treasury-row" class="pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-xs gap-1.5">
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="text-slate-300 text-[11px] sm:text-xs font-bold">💰 Caja:</span>
+                            <strong id="user-card-caja-amount" class="text-emerald-400 font-mono font-black text-xs sm:text-sm">1.037,17 €</strong>
                         </div>
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <div class="flex items-center gap-1">
-                                <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium">👤 Mi Bote:</span>
-                                <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-[11px] sm:text-xs md:text-sm">-- €</strong>
-                            </div>
-                            <a id="user-card-bote-link" href="bote_2.html" class="btn-destacado-bote px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/40 text-emerald-300 hover:text-white border border-emerald-500/60 font-black text-[10px] sm:text-xs shadow-md shadow-emerald-500/10 flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer transition-all active:scale-95 ml-1" title="Ver mi saldo y desglose completo en el Bote">
-                                <span>💰</span><span>Ver mi bote →</span>
-                            </a>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="text-slate-300 text-[11px] sm:text-xs font-bold">👤 Mi Bote:</span>
+                            <strong id="user-card-bote-amount" class="text-emerald-400 font-mono font-black text-xs sm:text-sm">-- €</strong>
                         </div>
+                        <a id="user-card-bote-link" href="bote_2.html" class="btn-destacado-bote px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/40 text-emerald-300 hover:text-white border border-emerald-500/60 font-black text-[11px] sm:text-xs shadow-md shadow-emerald-500/10 flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer transition-all active:scale-95" title="Ver mi saldo y desglose completo en el Bote">
+                            <span>💰 Ver bote →</span>
+                        </a>
                     </div>
 
                     <!-- Recordatorio PIG (sólo visible si la jornada tiene PIG) -->
@@ -818,7 +819,7 @@
                         <div id="mobile-dobles-names" class="text-xs sm:text-sm font-black text-amber-300 leading-snug py-0.5 break-words">
                             Cargando...
                         </div>
-                        <div id="mobile-dobles-subtitle" class="text-[9px] sm:text-[10px] text-slate-400 font-medium">
+                        <div id="mobile-dobles-subtitle" class="text-xs text-slate-300 font-bold">
                             Ganador semanal
                         </div>
                     </div>
@@ -829,15 +830,15 @@
                     <!-- Sección Sella -->
                     <div class="flex items-center justify-between gap-1">
                         <div class="flex items-center gap-1.5 min-w-0">
-                            <span class="text-[11px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1 shrink-0">
-                                <span>✍️</span> Sella:
+                            <span class="text-xs sm:text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1 shrink-0">
+                                <span>🤝</span> Sella:
                             </span>
                             <span id="mobile-sella-name" class="text-xs sm:text-sm font-black text-rose-400 truncate">
                                 Cargando...
                             </span>
                             <span id="mobile-sella-badge" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0"></span>
                         </div>
-                        <span id="mobile-sella-subtitle" class="text-[9px] sm:text-[10px] font-medium text-slate-400 whitespace-nowrap shrink-0">
+                        <span id="mobile-sella-subtitle" class="text-xs font-bold text-slate-300 whitespace-nowrap shrink-0">
                             Sellaría sig.
                         </span>
                     </div>
@@ -903,17 +904,17 @@
             </div>
 
             <!-- Fila Inferior: Tu Quiniela & Progreso de Envíos de la Peña -->
-            <div class="pt-2 md:pt-3 border-t border-slate-800/80 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-1.5 text-xs md:text-sm">
+            <div class="pt-1.5 border-t border-slate-800/80 flex items-center justify-between gap-1.5 text-xs sm:text-sm">
                 <div class="flex items-center gap-1.5 truncate">
-                    <span class="text-slate-400 text-[11px] sm:text-xs md:text-sm lg:text-base">Tu Quiniela:</span>
-                    <strong id="my-forecast-badge" class="text-amber-400 font-bold text-[11px] sm:text-xs md:text-sm lg:text-base">Comprobando...</strong>
+                    <span class="text-slate-300 font-bold text-xs sm:text-sm">Tu Quiniela:</span>
+                    <strong id="my-forecast-badge" class="text-amber-400 font-black text-xs sm:text-sm">Comprobando...</strong>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <button type="button" onclick="window.DashboardApp && window.DashboardApp.openSubmittedListModal()" class="text-slate-400 hover:text-amber-300 text-[11px] sm:text-xs md:text-sm lg:text-base flex items-center gap-1 font-medium transition">
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="window.DashboardApp && window.DashboardApp.openSubmittedListModal()" class="text-slate-300 hover:text-amber-300 text-xs sm:text-sm flex items-center gap-1 font-bold transition">
                         <span>Envíos:</span>
                         <strong id="submitted-count" class="text-white font-mono font-bold">0</strong>/<strong id="total-members-count" class="text-white font-mono font-bold">19</strong>
                         (<span id="submitted-percentage" class="text-emerald-400 font-mono font-bold">0%</span>)
-                        <span class="text-amber-400 text-xs md:text-sm">📋</span>
+                        <span class="text-amber-400 text-xs sm:text-sm">📋</span>
                     </button>
                     <span id="participation-jornada-badge" class="hidden"></span>
                 </div>

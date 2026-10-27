@@ -868,7 +868,7 @@ class Dashboard2AppController {
      */
     updateCajaRealDisplays() {
         const summary = this.getBoteOfficialSummary();
-        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1037.17;
         const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
         const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
 
@@ -951,9 +951,10 @@ class Dashboard2AppController {
             if (icon) icon.innerHTML = '⚽';
             if (tag) {
                 tag.textContent = 'Próxima Jornada';
-                tag.className = 'px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono';
+                tag.className = 'px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono';
             }
-            if (title) title.textContent = `Jornada ${nextJ.number} - ${nextJ.date}`;
+            const isMobile = window.innerWidth < 640;
+            if (title) title.textContent = isMobile ? `Jornada ${nextJ.number}` : `Jornada ${nextJ.number} - ${nextJ.date}`;
             if (sub) sub.textContent = 'Plazo para tener todas las quinielas rellenas en la web: Jueves a las 17:00h.';
         } else {
             if (title) title.textContent = 'Temporada 2026-2027';
@@ -978,8 +979,9 @@ class Dashboard2AppController {
 
         const elDeadline = document.getElementById('cd-deadline-label');
         if (elDeadline) {
+            const isMobile = window.innerWidth < 640;
             const dateFormatted = deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
-            elDeadline.textContent = `Jueves ${dateFormatted} a las 17:00h`;
+            elDeadline.textContent = isMobile ? `Jue ${dateFormatted} · 17h` : `Jueves ${dateFormatted} · 17:00h`;
         }
 
         if (this.countdownInterval) clearInterval(this.countdownInterval);
@@ -1419,19 +1421,19 @@ class Dashboard2AppController {
 
                 if (userHasSubmitted) {
                     if (elForecastStatusIcon) elForecastStatusIcon.textContent = '✅';
-                    elForecastStatusText.textContent = `Tu quiniela: Enviada${jNumStr}`;
+                    elForecastStatusText.textContent = 'Tu quiniela: Enviada';
                     elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-950/30 hover:bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 transition group cursor-pointer text-xs shadow-sm';
                     if (elForecastStatusAction) {
-                        elForecastStatusAction.textContent = 'Ver / Modificar →';
-                        elForecastStatusAction.className = 'font-bold text-emerald-400 group-hover:text-emerald-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
+                        elForecastStatusAction.textContent = 'Modificar →';
+                        elForecastStatusAction.className = 'font-bold text-emerald-400 group-hover:text-emerald-300 group-hover:underline text-[11px] sm:text-xs shrink-0 whitespace-nowrap ml-1.5';
                     }
                 } else {
                     if (elForecastStatusIcon) elForecastStatusIcon.textContent = '⏳';
-                    elForecastStatusText.textContent = `Tu quiniela: Aún sin enviar${jNumStr}`;
+                    elForecastStatusText.textContent = 'Tu quiniela: Aún sin enviar';
                     elForecastStatusLink.className = 'flex items-center justify-between px-2 sm:px-2.5 py-1 rounded-lg bg-amber-950/40 hover:bg-amber-950/60 border border-amber-500/50 text-amber-300 transition group cursor-pointer text-xs shadow-sm animate-pulse';
                     if (elForecastStatusAction) {
-                        elForecastStatusAction.textContent = 'Sellar ahora →';
-                        elForecastStatusAction.className = 'font-bold text-amber-400 group-hover:text-amber-300 group-hover:underline text-[10px] sm:text-[11px] shrink-0 whitespace-nowrap ml-1.5';
+                        elForecastStatusAction.textContent = 'Sellar →';
+                        elForecastStatusAction.className = 'font-bold text-amber-400 group-hover:text-amber-300 group-hover:underline text-[11px] sm:text-xs shrink-0 whitespace-nowrap ml-1.5';
                     }
                 }
             }
@@ -1443,7 +1445,7 @@ class Dashboard2AppController {
         const elBoteLink = document.getElementById('user-card-bote-link');
 
         const summary = this.getBoteOfficialSummary();
-        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1037.17;
         const formattedCaja = (window.AppUtils && window.AppUtils.formatEuro)
             ? window.AppUtils.formatEuro(cajaReal)
             : `${cajaReal.toSpanishFormat()} €`;
@@ -1759,7 +1761,7 @@ class Dashboard2AppController {
         const elPremios = document.getElementById('dashboard-bote-premios');
 
         const summary = this.getBoteOfficialSummary();
-        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1037.17;
         const totalSaldos = (summary && typeof summary.totalSaldosVirtuales === 'number') ? summary.totalSaldosVirtuales : 694.71;
         const superavit = (summary && typeof summary.superavit === 'number') ? summary.superavit : (cajaReal - totalSaldos);
 
@@ -2042,7 +2044,7 @@ class Dashboard2AppController {
 
         // 6. Caja Real de la Peña
         const summary = this.getBoteOfficialSummary();
-        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1021.64;
+        const cajaReal = (summary && typeof summary.cajaReal === 'number') ? summary.cajaReal : 1037.17;
         const cajaFmt = (window.AppUtils && window.AppUtils.formatEuro) ? window.AppUtils.formatEuro(cajaReal) : `${cajaReal.toSpanishFormat()} €`;
         items.push({ text: `💰 <strong class="text-emerald-400">Caja Real de la Peña:</strong> ${cajaFmt} disponibles en la tesorería común (Saldos + Premios + Cuotas + Multas − Sellados).`, action: 'bote' });
 

@@ -8,7 +8,7 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 
 - **Frontend**: HTML5, CSS (Vanilla + Tailwind CSS v4 / CDN), JS (Vanilla ES6+). Sin frameworks pesados.
 - **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`) con persistencia offline en IndexedDB (`db.enablePersistence({ synchronizeTabs: true })`).
-- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v2.48`).
+- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v2.49`).
 - **Hojas de Estilo y Sistema de Diseño (`/css/`)**:
   - `styles.css`: Estilos base, tema oscuro original, utilidades y animaciones.
   - `resumen-styles.css`: Reglas específicas para gráficas y paneles del resumen de temporada.
@@ -1577,18 +1577,20 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 ---
 
 ## 57. OPTIMIZACIÓN ERGONÓMICA DEL DASHBOARD 2.0 Y EXPERIENCIA MODO FÁCIL EN MÓVIL
-- **Botón Destacado de "Ver mi bote"**:
-  - Se sustituyó el antiguo enlace plano de texto por el componente interactivo `.btn-destacado-bote`, dotado de icono monetario (`💰`), bordes esmeralda y retroalimentación táctil (`active:scale-95`).
-- **Distribución Móvil en Modo Fácil sin Textos Cortados (`css/mode-easy.css`)**:
-  - Los 3 grandes botones de acción inferior (*Quiniela*, *Jornada*, *Clasificación*) adoptan distribución vertical (`flex-direction: column`) en pantallas móviles (`< 640px`), con `white-space: normal` y `overflow: visible`, erradicando por completo cualquier truncado o corte con elipsis (`...`).
-- **Restauración de Dobles en Modo Fácil para PC**:
-  - Regla responsiva específica (`@media (min-width: 768px)`) para mantener visibles los 3 pilares secundarios (`#hero-secondary-pillars`: Caja Real, Dobles de la Jornada y Sellador Oficial) en PC incluso con el Modo Fácil activado.
-- **Ajuste de Pantalla Única en PC (Modo Pro)**:
-  - En escritorio (`md:` y superiores), el número de jornada, las insignias de estado (*Próxima Jornada*, *Plazo Abierto*), el reloj digital de cuenta atrás y la fecha límite se unifican en **una sola fila horizontal**, ahorrando más de 60 px de altura.
-  - Se compactaron los márgenes y rellenos verticales de cenas, cuadrículas de widgets y el botón de *Echar a Emilio*, asegurando que la página completa quede 100% visible en monitores sin necesidad de scroll vertical.
-- **Eliminación Total del Scroll Vertical en Móvil (Modo Fácil)**:
-  - Detección y supresión del `padding-bottom: 2rem/4rem` residual del teletipo (oculto en Modo Fácil) tanto en `body` como en `#main-content`.
-  - Compactación proporcional de espaciados interiores y tarjetas, logrando que el Dashboard en Modo Fácil encaje a la perfección dentro del viewport móvil sin un solo píxel de desplazamiento vertical.
+- **Ajuste Integral de Pantalla Única en Móvil (Cero Scroll Absoluto)**:
+  - Configuración estricta de `100dvh` con `overflow-y: hidden` en `body.mode-easy` y contenedor flexible `#main-content` con distribución vertical `justify-between`, erradicando cualquier scroll y aprovechando el 100% del alto de la pantalla sin huecos vacíos.
+- **Visibilidad Total de Caja Real y Bote Personal (`user-summary-card`)**:
+  - Se desacopló la fila de tesorería (`#user-card-treasury-row`) eliminando la clase `truncate` que ocultaba la cifra de Caja Real.
+  - Ahora se muestran de forma limpia, destacada e independiente: **💰 Caja: 1.037,17 €**, **👤 Mi Bote: [saldo] €** y el botón de acción táctil **[💰 Ver bote →]** sin solapamiento ni recorte en ningún dispositivo.
+- **Corrección de Truncado en Estado de Quiniela ("Tu quiniela: Aún sin enviar")**:
+  - Sustitución de concatenaciones redundantes por textos directos y concisos: *Tu quiniela: Aún sin enviar* y botón *Sellar →* (o *Tu quiniela: Enviada* y *Modificar →*), con padding optimizado y `white-space: nowrap`, eliminando los puntos suspensivos (`...`).
+- **Ajuste de Cuenta Atrás y Fecha Límite sin Desbordamiento**:
+  - En móviles, el reloj digital adapta el padding y tamaño de sus dígitos (`0.82rem`) y la fecha límite se compacta (`Jue 29/10 · 17h`), garantizando que la cuenta atrás y el límite queden perfectamente encuadrados dentro de los márgenes de la pantalla sin salirse por la derecha.
+  - Se reubicó la chapa de `⚡ Modo Fácil` en la segunda fila móvil junto al reloj, permitiendo que el título de la jornada y las insignias de estado (*Próxima Jornada*, *Plazo Abierto*) convivan en una sola línea superior.
+- **Eliminación de Textos Grises Diminutos**:
+  - Todos los textos secundarios (subtítulos de dobles, sella, límites, envíos) se escalaron a `0.78rem - 0.82rem` (12-13px) en negrita (`font-bold`) con colores de alto contraste (`text-slate-200` / `text-slate-300` en modo oscuro y `text-slate-700` en modo claro).
+- **Botones de Acción Inferiores**:
+  - Los 3 botones (*Quiniela*, *Jornada*, *Clasificación*) se dimensionaron con mayor altura e iconos destacados (`1.25rem`), anclados en la base del viewport.
 
 ---
 
@@ -1607,9 +1609,9 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
-## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.47)
+## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.49)
 - **Incremento Progresivo de Versiones**:
-  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.48` en `service-worker.js`.
+  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.49` en `service-worker.js`.
   - Fuerza la invalidación inmediata de recursos obsoletos en los clientes PWA instalados en iOS y Android, asegurando la entrega instantánea de los nuevos estilos ergonómicos y controladores de datos.
 
 ---

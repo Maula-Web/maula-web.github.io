@@ -67,72 +67,128 @@
     margin-bottom: 0 !important;
 }
 
-/* Ajuste de pantalla única en móvil en Modo Fácil (cero scroll vertical) */
+/* Ajuste de pantalla única en móvil en Modo Fácil (cero scroll vertical y aprovechamiento total del viewport) */
 @media (max-width: 767px) {
+    html.mode-easy,
+    body.mode-easy,
     .mode-easy html,
     .mode-easy body {
+        overflow-y: hidden !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
         padding-bottom: 0 !important;
         margin-bottom: 0 !important;
     }
 
     .mode-easy #main-content {
-        padding-top: 0.25rem !important;
-        padding-bottom: 0 !important;
-        margin-bottom: 0 !important;
+        padding: 0.35rem 0.5rem 0.35rem 0.5rem !important;
+        height: calc(100dvh - 54px) !important;
+        max-height: calc(100dvh - 54px) !important;
+        overflow-y: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
         gap: 0.35rem !important;
+        margin-bottom: 0 !important;
     }
 
     /* Navbar superior compacta en móvil */
     .mode-easy nav.main-navbar-sticky {
         padding: 0.35rem 0.5rem !important;
         gap: 0.25rem !important;
+        flex-shrink: 0 !important;
     }
 
     /* Cuadro de mando principal (Live Jornada Banner) */
     .mode-easy #live-jornada-banner {
-        padding: 0.45rem 0.6rem !important;
-        gap: 0.35rem !important;
+        padding: 0.45rem 0.65rem !important;
+        gap: 0.3rem !important;
+        flex-shrink: 0 !important;
     }
     .mode-easy #live-jornada-banner > div:first-child {
-        padding-bottom: 0.25rem !important;
+        padding-bottom: 0.2rem !important;
     }
 
     /* Grid de pilares vitales */
     .mode-easy #hero-pillars-grid {
         gap: 0.35rem !important;
+        flex-shrink: 0 !important;
     }
 
     /* Tarjeta del socio conectado */
     .mode-easy #user-summary-card {
-        padding: 0.45rem 0.55rem !important;
-        gap: 0.25rem !important;
+        padding: 0.5rem 0.65rem !important;
+        gap: 0.3rem !important;
+        flex-shrink: 0 !important;
     }
     .mode-easy #user-summary-card .border-t {
-        padding-top: 0.2rem !important;
+        padding-top: 0.25rem !important;
     }
 
     /* Tarjeta de dobles y sella en móvil */
     .mode-easy #mobile-dobles-sella-card {
-        padding: 0.35rem 0.55rem !important;
-        gap: 0.2rem !important;
+        padding: 0.45rem 0.65rem !important;
+        gap: 0.25rem !important;
+        flex-shrink: 0 !important;
     }
     .mode-easy #mobile-dobles-names {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
-        line-height: 1.2 !important;
+        line-height: 1.25 !important;
+        font-size: 0.95rem !important;
     }
 
     /* Botones destacados en tarjetas */
     .mode-easy .btn-destacado-boleto,
     .mode-easy .btn-destacado-bote,
     .mode-easy .btn-destacado-dobles {
-        padding: 0.3rem 0.55rem !important;
-        font-size: 0.78rem !important;
+        padding: 0.35rem 0.6rem !important;
+        font-size: 0.8rem !important;
     }
 
-    /* Fila de los 3 botones de acción directa */
+    /* Cuenta atrás compacta para que el límite nunca desborde */
+    .mode-easy #countdown-timer-container.countdown-active {
+        gap: 0.15rem !important;
+    }
+    .mode-easy #countdown-timer-container.countdown-active .cd-digit {
+        padding: 0.12rem 0.28rem !important;
+        font-size: 0.82rem !important;
+        font-weight: 900 !important;
+    }
+    .mode-easy #countdown-timer-container.countdown-active .cd-unit {
+        font-size: 0.65rem !important;
+        margin-right: 0.1rem !important;
+    }
+    .mode-easy #cd-deadline-container {
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Textos secundarios grandes y legibles (sin grises diminutos) */
+    .mode-easy #mobile-dobles-subtitle,
+    .mode-easy #mobile-sella-subtitle {
+        font-size: 0.78rem !important;
+        font-weight: 700 !important;
+        color: #cbd5e1 !important;
+        line-height: 1.25 !important;
+    }
+    .mode-easy #cd-deadline-label {
+        font-size: 0.78rem !important;
+        font-weight: 800 !important;
+        color: #fcd34d !important;
+    }
+    .mode-easy #user-card-live-hits-label,
+    .mode-easy #user-card-total-points-label {
+        font-size: 0.78rem !important;
+        font-weight: 700 !important;
+        color: #e2e8f0 !important;
+    }
+
+    /* Fila de los 3 botones de acción directa anclados abajo */
     .mode-easy #live-banner-actions {
         gap: 0.35rem !important;
+        flex-shrink: 0 !important;
+        margin-top: auto !important;
     }
 }
 
@@ -312,22 +368,42 @@
     transform: translateY(-1px);
 }
 
-/* Estado de quiniela y panel de sellado */
+/* Estado de quiniela y panel de sellado (sin textos cortados) */
 .mode-easy #user-card-forecast-status {
-    padding: 0.75rem 1rem !important;
+    padding: 0.45rem 0.75rem !important;
     border-width: 2px !important;
     border-color: rgba(245, 158, 11, 0.7) !important;
     background: rgba(15, 23, 42, 0.95) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
+.mode-easy #user-card-forecast-status-text {
+    font-size: 0.82rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    color: #f8fafc !important;
+    overflow: visible !important;
+}
 .mode-easy #user-card-forecast-status-action {
-    font-size: 0.85rem !important;
+    font-size: 0.8rem !important;
     font-weight: 900 !important;
     background: rgba(245, 158, 11, 0.25) !important;
-    padding: 0.3rem 0.75rem !important;
+    padding: 0.25rem 0.6rem !important;
     border-radius: 0.5rem !important;
     border: 1.5px solid rgba(245, 158, 11, 0.6) !important;
     color: #fef3c7 !important;
+    white-space: nowrap !important;
+}
+
+/* Fila de tesorería y caja real en Modo Fácil (sin recortes) */
+.mode-easy #user-card-treasury-row {
+    padding-top: 0.35rem !important;
+    gap: 0.25rem !important;
+}
+.mode-easy #user-card-caja-amount,
+.mode-easy #user-card-bote-amount {
+    font-size: 0.88rem !important;
+    font-weight: 900 !important;
+    color: #34d399 !important;
 }
 
 /* Grandes Botones de Acción Directa (Quiniela, Jornada, Clasificación) */
@@ -338,27 +414,50 @@
     font-weight: 900 !important;
     border-radius: 0.85rem !important;
 }
-/* En móvil (< 640px) en Modo Fácil: Icono arriba y texto completo debajo sin recortes */
+/* En móvil (< 640px) en Modo Fácil: Icono arriba y texto completo debajo sin recortes, aprovechando la pantalla */
 @media (max-width: 639px) {
     .mode-easy .btn-hero-action {
-        padding: 0.4rem 0.2rem !important;
-        font-size: 0.78rem !important;
+        padding: 0.55rem 0.25rem !important;
+        font-size: 0.82rem !important;
         flex-direction: column !important;
-        gap: 0.1rem !important;
+        gap: 0.15rem !important;
         min-width: 0 !important;
     }
     .mode-easy .btn-hero-action span.shrink-0 {
-        font-size: 1.15rem !important;
+        font-size: 1.25rem !important;
         margin-bottom: 0 !important;
     }
     .mode-easy .btn-hero-action span.truncate {
         overflow: visible !important;
         text-overflow: clip !important;
         white-space: normal !important;
-        line-height: 1.1 !important;
-        font-size: 0.78rem !important;
+        line-height: 1.15 !important;
+        font-size: 0.82rem !important;
         text-align: center !important;
+        font-weight: 900 !important;
     }
+}
+
+/* Soporte Dual Obligatorio (Modo Claro bajo .light-theme) */
+.light-theme.mode-easy #mobile-dobles-subtitle,
+.light-theme.mode-easy #mobile-sella-subtitle,
+.light-theme .mode-easy #mobile-dobles-subtitle,
+.light-theme .mode-easy #mobile-sella-subtitle {
+    color: #475569 !important;
+}
+.light-theme.mode-easy #cd-deadline-label,
+.light-theme .mode-easy #cd-deadline-label {
+    color: #b45309 !important;
+}
+.light-theme.mode-easy #user-card-forecast-status-text,
+.light-theme .mode-easy #user-card-forecast-status-text {
+    color: #0f172a !important;
+}
+.light-theme.mode-easy #user-card-live-hits-label,
+.light-theme.mode-easy #user-card-total-points-label,
+.light-theme .mode-easy #user-card-live-hits-label,
+.light-theme .mode-easy #user-card-total-points-label {
+    color: #334155 !important;
 }
 .mode-easy .btn-hero-quiniela {
     background: linear-gradient(135deg, #065f46 0%, #022c22 100%) !important;
