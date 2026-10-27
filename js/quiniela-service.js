@@ -159,8 +159,34 @@ class QuinielaService {
         return (QuinielaService.BUILTIN_UPCOMING_JORNADAS || []).slice();
     }
 
-    static async fetchUpcomingFromEduardoLosilla() {
-        const candidateNumbers = [14, 16]; // Domingos oficiales de liga (J15 es Champions intersemanal)
+    static async fetchUpcomingFromEduardoLosilla(customCandidates = null) {
+        let candidateNumbers = customCandidates;
+        if (!candidateNumbers || candidateNumbers.length === 0) {
+            let maxJ = 16;
+            if (typeof window !== 'undefined' && window.JornadasApp && Array.isArray(window.JornadasApp.jornadas) && window.JornadasApp.jornadas.length > 0) {
+                const nums = window.JornadasApp.jornadas.map(j => parseInt(j.number, 10)).filter(n => !isNaN(n));
+                if (nums.length > 0) maxJ = Math.max(...nums);
+            }
+            candidateNumbers = [];
+            for (let n = Math.max(1, maxJ); n <= maxJ + 6; n++) {
+                candidateNumbers.push(n);
+            }
+        }
+
+        const KNOWN_DATES = {
+            14: '18/10/2026',
+            15: '21/10/2026',
+            16: '25/10/2026',
+            17: '28/10/2026',
+            18: '01/11/2026',
+            19: '04/11/2026',
+            20: '08/11/2026',
+            21: '11/11/2026',
+            22: '15/11/2026',
+            23: '18/11/2026',
+            24: '22/11/2026'
+        };
+
         const results = [];
 
         for (const jNum of candidateNumbers) {
@@ -195,12 +221,54 @@ class QuinielaService {
                 }
 
                 if (matches.length === 15) {
-                    const dateStr = jNum === 14 ? '18/10/2026' : (jNum === 16 ? '25/10/2026' : '');
+                    // Ignorar jornadas con partidos pendientes de sorteo ('A DETERMINAR')
+                    const hasPlaceholders = matches.some(m =>
+                        (m.home && m.home.toUpperCase().includes('DETERMINAR')) ||
+                        (m.away && m.away.toUpperCase().includes('DETERMINAR'))
+                    );
+                    if (hasPlaceholders) continue;
+
+                    // Consultar horarios para comprobar si es jornada de fin de semana (DOM/SAB)
+                    let isSunday = true;
+                    try {
+                        const ctrlH = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                        const timerH = ctrlH ? setTimeout(() => ctrlH.abort(), 1500) : null;
+                        const resH = await fetch(`https://api.eduardolosilla.es/v1/xml2/horarios?jornada=${jNum}`, {
+                            signal: ctrlH ? ctrlH.signal : undefined
+                        });
+                        if (timerH) clearTimeout(timerH);
+                        if (resH.ok) {
+                            const txtH = await resH.text();
+                            const dias = [...txtH.matchAll(/dia="([^"]+)"/g)].map(m => m[1]);
+                            if (dias.length > 0) {
+                                isSunday = dias.some(d => ['DOM', 'SAB', 'SÁB'].includes(d.toUpperCase()));
+                            }
+                        }
+                    } catch(eH) {
+                        isSunday = (jNum % 2 === 0);
+                    }
+
+                    // Calcular o asignar fecha oficial
+                    let dateStr = KNOWN_DATES[jNum] || '';
+                    if (!dateStr) {
+                        if (isSunday && jNum % 2 === 0) {
+                            const weeksDiff = (jNum - 16) / 2;
+                            const d = new Date(2026, 9, 25);
+                            d.setDate(d.getDate() + (weeksDiff * 7));
+                            dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                        } else {
+                            const weeksDiff = Math.floor((jNum - 16) / 2);
+                            const d = new Date(2026, 9, 28);
+                            d.setDate(d.getDate() + (weeksDiff * 7));
+                            dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                        }
+                    }
+
                     results.push({
                         number: jNum,
                         dateStr: dateStr,
                         season: '2026-2027',
-                        isSunday: true,
+                        isSunday: isSunday,
                         source: 'Eduardo Losilla Oficial',
                         matches: matches
                     });
@@ -256,10 +324,31 @@ class QuinielaService {
             'TENERIFE': 'Tenerife',
             'LEVANTE': 'Levante',
             'LOGROÑO': 'Logroño',
-            'BADALONA W.': 'Badalona Women'
+            'BADALONA W.': 'Badalona Women',
+            'BADALONA W.(F)': 'Badalona Women (f)',
+            'RACING S.': 'Racing Santander',
+            'RACING': 'Racing Santander',
+            'ELDENSE': 'Eldense',
+            'GRANADA': 'Granada',
+            'SPORTING': 'Sporting de Gijón',
+            'ZARAGOZA': 'Zaragoza',
+            'CARTAGENA': 'Cartagena',
+            'MIRANDÉS': 'Mirandés',
+            'MIRANDES': 'Mirandés',
+            'HUESCA': 'Huesca',
+            'CÁDIZ': 'Cádiz',
+            'CADIZ': 'Cádiz',
+            'CÓRDOBA': 'Córdoba',
+            'CORDOBA': 'Córdoba',
+            'ALBACETE': 'Albacete',
+            'FERROL': 'Racing de Ferrol',
+            'R.FERROL': 'Racing de Ferrol'
         };
 
-        const res = map[str.toUpperCase()] || str;
+        let res = map[str.toUpperCase()] || str;
+        if (!map[str.toUpperCase()] && res === str && res === res.toUpperCase() && res.length > 2) {
+            res = res.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
         return isF ? (res + ' (f)') : res;
     }
 
@@ -376,27 +465,51 @@ class QuinielaService {
 
 QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
     {
-        number: 14,
-        dateStr: "18/10/2026",
+        number: 18,
+        dateStr: "01/11/2026",
         season: "2026-2027",
         isSunday: true,
         source: "Eduardo Losilla Oficial",
         matches: [
-            { position: 1, home: "Espanyol", away: "Atlético de Madrid", result: "" },
-            { position: 2, home: "Villarreal", away: "Elche", result: "" },
-            { position: 3, home: "Betis", away: "Barcelona", result: "" },
-            { position: 4, home: "Valencia", away: "Athletic Club", result: "" },
-            { position: 5, home: "Celta", away: "Alavés", result: "" },
-            { position: 6, home: "Málaga", away: "Real Sociedad", result: "" },
-            { position: 7, home: "Real Madrid", away: "Sevilla", result: "" },
-            { position: 8, home: "Eibar", away: "Mallorca", result: "" },
-            { position: 9, home: "Las Palmas", away: "Castellón", result: "" },
-            { position: 10, home: "Burgos", away: "Sabadell", result: "" },
-            { position: 11, home: "Athletic Club (f)", away: "Valencia (f)", result: "" },
-            { position: 12, home: "Real Madrid (f)", away: "Espanyol (f)", result: "" },
-            { position: 13, home: "Eibar (f)", away: "Deportivo (f)", result: "" },
-            { position: 14, home: "Atlético de Madrid (f)", away: "Madrid CFF (f)", result: "" },
-            { position: 15, home: "Getafe", away: "Rayo Vallecano", result: "" }
+            { position: 1, home: "Levante", away: "Atlético de Madrid", result: "" },
+            { position: 2, home: "Rayo Vallecano", away: "Celta", result: "" },
+            { position: 3, home: "Betis", away: "Málaga", result: "" },
+            { position: 4, home: "Barcelona", away: "Alavés", result: "" },
+            { position: 5, home: "Getafe", away: "Sevilla", result: "" },
+            { position: 6, home: "Racing Santander", away: "Real Madrid", result: "" },
+            { position: 7, home: "Elche", away: "Valencia", result: "" },
+            { position: 8, home: "Eibar", away: "Almería", result: "" },
+            { position: 9, home: "Eldense", away: "Granada", result: "" },
+            { position: 10, home: "Burgos", away: "Castellón", result: "" },
+            { position: 11, home: "Alavés (f)", away: "Real Sociedad (f)", result: "" },
+            { position: 12, home: "Madrid CFF (f)", away: "Deportivo (f)", result: "" },
+            { position: 13, home: "Sevilla (f)", away: "Real Madrid (f)", result: "" },
+            { position: 14, home: "Tenerife (f)", away: "Athletic Club (f)", result: "" },
+            { position: 15, home: "Athletic Club", away: "Real Sociedad", result: "" }
+        ]
+    },
+    {
+        number: 20,
+        dateStr: "08/11/2026",
+        season: "2026-2027",
+        isSunday: true,
+        source: "Eduardo Losilla Oficial",
+        matches: [
+            { position: 1, home: "Málaga", away: "Racing Santander", result: "" },
+            { position: 2, home: "Sevilla", away: "Levante", result: "" },
+            { position: 3, home: "Alavés", away: "Getafe", result: "" },
+            { position: 4, home: "Betis", away: "Elche", result: "" },
+            { position: 5, home: "Almería", away: "Burgos", result: "" },
+            { position: 6, home: "Real Madrid", away: "Rayo Vallecano", result: "" },
+            { position: 7, home: "Valencia", away: "Athletic Club", result: "" },
+            { position: 8, home: "Celta", away: "Espanyol", result: "" },
+            { position: 9, home: "Deportivo", away: "Eibar", result: "" },
+            { position: 10, home: "Castellón", away: "Sabadell", result: "" },
+            { position: 11, home: "Badalona Women (f)", away: "Real Madrid (f)", result: "" },
+            { position: 12, home: "Real Sociedad (f)", away: "Tenerife (f)", result: "" },
+            { position: 13, home: "Deportivo (f)", away: "Logroño (f)", result: "" },
+            { position: 14, home: "Madrid CFF (f)", away: "Sevilla (f)", result: "" },
+            { position: 15, home: "Atlético de Madrid", away: "Barcelona", result: "" }
         ]
     },
     {
@@ -421,6 +534,30 @@ QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
             { position: 13, home: "Eibar (f)", away: "Madrid CFF (f)", result: "" },
             { position: 14, home: "Real Madrid (f)", away: "Tenerife (f)", result: "" },
             { position: 15, home: "Barcelona", away: "Real Madrid", result: "" }
+        ]
+    },
+    {
+        number: 14,
+        dateStr: "18/10/2026",
+        season: "2026-2027",
+        isSunday: true,
+        source: "Eduardo Losilla Oficial",
+        matches: [
+            { position: 1, home: "Espanyol", away: "Atlético de Madrid", result: "" },
+            { position: 2, home: "Villarreal", away: "Elche", result: "" },
+            { position: 3, home: "Betis", away: "Barcelona", result: "" },
+            { position: 4, home: "Valencia", away: "Athletic Club", result: "" },
+            { position: 5, home: "Celta", away: "Alavés", result: "" },
+            { position: 6, home: "Málaga", away: "Real Sociedad", result: "" },
+            { position: 7, home: "Real Madrid", away: "Sevilla", result: "" },
+            { position: 8, home: "Eibar", away: "Mallorca", result: "" },
+            { position: 9, home: "Las Palmas", away: "Castellón", result: "" },
+            { position: 10, home: "Burgos", away: "Sabadell", result: "" },
+            { position: 11, home: "Athletic Club (f)", away: "Valencia (f)", result: "" },
+            { position: 12, home: "Real Madrid (f)", away: "Espanyol (f)", result: "" },
+            { position: 13, home: "Eibar (f)", away: "Deportivo (f)", result: "" },
+            { position: 14, home: "Atlético de Madrid (f)", away: "Madrid CFF (f)", result: "" },
+            { position: 15, home: "Getafe", away: "Rayo Vallecano", result: "" }
         ]
     }
 ];

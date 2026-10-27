@@ -1928,6 +1928,12 @@ class Dashboard2AppController {
             url: 'jornadas_2.html'
         });
 
+        // NOTICIA: IMPORTADOR DE PARTIDOS
+        items.push({
+            text: `⚽ <strong class="text-amber-400">Importador de Partidos:</strong> Actualizado con detección dinámica de boletos oficiales y calendario completo de próximas jornadas en 1 clic.`,
+            action: 'jornadas'
+        });
+
         // 2.e2 NOVEDAD EN BOTE: Explorador de Premios
         items.push({
             text: `🎁 <strong class="text-amber-400">Novedad en Bote:</strong> Nuevo explorador de premios obtenidos: vista agrupada por socio, por jornada o desglosada (ordenada por jornada, cantidad o socio).`,

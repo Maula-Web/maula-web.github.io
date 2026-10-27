@@ -1678,11 +1678,15 @@ class Jornadas2AppController {
                 return d.getTime() >= today.getTime();
             });
 
-            const candidateList = futureOnly.length > 0 ? futureOnly : this.availableUpcomingJornadas;
+            const uncreatedList = this.availableUpcomingJornadas.filter(cand => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(cand.number, 10)));
+            const candidateList = futureOnly.length > 0 ? futureOnly : (uncreatedList.length > 0 ? uncreatedList : this.availableUpcomingJornadas);
             this.availableUpcomingJornadas = candidateList;
 
-            // Seleccionar la primera jornada futura que aún no exista en el sistema
-            const newCandidate = candidateList.find(cand => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(cand.number, 10))) || candidateList[0];
+            // Seleccionar la primera jornada futura o no existente que sea preferentemente de domingo (regla oficial de la Peña)
+            const newCandidate = candidateList.find(cand => cand.isSunday && !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(cand.number, 10)))
+                || candidateList.find(cand => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(cand.number, 10)))
+                || candidateList.find(cand => cand.isSunday)
+                || candidateList[0];
 
             // Mostrar vista previa (Paso 2)
             document.getElementById('import-matches-step-1').classList.add('hidden');
@@ -1718,7 +1722,7 @@ class Jornadas2AppController {
         this.pendingImportMatches = {
             jNum: candidate.number,
             dateStr: candidate.dateStr,
-            isSunday: true,
+            isSunday: candidate.isSunday !== false,
             warnings: [],
             matches: candidate.matches
         };
@@ -1732,7 +1736,8 @@ class Jornadas2AppController {
             const optionsHtml = (this.availableUpcomingJornadas || [candidate]).map(cand => {
                 const isSelected = parseInt(cand.number, 10) === parseInt(candidate.number, 10);
                 const exists = this.jornadas.some(j => parseInt(j.number, 10) === parseInt(cand.number, 10));
-                return `<option value="${cand.number}" ${isSelected ? 'selected' : ''}>Jornada ${cand.number} - ${cand.dateStr} (Domingo)${exists ? ' [Ya existe]' : ' [Nueva]'}</option>`;
+                const dayLabel = cand.isSunday ? '(Domingo)' : '(Intersemanal)';
+                return `<option value="${cand.number}" ${isSelected ? 'selected' : ''}>Jornada ${cand.number} - ${cand.dateStr} ${dayLabel}${exists ? ' [Ya existe]' : ' [Nueva]'}</option>`;
             }).join('');
 
             headerBox.innerHTML = `
@@ -1750,7 +1755,7 @@ class Jornadas2AppController {
                         </div>
                     </div>
                     <div class="flex items-center justify-between text-xs pt-0.5">
-                        <span class="text-slate-300 font-semibold">Fecha oficial de juego: <strong class="text-white font-mono">${candidate.dateStr}</strong> (Domingo)</span>
+                        <span class="text-slate-300 font-semibold">Fecha oficial de juego: <strong class="text-white font-mono">${candidate.dateStr}</strong> ${candidate.isSunday ? '(Domingo)' : '(Intersemanal)'}</span>
                         <span class="px-2 py-0.5 rounded text-[11px] font-bold ${alreadyExists ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">
                             ${alreadyExists ? '⚠️ Se actualizarán partidos' : '✅ Lista para crear'}
                         </span>

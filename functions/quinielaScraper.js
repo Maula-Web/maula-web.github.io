@@ -353,6 +353,23 @@ async function fetchUpcomingQuinielaJornadas() {
         console.warn('[quinielaScraper] Fallo consultando SELAE buscadorSorteos:', e.message);
     }
 
+    // 2. Fuente Secundaria: Eduardo Losilla Oficial en vivo
+    try {
+        console.log('[quinielaScraper] SELAE sin sorteos futuros. Consultando fuente secundaria Eduardo Losilla...');
+        const path = require('path');
+        const quinielaServicePath = path.join(__dirname, '../js/quiniela-service.js');
+        const { QuinielaService } = require(quinielaServicePath);
+        if (QuinielaService && typeof QuinielaService.fetchUpcomingFromEduardoLosilla === 'function') {
+            const losillaList = await QuinielaService.fetchUpcomingFromEduardoLosilla();
+            if (Array.isArray(losillaList) && losillaList.length > 0) {
+                console.log(`[quinielaScraper] ✅ Obtenidas ${losillaList.length} próximas jornadas desde Eduardo Losilla.`);
+                return losillaList;
+            }
+        }
+    } catch (e2) {
+        console.warn('[quinielaScraper] Fallo consultando fuente secundaria Eduardo Losilla:', e2.message);
+    }
+
     return [];
 }
 

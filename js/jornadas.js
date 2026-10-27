@@ -1387,8 +1387,12 @@ class JornadaManager {
                 const d = new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10));
                 return d.getTime() >= todayV1.getTime();
             });
-            const validList = futureUpcoming.length > 0 ? futureUpcoming : upcoming;
-            const cand = validList.find(c => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(c.number, 10))) || validList[0];
+            const uncreatedList = upcoming.filter(c => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(c.number, 10)));
+            const validList = futureUpcoming.length > 0 ? futureUpcoming : (uncreatedList.length > 0 ? uncreatedList : upcoming);
+            const cand = validList.find(c => c.isSunday && !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(c.number, 10)))
+                || validList.find(c => !this.jornadas.some(j => parseInt(j.number, 10) === parseInt(c.number, 10)))
+                || validList.find(c => c.isSunday)
+                || validList[0];
 
             this.pendingImportData = {
                 jNum: cand.number,

@@ -309,6 +309,12 @@
                 url: 'dashboard_2.html'
             });
 
+            // NOTICIA 2.g: ACTUALIZACIÓN IMPORTADOR DE PARTIDOS
+            items.push({
+                text: `⚽ <strong class="text-amber-400">Importador de Partidos:</strong> Actualizado con detección dinámica de boletos oficiales y calendario completo de próximas jornadas en 1 clic.`,
+                url: 'jornadas_2.html'
+            });
+
             // NOTICIA 2.d: CAJA REAL OFICIAL Y BALANCE CONTABLE
             items.push({
                 text: `💰 <strong class="text-amber-400">Caja Real Oficial:</strong> Fijada en <strong>${cajaFmt}</strong> (suma de tarjetas: Saldos + Premios + Cuotas + Penalizaciones − Sellados).`,
