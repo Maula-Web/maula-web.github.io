@@ -1878,6 +1878,12 @@ class Dashboard2AppController {
             items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
 
+        // NOTICIA REDISTRIBUCIÓN Y AJUSTES MODO FÁCIL MÓVIL
+        items.push({
+            text: '📱 <strong class="text-amber-400">Modo Fácil Móvil:</strong> Aprovechamiento y redistribución completa del espacio vertical en pantalla única, corrección de visualización del botón "Ver bote" y unificación del indicador en una sola línea horizontal.',
+            action: 'inicio'
+        });
+
         // NOTICIA REGLAMENTO QUINIELA DE DOBLES
         items.push({
             text: '✌️ <strong class="text-purple-400">Quiniela de Dobles:</strong> Se habilita exclusivamente para la próxima jornada inmediata a disputarse. En jornadas posteriores publicadas, los dobles se activarán correlativamente tras conocer los resultados oficiales previos.',

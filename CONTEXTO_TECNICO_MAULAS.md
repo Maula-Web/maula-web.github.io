@@ -1613,9 +1613,9 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
-## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.51)
+## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.52)
 - **Incremento Progresivo de Versiones**:
-  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.51` en `service-worker.js`.
+  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.52` en `service-worker.js`.
   - Fuerza la invalidación inmediata de recursos obsoletos en los clientes PWA instalados en iOS y Android, asegurando la entrega instantánea de los nuevos estilos ergonómicos y controladores de datos.
 
 ---
@@ -1632,6 +1632,17 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
   - `pronosticos_2.html` (`window.getEligibleDoublesMembers`): Retorna lista vacía `[]` para cualquier jornada no disputada posterior a la próxima inmediata, eliminando la estrella (★), ocultando los avisos amarillos y bloqueando la pestaña de dobles en el modal de edición.
   - `pronosticos_2.html` (`window.openEditorForDoubles` y `saveDoubles`): Protección perimetral con alerta informativa al usuario si intenta acceder o guardar dobles para jornadas futuras más allá de la próxima inmediata.
   - `updateKPIsCustom()`: En jornadas futuras posteriores, el KPI de dobles muestra *"Responsable: Se asignará tras disputarse la J(N-1)"* y deshabilita el botón de rellenado con aviso informativo.
+
+---
+
+## 61. REDISTRIBUCIÓN VERTICAL Y ERGONOMÍA DEL MODO FÁCIL MÓVIL EN DASHBOARD
+- **Unificación y Fijación en 1 Línea del Indicador de Modo Fácil**:
+  - Se eliminó la etiqueta duplicada oculta en la fila del temporizador y se reubicó la pastilla `⚡ MODO FÁCIL` alineada a la derecha en la fila superior (`Jornada 18`), aplicando `white-space: nowrap !important` y `line-height: 1` para impedir que el texto salte de línea o se deforme como un círculo aplastado.
+- **Corrección del Botón 'Ver Bote'**:
+  - Se suprimió el emoji redundante `💰` del botón (`Ver bote →`) y se calibraron las dimensiones tipográficas y espaciados flex (`gap: 0.25rem`, padding `0.25rem 0.5rem`, `font-size: 0.75rem`), garantizando que `💰 Caja`, `👤 Mi Bote` y el botón se muestren íntegros sin ningún recorte tipográfico (`Ver b`).
+- **Aprovechamiento Integral y Redistribución del Espacio Vertical**:
+  - Se retiró el `margin-top: auto` que aislaba la botonera inferior y empujaba el contenido hacia arriba dejando un hueco negro de más de 150px.
+  - Se configuró `#live-jornada-banner` y sus tarjetas internas (`#hero-pillars-grid`, `#user-summary-card`) con `flex: 1 1 auto` y distribución equilibrada (`justify-content: space-between`), dotando a las tarjetas y filas de holgura visual y confort de lectura en una única pantalla (`100dvh`) con cero scroll.
 
 ---
 

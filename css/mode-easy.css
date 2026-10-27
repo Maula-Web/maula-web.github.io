@@ -67,7 +67,7 @@
     margin-bottom: 0 !important;
 }
 
-/* Ajuste de pantalla única en móvil en Modo Fácil (cero scroll vertical y aprovechamiento total del viewport) */
+/* Ajuste de pantalla única en móvil en Modo Fácil (cero scroll vertical y redistribución total del espacio disponible) */
 @media (max-width: 767px) {
     html.mode-easy,
     body.mode-easy,
@@ -76,20 +76,21 @@
         overflow-y: hidden !important;
         height: 100dvh !important;
         max-height: 100dvh !important;
-        padding-bottom: 0 !important;
-        margin-bottom: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     .mode-easy #main-content {
-        padding: 0.35rem 0.5rem 0.35rem 0.5rem !important;
-        height: calc(100dvh - 54px) !important;
-        max-height: calc(100dvh - 54px) !important;
+        padding: 0.35rem 0.5rem 0.5rem 0.5rem !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
         overflow-y: hidden !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        gap: 0.35rem !important;
-        margin-bottom: 0 !important;
+        gap: 0.45rem !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
     /* Navbar superior compacta en móvil */
@@ -99,36 +100,56 @@
         flex-shrink: 0 !important;
     }
 
-    /* Cuadro de mando principal (Live Jornada Banner) */
+    /* Cuadro de mando principal: SE EXPANDE Y REDISTRIBUYE PARA APROVECHAR TODO EL ESPACIO */
     .mode-easy #live-jornada-banner {
-        padding: 0.45rem 0.65rem !important;
-        gap: 0.3rem !important;
-        flex-shrink: 0 !important;
-    }
-    .mode-easy #live-jornada-banner > div:first-child {
-        padding-bottom: 0.2rem !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        padding: 0.65rem 0.75rem !important;
+        gap: 0.45rem !important;
+        box-sizing: border-box !important;
     }
 
-    /* Grid de pilares vitales */
-    .mode-easy #hero-pillars-grid {
-        gap: 0.35rem !important;
+    /* Cabecera de jornada */
+    .mode-easy #live-jornada-banner > div:first-child {
+        padding-bottom: 0.3rem !important;
         flex-shrink: 0 !important;
+    }
+
+    /* Grid de pilares vitales: expande y reparte verticalmente */
+    .mode-easy #hero-pillars-grid {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        gap: 0.45rem !important;
     }
 
     /* Tarjeta del socio conectado */
     .mode-easy #user-summary-card {
-        padding: 0.5rem 0.65rem !important;
-        gap: 0.3rem !important;
-        flex-shrink: 0 !important;
+        padding: 0.65rem 0.75rem !important;
+        gap: 0.4rem !important;
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
     }
     .mode-easy #user-summary-card .border-t {
-        padding-top: 0.25rem !important;
+        padding-top: 0.3rem !important;
+    }
+
+    /* Fila de tesorería del socio (Caja + Mi Bote + Ver Bote) */
+    .mode-easy #user-card-treasury-row {
+        gap: 0.25rem !important;
     }
 
     /* Tarjeta de dobles y sella en móvil */
     .mode-easy #mobile-dobles-sella-card {
-        padding: 0.45rem 0.65rem !important;
-        gap: 0.25rem !important;
+        padding: 0.55rem 0.75rem !important;
+        gap: 0.35rem !important;
         flex-shrink: 0 !important;
     }
     .mode-easy #mobile-dobles-names {
@@ -140,10 +161,21 @@
 
     /* Botones destacados en tarjetas */
     .mode-easy .btn-destacado-boleto,
-    .mode-easy .btn-destacado-bote,
     .mode-easy .btn-destacado-dobles {
-        padding: 0.35rem 0.6rem !important;
+        padding: 0.35rem 0.65rem !important;
         font-size: 0.8rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Botón Ver Bote: blindado para no cortarse jamás */
+    .mode-easy .btn-destacado-bote {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     /* Cuenta atrás compacta para que el límite nunca desborde */
@@ -184,11 +216,23 @@
         color: #e2e8f0 !important;
     }
 
-    /* Fila de los 3 botones de acción directa anclados abajo */
-    .mode-easy #live-banner-actions {
-        gap: 0.35rem !important;
+    /* Pie del banner: estado del envío y barra de progreso */
+    .mode-easy #live-jornada-banner > div:last-child {
         flex-shrink: 0 !important;
-        margin-top: auto !important;
+        padding-top: 0.15rem !important;
+    }
+
+    /* Fila de los 3 botones de acción directa: distribuidos y con altura táctil ergonómica */
+    .mode-easy #live-banner-actions {
+        gap: 0.45rem !important;
+        flex-shrink: 0 !important;
+        margin-top: 0 !important;
+    }
+    .mode-easy #live-banner-actions a {
+        padding-top: 0.65rem !important;
+        padding-bottom: 0.65rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 0.85rem !important;
     }
 }
 
@@ -280,21 +324,31 @@
 /* Píldora de aviso de Modo Fácil - OCULTA SIEMPRE POR DEFECTO, SOLO VISIBLE EN .mode-easy */
 .badge-mode-easy {
     display: none !important;
+    white-space: nowrap !important;
 }
 
 :is(.mode-easy, html.mode-easy, body.mode-easy) .badge-mode-easy {
     display: inline-flex !important;
+    white-space: nowrap !important;
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     color: #ffffff !important;
-    font-size: 11px !important;
+    font-size: 10px !important;
     font-weight: 800 !important;
-    padding: 3px 10px !important;
+    padding: 2.5px 8px !important;
     border-radius: 9999px !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
+    letter-spacing: 0.04em !important;
     align-items: center !important;
     gap: 4px !important;
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+}
+
+.light-theme :is(.mode-easy, html.mode-easy, body.mode-easy) .badge-mode-easy {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25) !important;
 }
 
 /* --- 7. TARJETA DE BALANCE EN MODO FÁCIL (DISTRIBUCIÓN 2, 2 Y 1) --- */
