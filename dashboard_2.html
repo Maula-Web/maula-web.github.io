@@ -432,6 +432,9 @@
             body {
                 padding-bottom: 4rem !important; /* Margen para que el ticker inferior nunca tape el contenido */
             }
+            .mode-easy body {
+                padding-bottom: 0 !important;
+            }
             #main-content {
                 display: flex !important;
                 flex-direction: column !important;
@@ -441,6 +444,9 @@
                 overflow: visible !important;
                 padding-bottom: 1rem !important;
                 margin-bottom: 0 !important;
+            }
+            .mode-easy #main-content {
+                padding-bottom: 0 !important;
             }
             #live-jornada-banner {
                 flex: none !important;

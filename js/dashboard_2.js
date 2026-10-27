@@ -1850,6 +1850,12 @@ class Dashboard2AppController {
             action: 'inicio'
         });
 
+        // NOTICIA MODO FÁCIL MÓVIL: Ajuste de Pantalla Única sin Scroll
+        items.push({
+            text: '📱 <strong class="text-amber-400">Modo Fácil Móvil:</strong> Ajuste de altura y eliminación completa del scroll vertical en el Dashboard para visualización a pantalla única.',
+            action: 'inicio'
+        });
+
         // NOTICIA BOTE: Sincronización del Cálculo Oficial de Caja Real
         items.push({
             text: '💰 <strong class="text-amber-400">Auditoría del Bote:</strong> Sincronización dinámica de la fórmula de Cálculo de Caja Real con las tarjetas contables de saldos, premios, cuotas, penalizaciones y sellados.',

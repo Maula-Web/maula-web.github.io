@@ -60,10 +60,80 @@
     }
 }
 
-/* Retirar el margen inferior forzado por el teletipo */
+/* Retirar el margen inferior forzado por el teletipo y eliminar scroll en móvil */
 .mode-easy body.has-ticker,
 .mode-easy body {
-    padding-bottom: 2rem !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Ajuste de pantalla única en móvil en Modo Fácil (cero scroll vertical) */
+@media (max-width: 767px) {
+    .mode-easy html,
+    .mode-easy body {
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .mode-easy #main-content {
+        padding-top: 0.25rem !important;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+        gap: 0.35rem !important;
+    }
+
+    /* Navbar superior compacta en móvil */
+    .mode-easy nav.main-navbar-sticky {
+        padding: 0.35rem 0.5rem !important;
+        gap: 0.25rem !important;
+    }
+
+    /* Cuadro de mando principal (Live Jornada Banner) */
+    .mode-easy #live-jornada-banner {
+        padding: 0.45rem 0.6rem !important;
+        gap: 0.35rem !important;
+    }
+    .mode-easy #live-jornada-banner > div:first-child {
+        padding-bottom: 0.25rem !important;
+    }
+
+    /* Grid de pilares vitales */
+    .mode-easy #hero-pillars-grid {
+        gap: 0.35rem !important;
+    }
+
+    /* Tarjeta del socio conectado */
+    .mode-easy #user-summary-card {
+        padding: 0.45rem 0.55rem !important;
+        gap: 0.25rem !important;
+    }
+    .mode-easy #user-summary-card .border-t {
+        padding-top: 0.2rem !important;
+    }
+
+    /* Tarjeta de dobles y sella en móvil */
+    .mode-easy #mobile-dobles-sella-card {
+        padding: 0.35rem 0.55rem !important;
+        gap: 0.2rem !important;
+    }
+    .mode-easy #mobile-dobles-names {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Botones destacados en tarjetas */
+    .mode-easy .btn-destacado-boleto,
+    .mode-easy .btn-destacado-bote,
+    .mode-easy .btn-destacado-dobles {
+        padding: 0.3rem 0.55rem !important;
+        font-size: 0.78rem !important;
+    }
+
+    /* Fila de los 3 botones de acción directa */
+    .mode-easy #live-banner-actions {
+        gap: 0.35rem !important;
+    }
 }
 
 /* Destacar la tarjeta del socio conectado como eje central */
@@ -271,21 +341,21 @@
 /* En móvil (< 640px) en Modo Fácil: Icono arriba y texto completo debajo sin recortes */
 @media (max-width: 639px) {
     .mode-easy .btn-hero-action {
-        padding: 0.55rem 0.2rem !important;
+        padding: 0.4rem 0.2rem !important;
         font-size: 0.78rem !important;
         flex-direction: column !important;
-        gap: 0.15rem !important;
+        gap: 0.1rem !important;
         min-width: 0 !important;
     }
     .mode-easy .btn-hero-action span.shrink-0 {
-        font-size: 1.25rem !important;
-        margin-bottom: 0.1rem !important;
+        font-size: 1.15rem !important;
+        margin-bottom: 0 !important;
     }
     .mode-easy .btn-hero-action span.truncate {
         overflow: visible !important;
         text-overflow: clip !important;
         white-space: normal !important;
-        line-height: 1.15 !important;
+        line-height: 1.1 !important;
         font-size: 0.78rem !important;
         text-align: center !important;
     }
