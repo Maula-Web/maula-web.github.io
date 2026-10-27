@@ -1864,7 +1864,7 @@ class Dashboard2AppController {
 
         // 1.b NOVEDAD RESULTADOS: Matriz Panorámica en PC
         items.push({
-            text: '🗂️ <strong class="text-amber-400">Novedad Resultados (PC):</strong> Nueva vista de <strong>Matriz Panorámica</strong> en pantalla única con todos los resultados 1X2, P15 y PIGs de la temporada.',
+            text: '🗂️ <strong class="text-amber-400">Mejora Resultados:</strong> Matriz Panorámica optimizada exclusivamente para jornadas disputadas y nuevos tooltips visuales integrados.',
             action: 'jornadas'
         });
 

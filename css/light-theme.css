@@ -3074,6 +3074,36 @@ html.light-theme #card-desglose-balance-bote {
     border-color: #f59e0b !important;
 }
 
+/* Tooltip flotante de la Matriz Panorámica */
+.light-theme #matrix-panoramic-tooltip,
+.light-theme .matrix-tooltip {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1.5px solid #d97706 !important;
+    box-shadow: 0 20px 45px -10px rgba(120, 80, 20, 0.18), 0 8px 18px -4px rgba(0, 0, 0, 0.06) !important;
+}
+.light-theme #matrix-panoramic-tooltip *,
+.light-theme .matrix-tooltip * {
+    color: #1e293b;
+}
+.light-theme #matrix-panoramic-tooltip .text-amber-400,
+.light-theme .matrix-tooltip .text-amber-400 {
+    color: #b45309 !important;
+}
+.light-theme #matrix-panoramic-tooltip .text-slate-300,
+.light-theme #matrix-panoramic-tooltip .text-slate-400,
+.light-theme .matrix-tooltip .text-slate-300,
+.light-theme .matrix-tooltip .text-slate-400 {
+    color: #475569 !important;
+}
+.light-theme #matrix-panoramic-tooltip .border-slate-700\/80,
+.light-theme #matrix-panoramic-tooltip .border-slate-800\/80,
+.light-theme .matrix-tooltip .border-slate-700\/80,
+.light-theme .matrix-tooltip .border-slate-800\/80 {
+    border-color: #e2e8f0 !important;
+}
+
 /* ==========================================================================
    MÓDULO DE TELETIPO Y ANUNCIOS DE SOCIOS EN ADMINISTRACIÓN (MODO CLARO)
    ========================================================================== */
