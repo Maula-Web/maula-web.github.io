@@ -273,6 +273,12 @@
                 items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
             }
 
+            // NOTICIA 1.d: VELOCIDAD Y ANUNCIOS DE SOCIOS EN TELETIPO
+            items.push({
+                text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios (1 por semana, 3 días de vigencia) desde Administración.',
+                url: 'admin_2.html'
+            });
+
             // NOTICIA 1.c: MEJORA ERGONOMÍA MÓVIL - Menú Superior
             items.push({
                 text: '📱 <strong class="text-amber-400">Mejora Móvil:</strong> Menú superior y botones de acción (actualizar y cerrar sesión) reajustados para visualización perfecta en cualquier móvil sin cortes.',
@@ -466,6 +472,29 @@
                 text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Entrada anticipada de jornadas selladas con coste de sellado y cuotas, activando penalizaciones con el 1º partido.`,
                 url: 'bote_2.html'
             });
+
+            // Aplicar velocidad configurada desde Administración
+            let speedSeconds = 120;
+            try {
+                const savedSpeed = localStorage.getItem('maulas_teletipo_speed');
+                if (savedSpeed && !isNaN(savedSpeed) && Number(savedSpeed) >= 20) {
+                    speedSeconds = Number(savedSpeed);
+                } else if (data && data.teletipoConfig && data.teletipoConfig.speedSeconds) {
+                    speedSeconds = Number(data.teletipoConfig.speedSeconds);
+                    localStorage.setItem('maulas_teletipo_speed', speedSeconds);
+                }
+            } catch (e) {}
+
+            container.style.animationDuration = `${speedSeconds}s`;
+            document.documentElement.style.setProperty('--ticker-speed', `${speedSeconds}s`);
+
+            // Si el número de noticias supera 30, los anuncios de socios son los últimos en desaparecer
+            if (items.length > 30) {
+                const socioItems = items.filter(it => it && it.isSocioAnnouncement);
+                const regularItems = items.filter(it => !it || !it.isSocioAnnouncement);
+                const maxRegular = Math.max(10, 30 - socioItems.length);
+                items = [...regularItems.slice(0, maxRegular), ...socioItems];
+            }
 
             // Duplicar items para scroll continuo infinito
             const htmlItems = items.map((it, idx) => {

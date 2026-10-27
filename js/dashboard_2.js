@@ -1844,6 +1844,12 @@ class Dashboard2AppController {
             items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
 
+        // 1.d VELOCIDAD Y ANUNCIOS DE SOCIOS EN TELETIPO
+        items.push({
+            text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios (1 por semana, 3 días de vigencia) desde Administración.',
+            action: 'admin'
+        });
+
         // 1.c MEJORA ERGONOMÍA MÓVIL: Menú Superior
         items.push({
             text: '📱 <strong class="text-amber-400">Mejora Móvil:</strong> Menú superior y botones de acción (actualizar y cerrar sesión) reajustados para visualización perfecta en cualquier móvil sin cortes.',

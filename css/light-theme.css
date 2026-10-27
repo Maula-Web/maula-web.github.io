@@ -3069,3 +3069,39 @@ html.light-theme #card-desglose-balance-bote {
     color: #92400e !important;
     border-color: #f59e0b !important;
 }
+
+/* ==========================================================================
+   MÓDULO DE TELETIPO Y ANUNCIOS DE SOCIOS EN ADMINISTRACIÓN (MODO CLARO)
+   ========================================================================== */
+.light-theme #module-teletipo {
+    background-color: #ffffff !important;
+    border-color: #f59e0b !important;
+}
+.light-theme #module-teletipo .bg-slate-900\/60,
+.light-theme #module-teletipo .bg-slate-100\/80 {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+.light-theme #module-teletipo select,
+.light-theme #module-teletipo textarea {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+.light-theme #module-teletipo select:focus,
+.light-theme #module-teletipo textarea:focus {
+    border-color: #f59e0b !important;
+}
+.light-theme #module-teletipo #teletipo-quota-pill {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #module-teletipo #teletipo-announcements-list .bg-slate-950\/80 {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+.light-theme #module-teletipo #teletipo-announcements-list p.text-slate-200 {
+    color: #1e293b !important;
+}

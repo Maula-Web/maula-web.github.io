@@ -276,13 +276,23 @@ class DataService {
         this._seasonDataPromise = (async () => {
             const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
 
-            const [members, allJornadas, pronosticos, pronosticosExtra, scoringRulesDoc] = await Promise.all([
+            const [members, allJornadas, pronosticos, pronosticosExtra, scoringRulesDoc, anunciosSnap, teletipoDoc] = await Promise.all([
                 this.getAll('members'),
                 this.getAll('jornadas'),
                 this.getAll('pronosticos'),
                 this.getAll('pronosticos_extra').catch(() => []),
-                this.getDoc('config', 'scoring_rules').catch(() => null)
+                this.getDoc('config', 'scoring_rules').catch(() => null),
+                this.getAll('anuncios_teletipo').catch(() => []),
+                this.getDoc('config', 'teletipo').catch(() => null)
             ]);
+
+            // Cache teletipo config and active announcements locally
+            if (teletipoDoc && teletipoDoc.speedSeconds) {
+                localStorage.setItem('maulas_teletipo_speed', teletipoDoc.speedSeconds);
+            }
+            if (Array.isArray(anunciosSnap) && anunciosSnap.length > 0) {
+                localStorage.setItem('maulas_anuncios_teletipo', JSON.stringify(anunciosSnap));
+            }
 
             // Integrate scoring rules history globally
             if (scoringRulesDoc && scoringRulesDoc.history && window.ScoringSystem) {
@@ -328,7 +338,9 @@ class DataService {
                         const jId = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId !== undefined && p.jornadaId !== null ? p.jornadaId : ''));
                         return seasonJornadaIds.has(jId);
                     });
-                })()
+                })(),
+                anunciosTeletipo: anunciosSnap || [],
+                teletipoConfig: teletipoDoc || null
             };
         })();
 

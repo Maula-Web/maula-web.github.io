@@ -97,6 +97,7 @@ body.layout-vertical .main-container {
 }
 
 :root {
+    --ticker-speed: 120s;
     --main-font-family: 'Inter', sans-serif;
     --main-font-size: 16px;
     --modal-bg: #2d2d2d;
@@ -4602,7 +4603,7 @@ body.has-ticker {
 .ticker-move {
     display: inline-flex;
     white-space: nowrap;
-    animation: ticker-slide 120s linear infinite;
+    animation: ticker-slide var(--ticker-speed, 120s) linear infinite;
 }
 
 .ticker-move:hover,
