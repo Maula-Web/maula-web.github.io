@@ -18,6 +18,8 @@ class Jornadas2AppController {
         // Estado del calendario DatePicker
         this.calCurrentYear = 2026;
         this.calCurrentMonth = 8; // Septiembre (0-indexed: 8 = Septiembre)
+        this.currentViewMode = 'boleto'; // boleto | matriz
+        this.matrixFilterMode = 'played'; // played | all
 
         this.init();
     }
@@ -378,7 +380,330 @@ class Jornadas2AppController {
         this.selectJornadaById(id);
     }
 
-    selectJornadaById(id) {
+
+    /**
+     * Alterna la vista activa en escritorio: Boleto detallado individual vs Matriz Panorámica
+     */
+    switchViewMode(mode) {
+        this.currentViewMode = mode || 'boleto';
+        const btnBoleto = document.getElementById('btn-view-boleto');
+        const btnMatriz = document.getElementById('btn-view-matriz');
+        const secBoleto = document.getElementById('section-boleto-matches');
+        const secEscrutinio = document.getElementById('section-escrutinio');
+        const secBottomNav = document.getElementById('section-jornadas-bottom-nav');
+        const secMatrix = document.getElementById('section-panoramic-matrix');
+
+        const activeClasses = ['bg-gradient-to-r', 'from-amber-500', 'to-amber-600', 'text-slate-950', 'shadow', 'font-bold'];
+        const inactiveClasses = ['text-slate-400', 'hover:text-white', 'hover:bg-slate-800', 'font-semibold'];
+
+        if (this.currentViewMode === 'matriz') {
+            if (btnMatriz) {
+                btnMatriz.classList.remove(...inactiveClasses);
+                btnMatriz.classList.add(...activeClasses);
+            }
+            if (btnBoleto) {
+                btnBoleto.classList.remove(...activeClasses);
+                btnBoleto.classList.add(...inactiveClasses);
+            }
+            if (secMatrix) secMatrix.classList.remove('hidden');
+            if (secBoleto) secBoleto.classList.add('hidden');
+            if (secEscrutinio) secEscrutinio.classList.add('hidden');
+            if (secBottomNav) secBottomNav.classList.add('hidden');
+
+            this.renderPanoramicMatrix();
+        } else {
+            if (btnBoleto) {
+                btnBoleto.classList.remove(...inactiveClasses);
+                btnBoleto.classList.add(...activeClasses);
+            }
+            if (btnMatriz) {
+                btnMatriz.classList.remove(...activeClasses);
+                btnMatriz.classList.add(...inactiveClasses);
+            }
+            if (secMatrix) secMatrix.classList.add('hidden');
+            if (secBoleto) secBoleto.classList.remove('hidden');
+            if (secEscrutinio) secEscrutinio.classList.remove('hidden');
+            if (secBottomNav) secBottomNav.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Permite cambiar el filtro de la matriz (solo jugadas vs toda la temporada)
+     */
+    setMatrixFilterMode(mode) {
+        this.matrixFilterMode = mode;
+        this.renderPanoramicMatrix();
+    }
+
+    /**
+     * Selecciona una jornada desde la matriz y vuelve a la vista de boleto con scroll suave
+     */
+    selectJornadaFromMatrix(jId) {
+        if (!jId) return;
+        this.selectJornadaById(jId);
+        this.switchViewMode('boleto');
+        const target = document.getElementById('section-boleto-matches');
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    /**
+     * Renderiza la Matriz Panorámica de Resultados de toda la temporada en una sola pantalla
+     */
+    renderPanoramicMatrix() {
+        const container = document.getElementById('panoramic-matrix-container');
+        if (!container) return;
+
+        const official = this.getOfficialJornadas();
+        if (!official || official.length === 0) {
+            container.innerHTML = '<p class="text-center text-slate-500 py-8 font-mono text-xs">No hay jornadas oficiales registradas en esta temporada.</p>';
+            return;
+        }
+
+        // Jornadas disputadas (con al menos 1 resultado oficial registrado)
+        const playedJornadas = official.filter(j => {
+            const matches = Array.isArray(j.matches) ? j.matches : [];
+            return matches.some(m => m && m.result && String(m.result).trim() !== '' && String(m.result).trim() !== '-' && String(m.result).toLowerCase() !== 'por definir');
+        });
+
+        const displayJornadas = (this.matrixFilterMode === 'all') ? official : playedJornadas;
+
+        if (displayJornadas.length === 0) {
+            container.innerHTML = '<p class="text-center text-slate-500 py-8 font-mono text-xs">Aún no se han disputado partidos esta temporada.</p>';
+            return;
+        }
+
+        // Estadísticas agregadas de los 14 primeros partidos
+        let total1 = 0;
+        let totalX = 0;
+        let total2 = 0;
+        let totalMatchesPlayed = 0;
+        let totalPigs = 0;
+
+        playedJornadas.forEach(j => {
+            const matches = j.matches || [];
+            if (this.findPigMatch(j)) totalPigs++;
+            for (let i = 0; i < 14; i++) {
+                const res = matches[i] && matches[i].result ? String(matches[i].result).trim().toUpperCase() : '';
+                if (res === '1') { total1++; totalMatchesPlayed++; }
+                else if (res === 'X') { totalX++; totalMatchesPlayed++; }
+                else if (res === '2') { total2++; totalMatchesPlayed++; }
+            }
+        });
+
+        const pct1 = totalMatchesPlayed > 0 ? ((total1 / totalMatchesPlayed) * 100).toFixed(1) : '0.0';
+        const pctX = totalMatchesPlayed > 0 ? ((totalX / totalMatchesPlayed) * 100).toFixed(1) : '0.0';
+        const pct2 = totalMatchesPlayed > 0 ? ((total2 / totalMatchesPlayed) * 100).toFixed(1) : '0.0';
+
+        // 1. Barra superior de KPIs y Selector de Filtro
+        let html = `
+            <div class="flex flex-wrap items-center justify-between gap-2 p-2 mb-2 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono">
+                <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-slate-400 text-[11px]">Partidos analizados:</span>
+                        <span class="font-black text-white px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700">${totalMatchesPlayed}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded flex items-center justify-center font-black text-[9px] bg-sky-500/25 text-sky-300 border border-sky-500/40">1</span>
+                        <span class="text-sky-300 font-bold">${total1}</span>
+                        <span class="text-slate-500 text-[10px]">(${pct1}%)</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded flex items-center justify-center font-black text-[9px] bg-amber-500/25 text-amber-300 border border-amber-500/40">X</span>
+                        <span class="text-amber-300 font-bold">${totalX}</span>
+                        <span class="text-slate-500 text-[10px]">(${pctX}%)</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded flex items-center justify-center font-black text-[9px] bg-rose-500/25 text-rose-300 border border-rose-500/40">2</span>
+                        <span class="text-rose-300 font-bold">${total2}</span>
+                        <span class="text-slate-500 text-[10px]">(${pct2}%)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs">🐷</span>
+                        <span class="text-pink-300 font-bold">${totalPigs}</span>
+                        <span class="text-slate-500 text-[10px]">PIG</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1 bg-slate-950 p-0.5 rounded-lg border border-slate-800 shrink-0">
+                    <button type="button" onclick="window.JornadasApp.setMatrixFilterMode('played')" class="px-2 py-0.5 rounded text-[11px] font-bold transition ${this.matrixFilterMode === 'played' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'}">
+                        Jugadas (${playedJornadas.length})
+                    </button>
+                    <button type="button" onclick="window.JornadasApp.setMatrixFilterMode('all')" class="px-2 py-0.5 rounded text-[11px] font-bold transition ${this.matrixFilterMode === 'all' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'}">
+                        Temporada Completa (${official.length})
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 2. Tabla Matriz Compacta en 1 Pantalla
+        html += `
+            <div class="overflow-x-auto w-full max-w-full rounded-xl border border-slate-800/80 shadow-inner bg-slate-950/90">
+                <table class="w-full text-center border-collapse select-none text-[11px] font-mono">
+                    <thead>
+                        <tr class="bg-slate-900/90 text-slate-400 border-b border-slate-800">
+                            <th class="sticky left-0 z-20 bg-slate-950 py-1 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-r border-slate-800 text-left w-14 min-w-[56px] matrix-sticky-col">
+                                Part.
+                            </th>
+        `;
+
+        // Columnas de Jornadas
+        displayJornadas.forEach(j => {
+            const isCurr = String(j.id) === String(this.selectedJornadaId);
+            const pig = this.findPigMatch(j);
+            const activeStyle = isCurr ? 'bg-amber-500/20 text-amber-300 font-black border-amber-500/60 matrix-th-active' : 'hover:bg-slate-800/70 text-slate-300';
+            const tooltip = `Jornada ${j.number} (${j.date || 'Fecha pendiente'})${pig ? ' • 🐷 Partido PIG' : ''}\nHaz clic para ver el boleto completo`;
+
+            html += `
+                <th class="py-1 px-0.5 min-w-[28px] max-w-[34px] border-r border-slate-800/60 cursor-pointer transition-colors ${activeStyle}" onclick="window.JornadasApp.selectJornadaFromMatrix('${j.id}')" title="${tooltip}">
+                    ${pig ? '<span class="text-[9px] block leading-none">🐷</span>' : ''}
+                    <span class="block text-[11px]">J.${j.number}</span>
+                </th>
+            `;
+        });
+
+        html += `
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60">
+        `;
+
+        // Filas de Partidos 1 al 14
+        for (let idx = 0; idx < 14; idx++) {
+            const partNum = String(idx + 1).padStart(2, '0');
+            html += `
+                <tr class="hover:bg-slate-900/30 transition-colors">
+                    <td class="sticky left-0 z-10 bg-slate-950 text-slate-300 font-mono text-[10px] font-bold py-1 px-2 border-r border-slate-800 text-left matrix-sticky-col flex items-center justify-between">
+                        <span>P.${partNum}</span>
+                    </td>
+            `;
+
+            displayJornadas.forEach(j => {
+                const isCurr = String(j.id) === String(this.selectedJornadaId);
+                const matches = j.matches || [];
+                const m = matches[idx];
+                const home = m ? (m.home || '') : '';
+                const away = m ? (m.away || '') : '';
+                const res = m && m.result ? String(m.result).trim().toUpperCase() : '';
+                const pig = this.findPigMatch(j);
+                const isPigMatch = pig && pig.index === idx;
+
+                let cellClass = 'matrix-cell text-slate-600 font-bold';
+                let cellContent = '-';
+
+                if (res === '1') {
+                    cellClass = 'matrix-cell-1 text-sky-400 bg-sky-500/15 font-black hover:bg-sky-500/30';
+                    cellContent = '1';
+                } else if (res === 'X') {
+                    cellClass = 'matrix-cell-x text-amber-400 bg-amber-500/15 font-black hover:bg-amber-500/30';
+                    cellContent = 'X';
+                } else if (res === '2') {
+                    cellClass = 'matrix-cell-2 text-rose-400 bg-rose-500/15 font-black hover:bg-rose-500/30';
+                    cellContent = '2';
+                }
+
+                if (isPigMatch) {
+                    cellClass += ' ring-1 ring-pink-400/90 shadow-[0_0_6px_rgba(244,114,182,0.4)]';
+                }
+
+                const colBg = isCurr ? 'bg-amber-500/5' : '';
+                const tooltip = `J.${j.number} - Partido ${idx + 1}${isPigMatch ? ' 🐷 [PIG]' : ''}\n${home} vs ${away}\nResultado: ${res || 'Pendiente'}\nHaz clic para ver jornada`;
+
+                html += `
+                    <td class="p-0.5 border-r border-slate-800/60 ${colBg} cursor-pointer transition-transform hover:scale-110" onclick="window.JornadasApp.selectJornadaFromMatrix('${j.id}')" title="${tooltip}">
+                        <span class="w-full h-5 rounded flex items-center justify-center ${cellClass} text-[11px]">${cellContent}</span>
+                    </td>
+                `;
+            });
+
+            html += `</tr>`;
+        }
+
+        // Fila Especial: Pleno al 15 (P15)
+        html += `
+            <tr class="bg-purple-950/20 border-t-2 border-b-2 border-purple-500/40 hover:bg-purple-950/30 transition-colors">
+                <td class="sticky left-0 z-10 bg-slate-950 text-purple-300 font-mono text-[10px] font-black py-1.5 px-2 border-r border-purple-500/40 text-left matrix-sticky-col">
+                    <span>P.15</span>
+                </td>
+        `;
+
+        displayJornadas.forEach(j => {
+            const isCurr = String(j.id) === String(this.selectedJornadaId);
+            const matches = j.matches || [];
+            const m = matches[14];
+            const home = m ? (m.home || '') : '';
+            const away = m ? (m.away || '') : '';
+            const res = m && m.result ? String(m.result).trim().toUpperCase() : '';
+            const pig = this.findPigMatch(j);
+            const isPigMatch = pig && pig.index === 14;
+
+            let cellClass = 'matrix-cell text-slate-600';
+            let cellContent = '-';
+
+            if (res) {
+                cellClass = 'matrix-cell-p15 text-purple-300 bg-purple-500/20 border border-purple-500/40 font-bold hover:bg-purple-500/40';
+                cellContent = res;
+            }
+
+            if (isPigMatch) {
+                cellClass += ' ring-1 ring-pink-400/90 shadow-[0_0_6px_rgba(244,114,182,0.4)]';
+            }
+
+            const colBg = isCurr ? 'bg-amber-500/10' : '';
+            const tooltip = `J.${j.number} - Pleno al 15${isPigMatch ? ' 🐷 [PIG]' : ''}\n${home} vs ${away}\nResultado: ${res || 'Pendiente'}\nHaz clic para ver jornada`;
+
+            html += `
+                <td class="p-0.5 border-r border-slate-800/60 ${colBg} cursor-pointer transition-transform hover:scale-105" onclick="window.JornadasApp.selectJornadaFromMatrix('${j.id}')" title="${tooltip}">
+                    <span class="w-full h-5 px-0.5 rounded flex items-center justify-center ${cellClass} text-[9px] leading-none">${cellContent}</span>
+                </td>
+            `;
+        });
+
+        html += `</tr>`;
+
+        // Fila de Resumen por Jornada: Distribución 1 · X · 2
+        html += `
+                    </tbody>
+                    <tfoot class="bg-slate-900/90 border-t border-slate-800">
+                        <tr>
+                            <td class="sticky left-0 z-10 bg-slate-950 text-slate-400 font-mono text-[9px] font-bold py-1 px-2 border-r border-slate-800 text-left matrix-sticky-col" title="Recuento de 1, X, 2 en la jornada">
+                                1·X·2
+                            </td>
+        `;
+
+        displayJornadas.forEach(j => {
+            const isCurr = String(j.id) === String(this.selectedJornadaId);
+            const matches = j.matches || [];
+            let c1 = 0, cX = 0, c2 = 0;
+            for (let i = 0; i < 14; i++) {
+                const r = matches[i] && matches[i].result ? String(matches[i].result).trim().toUpperCase() : '';
+                if (r === '1') c1++;
+                else if (r === 'X') cX++;
+                else if (r === '2') c2++;
+            }
+
+            const colBg = isCurr ? 'bg-amber-500/10 font-bold' : '';
+            const tooltip = `Jornada ${j.number}: ${c1} victorias locales (1), ${cX} empates (X), ${c2} victorias visitantes (2)`;
+
+            html += `
+                <td class="p-0.5 border-r border-slate-800/60 ${colBg} text-[9px] text-slate-400 select-none" title="${tooltip}">
+                    <span class="text-sky-400 font-bold">${c1}</span><span class="text-slate-600">·</span><span class="text-amber-400 font-bold">${cX}</span><span class="text-slate-600">·</span><span class="text-rose-400 font-bold">${c2}</span>
+                </td>
+            `;
+        });
+
+        html += `
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    }
+
+        selectJornadaById(id) {
         this.selectedJornadaId = id;
         this.renderHubControls();
         this.renderCurrentJornadaView();

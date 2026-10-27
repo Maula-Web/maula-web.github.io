@@ -1844,6 +1844,12 @@ class Dashboard2AppController {
             items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
 
+        // 1.b NOVEDAD RESULTADOS: Matriz Panorámica en PC
+        items.push({
+            text: '🗂️ <strong class="text-amber-400">Novedad Resultados (PC):</strong> Nueva vista de <strong>Matriz Panorámica</strong> en pantalla única con todos los resultados 1X2, P15 y PIGs de la temporada.',
+            action: 'jornadas'
+        });
+
         // 2. NOVEDAD WEB: ¡Estreno oficial de Maula Hero!
         items.push({
             text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Estreno oficial del juego <strong>Maula Hero</strong> en tu móvil. ¡Pon a prueba tus reflejos y compite por el récord de la Peña!`,

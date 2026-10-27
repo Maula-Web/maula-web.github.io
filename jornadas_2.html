@@ -793,8 +793,17 @@
                     </div>
                 </div>
 
-                <!-- EN ESCRITORIO: Botones de Acción Completos (1 sola fila limpia sin wrapping) -->
+                <!-- EN ESCRITORIO: Conmutador de Vistas y Botonera -->
                 <div class="hidden lg:flex items-center gap-1 sm:gap-1.5 flex-nowrap justify-end shrink-0">
+                    <!-- Selector de Vista: Boleto Individual vs Matriz Panorámica de Temporada -->
+                    <div class="flex items-center bg-slate-900/90 p-0.5 rounded-xl border border-slate-700/80 mr-1.5 shadow-inner" id="view-mode-selector-desktop">
+                        <button type="button" id="btn-view-boleto" onclick="window.JornadasApp.switchViewMode('boleto')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow" title="Vista detallada del boleto de la jornada seleccionada">
+                            <span>📝</span> <span>Boleto</span>
+                        </button>
+                        <button type="button" id="btn-view-matriz" onclick="window.JornadasApp.switchViewMode('matriz')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-slate-400 hover:text-white hover:bg-slate-800" title="Ver matriz panorámica de resultados de toda la temporada">
+                            <span>🗂️</span> <span>Matriz Temporada</span>
+                        </button>
+                    </div>
                     <button type="button" onclick="window.JornadasApp.openAuditModal()" class="px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 text-[11px] sm:text-xs font-bold transition flex items-center gap-1 shadow whitespace-nowrap" title="Auditar integridad y detectar discrepancias de toda la temporada">
                         <span>🔍</span> <span class="hidden 2xl:inline">Verificación Total</span><span class="2xl:hidden">Auditoría</span>
                     </button>
@@ -829,9 +838,58 @@
         </section>
 
         <!-- =====================================================================
+             MATRIZ PANORÁMICA DE RESULTADOS (TEMPORADA COMPLETA EN 1 PANTALLA)
+             Solo en PC (hidden lg:block) y en Modo Pro
+             ===================================================================== -->
+        <section id="section-panoramic-matrix" class="hidden glass-panel p-3 sm:p-5 border-amber-500/40 space-y-3.5 order-5 min-w-0 max-w-full overflow-hidden shadow-2xl">
+            <!-- Cabecera de la Matriz Panorámica -->
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 flex-wrap gap-2">
+                <div class="flex items-center gap-2.5">
+                    <span class="p-2 rounded-xl bg-amber-500/20 text-amber-400 text-lg">🗂️</span>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                            <span>Matriz Panorámica de Resultados</span>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500/15 text-amber-300 font-bold border border-amber-500/30">Temporada 2026-2027</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Resultados oficiales de todos los partidos disputados en una sola pantalla</p>
+                    </div>
+                </div>
+
+                <!-- Leyenda de signos -->
+                <div class="flex items-center gap-1.5 text-xs font-mono">
+                    <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                        <span class="w-4 h-4 rounded flex items-center justify-center font-black text-[10px] bg-sky-500/25 text-sky-300 border border-sky-500/40">1</span>
+                        <span class="text-slate-400 text-[11px]">Local</span>
+                    </div>
+                    <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                        <span class="w-4 h-4 rounded flex items-center justify-center font-black text-[10px] bg-amber-500/25 text-amber-300 border border-amber-500/40">X</span>
+                        <span class="text-slate-400 text-[11px]">Empate</span>
+                    </div>
+                    <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                        <span class="w-4 h-4 rounded flex items-center justify-center font-black text-[10px] bg-rose-500/25 text-rose-300 border border-rose-500/40">2</span>
+                        <span class="text-slate-400 text-[11px]">Visitante</span>
+                    </div>
+                    <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                        <span class="w-5 h-4 rounded flex items-center justify-center font-black text-[9px] bg-purple-500/25 text-purple-300 border border-purple-500/40">P15</span>
+                        <span class="text-slate-400 text-[11px]">Pleno</span>
+                    </div>
+                    <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                        <span class="text-xs">🐷</span>
+                        <span class="text-pink-300 text-[11px]">PIG</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor dinámico de la Matriz Panorámica -->
+            <div id="panoramic-matrix-container" class="w-full overflow-x-auto rounded-xl border border-slate-800/80 bg-slate-950/70 p-2 min-w-0">
+                <p class="text-center text-slate-500 py-8 font-mono text-xs">Cargando matriz panorámica de resultados...</p>
+            </div>
+        </section>
+
+        <!-- =====================================================================
              BOLETO OFICIAL DE 15 PARTIDOS (DISEÑO DEPORTIVO MAULAS 2.0)
              ===================================================================== -->
-        <section class="glass-panel p-3 sm:p-6 border-amber-500/40 space-y-4 order-5 min-w-0 max-w-full overflow-hidden">
+        <section id="section-boleto-matches" class="glass-panel p-3 sm:p-6 border-amber-500/40 space-y-4 order-5 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800 flex-wrap gap-2">
                 <div class="flex items-center gap-2.5">
                     <span class="p-2 rounded-xl bg-amber-500/20 text-amber-400 text-lg">📝</span>

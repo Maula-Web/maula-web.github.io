@@ -3026,3 +3026,46 @@ html.light-theme #card-desglose-balance-bote {
 .light-theme #marcelo-historical-banner p {
     color: #92400e !important;
 }
+
+/* ==========================================================================
+   MATRIZ PANORÁMICA DE RESULTADOS (MODO CLARO)
+   ========================================================================== */
+.light-theme #section-panoramic-matrix {
+    background-color: #ffffff !important;
+    border-color: #f59e0b !important;
+}
+.light-theme #view-mode-selector-desktop {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+.light-theme #panoramic-matrix-container {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+.light-theme .matrix-sticky-col {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+    border-color: #e2e8f0 !important;
+}
+.light-theme .matrix-cell-1 {
+    background-color: rgba(14, 165, 233, 0.15) !important;
+    color: #0369a1 !important;
+}
+.light-theme .matrix-cell-x {
+    background-color: rgba(245, 158, 11, 0.18) !important;
+    color: #b45309 !important;
+}
+.light-theme .matrix-cell-2 {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    color: #be123c !important;
+}
+.light-theme .matrix-cell-p15 {
+    background-color: rgba(168, 85, 247, 0.15) !important;
+    color: #6b21a8 !important;
+    border-color: rgba(168, 85, 247, 0.4) !important;
+}
+.light-theme .matrix-th-active {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+    border-color: #f59e0b !important;
+}

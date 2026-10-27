@@ -273,6 +273,12 @@
                 items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
             }
 
+            // NOTICIA 1.b: NOVEDAD RESULTADOS - Matriz Panorámica en PC
+            items.push({
+                text: '🗂️ <strong class="text-amber-400">Novedad Resultados (PC):</strong> Nueva vista de <strong>Matriz Panorámica</strong> en pantalla única con todos los resultados 1X2, P15 y PIGs de la temporada.',
+                url: 'jornadas_2.html'
+            });
+
             // NOTICIA 2: NOVEDAD WEB - Maula Hero
             items.push({
                 text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: subida de nivel ágil cada 25s o por puntos conseguidos, pausa de celebración y barra dual de progreso.`,

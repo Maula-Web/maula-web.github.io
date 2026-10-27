@@ -268,3 +268,13 @@
     border-color: #a855f7 !important;
     box-shadow: 0 6px 22px rgba(168, 85, 247, 0.5) !important;
 }
+
+/* ==========================================================================
+   MATRIZ PANORÁMICA DE RESULTADOS (EXCLUSIVO MODO PRO EN PC)
+   Ocultar conmutador y matriz panorámica en Modo Fácil
+   ========================================================================== */
+.mode-easy #view-mode-selector-desktop,
+.mode-easy #section-panoramic-matrix {
+    display: none !important;
+}
+
