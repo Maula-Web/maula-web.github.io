@@ -1224,49 +1224,24 @@ window.AppTextScale = {
 // =========================================================================
 window.AppUIMode = {
     isTargetUser() {
-        // 1. Forzar por parámetro en URL para testeo directo
-        try {
-            if (typeof window !== 'undefined' && window.location) {
-                const p = new URLSearchParams(window.location.search);
-                if (p.get('eval') === '1' || p.get('admin') === '1' || p.get('fernando') === '1' || p.get('facil') === '1' || p.get('modo') === 'facil' || p.get('modo') === 'pro') {
-                    return true;
-                }
-            }
-        } catch (e) {}
-
-        // 2. Comprobar si el usuario activo es Fernando Lozano (ID 6)
-        try {
-            if (window.AppVersion && typeof window.AppVersion.isFernandoLozano === 'function') {
-                if (window.AppVersion.isFernandoLozano()) return true;
-            }
-            const userStr = sessionStorage.getItem('maulas_user') || localStorage.getItem('maulas_user');
-            if (userStr) {
-                const u = JSON.parse(userStr);
-                const uid = String(u.id || '');
-                const umail = (u.email || '').toLowerCase().trim();
-                const uname = (u.name || '').toLowerCase().trim();
-                const uphone = (u.phone || '').toLowerCase().trim();
-                if (uid === '6' || umail.includes('lozano') || uname.includes('fernando') || uname.includes('lozano') || uphone.includes('lozano')) {
-                    return true;
-                }
-            }
-        } catch (e) {}
-
-        return false;
+        // Abierto al 100% para todos los socios y usuarios de la Peña Maulas
+        return true;
     },
 
     getMode() {
-        if (!this.isTargetUser()) return 'pro';
         try {
             const p = new URLSearchParams(window.location.search);
             if (p.get('modo') === 'facil' || p.get('facil') === '1') return 'easy';
             if (p.get('modo') === 'pro') return 'pro';
         } catch (e) {}
-        return localStorage.getItem('maulas_ui_mode') === 'easy' ? 'easy' : 'pro';
+        const saved = localStorage.getItem('maulas_ui_mode');
+        if (saved === 'pro') return 'pro';
+        if (saved === 'easy') return 'easy';
+        // Modo Fácil activado por defecto para todos los usuarios
+        return 'easy';
     },
 
     setMode(mode) {
-        if (!this.isTargetUser()) return;
         const targetMode = mode === 'easy' ? 'easy' : 'pro';
         localStorage.setItem('maulas_ui_mode', targetMode);
         this.applyMode(targetMode);
@@ -1277,7 +1252,7 @@ window.AppUIMode = {
     },
 
     applyMode(mode) {
-        const isEasy = (mode === 'easy') && this.isTargetUser();
+        const isEasy = (mode === 'easy');
         const root = document.documentElement;
         const body = document.body;
 

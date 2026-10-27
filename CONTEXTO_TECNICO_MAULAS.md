@@ -8,7 +8,7 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 
 - **Frontend**: HTML5, CSS (Vanilla + Tailwind CSS v4 / CDN), JS (Vanilla ES6+). Sin frameworks pesados.
 - **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`) con persistencia offline en IndexedDB (`db.enablePersistence({ synchronizeTabs: true })`).
-- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v2.49`).
+- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v2.50`).
 - **Hojas de Estilo y Sistema de Diseño (`/css/`)**:
   - `styles.css`: Estilos base, tema oscuro original, utilidades y animaciones.
   - `resumen-styles.css`: Reglas específicas para gráficas y paneles del resumen de temporada.
@@ -1576,7 +1576,11 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
-## 57. OPTIMIZACIÓN ERGONÓMICA DEL DASHBOARD 2.0 Y EXPERIENCIA MODO FÁCIL EN MÓVIL
+## 57. OPTIMIZACIÓN ERGONÓMICA DEL DASHBOARD 2.0 Y APERTURA GLOBAL DEL MODO FÁCIL PARA TODOS LOS USUARIOS
+- **Apertura Universal del Modo Fácil**:
+  - Se eliminó la restricción que limitaba el Modo Fácil a una cuenta de pruebas o parámetros URL.
+  - El selector **⚡ Fácil / 🚀 Pro** se inyecta y está activo en la cabecera (escritorio y móvil) para **todos los socios y visitantes**.
+  - **Modo Fácil por Defecto**: Si el usuario no ha seleccionado previamente una preferencia en `localStorage`, la aplicación arranca de forma nativa en **Modo Fácil** (`easy`), permitiendo conmutar a **Modo Pro** (`pro`) en cualquier momento con persistencia inmediata.
 - **Ajuste Integral de Pantalla Única en Móvil (Cero Scroll Absoluto)**:
   - Configuración estricta de `100dvh` con `overflow-y: hidden` en `body.mode-easy` y contenedor flexible `#main-content` con distribución vertical `justify-between`, erradicando cualquier scroll y aprovechando el 100% del alto de la pantalla sin huecos vacíos.
 - **Visibilidad Total de Caja Real y Bote Personal (`user-summary-card`)**:
@@ -1609,9 +1613,9 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
-## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.49)
+## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.50)
 - **Incremento Progresivo de Versiones**:
-  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.49` en `service-worker.js`.
+  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.50` en `service-worker.js`.
   - Fuerza la invalidación inmediata de recursos obsoletos en los clientes PWA instalados en iOS y Android, asegurando la entrega instantánea de los nuevos estilos ergonómicos y controladores de datos.
 
 ---

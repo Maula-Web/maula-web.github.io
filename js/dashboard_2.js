@@ -1878,6 +1878,12 @@ class Dashboard2AppController {
             items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
 
+        // NOTICIA MODO FÁCIL PARA TODOS LOS USUARIOS
+        items.push({
+            text: '⚡ <strong class="text-amber-400">¡Modo Fácil para todos!:</strong> Estrenamos la nueva interfaz simplificada a pantalla única para todos los socios. Puedes alternar en 1 clic entre Modo Fácil (⚡) y Modo Pro (🚀) en la barra superior.',
+            action: 'inicio'
+        });
+
         // MEJORA DASHBOARD: Botón Ver Mi Bote, Modo Fácil y Pantalla Única en PC
         items.push({
             text: '⚡ <strong class="text-amber-400">Mejora Dashboard:</strong> Nuevo botón destacado para "Ver mi bote", optimización táctil en Modo Fácil sin textos cortados, información de Dobles en PC y ajuste de pantalla única en Modo Pro.',
