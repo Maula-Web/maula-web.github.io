@@ -8,7 +8,7 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 
 - **Frontend**: HTML5, CSS (Vanilla + Tailwind CSS v4 / CDN), JS (Vanilla ES6+). Sin frameworks pesados.
 - **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`) con persistencia offline en IndexedDB (`db.enablePersistence({ synchronizeTabs: true })`).
-- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v1.21`).
+- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v2.47`).
 - **Hojas de Estilo y Sistema de Diseño (`/css/`)**:
   - `styles.css`: Estilos base, tema oscuro original, utilidades y animaciones.
   - `resumen-styles.css`: Reglas específicas para gráficas y paneles del resumen de temporada.
@@ -1542,6 +1542,72 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
   - **Quiniela**: Se ocultan herramientas complejas de exportación SELAE y análisis laterales, permitiendo rellenar el boleto de 14 partidos + Pleno al 15 con máxima rapidez.
 - **Soporte Dual en Modo Claro y Oscuro**:
   - Integrado en `css/light-theme.css` para garantizar armonía estética y contraste óptimo en ambos temas.
+
+---
+
+## 55. CONTROL DE VELOCIDAD Y TABLÓN DE ANUNCIOS DE SOCIOS EN EL TELETIPO (ADMINISTRACIÓN)
+- **Velocidad Configurable de la Cinta (`admin_2.html`, `js/teletipo.js`, `js/dashboard_2.js`)**:
+  - Selector de velocidad con 3 niveles: *Rápida* (duración 80s), *Normal* (120s) y *Pausada* (160s).
+  - La velocidad se persiste en Firestore (`config/ticker_config.speed`) y en `localStorage` con sincronización en tiempo real a través de variables CSS (`--ticker-duration`).
+- **Tablón de Anuncios de Socios en la Cinta de Noticias**:
+  - Módulo en Administración que permite a cualquier socio conectado publicar anuncios o mensajes comunales en el teletipo general.
+  - **Reglas de Negocio Estrictas**:
+    * **Límite de Frecuencia**: Máximo **1 anuncio por socio y por semana** (verificado en base al histórico de publicaciones del socio en los últimos 7 días).
+    * **Caducidad Automática**: Los anuncios tienen una vigencia máxima de **3 días (72 horas)** tras su publicación, desactivándose automáticamente una vez expirado el plazo.
+    * **Prioridad de Visualización y Reemplazo**: Si se publican noticias del sistema más recientes, los anuncios de los socios se desplazan hacia el final de la cinta pero son **los últimos en eliminarse**, garantizando que los mensajes de los socios tengan siempre presencia visible en la rotación.
+  - Persistencia en Firestore (colección `socio_announcements`) con respaldo en memoria y `localStorage`.
+
+---
+
+## 56. MATRIZ PANORÁMICA DE RESULTADOS DE TEMPORADA EN PANTALLA ÚNICA (RESULTADOS 2.0)
+- **Visualización Global en PC (`jornadas_2.html`, `js/jornadas_2.js`)**:
+  - Nueva vista de **Matriz Panorámica de Resultados** disponible en escritorio para el Modo Pro.
+  - Muestra en una sola pantalla todos los partidos (P.01 al P.14) más el Pleno al 15 y el recuento de signos 1X2 por columna de jornada.
+- **Enfoque Exclusivo en Jornadas Disputadas**:
+  - Siguiendo los criterios de usabilidad de la peña, se eliminó el selector superfluo de *Jugadas vs Temporada Completa*, fijando la matriz para renderizar exclusivamente las jornadas oficiales que cuentan con al menos un resultado disputado.
+- **Sistema de Tooltips Visuales Flotantes Dinámicos (`#matrix-panoramic-tooltip`)**:
+  - Reemplazo absoluto de los tooltips nativos del navegador (`title`) por tarjetas flotantes emergentes estilizadas con la identidad visual corporativa de Las Maulas (`bg-slate-950/95`, `border-amber-500/80`, efecto glassmorphism y sombra 2xl).
+  - Incluye badges cromáticos oficiales: **1 (Azul Cielo)**, **X (Ámbar)**, **2 (Rosa Rojizo)**, **Pleno al 15 (Púrpura)** y **Partido PIG (🐷)**, junto con los equipos contendientes y la llamada a la acción interactiva (*Haz clic para ver el boleto*).
+  - Algoritmo de posicionamiento con *boundary checking* de los bordes del viewport y auto-ocultación en eventos de scroll o cambio de pestaña.
+  - **Soporte Dual en Modo Claro (`css/light-theme.css`)**: Adaptación con fondo blanco cerámico, borde ámbar cálido (`#d97706`) y tipografías obsidian de alto contraste.
+
+---
+
+## 57. OPTIMIZACIÓN ERGONÓMICA DEL DASHBOARD 2.0 Y EXPERIENCIA MODO FÁCIL EN MÓVIL
+- **Botón Destacado de "Ver mi bote"**:
+  - Se sustituyó el antiguo enlace plano de texto por el componente interactivo `.btn-destacado-bote`, dotado de icono monetario (`💰`), bordes esmeralda y retroalimentación táctil (`active:scale-95`).
+- **Distribución Móvil en Modo Fácil sin Textos Cortados (`css/mode-easy.css`)**:
+  - Los 3 grandes botones de acción inferior (*Quiniela*, *Jornada*, *Clasificación*) adoptan distribución vertical (`flex-direction: column`) en pantallas móviles (`< 640px`), con `white-space: normal` y `overflow: visible`, erradicando por completo cualquier truncado o corte con elipsis (`...`).
+- **Restauración de Dobles en Modo Fácil para PC**:
+  - Regla responsiva específica (`@media (min-width: 768px)`) para mantener visibles los 3 pilares secundarios (`#hero-secondary-pillars`: Caja Real, Dobles de la Jornada y Sellador Oficial) en PC incluso con el Modo Fácil activado.
+- **Ajuste de Pantalla Única en PC (Modo Pro)**:
+  - En escritorio (`md:` y superiores), el número de jornada, las insignias de estado (*Próxima Jornada*, *Plazo Abierto*), el reloj digital de cuenta atrás y la fecha límite se unifican en **una sola fila horizontal**, ahorrando más de 60 px de altura.
+  - Se compactaron los márgenes y rellenos verticales de cenas, cuadrículas de widgets y el botón de *Echar a Emilio*, asegurando que la página completa quede 100% visible en monitores sin necesidad de scroll vertical.
+- **Eliminación Total del Scroll Vertical en Móvil (Modo Fácil)**:
+  - Detección y supresión del `padding-bottom: 2rem/4rem` residual del teletipo (oculto en Modo Fácil) tanto en `body` como en `#main-content`.
+  - Compactación proporcional de espaciados interiores y tarjetas, logrando que el Dashboard en Modo Fácil encaje a la perfección dentro del viewport móvil sin un solo píxel de desplazamiento vertical.
+
+---
+
+## 58. AUDITORÍA DEL BOTE: DINAMIZACIÓN DEL CÁLCULO OFICIAL DE CAJA REAL Y SEMÁFORO DE PARTIDAS
+- **Sincronización Dinámica de la Línea de Cálculo (`bote_2.html`, `js/bote_2.js`)**:
+  - Se asignaron identificadores individuales (`#calc-caja-saldos`, `#calc-caja-premios`, `#calc-caja-cuotas`, `#calc-caja-penalizaciones`, `#calc-caja-sellados`) a cada sumando de la fórmula de *Cálculo oficial de Caja Real*.
+  - El método `renderSummaryCards()` enlaza en tiempo real los valores de la fórmula con los importes exactos calculados en las 5 tarjetas de desglose contable:
+    * **Suma total saldos de socios**: `+689,11 €`
+    * **Suma total premios temporada**: `+284,21 €`
+    * **Suma total cuotas semanales**: `+269,60 €`
+    * **Suma total de penalizaciones**: `+42,50 €`
+    * **Suma total de sellados**: `− 248,25 €`
+    * **Caja Real de la Peña**: `1.037,17 €` *(689,11 + 284,21 + 269,60 + 42,50 − 248,25 = 1.037,17 €)*.
+- **Semáforo Cromático de Partidas**:
+  - Todas las partidas que suman al fondo común se destacan en **verde esmeralda** (`text-emerald-400 font-mono font-bold` en modo oscuro y `#047857` en modo claro), mientras que el gasto real de sellado se mantiene en rojo (`text-rose-400` / `#be123c`).
+
+---
+
+## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.47)
+- **Incremento Progresivo de Versiones**:
+  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.47` en `service-worker.js`.
+  - Fuerza la invalidación inmediata de recursos obsoletos en los clientes PWA instalados en iOS y Android, asegurando la entrega instantánea de los nuevos estilos ergonómicos y controladores de datos.
 
 ---
 
