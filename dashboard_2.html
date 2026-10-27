@@ -691,9 +691,9 @@
             <div class="border-b border-slate-800/80 pb-2 md:pb-2.5">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-3">
                     
-                    <!-- Fila 1 móvil / Bloque izquierdo en PC: Balón + Título Jornada + Chapas + Modo Fácil -->
-                    <div class="flex items-center justify-between gap-1 sm:gap-1.5 md:gap-2 min-w-0 w-full md:w-auto">
-                        <div class="flex items-center gap-1 sm:gap-1.5 md:gap-2 min-w-0 flex-nowrap sm:flex-wrap">
+                    <!-- Fila 1 móvil / Bloque izquierdo en PC: Balón + Título Jornada + Tag Próxima + Píldora Modo Fácil -->
+                    <div class="flex items-center justify-between gap-1.5 sm:gap-2 min-w-0 w-full md:w-auto">
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-nowrap">
                             <span id="live-banner-icon" class="text-base sm:text-lg md:text-xl lg:text-2xl shrink-0">⚽</span>
                             <h2 id="live-banner-title" class="text-white font-black text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-tight shrink-0 whitespace-nowrap">
                                 Jornada 15
@@ -701,16 +701,12 @@
                             <span id="live-banner-tag" class="px-1.5 sm:px-2 md:px-2.5 py-0.5 rounded text-[9.5px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono whitespace-nowrap shrink-0">
                                 Próxima Jornada
                             </span>
-                            <span id="cd-status-badge" class="px-1.5 sm:px-2 md:px-2.5 py-0.5 rounded-full text-[9.5px] sm:text-[11px] md:text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 whitespace-nowrap shrink-0">
-                                <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400"></span>
-                                <span>Plazo Abierto</span>
-                            </span>
                         </div>
-                        <span class="badge-mode-easy shrink-0 whitespace-nowrap ml-auto md:ml-1">⚡ Modo Fácil</span>
+                        <span class="badge-mode-easy shrink-0 whitespace-nowrap ml-auto md:ml-2">⚡ Modo Fácil</span>
                     </div>
 
-                    <!-- Fila 2 móvil / Bloque derecho en PC: Reloj Digital y Límite (Sin badge duplicado) -->
-                    <div id="live-banner-time-block" class="flex items-center justify-between md:justify-end gap-1 sm:gap-2 md:gap-3 shrink-0 pt-0.5 md:pt-0 w-full md:w-auto">
+                    <!-- Fila 2 móvil / Bloque derecho en PC: Reloj Digital + Estado Plazo + Límite -->
+                    <div id="live-banner-time-block" class="flex items-center justify-between md:justify-end gap-1.5 sm:gap-2 md:gap-3 shrink-0 pt-0.5 md:pt-0 w-full md:w-auto">
                         <div class="flex items-center justify-between md:justify-end gap-1.5 sm:gap-2 shrink-0 w-full md:w-auto">
                             <!-- Cuenta atrás digital con tamaño dinámico -->
                             <div id="countdown-timer-container" class="countdown-idle flex items-center justify-end font-mono font-black text-white shrink-0">
@@ -719,8 +715,14 @@
                                 <span class="bg-slate-950/80 rounded border border-slate-800 font-mono cd-digit" id="cd-mins">--</span><span class="text-slate-500 cd-unit">m</span>
                                 <span class="bg-slate-950/80 rounded border border-slate-800 text-emerald-400 font-mono cd-digit" id="cd-secs">--</span><span class="text-slate-500 cd-unit">s</span>
                             </div>
-                            <div id="cd-deadline-container" class="text-[10.5px] sm:text-xs md:text-xs lg:text-sm text-slate-300 font-mono font-bold whitespace-nowrap shrink-0">
-                                Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span id="cd-status-badge" class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10.5px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 whitespace-nowrap shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                    <span>Plazo Abierto</span>
+                                </span>
+                                <div id="cd-deadline-container" class="text-[10px] sm:text-xs text-slate-300 font-mono font-bold whitespace-nowrap shrink-0">
+                                    Límite: <span id="cd-deadline-label" class="font-bold text-amber-300">Jueves 17:00h</span>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -15,6 +15,10 @@
 .mode-easy [data-version-link="socios"],
 .mode-easy [data-version-link="votaciones"],
 .mode-easy [data-version-link="resumen"],
+.mode-easy #btn-sandbox-nav-v2,
+.mode-easy #btn-arcade-nav-v2,
+.mode-easy a[href*="sandbox"],
+.mode-easy a[href*="juego.html"],
 .mode-easy nav a[href*="admin_2.html"],
 .mode-easy nav a[href*="admin.html"],
 .mode-easy nav a[href*="administracion.html"],
@@ -118,24 +122,42 @@
         flex-shrink: 0 !important;
     }
 
-    /* Grid de pilares vitales: expande y reparte verticalmente */
+    /* Navbar: distribución simétrica y perfecta de los 5 botones esenciales en móvil */
+    .mode-easy nav .overflow-x-auto,
+    .mode-easy nav .no-scrollbar {
+        display: flex !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        overflow: hidden !important;
+    }
+    .mode-easy nav .overflow-x-auto a,
+    .mode-easy nav .no-scrollbar a {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+    }
+
+    /* Grid de pilares vitales: expande y reparte verticalmente con equilibrio */
     .mode-easy #hero-pillars-grid {
         flex: 1 1 auto !important;
         min-height: 0 !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: space-evenly !important;
         gap: 0.45rem !important;
     }
 
-    /* Tarjeta del socio conectado */
+    /* Tarjeta del socio conectado: filas cohesivas sin huecos descolocados */
     .mode-easy #user-summary-card {
         padding: 0.65rem 0.75rem !important;
-        gap: 0.4rem !important;
+        gap: 0.35rem !important;
         flex: 1 1 auto !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: space-evenly !important;
     }
     .mode-easy #user-summary-card .border-t {
         padding-top: 0.3rem !important;

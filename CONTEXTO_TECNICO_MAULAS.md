@@ -1615,7 +1615,7 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.52)
 - **Incremento Progresivo de Versiones**:
-  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.52` en `service-worker.js`.
+  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.53` en `service-worker.js`.
   - Fuerza la invalidación inmediata de recursos obsoletos en los clientes PWA instalados en iOS y Android, asegurando la entrega instantánea de los nuevos estilos ergonómicos y controladores de datos.
 
 ---
@@ -1643,6 +1643,21 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 - **Aprovechamiento Integral y Redistribución del Espacio Vertical**:
   - Se retiró el `margin-top: auto` que aislaba la botonera inferior y empujaba el contenido hacia arriba dejando un hueco negro de más de 150px.
   - Se configuró `#live-jornada-banner` y sus tarjetas internas (`#hero-pillars-grid`, `#user-summary-card`) con `flex: 1 1 auto` y distribución equilibrada (`justify-content: space-between`), dotando a las tarjetas y filas de holgura visual y confort de lectura en una única pantalla (`100dvh`) con cero scroll.
+
+---
+
+
+## 62. PERFECCIONAMIENTO INTEGRAL DEL MODO FÁCIL MÓVIL EN PANTALLA ÚNICA (v2.53)
+- **Reorganización Anti-Solape de la Cabecera de Jornada (`dashboard_2.html`)**:
+  - En resoluciones móviles estrechas (<400px), convivir `⚽ Jornada 18`, `[PRÓXIMA JORNADA]`, `[🟢 Plazo Abierto]` y `[⚡ MODO FÁCIL]` en la primera fila horizontal provocaba colisión y solapamiento entre insignias.
+  - Se estructuró la cabecera en dos filas funcionales y limpias:
+    * **Fila 1**: Identificación de Jornada (`⚽ Jornada 18`), etiqueta de estado (`PRÓXIMA JORNADA`) a la izquierda y selector/píldora (`⚡ Modo Fácil`) anclado a la derecha con margen suficiente.
+    * **Fila 2**: Temporizador de cuenta atrás digital (`dd:hh:mm:ss`) a la izquierda, acompañado del semáforo de plazo (`[🟢 Plazo Abierto]`) y fecha/hora límite (`Límite: Jueves 17:00h`) a la derecha, agrupando cronología y plazos de forma natural y sin colisiones.
+- **Barra de Navegación Inferior Simétrica de 5 Accesos Esenciales (`css/mode-easy.css`)**:
+  - El script `initFernandoSandbox` inyectaba botones suplementarios (`Sandbox`, `Maula Hero`) en la barra inferior para ciertos roles, provocando desbordamiento horizontal y recorte tipográfico (`[M...`) en el extremo derecho.
+  - En Modo Fácil móvil, se aplican reglas estrictas de visibilidad (`display: none !important` para accesos avanzados) y distribución flexible equilibrada (`flex: 1 1 0` con `justify-content: space-between`), presentando con holgura los 5 accesos esenciales de la Peña: *Inicio, Bote, Resultados, Quiniela y Clasificación*.
+- **Cohesión Vertical Uniforme de Tarjetas sin Huecos Vaciados (`css/mode-easy.css`)**:
+  - Se calibraron los contenedores flexibles `#hero-pillars-grid` y `#user-summary-card` con `justify-content: space-evenly !important` y `gap: 0.35rem`, evitando separaciones desproporcionadas entre filas de datos del socio y garantizando un layout armónico en pantalla única sin ningún tipo de scroll (`100dvh`).
 
 ---
 
