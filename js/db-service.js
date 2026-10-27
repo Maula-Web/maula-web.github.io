@@ -286,13 +286,28 @@ class DataService {
                 this.getDoc('config', 'teletipo').catch(() => null)
             ]);
 
-            // Cache teletipo config and active announcements locally
+            // Cache teletipo config and active announcements locally (combinando Firestore y localStorage)
             if (teletipoDoc && teletipoDoc.speedSeconds) {
                 localStorage.setItem('maulas_teletipo_speed', teletipoDoc.speedSeconds);
             }
-            if (Array.isArray(anunciosSnap) && anunciosSnap.length > 0) {
-                localStorage.setItem('maulas_anuncios_teletipo', JSON.stringify(anunciosSnap));
+            let finalAnuncios = [];
+            const mapAnuncios = new Map();
+            try {
+                const local = localStorage.getItem('maulas_anuncios_teletipo');
+                if (local) {
+                    const parsed = JSON.parse(local);
+                    if (Array.isArray(parsed)) {
+                        parsed.forEach(a => { if (a && a.id) mapAnuncios.set(String(a.id), a); });
+                    }
+                }
+            } catch (e) {}
+            if (Array.isArray(anunciosSnap)) {
+                anunciosSnap.forEach(a => { if (a && a.id) mapAnuncios.set(String(a.id), a); });
             }
+            finalAnuncios = Array.from(mapAnuncios.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            try {
+                localStorage.setItem('maulas_anuncios_teletipo', JSON.stringify(finalAnuncios));
+            } catch (e) {}
 
             // Integrate scoring rules history globally
             if (scoringRulesDoc && scoringRulesDoc.history && window.ScoringSystem) {
@@ -339,7 +354,7 @@ class DataService {
                         return seasonJornadaIds.has(jId);
                     });
                 })(),
-                anunciosTeletipo: anunciosSnap || [],
+                anunciosTeletipo: finalAnuncios,
                 teletipoConfig: teletipoDoc || null
             };
         })();

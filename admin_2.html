@@ -1683,6 +1683,15 @@
                 this.loadSpeed();
                 await this.loadMembers();
                 await this.loadAnnouncements();
+
+                // Soporte para abrir la pestaña directamente desde URL (?tab=teletipo)
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const tabParam = urlParams.get('tab');
+                    if (tabParam && typeof switchAdminTab === 'function') {
+                        switchAdminTab(tabParam);
+                    }
+                } catch (e) {}
             },
 
             loadSpeed() {
@@ -1782,19 +1791,33 @@
             },
 
             async loadAnnouncements() {
-                let list = [];
+                let firestoreList = [];
+                let localList = [];
+                try {
+                    const local = localStorage.getItem('maulas_anuncios_teletipo');
+                    if (local) {
+                        const parsed = JSON.parse(local);
+                        if (Array.isArray(parsed)) localList = parsed;
+                    }
+                } catch (err) {}
+
                 try {
                     if (window.DataService) {
-                        list = await window.DataService.getAll('anuncios_teletipo');
+                        firestoreList = await window.DataService.getAll('anuncios_teletipo');
                     }
                 } catch (e) {
                     console.warn('Error cargando anuncios de Firestore, usando localStorage:', e);
-                    try {
-                        const local = localStorage.getItem('maulas_anuncios_teletipo');
-                        if (local) list = JSON.parse(local);
-                    } catch (err) {}
                 }
-                this.announcements = Array.isArray(list) ? list : [];
+
+                const map = new Map();
+                (Array.isArray(localList) ? localList : []).forEach(item => {
+                    if (item && item.id) map.set(String(item.id), item);
+                });
+                (Array.isArray(firestoreList) ? firestoreList : []).forEach(item => {
+                    if (item && item.id) map.set(String(item.id), item);
+                });
+
+                this.announcements = Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 try {
                     localStorage.setItem('maulas_anuncios_teletipo', JSON.stringify(this.announcements));
                 } catch (e) {}
@@ -1921,7 +1944,11 @@
                     this.renderAnnouncementsList();
                     this.checkEligibility(socioId);
 
-                    alert('🎉 ¡Anuncio de ' + socioName + ' publicado con éxito en el teletipo! Estará visible durante 3 días.');
+                    if (window.TeletipoService && typeof window.TeletipoService.loadAndRender === 'function') {
+                        window.TeletipoService.loadAndRender();
+                    }
+
+                    alert('🎉 ¡Anuncio de ' + socioName + ' publicado con éxito en el teletipo! Estará visible durante 3 días en las primeras posiciones.');
                 } catch (err) {
                     console.error('Error publicando anuncio en Firestore:', err);
                     alert('Error al publicar el anuncio. Inténtalo de nuevo.');
@@ -1941,6 +1968,10 @@
 
                     this.renderAnnouncementsList();
                     this.checkEligibilityCurrent();
+
+                    if (window.TeletipoService && typeof window.TeletipoService.loadAndRender === 'function') {
+                        window.TeletipoService.loadAndRender();
+                    }
                 } catch (err) {
                     console.error('Error eliminando anuncio:', err);
                     alert('Error al eliminar el anuncio.');

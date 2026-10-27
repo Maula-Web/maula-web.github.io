@@ -718,7 +718,8 @@ class Dashboard2AppController {
                 liveLoserName: isNextInProgress ? liveLoserName : null,
                 totalSeasonMoney,
                 indivCount: totalSeasonIndivPrizes,
-                doblesCount: totalSeasonDoblesPrizes
+                doblesCount: totalSeasonDoblesPrizes,
+                anunciosTeletipo: (this.seasonData && this.seasonData.anunciosTeletipo) || null
             });
 
         } catch (e) {
@@ -1830,10 +1831,41 @@ class Dashboard2AppController {
             liveLoserName,
             totalSeasonMoney,
             indivCount,
-            doblesCount
+            doblesCount,
+            anunciosTeletipo
         } = data;
 
-        const items = [];
+        // 0. ANUNCIOS DE SOCIOS: PUBLICACIÓN EN LAS PRIMERAS POSICIONES DEL TELETIPO
+        let socioAnnouncements = [];
+        if (Array.isArray(anunciosTeletipo) && anunciosTeletipo.length > 0) {
+            socioAnnouncements = anunciosTeletipo;
+        } else if (this.seasonData && Array.isArray(this.seasonData.anunciosTeletipo) && this.seasonData.anunciosTeletipo.length > 0) {
+            socioAnnouncements = this.seasonData.anunciosTeletipo;
+        } else {
+            try {
+                const local = localStorage.getItem('maulas_anuncios_teletipo');
+                if (local) {
+                    const parsed = JSON.parse(local);
+                    if (Array.isArray(parsed)) socioAnnouncements = parsed;
+                }
+            } catch (e) {}
+        }
+
+        const now = Date.now();
+        const activeSocioAnnouncements = socioAnnouncements
+            .filter(a => a && a.text && String(a.text).trim().length > 0 && a.active !== false && (!a.expiresAt || a.expiresAt > now))
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        const socioItems = activeSocioAnnouncements.map(a => ({
+            text: `📢 <span class="bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-black uppercase tracking-wide mr-1 shadow-sm">AVISO SOCIO</span> <strong class="text-amber-300 font-bold">${a.socioName || 'Socio'}:</strong> <span class="text-white font-semibold">“${a.text}”</span>`,
+            url: 'admin_2.html?tab=teletipo',
+            action: 'socio_announcement',
+            announcement: a,
+            isSocioAnnouncement: true
+        }));
+
+        // Los anuncios de los socios se publican en las PRIMERAS POSICIONES
+        const items = [...socioItems];
 
         // 1. Jornada en curso / Próxima jornada
         if (isNextInProgress && nextJ) {
@@ -1864,7 +1896,7 @@ class Dashboard2AppController {
 
         // 1.d VELOCIDAD Y ANUNCIOS DE SOCIOS EN TELETIPO
         items.push({
-            text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios (1 por semana, 3 días de vigencia) desde Administración.',
+            text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios en las primeras posiciones (1 por semana, 3 días de vigencia) desde Administración.',
             action: 'admin'
         });
 
@@ -2091,15 +2123,40 @@ class Dashboard2AppController {
         while (items.length < 15) {
             items.push({ text: `⭐ <strong class="text-amber-400">Peña Maulas:</strong> Pasión y rigor quinielístico desde 2004.`, action: 'jornadas' });
         }
+
+        // Si el número de noticias supera 35, los anuncios de socios son los últimos en desaparecer y mantienen primeras posiciones
+        if (items.length > 35) {
+            const socioList = items.filter(it => it && it.isSocioAnnouncement);
+            const regularList = items.filter(it => !it || !it.isSocioAnnouncement);
+            const maxRegular = Math.max(15, 35 - socioList.length);
+            items = [...socioList, ...regularList.slice(0, maxRegular)];
+        }
+
         const finalItems = items;
+
+        // Aplicar velocidad configurada desde Administración
+        let speedSeconds = 120;
+        try {
+            const savedSpeed = localStorage.getItem('maulas_teletipo_speed');
+            if (savedSpeed && !isNaN(savedSpeed) && Number(savedSpeed) >= 20) {
+                speedSeconds = Number(savedSpeed);
+            } else if (this.seasonData && this.seasonData.teletipoConfig && this.seasonData.teletipoConfig.speedSeconds) {
+                speedSeconds = Number(this.seasonData.teletipoConfig.speedSeconds);
+                localStorage.setItem('maulas_teletipo_speed', speedSeconds);
+            }
+        } catch (e) {}
+
+        container.style.animationDuration = `${speedSeconds}s`;
+        document.documentElement.style.setProperty('--ticker-speed', `${speedSeconds}s`);
 
         // Renderizar elementos con loop continuo infinito (duplicados exactamente una vez)
         const renderItemHtml = (it, idx) => {
             const text = typeof it === 'object' ? it.text : it;
             const url = typeof it === 'object' && it.url ? it.url : '';
             const action = typeof it === 'object' && it.action ? it.action : '';
+            const isSocio = typeof it === 'object' && it.isSocioAnnouncement ? 'bg-amber-500/10 rounded-lg px-2 border border-amber-500/30' : '';
             return `
-                <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.DashboardApp && window.DashboardApp.handleTickerClick(${idx}, this)" data-url="${url}" data-action="${action}">
+                <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition ${isSocio}" onclick="window.DashboardApp && window.DashboardApp.handleTickerClick(${idx}, this)" data-url="${url}" data-action="${action}">
                     <span class="text-amber-400/80 font-mono text-[10px] sm:text-[11px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
                     <span>${text}</span>
                     <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>

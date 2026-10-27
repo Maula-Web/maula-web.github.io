@@ -8,7 +8,7 @@ Este documento sirve como "memoria de seguridad" centralizada para cualquier asi
 
 - **Frontend**: HTML5, CSS (Vanilla + Tailwind CSS v4 / CDN), JS (Vanilla ES6+). Sin frameworks pesados.
 - **Backend/Base de Datos**: Firebase (`firebase-init.js`, `db-service.js`) con persistencia offline en IndexedDB (`db.enablePersistence({ synchronizeTabs: true })`).
-- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v2.47`).
+- **PWA e Instalación**: Service Worker (`service-worker.js`), Web App Manifest (`manifest.json`) y suite de iconos estándar, maskables y Apple Touch Icons (Caché actual: `maulas-pwa-v2.48`).
 - **Hojas de Estilo y Sistema de Diseño (`/css/`)**:
   - `styles.css`: Estilos base, tema oscuro original, utilidades y animaciones.
   - `resumen-styles.css`: Reglas específicas para gráficas y paneles del resumen de temporada.
@@ -1554,8 +1554,11 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
   - **Reglas de Negocio Estrictas**:
     * **Límite de Frecuencia**: Máximo **1 anuncio por socio y por semana** (verificado en base al histórico de publicaciones del socio en los últimos 7 días).
     * **Caducidad Automática**: Los anuncios tienen una vigencia máxima de **3 días (72 horas)** tras su publicación, desactivándose automáticamente una vez expirado el plazo.
-    * **Prioridad de Visualización y Reemplazo**: Si se publican noticias del sistema más recientes, los anuncios de los socios se desplazan hacia el final de la cinta pero son **los últimos en eliminarse**, garantizando que los mensajes de los socios tengan siempre presencia visible en la rotación.
-  - Persistencia en Firestore (colección `socio_announcements`) con respaldo en memoria y `localStorage`.
+    * **Ubicación en Primeras Posiciones**: Los anuncios de los socios se renderizan en las **primeras posiciones del teletipo** (posiciones preferentes #1, #2...) con badge identificativo `AVISO SOCIO` e iluminación ámbar, asegurando visibilidad inmediata al entrar a la web.
+    * **Prioridad y Retención**: Si se añaden noticias del sistema o el carrusel supera las 35 noticias, los anuncios de socios se conservan en cabeza y son **los últimos en eliminarse**.
+  - **Sincronización Bidireccional Total (`db-service.js`, `dashboard_2.js`, `teletipo.js`, `admin_2.html`)**:
+    * Persistencia en Firestore (`anuncios_teletipo`) fusionada con `localStorage` (`maulas_anuncios_teletipo`) para evitar pérdidas ante latencias de red o modos sin conexión.
+    * Los clics sobre los anuncios en la cinta redirigen directamente a la pestaña de administración (`admin_2.html?tab=teletipo`) para consultar y gestionar el tablón.
 
 ---
 
@@ -1606,7 +1609,7 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.47)
 - **Incremento Progresivo de Versiones**:
-  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.47` en `service-worker.js`.
+  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.48` en `service-worker.js`.
   - Fuerza la invalidación inmediata de recursos obsoletos en los clientes PWA instalados en iOS y Android, asegurando la entrega instantánea de los nuevos estilos ergonómicos y controladores de datos.
 
 ---

@@ -260,8 +260,35 @@
                 }
             }
 
+            // 0. ANUNCIOS DE SOCIOS (PUBLICACIÓN EN PRIMERAS POSICIONES DEL TELETIPO)
+            let socioAnnouncements = [];
+            if (data && Array.isArray(data.anunciosTeletipo) && data.anunciosTeletipo.length > 0) {
+                socioAnnouncements = data.anunciosTeletipo;
+            } else {
+                try {
+                    const local = localStorage.getItem('maulas_anuncios_teletipo');
+                    if (local) {
+                        const parsed = JSON.parse(local);
+                        if (Array.isArray(parsed)) socioAnnouncements = parsed;
+                    }
+                } catch (e) {}
+            }
+
+            const now = Date.now();
+            const activeSocioAnnouncements = socioAnnouncements
+                .filter(a => a && a.text && String(a.text).trim().length > 0 && a.active !== false && (!a.expiresAt || a.expiresAt > now))
+                .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+            const socioItems = activeSocioAnnouncements.map(a => ({
+                text: `📢 <span class="bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-black uppercase tracking-wide mr-1 shadow-sm">AVISO SOCIO</span> <strong class="text-amber-300 font-bold">${a.socioName || 'Socio'}:</strong> <span class="text-white font-semibold">“${a.text}”</span>`,
+                url: 'admin_2.html?tab=teletipo',
+                announcement: a,
+                isSocioAnnouncement: true
+            }));
+
             // Construir lista limpia de noticias y marcadores oficiales
-            const items = [];
+            // LOS ANUNCIOS DE SOCIOS SE PUBLICAN EN LAS PRIMERAS POSICIONES
+            let items = [...socioItems];
 
             // NOTICIA 1: Estado principal de la jornada
             if (inProgressJ) {
@@ -293,7 +320,7 @@
 
             // NOTICIA 1.d: VELOCIDAD Y ANUNCIOS DE SOCIOS EN TELETIPO
             items.push({
-                text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios (1 por semana, 3 días de vigencia) desde Administración.',
+                text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios en las primeras posiciones (1 por semana, 3 días de vigencia) desde Administración.',
                 url: 'admin_2.html'
             });
 
@@ -506,20 +533,21 @@
             container.style.animationDuration = `${speedSeconds}s`;
             document.documentElement.style.setProperty('--ticker-speed', `${speedSeconds}s`);
 
-            // Si el número de noticias supera 30, los anuncios de socios son los últimos en desaparecer
-            if (items.length > 30) {
-                const socioItems = items.filter(it => it && it.isSocioAnnouncement);
-                const regularItems = items.filter(it => !it || !it.isSocioAnnouncement);
-                const maxRegular = Math.max(10, 30 - socioItems.length);
-                items = [...regularItems.slice(0, maxRegular), ...socioItems];
+            // Si el número de noticias supera 35, los anuncios de socios son los últimos en desaparecer y mantienen primeras posiciones
+            if (items.length > 35) {
+                const socioList = items.filter(it => it && it.isSocioAnnouncement);
+                const regularList = items.filter(it => !it || !it.isSocioAnnouncement);
+                const maxRegular = Math.max(15, 35 - socioList.length);
+                items = [...socioList, ...regularList.slice(0, maxRegular)];
             }
 
             // Duplicar items para scroll continuo infinito
             const htmlItems = items.map((it, idx) => {
                 const text = typeof it === 'object' ? it.text : it;
                 const url = typeof it === 'object' && it.url ? it.url : '';
+                const isSocio = typeof it === 'object' && it.isSocioAnnouncement ? 'bg-amber-500/10 rounded-lg px-2 border border-amber-500/30' : '';
                 return `
-                    <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition" onclick="window.handleTeletipoClick(${idx}, this)" data-url="${url}">
+                    <span class="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-1 md:py-1.5 cursor-pointer hover:text-white transition ${isSocio}" onclick="window.handleTeletipoClick(${idx}, this)" data-url="${url}">
                         <span class="text-amber-400/80 font-mono text-[10px] sm:text-[11px] md:text-xs lg:text-sm font-bold">#${idx + 1}</span>
                         <span>${text}</span>
                         <span class="text-amber-500/50 font-black ml-3 md:ml-5 text-sm md:text-base select-none">•</span>
