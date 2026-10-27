@@ -2212,6 +2212,32 @@
                 return window._eligibleDoublesCache.get(cacheKey);
             }
 
+            // REGLA CRÍTICA DE LA PEÑA: Los dobles solo se pueden rellenar y asignar en la próxima jornada inmediata a disputarse.
+            // Para cualquier jornada posterior no disputada, nadie puede tener asignada la quiniela de dobles ni rellenarla.
+            const isFinishedJornada = (jor) => {
+                if (!jor) return false;
+                if (jor.status === 'closed' || jor.status === 'completed' || jor.finalizada === true) return true;
+                if (!jor.matches || !Array.isArray(jor.matches) || jor.matches.length === 0) return false;
+                const filled = jor.matches.filter(m => {
+                    if (!m || !m.result) return false;
+                    const r = String(m.result).trim().toLowerCase();
+                    return r !== '' && r !== '-' && r !== 'por definir';
+                }).length;
+                return filled >= 14;
+            };
+
+            const nextJToPlay = window.app && typeof window.app.getNextJornadaToPlay === 'function'
+                ? window.app.getNextJornadaToPlay()
+                : null;
+
+            const isUnplayed = !isFinishedJornada(j);
+            const isNextToPlay = nextJToPlay && (String(nextJToPlay.id) === String(j.id) || parseInt(nextJToPlay.number) === parseInt(j.number));
+
+            if (isUnplayed && !isNextToPlay && !(window.app && window.app.correctionMode)) {
+                if (window._eligibleDoublesCache) window._eligibleDoublesCache.set(cacheKey, []);
+                return [];
+            }
+
             // A partir de la Jornada 16: El ganador único y cualquier socio que haya obtenido premio económico en los dobles previos sellan dobles
             if (parseInt(j.number) >= 16) {
                 const list = [];
@@ -2333,16 +2359,25 @@
 
             // Comprobar si este socio es elegible para dobles en esta jornada o si ya existen dobles registrados
             const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null;
+            const isFinishedJ = (jor) => {
+                if (!jor) return false;
+                if (jor.status === 'closed' || jor.status === 'completed' || jor.finalizada === true) return true;
+                if (!jor.matches || !Array.isArray(jor.matches) || jor.matches.length === 0) return false;
+                return jor.matches.filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length >= 14;
+            };
+            const nextJToPlayModal = window.app && typeof window.app.getNextJornadaToPlay === 'function' ? window.app.getNextJornadaToPlay() : null;
+            const isFutureNotImmediateModal = j && !isFinishedJ(j) && nextJToPlayModal && (String(nextJToPlayModal.id) !== String(j.id) && parseInt(nextJToPlayModal.number) !== parseInt(j.number));
+
             const eligibleMembers = window.getEligibleDoublesMembers(j);
-            const isDoublesEligible = eligibleMembers.some(m => String(m.id) === String(window.app.currentMemberId)) || (window.app && window.app.correctionMode);
+            const isDoublesEligible = (!isFutureNotImmediateModal && eligibleMembers.some(m => String(m.id) === String(window.app.currentMemberId))) || (window.app && window.app.correctionMode);
 
             // Buscar si este socio específico tiene pronóstico de dobles guardado
-            const existingExtra = (window.app && window.app.pronosticosExtra)
+            const existingExtra = (window.app && window.app.pronosticosExtra && !isFutureNotImmediateModal)
                 ? window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)) && (p.selection && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-')))
                   || window.app.pronosticosExtra.find(p => (String(p.jId || p.jornadaId) === String(window.app.currentJornadaId) || String(p.jId || p.jornadaId) === String(j ? j.number : '')) && (String(p.mId || p.memberId) === String(window.app.currentMemberId)))
                 : null;
             const hasDoublesForecast = !!(existingExtra && existingExtra.selection && existingExtra.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-'));
-            const canViewDoubles = isDoublesEligible || hasDoublesForecast || openDoublesTab;
+            const canViewDoubles = (!isFutureNotImmediateModal && (isDoublesEligible || hasDoublesForecast || openDoublesTab)) || (window.app && window.app.correctionMode);
 
             const tabBtnDoubles = document.getElementById('tab-btn-doubles');
             const tabBtnBase = document.getElementById('tab-btn-base');
@@ -2448,6 +2483,21 @@
                 if (window.app.selJornada) window.app.selJornada.value = String(jornadaId);
             }
             const j = window.app && window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId) || String(jor.number) === String(window.app.currentJornadaId)) : null;
+
+            const isFinishedJ = (jor) => {
+                if (!jor) return false;
+                if (jor.status === 'closed' || jor.status === 'completed' || jor.finalizada === true) return true;
+                if (!jor.matches || !Array.isArray(jor.matches) || jor.matches.length === 0) return false;
+                return jor.matches.filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length >= 14;
+            };
+            const nextJToPlay = window.app && typeof window.app.getNextJornadaToPlay === 'function' ? window.app.getNextJornadaToPlay() : null;
+            const isFutureNotImmediate = j && !isFinishedJ(j) && nextJToPlay && (String(nextJToPlay.id) !== String(j.id) && parseInt(nextJToPlay.number) !== parseInt(j.number));
+
+            if (isFutureNotImmediate && !(window.app && window.app.correctionMode)) {
+                alert('⚠️ La Quiniela de Dobles solo puede rellenarse para la próxima jornada inmediata' + (nextJToPlay ? ' (Jornada ' + nextJToPlay.number + ')' : '') + '.\n\nPara jornadas posteriores (como la Jornada ' + (j ? j.number : '') + '), los responsables se asignarán automáticamente cuando se dispute y finalice la jornada previa.');
+                return;
+            }
+
             const eligibleMembers = window.getEligibleDoublesMembers(j);
             const currentMid = window.app ? String(window.app.currentMemberId) : null;
             
@@ -3144,16 +3194,41 @@
                 if (subEl) subEl.textContent = recibidos === totalSocios ? '100% Completo 🎉' : `${totalSocios - recibidos} pendientes`;
 
                 // 3. KPI Quiniela Dobles (Mostrar Nombre del Responsable o Responsables)
+                const isFinishedJKPI = (jor) => {
+                    if (!jor) return false;
+                    if (jor.status === 'closed' || jor.status === 'completed' || jor.finalizada === true) return true;
+                    if (!jor.matches || !Array.isArray(jor.matches) || jor.matches.length === 0) return false;
+                    return jor.matches.filter(m => m && m.result && m.result.trim() !== '' && m.result.trim() !== '-').length >= 14;
+                };
+                const nextJToPlayKPI = this.getNextJornadaToPlay();
+                const isFutureNotImmediateKPI = jornada && !isFinishedJKPI(jornada) && nextJToPlayKPI && (String(nextJToPlayKPI.id) !== String(jornada.id) && parseInt(nextJToPlayKPI.number) !== parseInt(jornada.number));
+
                 const eligibleList = window.getEligibleDoublesMembers ? window.getEligibleDoublesMembers(jornada) : [];
                 const respEl = document.getElementById('kpi-dobles-responsable');
+                const btnMainDobles = document.getElementById('btn-rellenar-dobles-main');
+
                 if (respEl) {
-                    if (eligibleList.length > 1) {
+                    if (isFutureNotImmediateKPI && !this.correctionMode) {
+                        respEl.textContent = `Responsable: Se asignará tras disputarse la J${parseInt(jornada.number) - 1}`;
+                    } else if (eligibleList.length > 1) {
                         respEl.textContent = `Responsables: ${eligibleList.map(m => AppUtils.getMemberName(m)).join(' y ')}`;
                     } else if (eligibleList.length === 1) {
                         respEl.textContent = `Responsable: ${AppUtils.getMemberName(eligibleList[0])}`;
                     } else {
                         const resp = window.getEligibleDoublesMember(jornada);
                         respEl.textContent = resp ? `Responsable: ${AppUtils.getMemberName(resp)}` : 'Responsable: Por asignar';
+                    }
+                }
+
+                if (btnMainDobles) {
+                    if (isFutureNotImmediateKPI && !this.correctionMode) {
+                        btnMainDobles.disabled = true;
+                        btnMainDobles.classList.add('opacity-50', 'cursor-not-allowed');
+                        btnMainDobles.innerHTML = `<span>⏳</span> <span>Dobles asignados tras jugar J${parseInt(jornada.number) - 1}</span>`;
+                    } else {
+                        btnMainDobles.disabled = false;
+                        btnMainDobles.classList.remove('opacity-50', 'cursor-not-allowed');
+                        btnMainDobles.innerHTML = `<span>✌️</span> <span>Rellenar Quiniela de Dobles</span>`;
                     }
                 }
 

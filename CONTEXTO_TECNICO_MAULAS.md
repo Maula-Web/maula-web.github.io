@@ -1613,10 +1613,25 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
-## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.50)
+## 59. CICLO DE CACHÉ PWA Y CONTROL DE INTEGRIDAD (v2.51)
 - **Incremento Progresivo de Versiones**:
-  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.50` en `service-worker.js`.
+  - La versión de caché de la PWA avanzó escalonadamente desde `maulas-pwa-v2.34` hasta `maulas-pwa-v2.51` en `service-worker.js`.
   - Fuerza la invalidación inmediata de recursos obsoletos en los clientes PWA instalados en iOS y Android, asegurando la entrega instantánea de los nuevos estilos ergonómicos y controladores de datos.
+
+---
+
+## 60. REGLAMENTO DE QUINIELA DE DOBLES: RESTRICCIÓN ESTRICTA A LA PRÓXIMA JORNADA INMEDIATA
+- **Problema detectado**:
+  - Cuando se publicaban de forma anticipada dos o más jornadas futuras no disputadas (por ejemplo, J17 y J18), el motor de elegibilidad `checkEligibility()` evaluaba los resultados de la última jornada completada (J16) para todas las jornadas futuras.
+  - Esto provocaba que los ganadores y premiados en dobles de J16 (Samu y Rafa) apareciesen erróneamente marcados con estrella (★) y con permisos para cumplimentar la Quiniela de Dobles en ambas jornadas venideras simultáneamente.
+- **Principio Reglamentario Aplicado**:
+  - La Quiniela de Dobles es un privilegio y responsabilidad semanal que **únicamente se puede cumplimentar y asignar para la próxima jornada inmediata a disputarse** (`getNextJornadaToPlay()`).
+  - Para cualquier jornada futura posterior a la próxima inmediata, la asignación de dobles permanece en estado pendiente (`future_not_immediate`), dado que dependerá inexorablemente de los resultados y desempates de la jornada intermedia previa una vez se dispute.
+- **Implementación Técnica**:
+  - `js/pronosticos.js` (`checkEligibility`): Si la jornada no está finalizada y no coincide con la próxima inmediata (`!isImmediateNext`), retorna inmediatamente `{ eligible: false, reason: 'future_not_immediate' }` (salvo en Modo Corrección para administradores).
+  - `pronosticos_2.html` (`window.getEligibleDoublesMembers`): Retorna lista vacía `[]` para cualquier jornada no disputada posterior a la próxima inmediata, eliminando la estrella (★), ocultando los avisos amarillos y bloqueando la pestaña de dobles en el modal de edición.
+  - `pronosticos_2.html` (`window.openEditorForDoubles` y `saveDoubles`): Protección perimetral con alerta informativa al usuario si intenta acceder o guardar dobles para jornadas futuras más allá de la próxima inmediata.
+  - `updateKPIsCustom()`: En jornadas futuras posteriores, el KPI de dobles muestra *"Responsable: Se asignará tras disputarse la J(N-1)"* y deshabilita el botón de rellenado con aviso informativo.
 
 ---
 

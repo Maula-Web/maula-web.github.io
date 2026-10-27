@@ -920,10 +920,18 @@ class PronosticoManager {
             }
         }
 
-        if (isEligibleForDoubles || hasExistingDoubles || this.correctionMode) {
+        // REGLAMENTO: Solo la próxima jornada inmediata admite rellenar quiniela de dobles
+        const nextJForDoubles = this.getNextJornadaToPlay();
+        const { isFinished: isJFinished } = this.isJornadaLocked(jornada);
+        const isFutureNotImmediate = !isJFinished && nextJForDoubles && (String(nextJForDoubles.id) !== String(jornada.id) && parseInt(nextJForDoubles.number) !== parseInt(jornada.number));
+
+        if ((!isFutureNotImmediate && (isEligibleForDoubles || hasExistingDoubles)) || this.correctionMode) {
             if (this.renderDoublesForm) this.renderDoublesForm(jornada, isLocked);
             if (this.doublesSection) this.doublesSection.classList.remove('hidden');
             if (this.doublesInfoHeader) this.doublesInfoHeader.style.display = 'flex';
+        } else {
+            if (this.doublesSection) this.doublesSection.classList.add('hidden');
+            if (this.doublesInfoHeader) this.doublesInfoHeader.style.display = 'none';
         }
 
         // Initial cost update
@@ -2531,6 +2539,39 @@ class PronosticoManager {
         // CORRECTION MODE BYPASS: If we are in correction mode, always allow managing doubles (unless calculating real eligibility)
         if (this.correctionMode && !forceReal) return { eligible: true };
 
+        const currentJornadaObj = (this.jornadas || []).find(j => parseInt(j.number) === parseInt(currentJornadaNum) || String(j.id) === String(currentJornadaNum));
+        if (!currentJornadaObj) return { eligible: false };
+
+        // REGLAMENTO PEÑA MAULAS: Solo la próxima jornada inmediata a disputarse admite quiniela de dobles.
+        // Si hay varias jornadas futuras publicadas, ninguna jornada posterior a la próxima inmediata puede tener dobles asignados.
+        const isJornadaCompleted = (j) => {
+            if (!j) return false;
+            if (j.status === 'closed' || j.status === 'completed' || j.finalizada === true) return true;
+            if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return false;
+            const filledResults = j.matches.filter(m => {
+                if (!m || !m.result) return false;
+                const r = String(m.result).trim().toLowerCase();
+                return r !== '' && r !== '-' && r !== 'por definir';
+            }).length;
+            return filledResults >= 14;
+        };
+
+        if (!isJornadaCompleted(currentJornadaObj)) {
+            const nextPendingJornada = this.getNextJornadaToPlay();
+            if (nextPendingJornada) {
+                const isImmediateNext = (String(currentJornadaObj.id) === String(nextPendingJornada.id)) ||
+                                        (parseInt(currentJornadaObj.number) === parseInt(nextPendingJornada.number));
+                if (!isImmediateNext) {
+                    return {
+                        eligible: false,
+                        isWinner: false,
+                        hasPrize: false,
+                        reason: 'future_not_immediate'
+                    };
+                }
+            }
+        }
+
         if (currentJornadaNum <= 1) {
             if (currentJornadaNum === 1) {
                 const member = this.members.find(m => String(m.id) === String(memberId));
@@ -3244,7 +3285,7 @@ class PronosticoManager {
     async saveDoubles() {
         const jornada = this.jornadas.find(j => j.id == this.currentJornadaId);
         if (jornada) {
-            const { isLockedRef, hasStarted } = this.isJornadaLocked(jornada);
+            const { isLockedRef, hasStarted, isFinished } = this.isJornadaLocked(jornada);
             if (isLockedRef && !this.correctionMode) {
                 if (hasStarted) {
                     alert("No se puede guardar la quiniela de dobles: la jornada ya cuenta con resultados registrados.");
@@ -3252,6 +3293,13 @@ class PronosticoManager {
                     alert("Esta jornada está bloqueada y no admite cambios en la quiniela de dobles sin activar el Modo Corrección.");
                 }
                 return;
+            }
+            if (!this.correctionMode && !isFinished) {
+                const nextJ = this.getNextJornadaToPlay();
+                if (nextJ && String(nextJ.id) !== String(jornada.id) && parseInt(nextJ.number) !== parseInt(jornada.number)) {
+                    alert('⚠️ La Quiniela de Dobles solo se puede rellenar para la próxima jornada inmediata (Jornada ' + nextJ.number + '). Para jornadas posteriores, los dobles se habilitarán automáticamente cuando finalice la jornada previa.');
+                    return;
+                }
             }
         }
 
