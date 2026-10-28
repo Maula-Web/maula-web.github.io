@@ -574,8 +574,8 @@
                     </div>
                 </div>
 
-                <button onclick="window.BoteApp.openModal('modal-ingreso')" class="primary-glow text-slate-950 font-bold px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all flex items-center gap-1 sm:gap-1.5 shrink-0 whitespace-nowrap" title="Registrar un ingreso bancario o Bizum recibido">
-                    <span class="text-sm sm:text-base font-extrabold leading-none">➕</span> Ingreso
+                <button onclick="window.BoteApp.openModal('modal-ingreso')" class="primary-glow text-slate-950 font-bold px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all flex items-center gap-1 sm:gap-1.5 shrink-0 whitespace-nowrap" title="Registrar un ingreso, Bizum o retirada de saldo">
+                    <span class="text-sm sm:text-base font-extrabold leading-none">➕</span> Ingreso / Retirada
                 </button>
 
                 <!-- Menú Desplegable de Tesorería (Rueda dentada) -->
@@ -1885,6 +1885,20 @@
             </div>
             <form onsubmit="window.BoteApp.handleCreateIngreso(event)" class="p-4 sm:p-5 space-y-4 text-xs sm:text-sm">
                 <input type="hidden" id="form-ingreso-id" value="">
+                <input type="hidden" id="form-ingreso-tipo" value="ingreso">
+
+                <!-- Selector Tipo de Movimiento: Ingreso vs Retirada -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Tipo de Movimiento</label>
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900/90 rounded-xl border border-slate-700/80">
+                        <button type="button" id="tipo-mov-ingreso" onclick="window.BoteApp.setIngresoTipo('ingreso')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm tipo-mov-btn-active-ingreso">
+                            <span>➕</span> Ingreso / Aporte (+)
+                        </button>
+                        <button type="button" id="tipo-mov-retirada" onclick="window.BoteApp.setIngresoTipo('retirada')" class="py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-white border border-transparent tipo-mov-btn-inactive">
+                            <span>➖</span> Retirada / Salida (-)
+                        </button>
+                    </div>
+                </div>
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Socio Destinatario</label>
                     <select id="form-ingreso-socio" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500">
@@ -1893,8 +1907,8 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Importe (€)</label>
-                        <input type="number" id="form-ingreso-cantidad" step="0.01" min="0.01" placeholder="Ej: 20,00" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500">
+                        <label id="form-ingreso-cantidad-label" class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Importe (€)</label>
+                        <input type="number" id="form-ingreso-cantidad" step="0.01" placeholder="Ej: 20,00" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Método de Pago</label>
@@ -1906,7 +1920,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Fecha del Ingreso</label>
+                    <label id="form-ingreso-fecha-label" class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Fecha del Movimiento</label>
                     <input type="date" id="form-ingreso-fecha" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
@@ -1927,13 +1941,13 @@
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-orange-950/40 to-slate-900 shrink-0">
                 <div>
                     <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                        <span>📋</span> Registro Histórico de Ingresos Manuales
+                        <span>📋</span> Registro Histórico de Movimientos Manuales
                     </h3>
-                    <p class="text-xs font-bold text-white">Aportaciones registradas en la temporada activa</p>
+                    <p class="text-xs font-bold text-white">Aportaciones y retiradas registradas en la temporada activa</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="window.BoteApp.openModal('modal-ingreso')" class="primary-glow text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs hover:brightness-110 active:scale-95 transition-all flex items-center gap-1">
-                        ➕ Nuevo Ingreso
+                        ➕ Nuevo Movimiento
                     </button>
                     <button onclick="window.BoteApp.closeModal('modal-gestion-ingresos')" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">✕</button>
                 </div>

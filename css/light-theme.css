@@ -3144,3 +3144,35 @@ html.light-theme #card-desglose-balance-bote {
 .light-theme #module-teletipo #teletipo-announcements-list p.text-slate-200 {
     color: #1e293b !important;
 }
+
+/* =========================================================================
+   SELECTOR TIPO DE MOVIMIENTO (BOTE 2 - INGRESO / RETIRADA)
+   ========================================================================= */
+.light-theme #tipo-mov-ingreso.tipo-mov-btn-active-ingreso,
+html.light-theme #tipo-mov-ingreso.tipo-mov-btn-active-ingreso {
+    background-color: #dcfce7 !important;
+    color: #15803d !important;
+    border-color: #86efac !important;
+    box-shadow: 0 1px 3px rgba(22, 101, 52, 0.15) !important;
+}
+
+.light-theme #tipo-mov-retirada.tipo-mov-btn-active-retirada,
+html.light-theme #tipo-mov-retirada.tipo-mov-btn-active-retirada {
+    background-color: #ffe4e6 !important;
+    color: #be123c !important;
+    border-color: #fda4af !important;
+    box-shadow: 0 1px 3px rgba(190, 18, 60, 0.15) !important;
+}
+
+.light-theme .tipo-mov-btn-inactive,
+html.light-theme .tipo-mov-btn-inactive {
+    color: #64748b !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+
+.light-theme .tipo-mov-btn-inactive:hover,
+html.light-theme .tipo-mov-btn-inactive:hover {
+    color: #0f172a !important;
+    background-color: #f1f5f9 !important;
+}

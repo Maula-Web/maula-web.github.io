@@ -3492,18 +3492,26 @@ class BoteAppController {
             const mem = data.memberSummaries.find(m => String(m.id) === String(i.memberId));
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-900/60 text-xs';
+            const numCant = parseFloat(i.cantidad || 0);
+            const isNeg = numCant < 0;
+            const cantClass = isNeg ? 'text-rose-400' : 'text-emerald-400';
+            const cantPrefix = isNeg ? '' : '+';
+            const badgeTipo = isNeg
+                ? '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold mr-1.5">Salida</span>'
+                : '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold mr-1.5">Ingreso</span>';
+
             tr.innerHTML = `
                 <td class="p-3 text-slate-400 whitespace-nowrap">${i.fecha || 'N/A'}</td>
-                <td class="p-3 font-bold text-white">${mem ? mem.name : `Socio #${i.memberId}`}</td>
-                <td class="p-3 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">+${parseFloat(i.cantidad || 0).toSpanishFormat()} €</td>
+                <td class="p-3 font-bold text-white">${badgeTipo}${mem ? mem.name : `Socio #${i.memberId}`}</td>
+                <td class="p-3 text-right font-mono font-bold ${cantClass} whitespace-nowrap">${cantPrefix}${numCant.toSpanishFormat()} €</td>
                 <td class="p-3 capitalize text-slate-300 whitespace-nowrap">${i.metodo || 'bizum'}</td>
-                <td class="p-3 text-slate-400">${i.concepto || 'Aportación manual'}</td>
+                <td class="p-3 text-slate-400">${i.concepto || (isNeg ? 'Retirada de saldo' : 'Aportación manual')}</td>
                 <td class="p-3 text-center whitespace-nowrap">
                     <div class="inline-flex items-center justify-center gap-1.5">
-                        <button onclick="window.BoteApp.openEditIngreso('${i.id}')" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Modificar este ingreso">
+                        <button onclick="window.BoteApp.openEditIngreso('${i.id}')" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Modificar este movimiento">
                             <span>✏️</span> Modificar
                         </button>
-                        <button onclick="window.BoteApp.deleteIngreso('${i.id}')" class="px-2.5 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Eliminar este ingreso">
+                        <button onclick="window.BoteApp.deleteIngreso('${i.id}')" class="px-2.5 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Eliminar este movimiento">
                             <span>🗑️</span> Eliminar
                         </button>
                     </div>
@@ -3669,9 +3677,12 @@ class BoteAppController {
 
         member.movements.forEach(m => {
             const isManual = m.isIngresoLibre;
-            const eventTitle = isManual ? `📥 ${m.description || 'Ingreso manual'}` : `Jornada ${m.jornadaNum}`;
-            const inVal = (m.totalIngresos || 0) + ((!m.isSelladoInCash && m.sellado < 0) ? Math.abs(m.sellado) : 0);
-            const outVal = m.totalGastos || 0;
+            const manualAmount = m.ingresosManual !== undefined ? m.ingresosManual : (m.totalIngresos || 0);
+            const isNegativeManual = isManual && (manualAmount < 0);
+            const eventIcon = isNegativeManual ? '📤' : (isManual ? '📥' : '');
+            const eventTitle = isManual ? `${eventIcon} ${m.description || (isNegativeManual ? 'Retirada de saldo' : 'Ingreso manual')}` : `Jornada ${m.jornadaNum}`;
+            const inVal = isNegativeManual ? 0 : ((m.totalIngresos || 0) + ((!m.isSelladoInCash && m.sellado < 0) ? Math.abs(m.sellado) : 0));
+            const outVal = isNegativeManual ? Math.abs(manualAmount) : (m.totalGastos || 0);
 
             let acText = m.aciertos !== undefined ? m.aciertos : '-';
             if (m.exento) acText += ' 🎁';
@@ -3682,13 +3693,19 @@ class BoteAppController {
 
             let inBreakdown = [];
             if (m.premios > 0) inBreakdown.push(`<span class="text-[10px] text-blue-300 font-bold bg-blue-500/20 px-1 py-0.5 rounded border border-blue-500/30">🔵 Premio Indiv: +${m.premios.toSpanishFormat()} €</span>`);
-            if (m.ingresosManual > 0) inBreakdown.push(`<span class="text-[10px] text-emerald-300 font-semibold">📥 Ingreso: +${m.ingresosManual.toSpanishFormat()} €</span>`);
+            if (manualAmount > 0) inBreakdown.push(`<span class="text-[10px] text-emerald-300 font-semibold">📥 Ingreso: +${manualAmount.toSpanishFormat()} €</span>`);
             if (m.sellado < 0 && !m.isSelladoInCash) inBreakdown.push(`<span class="text-[10px] text-purple-300 font-semibold">💀 Sellado: +${Math.abs(m.sellado).toSpanishFormat()} €</span>`);
 
+            let outBreakdown = [];
+            if (isNegativeManual) {
+                outBreakdown.push(`<span class="text-[10px] text-rose-300 font-semibold">📤 Retirada: -${Math.abs(manualAmount).toSpanishFormat()} €</span>`);
+            }
+
             const inSubHtml = inBreakdown.length > 0 ? `<div class="flex flex-col items-end gap-0.5 mt-0.5">${inBreakdown.join('')}</div>` : '';
+            const outSubHtml = outBreakdown.length > 0 ? `<div class="flex flex-col items-end gap-0.5 mt-0.5">${outBreakdown.join('')}</div>` : '';
 
             html += `
-                <tr class="hover:bg-slate-900/60 whitespace-nowrap ${isManual ? 'bg-emerald-950/20' : ''}">
+                <tr class="hover:bg-slate-900/60 whitespace-nowrap ${isNegativeManual ? 'bg-rose-950/20' : (isManual ? 'bg-emerald-950/20' : '')}">
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 font-semibold text-white whitespace-nowrap">${eventTitle}</td>
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs text-slate-400 whitespace-nowrap">${m.jornadaDate || m.date}</td>
                     <td class="px-2 sm:px-2.5 py-2 sm:py-2.5 text-center font-bold text-white whitespace-nowrap">${acText}</td>
@@ -3696,7 +3713,7 @@ class BoteAppController {
                         ${inVal > 0 ? `<div>+${inVal.toSpanishFormat()}&nbsp;€</div>${inSubHtml}` : '-'}
                     </td>
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-medium text-rose-400 whitespace-nowrap">
-                        ${outVal > 0 ? '-' + outVal.toSpanishFormat() + '&nbsp;€' : '0,00&nbsp;€'}
+                        ${outVal > 0 ? `<div>-${outVal.toSpanishFormat()}&nbsp;€</div>${outSubHtml}` : '0,00&nbsp;€'}
                     </td>
                     <td class="px-2.5 sm:px-3 py-2 sm:py-2.5 text-right font-mono font-extrabold ${m.boteAcumulado >= 0 ? 'text-emerald-400' : 'text-rose-400'} bg-slate-900/40 whitespace-nowrap">
                         ${m.boteAcumulado.toSpanishFormat()}&nbsp;€
@@ -3732,6 +3749,61 @@ class BoteAppController {
         });
     }
 
+    setIngresoTipo(tipo) {
+        const inputTipo = document.getElementById('form-ingreso-tipo');
+        const btnIngreso = document.getElementById('tipo-mov-ingreso');
+        const btnRetirada = document.getElementById('tipo-mov-retirada');
+        const titleEl = document.getElementById('modal-ingreso-title');
+        const labelCant = document.getElementById('form-ingreso-cantidad-label');
+        const inputCant = document.getElementById('form-ingreso-cantidad');
+        const inputConcepto = document.getElementById('form-ingreso-concepto');
+        const btnSubmit = document.getElementById('btn-ingreso-submit');
+        const idVal = document.getElementById('form-ingreso-id')?.value;
+        const isEditing = !!idVal;
+
+        if (inputTipo) inputTipo.value = tipo;
+
+        if (tipo === 'retirada') {
+            if (btnRetirada) {
+                btnRetirada.className = 'py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-sm tipo-mov-btn-active-retirada';
+            }
+            if (btnIngreso) {
+                btnIngreso.className = 'py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-white border border-transparent tipo-mov-btn-inactive';
+            }
+            if (titleEl) {
+                titleEl.innerHTML = isEditing ? '<span>✏️</span> Modificar Retirada / Ajuste' : '<span>➖</span> Registrar Retirada / Salida';
+            }
+            if (labelCant) labelCant.textContent = 'Importe a Retirar (€)';
+            if (inputCant) inputCant.placeholder = 'Ej: 15,00';
+            if (inputConcepto && (!inputConcepto.value || inputConcepto.value === 'Aportación manual')) {
+                inputConcepto.placeholder = 'Ej: Cobro premio en efectivo, retirada';
+            }
+            if (btnSubmit) {
+                btnSubmit.textContent = isEditing ? 'Actualizar Retirada' : 'Guardar Retirada';
+                btnSubmit.className = 'bg-rose-500 hover:bg-rose-600 text-white font-bold px-5 py-2 rounded-xl transition-all shadow-md';
+            }
+        } else {
+            if (btnIngreso) {
+                btnIngreso.className = 'py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm tipo-mov-btn-active-ingreso';
+            }
+            if (btnRetirada) {
+                btnRetirada.className = 'py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-white border border-transparent tipo-mov-btn-inactive';
+            }
+            if (titleEl) {
+                titleEl.innerHTML = isEditing ? '<span>✏️</span> Modificar Aportación / Ingreso' : '<span>➕</span> Registrar Aportación / Ingreso';
+            }
+            if (labelCant) labelCant.textContent = 'Importe a Ingresar (€)';
+            if (inputCant) inputCant.placeholder = 'Ej: 20,00';
+            if (inputConcepto && (!inputConcepto.value || inputConcepto.value === 'Retirada de saldo')) {
+                inputConcepto.placeholder = 'Ej: Recarga Bote, Bizum regularización';
+            }
+            if (btnSubmit) {
+                btnSubmit.textContent = isEditing ? 'Actualizar Ingreso' : 'Guardar Ingreso';
+                btnSubmit.className = 'primary-glow text-slate-950 font-bold px-5 py-2 rounded-xl hover:brightness-110';
+            }
+        }
+    }
+
     openEditIngreso(ingresoId) {
         const data = this.getSeasonData();
         const ingreso = (data.ingresos || []).find(i => String(i.id) === String(ingresoId));
@@ -3748,22 +3820,18 @@ class BoteAppController {
         const inputMetodo = document.getElementById('form-ingreso-metodo');
         const inputFecha = document.getElementById('form-ingreso-fecha');
         const inputConcepto = document.getElementById('form-ingreso-concepto');
-        const titleEl = document.getElementById('modal-ingreso-title');
-        const btnSubmit = document.getElementById('btn-ingreso-submit');
 
         if (inputId) inputId.value = String(ingreso.id);
         if (inputSocio) inputSocio.value = String(ingreso.memberId);
-        if (inputCantidad) inputCantidad.value = parseFloat(ingreso.cantidad || 0).toFixed(2);
+
+        const cantVal = parseFloat(ingreso.cantidad || 0);
+        const isRetirada = cantVal < 0;
+        this.setIngresoTipo(isRetirada ? 'retirada' : 'ingreso');
+
+        if (inputCantidad) inputCantidad.value = Math.abs(cantVal).toFixed(2);
         if (inputMetodo) inputMetodo.value = ingreso.metodo || 'bizum';
         if (inputFecha) inputFecha.value = ingreso.fecha || new Date().toISOString().split('T')[0];
         if (inputConcepto) inputConcepto.value = ingreso.concepto || '';
-
-        if (titleEl) {
-            titleEl.innerHTML = '<span>✏️</span> Modificar Aportación / Ingreso';
-        }
-        if (btnSubmit) {
-            btnSubmit.textContent = 'Actualizar Ingreso';
-        }
 
         this.openModal('modal-ingreso');
     }
@@ -3773,15 +3841,19 @@ class BoteAppController {
         const idVal = document.getElementById('form-ingreso-id')?.value;
         const isEditing = !!idVal;
         const mId = document.getElementById('form-ingreso-socio').value;
-        const cant = parseFloat(document.getElementById('form-ingreso-cantidad').value);
+        const rawCant = parseFloat(document.getElementById('form-ingreso-cantidad').value);
+        const tipo = document.getElementById('form-ingreso-tipo')?.value || 'ingreso';
         const met = document.getElementById('form-ingreso-metodo').value;
         const fec = document.getElementById('form-ingreso-fecha').value;
-        const con = document.getElementById('form-ingreso-concepto').value || 'Aportación manual';
+        const con = document.getElementById('form-ingreso-concepto').value || (tipo === 'retirada' ? 'Retirada de saldo' : 'Aportación manual');
 
-        if (!mId || isNaN(cant) || cant <= 0) {
-            alert('Por favor introduce un importe y socio válido.');
+        if (!mId || isNaN(rawCant) || rawCant === 0) {
+            alert('Por favor introduce un importe válido (distinto de 0) y selecciona un socio.');
             return;
         }
+
+        // Si es retirada, se registra en negativo; si es ingreso, en positivo
+        const cant = tipo === 'retirada' ? -Math.abs(rawCant) : Math.abs(rawCant);
 
         const entryId = isEditing ? (isNaN(idVal) ? idVal : parseInt(idVal)) : Date.now();
         const entry = {
@@ -3835,12 +3907,13 @@ class BoteAppController {
             this.renderAll();
             // Refrescar explícitamente el modal de gestión de ingresos si estaba abierto
             this.renderGestionIngresos();
+            const actionText = tipo === 'retirada' ? 'Retirada' : 'Ingreso';
             alert(isEditing
-                ? `¡Ingreso actualizado con éxito!`
-                : `¡Ingreso de ${cant.toSpanishFormat()} € registrado con éxito!`);
+                ? `¡${actionText} actualizado con éxito!`
+                : `¡${actionText} de ${Math.abs(cant).toSpanishFormat()} € registrado con éxito!`);
         } catch (err) {
-            console.error("Error guardando ingreso:", err);
-            alert("Hubo un error al guardar el ingreso en la base de datos.");
+            console.error("Error guardando ingreso/retirada:", err);
+            alert("Hubo un error al guardar el movimiento en la base de datos.");
         }
     }
 
@@ -4496,13 +4569,12 @@ class BoteAppController {
         if (modalId === 'modal-config') {
             this.populateConfigModal();
         } else if (modalId === 'modal-ingreso') {
+            this.populateSocioSelect();
+            const fechaInput = document.getElementById('form-ingreso-fecha');
+            if (fechaInput && !fechaInput.value) fechaInput.value = new Date().toISOString().split('T')[0];
             const inputId = document.getElementById('form-ingreso-id');
-            const titleEl = document.getElementById('modal-ingreso-title');
-            const btnSubmit = document.getElementById('btn-ingreso-submit');
-            // Si no se abrió a través de openEditIngreso, restaurar modo creación
             if (inputId && !inputId.value) {
-                if (titleEl) titleEl.innerHTML = '<span>➕</span> Registrar Aportación / Ingreso';
-                if (btnSubmit) btnSubmit.textContent = 'Guardar Ingreso';
+                this.setIngresoTipo('ingreso');
             }
         } else if (modalId === 'modal-gestion-ingresos') {
             this.renderGestionIngresos();
@@ -4534,8 +4606,6 @@ class BoteAppController {
             const inputMetodo = document.getElementById('form-ingreso-metodo');
             const inputFecha = document.getElementById('form-ingreso-fecha');
             const inputConcepto = document.getElementById('form-ingreso-concepto');
-            const titleEl = document.getElementById('modal-ingreso-title');
-            const btnSubmit = document.getElementById('btn-ingreso-submit');
 
             if (inputId) inputId.value = '';
             if (inputSocio) inputSocio.value = '';
@@ -4543,8 +4613,7 @@ class BoteAppController {
             if (inputMetodo) inputMetodo.value = 'bizum';
             if (inputFecha) inputFecha.value = new Date().toISOString().split('T')[0];
             if (inputConcepto) inputConcepto.value = '';
-            if (titleEl) titleEl.innerHTML = '<span>➕</span> Registrar Aportación / Ingreso';
-            if (btnSubmit) btnSubmit.textContent = 'Guardar Ingreso';
+            this.setIngresoTipo('ingreso');
         }
 
         const el = document.getElementById(modalId);
