@@ -2090,7 +2090,7 @@ class Jornadas2AppController {
             }
 
             if (statusBox) {
-                statusBox.textContent = force ? '✅ Análisis MD sincronizado correctamente con éxito.' : '';
+                statusBox.textContent = force ? `✅ Datos de la Jornada ${data.detectedJornadaNum || ''} sincronizados con éxito.` : '';
                 if (force) {
                     setTimeout(() => {
                         if (statusBox) statusBox.textContent = '';

@@ -225,16 +225,68 @@ async function main() {
 
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-    // 0. Comprobar si ya tenemos los datos oficiales importados y válidos para la próxima jornada
-    // Si ya están disponibles y verificados (available: true y matchCountWithTarget >= 8), no es necesario volver a raspar
+    // 0. Cargar catálogo de próximas jornadas de la Peña Maulas para determinar la jornada objetivo
+    let targetJornadas = [];
+    const cacheJornadasPath = path.join(DATA_DIR, 'proximas_jornadas_cache.json');
+    if (fs.existsSync(cacheJornadasPath)) {
+        try {
+            const raw = JSON.parse(fs.readFileSync(cacheJornadasPath, 'utf8'));
+            if (Array.isArray(raw) && raw.length > 0) {
+                targetJornadas = raw;
+            }
+        } catch (e) {
+            console.warn('⚠️ Error al leer proximas_jornadas_cache.json:', e.message);
+        }
+    }
+
+    if (targetJornadas.length === 0) {
+        try {
+            const { QuinielaService } = require('../js/quiniela-service');
+            if (QuinielaService && Array.isArray(QuinielaService.BUILTIN_UPCOMING_JORNADAS)) {
+                targetJornadas = QuinielaService.BUILTIN_UPCOMING_JORNADAS;
+            }
+        } catch (e) {
+            console.warn('⚠️ Error al cargar QuinielaService.BUILTIN_UPCOMING_JORNADAS:', e.message);
+        }
+    }
+
+    // Identificar próxima jornada oficial de fin de semana (domingo)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const nextSundayJornada = targetJornadas.find(j => {
+        if (!j || !j.isSunday || !j.dateStr) return false;
+        const parts = j.dateStr.split('/');
+        if (parts.length !== 3) return false;
+        const jDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        return jDate.getTime() >= (today.getTime() - 24 * 3600 * 1000);
+    }) || targetJornadas.find(j => j && j.isSunday) || targetJornadas[0];
+
+    const targetJornadaNum = nextSundayJornada ? parseInt(nextSundayJornada.number, 10) : null;
+
+    // Comprobar validez de la caché existente
     const forceRun = process.argv.includes('--force');
     if (!forceRun && fs.existsSync(OUTPUT_FILE)) {
         try {
             const existing = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8'));
-            if (existing && existing.available === true && existing.matchCountWithTarget >= 8 && Array.isArray(existing.matches) && existing.matches.length >= 14) {
-                console.log(`ℹ️ [MD Bot] Los análisis para la jornada ${existing.detectedJornadaNum || ''} ya han sido importados y verificados con éxito.`);
+            const existingJNum = existing ? parseInt(existing.detectedJornadaNum, 10) : null;
+            const updatedAt = existing && existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+            const ageHours = (Date.now() - updatedAt) / (1000 * 3600);
+
+            // La caché sólo es válida si:
+            // 1. Corresponde a la jornada objetivo vigente de la Peña
+            // 2. Tiene menos de 12 horas de antigüedad (para actualizar cambios de porcentajes durante la semana)
+            // 3. Contiene datos verificados y completos
+            const isSameJornada = targetJornadaNum && existingJNum && targetJornadaNum === existingJNum;
+            const isFresh = ageHours < 12;
+
+            if (isSameJornada && isFresh && existing.available === true && existing.matchCountWithTarget >= 8 && Array.isArray(existing.matches) && existing.matches.length >= 14) {
+                console.log(`ℹ️ [MD Bot] Los análisis para la jornada ${existingJNum} ya están actualizados (hace ${ageHours.toFixed(1)}h).`);
                 console.log(`ℹ️ [MD Bot] Omitiendo descarga para evitar llamadas innecesarias (usa --force para forzar la actualización).`);
                 return;
+            } else if (existingJNum && targetJornadaNum && existingJNum < targetJornadaNum) {
+                console.log(`🔄 [MD Bot] La jornada en caché (${existingJNum}) ha expirado. Nueva jornada objetivo de la Peña: ${targetJornadaNum}. Procediendo a raspar...`);
+            } else if (!isFresh) {
+                console.log(`🔄 [MD Bot] La caché de la jornada ${existingJNum || targetJornadaNum} tiene ${ageHours.toFixed(1)}h de antigüedad (>12h). Actualizando análisis de Mundo Deportivo...`);
             }
         } catch (eCheck) {
             console.warn('⚠️ Error comprobando archivo existente de análisis:', eCheck.message);
@@ -270,32 +322,7 @@ async function main() {
         console.warn('⚠️ Error al obtener Segunda División:', e.message);
     }
 
-    // 3. Verificación de Jornada Próxima de la Peña Maulas
-    let targetJornadas = [];
-    const cacheJornadasPath = path.join(DATA_DIR, 'proximas_jornadas_cache.json');
-    if (fs.existsSync(cacheJornadasPath)) {
-        try {
-            const raw = JSON.parse(fs.readFileSync(cacheJornadasPath, 'utf8'));
-            if (Array.isArray(raw) && raw.length > 0) {
-                targetJornadas = raw;
-            }
-        } catch (e) {
-            console.warn('⚠️ Error al leer proximas_jornadas_cache.json:', e.message);
-        }
-    }
-
-    // Si proximas_jornadas_cache.json está vacío, usar el catálogo de respaldo de QuinielaService
-    if (targetJornadas.length === 0) {
-        try {
-            const { QuinielaService } = require('../js/quiniela-service');
-            if (QuinielaService && Array.isArray(QuinielaService.BUILTIN_UPCOMING_JORNADAS)) {
-                targetJornadas = QuinielaService.BUILTIN_UPCOMING_JORNADAS;
-            }
-        } catch (e) {
-            console.warn('⚠️ Error al cargar QuinielaService.BUILTIN_UPCOMING_JORNADAS:', e.message);
-        }
-    }
-
+    // 3. Verificación de Jornada Próxima de la Peña Maulas (usando targetJornadas ya cargado)
     // Comprobar si el cierre es entre semana (Martes / Miércoles / Jueves)
     const isMidweek = mdData && mdData.closingSchedule && /martes|mi[eé]rcoles|jueves/i.test(mdData.closingSchedule);
 

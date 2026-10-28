@@ -300,6 +300,12 @@
                 items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
             }
 
+            // NOTICIA ANÁLISIS MUNDO DEPORTIVO JORNADA 18
+            items.push({
+                text: '📰 <strong class="text-cyan-400">Análisis Mundo Deportivo:</strong> Sincronizados los 15 análisis, porcentajes y clasificaciones oficiales de la Jornada 18 en Quiniela y Jornadas.',
+                url: 'jornadas_2.html'
+            });
+
             // NOTICIA REDISTRIBUCIÓN Y AJUSTES MODO FÁCIL MÓVIL
             items.push({
                 text: '📱 <strong class="text-amber-400">Modo Fácil Móvil:</strong> Reorganización limpia de cabecera de jornada sin solapes, botón \'Ver bote\' reubicado en línea propia para mayor ergonomía y pantalla única sin scroll (v2.54).',

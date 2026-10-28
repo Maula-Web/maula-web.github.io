@@ -1670,6 +1670,22 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 64. CORRECCIÓN Y ACTUALIZACIÓN INTELIGENTE DEL BOT DE ANÁLISIS DE MUNDO DEPORTIVO (v2.55)
+- **Diagnóstico del bloqueo de caché en el bot (`scripts/fetch_md_analysis.js`)**:
+  - El bot de Mundo Deportivo comprobaba si el fichero `analisis_mundodeportivo.json` existía con `available: true` sin comparar la jornada ni la fecha de actualización, lo que causaba que las llamadas periódicas de GitHub Actions omitieran indefinidamente la descarga pensando que la tarea estaba completada para siempre (quedando congelado en la Jornada 16).
+- **Lógica de caché dinámica y expiración inteligente**:
+  - Se reestructuró `scripts/fetch_md_analysis.js` para precargar primero el catálogo de próximas jornadas de la Peña Maulas y determinar la próxima jornada oficial dominical vigente.
+  - La caché sólo se preserva si:
+    1. Coincide exactamente con el número de jornada objetivo vigente.
+    2. Tiene una antigüedad menor a 12 horas (permitiendo refrescar cambios de cuotas/porcentajes durante la semana).
+  - Si la jornada en caché es anterior a la que toca disputar, o si supera las 12 horas, el bot fuerza la descarga automáticamente sin necesidad de intervención manual.
+- **Sincronización de la Jornada 18**:
+  - Se ejecutó el scraper importando con éxito los 15 partidos coincidentes de la Jornada 18, sus recomendaciones, porcentajes y clasificaciones de 1ª (20 equipos) y 2ª División (22 equipos).
+- **Clarificación de la interfaz y feedback (`jornadas_2.html`, `js/jornadas_2.js`)**:
+  - En el modal de importación, el botón de refresco ahora reporta explícitamente el número de jornada sincronizada (`✅ Datos de la Jornada [N] sincronizados con éxito`), aportando transparencia al usuario sobre la versión cargada.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
