@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-29T07:45:14.391Z",
+  "updatedAt": "2026-10-29T20:44:10.399Z",
   "available": true,
   "matchCountWithTarget": 15,
   "isMidweek": false,
@@ -17,15 +17,19 @@
       "comment": "Dos puntos separan al Levante del descenso tras caer ante la Real Sociedad y despedirse de una racha de tres jornadas sin perder. Su refugio es el Ciutat de València, donde apenas ha cedido una derrota, pero ahora recibe a un At. Madrid en racha. Los de Simeone encadenan seis victorias y acechan al líder, al que tienen a dos puntos y esperan la próxima jornada en el Metropolitano. Antes de esa cita crucial deberán resolver un pulso con buenos precedentes: no caen en terreno granota desde 2016. El pleno de dieciocho puntos refuerza a los visitantes, que además recuperan la pegada de Julián Álvarez. Sus goles parecen haber acercado de nuevo al argentino a una afición que vuelve a celebrar sus aciertos.",
       "percentages": {
         "quinielista": {
-          "1": 6,
-          "2": 85,
-          "X": 9
+          "1": 13,
+          "2": 66,
+          "X": 21
         },
-        "lae": null,
+        "lae": {
+          "1": 11,
+          "2": 74,
+          "X": 15
+        },
         "real": {
-          "1": 19,
-          "2": 59,
-          "X": 22
+          "1": 18,
+          "2": 61,
+          "X": 21
         }
       },
       "recommended": "2"
@@ -40,14 +44,18 @@
       "comment": "El futuro pinta muy mal para el Rayo. La fractura social, que ha derivado en un monumental enfrentamiento entre la afición y los dirigentes que mandan en el club, sobre todo su presidente, ya está pasando factura en el ámbito deportivo, con un vestuario también en convulsión. El 0-3 de la pasada jornada ante el Elche así lo demuestra y en una semana parece complicado encontrar una solución a lo que está pasando. El Celta va a intentar pescar en río revuelto, al margen de seguir con su buena dinámica de resultados. Lleva siete partidos sin perder, aunque en cinco de ellos no ha pasado del empate. Lejos de Balaídos ha disputado cuatro encuentros, que han acabado con una “X” en el boleto.",
       "percentages": {
         "quinielista": {
-          "1": 35,
-          "2": 32,
-          "X": 33
+          "1": 32,
+          "2": 33,
+          "X": 35
         },
-        "lae": null,
+        "lae": {
+          "1": 35,
+          "2": 31,
+          "X": 34
+        },
         "real": {
-          "1": 41,
-          "2": 30,
+          "1": 39,
+          "2": 32,
           "X": 29
         }
       },
@@ -63,14 +71,18 @@
       "comment": "El Betis quiere imponer su ley en el pulso andaluz. Los de Pellegrini conservan su puesto de Champions pese a sumar un único punto en las dos últimas jornadas, con la Real Sociedad cada vez más cerca. La Cartuja es su gran fortín: únicamente el Barça ha logrado conquistar un feudo donde los verdiblancos firman dos goles por encuentro. Al Málaga le toca romper los pronósticos desde el último puesto. El empate del Alavés en el descuento le arrebató un triunfo que parecía suyo y prolongó su calvario. Tras diez jornadas, el equipo de Juanfran Funes todavía no conoce la victoria. Sus números lejos de casa tampoco invitan al optimismo: apenas dos puntos y dos goles alimentan las urgencias del colista.",
       "percentages": {
         "quinielista": {
-          "1": 93,
-          "2": 1,
-          "X": 6
+          "1": 80,
+          "2": 2,
+          "X": 18
         },
-        "lae": null,
+        "lae": {
+          "1": 81,
+          "2": 8,
+          "X": 11
+        },
         "real": {
-          "1": 69,
-          "2": 13,
+          "1": 70,
+          "2": 12,
           "X": 18
         }
       },
@@ -87,14 +99,18 @@
       "percentages": {
         "quinielista": {
           "1": 98,
-          "2": 1,
-          "X": 1
+          "2": 0,
+          "X": 2
         },
-        "lae": null,
+        "lae": {
+          "1": 90,
+          "2": 5,
+          "X": 5
+        },
         "real": {
           "1": 86,
-          "2": 4,
-          "X": 10
+          "2": 5,
+          "X": 9
         }
       },
       "recommended": "1"
@@ -109,11 +125,15 @@
       "comment": "El Getafe recibe al Sevilla en plena tormenta. La goleada sufrida ante el Lugano en Conference (2-5) desató un duro enfrentamiento público entre Bordalás y el presidente, ante el desconcierto de la afición azulona. Aquel desastre tuvo continuidad en San Mamés, donde el Athletic endosó un 4-0 a un equipo que, según su técnico, ha tocado fondo. Con el descenso a un solo punto, el Coliseum espera a un rival que vive una realidad muy diferente. El Sevilla de Luis García Plaza ha comenzado la temporada con muy buen pie y llega tras superar a Osasuna el lunes. Los hispalenses ocupan posiciones europeas y aventajan en cinco puntos al séptimo clasificado, una situación muy distinta a la del curso anterior.",
       "percentages": {
         "quinielista": {
-          "1": 24,
-          "2": 42,
-          "X": 34
+          "1": 18,
+          "2": 43,
+          "X": 39
         },
-        "lae": null,
+        "lae": {
+          "1": 23,
+          "2": 42,
+          "X": 35
+        },
         "real": {
           "1": 30,
           "2": 38,
@@ -133,13 +153,17 @@
       "percentages": {
         "quinielista": {
           "1": 2,
-          "2": 92,
-          "X": 6
+          "2": 93,
+          "X": 5
         },
-        "lae": null,
+        "lae": {
+          "1": 7,
+          "2": 86,
+          "X": 7
+        },
         "real": {
-          "1": 10,
-          "2": 77,
+          "1": 9,
+          "2": 78,
           "X": 13
         }
       },
@@ -155,14 +179,18 @@
       "comment": "Cuatro jornadas sin conocer la derrota, con dos triunfos y dos igualadas, avalan el buen momento del Elche, decimoquinto clasificado y empeñado en poner más tierra de por medio con el descenso. Su último golpe de efecto llegó en Vallecas, donde venció al Rayo Vallecano por 0-3. Al otro lado se sitúa un Valencia que sigue sin levantar cabeza: ocupa la penúltima plaza y el desembarco de Javier Aguirre en el banquillo todavía no se ha traducido en el repunte que se espera con ansia en Mestalla. Ambos equipos vendrán de jugar Copa entre semana.",
       "percentages": {
         "quinielista": {
-          "1": 41,
-          "2": 28,
-          "X": 31
+          "1": 42,
+          "2": 21,
+          "X": 37
         },
-        "lae": null,
+        "lae": {
+          "1": 40,
+          "2": 27,
+          "X": 33
+        },
         "real": {
-          "1": 39,
-          "2": 33,
+          "1": 41,
+          "2": 31,
           "X": 28
         }
       },
@@ -178,11 +206,15 @@
       "comment": "Tres puntos separan a dos de los grandes animadores de LaLiga Hypermotion, y el duelo promete. El Eibar, tercero, atraviesa un momento de dudas: tres jornadas seguidas sin celebrar un triunfo, con dos derrotas y una igualada, la última cayendo por 2-0 en el campo del Córdoba. El equipo que le visita es el segundo clasificado, el Almería, que lleva tres puntos más. Los de García Pimienta frenaron el sábado su gran racha, siete victorias encadenadas, con un 2-2 en casa ante el Oviedo, y ahora se examinan en Ipurua. Para ambos, además, habrá habido duelo de Copa entre semana.",
       "percentages": {
         "quinielista": {
-          "1": 61,
-          "2": 14,
-          "X": 25
+          "1": 45,
+          "2": 23,
+          "X": 32
         },
-        "lae": null,
+        "lae": {
+          "1": 37,
+          "2": 30,
+          "X": 33
+        },
         "real": {
           "1": 39,
           "2": 34,
@@ -201,11 +233,15 @@
       "comment": "La competición de Segunda vuelve a escena para los dos equipos tras el paréntesis copero. Decimotercero en la clasificación, el Eldense cerró el domingo una serie de tres triunfos consecutivos al caer por 2-0 en el campo del Albacete. En su estadio, los azulgranas suman dos victorias, dos igualadas y un único revés. Enfrente estará el Granada, que afronta la jornada 12 instalado en una dinámica ganadora: cuatro triunfos seguidos en el campeonato, 2-3 frente a la Real Sociedad B, 0-1 en Burgos, 2-0 sobre el Cádiz y 2-1 ante el Valladolid. El equipo nazarí ocupa la quinta plaza de la tabla.",
       "percentages": {
         "quinielista": {
-          "1": 32,
-          "2": 39,
+          "1": 39,
+          "2": 27,
+          "X": 34
+        },
+        "lae": {
+          "1": 28,
+          "2": 43,
           "X": 29
         },
-        "lae": null,
         "real": {
           "1": 41,
           "2": 31,
@@ -224,15 +260,19 @@
       "comment": "Burgos y Castellón comparten también una semana con doble cita con la Copa de por medio. En Liga, los burgaleses aspiran a enlazar la tercera victoria seguida. Sus dos anteriores víctimas fuero el Sabadell (1-0) y el Andorra (2-3). Por su parte, el Castellón ha recuperado el pulso que necesitaba para volver a ocupar el liderato y busca encadenar también el tercer triunfo consecutivo en la competición de la regularidad, después de imponerse a la UD Las Palmas (0-3) y al Sporting (4-0). Como antecedente, el curso anterior dejó un 0-0 en Burgos y una victoria castellonense en Castalia (3-1).",
       "percentages": {
         "quinielista": {
-          "1": 30,
-          "2": 42,
-          "X": 28
+          "1": 18,
+          "2": 59,
+          "X": 23
         },
-        "lae": null,
-        "real": {
-          "1": 28,
+        "lae": {
+          "1": 25,
           "2": 45,
-          "X": 27
+          "X": 30
+        },
+        "real": {
+          "1": 27,
+          "2": 45,
+          "X": 28
         }
       },
       "recommended": "X2"
@@ -247,11 +287,15 @@
       "comment": "Duelo vasco entre un Alavés que acumula cinco jornadas sin ganar, con cuatro derrotas incluidas (la última, el pasado domingo en feudo del Deportivo), y una Real Sociedad que va encontrando ritmo. La que fuera tercera la temporada pasada, arrancó muy errática. Puede que fuera por combinar previas europeas, pero en liga tardó seis fechas en ganar. Desde entonces, siete puntos de nueve posibles y a domicilio sigue mostrando buena dinámica: dos salidas seguidas sin encajar. El conjunto babazorro, sin embargo, solamente ha perdido un duelo en casa (y fue contra el Barça).",
       "percentages": {
         "quinielista": {
+          "1": 14,
+          "2": 52,
+          "X": 34
+        },
+        "lae": {
           "1": 24,
           "2": 48,
           "X": 28
         },
-        "lae": null,
         "real": {
           "1": 26,
           "2": 48,
@@ -270,11 +314,15 @@
       "comment": "Dos equipos que quieren consolidarse en la parte se ven las caras y examinan sus buenas sensaciones. El Madrid CFF es una de las revelaciones de este inicio de curso. A pesar que lleva tres jornadas sin ganar, aunque con dos empates, está a un punto del tercero y en casa se está mostrando muy fiable (tres victorias y un empate). El Deportivo, mientras, firma dos triunfos seguidos y a domicilio se está sintiendo notablemente cómodo. Siete puntos de nueve, evidenciando buenas prestaciones defensivas (dos porterías a cero) y, cuando el guion lo requiere, capacidad atacante (en las dos últimas salidas, tres goles en cada una para ganar en Granada y Eibar).",
       "percentages": {
         "quinielista": {
-          "1": 81,
-          "2": 9,
-          "X": 10
+          "1": 57,
+          "2": 17,
+          "X": 26
         },
-        "lae": null,
+        "lae": {
+          "1": 67,
+          "2": 14,
+          "X": 19
+        },
         "real": {
           "1": 41,
           "2": 32,
@@ -294,10 +342,14 @@
       "percentages": {
         "quinielista": {
           "1": 3,
-          "2": 92,
-          "X": 5
+          "2": 79,
+          "X": 18
         },
-        "lae": null,
+        "lae": {
+          "1": 10,
+          "2": 76,
+          "X": 14
+        },
         "real": {
           "1": 16,
           "2": 61,
@@ -316,12 +368,20 @@
       "comment": "El Tenerife cayó el pasado fin de semana en feudo del Madrid, un aspirante a plaza europea que sufrió para ganar (3-2). Una derrota, por tanto, que demuestra el buen hacer de un equipo isleño que la temporada pasada fue capaz de terminar cuarto en la liga. El Athletic Club, además, se presume un rival directo en las aspiraciones de consolidarse en la parte alta de la tabla. El conjunto vasco firma cuatro jornadas sin perder y a domicilio ha sumado en dos de sus tres salidas. El último antecedente en la isla, en la segunda vuelta del curso anterior, se saldó con goleada tinerfeña.",
       "percentages": {
         "quinielista": {
-          "1": 34,
-          "2": 31,
-          "X": 35
+          "1": 38,
+          "2": 30,
+          "X": 32
         },
-        "lae": null,
-        "real": null
+        "lae": {
+          "1": 30,
+          "2": 41,
+          "X": 29
+        },
+        "real": {
+          "1": 36,
+          "2": 36,
+          "X": 28
+        }
       },
       "recommended": "1X"
     },
@@ -335,11 +395,15 @@
       "comment": "Un derbi vasco que promete emociones fuertes. En parte, porque los dos llegan en buen momento. El Athletic Club parece que va recuperando su nivel tras un arranque de liga irregular. Especialmente en San Mamés, donde goleó al Getafe el pasado domingo y donde acumula cuatro partidos sin perder, con tres porterías a cero. La Real Sociedad, por su parte, firma cuatro triunfos seguidos en liga y es, después del Barça, el equipo más goleador fuera. Eso sí, también es de los que más recibe. Un signo del fútbol valiente que quiere Matarazzo, técnico que no rehúye el intercambio de llegadas. El último antecedente en San Mamés, 1-1.",
       "percentages": {
         "quinielista": {
-          "1": 5,
-          "2": 61,
-          "X": 32
+          "1": 6,
+          "2": 32,
+          "X": 58
         },
-        "lae": null,
+        "lae": {
+          "1": 10,
+          "2": 39,
+          "X": 46
+        },
         "real": {
           "1": 23,
           "2": 25,
