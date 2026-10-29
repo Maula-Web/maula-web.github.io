@@ -71,12 +71,14 @@
     margin-bottom: 0 !important;
 }
 
-/* Ajuste de pantalla única en móvil en Modo Fácil (cero scroll vertical y redistribución total del espacio disponible) */
+/* Ajuste de pantalla ?nica en m?vil en Modo F?cil (cero scroll vertical y redistribuci?n total del espacio disponible) EXCLUSIVO PARA DASHBOARD (INICIO) */
 @media (max-width: 767px) {
-    html.mode-easy,
-    body.mode-easy,
-    .mode-easy html,
-    .mode-easy body {
+    html.mode-easy:has(#live-jornada-banner),
+    body.mode-easy:has(#live-jornada-banner),
+    html.mode-easy.page-dashboard,
+    body.mode-easy.page-dashboard,
+    .mode-easy body.page-dashboard,
+    .mode-easy:has(#live-jornada-banner) body {
         overflow-y: hidden !important;
         height: 100dvh !important;
         max-height: 100dvh !important;
@@ -84,7 +86,10 @@
         margin: 0 !important;
     }
 
-    .mode-easy #main-content {
+    .mode-easy:has(#live-jornada-banner) #main-content,
+    .mode-easy #main-content:has(#live-jornada-banner),
+    .mode-easy body.page-dashboard #main-content,
+    body.page-dashboard.mode-easy #main-content {
         padding: 0.35rem 0.5rem 0.5rem 0.5rem !important;
         height: 100dvh !important;
         max-height: 100dvh !important;
@@ -310,6 +315,46 @@
 .mode-easy #mobile-check-matrix,
 .mode-easy #mobile-check-chart {
     display: none !important;
+}
+
+/* Permitir y asegurar scroll vertical completo en m?vil en Clasificaci?n */
+@media (max-width: 767px) {
+    html.mode-easy:has(#view-ranking),
+    body.mode-easy:has(#view-ranking),
+    html.mode-easy:has(#clasificacion-podium-section),
+    body.mode-easy:has(#clasificacion-podium-section),
+    html.mode-easy.page-clasificacion,
+    body.mode-easy.page-clasificacion,
+    body#page-clasificacion,
+    .mode-easy body.page-clasificacion,
+    .mode-easy body#page-clasificacion,
+    .mode-easy #page-clasificacion {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100% !important;
+        max-height: none !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    body.page-clasificacion #main-content,
+    body#page-clasificacion #main-content,
+    .mode-easy body.page-clasificacion #main-content,
+    .mode-easy body#page-clasificacion #main-content,
+    .mode-easy #main-content.page-clasificacion-content,
+    .mode-easy:has(#view-ranking) #main-content,
+    .mode-easy #main-content:has(#view-ranking),
+    .mode-easy:has(#clasificacion-podium-section) #main-content,
+    .mode-easy #main-content:has(#clasificacion-podium-section) {
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        gap: 0.75rem !important;
+        padding-bottom: 3rem !important;
+    }
 }
 
 /* --- 5. PRONÓSTICOS Y QUINIELA (pronosticos_2.html) --- */

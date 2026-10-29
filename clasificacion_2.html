@@ -393,9 +393,38 @@
         .light-theme .matrix-row-rank td { background: #f1f5f9 !important; border-bottom: 2px solid rgba(217, 119, 6, 0.5) !important; }
         .light-theme .matrix-row-prizes td { background: #e2e8f0 !important; border-bottom: 3px solid rgba(217, 119, 6, 0.7) !important; }
 
-        @media (max-width: 767px) { 
+        @media (max-width: 767px) {
             .desktop-only-flex { display: none !important; }
             body { padding: 0.35rem 0.5rem !important; }
+
+            /* Asegurar scroll vertical continuo en m?vil (Modo Pro y Modo F?cil) */
+            html,
+            body,
+            html.mode-easy,
+            body.mode-easy,
+            .mode-easy html,
+            .mode-easy body,
+            body#page-clasificacion,
+            .mode-easy body#page-clasificacion {
+                overflow-y: auto !important;
+                height: auto !important;
+                min-height: 100% !important;
+                max-height: none !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+
+            #main-content,
+            .mode-easy #main-content,
+            .mode-easy #main-content.page-clasificacion-content {
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
+                overflow-y: visible !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important;
+                padding-bottom: 3rem !important;
+            }
         }
         @media (min-width: 768px) { .desktop-only-flex { display: flex !important; } }
         @media (max-height: 550px) and (orientation: landscape) {
@@ -433,7 +462,7 @@
     </script>
 </head>
 
-<body class="p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
+<body id="page-clasificacion" class="page-clasificacion p-2 sm:p-4 lg:p-6 antialiased selection:bg-amber-500 selection:text-black">
 
     <!-- Servicios y SDKs de la Peña -->
     <script src="js/firebase-init.js"></script>
@@ -449,7 +478,7 @@
     <!-- =====================================================================
          CONTENEDOR PRINCIPAL: CLASIFICACIÓN 2.0 PRO
          ===================================================================== -->
-    <div id="main-content" class="max-w-[1650px] mx-auto flex flex-col space-y-3 sm:space-y-4">
+    <div id="main-content" class="page-clasificacion-content max-w-[1650px] mx-auto flex flex-col space-y-3 sm:space-y-4">
 
         <!-- NAVBAR SUPERIOR MAULAS 2.0 -->
         <nav class="glass-panel main-navbar-sticky sticky top-0 p-2 sm:p-2.5 xl:p-3 flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-2 lg:gap-3 z-[100] shadow-xl order-1">
