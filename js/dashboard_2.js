@@ -1868,7 +1868,7 @@ class Dashboard2AppController {
         }));
 
         // Los anuncios de los socios se publican en las PRIMERAS POSICIONES
-        const items = [...socioItems];
+        let items = [...socioItems];
 
         // 1. Jornada en curso / Próxima jornada
         if (isNextInProgress && nextJ) {
