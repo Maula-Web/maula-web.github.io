@@ -1,352 +1,416 @@
 {
-  "updatedAt": "2026-11-01T00:41:01.860Z",
-  "available": false,
+  "updatedAt": "2026-11-01T01:34:49.413Z",
+  "available": true,
   "matchCountWithTarget": 15,
-  "isMidweek": true,
-  "detectedJornadaNum": "19",
-  "closingSchedule": "Martes 03 (19:30)",
-  "reason": "Los análisis publicados en Mundo Deportivo corresponden a una jornada entre semana (Champions/Copa) y no a la jornada oficial de la Peña Maulas.",
+  "isMidweek": false,
+  "detectedJornadaNum": "18",
+  "closingSchedule": "Sábado 31 (13:00)",
+  "reason": "Análisis disponible y verificado para la próxima jornada oficial.",
   "matches": [
     {
       "num": 1,
-      "home": "BARCELONA",
-      "away": "ASTON VILLA",
+      "home": "LEVANTE",
+      "away": "AT.MADRID",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 21:00",
-      "comment": "Recuperar la solidez es la gran asignatura pendiente del Barça antes de recibir al temible Aston Villa. Los de Flick acumulan dieciocho partidos europeos consecutivos encajando y su fragilidad atrás inquieta a una afición que espera una reacción inmediata en el Camp Nou. El tropiezo en París dejó a los azulgranas con seis puntos y redujo su margen si quieren mantenerse cerca de los primeros puestos. Enfrente aparece un rival que marcha segundo en la fase de Liga y figura entre los cinco conjuntos que han ganado todos sus encuentros. Los ingleses tratarán de sacar partido de las dudas defensivas locales con una de sus mejores armas: su peligro y su capacidad goleadora en las acciones de estrategia.",
+      "schedule": "SÁBADO, 14:00",
+      "comment": "Dos puntos separan al Levante del descenso tras caer ante la Real Sociedad y despedirse de una racha de tres jornadas sin perder. Su refugio es el Ciutat de València, donde apenas ha cedido una derrota, pero ahora recibe a un At. Madrid en racha. Los de Simeone encadenan seis victorias y acechan al líder, al que tienen a dos puntos y esperan la próxima jornada en el Metropolitano. Antes de esa cita crucial deberán resolver un pulso con buenos precedentes: no caen en terreno granota desde 2016. El pleno de dieciocho puntos refuerza a los visitantes, que además recuperan la pegada de Julián Álvarez. Sus goles parecen haber acercado de nuevo al argentino a una afición que vuelve a celebrar sus aciertos.",
       "percentages": {
         "quinielista": {
-          "1": 71,
-          "2": 20,
-          "X": 9
+          "1": 11,
+          "2": 65,
+          "X": 24
         },
-        "lae": null,
+        "lae": {
+          "1": 9,
+          "2": 76,
+          "X": 15
+        },
         "real": {
-          "1": 77,
-          "2": 9,
-          "X": 14
+          "1": 17,
+          "2": 62,
+          "X": 21
         }
       },
-      "recommended": "1X"
+      "recommended": "2"
     },
     {
       "num": 2,
-      "home": "BODO GLIMT",
-      "away": "LOSC LILLE",
+      "home": "RAYO",
+      "away": "CELTA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 21:00",
-      "comment": "Sin puntos y con todas las alarmas encendidas, el Lille afronta una visita que impone respeto. Le espera el Bodo/Glimt de Kjetil Knutsen, también obligado a ganar tras sumar apenas tres puntos. Los noruegos se agarran al Aspmyra Stadion, un fortín al norte del país, dentro del círculo polar ártico, donde han sucumbido Roma, Manchester City e Inter. El Borussia Dortmund engrosó esa lista el pasado catorce de octubre, en esta edición. Sus 8.270 localidades de asiento y el césped artificial, con calefacción bajo la superficie, completan ese escenario que pone a prueba a cualquiera. Los franceses conocen la dificultad del reto, pero su pleno de derrotas les exige dar un golpe sobre la mesa para seguir vivos.",
+      "schedule": "SÁBADO, 16:15",
+      "comment": "El futuro pinta muy mal para el Rayo. La fractura social, que ha derivado en un monumental enfrentamiento entre la afición y los dirigentes que mandan en el club, sobre todo su presidente, ya está pasando factura en el ámbito deportivo, con un vestuario también en convulsión. El 0-3 de la pasada jornada ante el Elche así lo demuestra y en una semana parece complicado encontrar una solución a lo que está pasando. El Celta va a intentar pescar en río revuelto, al margen de seguir con su buena dinámica de resultados. Lleva siete partidos sin perder, aunque en cinco de ellos no ha pasado del empate. Lejos de Balaídos ha disputado cuatro encuentros, que han acabado con una “X” en el boleto.",
       "percentages": {
         "quinielista": {
-          "1": 56,
-          "2": 21,
-          "X": 23
+          "1": 37,
+          "2": 33,
+          "X": 30
         },
-        "lae": null,
+        "lae": {
+          "1": 33,
+          "2": 32,
+          "X": 35
+        },
         "real": {
-          "1": 51,
-          "2": 25,
-          "X": 24
+          "1": 38,
+          "2": 32,
+          "X": 30
         }
       },
-      "recommended": "1X"
+      "recommended": "X2"
     },
     {
       "num": 3,
-      "home": "MAN.UNITED",
-      "away": "ROMA",
+      "home": "BETIS",
+      "away": "MÁLAGA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 21:00",
-      "comment": "La euforia duró poco en el Manchester United. Aquel 4-0 al debutante Sabah en su regreso a la Champions dio paso a dos derrotas que han dejado tocado al equipo de Michael Carrick: 2-0 en el Metropolitano y un sonrojante 4-1 en Como. Los ingleses necesitan que Old Trafford vuelva a ejercer de refugio para enderezar el rumbo, pero la visita de la Roma exige mucho más que el empuje de la grada. Los italianos están ofreciendo buenas prestaciones y suman ya cuatro puntos, una cosecha que podría ser mayor. En el Olímpico dejaron escapar en el tramo final un 3-1 favorable ante el Real Madrid. Esa herida no resta dificultad a un rival que amenaza con agravar la crisis de los diablos rojos.",
+      "schedule": "SÁBADO, 18:30",
+      "comment": "El Betis quiere imponer su ley en el pulso andaluz. Los de Pellegrini conservan su puesto de Champions pese a sumar un único punto en las dos últimas jornadas, con la Real Sociedad cada vez más cerca. La Cartuja es su gran fortín: únicamente el Barça ha logrado conquistar un feudo donde los verdiblancos firman dos goles por encuentro. Al Málaga le toca romper los pronósticos desde el último puesto. El empate del Alavés en el descuento le arrebató un triunfo que parecía suyo y prolongó su calvario. Tras diez jornadas, el equipo de Juanfran Funes todavía no conoce la victoria. Sus números lejos de casa tampoco invitan al optimismo: apenas dos puntos y dos goles alimentan las urgencias del colista.",
       "percentages": {
         "quinielista": {
-          "1": 59,
-          "2": 21,
-          "X": 20
+          "1": 83,
+          "2": 3,
+          "X": 14
         },
-        "lae": null,
+        "lae": {
+          "1": 87,
+          "2": 5,
+          "X": 8
+        },
         "real": {
-          "1": 41,
-          "2": 34,
-          "X": 25
+          "1": 72,
+          "2": 11,
+          "X": 17
         }
       },
-      "recommended": "1X2"
+      "recommended": "1"
     },
     {
       "num": 4,
-      "home": "VILLARREAL",
-      "away": "PSG",
+      "home": "BARCELONA",
+      "away": "ALAVÉS",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 21:00",
-      "comment": "Otra montaña espera al Villarreal en una Champions que no concede treguas. Tras medirse a Dortmund, Nápoles y Liverpool, los amarillos reciben en La Cerámica al campeón de las dos últimas ediciones, líder con un balance intimidante: catorce goles marcados y cinco recibidos en tres fechas. El equipo de Iñigo Pérez solo ha ganado un partido, precisamente ante su público, pero sus actuaciones en Alemania e Inglaterra acreditan que sabe plantar cara a cualquiera. Su ambición ofensiva se refleja en los ocho tantos que suma, pero también muestra su debilidad: ha encajado otros ocho. Reducir esa fragilidad será clave ante un adversario que llega con la pólvora encendida.",
+      "schedule": "SÁBADO, 21:00",
+      "comment": "Reacción obligada para un Barça herido tras caer ante PSG y Real Madrid. El revés europeo y la derrota del domingo en el Camp Nou han dejado al descubierto las grietas de los de Flick: menos acierto arriba y demasiadas concesiones atrás. Conservan el liderato, aunque el sábado necesitan recuperar el pulso para frenar los daños. Enfrente aparece un Alavés que ha dilapidado el impulso de su arranque. Solo dos puntos en seis jornadas dibujan un frenazo que exige respuestas, pese a que disfruta de una posición desahogada. El historial tampoco ayuda a los vitorianos: solo han conquistado una vez el feudo azulgrana, una victoria que se remonta a una década atrás.",
       "percentages": {
         "quinielista": {
-          "1": 8,
-          "2": 81,
-          "X": 11
+          "1": 98,
+          "2": 0,
+          "X": 2
         },
-        "lae": null,
+        "lae": {
+          "1": 93,
+          "2": 3,
+          "X": 4
+        },
         "real": {
-          "1": 20,
-          "2": 60,
-          "X": 20
+          "1": 86,
+          "2": 5,
+          "X": 9
         }
       },
-      "recommended": "2"
+      "recommended": "1"
     },
     {
       "num": 5,
-      "home": "AEK ATENAS",
-      "away": "R.MADRID",
+      "home": "GETAFE",
+      "away": "SEVILLA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 18:45",
-      "comment": "Doce puntos de doce es el premio que persigue el Real Madrid en Atenas. Los de Mourinho parten con ventaja ante un AEK que jamás les ha ganado en un duelo oficial, aunque la Champions castiga cualquier exceso de confianza. El Allwyn Arena promete una noche de presión, un clima que los blancos están acostumbrados a manejar. Los griegos sacaron adelante su único encuentro en casa al superar por 1-0 al LASK Linz austriaco. El conjunto español también ganó en su única salida, pero necesitó una remontada de las que alimentan su leyenda: perdía por 3-1 en el minuto 83 y se impuso con tres goles surgidos de otros tantos córners. Con este precedente y su superioridad, aspira a prolongar el pleno.",
+      "schedule": "DOMINGO, 14:00",
+      "comment": "El Getafe recibe al Sevilla en plena tormenta. La goleada sufrida ante el Lugano en Conference (2-5) desató un duro enfrentamiento público entre Bordalás y el presidente, ante el desconcierto de la afición azulona. Aquel desastre tuvo continuidad en San Mamés, donde el Athletic endosó un 4-0 a un equipo que, según su técnico, ha tocado fondo. Con el descenso a un solo punto, el Coliseum espera a un rival que vive una realidad muy diferente. El Sevilla de Luis García Plaza ha comenzado la temporada con muy buen pie y llega tras superar a Osasuna el lunes. Los hispalenses ocupan posiciones europeas y aventajan en cinco puntos al séptimo clasificado, una situación muy distinta a la del curso anterior.",
       "percentages": {
-        "quinielista": null,
-        "lae": null,
+        "quinielista": {
+          "1": 26,
+          "2": 42,
+          "X": 32
+        },
+        "lae": {
+          "1": 20,
+          "2": 46,
+          "X": 34
+        },
         "real": {
-          "1": 11,
-          "2": 73,
-          "X": 16
+          "1": 30,
+          "2": 38,
+          "X": 32
         }
       },
-      "recommended": "2"
+      "recommended": "X2"
     },
     {
       "num": 6,
-      "home": "FENERBAHCE",
-      "away": "LIVERPOOL",
+      "home": "RACING S.",
+      "away": "R.MADRID",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 18:45",
-      "comment": "",
+      "schedule": "DOMINGO, 16:15",
+      "comment": "Tras remontar al Espanyol (2-1) después de ir 0-1 por detrás, el Racing vuelve a jugar en casa en Liga. El cuadro cántabro es decimotercero con tres victorias, las tres logradas ante su afición. En El Sardinero, de hecho, todavía no ha perdido en el campeonato de la regularidad: suma tres triunfos y dos empates. Sin embargo, el equipo de José Alberto llegará con el desgaste añadido de haber disputado la Copa el jueves. Enfrente estará un Real Madrid que afronta la cita con la moral por las nubes tras imponerse en el Clásico, resultado que le sitúa a solo tres puntos del líder, el Barcelona. Los blancos deben sostener la intensidad que exhibieron en el Spotify Camp Nou. El conjunto de Mourinho aspira a enlazar su cuarto triunfo consecutivo en Liga.",
       "percentages": {
         "quinielista": {
-          "1": 12,
-          "2": 75,
-          "X": 13
+          "1": 2,
+          "2": 93,
+          "X": 5
         },
-        "lae": null,
+        "lae": {
+          "1": 5,
+          "2": 89,
+          "X": 6
+        },
         "real": {
-          "1": 19,
-          "2": 59,
-          "X": 22
+          "1": 10,
+          "2": 77,
+          "X": 13
         }
       },
       "recommended": "2"
     },
     {
       "num": 7,
-      "home": "B.DORTMUND",
-      "away": "BETIS",
+      "home": "ELCHE",
+      "away": "VALENCIA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
+      "schedule": "DOMINGO, 18:30",
+      "comment": "Cuatro jornadas sin conocer la derrota, con dos triunfos y dos igualadas, avalan el buen momento del Elche, decimoquinto clasificado y empeñado en poner más tierra de por medio con el descenso. Su último golpe de efecto llegó en Vallecas, donde venció al Rayo Vallecano por 0-3. Al otro lado se sitúa un Valencia que sigue sin levantar cabeza: ocupa la penúltima plaza y el desembarco de Javier Aguirre en el banquillo todavía no se ha traducido en el repunte que se espera con ansia en Mestalla. Ambos equipos vendrán de jugar Copa entre semana.",
       "percentages": {
         "quinielista": {
-          "1": 75,
-          "2": 12,
-          "X": 13
+          "1": 43,
+          "2": 26,
+          "X": 31
         },
-        "lae": null,
+        "lae": {
+          "1": 39,
+          "2": 27,
+          "X": 34
+        },
         "real": {
-          "1": 55,
-          "2": 22,
-          "X": 23
+          "1": 41,
+          "2": 31,
+          "X": 28
         }
       },
-      "recommended": "1"
+      "recommended": "1X2"
     },
     {
       "num": 8,
-      "home": "OPORTO",
-      "away": "NAPOLI",
+      "home": "EIBAR",
+      "away": "ALMERÍA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
+      "schedule": "SÁBADO, 16:15",
+      "comment": "Tres puntos separan a dos de los grandes animadores de LaLiga Hypermotion, y el duelo promete. El Eibar, tercero, atraviesa un momento de dudas: tres jornadas seguidas sin celebrar un triunfo, con dos derrotas y una igualada, la última cayendo por 2-0 en el campo del Córdoba. El equipo que le visita es el segundo clasificado, el Almería, que lleva tres puntos más. Los de García Pimienta frenaron el sábado su gran racha, siete victorias encadenadas, con un 2-2 en casa ante el Oviedo, y ahora se examinan en Ipurua. Para ambos, además, habrá habido duelo de Copa entre semana.",
       "percentages": {
         "quinielista": {
-          "1": 52,
-          "2": 27,
-          "X": 21
-        },
-        "lae": null,
-        "real": {
-          "1": 43,
+          "1": 40,
           "2": 30,
+          "X": 30
+        },
+        "lae": {
+          "1": 38,
+          "2": 29,
+          "X": 33
+        },
+        "real": {
+          "1": 37,
+          "2": 36,
           "X": 27
         }
       },
-      "recommended": "1"
+      "recommended": "1X2"
     },
     {
       "num": 9,
-      "home": "LENS",
-      "away": "COMO 1907",
+      "home": "ELDENSE",
+      "away": "GRANADA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
-      "percentages": {
-        "quinielista": {
-          "1": 37,
-          "2": 41,
-          "X": 22
-        },
-        "lae": null,
-        "real": {
-          "1": 33,
-          "2": 43,
-          "X": 24
-        }
-      },
-      "recommended": "2"
-    },
-    {
-      "num": 10,
-      "home": "RB LEIPZIG",
-      "away": "MAN.CITY",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
-      "percentages": {
-        "quinielista": {
-          "1": 13,
-          "2": 72,
-          "X": 15
-        },
-        "lae": null,
-        "real": {
-          "1": 18,
-          "2": 62,
-          "X": 20
-        }
-      },
-      "recommended": "2"
-    },
-    {
-      "num": 11,
-      "home": "SLAVIA PRAGA",
-      "away": "ARSENAL",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
-      "percentages": {
-        "quinielista": {
-          "1": 14,
-          "2": 86,
-          "X": 0
-        },
-        "lae": null,
-        "real": {
-          "1": 11,
-          "2": 72,
-          "X": 17
-        }
-      },
-      "recommended": "2"
-    },
-    {
-      "num": 12,
-      "home": "R.SOCIEDAD",
-      "away": "OL. LYON",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "JUEVES, 18:45",
-      "comment": "",
+      "schedule": "DOMINGO, 14:00",
+      "comment": "La competición de Segunda vuelve a escena para los dos equipos tras el paréntesis copero. Decimotercero en la clasificación, el Eldense cerró el domingo una serie de tres triunfos consecutivos al caer por 2-0 en el campo del Albacete. En su estadio, los azulgranas suman dos victorias, dos igualadas y un único revés. Enfrente estará el Granada, que afronta la jornada 12 instalado en una dinámica ganadora: cuatro triunfos seguidos en el campeonato, 2-3 frente a la Real Sociedad B, 0-1 en Burgos, 2-0 sobre el Cádiz y 2-1 ante el Valladolid. El equipo nazarí ocupa la quinta plaza de la tabla.",
       "percentages": {
         "quinielista": {
           "1": 43,
-          "2": 40,
-          "X": 17
+          "2": 29,
+          "X": 28
         },
-        "lae": null,
-        "real": {
-          "1": 49,
-          "2": 26,
-          "X": 25
-        }
-      },
-      "recommended": "1"
-    },
-    {
-      "num": 13,
-      "home": "CELTA",
-      "away": "R. UNION SG",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "JUEVES, 21:00",
-      "comment": "El Celta perdió en Vallecas este pasado sábado y vuelve a las andadas. Después de siete jornadas sin perder en liga, cinco de ellas saldadas con empate, frena una buena racha que incluía su primera victoria europea. Y muy meritoria en feudo del Celtic escocés (1-2). Antes, dos derrotas que evidencias las fragilidades atrás que no debe conceder ante un Royale Union belga que sigue imbatido. Siete puntos de nueve, con un empate ante la Real Sociedad que certifica el buen nivel que puede dar, como ya advierte su única salida, resuelta con goleada en Plzen (0-3). Por nivel global de plantel y recursos, el cuadro gallego parte con ventaja. Jugar en Vigo debería decantar la balanza.",
-      "percentages": {
-        "quinielista": {
-          "1": 57,
-          "2": 28,
-          "X": 15
+        "lae": {
+          "1": 27,
+          "2": 43,
+          "X": 30
         },
-        "lae": null,
         "real": {
-          "1": 46,
-          "2": 28,
-          "X": 26
+          "1": 41,
+          "2": 31,
+          "X": 28
         }
       },
       "recommended": "1X"
     },
     {
-      "num": 14,
-      "home": "GETAFE",
-      "away": "BRIGHTON",
+      "num": 10,
+      "home": "BURGOS",
+      "away": "CASTELLÓN",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "JUEVES, 21:00",
-      "comment": "",
+      "schedule": "DOMINGO, 18:30",
+      "comment": "Burgos y Castellón comparten también una semana con doble cita con la Copa de por medio. En Liga, los burgaleses aspiran a enlazar la tercera victoria seguida. Sus dos anteriores víctimas fuero el Sabadell (1-0) y el Andorra (2-3). Por su parte, el Castellón ha recuperado el pulso que necesitaba para volver a ocupar el liderato y busca encadenar también el tercer triunfo consecutivo en la competición de la regularidad, después de imponerse a la UD Las Palmas (0-3) y al Sporting (4-0). Como antecedente, el curso anterior dejó un 0-0 en Burgos y una victoria castellonense en Castalia (3-1).",
       "percentages": {
         "quinielista": {
-          "1": 15,
-          "2": 69,
-          "X": 16
+          "1": 21,
+          "2": 53,
+          "X": 26
         },
-        "lae": null,
+        "lae": {
+          "1": 24,
+          "2": 46,
+          "X": 30
+        },
         "real": {
-          "1": 19,
-          "2": 56,
-          "X": 25
+          "1": 26,
+          "2": 46,
+          "X": 28
         }
       },
-      "recommended": "2"
+      "recommended": "X2"
+    },
+    {
+      "num": 11,
+      "home": "ALAVÉS",
+      "away": "R.SOCIEDAD",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 12:00",
+      "comment": "Duelo vasco entre un Alavés que acumula cinco jornadas sin ganar, con cuatro derrotas incluidas (la última, el pasado domingo en feudo del Deportivo), y una Real Sociedad que va encontrando ritmo. La que fuera tercera la temporada pasada, arrancó muy errática. Puede que fuera por combinar previas europeas, pero en liga tardó seis fechas en ganar. Desde entonces, siete puntos de nueve posibles y a domicilio sigue mostrando buena dinámica: dos salidas seguidas sin encajar. El conjunto babazorro, sin embargo, solamente ha perdido un duelo en casa (y fue contra el Barça).",
+      "percentages": {
+        "quinielista": {
+          "1": 18,
+          "2": 52,
+          "X": 30
+        },
+        "lae": {
+          "1": 22,
+          "2": 50,
+          "X": 28
+        },
+        "real": {
+          "1": 20,
+          "2": 56,
+          "X": 24
+        }
+      },
+      "recommended": "X2"
+    },
+    {
+      "num": 12,
+      "home": "MADRID CFF",
+      "away": "DEPORTIVO",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "SÁBADO, 18:00",
+      "comment": "Dos equipos que quieren consolidarse en la parte se ven las caras y examinan sus buenas sensaciones. El Madrid CFF es una de las revelaciones de este inicio de curso. A pesar que lleva tres jornadas sin ganar, aunque con dos empates, está a un punto del tercero y en casa se está mostrando muy fiable (tres victorias y un empate). El Deportivo, mientras, firma dos triunfos seguidos y a domicilio se está sintiendo notablemente cómodo. Siete puntos de nueve, evidenciando buenas prestaciones defensivas (dos porterías a cero) y, cuando el guion lo requiere, capacidad atacante (en las dos últimas salidas, tres goles en cada una para ganar en Granada y Eibar).",
+      "percentages": {
+        "quinielista": {
+          "1": 48,
+          "2": 26,
+          "X": 26
+        },
+        "lae": {
+          "1": 68,
+          "2": 13,
+          "X": 19
+        },
+        "real": {
+          "1": 39,
+          "2": 33,
+          "X": 28
+        }
+      },
+      "recommended": "1X2"
+    },
+    {
+      "num": 13,
+      "home": "SEVILLA",
+      "away": "R.MADRID",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 19:00",
+      "comment": "El Sevilla firma tres empates seguidos que no lo alejan de la zona baja, pero confirman la mejora en su regularidad tras un inicio errático de campeonato. La evidencia, la igualada del pasado fin de semana en feudo de un férreo Athletic Club y que lleva una sola derrota en las últimas cinco jornadas. Eso sí, fue en casa, donde sigue sin ganar después de tres apariciones. El Madrid, mientras, volvió a ganar y van dos triunfos seguidos para olvidar la goleada del Camp Nou. Fue su última salida antes de ésta, que será la cuarta. Las dos primeras, dos victorias solventes, pero dejando ciertas dudas en defensa que no acaba de resolver.",
+      "percentages": {
+        "quinielista": {
+          "1": 5,
+          "2": 78,
+          "X": 17
+        },
+        "lae": {
+          "1": 7,
+          "2": 82,
+          "X": 11
+        },
+        "real": {
+          "1": 15,
+          "2": 63,
+          "X": 22
+        }
+      },
+      "recommended": "X2"
+    },
+    {
+      "num": 14,
+      "home": "TENERIFE",
+      "away": "ATH.CLUB",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "LUNES, 20:00",
+      "comment": "El Tenerife cayó el pasado fin de semana en feudo del Madrid, un aspirante a plaza europea que sufrió para ganar (3-2). Una derrota, por tanto, que demuestra el buen hacer de un equipo isleño que la temporada pasada fue capaz de terminar cuarto en la liga. El Athletic Club, además, se presume un rival directo en las aspiraciones de consolidarse en la parte alta de la tabla. El conjunto vasco firma cuatro jornadas sin perder y a domicilio ha sumado en dos de sus tres salidas. El último antecedente en la isla, en la segunda vuelta del curso anterior, se saldó con goleada tinerfeña.",
+      "percentages": {
+        "quinielista": {
+          "1": 39,
+          "2": 32,
+          "X": 29
+        },
+        "lae": {
+          "1": 32,
+          "2": 40,
+          "X": 28
+        },
+        "real": {
+          "1": 36,
+          "2": 36,
+          "X": 28
+        }
+      },
+      "recommended": "1X"
     },
     {
       "num": 15,
-      "home": "AT.MADRID",
-      "away": "B.MUNICH",
+      "home": "ATH.CLUB",
+      "away": "R.SOCIEDAD",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 21:00",
-      "comment": "Un gran partido en el Metropolitano entre dos equipos fuera del top-8 porque han perdido más puntos de los previstos. Especialmente el Bayern, que sigue sin perder, pero ha cedido dos empates seguidos. Uno de ellos, en su única salida, al Viking noruego. En tres jornadas, media de cinco goles. El Atlético, mientras, sigue en plena lucha por el liderato de la liga, pero en Champions ha sacado un punto en dos viajes, aunque ganó aquí al United. Un 2-0 que no refleja las llegadas que también protagonizó el cuadro inglés. Un duelo con protagonismo de las áreas que puede beneficiar la calidad ofensiva de ambos equipos. El once teutón, sin el sancionado Olise. El último antecedente aquí, hace seis años en fase de grupos: 1-1.",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "Un derbi vasco que promete emociones fuertes. En parte, porque los dos llegan en buen momento. El Athletic Club parece que va recuperando su nivel tras un arranque de liga irregular. Especialmente en San Mamés, donde goleó al Getafe el pasado domingo y donde acumula cuatro partidos sin perder, con tres porterías a cero. La Real Sociedad, por su parte, firma cuatro triunfos seguidos en liga y es, después del Barça, el equipo más goleador fuera. Eso sí, también es de los que más recibe. Un signo del fútbol valiente que quiere Matarazzo, técnico que no rehúye el intercambio de llegadas. El último antecedente en San Mamés, 1-1.",
       "percentages": {
         "quinielista": {
-          "1": 0,
-          "2": 37,
-          "X": 60
+          "1": 8,
+          "2": 36,
+          "X": 44
         },
-        "lae": null,
+        "lae": {
+          "1": 6,
+          "2": 41,
+          "X": 46
+        },
         "real": {
-          "1": 28,
-          "2": 23,
-          "X": 36
+          "1": 23,
+          "2": 25,
+          "X": 34
         }
       },
-      "recommended": "1-2"
+      "recommended": "2-1"
     },
     {
       "num": 16,
