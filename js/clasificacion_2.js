@@ -20,7 +20,36 @@
                 ];
 
                 this.initFloatingCardListeners();
+                this.initUIModeListener();
                 this.init();
+            }
+
+            /**
+             * Comprueba si el usuario se encuentra en Modo Fácil
+             */
+            isEasyMode() {
+                if (typeof window !== 'undefined' && window.AppUIMode && typeof window.AppUIMode.getMode === 'function') {
+                    return window.AppUIMode.getMode() === 'easy';
+                }
+                const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('maulas_ui_mode') : null;
+                if (saved) return saved === 'easy';
+                return (typeof document !== 'undefined') && (
+                    document.documentElement.classList.contains('mode-easy') ||
+                    (document.body && document.body.classList.contains('mode-easy'))
+                );
+            }
+
+            /**
+             * Escucha cambios en el modo de interfaz para forzar la Tabla de Honor si se pasa a Modo Fácil
+             */
+            initUIModeListener() {
+                if (typeof window === 'undefined') return;
+                window.addEventListener('maulas-ui-mode-changed', (e) => {
+                    const mode = (e && e.detail && e.detail.mode) ? e.detail.mode : (this.isEasyMode() ? 'easy' : 'pro');
+                    if (mode === 'easy') {
+                        this.switchView('ranking');
+                    }
+                });
             }
 
             /**
@@ -83,19 +112,28 @@
 
                     // Comprobar parámetros de URL o anclaje para abrir la vista solicitada (ej: Matriz Histórica)
                     try {
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const viewParam = (urlParams.get('view') || urlParams.get('tab') || '').toLowerCase();
-                        const hashParam = (window.location.hash || '').toLowerCase();
+                        if (this.isEasyMode()) {
+                            // En Modo Fácil SIEMPRE forzar la Tabla de Honor (Ranking)
+                            this.switchView('ranking');
+                        } else {
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const viewParam = (urlParams.get('view') || urlParams.get('tab') || '').toLowerCase();
+                            const hashParam = (window.location.hash || '').toLowerCase();
 
-                        if (viewParam === 'matrix' || viewParam === 'matriz' || hashParam === '#view-matrix' || hashParam === '#matriz') {
-                            if (!this.matrixRendered) this.renderMatrixTable();
-                            this.switchView('matrix');
-                            setTimeout(() => {
-                                const targetEl = document.getElementById('view-matrix') || document.querySelector('.view-switcher-box');
-                                if (targetEl) {
-                                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }
-                            }, 120);
+                            if (viewParam === 'matrix' || viewParam === 'matriz' || hashParam === '#view-matrix' || hashParam === '#matriz') {
+                                if (!this.matrixRendered) this.renderMatrixTable();
+                                this.switchView('matrix');
+                                setTimeout(() => {
+                                    const targetEl = document.getElementById('view-matrix') || document.querySelector('.view-switcher-box');
+                                    if (targetEl) {
+                                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
+                                }, 120);
+                            } else if (viewParam === 'chart' || viewParam === 'escalada' || hashParam === '#view-chart') {
+                                this.switchView('chart');
+                            } else {
+                                this.switchView('ranking');
+                            }
                         }
                     } catch (eParam) {
                         console.warn("[Clasificacion2] Error leyendo parámetros de vista:", eParam);
@@ -1382,6 +1420,9 @@
 
             // --- CONTROLES DE PESTAÑAS DE VISTA ---
             switchView(viewName) {
+                if (this.isEasyMode()) {
+                    viewName = 'ranking';
+                }
                 this.currentView = viewName;
 
                 const vr = document.getElementById('view-ranking');
@@ -2316,4 +2357,4 @@
         // Inicializar aplicación al cargar el DOM
         document.addEventListener('DOMContentLoaded', () => {
             window.ClasificacionApp = new Clasificacion2App();
-        });
+        });

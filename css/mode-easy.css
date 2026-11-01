@@ -306,6 +306,13 @@
 }
 
 /* --- 4. CLASIFICACIÓN (clasificacion_2.html) --- */
+/* Forzar siempre la visualización de la Tabla de Honor (Ranking) en Modo Fácil */
+.mode-easy #view-ranking,
+html.mode-easy #view-ranking,
+body.mode-easy #view-ranking {
+    display: block !important;
+}
+
 /* Ocultar desglose horizontal de 38 jornadas y gráficos complejos */
 .mode-easy #tab-btn-matrix,
 .mode-easy #tab-btn-chart,

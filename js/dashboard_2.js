@@ -922,7 +922,8 @@ class Dashboard2AppController {
         }
         const btnHeroClasificacion = document.getElementById('btn-hero-clasificacion');
         if (btnHeroClasificacion) {
-            btnHeroClasificacion.href = 'clasificacion_2.html?view=matrix';
+            const isEasy = (window.AppUIMode && window.AppUIMode.getMode) ? (window.AppUIMode.getMode() === 'easy') : (localStorage.getItem('maulas_ui_mode') !== 'pro');
+            btnHeroClasificacion.href = isEasy ? 'clasificacion_2.html' : 'clasificacion_2.html?view=matrix';
         }
 
         // Usuario logueado en la cabecera
@@ -1877,6 +1878,12 @@ class Dashboard2AppController {
         } else {
             items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
+
+        // NOTICIA CLASIFICACIÓN MODO FÁCIL: TABLA DE HONOR FIJADA
+        items.push({
+            text: '🏅 <strong class="text-amber-400">Modo Fácil en Clasificación:</strong> Se fija siempre la Tabla de Honor (Ranking) como vista principal garantizada, asegurando carga instantánea de datos y sin pantallas vacías.',
+            action: 'clasificacion'
+        });
 
         // NOTICIA BOTE: REGISTRO DUAL DE INGRESOS Y RETIRADAS
         items.push({
@@ -3261,6 +3268,15 @@ class Dashboard2AppController {
             if (e.detail && typeof e.detail.cajaReal === 'number') {
                 this.boteOfficialSummary = e.detail;
                 this.updateCajaRealDisplays();
+            }
+        });
+
+        // Actualizar enlace de Clasificación según el modo de interfaz (Fácil -> Tabla de Honor / Pro -> Matriz)
+        window.addEventListener('maulas-ui-mode-changed', (e) => {
+            const btnHero = document.getElementById('btn-hero-clasificacion');
+            if (btnHero) {
+                const isEasy = (e && e.detail && e.detail.mode) ? (e.detail.mode === 'easy') : (localStorage.getItem('maulas_ui_mode') !== 'pro');
+                btnHero.href = isEasy ? 'clasificacion_2.html' : 'clasificacion_2.html?view=matrix';
             }
         });
         // Cierre de dropdown al hacer clic fuera y cierre de modales al pulsar backdrop

@@ -300,6 +300,12 @@
                 items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
             }
 
+            // NOTICIA CLASIFICACIÓN MODO FÁCIL: TABLA DE HONOR FIJADA
+            items.push({
+                text: '🏅 <strong class="text-amber-400">Modo Fácil en Clasificación:</strong> Se fija siempre la Tabla de Honor (Ranking) como vista principal garantizada, asegurando carga instantánea de datos y sin pantallas vacías.',
+                url: 'clasificacion_2.html'
+            });
+
             // NOTICIA BOTE: REGISTRO DUAL DE INGRESOS Y RETIRADAS
             items.push({
                 text: '💰 <strong class="text-amber-400">Tesorería del Bote:</strong> Se habilita selector dual en el registro de movimientos para registrar tanto Aportaciones/Ingresos (+) como Retiradas/Salidas (-) de forma ágil y visual.',
