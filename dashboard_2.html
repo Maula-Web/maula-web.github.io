@@ -506,9 +506,11 @@
 
         /* Landscape en móvil o tablet */
         @media (orientation: landscape) and (max-height: 650px), (orientation: landscape) and (max-width: 1024px) {
-            html, body {
+            html, body,
+            html.mode-easy, body.mode-easy {
                 height: auto !important;
                 min-height: 100% !important;
+                max-height: none !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
                 -webkit-overflow-scrolling: touch !important;
@@ -516,27 +518,50 @@
             body {
                 padding-bottom: 4.5rem !important;
             }
-            #main-content {
+            body.mode-easy {
+                padding-bottom: 3.5rem !important;
+            }
+            #main-content,
+            .mode-easy #main-content {
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 0.75rem !important;
                 height: auto !important;
                 min-height: auto !important;
+                max-height: none !important;
                 overflow: visible !important;
                 padding-bottom: 2rem !important;
             }
-            #live-jornada-banner {
+            #live-jornada-banner,
+            .mode-easy #live-jornada-banner {
                 flex: none !important;
                 height: auto !important;
                 min-height: auto !important;
+                max-height: none !important;
             }
-            #hero-pillars-grid {
+            #hero-pillars-grid,
+            .mode-easy #hero-pillars-grid {
                 flex: none !important;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 0.75rem !important;
                 height: auto !important;
                 min-height: auto !important;
+                max-height: none !important;
+            }
+            #user-summary-card,
+            .mode-easy #user-summary-card {
+                flex: none !important;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
+            }
+            #mobile-dobles-sella-card,
+            .mode-easy #mobile-dobles-sella-card {
+                flex: none !important;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
             }
             #hero-secondary-pillars {
                 display: grid !important;
@@ -1344,12 +1369,17 @@
                 if (isLandscape && (isMobile || isShortScreen || window.innerWidth <= 1024)) {
                     document.body.classList.remove('mobile-details-folded');
                     document.body.classList.add('mobile-details-open');
-                    document.body.style.overflowY = 'auto';
-                    document.documentElement.style.overflowY = 'auto';
+                    document.body.style.setProperty('overflow-y', 'auto', 'important');
+                    document.documentElement.style.setProperty('overflow-y', 'auto', 'important');
+                    document.body.style.setProperty('height', 'auto', 'important');
+                    document.documentElement.style.setProperty('height', 'auto', 'important');
+                    document.body.style.setProperty('max-height', 'none', 'important');
+                    document.documentElement.style.setProperty('max-height', 'none', 'important');
                     if (main) {
-                        main.style.height = 'auto';
-                        main.style.minHeight = '100%';
-                        main.style.overflow = 'visible';
+                        main.style.setProperty('height', 'auto', 'important');
+                        main.style.setProperty('min-height', 'auto', 'important');
+                        main.style.setProperty('max-height', 'none', 'important');
+                        main.style.setProperty('overflow', 'visible', 'important');
                     }
                     return;
                 }

@@ -300,6 +300,12 @@
                 items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
             }
 
+            // NOTICIA DASHBOARD MODO FÁCIL: SOPORTE LANDSCAPE HORIZONTAL
+            items.push({
+                text: '📱 <strong class="text-amber-400">Modo Fácil en Horizontal:</strong> Optimizado el Dashboard al girar el móvil (landscape), con scroll vertical fluido y eliminación completa de solapamientos entre tarjetas.',
+                url: 'dashboard_2.html'
+            });
+
             // NOTICIA CLASIFICACIÓN MODO FÁCIL: TABLA DE HONOR FIJADA
             items.push({
                 text: '🏅 <strong class="text-amber-400">Modo Fácil en Clasificación:</strong> Se fija siempre la Tabla de Honor (Ranking) como vista principal garantizada, asegurando carga instantánea de datos y sin pantallas vacías.',

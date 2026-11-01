@@ -71,8 +71,8 @@
     margin-bottom: 0 !important;
 }
 
-/* Ajuste de pantalla ?nica en m?vil en Modo F?cil (cero scroll vertical y redistribuci?n total del espacio disponible) EXCLUSIVO PARA DASHBOARD (INICIO) */
-@media (max-width: 767px) {
+/* Ajuste de pantalla única en móvil en Modo Fácil (cero scroll vertical y redistribución total del espacio disponible) EXCLUSIVO PARA DASHBOARD EN VERTICAL (PORTRAIT) */
+@media (max-width: 767px) and (orientation: portrait) {
     html.mode-easy:has(#live-jornada-banner),
     body.mode-easy:has(#live-jornada-banner),
     html.mode-easy.page-dashboard,
@@ -101,6 +101,9 @@
         margin: 0 !important;
         box-sizing: border-box !important;
     }
+}
+
+@media (max-width: 767px) {
 
     /* Navbar superior compacta en móvil */
     .mode-easy nav.main-navbar-sticky {
@@ -277,6 +280,113 @@
 /* Ocultar enlace a matriz de jornadas desde la tarjeta del socio */
 .mode-easy #user-card-matrix-link {
     display: none !important;
+}
+
+/* =========================================================================
+   DASHBOARD EN MODO FÁCIL: ORIENTACIÓN HORIZONTAL (LANDSCAPE) EN MÓVIL Y PANTALLAS BAJAS
+   Garantiza scroll vertical natural y fluido sin solapamientos ni colapsos al girar la pantalla
+   ========================================================================= */
+@media (orientation: landscape) and (max-height: 650px), (orientation: landscape) and (max-width: 1024px), (max-height: 550px) {
+    html.mode-easy,
+    body.mode-easy,
+    html.mode-easy:has(#live-jornada-banner),
+    body.mode-easy:has(#live-jornada-banner),
+    html.mode-easy.page-dashboard,
+    body.mode-easy.page-dashboard,
+    .mode-easy body.page-dashboard,
+    .mode-easy:has(#live-jornada-banner) body,
+    .mode-easy body {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100% !important;
+        max-height: none !important;
+        padding-bottom: 3.5rem !important;
+        margin: 0 !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .mode-easy:has(#live-jornada-banner) #main-content,
+    .mode-easy #main-content:has(#live-jornada-banner),
+    .mode-easy body.page-dashboard #main-content,
+    body.page-dashboard.mode-easy #main-content,
+    .mode-easy #main-content {
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        overflow-x: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        gap: 0.75rem !important;
+        padding: 0.5rem 0.75rem 3rem 0.75rem !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .mode-easy #live-jornada-banner {
+        flex: none !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        gap: 0.65rem !important;
+        padding: 0.75rem 0.85rem !important;
+        overflow: visible !important;
+    }
+
+    .mode-easy #hero-pillars-grid {
+        flex: none !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        gap: 0.65rem !important;
+    }
+
+    .mode-easy #user-summary-card {
+        flex: none !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        gap: 0.5rem !important;
+        padding: 0.65rem 0.75rem !important;
+    }
+
+    .mode-easy #mobile-dobles-sella-card {
+        flex: none !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        gap: 0.45rem !important;
+        padding: 0.55rem 0.75rem !important;
+    }
+
+    .mode-easy #live-jornada-banner > div:first-child,
+    .mode-easy #live-jornada-banner > div:last-child {
+        flex: none !important;
+        flex-shrink: 0 !important;
+    }
+
+    .mode-easy #live-banner-actions {
+        flex: none !important;
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0.5rem !important;
+        margin-top: 0.25rem !important;
+        margin-bottom: 2rem !important;
+    }
 }
 
 /* --- 3. BOTE Y TESORERÍA (bote_2.html) --- */
