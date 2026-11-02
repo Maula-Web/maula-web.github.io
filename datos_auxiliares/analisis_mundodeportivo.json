@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-02T11:46:29.723Z",
+  "updatedAt": "2026-11-02T20:59:09.680Z",
   "available": false,
   "matchCountWithTarget": 15,
   "isMidweek": true,
@@ -17,14 +17,18 @@
       "comment": "Recuperar la solidez es la gran asignatura pendiente del Barça antes de recibir al temible Aston Villa. Los de Flick acumulan dieciocho partidos europeos consecutivos encajando y su fragilidad atrás inquieta a una afición que espera una reacción inmediata en el Camp Nou. El tropiezo en París dejó a los azulgranas con seis puntos y redujo su margen si quieren mantenerse cerca de los primeros puestos. Enfrente aparece un rival que marcha segundo en la fase de Liga y figura entre los cinco conjuntos que han ganado todos sus encuentros. Los ingleses tratarán de sacar partido de las dudas defensivas locales con una de sus mejores armas: su peligro y su capacidad goleadora en las acciones de estrategia.",
       "percentages": {
         "quinielista": {
-          "1": 71,
-          "2": 20,
+          "1": 84,
+          "2": 7,
           "X": 9
         },
-        "lae": null,
-        "real": {
-          "1": 77,
+        "lae": {
+          "1": 81,
           "2": 9,
+          "X": 10
+        },
+        "real": {
+          "1": 76,
+          "2": 10,
           "X": 14
         }
       },
@@ -40,15 +44,19 @@
       "comment": "Sin puntos y con todas las alarmas encendidas, el Lille afronta una visita que impone respeto. Le espera el Bodo/Glimt de Kjetil Knutsen, también obligado a ganar tras sumar apenas tres puntos. Los noruegos se agarran al Aspmyra Stadion, un fortín al norte del país, dentro del círculo polar ártico, donde han sucumbido Roma, Manchester City e Inter. El Borussia Dortmund engrosó esa lista el pasado catorce de octubre, en esta edición. Sus 8.270 localidades de asiento y el césped artificial, con calefacción bajo la superficie, completan ese escenario que pone a prueba a cualquiera. Los franceses conocen la dificultad del reto, pero su pleno de derrotas les exige dar un golpe sobre la mesa para seguir vivos.",
       "percentages": {
         "quinielista": {
-          "1": 56,
-          "2": 21,
-          "X": 23
+          "1": 62,
+          "2": 16,
+          "X": 22
         },
-        "lae": null,
+        "lae": {
+          "1": 53,
+          "2": 16,
+          "X": 31
+        },
         "real": {
-          "1": 51,
+          "1": 52,
           "2": 25,
-          "X": 24
+          "X": 23
         }
       },
       "recommended": "1X"
@@ -63,11 +71,15 @@
       "comment": "La euforia duró poco en el Manchester United. Aquel 4-0 al debutante Sabah en su regreso a la Champions dio paso a dos derrotas que han dejado tocado al equipo de Michael Carrick: 2-0 en el Metropolitano y un sonrojante 4-1 en Como. Los ingleses necesitan que Old Trafford vuelva a ejercer de refugio para enderezar el rumbo, pero la visita de la Roma exige mucho más que el empuje de la grada. Los italianos están ofreciendo buenas prestaciones y suman ya cuatro puntos, una cosecha que podría ser mayor. En el Olímpico dejaron escapar en el tramo final un 3-1 favorable ante el Real Madrid. Esa herida no resta dificultad a un rival que amenaza con agravar la crisis de los diablos rojos.",
       "percentages": {
         "quinielista": {
-          "1": 59,
-          "2": 21,
-          "X": 20
+          "1": 40,
+          "2": 32,
+          "X": 28
         },
-        "lae": null,
+        "lae": {
+          "1": 43,
+          "2": 34,
+          "X": 23
+        },
         "real": {
           "1": 41,
           "2": 34,
@@ -86,15 +98,19 @@
       "comment": "Otra montaña espera al Villarreal en una Champions que no concede treguas. Tras medirse a Dortmund, Nápoles y Liverpool, los amarillos reciben en La Cerámica al campeón de las dos últimas ediciones, líder con un balance intimidante: catorce goles marcados y cinco recibidos en tres fechas. El equipo de Iñigo Pérez solo ha ganado un partido, precisamente ante su público, pero sus actuaciones en Alemania e Inglaterra acreditan que sabe plantar cara a cualquiera. Su ambición ofensiva se refleja en los ocho tantos que suma, pero también muestra su debilidad: ha encajado otros ocho. Reducir esa fragilidad será clave ante un adversario que llega con la pólvora encendida.",
       "percentages": {
         "quinielista": {
-          "1": 8,
-          "2": 81,
+          "1": 5,
+          "2": 84,
           "X": 11
         },
-        "lae": null,
+        "lae": {
+          "1": 12,
+          "2": 78,
+          "X": 10
+        },
         "real": {
           "1": 20,
-          "2": 60,
-          "X": 20
+          "2": 59,
+          "X": 21
         }
       },
       "recommended": "2"
@@ -108,12 +124,20 @@
       "schedule": "MIÉRCOLES, 18:45",
       "comment": "Doce puntos de doce es el premio que persigue el Real Madrid en Atenas. Los de Mourinho parten con ventaja ante un AEK que jamás les ha ganado en un duelo oficial, aunque la Champions castiga cualquier exceso de confianza. El Allwyn Arena promete una noche de presión, un clima que los blancos están acostumbrados a manejar. Los griegos sacaron adelante su único encuentro en casa al superar por 1-0 al LASK Linz austriaco. El conjunto español también ganó en su única salida, pero necesitó una remontada de las que alimentan su leyenda: perdía por 3-1 en el minuto 83 y se impuso con tres goles surgidos de otros tantos córners. Con este precedente y su superioridad, aspira a prolongar el pleno.",
       "percentages": {
-        "quinielista": null,
-        "lae": null,
+        "quinielista": {
+          "1": 2,
+          "2": 95,
+          "X": 3
+        },
+        "lae": {
+          "1": 10,
+          "2": 81,
+          "X": 9
+        },
         "real": {
-          "1": 11,
-          "2": 73,
-          "X": 16
+          "1": 10,
+          "2": 76,
+          "X": 14
         }
       },
       "recommended": "2"
@@ -125,21 +149,25 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "MIÉRCOLES, 18:45",
-      "comment": "",
+      "comment": "Tres jornadas y ni una victoria: así llega el Fenerbahce a la cuarta cita de la fase liga de la Champions. El conjunto turco acumula dos empates y una derrota. Sacó una X ante su afición contra la Roma (1-1) y frente al Slavia de Praga (2-2), y en su visita a Inglaterra salió goleado por el Aston Villa, que le endosó un 6-0 sin paliativos. Ahora le toca medirse a otro rival inglés, aunque esta vez en su propio campo. El Liverpool pretende sostener su excelente rumbo continental, ya que, por ahora, todas sus apariciones en Europa terminaron en triunfo, con un 2-1 al Atlético, un 3-6 al LASK Linz y un 4-3 al Villarreal. Eso sí, el domingo los Reds se quedaron sin premio en Anfield ante el Arsenal (0-1) en la Premier.",
       "percentages": {
         "quinielista": {
-          "1": 12,
-          "2": 75,
-          "X": 13
+          "1": 7,
+          "2": 74,
+          "X": 19
         },
-        "lae": null,
+        "lae": {
+          "1": 13,
+          "2": 64,
+          "X": 23
+        },
         "real": {
-          "1": 19,
-          "2": 59,
-          "X": 22
+          "1": 18,
+          "2": 61,
+          "X": 21
         }
       },
-      "recommended": "2"
+      "recommended": "X2"
     },
     {
       "num": 7,
@@ -148,21 +176,25 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
+      "comment": "Seis puntos de nueve posibles: ese es el bagaje con el que el Dortmund encara la cuarta jornada de la fase liga de la Champions. Los amarillos arrancaron con un 3-2 ante el Villarreal en su estadio, tropezaron en Noruega frente al Bodo/Glimt (1-0) y después se llevaron el triunfo ante el Sabah (1-2). El sábado, en la Bundesliga, sacaron un 2-2 en el campo del Bayern, resultado que mantiene a ambos clubes en lo más alto de la tabla. El Betis aspira a no perder el ritmo de su magnífico recorrido europeo. El equipo de Pellegrini pisará el Signal Iduna Park con tres triunfos en tres partidos, tras superar al Feyenoord (1-0), al Porto (3-2) y al Lille (2-3). Saltar a uno de los campos más difíciles del continente será, sin duda, una auténtica prueba de fuego para los verdiblancos.",
       "percentages": {
         "quinielista": {
-          "1": 75,
-          "2": 12,
-          "X": 13
+          "1": 58,
+          "2": 16,
+          "X": 26
         },
-        "lae": null,
+        "lae": {
+          "1": 54,
+          "2": 17,
+          "X": 29
+        },
         "real": {
           "1": 55,
           "2": 22,
           "X": 23
         }
       },
-      "recommended": "1"
+      "recommended": "1X"
     },
     {
       "num": 8,
@@ -171,21 +203,25 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
+      "comment": "La Champions se le está haciendo cuesta arriba al Oporto, que sigue sin conocer el sabor del triunfo en esta fase liga. Los dragones cayeron ante el Manchester City (0-2), el Betis (3-2) y el PSV (0-1). En su liga doméstica, el equipo luso manda con autoridad, con diez triunfos en otros tantos partidos. El Nápoles estrenó su casillero de puntos en la pasada jornada, cuando se impuso por 4-3 al Bodo/Glimt, tras haber caído en las dos citas anteriores ante el Arsenal (0-1) y el Villarreal (3-1). El sábado recargó pilas en la Serie A con un 4-0 al Monza, resultado que le mantiene en la séptima plaza.",
       "percentages": {
         "quinielista": {
-          "1": 52,
-          "2": 27,
-          "X": 21
+          "1": 49,
+          "2": 22,
+          "X": 29
         },
-        "lae": null,
+        "lae": {
+          "1": 41,
+          "2": 29,
+          "X": 30
+        },
         "real": {
-          "1": 43,
-          "2": 30,
-          "X": 27
+          "1": 47,
+          "2": 27,
+          "X": 26
         }
       },
-      "recommended": "1"
+      "recommended": "1X"
     },
     {
       "num": 9,
@@ -194,21 +230,25 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
+      "comment": "Desde el 2-3 en el campo del Slavia de Praga, en la primera jornada, el Lens no ha vuelto a saborear el triunfo en la fase liga de la Champions. Ahora busca cortar esa sequía. El conjunto francés, octavo en la Ligue 1, perdió en las dos siguientes fechas ante el Sporting de Portugal (0-2) y el Brujas (3-0). El Como de Cesc se está exprimiendo su estreno en la máxima competición continental. Sus dos victorias de momento, ambas por todo lo alto y en su estadio, fueron un 4-1 al RB Leipzig y otro 4-1 al Manchester United. Esta vez buscará los primeros puntos fuera después de caer en Rotterdam ante el Feyenoord (2-3).",
       "percentages": {
         "quinielista": {
-          "1": 37,
-          "2": 41,
-          "X": 22
+          "1": 25,
+          "2": 49,
+          "X": 26
         },
-        "lae": null,
+        "lae": {
+          "1": 22,
+          "2": 47,
+          "X": 31
+        },
         "real": {
-          "1": 33,
+          "1": 32,
           "2": 43,
-          "X": 24
+          "X": 25
         }
       },
-      "recommended": "2"
+      "recommended": "X2"
     },
     {
       "num": 10,
@@ -217,17 +257,21 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
+      "comment": "Al RB Leipzig le toca recibir a un rival duro en la cuarta cita de la fase liga de la Champions. El conjunto alemán suma tres puntos de los nueve disputados gracias a un triunfo en su estadio ante el PSV (1-0). Los otros dos choques los jugó fuera saliendo muy mal parado: derrotas claras frente al Como y el Real Madrid por 4-1. El City de Maresca, que debutó con un 0-2 en la visita al Porto, se estrelló después ante el campeón PSG y volvió a levantar cabeza la jornada pasada con una goleada al AEK de Atenas (5-1). El equipo inglés viene don dudas en la Premier, donde encadena dos derrotas, la última el sábado en casa ante el Brighton (0-1).",
       "percentages": {
         "quinielista": {
-          "1": 13,
-          "2": 72,
-          "X": 15
+          "1": 8,
+          "2": 81,
+          "X": 11
         },
-        "lae": null,
+        "lae": {
+          "1": 13,
+          "2": 75,
+          "X": 12
+        },
         "real": {
-          "1": 18,
-          "2": 62,
+          "1": 19,
+          "2": 61,
           "X": 20
         }
       },
@@ -240,18 +284,22 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "MIÉRCOLES, 21:00",
-      "comment": "",
+      "comment": "Un partido aparentemente desigual entre dos líderes de sus ligas. El Slavia de Praga lo hace imbatido tras trece jornadas y el Arsenal, en solitario en una Premier muy exigente. Este mismo domingo se hizo con la primera plaza tras ganar en Anfield con marcador mínima y sin encajar. Otra muestra de la gran defensa que es el bloque de Arteta, que no dejó a cero los disparos a puerta del Liverpool. En Champions ya firmó triunfo en Nápoles y empate en Múnich. Esta vez visita a un rival que ya cayó aquí con el Lens. Después mereció más en sus dos salidas, pero aquí se las ve con un bloque muy bien diseñado y dirigido por Arteta. Para fijo.",
       "percentages": {
         "quinielista": {
-          "1": 14,
-          "2": 86,
-          "X": 0
+          "1": 2,
+          "2": 94,
+          "X": 4
         },
-        "lae": null,
-        "real": {
+        "lae": {
           "1": 11,
-          "2": 72,
-          "X": 17
+          "2": 80,
+          "X": 9
+        },
+        "real": {
+          "1": 10,
+          "2": 74,
+          "X": 16
         }
       },
       "recommended": "2"
@@ -263,21 +311,25 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "JUEVES, 18:45",
-      "comment": "",
+      "comment": "Otra prueba de nivel para la Real Sociedad, que en Europa ha sumado cuatro de seis puntos en sus dos últimas salidas y ha dejado atrás la derrota inicial aquí ante el Bournemouth inglés. Por tanto, será el segundo duelo en San Sebastián y llega después de perder el derbi vasco este domingo en San Mamés. El rival será el Lyon, un equipo de dos caras, pues se crece en casa (imbatido en liga, con cuatro triunfos seguidos, y en cita continental, ganador ante el Crystal Palace), pero baja prestaciones fuera. En la última jornada, de hecho, cayó goleado en su visita al Hoffenheim alemán. Por las mejores sensaciones realistas, el choque se decanta de su lado.",
       "percentages": {
         "quinielista": {
-          "1": 43,
-          "2": 40,
-          "X": 17
+          "1": 57,
+          "2": 19,
+          "X": 24
         },
-        "lae": null,
+        "lae": {
+          "1": 51,
+          "2": 16,
+          "X": 33
+        },
         "real": {
-          "1": 49,
-          "2": 26,
-          "X": 25
+          "1": 51,
+          "2": 25,
+          "X": 24
         }
       },
-      "recommended": "1"
+      "recommended": "1X"
     },
     {
       "num": 13,
@@ -289,14 +341,18 @@
       "comment": "El Celta perdió en Vallecas este pasado sábado y vuelve a las andadas. Después de siete jornadas sin perder en liga, cinco de ellas saldadas con empate, frena una buena racha que incluía su primera victoria europea. Y muy meritoria en feudo del Celtic escocés (1-2). Antes, dos derrotas que evidencias las fragilidades atrás que no debe conceder ante un Royale Union belga que sigue imbatido. Siete puntos de nueve, con un empate ante la Real Sociedad que certifica el buen nivel que puede dar, como ya advierte su única salida, resuelta con goleada en Plzen (0-3). Por nivel global de plantel y recursos, el cuadro gallego parte con ventaja. Jugar en Vigo debería decantar la balanza.",
       "percentages": {
         "quinielista": {
-          "1": 57,
-          "2": 28,
-          "X": 15
+          "1": 51,
+          "2": 25,
+          "X": 24
         },
-        "lae": null,
-        "real": {
+        "lae": {
           "1": 46,
-          "2": 28,
+          "2": 27,
+          "X": 27
+        },
+        "real": {
+          "1": 43,
+          "2": 31,
           "X": 26
         }
       },
@@ -309,21 +365,25 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "JUEVES, 21:00",
-      "comment": "",
+      "comment": "El Getafe remontó contra el Sevilla este mismo domingo y dejó atrás la primera crisis de la temporada. Una racha de cinco partidos sin ganar, pero lo preocupante, las dos últimas derrotas. Ambas por goleada, en que el equipo perdió la identidad y mostró muchas fragilidades atrás, impropias de un bloque de Bordalás, que se quejó del trabajo de la directiva en la confección de la plantilla. Ahora vuelve a Europa y se prueba con el Brighton, revelación de la Premier, donde está tercero después de ganar en feudo del City. En la competición continental, goleó en casa y empató en su visita al Jablonec checo. Si se puede, para cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 15,
-          "2": 69,
-          "X": 16
+          "1": 14,
+          "2": 63,
+          "X": 23
         },
-        "lae": null,
+        "lae": {
+          "1": 20,
+          "2": 53,
+          "X": 27
+        },
         "real": {
-          "1": 19,
-          "2": 56,
-          "X": 25
+          "1": 16,
+          "2": 60,
+          "X": 24
         }
       },
-      "recommended": "2"
+      "recommended": "1X2"
     },
     {
       "num": 15,
@@ -335,15 +395,19 @@
       "comment": "Un gran partido en el Metropolitano entre dos equipos fuera del top-8 porque han perdido más puntos de los previstos. Especialmente el Bayern, que sigue sin perder, pero ha cedido dos empates seguidos. Uno de ellos, en su única salida, al Viking noruego. En tres jornadas, media de cinco goles. El Atlético, mientras, sigue en plena lucha por el liderato de la liga, pero en Champions ha sacado un punto en dos viajes, aunque ganó aquí al United. Un 2-0 que no refleja las llegadas que también protagonizó el cuadro inglés. Un duelo con protagonismo de las áreas que puede beneficiar la calidad ofensiva de ambos equipos. El once teutón, sin el sancionado Olise. El último antecedente aquí, hace seis años en fase de grupos: 1-1.",
       "percentages": {
         "quinielista": {
-          "1": 0,
-          "2": 37,
-          "X": 60
+          "1": 12,
+          "2": 38,
+          "X": 43
         },
-        "lae": null,
+        "lae": {
+          "1": 7,
+          "2": 37,
+          "X": 48
+        },
         "real": {
-          "1": 28,
+          "1": 27,
           "2": 23,
-          "X": 36
+          "X": 35
         }
       },
       "recommended": "1-2"
@@ -459,6 +523,19 @@
       },
       {
         "pos": 8,
+        "team": "Osasuna",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/13.png?width=44&amp;height=44",
+        "pts": 14,
+        "pj": 11,
+        "pg": 4,
+        "pe": 2,
+        "pp": 5,
+        "gf": 11,
+        "gc": 20,
+        "dif": -9
+      },
+      {
+        "pos": 9,
         "team": "Villarreal",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/19.png?width=44&amp;height=44",
         "pts": 12,
@@ -471,7 +548,7 @@
         "dif": 0
       },
       {
-        "pos": 9,
+        "pos": 10,
         "team": "Celta",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/6.png?width=44&amp;height=44",
         "pts": 12,
@@ -484,7 +561,7 @@
         "dif": 0
       },
       {
-        "pos": 10,
+        "pos": 11,
         "team": "Alavés",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/4.png?width=44&amp;height=44",
         "pts": 12,
@@ -497,7 +574,7 @@
         "dif": -2
       },
       {
-        "pos": 11,
+        "pos": 12,
         "team": "Rayo",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/2.png?width=44&amp;height=44",
         "pts": 12,
@@ -510,7 +587,7 @@
         "dif": -5
       },
       {
-        "pos": 12,
+        "pos": 13,
         "team": "Getafe",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/172.png?width=44&amp;height=44",
         "pts": 12,
@@ -523,20 +600,20 @@
         "dif": -8
       },
       {
-        "pos": 13,
+        "pos": 14,
         "team": "Deportivo",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/7.png?width=44&amp;height=44",
         "pts": 11,
-        "pj": 10,
+        "pj": 11,
         "pg": 2,
         "pe": 5,
-        "pp": 3,
+        "pp": 4,
         "gf": 13,
-        "gc": 13,
-        "dif": 0
+        "gc": 14,
+        "dif": -1
       },
       {
-        "pos": 14,
+        "pos": 15,
         "team": "Espanyol",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/8.png?width=44&amp;height=44",
         "pts": 11,
@@ -547,19 +624,6 @@
         "gf": 13,
         "gc": 14,
         "dif": -1
-      },
-      {
-        "pos": 15,
-        "team": "Osasuna",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/13.png?width=44&amp;height=44",
-        "pts": 11,
-        "pj": 10,
-        "pg": 3,
-        "pe": 2,
-        "pp": 5,
-        "gf": 10,
-        "gc": 20,
-        "dif": -10
       },
       {
         "pos": 16,
@@ -723,10 +787,10 @@
         "pos": 8,
         "team": "Mallorca",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/11.png?width=44&amp;height=44",
-        "pts": 19,
-        "pj": 11,
+        "pts": 20,
+        "pj": 12,
         "pg": 5,
-        "pe": 4,
+        "pe": 5,
         "pp": 2,
         "gf": 13,
         "gc": 6,
@@ -737,13 +801,13 @@
         "team": "Oviedo",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/14.png?width=44&amp;height=44",
         "pts": 18,
-        "pj": 11,
+        "pj": 12,
         "pg": 5,
         "pe": 3,
-        "pp": 3,
-        "gf": 15,
-        "gc": 12,
-        "dif": 3
+        "pp": 4,
+        "gf": 17,
+        "gc": 15,
+        "dif": 2
       },
       {
         "pos": 10,
@@ -760,6 +824,19 @@
       },
       {
         "pos": 11,
+        "team": "Las Palmas",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/9.png?width=44&amp;height=44",
+        "pts": 17,
+        "pj": 12,
+        "pg": 5,
+        "pe": 2,
+        "pp": 5,
+        "gf": 17,
+        "gc": 21,
+        "dif": -4
+      },
+      {
+        "pos": 12,
         "team": "Córdoba",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/342.png?width=44&amp;height=44",
         "pts": 16,
@@ -772,7 +849,20 @@
         "dif": -3
       },
       {
-        "pos": 12,
+        "pos": 13,
+        "team": "Real Valladolid",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/18.png?width=44&amp;height=44",
+        "pts": 15,
+        "pj": 12,
+        "pg": 4,
+        "pe": 3,
+        "pp": 5,
+        "gf": 20,
+        "gc": 19,
+        "dif": 1
+      },
+      {
+        "pos": 14,
         "team": "Tenerife",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/162.png?width=44&amp;height=44",
         "pts": 14,
@@ -785,7 +875,7 @@
         "dif": -2
       },
       {
-        "pos": 13,
+        "pos": 15,
         "team": "Eldense",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/672.png?width=44&amp;height=44",
         "pts": 14,
@@ -798,20 +888,7 @@
         "dif": -4
       },
       {
-        "pos": 14,
-        "team": "Las Palmas",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/9.png?width=44&amp;height=44",
-        "pts": 14,
-        "pj": 11,
-        "pg": 4,
-        "pe": 2,
-        "pp": 5,
-        "gf": 14,
-        "gc": 19,
-        "dif": -5
-      },
-      {
-        "pos": 15,
+        "pos": 16,
         "team": "Celta Fortuna",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/688323abe51b982.png?width=44&amp;height=44",
         "pts": 13,
@@ -824,33 +901,33 @@
         "dif": -5
       },
       {
-        "pos": 16,
-        "team": "Real Valladolid",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/18.png?width=44&amp;height=44",
-        "pts": 12,
-        "pj": 11,
-        "pg": 3,
-        "pe": 3,
-        "pp": 5,
-        "gf": 16,
-        "gc": 16,
-        "dif": 0
-      },
-      {
         "pos": 17,
         "team": "Leganés",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/132.png?width=44&amp;height=44",
         "pts": 12,
-        "pj": 11,
+        "pj": 12,
         "pg": 3,
         "pe": 3,
-        "pp": 5,
-        "gf": 7,
-        "gc": 16,
-        "dif": -9
+        "pp": 6,
+        "gf": 10,
+        "gc": 20,
+        "dif": -10
       },
       {
         "pos": 18,
+        "team": "Cádiz",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/91.png?width=44&amp;height=44",
+        "pts": 11,
+        "pj": 12,
+        "pg": 2,
+        "pe": 5,
+        "pp": 5,
+        "gf": 14,
+        "gc": 14,
+        "dif": 0
+      },
+      {
+        "pos": 19,
         "team": "R. Sociedad B",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/318.png?width=44&amp;height=44",
         "pts": 11,
@@ -861,19 +938,6 @@
         "gf": 15,
         "gc": 22,
         "dif": -7
-      },
-      {
-        "pos": 19,
-        "team": "Cádiz",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/91.png?width=44&amp;height=44",
-        "pts": 10,
-        "pj": 11,
-        "pg": 2,
-        "pe": 4,
-        "pp": 5,
-        "gf": 14,
-        "gc": 14,
-        "dif": 0
       },
       {
         "pos": 20,
