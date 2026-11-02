@@ -562,6 +562,44 @@
             box-shadow: inset 0 0 0 1.5px rgba(147, 51, 234, 0.5) !important;
         }
 
+        /* Celda del socio sellador oficial de la jornada */
+        .sealer-cell-highlight {
+            background: rgba(244, 63, 94, 0.12) !important;
+            box-shadow: inset 0 0 14px rgba(244, 63, 94, 0.18) !important;
+        }
+        .light-theme .sealer-cell-highlight {
+            background: rgba(244, 63, 94, 0.08) !important;
+            box-shadow: inset 0 0 10px rgba(244, 63, 94, 0.12) !important;
+        }
+        .sealer-cell-highlight:hover {
+            background: rgba(244, 63, 94, 0.22) !important;
+            box-shadow: inset 0 0 0 1.5px rgba(244, 63, 94, 0.6) !important;
+        }
+        .light-theme .sealer-cell-highlight:hover {
+            background: rgba(244, 63, 94, 0.15) !important;
+            box-shadow: inset 0 0 0 1.5px rgba(244, 63, 94, 0.5) !important;
+        }
+
+        .forecast-badge-sealer {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            line-height: 1;
+            filter: drop-shadow(0 1px 2px rgba(244, 63, 94, 0.5));
+        }
+
+        .summary-sealer-badge {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.35);
+        }
+        .light-theme .summary-sealer-badge {
+            background: #ffe4e6 !important;
+            color: #e11d48 !important;
+            border: 1px solid #fda4af !important;
+        }
+
         #forecast-summary-table tbody tr:hover td:not(.summary-sticky-col) {
             background: rgba(30, 41, 59, 0.35) !important;
         }
@@ -1697,6 +1735,7 @@
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-green"></span> Completo</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-yellow"></span> Dobles</span>
                     <span class="flex items-center gap-1"><span class="led-status-indicator led-red"></span> Pendiente</span>
+                    <span class="flex items-center gap-1 text-rose-500 dark:text-rose-400 font-bold ml-1" title="Socio que selló la quiniela oficial"><span>✍️</span> Sellador</span>
                 </div>
             </div>
 
@@ -2147,6 +2186,7 @@
     <script src="js/dice-service.js"></script>
     
     <!-- Script de Pronósticos V1 -->
+    <script src="js/bote-engine.js"></script>
     <script src="js/pronosticos.js?v=20240323_v3"></script>
 
     <!-- =====================================================================
@@ -2645,6 +2685,26 @@
                 }
             };
 
+            // Helper para obtener el sellador oficial de la jornada
+            PM.prototype.getSealerForJornada = function(jornada) {
+                if (!jornada) return null;
+                if (typeof BoteEngine !== 'undefined') {
+                    if (!this._boteEngine) {
+                        this._boteEngine = new BoteEngine({ temporadaActual: '2026-2027' });
+                    }
+                    return this._boteEngine.getSealerForJornada(jornada, this.members, this.jornadas, this.pronosticos);
+                }
+                if (jornada.sustitutoSellado) {
+                    const mem = (this.members || []).find(m => String(m.id) === String(jornada.sustitutoSellado));
+                    return { id: String(jornada.sustitutoSellado), name: mem ? (mem.name || mem.phone) : 'Sustituto', isSustituto: true };
+                }
+                if (jornada.sealerId) {
+                    const mem = (this.members || []).find(m => String(m.id) === String(jornada.sealerId));
+                    return { id: String(jornada.sealerId), name: mem ? (mem.name || mem.phone) : (jornada.sealerName || 'Sellador'), isSustituto: false };
+                }
+                return null;
+            };
+
             // B. Interceptar renderSummaryTable: vertical compacto, sin cajas/recuadros, estilo Bote y P15 condicional
             PM.prototype.renderSummaryTable = function() {
                 if (!this.summaryTable) return;
@@ -2845,6 +2905,14 @@
                     const hasPig15 = window.isJornadaP15Required(j);
                     const hasPigAnywhere = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
 
+                    const sealer = (typeof this.getSealerForJornada === 'function') ? this.getSealerForJornada(j) : null;
+                    const sealerBadgeHtml = sealer ? `
+                        <div class="summary-sealer-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold truncate max-w-[120px] mt-0.5" title="Selló la Jornada ${j.number}: ${sealer.name}${sealer.isSustituto ? ' (Sustituto)' : ''}">
+                            <span>✍️</span>
+                            <span class="truncate">${sealer.name}</span>
+                        </div>
+                    ` : '';
+
                     let rowHtml = `<tr>
                         <td class="summary-sticky-col summary-jornada-info p-2">
                             <div class="flex flex-col text-left justify-center gap-0.5">
@@ -2854,6 +2922,7 @@
                                 </div>
                                 <div class="text-[10px] text-slate-400 font-mono">${dateFormatted}</div>
                                 <div class="text-[9px] text-slate-500 font-mono">${hasPig15 ? '15 partidos' : '14 partidos'}</div>
+                                ${sealerBadgeHtml}
                             </div>
                         </td>
                     `;
@@ -2873,6 +2942,8 @@
 
                         const cellLed = this.getMemberStatusLed(m.id, j, jEligibleMembers);
                         const isCellDoubles = jEligibleMembers.some(em => String(em.id) === String(m.id));
+                        const isCellSealer = sealer && String(sealer.id) === String(m.id);
+                        const sealerBadge = isCellSealer ? `<span class="forecast-badge-sealer" title="Selló la quiniela de la Jornada ${j.number}${sealer.isSustituto ? ' (Sustituto)' : ''}">✍️</span>` : '';
                         let cellContent = '';
 
                         // Helper para colorear un signo individual con span
@@ -2927,7 +2998,7 @@
 
                             cellContent = `
                                 <div class="forecast-h-cell">
-                                    <div class="forecast-h-badges">${diceBadge}${lateBadge}${doubleStar}${ledBadge}${statsBadgesHtml}</div>
+                                    <div class="forecast-h-badges">${diceBadge}${lateBadge}${doubleStar}${sealerBadge}${ledBadge}${statsBadgesHtml}</div>
                                     <div class="forecast-h-block">${b1}</div>
                                     <div class="forecast-h-sep"></div>
                                     <div class="forecast-h-block">${b2}</div>
@@ -2943,7 +3014,7 @@
                             // En vacío siempre mostramos el LED (siempre será rojo o amarillo)
                             cellContent = `
                                 <div class="forecast-h-cell opacity-40">
-                                    <div class="forecast-h-badges"><span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span>${doubleStar}</div>
+                                    <div class="forecast-h-badges"><span class="led-status-indicator led-${cellLed.status}" title="${cellLed.title}"></span>${doubleStar}${sealerBadge}</div>
                                     <div class="forecast-h-block forecast-h-empty">----</div>
                                     <div class="forecast-h-sep"></div>
                                     <div class="forecast-h-block forecast-h-empty">----</div>
@@ -2955,10 +3026,15 @@
                             `;
                         }
 
-                        const doubleCellClass = isCellDoubles ? 'doubles-cell-highlight' : '';
-                        const doubleCellTitle = isCellDoubles ? ` (Responsable de Dobles J${j.number})` : '';
+                        let cellHighlightClass = '';
+                        if (isCellDoubles) cellHighlightClass += ' doubles-cell-highlight';
+                        if (isCellSealer) cellHighlightClass += ' sealer-cell-highlight';
 
-                        rowHtml += `<td class="summary-cell ${doubleCellClass}" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}${doubleCellTitle}">${cellContent}</td>`;
+                        let cellTitleExtra = '';
+                        if (isCellDoubles) cellTitleExtra += ` (Responsable de Dobles J${j.number})`;
+                        if (isCellSealer) cellTitleExtra += ` (Selló la quiniela de la Jornada ${j.number}${sealer.isSustituto ? ' [Sustituto]' : ''})`;
+
+                        rowHtml += `<td class="summary-cell${cellHighlightClass}" onclick="window.openEditorModal(${m.id}, false, '${j.id}')" title="Abrir boleto de ${AppUtils.getMemberName(m)}${cellTitleExtra}">${cellContent}</td>`;
                     });
 
                     // Columna de Dobles para esta Jornada

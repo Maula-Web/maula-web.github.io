@@ -1812,6 +1812,25 @@ class PronosticoManager {
         });
     }
 
+    getSealerForJornada(jornada) {
+        if (!jornada) return null;
+        if (typeof BoteEngine !== 'undefined') {
+            if (!this._boteEngine) {
+                this._boteEngine = new BoteEngine({ temporadaActual: '2026-2027' });
+            }
+            return this._boteEngine.getSealerForJornada(jornada, this.members, this.jornadas, this.pronosticos);
+        }
+        if (jornada.sustitutoSellado) {
+            const mem = (this.members || []).find(m => String(m.id) === String(jornada.sustitutoSellado));
+            return { id: String(jornada.sustitutoSellado), name: mem ? (mem.name || mem.phone) : 'Sustituto', isSustituto: true };
+        }
+        if (jornada.sealerId) {
+            const mem = (this.members || []).find(m => String(m.id) === String(jornada.sealerId));
+            return { id: String(jornada.sealerId), name: mem ? (mem.name || mem.phone) : (jornada.sealerName || 'Sellador'), isSustituto: false };
+        }
+        return null;
+    }
+
     renderSummaryTable() {
         if (!this.summaryTable) return;
 
@@ -1928,10 +1947,17 @@ class PronosticoManager {
             } catch (e) { }
 
             const hasPig = (j.matches || []).some(m => m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch(m.home, m.away));
+            const sealer = (typeof this.getSealerForJornada === 'function') ? this.getSealerForJornada(j) : null;
+            const sealerBadgeHtml = sealer ? `
+                <div class="summary-sealer-badge" style="display:inline-flex; align-items:center; gap:3px; margin-top:3px; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold; white-space:nowrap;" title="Selló esta jornada: ${sealer.name}${sealer.isSustituto ? ' (Sustituto)' : ''}">
+                    <span>✍️</span> <span>${sealer.name}</span>
+                </div>` : '';
+
             let rowHtml = `<tr>
                 <td class="summary-sticky-col summary-jornada-info">
                     <div class="summary-j-num">J${j.number}${hasPig ? ' 🐷' : ''}</div>
                     <div class="summary-j-date">${dateFormatted}</div>
+                    ${sealerBadgeHtml}
                 </td>`;
 
             sortedMembers.forEach((m, index) => {
@@ -1940,8 +1966,9 @@ class PronosticoManager {
                 const p = pronosticosMap.get(`${jIdStr}_${mIdStr}`);
                 const isEven = index % 2 !== 0;
 
+                const isCellSealer = sealer && String(sealer.id) === String(m.id);
                 let cellContent = '-';
-                let cellClass = `summary-cell ${isEven ? 'col-even' : 'col-odd'} hoverable-cell`;
+                let cellClass = `summary-cell ${isEven ? 'col-even' : 'col-odd'} hoverable-cell${isCellSealer ? ' sealer-cell-highlight' : ''}`;
 
                 let isPlayed = false;
                 if (p && p.selection && Array.isArray(p.selection)) {
@@ -1968,12 +1995,14 @@ class PronosticoManager {
                     const lateClass = p.late ? ' late' : '';
                     const lateTitle = p.late ? ' (Enviado con retraso)' : '';
                     const diceBadge = p.isDice ? '<span class="sf-dice-badge" title="Relleno con Dado 🎲">🎲</span>' : '';
+                    const sealerBadge = isCellSealer ? '<span class="forecast-badge-sealer" title="Selló la quiniela de esta jornada">✍️</span>' : '';
                     const p15Badge = p15Val ? `<span class="sf-p15-badge" title="Pleno al 15: ${p15Val}">P15: ${p15Val}</span>` : '';
 
                     cellContent = `
-                        <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}${p.isDice ? ' (Relleno con Dado 🎲)' : ''} - ${cellLed.title}">
+                        <div class="summary-forecast${lateClass}" title="Pronóstico${lateTitle}${p.isDice ? ' (Relleno con Dado 🎲)' : ''}${isCellSealer ? ' (Sellador J' + j.number + ')' : ''} - ${cellLed.title}">
                             ${cellLedHtml}
                             ${diceBadge}
+                            ${sealerBadge}
                             <span class="sf-block">${b1}</span>
                             <span class="sf-sep">|</span>
                             <span class="sf-block">${b2}</span>

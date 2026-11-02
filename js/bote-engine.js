@@ -1145,6 +1145,57 @@ class BoteEngine {
         return finalLoserId;
     }
 
+    getSealerForJornada(jornada, members, jornadas, pronosticos) {
+        if (!jornada) return null;
+        if (jornada.noSellado) return null;
+
+        // 1. Sustituto explícito si existe
+        if (jornada.sustitutoSellado) {
+            const mem = (members || []).find(m => String(m.id) === String(jornada.sustitutoSellado));
+            return {
+                id: String(jornada.sustitutoSellado),
+                name: mem ? (mem.name || mem.phone) : 'Sustituto',
+                isSustituto: true
+            };
+        }
+
+        // 2. Campo explícito sealerId en la jornada
+        if (jornada.sealerId) {
+            const mem = (members || []).find(m => String(m.id) === String(jornada.sealerId));
+            return {
+                id: String(jornada.sealerId),
+                name: mem ? (mem.name || mem.phone) : (jornada.sealerName || 'Sellador'),
+                isSustituto: false
+            };
+        }
+
+        // 3. Determinar por orden cronológico (el perdedor de la jornada anterior)
+        if (jornada.number === 1) {
+            const is2026 = (this.config && this.config.temporadaActual ? this.config.temporadaActual : '').includes('2026');
+            const targetName = is2026 ? 'edu' : 'luismi';
+            const mem = (members || []).find(m => m.name && m.name.toLowerCase().includes(targetName));
+            if (mem) {
+                return { id: String(mem.id), name: mem.name || mem.phone, isSustituto: false };
+            }
+        } else if (jornada.number > 1) {
+            const sortedJornadas = [...(jornadas || [])].sort((a, b) => a.number - b.number);
+            const prevJornada = sortedJornadas.find(x => x.number === (jornada.number - 1));
+            if (prevJornada) {
+                const loserId = this.getLoserOfJornada(prevJornada, members, jornadas, pronosticos);
+                if (loserId) {
+                    const mem = (members || []).find(m => String(m.id) === String(loserId));
+                    return {
+                        id: String(loserId),
+                        name: mem ? (mem.name || mem.phone) : `Socio ${loserId}`,
+                        isSustituto: false
+                    };
+                }
+            }
+        }
+
+        return null;
+    }
+
     wasLoserOfJornada(memberId, prevJornada, members, jornadas, pronosticos) {
         const loserId = this.getLoserOfJornada(prevJornada, members, jornadas, pronosticos);
         return loserId !== null && String(loserId) === String(memberId);
