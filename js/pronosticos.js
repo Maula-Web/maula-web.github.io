@@ -1187,21 +1187,41 @@ class PronosticoManager {
     }
 
     renderHelpMarks() {
-        // Deactivated for now as per user request
         if (!this.marksPhysical || !this.marksDigital) return;
         this.marksPhysical.innerHTML = '';
         this.marksDigital.innerHTML = '';
-        return;
-        // We look for ANY member's extra forecast that has valid signs, since normally only one is filled.
-        const pExtra = (this.pronosticosExtra || []).find(p =>
-            (String(p.jId || p.jornadaId) === String(this.currentJornadaId)) &&
-            (p.selection && p.selection.some(s => s && s.trim() !== '' && s !== '-'))
-        );
 
+        // 1. Determinar la jornada objetivo: la seleccionada en la vista o la siguiente a sellar
+        let targetJ = null;
+        if (this.currentJornadaId) {
+            targetJ = (this.jornadas || []).find(j => String(j.id) === String(this.currentJornadaId) || j.number === Number(this.currentJornadaId));
+        }
+        if (!targetJ && typeof this.getNextJornadaToPlay === 'function') {
+            targetJ = this.getNextJornadaToPlay();
+        }
+        if (!targetJ && this.jornadas && this.jornadas.length > 0) {
+            targetJ = this.jornadas[0];
+        }
+
+        const targetJId = targetJ ? String(targetJ.id) : String(this.currentJornadaId || '');
+        const targetJNum = targetJ ? String(targetJ.number) : '';
+
+        // 2. Buscar si hay quiniela de dobles guardada y con signos para esta jornada
+        const pExtra = (this.pronosticosExtra || []).find(p => {
+            if (!p) return false;
+            const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+            const matchesJ = (pJ === targetJId) || (targetJNum !== '' && pJ === targetJNum);
+            const hasSigns = p.selection && Array.isArray(p.selection) && p.selection.some(s => s && String(s).trim() !== '' && String(s) !== '-');
+            return matchesJ && hasSigns;
+        });
+
+        const tagPhys = document.getElementById('help-physical-tag');
+        const tagDig = document.getElementById('help-digital-tag');
+
+        // Si aún no se ha rellenado, aparece únicamente el boleto en blanco como ocurre ahora
         if (!pExtra || !pExtra.selection) {
-            const msg = '<div style="position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); color:white; background:rgba(0,0,0,0.85); padding:30px; border-radius:15px; font-size:1.2rem; text-align:center; width:80%; box-shadow:0 15px 40px rgba(0,0,0,0.5); z-index:1000; border:2px solid #00e5ff;">⚠️ No se han encontrado dobles guardados para la Jornada ' + this.currentJornadaId + '.<br><br><span style="font-size:0.9rem; opacity:0.8;">Asegúrate de que alguien haya rellenado y guardado la quiniela de dobles primero.</span></div>';
-            this.marksPhysical.innerHTML = msg;
-            this.marksDigital.innerHTML = msg;
+            if (tagPhys) tagPhys.textContent = targetJ ? `(J.${targetJ.number} · Sin dobles aún)` : '';
+            if (tagDig) tagDig.textContent = targetJ ? `(J.${targetJ.number} · Sin dobles aún)` : '';
             return;
         }
 
@@ -1209,8 +1229,16 @@ class PronosticoManager {
         let doublesCount = 0;
         let doubleIndices = [];
 
+        // Obtener autor de la quiniela de dobles si está disponible
+        let authorMem = this.members ? this.members.find(m => String(m.id) === String(pExtra.mId || pExtra.memberId)) : null;
+        if (!authorMem && typeof window.getEligibleDoublesMembers === 'function' && targetJ) {
+            const eligibles = window.getEligibleDoublesMembers(targetJ);
+            if (eligibles && eligibles.length > 0) authorMem = eligibles[0];
+        }
+        const authorName = authorMem ? (typeof AppUtils !== 'undefined' ? AppUtils.getMemberName(authorMem).split(' ')[0] : authorMem.name) : '';
+
         // ---------------------------------------------------------
-        // 1. PHYSICAL GRID (Basado en Excel A1:AG33 = 33x33 celdas)
+        // 1. BOLETO FÍSICO (Matriz de reducción)
         // ---------------------------------------------------------
         const gC = 33;
         const gP = (c) => ((c - 0.5) / gC) * 100;
@@ -1226,16 +1254,17 @@ class PronosticoManager {
             if (idx === 14) return;
             const rE = 2 + (idx * 2);
             const y = gP(rE);
-            if (sign.includes('1')) this.drawX(this.marksPhysical, phys.c1, y);
-            if (sign.includes('X')) this.drawX(this.marksPhysical, phys.cX, y);
-            if (sign.includes('2')) this.drawX(this.marksPhysical, phys.c2, y);
-            if (sign.length === 2) {
+            const sUpper = String(sign || '').toUpperCase();
+            if (sUpper.includes('1')) this.drawX(this.marksPhysical, phys.c1, y);
+            if (sUpper.includes('X')) this.drawX(this.marksPhysical, phys.cX, y);
+            if (sUpper.includes('2')) this.drawX(this.marksPhysical, phys.c2, y);
+            if (sUpper.length >= 2) {
                 doublesCount++;
                 doubleIndices.push(idx + 1);
             }
         });
 
-        const p15Val = sel[14] || '';
+        const p15Val = String(sel[14] || '').toUpperCase();
         if (p15Val.includes('-')) {
             const [h, a] = p15Val.split('-');
             if (phys.p15Cols[h]) this.drawX(this.marksPhysical, phys.p15Cols[h], phys.r15E1);
@@ -1245,6 +1274,9 @@ class PronosticoManager {
         if (doublesCount === 7) {
             this.drawX(this.marksPhysical, phys.cP, gP(14)); // P14 (7 dobles)
             this.drawX(this.marksPhysical, gP(26.8), gP(14.8)); // Casilla Reducción
+        } else if (doublesCount > 0) {
+            const multRow = doublesCount * 2;
+            if (multRow <= 32) this.drawX(this.marksPhysical, phys.cP, gP(multRow));
         }
 
         doubleIndices.forEach(idx => {
@@ -1253,19 +1285,25 @@ class PronosticoManager {
         });
 
         // ---------------------------------------------------------
-        // 2. DIGITAL GRID
+        // 2. INTERFAZ DIGITAL WEB
         // ---------------------------------------------------------
         const dig = { startY: 23.5, stepY: 4.02, c1: 60.5, cX: 62.1, c2: 63.7, sX: 72.2 };
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
             const y = dig.startY + (idx * dig.stepY);
-            if (sign.includes('1')) this.drawX(this.marksDigital, dig.c1, y);
-            if (sign.includes('X')) this.drawX(this.marksDigital, dig.cX, y);
-            if (sign.includes('2')) this.drawX(this.marksDigital, dig.c2, y);
-            if (sign.length === 2) this.drawX(this.marksDigital, dig.sX, y);
+            const sUpper = String(sign || '').toUpperCase();
+            if (sUpper.includes('1')) this.drawX(this.marksDigital, dig.c1, y);
+            if (sUpper.includes('X')) this.drawX(this.marksDigital, dig.cX, y);
+            if (sUpper.includes('2')) this.drawX(this.marksDigital, dig.c2, y);
+            if (sUpper.length >= 2) this.drawX(this.marksDigital, dig.sX, y);
         });
 
-        this.marksDigital.innerHTML += '<div style="position:absolute; top:20px; right:20px; background:rgba(0, 71, 161, 0.95); color:white; padding:10px 20px; border-radius:30px; font-size:1rem; font-weight:900; box-shadow:0 8px 20px rgba(0,0,0,0.4); z-index:1000; border:2px solid #00e5ff;">GUÍA: ' + doublesCount + ' DOBLES</div>';
+        const guideText = 'J.' + (targetJ ? targetJ.number : '') + ' · ' + doublesCount + ' DOBLES' + (authorName ? ' (' + authorName + ')' : '');
+        this.marksPhysical.innerHTML += '<div style="position:absolute; top:12px; right:12px; background:rgba(2, 132, 199, 0.95); color:white; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:100; border:1px solid #38bdf8; font-family:sans-serif;">' + guideText + '</div>';
+        this.marksDigital.innerHTML += '<div style="position:absolute; top:12px; right:12px; background:rgba(2, 132, 199, 0.95); color:white; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:100; border:1px solid #38bdf8; font-family:sans-serif;">' + guideText + '</div>';
+
+        if (tagPhys) tagPhys.textContent = guideText;
+        if (tagDig) tagDig.textContent = guideText;
     }
 
     drawX(container, xPct, yPct) {

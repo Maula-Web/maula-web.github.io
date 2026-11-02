@@ -600,6 +600,38 @@
             border: 1px solid #fda4af !important;
         }
 
+        /* Marcas X sobre el boleto en Ayuda de Sellado */
+        .help-mark-x {
+            position: absolute;
+            color: #00e5ff;
+            font-weight: 1000;
+            font-size: 11px;
+            width: 15px;
+            height: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            line-height: 1;
+            z-index: 50;
+            background: rgba(0, 71, 161, 0.65);
+            border: 1.5px solid #00e5ff;
+            border-radius: 3px;
+            box-shadow: 0 0 6px rgba(0, 229, 255, 0.7);
+            font-family: monospace;
+            text-shadow: 0 0 2px #000;
+        }
+
+        @media (max-width: 768px) {
+            .help-mark-x {
+                font-size: 8px;
+                width: 11px;
+                height: 11px;
+                border-width: 1px;
+            }
+        }
+
         #forecast-summary-table tbody tr:hover td:not(.summary-sticky-col) {
             background: rgba(30, 41, 59, 0.35) !important;
         }
@@ -2114,7 +2146,10 @@
             <div id="help-container" class="flex-1 overflow-y-auto custom-scroll p-4 flex flex-col lg:flex-row gap-6">
                 <!-- Físico -->
                 <div id="help-physical-section" class="flex-1 bg-white dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <h4 class="text-blue-600 dark:text-blue-400 font-black mb-3 border-b border-slate-200 dark:border-slate-700/50 pb-2 text-sm">📌 Boleto Oficial Físico</h4>
+                    <h4 class="text-blue-600 dark:text-blue-400 font-black mb-3 border-b border-slate-200 dark:border-slate-700/50 pb-2 text-sm flex items-center justify-between">
+                        <span>📌 Boleto Oficial Físico</span>
+                        <span id="help-physical-tag" class="text-xs font-mono font-bold text-amber-500"></span>
+                    </h4>
                     <div class="relative rounded-xl overflow-hidden border border-slate-300 dark:border-slate-700 shadow-lg mb-4">
                         <img src="IMAGENES/reducidas.png" class="w-full h-auto">
                         <div id="marks-physical" class="absolute inset-0 pointer-events-none"></div>
@@ -2131,7 +2166,10 @@
                 </div>
                 <!-- Digital -->
                 <div id="help-digital-section" class="flex-1 bg-white dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <h4 class="text-emerald-600 dark:text-emerald-400 font-black mb-3 border-b border-slate-200 dark:border-slate-700/50 pb-2 text-sm">💻 Interfaz Digital Web</h4>
+                    <h4 class="text-emerald-600 dark:text-emerald-400 font-black mb-3 border-b border-slate-200 dark:border-slate-700/50 pb-2 text-sm flex items-center justify-between">
+                        <span>💻 Interfaz Digital Web</span>
+                        <span id="help-digital-tag" class="text-xs font-mono font-bold text-emerald-500 dark:text-emerald-400"></span>
+                    </h4>
                     <div class="relative rounded-xl overflow-hidden border border-slate-300 dark:border-slate-700 shadow-lg mb-4">
                         <img src="IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg" class="w-full h-auto">
                         <div id="marks-digital" class="absolute inset-0 pointer-events-none"></div>
