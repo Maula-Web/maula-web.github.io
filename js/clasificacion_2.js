@@ -2097,13 +2097,16 @@
 
                     if (j.isInPlay) {
                         const ch = s.rankChange || 0;
+                        const absCh = Math.abs(ch);
+                        const puestosTexto = absCh === 1 ? '1 puesto' : `${absCh} puestos`;
+                        const newRankText = s.liveRank ? `#${s.liveRank}` : '';
                         let effectHtml = '';
                         if (ch > 0) {
-                            effectHtml = `<span class="text-emerald-500 font-black">Sube ${ch} puestos (↑+${ch})</span>`;
+                            effectHtml = `<span class="text-emerald-500 font-black">Sube ${puestosTexto} (${newRankText})</span>`;
                         } else if (ch < 0) {
-                            effectHtml = `<span class="text-rose-500 font-black">Baja ${Math.abs(ch)} puestos (↓${ch})</span>`;
+                            effectHtml = `<span class="text-rose-500 font-black">Baja ${puestosTexto} (${newRankText})</span>`;
                         } else {
-                            effectHtml = `<span class="text-blue-500 dark:text-blue-400 font-black">Mantiene puesto (=)</span>`;
+                            effectHtml = `<span class="text-blue-500 dark:text-blue-400 font-black">Mantiene puesto (${newRankText})</span>`;
                         }
 
                         return {
