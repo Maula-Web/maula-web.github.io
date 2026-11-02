@@ -25,25 +25,25 @@
       "num": 4,
       "home": "Barcelona (m)",
       "away": "Alavés (m)",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 5,
       "home": "Getafe (m)",
       "away": "Sevilla (m)",
-      "result": ""
+      "result": "1"
     },
     {
       "num": 6,
       "home": "Racing Santander (m)",
       "away": "Real Madrid (m)",
-      "result": ""
+      "result": "2"
     },
     {
       "num": 7,
       "home": "Elche (m)",
       "away": "Valencia (m)",
-      "result": ""
+      "result": "2"
     },
     {
       "num": 8,
@@ -55,19 +55,19 @@
       "num": 9,
       "home": "Eldense (m)",
       "away": "Granada (m)",
-      "result": ""
+      "result": "2"
     },
     {
       "num": 10,
       "home": "Burgos (m)",
       "away": "Castellón (m)",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 11,
       "home": "Alavés (f)",
       "away": "Real Sociedad (f)",
-      "result": ""
+      "result": "X"
     },
     {
       "num": 12,
@@ -79,7 +79,7 @@
       "num": 13,
       "home": "Sevilla (f)",
       "away": "Real Madrid (f)",
-      "result": ""
+      "result": "2"
     },
     {
       "num": 14,
@@ -91,7 +91,7 @@
       "num": 15,
       "home": "Athletic Club (m)",
       "away": "Real Sociedad (m)",
-      "result": ""
+      "result": "2-1"
     }
   ],
   "prizes": {
