@@ -3222,7 +3222,7 @@ class BoteAppController {
         // Matriz oficial de reducción autorizada de 7 dobles (R2 - 16 apuestas) o directa para N dobles
         let matrix = (window.ScoringSystem && window.ScoringSystem.reducciones && window.ScoringSystem.reducciones['R2']) || [];
         if (multiIndices.length !== 7 && multiIndices.length > 0) {
-            const numCombs = Math.min(16, Math.pow(2, multiIndices.length));
+            const numCombs = Math.min(64, Math.pow(2, multiIndices.length));
             matrix = [];
             for (let i = 0; i < numCombs; i++) {
                 const row = [];
@@ -3350,7 +3350,7 @@ class BoteAppController {
             <!-- Tarjeta explicativa de la reducción (Formato Superávit Peña) -->
             <div class="p-3.5 bg-slate-900/95 border border-purple-500/40 text-slate-300 rounded-xl shadow-2xl text-xs space-y-1">
                 <strong class="text-purple-300 block font-bold flex items-center gap-1.5">
-                    <span>🟣</span> ¿Cómo funciona la Reducción Autorizada R2 (7 dobles - 16 apuestas)?
+                    <span>🟣</span> ${multiIndices.length === 7 && targetData.isReduced ? "¿Cómo funciona la Reducción Autorizada R2 (7 dobles - 16 apuestas)?" : `Quiniela Múltiple Directa (${multiIndices.length} dobles - ${matrix.length} apuestas)`}
                 </strong>
                 <p class="leading-relaxed">
                     La quiniela base pronosticada por <strong>${targetData.memberName}</strong> contiene 7 dobles (que al directo serían 128 apuestas = 96,00 €). El método oficial de reducción autorizada de LAE optimiza la jugada en exactamente <strong>16 apuestas estratégicas (coste ${cDob.toSpanishFormat()} € pagado al 100% por la peña)</strong> asegurando el 100% al 13 si se aciertan los 14 signos y altas garantías de 14. En la tabla se compara el <strong>pronóstico base</strong> junto a las <strong>16 apuestas</strong> generadas y el <strong>resultado oficial</strong> de cada partido.

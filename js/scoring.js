@@ -232,7 +232,67 @@ const ScoringSystem = {
             return { hits, points, bonus: points - hits, breakdown, officialHits };
         }
 
-        // 3. Normal / Direct Multiple Logic
+        // Direct Multiple (al directo con dobles / triples)
+        if (multiIndices.length > 0) {
+            const multiOptions = multiIndices.map(idx => {
+                const s = String(forecastSelection[idx] || '').trim().toUpperCase();
+                return s.split('');
+            });
+            const totalCombs = multiOptions.reduce((acc, curr) => acc * curr.length, 1);
+            if (totalCombs <= 2048) {
+                const betsData = [];
+                for (let i = 0; i < totalCombs; i++) {
+                    let temp = i;
+                    const chosen = [];
+                    for (let m = 0; m < multiOptions.length; m++) {
+                        const len = multiOptions[m].length;
+                        chosen.push(multiOptions[m][temp % len]);
+                        temp = Math.floor(temp / len);
+                    }
+
+                    let regHits = 0;
+                    let p15Hit = false;
+
+                    forecastSelection.forEach((sel, idx) => {
+                        if (idx >= 15) return;
+                        const res = officialResults[idx];
+                        if (!res || res === '' || res.toUpperCase() === 'POR DEFINIR') return;
+
+                        const rSign = this.normalizeSign(res);
+                        const rScore = String(res).trim().toUpperCase();
+
+                        let activeSign = sel;
+                        if (multiIndices.includes(idx)) {
+                            const mPos = multiIndices.indexOf(idx);
+                            activeSign = chosen[mPos];
+                        }
+
+                        if (idx < 14) {
+                            if (activeSign.includes(rSign)) regHits++;
+                        } else if (idx === 14) {
+                            p15Hit = (rScore === activeSign) || (rSign === activeSign);
+                        }
+                    });
+
+                    const totalRaw = regHits; // El partido 15 nunca suma aciertos
+                    const officialCat = (regHits === 14 && p15Hit) ? 15 : regHits;
+                    betsData.push({ totalRaw, officialCat });
+                }
+
+                const hits = Math.max(...betsData.map(b => b.totalRaw));
+                const officialHits = Math.max(...betsData.map(b => b.officialCat));
+                const points = this.calculateScore(hits, targetDate);
+
+                const breakdown = { 15: 0, 14: 0, 13: 0, 12: 0, 11: 0, 10: 0 };
+                betsData.forEach(b => {
+                    if (b.officialCat >= 10) breakdown[b.officialCat]++;
+                });
+
+                return { hits, points, bonus: points - hits, breakdown, officialHits };
+            }
+        }
+
+        // 3. Normal Simple Forecast Logic (Single combination)
         let regHits = 0;
         let p15Hit = false;
         forecastSelection.forEach((sel, idx) => {

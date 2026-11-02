@@ -2429,7 +2429,7 @@ class Dashboard2AppController {
                 let actualHits = 0;
 
                 if (ev && ev.breakdown) {
-                    actualHits = ev.hits || 0;
+                    actualHits = (ev.officialHits !== undefined ? ev.officialHits : ev.hits) || 0;
                     Object.keys(ev.breakdown).forEach(h => {
                         const count = ev.breakdown[h];
                         let pVal = prizesMap[h] || prizesMap[String(h)] || 0;

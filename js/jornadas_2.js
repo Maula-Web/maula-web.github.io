@@ -1248,7 +1248,8 @@ class Jornadas2AppController {
                         if (typeof pVal === 'string') pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
                         if (count > 0 && pVal > 0) {
                             totalPrizeMoney += count * pVal;
-                            winnerNames.push(`Dobles Peña (${h} aciertos: ${this.formatMoney(count * pVal)})`);
+                            const countLabel = count > 1 ? `${count}x ${h} aciertos` : `${h} aciertos`;
+                            winnerNames.push(`Dobles Peña (${countLabel}: ${this.formatMoney(count * pVal)})`);
                         }
                     });
                 } else if (ev) {
@@ -1462,7 +1463,8 @@ class Jornadas2AppController {
                     const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
                     const ev = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced }) : null;
                     if (ev && ev.breakdown && ev.breakdown[cat.key] > 0) {
-                        winners.push(`Columna Dobles (${ev.breakdown[cat.key]}x)`);
+                        const cnt = ev.breakdown[cat.key];
+                        winners.push(cnt > 1 ? `Columna Dobles (${cnt}x)` : 'Columna Dobles');
                     } else if (ev && !ev.breakdown) {
                         const directCat = String(ev.officialHits !== undefined ? ev.officialHits : ev.hits);
                         if (directCat === String(cat.key)) {
