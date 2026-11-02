@@ -1251,6 +1251,20 @@ class Jornadas2AppController {
                             winnerNames.push(`Dobles Peña (${h} aciertos: ${this.formatMoney(count * pVal)})`);
                         }
                     });
+                } else if (ev) {
+                    const cat = ev.officialHits !== undefined ? ev.officialHits : ev.hits;
+                    let actualMinHits = jornada.minHitsToWin || 10;
+                    if (prizesMap && Object.keys(prizesMap).length > 0) {
+                        actualMinHits = Math.min(...Object.keys(prizesMap).map(Number));
+                    }
+                    if (cat >= actualMinHits) {
+                        let pVal = prizesMap[cat] || prizesMap[String(cat)] || 0;
+                        if (typeof pVal === 'string') pVal = parseFloat(pVal.replace(',', '.').replace('€', '').trim());
+                        if (pVal > 0) {
+                            totalPrizeMoney += parseFloat(pVal);
+                            winnerNames.push(`Dobles Peña (${cat} aciertos: ${this.formatMoney(pVal)})`);
+                        }
+                    }
                 }
             });
         }
@@ -1449,6 +1463,11 @@ class Jornadas2AppController {
                     const ev = window.ScoringSystem ? window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced }) : null;
                     if (ev && ev.breakdown && ev.breakdown[cat.key] > 0) {
                         winners.push(`Columna Dobles (${ev.breakdown[cat.key]}x)`);
+                    } else if (ev && !ev.breakdown) {
+                        const directCat = String(ev.officialHits !== undefined ? ev.officialHits : ev.hits);
+                        if (directCat === String(cat.key)) {
+                            winners.push(`Columna Dobles`);
+                        }
                     }
                 });
             }

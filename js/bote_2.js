@@ -1289,6 +1289,7 @@ class BoteAppController {
 
         const jMovements = data.movements.filter(m => m.jornadaNum === jSummary.number);
         const doblesPrize = jMovements.reduce((sum, m) => sum + (m.extraPrizes || 0), 0);
+        const doblesHits = jMovements.reduce((max, m) => Math.max(max, m.extraHits || 0), 0) || (jSummary.doblesHits || 11);
         const doblesBtn = (doblesPrize > 0) ? `
             <button onclick="window.BoteApp.showReducedBreakdown('${jSummary.doblesPlayerId || jSummary.winnerId || ''}', ${jSummary.number})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold transition-all shadow-sm whitespace-nowrap" title="Ver desglose oficial de las 16 apuestas reducidas premiadas">
                 <span>📋</span> Ver Reducción Premiada (+${doblesPrize.toSpanishFormat()} €)
@@ -1624,7 +1625,7 @@ class BoteAppController {
                         <button onclick="window.BoteApp.showReducedBreakdown(null, ${jSummary.number})" class="text-[10px] text-purple-400 hover:text-purple-200 underline ml-1 whitespace-nowrap">Ver 16 apuestas</button>
                     </div>
                 </td>
-                <td class="p-2.5 sm:px-4 text-center font-bold text-purple-300 whitespace-nowrap">10 ac.</td>
+                <td class="p-2.5 sm:px-4 text-center font-bold text-purple-300 whitespace-nowrap">${doblesHits} ac.</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono text-slate-400 whitespace-nowrap">${jSummary.costeDobles.toSpanishFormat()}&nbsp;€ (Peña)</td>
                 <td class="p-2.5 sm:px-4 text-center text-slate-500 whitespace-nowrap">-</td>
                 <td class="p-2.5 sm:px-4 text-right font-mono text-slate-500 whitespace-nowrap">-</td>
@@ -1639,7 +1640,7 @@ class BoteAppController {
                                 <span>🟣</span> Premio Reducción de Dobles (+${doblesPrize.toSpanishFormat()} €)
                             </strong>
                             <p class="leading-relaxed">
-                                Premio oficial conseguido por las 16 apuestas reducidas (7 dobles) financiadas por la peña. Este importe entra directamente al fondo de la caja común.
+                                Premio oficial conseguido por la Quiniela de Dobles financiada por la peña. Este importe entra directamente al fondo de la caja común.
                             </p>
                         </div>
                     </div>
@@ -2751,18 +2752,35 @@ class BoteAppController {
         const doblesPrizes = [];
         (data.movements || []).forEach(m => {
             if ((m.extraPrizes || 0) > 0) {
-                if (!doblesPrizes.some(x => x.jornadaNum === m.jornadaNum && x.memberId === m.memberId)) {
+                if (!doblesPrizes.some(x => x.jornadaNum === m.jornadaNum)) {
+                    let authorId = m.memberId;
+                    let authorName = m.memberName;
+                    if (this.rawSeasonData && Array.isArray(this.rawSeasonData.pronosticosExtra)) {
+                        const extraDoc = this.rawSeasonData.pronosticosExtra.find(p => {
+                            const pJ = String(p.jId !== undefined && p.jId !== null ? p.jId : (p.jornadaId || ''));
+                            return pJ === String(m.jornadaId) || pJ === String(m.jornadaNum);
+                        });
+                        if (extraDoc) {
+                            const rawMid = extraDoc.mId !== undefined ? extraDoc.mId : extraDoc.memberId;
+                            if (rawMid) {
+                                authorId = rawMid;
+                                const mem = (this.rawSeasonData.members || []).find(x => String(x.id) === String(rawMid));
+                                if (mem) authorName = mem.name;
+                            }
+                        }
+                    }
+
                     doblesPrizes.push({
-                        id: `dobles_${m.jornadaNum}_${m.memberId || 'colectivo'}`,
+                        id: `dobles_${m.jornadaNum}_${authorId || 'colectivo'}`,
                         type: 'dobles',
                         typeLabel: 'Quiniela de Dobles (Peña)',
                         badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
                         jornadaNum: m.jornadaNum,
                         date: m.jornadaDate || m.date || '',
-                        memberId: m.memberId,
-                        memberName: m.memberName || 'Equipo Dobles',
+                        memberId: authorId,
+                        memberName: authorName || 'Equipo Dobles',
                         previousJornada: m.jornadaNum - 1,
-                        hits: m.extraHits || 10,
+                        hits: m.extraHits || 11,
                         amount: m.extraPrizes
                     });
                 }
@@ -3178,6 +3196,7 @@ class BoteAppController {
                         memberName: mem ? mem.name : (targetData.memberName || 'Socio'),
                         jornadaNum: liveJ.number,
                         date: liveJ.date,
+                        isReduced: liveP.isReduced || false,
                         selection: liveP.selection || liveP.forecast,
                         matches: liveJ.matches,
                         prizes: liveJ.prizes || targetData.prizes || {}
@@ -3200,8 +3219,21 @@ class BoteAppController {
             if (idx < 14 && sel && sel.length > 1) multiIndices.push(idx);
         });
 
-        // Matriz oficial de reducción autorizada de 7 dobles (R2 - 16 apuestas)
-        const matrix = (window.ScoringSystem && window.ScoringSystem.reducciones && window.ScoringSystem.reducciones['R2']) || [
+        // Matriz oficial de reducción autorizada de 7 dobles (R2 - 16 apuestas) o directa para N dobles
+        let matrix = (window.ScoringSystem && window.ScoringSystem.reducciones && window.ScoringSystem.reducciones['R2']) || [];
+        if (multiIndices.length !== 7 && multiIndices.length > 0) {
+            const numCombs = Math.min(16, Math.pow(2, multiIndices.length));
+            matrix = [];
+            for (let i = 0; i < numCombs; i++) {
+                const row = [];
+                for (let d = 0; d < multiIndices.length; d++) {
+                    const bit = (i >> (multiIndices.length - 1 - d)) & 1;
+                    row.push(bit === 0 ? '1' : 'X');
+                }
+                matrix.push(row);
+            }
+        }
+        const defaultMatrix = [
             ['1', '1', '1', '1', '1', '1', '1'],
             ['1', '1', '1', 'X', 'X', 'X', 'X'],
             ['1', 'X', 'X', '1', '1', 'X', 'X'],

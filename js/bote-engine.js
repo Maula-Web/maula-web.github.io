@@ -197,8 +197,10 @@ class BoteEngine {
                     boteAcumulado += netoForSocio;
 
                     let extraPrizes = 0;
+                    let extraHits = 0;
                     if (memberIndex === 0) {
                         extraPrizes = this.getExtraPrizesForJornada(jornada, pronosticosExtra);
+                        extraHits = this.getExtraHitsForJornada(jornada, pronosticosExtra);
                     }
 
                     movements.push({
@@ -218,6 +220,7 @@ class BoteEngine {
                         sellado: costs.sellado,
                         premios: prizes,
                         extraPrizes: extraPrizes,
+                        extraHits: extraHits,
                         ingresosManual: manualIngresos,
                         aciertos: costs.aciertos,
                         totalIngresos: (manualIngresos + prizes),
@@ -864,6 +867,37 @@ class BoteEngine {
         });
 
         return totalExtraPrize;
+    }
+
+    getExtraHitsForJornada(jornada, pronosticosExtra) {
+        if (!pronosticosExtra) return 0;
+        if (!window.ScoringSystem) return 0;
+
+        const extras = pronosticosExtra.filter(p => {
+            const pJ = String(p.jId || p.jornadaId || '');
+            return pJ === String(jornada.id) || pJ === String(jornada.number);
+        });
+        if (extras.length === 0) return 0;
+
+        const jDate = window.AppUtils ? window.AppUtils.parseDate(jornada.date) : new Date(jornada.date);
+        const officialResults = (jornada.matches || []).map(m => (m.result !== undefined ? m.result : (m.r || '')));
+
+        let maxHits = 0;
+        extras.forEach(p => {
+            const selection = p.selection || p.forecast;
+            if (!selection || !Array.isArray(selection)) return;
+
+            const doubleCount = selection.filter((s, i) => i < 14 && s && s.length > 1).length;
+            const isReduced = p.isReduced || (doubleCount === 7);
+
+            const ev = window.ScoringSystem.evaluateForecast(selection, officialResults, jDate, { isReduced });
+            if (ev) {
+                const hits = ev.officialHits !== undefined ? ev.officialHits : ev.hits;
+                if (hits > maxHits) maxHits = hits;
+            }
+        });
+
+        return maxHits;
     }
 
     getDoublesPrizeForMember(memberId, jornada, pronosticosExtra) {

@@ -629,9 +629,11 @@ class BoteManager {
 
         // Row for Extra Column (Doubles) if they have prizes
         if (extraPrizes > 0) {
+            const doblesHits = jornadaMovements.reduce((max, m) => Math.max(max, m.extraHits || 0), 0) || 11;
             html += `
                 <tr style="background: rgba(255, 145, 0, 0.1); border-top: 2px solid var(--primary-color);">
                     <td><strong>💰 Quiniela de Dobles</strong></td>
+                    <td style="font-weight:900; text-align:center;">${doblesHits}</td>
                     <td style="text-align:center;">-</td>
                     <td style="text-align:center;">-</td>
                     <td style="text-align:center;">-</td>
@@ -639,8 +641,8 @@ class BoteManager {
                     <td style="text-align:center;">-</td>
                     <td class="positive" style="font-weight:bold;">${extraPrizes.toSpanishFormat()}€</td>
                     <td style="text-align:center;">-</td>
-                    <td style="text-align:center;">-</td>
-                    <td style="text-align:center; opacity: 0.5;">-</td>
+                    <td class="positive" style="font-weight:bold;">+${extraPrizes.toSpanishFormat()}€</td>
+                    <td style="text-align:center; font-weight:bold; color: var(--primary-color);">Bote Peña</td>
                 </tr>
             `;
         }
