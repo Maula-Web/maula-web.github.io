@@ -1912,10 +1912,10 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Método de Pago</label>
-                        <select id="form-ingreso-metodo" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500">
+                        <select id="form-ingreso-metodo" onchange="window.BoteApp.handleMetodoChange(this.value)" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500">
                             <option value="bizum">📱 Bizum</option>
-                            <option value="transferencia">🏦 Transferencia</option>
                             <option value="efectivo">💵 Efectivo</option>
+                            <option value="bote">🏺 Bote</option>
                         </select>
                     </div>
                 </div>

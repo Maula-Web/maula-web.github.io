@@ -286,11 +286,12 @@ class BoteEngine {
                         });
                     }
                 } else if (event.type === 'ingreso_libre') {
-                    // Aportación manual directa al bote (sin jornada vinculada)
+                    // Aportación manual directa al bote (sin jornada vinculada) o retirada de fondos
                     const i = event.data;
                     const amount = parseFloat(i.cantidad || i.amount || 0);
                     if (amount === 0) return;
                     boteAcumulado += amount;
+                    const isBoteRetiro = (i.metodo === 'bote' && amount < 0);
                     movements.push({
                         type: 'ingreso_libre',
                         memberId: member.id,
@@ -298,13 +299,14 @@ class BoteEngine {
                         date: i.fecha || i.date,
                         jornadaNum: null,
                         jornadaDate: i.fecha || i.date,
-                        description: i.concepto || i.metodo || 'Aportación manual',
+                        description: i.concepto || (isBoteRetiro ? 'Traspaso al Bote de la Peña' : (amount < 0 ? 'Retirada de saldo' : (i.metodo || 'Aportación manual'))),
+                        metodo: i.metodo || 'bizum',
                         ingresosManual: amount,
                         totalIngresos: amount,
                         totalGastos: 0,
                         neto: amount,
                         boteAcumulado: boteAcumulado,
-                        pennaIn: 0,
+                        pennaIn: isBoteRetiro ? Math.abs(amount) : 0,
                         isIngresoLibre: true
                     });
                 }
@@ -437,14 +439,22 @@ class BoteEngine {
         const totalPenalizaciones = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? ((m.breakdown.unos || 0) + (m.breakdown.bajos || 0) + (m.breakdown.pig || 0) + (m.breakdown.maula || 0)) : 0), 0);
         const totalIngresos = memberSummaries.reduce((sum, m) => sum + m.totIn, 0);
 
+        // Traspasos entre saldo de socios y Bote Común de la Peña (método 'bote')
+        // En una retirada hacia el Bote de la Peña (importe < 0): los fondos se restan de la hucha del socio
+        // pero permanecen íntegros en la Peña, sumándose al Superávit / Bote común y sin reducir la Caja Real.
+        const traspasosBotePenna = movements
+            .filter(m => m.isIngresoLibre && m.metodo === 'bote')
+            .reduce((acc, m) => acc - (parseFloat(m.ingresosManual) || 0), 0);
+
         // REGLA OFICIAL DE LA PEÑA:
-        // Caja Real = Saldos + Premios + Cuotas + Penalizaciones - Sellados
-        const cajaRealOficial = totalSaldosVirtuales + totalPremios + totalCuotas + totalPenalizaciones - totalGastos;
+        // Caja Real = Saldos + Traspasos al Bote de la Peña + Premios + Cuotas + Penalizaciones - Sellados
+        const cajaRealOficial = totalSaldosVirtuales + traspasosBotePenna + totalPremios + totalCuotas + totalPenalizaciones - totalGastos;
         const superavitOficial = cajaRealOficial - totalSaldosVirtuales;
 
         return {
             cajaReal: cajaRealOficial,
             totalSaldosVirtuales,
+            traspasosBotePenna,
             totalIngresos,
             totalGastos,
             totalPremios,

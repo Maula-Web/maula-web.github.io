@@ -3176,3 +3176,72 @@ html.light-theme .tipo-mov-btn-inactive:hover {
     color: #0f172a !important;
     background-color: #f1f5f9 !important;
 }
+
+/* =========================================================================
+   MODAL DE INGRESO / RETIRADA Y GESTIÓN DE INGRESOS EN MODO CLARO
+   ========================================================================= */
+.light-theme #modal-ingreso .glass-panel,
+html.light-theme #modal-ingreso .glass-panel {
+    background-color: #ffffff !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15) !important;
+    color: #0f172a !important;
+}
+
+.light-theme #modal-ingreso input,
+.light-theme #modal-ingreso select,
+html.light-theme #modal-ingreso input,
+html.light-theme #modal-ingreso select {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+.light-theme #modal-ingreso input:focus,
+.light-theme #modal-ingreso select:focus,
+html.light-theme #modal-ingreso input:focus,
+html.light-theme #modal-ingreso select:focus {
+    border-color: #f97316 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2) !important;
+}
+
+.light-theme #modal-ingreso label,
+html.light-theme #modal-ingreso label {
+    color: #475569 !important;
+}
+
+.light-theme #modal-gestion-ingresos .glass-panel,
+html.light-theme #modal-gestion-ingresos .glass-panel {
+    background-color: #ffffff !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2) !important;
+    color: #0f172a !important;
+}
+
+.light-theme #modal-gestion-ingresos div[class*="bg-gradient-to-r"],
+html.light-theme #modal-gestion-ingresos div[class*="bg-gradient-to-r"] {
+    background: linear-gradient(to right, #fff7ed, #f8fafc) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.light-theme #modal-gestion-ingresos h3,
+html.light-theme #modal-gestion-ingresos h3 {
+    color: #0f172a !important;
+}
+
+.light-theme #gestion-ingresos-table thead,
+html.light-theme #gestion-ingresos-table thead {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+}
+
+.light-theme #gestion-ingresos-table tbody tr:hover,
+html.light-theme #gestion-ingresos-table tbody tr:hover {
+    background-color: #f8fafc !important;
+}
+
+.light-theme #gestion-ingresos-table td,
+html.light-theme #gestion-ingresos-table td {
+    border-color: #f1f5f9 !important;
+}

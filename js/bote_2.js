@@ -478,9 +478,16 @@ class BoteAppController {
         const totalCuotas = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? (m.breakdown.cuotas || 0) : 0), 0);
         const totalPenalizaciones = memberSummaries.reduce((sum, m) => sum + (m.breakdown ? ((m.breakdown.unos || 0) + (m.breakdown.bajos || 0) + (m.breakdown.pig || 0) + (m.breakdown.maula || 0)) : 0), 0);
 
+        // Traspasos entre saldo de socios y Bote Común de la Peña (método 'bote')
+        // En una retirada hacia el Bote de la Peña (importe < 0): los fondos se restan de la hucha del socio
+        // pero permanecen íntegros en la Peña, sumándose al Superávit / Bote común y sin reducir la Caja Real.
+        const traspasosBotePenna = movements
+            .filter(m => m.isIngresoLibre && m.metodo === 'bote')
+            .reduce((acc, m) => acc - (parseFloat(m.ingresosManual) || 0), 0);
+
         // REGLA OFICIAL DE LA PEÑA: La Caja Real es la suma de las tarjetas del balance y desglose contable
-        // (Suma saldos socios + Premios temporada + Cuotas semanales + Penalizaciones - Sellados)
-        const cajaRealOficial = totalSaldosVirtuales + totalPremios + totalCuotas + totalPenalizaciones - totalGastos;
+        // (Suma saldos socios + Traspasos al Bote de la Peña + Premios temporada + Cuotas semanales + Penalizaciones - Sellados)
+        const cajaRealOficial = totalSaldosVirtuales + traspasosBotePenna + totalPremios + totalCuotas + totalPenalizaciones - totalGastos;
         const superavitOficial = cajaRealOficial - totalSaldosVirtuales;
 
         const seasonModel = {
@@ -489,6 +496,7 @@ class BoteAppController {
             summary: {
                 cajaReal: cajaRealOficial,
                 totalSaldosVirtuales,
+                traspasosBotePenna,
                 totalIngresos,
                 totalGastos,
                 totalGastosSocios,
@@ -3536,8 +3544,16 @@ class BoteAppController {
                 <td class="p-3 text-slate-400 whitespace-nowrap">${i.fecha || 'N/A'}</td>
                 <td class="p-3 font-bold text-white">${badgeTipo}${mem ? mem.name : `Socio #${i.memberId}`}</td>
                 <td class="p-3 text-right font-mono font-bold ${cantClass} whitespace-nowrap">${cantPrefix}${numCant.toSpanishFormat()} €</td>
-                <td class="p-3 capitalize text-slate-300 whitespace-nowrap">${i.metodo || 'bizum'}</td>
-                <td class="p-3 text-slate-400">${i.concepto || (isNeg ? 'Retirada de saldo' : 'Aportación manual')}</td>
+                <td class="p-3 whitespace-nowrap">
+                    ${i.metodo === 'bote'
+                        ? '<span class="inline-flex items-center gap-1 font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30">🏺 Bote</span>'
+                        : (i.metodo === 'efectivo'
+                            ? '<span class="text-slate-300 inline-flex items-center gap-1">💵 Efectivo</span>'
+                            : (i.metodo === 'transferencia'
+                                ? '<span class="text-slate-300 inline-flex items-center gap-1">🏦 Transferencia</span>'
+                                : '<span class="text-slate-300 inline-flex items-center gap-1">📱 Bizum</span>'))}
+                </td>
+                <td class="p-3 text-slate-400">${i.concepto || (isNeg ? (i.metodo === 'bote' ? 'Traspaso al Bote de la Peña' : 'Retirada de saldo') : 'Aportación manual')}</td>
                 <td class="p-3 text-center whitespace-nowrap">
                     <div class="inline-flex items-center justify-center gap-1.5">
                         <button onclick="window.BoteApp.openEditIngreso('${i.id}')" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all inline-flex items-center gap-1 shadow-sm" title="Modificar este movimiento">
@@ -3711,8 +3727,10 @@ class BoteAppController {
             const isManual = m.isIngresoLibre;
             const manualAmount = m.ingresosManual !== undefined ? m.ingresosManual : (m.totalIngresos || 0);
             const isNegativeManual = isManual && (manualAmount < 0);
-            const eventIcon = isNegativeManual ? '📤' : (isManual ? '📥' : '');
-            const eventTitle = isManual ? `${eventIcon} ${m.description || (isNegativeManual ? 'Retirada de saldo' : 'Ingreso manual')}` : `Jornada ${m.jornadaNum}`;
+            const isTraspasoBote = isNegativeManual && (m.metodo === 'bote');
+            const eventIcon = isTraspasoBote ? '🏺' : (isNegativeManual ? '📤' : (isManual ? '📥' : ''));
+            const defaultManualDesc = isTraspasoBote ? 'Traspaso al Bote de la Peña' : (isNegativeManual ? 'Retirada de saldo' : 'Ingreso manual');
+            const eventTitle = isManual ? `${eventIcon} ${m.description || defaultManualDesc}` : `Jornada ${m.jornadaNum}`;
             const inVal = isNegativeManual ? 0 : ((m.totalIngresos || 0) + ((!m.isSelladoInCash && m.sellado < 0) ? Math.abs(m.sellado) : 0));
             const outVal = isNegativeManual ? Math.abs(manualAmount) : (m.totalGastos || 0);
 
@@ -3730,7 +3748,11 @@ class BoteAppController {
 
             let outBreakdown = [];
             if (isNegativeManual) {
-                outBreakdown.push(`<span class="text-[10px] text-rose-300 font-semibold">📤 Retirada: -${Math.abs(manualAmount).toSpanishFormat()} €</span>`);
+                if (isTraspasoBote) {
+                    outBreakdown.push(`<span class="text-[10px] text-amber-300 font-semibold">🏺 Traspaso Peña: -${Math.abs(manualAmount).toSpanishFormat()} €</span>`);
+                } else {
+                    outBreakdown.push(`<span class="text-[10px] text-rose-300 font-semibold">📤 Retirada: -${Math.abs(manualAmount).toSpanishFormat()} €</span>`);
+                }
             }
 
             const inSubHtml = inBreakdown.length > 0 ? `<div class="flex flex-col items-end gap-0.5 mt-0.5">${inBreakdown.join('')}</div>` : '';
@@ -3795,6 +3817,14 @@ class BoteAppController {
 
         if (inputTipo) inputTipo.value = tipo;
 
+        const inputMetodo = document.getElementById('form-ingreso-metodo');
+        if (inputMetodo) {
+            const optBote = inputMetodo.querySelector('option[value="bote"]');
+            if (optBote) {
+                optBote.textContent = tipo === 'retirada' ? '🏺 Bote (Traspaso a la Peña)' : '🏺 Bote';
+            }
+        }
+
         if (tipo === 'retirada') {
             if (btnRetirada) {
                 btnRetirada.className = 'py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-sm tipo-mov-btn-active-retirada';
@@ -3807,8 +3837,10 @@ class BoteAppController {
             }
             if (labelCant) labelCant.textContent = 'Importe a Retirar (€)';
             if (inputCant) inputCant.placeholder = 'Ej: 15,00';
+            const curMetodo = inputMetodo ? inputMetodo.value : 'bizum';
+            const defaultRetPlaceholder = curMetodo === 'bote' ? 'Traspaso al Bote de la Peña' : 'Ej: Cobro premio en efectivo, retirada';
             if (inputConcepto && (!inputConcepto.value || inputConcepto.value === 'Aportación manual')) {
-                inputConcepto.placeholder = 'Ej: Cobro premio en efectivo, retirada';
+                inputConcepto.placeholder = defaultRetPlaceholder;
             }
             if (btnSubmit) {
                 btnSubmit.textContent = isEditing ? 'Actualizar Retirada' : 'Guardar Retirada';
@@ -3826,12 +3858,30 @@ class BoteAppController {
             }
             if (labelCant) labelCant.textContent = 'Importe a Ingresar (€)';
             if (inputCant) inputCant.placeholder = 'Ej: 20,00';
-            if (inputConcepto && (!inputConcepto.value || inputConcepto.value === 'Retirada de saldo')) {
+            if (inputConcepto && (!inputConcepto.value || inputConcepto.value === 'Retirada de saldo' || inputConcepto.value === 'Traspaso al Bote de la Peña')) {
                 inputConcepto.placeholder = 'Ej: Recarga Bote, Bizum regularización';
             }
             if (btnSubmit) {
                 btnSubmit.textContent = isEditing ? 'Actualizar Ingreso' : 'Guardar Ingreso';
                 btnSubmit.className = 'primary-glow text-slate-950 font-bold px-5 py-2 rounded-xl hover:brightness-110';
+            }
+        }
+    }
+
+    handleMetodoChange(metodoVal) {
+        const tipo = document.getElementById('form-ingreso-tipo')?.value || 'ingreso';
+        const inputConcepto = document.getElementById('form-ingreso-concepto');
+        if (tipo === 'retirada' && inputConcepto) {
+            if (metodoVal === 'bote') {
+                inputConcepto.placeholder = 'Traspaso al Bote de la Peña';
+                if (!inputConcepto.value || inputConcepto.value === 'Retirada de saldo') {
+                    inputConcepto.value = 'Traspaso al Bote de la Peña';
+                }
+            } else {
+                inputConcepto.placeholder = 'Ej: Cobro premio en efectivo, retirada';
+                if (inputConcepto.value === 'Traspaso al Bote de la Peña') {
+                    inputConcepto.value = 'Retirada de saldo';
+                }
             }
         }
     }
@@ -3877,7 +3927,10 @@ class BoteAppController {
         const tipo = document.getElementById('form-ingreso-tipo')?.value || 'ingreso';
         const met = document.getElementById('form-ingreso-metodo').value;
         const fec = document.getElementById('form-ingreso-fecha').value;
-        const con = document.getElementById('form-ingreso-concepto').value || (tipo === 'retirada' ? 'Retirada de saldo' : 'Aportación manual');
+        const defaultConcept = tipo === 'retirada'
+            ? (met === 'bote' ? 'Traspaso al Bote de la Peña' : 'Retirada de saldo')
+            : 'Aportación manual';
+        const con = document.getElementById('form-ingreso-concepto').value || defaultConcept;
 
         if (!mId || isNaN(rawCant) || rawCant === 0) {
             alert('Por favor introduce un importe válido (distinto de 0) y selecciona un socio.');
@@ -3922,15 +3975,25 @@ class BoteAppController {
                         m.movements.push({
                             isIngresoLibre: true,
                             description: con,
+                            metodo: met,
                             date: fec,
                             totalIngresos: cant,
+                            ingresosManual: cant,
                             totalGastos: 0,
-                            boteAcumulado: m.saldo
+                            boteAcumulado: m.saldo,
+                            pennaIn: (met === 'bote' && cant < 0) ? Math.abs(cant) : 0
                         });
                     }
                     data.summary.totalIngresos += cant;
                     data.summary.totalSaldosVirtuales += cant;
-                    data.summary.cajaReal += cant;
+                    if (met === 'bote' && cant < 0) {
+                        data.summary.traspasosBotePenna = (data.summary.traspasosBotePenna || 0) + Math.abs(cant);
+                        data.summary.superavit = (data.summary.superavit || 0) + Math.abs(cant);
+                        // En retirada hacia Bote Peña, cajaReal permanece intacta
+                    } else {
+                        data.summary.cajaReal += cant;
+                        data.summary.superavit = data.summary.cajaReal - data.summary.totalSaldosVirtuales;
+                    }
                     this.saveOfficialSummaryToStorage();
                 }
             }
