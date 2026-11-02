@@ -2072,8 +2072,18 @@ class PronosticoManager {
                 const p15BadgeClass = p15Val !== '-' ? 'doubles-p15-badge' : 'doubles-p15-badge empty';
                 const p15Badge = `<span class="${p15BadgeClass}" title="Pleno al 15">P15: ${p15Val}</span>`;
 
+                let authorHtml = '';
+                if (pExtra) {
+                    let authorMem = this.members ? this.members.find(m => String(m.id) === String(pExtra.mId || pExtra.memberId)) : null;
+                    if (authorMem) {
+                        const aName = (typeof AppUtils !== 'undefined' && AppUtils.getMemberName) ? AppUtils.getMemberName(authorMem).split(' ')[0] : (authorMem.name || '');
+                        authorHtml = `<div class="summary-doubles-author" style="font-size:9px; font-weight:800; color:#f59e0b; margin-bottom:2px;" title="Quiniela de Dobles de ${AppUtils.getMemberName(authorMem)}">${aName}</div>`;
+                    }
+                }
+
                 doublesContent = `
                     <div class="summary-doubles-container">
+                        ${authorHtml}
                         <div class="doubles-grid-wrapper">
                             <div class="doubles-grid">
                                 ${gridColsHtml}

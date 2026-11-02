@@ -3052,8 +3052,12 @@
                     if (pExtras.length > 0) {
                         doublesContent = pExtras.map(pExtra => {
                             const dsel = pExtra.selection || [];
-                            const authorMem = this.members ? this.members.find(m => String(m.id) === String(pExtra.mId || pExtra.memberId)) : null;
-                            const authorTag = (pExtras.length > 1 && authorMem) ? `<div class="text-[9px] font-black text-amber-400 mb-0.5">${AppUtils.getMemberName(authorMem).split(' ')[0]}</div>` : '';
+                            let authorMem = this.members ? this.members.find(m => String(m.id) === String(pExtra.mId || pExtra.memberId)) : null;
+                            if (!authorMem && jEligibleMembers && jEligibleMembers.length > 0) {
+                                authorMem = jEligibleMembers[0];
+                            }
+                            const authorName = authorMem ? AppUtils.getMemberName(authorMem).split(' ')[0] : '';
+                            const authorTag = authorName ? `<div class="text-[9px] font-black text-amber-500 dark:text-amber-400 mb-0.5" title="Quiniela de Dobles de ${authorMem ? AppUtils.getMemberName(authorMem) : authorName}">${authorName}</div>` : '';
                             const db1 = [0,1,2,3].map(i => colorSignD(dsel[i], i)).join('');
                             const db2 = [4,5,6,7].map(i => colorSignD(dsel[i], i)).join('');
                             const db3 = [8,9,10].map(i => colorSignD(dsel[i], i)).join('');
