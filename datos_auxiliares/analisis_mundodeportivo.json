@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-03T03:18:01.777Z",
+  "updatedAt": "2026-11-03T03:45:46.583Z",
   "available": false,
   "matchCountWithTarget": 15,
   "isMidweek": true,
@@ -55,8 +55,8 @@
         },
         "real": {
           "1": 52,
-          "2": 24,
-          "X": 24
+          "2": 25,
+          "X": 23
         }
       },
       "recommended": "1X"
@@ -162,8 +162,8 @@
           "X": 23
         },
         "real": {
-          "1": 17,
-          "2": 62,
+          "1": 18,
+          "2": 61,
           "X": 21
         }
       },
@@ -180,8 +180,8 @@
       "percentages": {
         "quinielista": {
           "1": 58,
-          "2": 17,
-          "X": 25
+          "2": 16,
+          "X": 26
         },
         "lae": {
           "1": 54,
@@ -244,8 +244,8 @@
         },
         "real": {
           "1": 32,
-          "2": 44,
-          "X": 24
+          "2": 43,
+          "X": 25
         }
       },
       "recommended": "X2"
@@ -288,8 +288,8 @@
       "percentages": {
         "quinielista": {
           "1": 2,
-          "2": 95,
-          "X": 3
+          "2": 94,
+          "X": 4
         },
         "lae": {
           "1": 11,
@@ -297,8 +297,8 @@
           "X": 9
         },
         "real": {
-          "1": 9,
-          "2": 75,
+          "1": 10,
+          "2": 74,
           "X": 16
         }
       },
@@ -342,8 +342,8 @@
       "percentages": {
         "quinielista": {
           "1": 52,
-          "2": 24,
-          "X": 24
+          "2": 25,
+          "X": 23
         },
         "lae": {
           "1": 46,
@@ -368,9 +368,9 @@
       "comment": "El Getafe remontó contra el Sevilla este mismo domingo y dejó atrás la primera crisis de la temporada. Una racha de cinco partidos sin ganar, pero lo preocupante, las dos últimas derrotas. Ambas por goleada, en que el equipo perdió la identidad y mostró muchas fragilidades atrás, impropias de un bloque de Bordalás, que se quejó del trabajo de la directiva en la confección de la plantilla. Ahora vuelve a Europa y se prueba con el Brighton, revelación de la Premier, donde está tercero después de ganar en feudo del City. En la competición continental, goleó en casa y empató en su visita al Jablonec checo. Si se puede, para cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 15,
+          "1": 14,
           "2": 62,
-          "X": 23
+          "X": 24
         },
         "lae": {
           "1": 20,
