@@ -794,6 +794,7 @@ class PronosticoManager {
                                     ${mdMatch.comment}
                                 </div>
                             ` : '<div class="text-[10px] text-slate-500 italic">Sin comentario editorial disponible.</div>'}
+                            ${this.renderOtherMembersForecastsHtml(idx, true)}
                             <div class="pt-0.5 flex items-center justify-end">
                                 <button type="button" onclick="event.stopPropagation(); window.app.openMDMobileDetail(${idx});" class="text-[10px] text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1">
                                     <span>📊 Ver Ficha Completa & Clasificación →</span>
@@ -3141,6 +3142,7 @@ class PronosticoManager {
                                     ${mdMatch.comment}
                                 </div>
                             ` : '<div class="text-[10px] text-slate-500 italic">Sin comentario editorial disponible.</div>'}
+                            ${this.renderOtherMembersForecastsHtml(idx, true)}
                             <div class="pt-0.5 flex items-center justify-end">
                                 <button type="button" onclick="event.stopPropagation(); window.app.openMDMobileDetail(${idx});" class="text-[10px] text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1">
                                     <span>📊 Ver Ficha Completa & Clasificación →</span>
@@ -4157,6 +4159,9 @@ class PronosticoManager {
                     </div>
                 ` : ''}
 
+                <!-- Pronósticos del resto de socios para este partido -->
+                ${this.renderOtherMembersForecastsHtml(idx)}
+
                 <!-- Accesos rápidos a Clasificación -->
                 <div class="pt-1 flex items-center gap-2">
                     <button type="button" onclick="window.app.switchMDView('standings-1')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold border border-slate-800 flex items-center justify-center gap-1 transition">
@@ -4165,6 +4170,229 @@ class PronosticoManager {
                     <button type="button" onclick="window.app.switchMDView('standings-2')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold border border-slate-800 flex items-center justify-center gap-1 transition">
                         <span>🥈</span> Ver 2ª División
                     </button>
+                </div>
+            </div>
+        `;
+    }
+
+
+    /**
+     * Obtiene y desglosa los pronósticos rellenados por el resto de socios para un partido determinado
+     * @param {number} matchIdx Índice del partido (0 a 14)
+     * @returns {Object|null} Datos consolidados con conteos, porcentajes y listas de socios por signo
+     */
+    getOtherMembersForecastsForMatch(matchIdx) {
+        if (!this.members || !Array.isArray(this.members)) return null;
+
+        const currentMId = this.currentMemberId ? String(this.currentMemberId) : null;
+        // Filtrar el resto de socios (excluyendo al socio actual conectado o seleccionado en el editor)
+        const otherMembers = this.members.filter(m => String(m.id) !== currentMId);
+        if (otherMembers.length === 0) return null;
+
+        const currentJId = this.currentJornadaId ? String(this.currentJornadaId) : null;
+        if (!currentJId) return null;
+
+        const bySign = {
+            '1': [],
+            'X': [],
+            '2': [],
+            'other': [],
+            'pending': []
+        };
+
+        let filledCount = 0;
+
+        otherMembers.forEach(m => {
+            const pred = (this.pronosticos || []).find(p => 
+                (String(p.jId || p.jornadaId) === currentJId) &&
+                (String(p.mId || p.memberId) === String(m.id))
+            );
+
+            const mName = (typeof AppUtils !== 'undefined' && AppUtils.getMemberName) 
+                ? AppUtils.getMemberName(m) 
+                : (m.name || `Socio #${m.id}`);
+
+            const selection = (pred && (pred.selection || pred.pronostico)) || [];
+            const rawSign = (selection && selection[matchIdx] !== undefined) ? String(selection[matchIdx]).trim() : '';
+            const sign = rawSign.toUpperCase();
+
+            if (!sign || sign === '-' || sign === 'POR DEFINIR') {
+                bySign.pending.push({ member: m, name: mName, sign: '' });
+            } else if (sign === '1' || sign === 'X' || sign === '2') {
+                bySign[sign].push({ member: m, name: mName, sign: sign });
+                filledCount++;
+            } else {
+                // Pleno al 15 con resultado exacto (ej: 1-1, 2-1, M-1...)
+                bySign.other.push({ member: m, name: mName, sign: sign });
+                filledCount++;
+            }
+        });
+
+        const totalOthers = otherMembers.length;
+        const pct1 = filledCount > 0 ? Math.round((bySign['1'].length / filledCount) * 100) : 0;
+        const pctX = filledCount > 0 ? Math.round((bySign['X'].length / filledCount) * 100) : 0;
+        const pct2 = filledCount > 0 ? Math.round((bySign['2'].length / filledCount) * 100) : 0;
+
+        return {
+            totalOthers,
+            filledCount,
+            pendingCount: bySign.pending.length,
+            bySign,
+            percentages: {
+                '1': pct1,
+                'X': pctX,
+                '2': pct2
+            }
+        };
+    }
+
+    /**
+     * Renderiza el bloque visual con los signos rellenados por el resto de socios para un partido
+     * @param {number} matchIdx Índice del partido (0 a 14)
+     * @param {boolean} isCompact Modo compacto para desplegables móviles
+     * @returns {string} HTML del componente
+     */
+    renderOtherMembersForecastsHtml(matchIdx, isCompact = false) {
+        const data = this.getOtherMembersForecastsForMatch(matchIdx);
+        if (!data) return '';
+
+        const isP15 = matchIdx === 14;
+
+        if (data.filledCount === 0) {
+            return `
+                <div class="mt-2.5 pt-2 border-t border-slate-800/80 space-y-1.5">
+                    <div class="flex items-center justify-between text-[11px] font-black uppercase text-amber-400">
+                        <div class="flex items-center gap-1.5">
+                            <span>👥</span>
+                            <span>Pronósticos del Resto de Socios</span>
+                        </div>
+                        <span class="text-[9px] text-slate-500 font-mono font-normal">0/${data.totalOthers} rellenos</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80 text-center text-[11px] text-slate-400">
+                        <span class="text-xs">⏳</span> Ningún otro socio ha rellenado aún este partido.
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render de badges de socios por signo
+        const renderMemberList = (list, signClass, borderClass) => {
+            if (!list || list.length === 0) {
+                return `<div class="text-[10px] text-slate-500 italic py-0.5">Ningún socio</div>`;
+            }
+            return `
+                <div class="flex flex-wrap gap-1 mt-1">
+                    ${list.map(item => `
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${signClass} border ${borderClass} truncate max-w-[125px]" title="${item.name}: ${item.sign}">
+                            ${item.name}
+                        </span>
+                    `).join('')}
+                </div>
+            `;
+        };
+
+        // Si es Pleno al 15 y hay resultados con formato goles (ej: 0-1, M-1, etc.)
+        let p15SpecificHtml = '';
+        if (isP15 && data.bySign.other.length > 0) {
+            const grouped = {};
+            data.bySign.other.forEach(item => {
+                if (!grouped[item.sign]) grouped[item.sign] = [];
+                grouped[item.sign].push(item);
+            });
+            p15SpecificHtml = `
+                <div class="space-y-1 mt-1.5">
+                    <div class="text-[10px] font-bold text-purple-300 flex items-center gap-1">
+                        <span>🎯</span> <span>Pleno al 15 (Goles / Resultados):</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        ${Object.keys(grouped).map(r => `
+                            <div class="p-1.5 rounded-lg bg-slate-900/80 border border-purple-500/30 text-[10px]">
+                                <div class="flex justify-between font-black text-purple-300">
+                                    <span>${r}</span>
+                                    <span>${grouped[r].length} socio${grouped[r].length > 1 ? 's' : ''}</span>
+                                </div>
+                                <div class="text-[9px] text-slate-400 truncate mt-0.5">${grouped[r].map(x => x.name).join(', ')}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="mt-3 pt-2.5 border-t border-slate-800 space-y-2">
+                <!-- Título y Contador -->
+                <div class="flex items-center justify-between text-[11px] font-black uppercase text-amber-400">
+                    <div class="flex items-center gap-1.5">
+                        <span>👥</span>
+                        <span>Pronósticos del Resto de Socios</span>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-300 font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800 shadow-sm">
+                        ${data.filledCount} de ${data.totalOthers} rellenos
+                    </span>
+                </div>
+
+                <!-- Barra comparativa de votos de la Peña -->
+                <div class="grid grid-cols-3 gap-1.5 text-center font-mono text-xs">
+                    <div class="p-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30">
+                        <div class="text-[10px] font-bold text-emerald-400">1 (${data.bySign['1'].length})</div>
+                        <div class="font-black text-emerald-300 text-sm mt-0.5">${data.percentages['1']}%</div>
+                    </div>
+                    <div class="p-1.5 rounded-lg bg-sky-950/30 border border-sky-500/30">
+                        <div class="text-[10px] font-bold text-sky-400">X (${data.bySign['X'].length})</div>
+                        <div class="font-black text-sky-300 text-sm mt-0.5">${data.percentages['X']}%</div>
+                    </div>
+                    <div class="p-1.5 rounded-lg bg-amber-950/30 border border-amber-500/30">
+                        <div class="text-[10px] font-bold text-amber-400">2 (${data.bySign['2'].length})</div>
+                        <div class="font-black text-amber-300 text-sm mt-0.5">${data.percentages['2']}%</div>
+                    </div>
+                </div>
+
+                <!-- Listado de Socios agrupados por Signo -->
+                <div class="space-y-1.5 text-[11px]">
+                    ${data.bySign['1'].length > 0 ? `
+                        <div class="p-2 rounded-lg bg-slate-900/70 border border-slate-800/80">
+                            <div class="flex items-center justify-between text-[10px] font-bold text-emerald-400 pb-0.5 border-b border-slate-800/60">
+                                <span class="flex items-center gap-1"><span>🟩</span> <span>Han puesto 1:</span></span>
+                                <span class="font-mono">${data.bySign['1'].length} socio${data.bySign['1'].length > 1 ? 's' : ''}</span>
+                            </div>
+                            ${renderMemberList(data.bySign['1'], 'bg-emerald-500/15 text-emerald-300', 'border-emerald-500/30')}
+                        </div>
+                    ` : ''}
+
+                    ${data.bySign['X'].length > 0 ? `
+                        <div class="p-2 rounded-lg bg-slate-900/70 border border-slate-800/80">
+                            <div class="flex items-center justify-between text-[10px] font-bold text-sky-400 pb-0.5 border-b border-slate-800/60">
+                                <span class="flex items-center gap-1"><span>🟦</span> <span>Han puesto X:</span></span>
+                                <span class="font-mono">${data.bySign['X'].length} socio${data.bySign['X'].length > 1 ? 's' : ''}</span>
+                            </div>
+                            ${renderMemberList(data.bySign['X'], 'bg-sky-500/15 text-sky-300', 'border-sky-500/30')}
+                        </div>
+                    ` : ''}
+
+                    ${data.bySign['2'].length > 0 ? `
+                        <div class="p-2 rounded-lg bg-slate-900/70 border border-slate-800/80">
+                            <div class="flex items-center justify-between text-[10px] font-bold text-amber-400 pb-0.5 border-b border-slate-800/60">
+                                <span class="flex items-center gap-1"><span>🟧</span> <span>Han puesto 2:</span></span>
+                                <span class="font-mono">${data.bySign['2'].length} socio${data.bySign['2'].length > 1 ? 's' : ''}</span>
+                            </div>
+                            ${renderMemberList(data.bySign['2'], 'bg-amber-500/15 text-amber-300', 'border-amber-500/30')}
+                        </div>
+                    ` : ''}
+
+                    ${p15SpecificHtml}
+
+                    ${!isCompact && data.pendingCount > 0 ? `
+                        <details class="text-[10px] text-slate-500 pt-0.5 group">
+                            <summary class="cursor-pointer hover:text-slate-400 font-medium select-none flex items-center justify-between">
+                                <span>⏳ Pendientes de rellenar (${data.pendingCount})</span>
+                                <span class="text-[9px] group-open:rotate-90 transition-transform">▸</span>
+                            </summary>
+                            <div class="mt-1 p-1.5 rounded bg-slate-950/60 border border-slate-800/60 text-slate-400 leading-relaxed">
+                                ${data.bySign.pending.map(x => x.name).join(', ')}
+                            </div>
+                        </details>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -4365,6 +4593,9 @@ class PronosticoManager {
                         </div>
                     </div>
                 ` : ''}
+
+                <!-- Pronósticos del resto de socios para este partido -->
+                ${this.renderOtherMembersForecastsHtml(idx)}
 
                 <!-- Accesos rápidos a Clasificación -->
                 <div class="pt-2 flex items-center gap-2">

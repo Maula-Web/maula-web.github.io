@@ -3245,3 +3245,103 @@ html.light-theme #gestion-ingresos-table tbody tr:hover {
 html.light-theme #gestion-ingresos-table td {
     border-color: #f1f5f9 !important;
 }
+
+/* =========================================================================
+   PRONÓSTICOS DE SOCIOS Y ANÁLISIS MUNDO DEPORTIVO EN MODO CLARO
+   ========================================================================= */
+.light-theme #md-analysis-sidebar > div,
+html.light-theme #md-analysis-sidebar > div,
+.light-theme #modal-md-mobile-sheet > div,
+html.light-theme #modal-md-mobile-sheet > div {
+    background-color: #ffffff !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1) !important;
+    color: #0f172a !important;
+}
+
+.light-theme #md-view-analysis-box > div,
+html.light-theme #md-view-analysis-box > div,
+.light-theme #md-mobile-sheet-content > div,
+html.light-theme #md-mobile-sheet-content > div {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.light-theme .md-inline-card,
+html.light-theme .md-inline-card {
+    background-color: #f8fafc !important;
+    border-color: #38bdf8 !important;
+    color: #0f172a !important;
+}
+
+/* Cajas de votos de la Peña en Modo Claro */
+.light-theme .bg-emerald-950\/30,
+.light-theme .bg-emerald-950\/20,
+html.light-theme .bg-emerald-950\/30,
+html.light-theme .bg-emerald-950\/20 {
+    background-color: #f0fdf4 !important;
+    border-color: #86efac !important;
+}
+.light-theme .bg-emerald-950\/30 .text-emerald-300,
+html.light-theme .bg-emerald-950\/30 .text-emerald-300 {
+    color: #15803d !important;
+}
+
+.light-theme .bg-sky-950\/30,
+.light-theme .bg-sky-950\/20,
+html.light-theme .bg-sky-950\/30,
+html.light-theme .bg-sky-950\/20 {
+    background-color: #f0f9ff !important;
+    border-color: #93c5fd !important;
+}
+.light-theme .bg-sky-950\/30 .text-sky-300,
+html.light-theme .bg-sky-950\/30 .text-sky-300 {
+    color: #1d4ed8 !important;
+}
+
+.light-theme .bg-amber-950\/30,
+.light-theme .bg-amber-950\/20,
+html.light-theme .bg-amber-950\/30,
+html.light-theme .bg-amber-950\/20 {
+    background-color: #fffbeb !important;
+    border-color: #fde68a !important;
+}
+.light-theme .bg-amber-950\/30 .text-amber-300,
+html.light-theme .bg-amber-950\/30 .text-amber-300 {
+    color: #b45309 !important;
+}
+
+/* Badges de socios por signo en Modo Claro */
+.light-theme .bg-emerald-500\/15,
+html.light-theme .bg-emerald-500\/15 {
+    background-color: #dcfce7 !important;
+    color: #15803d !important;
+    border-color: #86efac !important;
+}
+
+.light-theme .bg-sky-500\/15,
+html.light-theme .bg-sky-500\/15 {
+    background-color: #dbeafe !important;
+    color: #1e40af !important;
+    border-color: #93c5fd !important;
+}
+
+.light-theme .bg-amber-500\/15,
+html.light-theme .bg-amber-500\/15 {
+    background-color: #fef3c7 !important;
+    color: #b45309 !important;
+    border-color: #fde68a !important;
+}
+
+.light-theme #md-analysis-sidebar .bg-slate-900\/70,
+.light-theme #md-analysis-sidebar .bg-slate-900\/60,
+.light-theme #md-analysis-sidebar .bg-slate-900\/50,
+.light-theme #md-analysis-sidebar .bg-slate-900,
+html.light-theme #md-analysis-sidebar .bg-slate-900\/70,
+html.light-theme #md-analysis-sidebar .bg-slate-900\/60,
+html.light-theme #md-analysis-sidebar .bg-slate-900\/50,
+html.light-theme #md-analysis-sidebar .bg-slate-900 {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
