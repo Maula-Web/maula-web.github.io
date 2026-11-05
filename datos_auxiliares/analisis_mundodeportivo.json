@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-04T17:38:38.292Z",
+  "updatedAt": "2026-11-05T13:39:48.562Z",
   "available": true,
   "matchCountWithTarget": 15,
   "isMidweek": false,
@@ -21,7 +21,11 @@
           "2": 22,
           "X": 30
         },
-        "lae": null,
+        "lae": {
+          "1": 39,
+          "2": 30,
+          "X": 31
+        },
         "real": {
           "1": 40,
           "2": 34,
@@ -40,11 +44,15 @@
       "comment": "Europa y el descenso marcan el pulso de una cita con mucho en juego. Osasuna recibe al Athletic con un solo punto de margen sobre la ´zona roja´ y herido por su caída en Riazor. El gol de Budimir le permitió llegar al descanso por delante (0-1), pero acabó encajando su segunda derrota liguera bajo las órdenes de Jagoba Arrasate, tras la del Sánchez Pizjuán. Los visitantes aterrizan en El Sadar con otra cara: tienen un partido menos y las plazas europeas al alcance. Las victorias ante Getafe y Real Sociedad en San Mamés han reforzado el plan de Edin Terzic y calmado las dudas. El reto del técnico alemán está ahora a domicilio, donde su equipo apenas ha cosechado un triunfo a lo largo del curso.",
       "percentages": {
         "quinielista": {
-          "1": 15,
-          "2": 45,
-          "X": 40
+          "1": 19,
+          "2": 44,
+          "X": 37
         },
-        "lae": null,
+        "lae": {
+          "1": 24,
+          "2": 42,
+          "X": 34
+        },
         "real": {
           "1": 27,
           "2": 45,
@@ -64,13 +72,17 @@
       "percentages": {
         "quinielista": {
           "1": 2,
-          "2": 94,
-          "X": 4
+          "2": 93,
+          "X": 5
         },
-        "lae": null,
+        "lae": {
+          "1": 9,
+          "2": 82,
+          "X": 9
+        },
         "real": {
-          "1": 11,
-          "2": 73,
+          "1": 10,
+          "2": 74,
           "X": 16
         }
       },
@@ -86,15 +98,19 @@
       "comment": "Frenazo en seco para un Elche que vuelve a mirar de reojo al descenso. El tropiezo del domingo en casa cortó una serie de cuatro partidos sin perder y dejó a los franjiverdes igualados con el Levante, que señala la frontera del peligro. Ahora les espera un examen de altura ante el Betis en el Martínez Valero. Los verdiblancos llegan reforzados tras doblegar con apuros al Málaga en La Cartuja, un triunfo que les mantiene en puestos de Champions. Su reto pasa por mejorar lejos de su afición, donde aún les cuesta imponer su ley. Aunque solo han sufrido una derrota en cinco salidas, apenas han celebrado dos victorias. Una cuenta que quieren engordar en territorio ilicitano.",
       "percentages": {
         "quinielista": {
-          "1": 16,
-          "2": 58,
-          "X": 26
+          "1": 17,
+          "2": 55,
+          "X": 28
         },
-        "lae": null,
+        "lae": {
+          "1": 18,
+          "2": 59,
+          "X": 23
+        },
         "real": {
-          "1": 30,
+          "1": 29,
           "2": 45,
-          "X": 25
+          "X": 26
         }
       },
       "recommended": "X2"
@@ -109,14 +125,18 @@
       "comment": "La Real Sociedad no pudo superar el examen del derbi vasco en San Mamés y vio frenada la dinámica de cuatro victorias consecutivas. Pese a este palo, el conjunto de Pellegrino Matarazzo conserva su quinta plaza, la de Europa League, beneficiado por la derrota del Sevilla en el Coliseum. Ahora toca pasar página y afrontar un nuevo encuentro en el Reale Arena. Con su amplia victoria ante el Celta en Vallecas, el Rayo aparcó su crisis social y también deportiva, aunque sigue estando cerca de la ´zona roja´. Pero se trata de un soplo de aire fresco. La salvación será complicada para los madrileños si no mejoran su rendimiento como visitantes. Dos empates en cinco salidas no invitan al optimismo.",
       "percentages": {
         "quinielista": {
-          "1": 80,
-          "2": 4,
+          "1": 81,
+          "2": 5,
+          "X": 14
+        },
+        "lae": {
+          "1": 73,
+          "2": 11,
           "X": 16
         },
-        "lae": null,
         "real": {
-          "1": 57,
-          "2": 20,
+          "1": 56,
+          "2": 21,
           "X": 23
         }
       },
@@ -132,11 +152,15 @@
       "comment": "Noveno en la clasificación, el Celta intentará sacudirse el golpe del pasado sábado en Vallecas, donde cayó por 3-0. Su último compromiso liguero en Vigo se saldó con tablas, y como local su cosecha es discreta: dos victorias, dos empates y dos derrotas en el campeonato de la regularidad. Por el otro lado asoma el Levante, que ocupa el primer puesto de la zona de descenso después de encadenar dos reveses ante adversarios de buen nivel, 2-1 frente a la Real Sociedad y 0-2 contra el Atlético. Los granota necesitan retomar el rumbo, aunque aún no han vencido como forasteros.",
       "percentages": {
         "quinielista": {
-          "1": 70,
-          "2": 10,
-          "X": 20
+          "1": 64,
+          "2": 12,
+          "X": 24
         },
-        "lae": null,
+        "lae": {
+          "1": 64,
+          "2": 14,
+          "X": 22
+        },
         "real": {
           "1": 53,
           "2": 22,
@@ -159,7 +183,11 @@
           "2": 4,
           "X": 10
         },
-        "lae": null,
+        "lae": {
+          "1": 75,
+          "2": 9,
+          "X": 16
+        },
         "real": {
           "1": 66,
           "2": 13,
@@ -178,15 +206,19 @@
       "comment": "El Cádiz busca remontar el vuelo en la Segunda División. El cuadro gaditano abre la zona de descenso. El comodín del cambio de míster ya lo ha utilizado. Borja Jiménez relevó a Celades y lleva un balance de un triunfo (3-1 al Ceuta) y de una derrota, este lunes en Son Moix contra el Mallorca (2-1). El Oviedo viene de perder en casa contra la UD Las Palmas tras encadenar tres jornadas sin caer (un empate y dos triunfos). El equipo asturiano ocupa la novena posición de la tabla. Lejos del Tartiere no anda mal, pues ha sacado 10 puntos de 18.",
       "percentages": {
         "quinielista": {
-          "1": 27,
-          "2": 36,
-          "X": 37
+          "1": 28,
+          "2": 37,
+          "X": 35
         },
-        "lae": null,
+        "lae": {
+          "1": 31,
+          "2": 35,
+          "X": 34
+        },
         "real": {
-          "1": 34,
+          "1": 35,
           "2": 36,
-          "X": 30
+          "X": 29
         }
       },
       "recommended": "1X"
@@ -201,15 +233,19 @@
       "comment": "Atractivo partido en Montilivi. El Girona ha salido de la zona de play-off y va séptimo tras perder el sábado en el campo de la Real Sociedad B. El equipo catalán llegó a tierras donostiarras tras dos triunfos seguidos y hasta seis jornadas en línea sin perder. El reto que se le presenta en casa en la decimotercera jornada es mayúsculo ante otro aspirante al ascenso, el Almería, que va segundo después de dos empates consecutivos. El equipo indálico se ha encallado con estas dos X después de llegar a encadenar siete victorias seguidas.",
       "percentages": {
         "quinielista": {
-          "1": 47,
-          "2": 27,
-          "X": 26
+          "1": 46,
+          "2": 26,
+          "X": 28
         },
-        "lae": null,
+        "lae": {
+          "1": 39,
+          "2": 33,
+          "X": 28
+        },
         "real": {
-          "1": 45,
+          "1": 46,
           "2": 28,
-          "X": 27
+          "X": 26
         }
       },
       "recommended": "1X2"
@@ -224,11 +260,15 @@
       "comment": "Aunque la igualdad es máxima en la zona alta de Segunda, el Sporting ocupa la sexta plaza cerrando los puestos de play-off de ascenso. El conjunto gijonés llega tras imponerse por 0-2 al Ceuta, resultado que redondea una cosecha de doce puntos en los últimos quince en juego. Enfrente tendrá al Valladolid, decimotercero, que este lunes cortó su racha de dos derrotas consecutivas con un 4-3 al Leganés. El choque en El Molinón se presenta como una prueba de nivel para los pucelanos, si quieren escalar posiciones en la clasificación.",
       "percentages": {
         "quinielista": {
-          "1": 63,
-          "2": 11,
+          "1": 59,
+          "2": 15,
           "X": 26
         },
-        "lae": null,
+        "lae": {
+          "1": 61,
+          "2": 14,
+          "X": 25
+        },
         "real": {
           "1": 41,
           "2": 30,
@@ -251,7 +291,11 @@
           "2": 64,
           "X": 22
         },
-        "lae": null,
+        "lae": {
+          "1": 16,
+          "2": 66,
+          "X": 18
+        },
         "real": {
           "1": 25,
           "2": 48,
@@ -270,11 +314,15 @@
       "comment": "Dos clubes que necesitan puntos para salir de abajo se ven las caras en un duelo que se presuma ajustado y decidido en detalles. El Logroño, que sigue sin empatar tras nueve fechas, llega en mala racha, con cinco derrotas en las últimas seis jornadas, aunque la única victoria es de su última aparición en casa, con triunfo sobre el Badalona, rival directo de ambos por escapar de la zona roja. El Sevilla, mientras, sigue mostrando un buen nivel competitivo, como este domingo pasado, cuando cayó con el Madrid con dos goles en el tramo final. A domicilio, además, ha puntuado en cuatro de cinco salidas.",
       "percentages": {
         "quinielista": {
-          "1": 35,
-          "2": 39,
+          "1": 38,
+          "2": 36,
           "X": 26
         },
-        "lae": null,
+        "lae": {
+          "1": 34,
+          "2": 33,
+          "X": 33
+        },
         "real": {
           "1": 45,
           "2": 28,
@@ -293,11 +341,15 @@
       "comment": "Un partido entre clubes vascos que presume igualdad, a pesar de llegar en momentos distintos. El Eibar acumula cuatro partidos sin ganar y llega de perder en feudo del colista. Una mal resultado que confirma la irregularidad actual de un equipo que en casa ha ganado una vez de sus últimas cuatro apariciones, con dos derrotas incluidas. La Real Sociedad, por su parte, encadena seis encuentros sin perder, dos de ellos en Europa. En la liga, además, firma tres salidas seguidas sumando, certificando la reacción después de un errático inicio de temporada. Si se puede, conviene cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 18,
-          "2": 55,
-          "X": 27
+          "1": 20,
+          "2": 49,
+          "X": 31
         },
-        "lae": null,
+        "lae": {
+          "1": 42,
+          "2": 29,
+          "X": 29
+        },
         "real": {
           "1": 24,
           "2": 49,
@@ -320,7 +372,11 @@
           "2": 5,
           "X": 15
         },
-        "lae": null,
+        "lae": {
+          "1": 73,
+          "2": 11,
+          "X": 16
+        },
         "real": {
           "1": 51,
           "2": 23,
@@ -339,15 +395,19 @@
       "comment": "Duelo por el liderato entre dos aspirantes al título. El Atlético, además, lo es por una trayectoria de menos a más que lo ha llevado a firmar, con cinco porterías a cero, siete victorias consecutivas. Entre ellas, una contra el Madrid en este mismo escenario (2-1). El Barça, mientras, dejó atrás la derrota en el Clásico (1-2) con otra goleada. Ésta contra el Alavés (6-1) en un ejercicio de efectividad que también ha mostrado de visitante. De hecho, fuera se mantiene imbatido, con una media de más de cuatro goles a favor. Los últimos precedentes ligueros aquí, 1-2 y 2-4 para el conjunto catalán.",
       "percentages": {
         "quinielista": {
-          "1": 12,
-          "2": 28,
+          "1": 11,
+          "2": 29,
           "X": 53
         },
-        "lae": null,
+        "lae": {
+          "1": 7,
+          "2": 36,
+          "X": 46
+        },
         "real": {
-          "1": 34,
+          "1": 33,
           "2": 20,
-          "X": 36
+          "X": 37
         }
       },
       "recommended": "2-M"
