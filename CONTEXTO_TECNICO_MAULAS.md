@@ -1734,21 +1734,22 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 ## 67. CALIBRACIÓN MILIMÉTRICA DE MARCAS 'X' EN AYUDA AL SELLADO DE REDUCIDAS
 - **Regla y Diagnóstico**:
   - En la vista de Ayuda de Sellado (`pronosticos_2.html` / `pronosticos.html`), sobre las imágenes oficiales del boleto físico (`IMAGENES/reducidas.png`) y de la interfaz web oficial de SELAE (`IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg`), se superponen marcas 'X' cian para indicar al socio sellador exactamente qué casillas marcar.
-  - Las marcas previas se encontraban desalineadas debido a fórmulas teóricas de cuadrículas 33x33 y coordenadas desfasadas que caían en los encabezados o en los márgenes exteriores.
-- **Implementación Técnica (`js/pronosticos.js`, `css/light-theme.css`)**:
+  - Las marcas previas se encontraban desalineadas tanto por coordenadas como por el tamaño fijo en píxeles (`15px × 15px`) que desbordaba las casillas reales (~7px de ancho en vista de doble columna en PC).
+- **Implementación Técnica (`js/pronosticos.js`, `pronosticos_2.html`, `pronosticos.html`, `css/light-theme.css`)**:
+  - **Dimensionamiento Proporcional Exacto (`.help-mark-x`)**:
+    * Cada marca se dimensiona en porcentaje relativo al contenedor de la imagen (`width: 1.65%; height: 3.15%; font-size: clamp(6px, 0.7vw, 10px)`), coincidiendo exactamente con el ancho y alto de los recuadros rojos impresos en ambas imágenes en cualquier resolución (PC, tablet o móvil) sin solaparse con las casillas vecinas.
   - **Boleto Físico de Reducidas (`IMAGENES/reducidas.png` · 1930 × 1236 px)**:
-    * Columnas de pronósticos: `c1: 17.36%`, `cX: 19.27%`, `c2: 21.14%`.
-    * Matriz de alturas por partido (1 a 14) que refleja los grupos físicos del boleto: `physRowsY = [26.29, 29.29, 33.17, 36.17, 39.16, 44.17, 47.17, 50.16, 53.24, 56.23, 59.30, 64.24, 67.31, 70.31]`.
-    * Columna de combinaciones (dobles): `cD = 23.11%` (marca casilla 7 en Y = 47.17%).
-    * Casilla de Reducción Autorizada 2 (Segunda: 7 dobles): `x = 35.49%, y = 25.89%`.
-    * Casillas de partidos en REDUCCIONES (1 a 14): dos columnas (`x = 27.67%` para partidos 1-7, `x = 29.79%` para partidos 8-14, con espaciado vertical calibrado).
-    * Pleno al 15: Equipo 1 (`y = 81.72%`) y Equipo 2 (`y = 84.79%`) con columnas 0, 1, 2, M (`11.61%, 13.42%, 15.23%, 17.05%`).
+    * Columnas de pronósticos medidas sobre los bordes rojos reales: `c1: 31.31%`, `cX: 33.59%`, `c2: 35.88%`.
+    * Matriz de alturas por partido (1 a 14): `physRowsY = [26.05, 30.83, 35.64, 40.39, 45.19, 49.94, 54.75, 59.53, 64.32, 69.09, 73.87, 78.64, 83.43, 88.23]`.
+    * Columna `COMBINACIONES -> DOBLES`: `cD = 42.75%` (marca casilla 7 en `physRowsY[6] = 54.75%`).
+    * Columna `REDUCCIONES` (casillas 1 a 14 de partidos con doble): `cRed = 51.89%`, alineada fila a fila con `physRowsY`.
+    * Pleno al 15: Equipo 1 (`y = 88.35%`) y Equipo 2 (`y = 93.12%`) con columnas 0, 1, 2, M (`17.67%, 19.97%, 22.27%, 24.56%`).
   - **Interfaz Digital Web (`IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg` · 806 × 573 px)**:
     * Columnas de pronósticos: `c1: 30.15%`, `cX: 32.13%`, `c2: 34.12%`.
-    * Inicio vertical Partido 1: `startY = 18.37%` con paso uniforme exacto `stepY = 3.665%` (21 px/fila).
-    * Columna "PART. EN SISTEMA" (partidos con doble): `sX = 49.01%`.
-    * Casilla "Segunda: 7 dobles - 16 apuestas": `x = 72.46%, y = 44.50%`.
-    * Pleno al 15 digital: `p15Y = 75.39%` (Equipo 1: 30.52% a 35.73%, Equipo 2: 54.59% a 59.80%).
+    * Alturas exactas por partido (1 a 14): `digRowsY = [18.24, 21.90, 25.57, 29.23, 32.90, 36.56, 40.23, 43.89, 47.56, 51.22, 54.89, 58.55, 62.22, 65.88]`.
+    * Columna `COMBINACIONES -> DOBLES`: `cD = 40.32%` (marca casilla 7 en `digRowsY[6] = 40.23%`).
+    * Columna `PART. EN SISTEMA` (partidos con doble): `sX = 56.45%`.
+    * Pleno al 15 digital: `p15Y = 74.96%` (Equipo 1: `31.02%, 33.13%, 35.24%, 37.34%`; Equipo 2: `54.47%, 56.58%, 58.68%, 60.79%`).
   - **Soporte Dual Modo Claro / Modo Oscuro**:
     * Clase `.help-mark-x` adaptada en `css/light-theme.css` con contraste azul cielo sobre fondo claro (`#0369a1`, borde `#0284c7`, fondo `rgba(224, 242, 254, 0.9)`), manteniendo cyan vibrante con fondo azul marino en Modo Oscuro.
 

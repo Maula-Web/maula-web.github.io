@@ -1272,19 +1272,19 @@ class PronosticoManager {
         // ---------------------------------------------------------
         // 1. BOLETO FÍSICO (reducidas.png · 1930 x 1236 px)
         // ---------------------------------------------------------
-        // Coordenadas milimétricas calibradas sobre la imagen oficial
-        const physRowsY = [26.29, 29.29, 33.17, 36.17, 39.16, 44.17, 47.17, 50.16, 53.24, 56.23, 59.30, 64.24, 67.31, 70.31];
+        // Coordenadas medidas sobre los bordes reales de cada casilla roja
+        const physRowsY = [26.05, 30.83, 35.64, 40.39, 45.19, 49.94, 54.75, 59.53, 64.32, 69.09, 73.87, 78.64, 83.43, 88.23];
         const phys = {
-            c1: 17.36, cX: 19.27, c2: 21.14,
-            cD: 23.11, // Columna COMBINACIONES (DOBLES)
-            cReducAutorizada2: { x: 35.49, y: 25.89 }, // Casilla 2 en Reducciones Autorizadas (Segunda: 7 dobles)
-            p15Cols: { '0': 11.61, '1': 13.42, '2': 15.23, 'M': 17.05 },
-            r15E1: 81.72, r15E2: 84.79
+            c1: 31.31, cX: 33.59, c2: 35.88,
+            cD: 42.75, // Columna COMBINACIONES -> DOBLES (casillas 1 a 14)
+            cRed: 51.89, // Columna REDUCCIONES (casillas 1 a 14 de partidos con doble)
+            p15Cols: { '0': 17.67, '1': 19.97, '2': 22.27, 'M': 24.56 },
+            r15E1: 88.35, r15E2: 93.12
         };
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
-            const y = physRowsY[idx] !== undefined ? physRowsY[idx] : (26.29 + idx * 3.38);
+            const y = physRowsY[idx] !== undefined ? physRowsY[idx] : (26.05 + idx * 4.783);
             const sUpper = String(sign || '').toUpperCase();
             if (sUpper.includes('1')) this.drawX(this.marksPhysical, phys.c1, y);
             if (sUpper.includes('X')) this.drawX(this.marksPhysical, phys.cX, y);
@@ -1292,6 +1292,8 @@ class PronosticoManager {
             if (sUpper.length >= 2) {
                 doublesCount++;
                 doubleIndices.push(idx + 1); // Índice 1-based del partido
+                // Marcar la casilla del partido en la columna REDUCCIONES (alineada con la misma fila)
+                this.drawX(this.marksPhysical, phys.cRed, y);
             }
         });
 
@@ -1303,50 +1305,31 @@ class PronosticoManager {
             if (phys.p15Cols[a]) this.drawX(this.marksPhysical, phys.p15Cols[a], phys.r15E2);
         }
 
-        // Columna Combinaciones (marca el número de dobles, ej. casilla 7)
+        // Columna Combinaciones -> DOBLES (marca el número total de dobles, ej. casilla 7)
         if (doublesCount > 0 && doublesCount <= 14) {
             const dRowY = physRowsY[doublesCount - 1];
             if (dRowY !== undefined) this.drawX(this.marksPhysical, phys.cD, dRowY);
         }
 
-        // Si son 7 dobles reducidos, marcar casilla 2 en Reducciones Autorizadas (Segunda: 7 dobles)
-        if (doublesCount === 7) {
-            this.drawX(this.marksPhysical, phys.cReducAutorizada2.x, phys.cReducAutorizada2.y);
-        }
-
-        // Marcar números de partidos con doble en la sección REDUCCIONES (casillas 1 a 14)
-        doubleIndices.forEach(matchNum => {
-            if (matchNum >= 1 && matchNum <= 7) {
-                const xRed = 27.67;
-                const yRed = ((320 + (matchNum - 1) * 32) / 1236) * 100;
-                this.drawX(this.marksPhysical, xRed, yRed);
-            } else if (matchNum >= 8 && matchNum <= 14) {
-                const xRed = 29.79;
-                const yRed = ((320 + (matchNum - 8) * 32) / 1236) * 100;
-                this.drawX(this.marksPhysical, xRed, yRed);
-            }
-        });
-
         // ---------------------------------------------------------
         // 2. INTERFAZ DIGITAL WEB (imagenes_reducidas_interfaz_1416b371.jpg · 806 x 573 px)
         // ---------------------------------------------------------
-        // Coordenadas milimétricas calibradas sobre la interfaz web de SELAE
+        // Coordenadas medidas sobre los bordes reales de cada casilla roja
+        const digRowsY = [18.24, 21.90, 25.57, 29.23, 32.90, 36.56, 40.23, 43.89, 47.56, 51.22, 54.89, 58.55, 62.22, 65.88];
         const dig = {
-            startY: 18.37,
-            stepY: 3.665,
             c1: 30.15,
             cX: 32.13,
             c2: 34.12,
-            sX: 49.01, // Columna PART. EN SISTEMA (selección de partidos con doble)
-            reducSegunda: { x: 72.46, y: 44.50 }, // Casilla "Segunda: 7 dobles - 16 apuestas"
-            p15Y: 75.39,
-            p15E1: { '0': 30.52, '1': 32.26, '2': 33.99, 'M': 35.73 },
-            p15E2: { '0': 54.59, '1': 56.33, '2': 58.06, 'M': 59.80 }
+            cD: 40.32, // Columna COMBINACIONES -> DOBLES
+            sX: 56.45, // Columna PART. EN SISTEMA (selección de partidos con doble)
+            p15Y: 74.96,
+            p15E1: { '0': 31.02, '1': 33.13, '2': 35.24, 'M': 37.34 },
+            p15E2: { '0': 54.47, '1': 56.58, '2': 58.68, 'M': 60.79 }
         };
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
-            const y = dig.startY + (idx * dig.stepY);
+            const y = digRowsY[idx] !== undefined ? digRowsY[idx] : (18.24 + idx * 3.665);
             const sUpper = String(sign || '').toUpperCase();
             if (sUpper.includes('1')) this.drawX(this.marksDigital, dig.c1, y);
             if (sUpper.includes('X')) this.drawX(this.marksDigital, dig.cX, y);
@@ -1354,18 +1337,18 @@ class PronosticoManager {
             if (sUpper.length >= 2) this.drawX(this.marksDigital, dig.sX, y);
         });
 
+        // Columna Combinaciones -> DOBLES en interfaz digital (marca casilla 7)
+        if (doublesCount > 0 && doublesCount <= 14) {
+            const dDigY = digRowsY[doublesCount - 1];
+            if (dDigY !== undefined) this.drawX(this.marksDigital, dig.cD, dDigY);
+        }
+
         // Pleno al 15 (Interfaz digital)
         if (p15Val.includes('-')) {
             const [h, a] = p15Val.split('-');
             if (dig.p15E1[h]) this.drawX(this.marksDigital, dig.p15E1[h], dig.p15Y);
             if (dig.p15E2[a]) this.drawX(this.marksDigital, dig.p15E2[a], dig.p15Y);
         }
-
-        // Reducción autorizada en web (Segunda: 7 dobles)
-        if (doublesCount === 7) {
-            this.drawX(this.marksDigital, dig.reducSegunda.x, dig.reducSegunda.y);
-        }
-
 
         const guideText = 'J.' + (targetJ ? targetJ.number : '') + ' · ' + doublesCount + ' DOBLES' + (authorName ? ' (' + authorName + ')' : '');
         this.marksPhysical.innerHTML += '<div style="position:absolute; top:12px; right:12px; background:rgba(2, 132, 199, 0.95); color:white; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:100; border:1px solid #38bdf8; font-family:sans-serif;">' + guideText + '</div>';

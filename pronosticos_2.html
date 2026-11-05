@@ -600,14 +600,14 @@
             border: 1px solid #fda4af !important;
         }
 
-        /* Marcas X sobre el boleto en Ayuda de Sellado */
+        /* Marcas X sobre el boleto en Ayuda de Sellado (escalado proporcional exacto a cada casilla) */
         .help-mark-x {
             position: absolute;
             color: #00e5ff;
-            font-weight: 1000;
-            font-size: 11px;
-            width: 15px;
-            height: 15px;
+            font-weight: 900;
+            font-size: clamp(6px, 0.7vw, 10px);
+            width: 1.65%;
+            height: 3.15%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -615,19 +615,20 @@
             pointer-events: none;
             line-height: 1;
             z-index: 50;
-            background: rgba(0, 71, 161, 0.65);
-            border: 1.5px solid #00e5ff;
-            border-radius: 3px;
-            box-shadow: 0 0 6px rgba(0, 229, 255, 0.7);
+            background: rgba(0, 71, 161, 0.72);
+            border: 1px solid #00e5ff;
+            border-radius: 2px;
+            box-shadow: 0 0 4px rgba(0, 229, 255, 0.7);
             font-family: monospace;
             text-shadow: 0 0 2px #000;
+            box-sizing: border-box;
         }
 
         @media (max-width: 768px) {
             .help-mark-x {
-                font-size: 8px;
-                width: 11px;
-                height: 11px;
+                font-size: clamp(6px, 1.8vw, 9px);
+                width: 1.65%;
+                height: 3.15%;
                 border-width: 1px;
             }
         }
@@ -2232,7 +2233,7 @@
     
     <!-- Script de Pronósticos V1 -->
     <script src="js/bote-engine.js"></script>
-    <script src="js/pronosticos.js?v=20240323_v3"></script>
+    <script src="js/pronosticos.js?v=20261105_v4"></script>
 
     <!-- =====================================================================
          MOTOR DE EXTENSIÓN V2:
