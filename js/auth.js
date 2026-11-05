@@ -746,3 +746,4 @@ const Auth = {
 };
 
 Auth.checkContext();
+window.Auth = Auth;
