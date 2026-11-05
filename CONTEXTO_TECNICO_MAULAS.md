@@ -1758,7 +1758,7 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 - **Regla de Negocio**:
   - Ningún anuncio, aviso o noticia del teletipo (`news-ticker-bar`) puede permanecer visible más de cinco (5) días.
   - Al cumplirse 5 días desde su creación (`createdAt`), el anuncio debe ser sustituido por otro nuevo o retirarse automáticamente si no hay noticias vigentes.
-  - No se anuncian modificaciones internas en el teletipo de forma automática.
+  - **Protocolo de Anuncios por Cambios**: NO anunciar modificaciones técnicas o mejoras en el teletipo de forma automática. Para cada cambio o novedad realizada en la web, el asistente preguntará al usuario si desea anunciarlo en el teletipo. Si el usuario no responde a la pregunta, se asume que NO se debe anunciar. Las noticias de resultados oficiales, marcadores en vivo, aciertos, líderes, podio, farolillo, botes y datos derivados de la web se publican de forma automática.
 - **Implementación Técnica (`js/teletipo.js`, `js/dashboard_2.js`)**:
   - **Filtro de Antigüedad Estricto (`MAX_ANUNCIO_AGE_MS = 5 * 24 * 60 * 60 * 1000`)**:
     * En `js/teletipo.js` y `js/dashboard_2.js`, la lista de anuncios activos de socios (`activeSocioAnnouncements`) evalúa en tiempo real:
