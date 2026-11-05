@@ -449,6 +449,17 @@ window.TelegramService = {
     async checkThursdayReminder() {
         if (!window.DataService) return;
 
+        // Seguridad: solo administradores autenticados pueden disparar este recordatorio desde el cliente
+        // para garantizar que la actualización de estado en Firestore se pueda guardar y evitar spam.
+        if (window.Auth && (!window.Auth.currentUser || !window.Auth.currentUser.isAdmin)) {
+            return;
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (localStorage.getItem('maulas_tg_reminder_sent_' + todayStr)) {
+            return;
+        }
+
         try {
             // 1. Get Config
             const config = await window.DataService.getAll('config');
@@ -456,7 +467,7 @@ window.TelegramService = {
             const rem = config.find(c => c.id === 'reminder') || {
                 day: 4,
                 hour: 9,
-                message: '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://maula-web.github.io/login.html)'
+                message: '¡¡Por fin es jueves!! 🐸\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://maula-web.github.io/login.html)'
             };
 
             if (!tg || !tg.enabled || !tg.reminderEnabled || !tg.token || !tg.chatId) return;
@@ -481,37 +492,42 @@ window.TelegramService = {
 
             if (dayOfWeek !== rem.day || hour < (rem.hour || 0)) return;
 
-            // 4. Find target Jornada (upcoming)
+            // 4. Find target Jornada (upcoming and unfinished)
             const jornadas = await window.DataService.getAll('jornadas');
+            const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
 
-            const targetJornada = jornadas.find(j => {
-                if (!j.active) return false;
-                // If already sent, skip
-                if (j.thursdayReminderSent) return false;
+            const activeJornadas = jornadas
+                .filter(j => j && j.active !== false && (j.season || '2026-2027') === activeSeason)
+                .sort((a, b) => (parseInt(a.number || a.id) || 0) - (parseInt(b.number || b.id) || 0));
 
-                const activeSeason = (window.AppUtils && window.AppUtils.activeSeason) || '2026-2027';
-                if ((j.season || '2026-2027') !== activeSeason) return false;
+            const isFinished = (j) => {
+                if (j.status === 'closed' || j.status === 'completed' || j.finalizada === true) return true;
+                if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return false;
+                const filledResults = j.matches.filter(m => {
+                    if (!m || !m.result) return false;
+                    const r = String(m.result).trim().toLowerCase();
+                    return r !== '' && r !== '-' && r !== 'por definir';
+                }).length;
+                return filledResults >= 14;
+            };
 
-                const jDate = AppUtils.parseDate(j.date);
-                if (!jDate) return false;
+            const targetJornada = activeJornadas.find(j => {
+                // If already sent today, skip
+                if (j.thursdayReminderDate === todayStr) return false;
+                if (j.thursdayReminderSent && !j.thursdayReminderDate) return false;
 
-                // Time diff in milliseconds
-                const diff = jDate.getTime() - now.getTime();
-                const diffDays = diff / (1000 * 3600 * 24);
-
-                // We target the next Jornada within the next 6 days (to be safe across different configured days)
-                return diffDays >= 0 && diffDays <= 6;
+                // Debe ser la siguiente jornada pendiente de juego
+                return !isFinished(j);
             });
 
             if (targetJornada) {
                 console.log(`TelegramService: Sending Weekly Reminder (J${targetJornada.number})...`);
 
-                let msg = rem.message || '¡¡Por fin es jueves!! 🦅\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://maula-web.github.io/login.html)';
+                let msg = rem.message || '¡¡Por fin es jueves!! 🐸\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://maula-web.github.io/login.html)';
                 msg = msg.replace('{jornada}', targetJornada.number);
 
-                const hasPIG = targetJornada.matches && targetJornada.matches.some(m => m && AppUtils.isPigMatch(m.home, m.away));
+                const hasPIG = targetJornada.matches && targetJornada.matches.some(m => m && window.AppUtils && window.AppUtils.isPigMatch(m.home, m.away));
                 if (hasPIG) {
-                    // Si existe el enlace al final, lo ponemos antes del enlace para que quede mejor
                     const pigWarning = '\n\n⚠️ *¡ATENCIÓN! Esta jornada hay PIG 🐷 (Partido de Interés General).* ¡Recuerda sellar también el PIG 🐷!';
                     if (msg.includes('\n🔗')) {
                         msg = msg.replace('\n🔗', pigWarning + '\n🔗');
@@ -524,6 +540,8 @@ window.TelegramService = {
 
                 if (res.ok) {
                     targetJornada.thursdayReminderSent = true;
+                    targetJornada.thursdayReminderDate = todayStr;
+                    localStorage.setItem('maulas_tg_reminder_sent_' + todayStr, String(targetJornada.number));
                     await window.DataService.save('jornadas', targetJornada);
                     console.log("TelegramService: Reminder sent and logged.");
                 } else {

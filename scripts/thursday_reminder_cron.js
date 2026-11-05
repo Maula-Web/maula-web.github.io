@@ -47,6 +47,133 @@ function initFirebase() {
     };
 }
 
+
+// =========================================================================
+// FUNCIONES AUXILIARES: TELEGRAM Y PIG
+// =========================================================================
+function normalizeTeamName(name) {
+    if (!name) return '';
+    return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '');
+}
+
+function getPigClub(name) {
+    if (!name) return null;
+    const norm = normalizeTeamName(name);
+    if (/^(realmadrid|rmadrid)$/.test(norm)) return 'REAL_MADRID';
+    if (/^(barcelona|fcbarcelona|barca)$/.test(norm)) return 'BARCELONA';
+    if (/^(atleticomadrid|atletico|atmadrid)$/.test(norm)) return 'ATLETICO_MADRID';
+    return null;
+}
+
+function hasPigMatch(matches) {
+    if (!Array.isArray(matches)) return false;
+    return matches.some(m => {
+        if (!m || !m.home || !m.away) return false;
+        const c1 = getPigClub(m.home);
+        const c2 = getPigClub(m.away);
+        return c1 && c2 && c1 !== c2;
+    });
+}
+
+async function sendTelegramReminder(db, targetJornada, todayMadridStr, isManualRun) {
+    console.log('\n-------------------------------------------------------------');
+    console.log('  📢 COMPROBANDO RECORDATORIO SEMANAL DE TELEGRAM');
+    console.log('-------------------------------------------------------------');
+
+    try {
+        const tgDoc = await db.collection('config').doc('telegram').get();
+        if (!tgDoc.exists) {
+            console.log('ℹ️ No existe configuración de Telegram en Firestore.');
+            return;
+        }
+        const tg = tgDoc.data();
+        if (!tg.enabled || !tg.reminderEnabled || !tg.token || !tg.chatId) {
+            console.log('ℹ️ Recordatorios de Telegram deshabilitados en configuración.');
+            return;
+        }
+
+        const remDoc = await db.collection('config').doc('reminder').get();
+        const rem = remDoc.exists ? remDoc.data() : {};
+
+        // Deduplicación estricta para Telegram: un solo mensaje por jueves
+        if (!isManualRun) {
+            if (targetJornada.thursdayReminderDate === todayMadridStr) {
+                console.log(`ℹ️ Recordatorio de Telegram para Jornada ${targetJornada.number} ya enviado hoy (${todayMadridStr}). Omitiendo.`);
+                return;
+            }
+
+            const tgLogSnap = await db.collection('push_log')
+                .where('type', '==', 'telegram_thursday_reminder')
+                .where('jornada', '==', targetJornada.number)
+                .get();
+
+            const alreadySentTelegram = !tgLogSnap.empty && tgLogSnap.docs.some(d => {
+                const data = d.data();
+                const sentAt = data.sentAt ? new Date(data.sentAt).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' }) : null;
+                return sentAt === todayMadridStr || data.dateStr === todayMadridStr;
+            });
+
+            if (alreadySentTelegram) {
+                console.log(`ℹ️ Ya existe registro en push_log del recordatorio Telegram de hoy para Jornada ${targetJornada.number}. Omitiendo.`);
+                return;
+            }
+        }
+
+        let msg = rem.message || '¡¡Por fin es jueves!! 🐸\n\nNo olvidéis rellenar la quiniela de la Jornada {jornada}.\n🔗 [Peña Maulas](https://maula-web.github.io/login.html)';
+        msg = msg.replace('{jornada}', targetJornada.number);
+
+        if (hasPigMatch(targetJornada.matches)) {
+            const pigWarning = '\n\n⚠️ *¡ATENCIÓN! Esta jornada hay PIG 🐷 (Partido de Interés General).* ¡Recuerda sellar también el PIG 🐷!';
+            if (msg.includes('\n🔗')) {
+                msg = msg.replace('\n🔗', pigWarning + '\n🔗');
+            } else {
+                msg += pigWarning;
+            }
+        }
+
+        console.log(`🚀 Enviando recordatorio semanal a Telegram (Jornada ${targetJornada.number})...`);
+        const url = `https://api.telegram.org/bot${tg.token}/sendMessage`;
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: tg.chatId,
+                text: msg,
+                parse_mode: 'Markdown',
+                disable_web_page_preview: true
+            })
+        });
+
+        const resData = await res.json();
+        if (resData.ok) {
+            console.log(`✅ Mensaje de Telegram enviado con éxito (Message ID: ${resData.result?.message_id}).`);
+
+            if (targetJornada._docId) {
+                await db.collection('jornadas').doc(targetJornada._docId).update({
+                    thursdayReminderSent: true,
+                    thursdayReminderDate: todayMadridStr
+                });
+            }
+
+            await db.collection('push_log').add({
+                type: 'telegram_thursday_reminder',
+                jornada: targetJornada.number,
+                dateStr: todayMadridStr,
+                sentAt: new Date().toISOString(),
+                source: isManualRun ? 'manual-dispatch' : 'github-actions-cron',
+                messageId: resData.result?.message_id
+            });
+            console.log('📝 Registro de Telegram guardado en push_log.');
+        } else {
+            console.error('❌ Error al enviar mensaje a Telegram:', resData.description || resData);
+        }
+    } catch (err) {
+        console.error('❌ Error en sendTelegramReminder:', err.message);
+    }
+}
+
 async function main() {
     console.log('\n=============================================================');
     console.log('  ⚽ PEÑA MAULAS - RECORDATORIO AUTOMÁTICO DE QUINIELA JUEVES ');
@@ -84,15 +211,24 @@ async function main() {
 
     const activeJornadas = [];
     jornadasSnap.forEach(doc => {
-        activeJornadas.push(doc.data());
+        activeJornadas.push({ ...doc.data(), _docId: doc.id });
     });
-    activeJornadas.sort((a, b) => (a.number || 0) - (b.number || 0));
+    activeJornadas.sort((a, b) => (parseInt(a.number || a.id) || 0) - (parseInt(b.number || b.id) || 0));
+
+    const isFinished = (j) => {
+        if (j.status === 'closed' || j.status === 'completed' || j.finalizada === true) return true;
+        if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return false;
+        const filledResults = j.matches.filter(m => {
+            if (!m || !m.result) return false;
+            const r = String(m.result).trim().toLowerCase();
+            return r !== '' && r !== '-' && r !== 'por definir';
+        }).length;
+        return filledResults >= 14;
+    };
 
     let targetJornada = null;
     for (const j of activeJornadas) {
-        const matches = j.matches || [];
-        const filled = matches.filter(m => m.result && m.result !== '').length;
-        if (filled < 15) {
+        if (!isFinished(j)) {
             targetJornada = j;
             break;
         }
@@ -105,6 +241,9 @@ async function main() {
 
     const jornadaNum = targetJornada.number;
     console.log(`✅ Jornada activa seleccionada: Jornada ${jornadaNum} (Fecha: ${targetJornada.date || 'Sin fecha'})`);
+
+    // Recordatorio general por canal de Telegram (broadcast único semanal)
+    await sendTelegramReminder(db, targetJornada, todayMadridStr, isManualRun);
 
     // Comprobar si ya se envió hoy para esta jornada (evita envíos duplicados si hay reintentos programados)
     if (!isManualRun) {

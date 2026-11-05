@@ -736,13 +736,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateClock();
         setInterval(updateClock, 1000);
 
-        // Telegram Weekly Reminder Check
-        // We delay slightly to ensure TelegramService is fully initialized if needed
-        setTimeout(() => {
-            if (window.TelegramService && typeof window.TelegramService.checkThursdayReminder === 'function') {
-                window.TelegramService.checkThursdayReminder();
-            }
-        }, 3000);
     }
 });
 
