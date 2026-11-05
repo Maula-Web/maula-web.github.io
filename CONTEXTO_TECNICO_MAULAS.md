@@ -1731,6 +1731,48 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 67. CALIBRACIÓN MILIMÉTRICA DE MARCAS 'X' EN AYUDA AL SELLADO DE REDUCIDAS
+- **Regla y Diagnóstico**:
+  - En la vista de Ayuda de Sellado (`pronosticos_2.html` / `pronosticos.html`), sobre las imágenes oficiales del boleto físico (`IMAGENES/reducidas.png`) y de la interfaz web oficial de SELAE (`IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg`), se superponen marcas 'X' cian para indicar al socio sellador exactamente qué casillas marcar.
+  - Las marcas previas se encontraban desalineadas debido a fórmulas teóricas de cuadrículas 33x33 y coordenadas desfasadas que caían en los encabezados o en los márgenes exteriores.
+- **Implementación Técnica (`js/pronosticos.js`, `css/light-theme.css`)**:
+  - **Boleto Físico de Reducidas (`IMAGENES/reducidas.png` · 1930 × 1236 px)**:
+    * Columnas de pronósticos: `c1: 17.36%`, `cX: 19.27%`, `c2: 21.14%`.
+    * Matriz de alturas por partido (1 a 14) que refleja los grupos físicos del boleto: `physRowsY = [26.29, 29.29, 33.17, 36.17, 39.16, 44.17, 47.17, 50.16, 53.24, 56.23, 59.30, 64.24, 67.31, 70.31]`.
+    * Columna de combinaciones (dobles): `cD = 23.11%` (marca casilla 7 en Y = 47.17%).
+    * Casilla de Reducción Autorizada 2 (Segunda: 7 dobles): `x = 35.49%, y = 25.89%`.
+    * Casillas de partidos en REDUCCIONES (1 a 14): dos columnas (`x = 27.67%` para partidos 1-7, `x = 29.79%` para partidos 8-14, con espaciado vertical calibrado).
+    * Pleno al 15: Equipo 1 (`y = 81.72%`) y Equipo 2 (`y = 84.79%`) con columnas 0, 1, 2, M (`11.61%, 13.42%, 15.23%, 17.05%`).
+  - **Interfaz Digital Web (`IMAGENES/imagenes_reducidas_interfaz_1416b371.jpg` · 806 × 573 px)**:
+    * Columnas de pronósticos: `c1: 30.15%`, `cX: 32.13%`, `c2: 34.12%`.
+    * Inicio vertical Partido 1: `startY = 18.37%` con paso uniforme exacto `stepY = 3.665%` (21 px/fila).
+    * Columna "PART. EN SISTEMA" (partidos con doble): `sX = 49.01%`.
+    * Casilla "Segunda: 7 dobles - 16 apuestas": `x = 72.46%, y = 44.50%`.
+    * Pleno al 15 digital: `p15Y = 75.39%` (Equipo 1: 30.52% a 35.73%, Equipo 2: 54.59% a 59.80%).
+  - **Soporte Dual Modo Claro / Modo Oscuro**:
+    * Clase `.help-mark-x` adaptada en `css/light-theme.css` con contraste azul cielo sobre fondo claro (`#0369a1`, borde `#0284c7`, fondo `rgba(224, 242, 254, 0.9)`), manteniendo cyan vibrante con fondo azul marino en Modo Oscuro.
+
+---
+
+## 68. POLÍTICA DE EXPIRACIÓN Y CADUCIDAD DE ANUNCIOS EN EL TELETIPO (MÁXIMO 5 DÍAS)
+- **Regla de Negocio**:
+  - Ningún anuncio, aviso o noticia del teletipo (`news-ticker-bar`) puede permanecer visible más de cinco (5) días.
+  - Al cumplirse 5 días desde su creación (`createdAt`), el anuncio debe ser sustituido por otro nuevo o retirarse automáticamente si no hay noticias vigentes.
+  - No se anuncian modificaciones internas en el teletipo de forma automática.
+- **Implementación Técnica (`js/teletipo.js`, `js/dashboard_2.js`)**:
+  - **Filtro de Antigüedad Estricto (`MAX_ANUNCIO_AGE_MS = 5 * 24 * 60 * 60 * 1000`)**:
+    * En `js/teletipo.js` y `js/dashboard_2.js`, la lista de anuncios activos de socios (`activeSocioAnnouncements`) evalúa en tiempo real:
+      `if (a.createdAt && (now - a.createdAt) > MAX_ANUNCIO_AGE_MS) return false;`
+      `if (a.expiresAt && a.expiresAt <= now) return false;`
+    * Si el anuncio supera los 5 días de antigüedad, queda excluido de la visualización y no se renderiza en la cinta.
+  - **Purga de Anuncios Estáticos Obsoletos**:
+    * Se eliminaron todos los avisos hardcodeados antiguos de semanas y meses anteriores (anuncios de versiones v2.54, resultados de jornadas 16 y 18, estrenos de juegos y balances antiguos).
+    * El teletipo queda reservado a:
+      1. Avisos de socios vigentes (<= 5 días de antigüedad).
+      2. Datos y métricas en tiempo real de la competición (jornada en juego/próxima, marcadores en directo, podio general, líder, sellador, caja real, alerta PIG, límite de sellado, envíos y premios acumulados).
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

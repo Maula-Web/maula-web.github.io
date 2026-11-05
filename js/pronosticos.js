@@ -1269,32 +1269,33 @@ class PronosticoManager {
         const authorName = authorMem ? (typeof AppUtils !== 'undefined' ? AppUtils.getMemberName(authorMem).split(' ')[0] : authorMem.name) : '';
 
         // ---------------------------------------------------------
-        // 1. BOLETO FÍSICO (Matriz de reducción)
         // ---------------------------------------------------------
-        const gC = 33;
-        const gP = (c) => ((c - 0.5) / gC) * 100;
-
+        // 1. BOLETO FÍSICO (reducidas.png · 1930 x 1236 px)
+        // ---------------------------------------------------------
+        // Coordenadas milimétricas calibradas sobre la imagen oficial
+        const physRowsY = [26.29, 29.29, 33.17, 36.17, 39.16, 44.17, 47.17, 50.16, 53.24, 56.23, 59.30, 64.24, 67.31, 70.31];
         const phys = {
-            c1: gP(10), cX: gP(12), c2: gP(14),
-            cP: gP(16), cT: gP(20),
-            p15Cols: { '0': gP(2), '1': gP(4), '2': gP(6), 'M': gP(8) },
-            r15E1: gP(28), r15E2: gP(29)
+            c1: 17.36, cX: 19.27, c2: 21.14,
+            cD: 23.11, // Columna COMBINACIONES (DOBLES)
+            cReducAutorizada2: { x: 35.49, y: 25.89 }, // Casilla 2 en Reducciones Autorizadas (Segunda: 7 dobles)
+            p15Cols: { '0': 11.61, '1': 13.42, '2': 15.23, 'M': 17.05 },
+            r15E1: 81.72, r15E2: 84.79
         };
 
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
-            const rE = 2 + (idx * 2);
-            const y = gP(rE);
+            const y = physRowsY[idx] !== undefined ? physRowsY[idx] : (26.29 + idx * 3.38);
             const sUpper = String(sign || '').toUpperCase();
             if (sUpper.includes('1')) this.drawX(this.marksPhysical, phys.c1, y);
             if (sUpper.includes('X')) this.drawX(this.marksPhysical, phys.cX, y);
             if (sUpper.includes('2')) this.drawX(this.marksPhysical, phys.c2, y);
             if (sUpper.length >= 2) {
                 doublesCount++;
-                doubleIndices.push(idx + 1);
+                doubleIndices.push(idx + 1); // Índice 1-based del partido
             }
         });
 
+        // Pleno al 15 (Boleto físico)
         const p15Val = String(sel[14] || '').toUpperCase();
         if (p15Val.includes('-')) {
             const [h, a] = p15Val.split('-');
@@ -1302,23 +1303,47 @@ class PronosticoManager {
             if (phys.p15Cols[a]) this.drawX(this.marksPhysical, phys.p15Cols[a], phys.r15E2);
         }
 
-        if (doublesCount === 7) {
-            this.drawX(this.marksPhysical, phys.cP, gP(14)); // P14 (7 dobles)
-            this.drawX(this.marksPhysical, gP(26.8), gP(14.8)); // Casilla Reducción
-        } else if (doublesCount > 0) {
-            const multRow = doublesCount * 2;
-            if (multRow <= 32) this.drawX(this.marksPhysical, phys.cP, gP(multRow));
+        // Columna Combinaciones (marca el número de dobles, ej. casilla 7)
+        if (doublesCount > 0 && doublesCount <= 14) {
+            const dRowY = physRowsY[doublesCount - 1];
+            if (dRowY !== undefined) this.drawX(this.marksPhysical, phys.cD, dRowY);
         }
 
-        doubleIndices.forEach(idx => {
-            const rE = 2 + ((idx - 1) * 2);
-            this.drawX(this.marksPhysical, phys.cT, gP(rE));
+        // Si son 7 dobles reducidos, marcar casilla 2 en Reducciones Autorizadas (Segunda: 7 dobles)
+        if (doublesCount === 7) {
+            this.drawX(this.marksPhysical, phys.cReducAutorizada2.x, phys.cReducAutorizada2.y);
+        }
+
+        // Marcar números de partidos con doble en la sección REDUCCIONES (casillas 1 a 14)
+        doubleIndices.forEach(matchNum => {
+            if (matchNum >= 1 && matchNum <= 7) {
+                const xRed = 27.67;
+                const yRed = ((320 + (matchNum - 1) * 32) / 1236) * 100;
+                this.drawX(this.marksPhysical, xRed, yRed);
+            } else if (matchNum >= 8 && matchNum <= 14) {
+                const xRed = 29.79;
+                const yRed = ((320 + (matchNum - 8) * 32) / 1236) * 100;
+                this.drawX(this.marksPhysical, xRed, yRed);
+            }
         });
 
         // ---------------------------------------------------------
-        // 2. INTERFAZ DIGITAL WEB
+        // 2. INTERFAZ DIGITAL WEB (imagenes_reducidas_interfaz_1416b371.jpg · 806 x 573 px)
         // ---------------------------------------------------------
-        const dig = { startY: 23.5, stepY: 4.02, c1: 60.5, cX: 62.1, c2: 63.7, sX: 72.2 };
+        // Coordenadas milimétricas calibradas sobre la interfaz web de SELAE
+        const dig = {
+            startY: 18.37,
+            stepY: 3.665,
+            c1: 30.15,
+            cX: 32.13,
+            c2: 34.12,
+            sX: 49.01, // Columna PART. EN SISTEMA (selección de partidos con doble)
+            reducSegunda: { x: 72.46, y: 44.50 }, // Casilla "Segunda: 7 dobles - 16 apuestas"
+            p15Y: 75.39,
+            p15E1: { '0': 30.52, '1': 32.26, '2': 33.99, 'M': 35.73 },
+            p15E2: { '0': 54.59, '1': 56.33, '2': 58.06, 'M': 59.80 }
+        };
+
         sel.forEach((sign, idx) => {
             if (idx === 14) return;
             const y = dig.startY + (idx * dig.stepY);
@@ -1328,6 +1353,19 @@ class PronosticoManager {
             if (sUpper.includes('2')) this.drawX(this.marksDigital, dig.c2, y);
             if (sUpper.length >= 2) this.drawX(this.marksDigital, dig.sX, y);
         });
+
+        // Pleno al 15 (Interfaz digital)
+        if (p15Val.includes('-')) {
+            const [h, a] = p15Val.split('-');
+            if (dig.p15E1[h]) this.drawX(this.marksDigital, dig.p15E1[h], dig.p15Y);
+            if (dig.p15E2[a]) this.drawX(this.marksDigital, dig.p15E2[a], dig.p15Y);
+        }
+
+        // Reducción autorizada en web (Segunda: 7 dobles)
+        if (doublesCount === 7) {
+            this.drawX(this.marksDigital, dig.reducSegunda.x, dig.reducSegunda.y);
+        }
+
 
         const guideText = 'J.' + (targetJ ? targetJ.number : '') + ' · ' + doublesCount + ' DOBLES' + (authorName ? ' (' + authorName + ')' : '');
         this.marksPhysical.innerHTML += '<div style="position:absolute; top:12px; right:12px; background:rgba(2, 132, 199, 0.95); color:white; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:100; border:1px solid #38bdf8; font-family:sans-serif;">' + guideText + '</div>';

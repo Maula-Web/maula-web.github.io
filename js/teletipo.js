@@ -275,8 +275,16 @@
             }
 
             const now = Date.now();
+            // REGLA OFICIAL DE VIGENCIA: Máximo 5 días por anuncio. Si supera los 5 días, se elimina automáticamente.
+            const MAX_ANUNCIO_AGE_MS = 5 * 24 * 60 * 60 * 1000;
             const activeSocioAnnouncements = socioAnnouncements
-                .filter(a => a && a.text && String(a.text).trim().length > 0 && a.active !== false && (!a.expiresAt || a.expiresAt > now))
+                .filter(a => {
+                    if (!a || !a.text || String(a.text).trim().length === 0) return false;
+                    if (a.active === false) return false;
+                    if (a.createdAt && (now - a.createdAt) > MAX_ANUNCIO_AGE_MS) return false;
+                    if (a.expiresAt && a.expiresAt <= now) return false;
+                    return true;
+                })
                 .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
             const socioItems = activeSocioAnnouncements.map(a => ({
@@ -299,192 +307,6 @@
             } else {
                 items.push(`⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`);
             }
-
-            // NOTICIA DASHBOARD MODO FÁCIL: SOPORTE LANDSCAPE HORIZONTAL
-            items.push({
-                text: '📱 <strong class="text-amber-400">Modo Fácil en Horizontal:</strong> Optimizado el Dashboard al girar el móvil (landscape), con scroll vertical fluido y eliminación completa de solapamientos entre tarjetas.',
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA CLASIFICACIÓN MODO FÁCIL: TABLA DE HONOR FIJADA
-            items.push({
-                text: '🏅 <strong class="text-amber-400">Modo Fácil en Clasificación:</strong> Se fija siempre la Tabla de Honor (Ranking) como vista principal garantizada, asegurando carga instantánea de datos y sin pantallas vacías.',
-                url: 'clasificacion_2.html'
-            });
-
-            // NOTICIA BOTE: REGISTRO DUAL DE INGRESOS Y RETIRADAS
-            items.push({
-                text: '💰 <strong class="text-amber-400">Tesorería del Bote:</strong> Se habilita selector dual en el registro de movimientos para registrar tanto Aportaciones/Ingresos (+) como Retiradas/Salidas (-) de forma ágil y visual.',
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA ANÁLISIS MUNDO DEPORTIVO JORNADA 18
-            items.push({
-                text: '📰 <strong class="text-cyan-400">Análisis Mundo Deportivo:</strong> Sincronizados los 15 análisis, porcentajes y clasificaciones oficiales de la Jornada 18 en Quiniela y Jornadas.',
-                url: 'jornadas_2.html'
-            });
-
-            // NOTICIA REDISTRIBUCIÓN Y AJUSTES MODO FÁCIL MÓVIL
-            items.push({
-                text: '📱 <strong class="text-amber-400">Modo Fácil Móvil:</strong> Reorganización limpia de cabecera de jornada sin solapes, botón \'Ver bote\' reubicado en línea propia para mayor ergonomía y pantalla única sin scroll (v2.54).',
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA REGLAMENTO QUINIELA DE DOBLES
-            items.push({
-                text: '✌️ <strong class="text-purple-400">Quiniela de Dobles:</strong> Se habilita exclusivamente para la próxima jornada inmediata a disputarse. En jornadas posteriores publicadas, los dobles se activarán correlativamente tras conocer los resultados oficiales previos.',
-                url: 'pronosticos_2.html'
-            });
-
-            // NOTICIA MODO FÁCIL PARA TODOS LOS USUARIOS
-            items.push({
-                text: '⚡ <strong class="text-amber-400">¡Modo Fácil para todos!:</strong> Estrenamos la nueva interfaz simplificada a pantalla única para todos los socios. Puedes alternar en 1 clic entre Modo Fácil (⚡) y Modo Pro (🚀) en la barra superior.',
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA DASHBOARD: Botón Ver Mi Bote, Modo Fácil y Pantalla Única en PC
-            items.push({
-                text: '⚡ <strong class="text-amber-400">Mejora Dashboard:</strong> Nuevo botón destacado para "Ver mi bote", optimización táctil en Modo Fácil sin textos cortados, información de Dobles en PC y ajuste de pantalla única en Modo Pro.',
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA MODO FÁCIL MÓVIL: Ajuste de Pantalla Única sin Scroll
-            items.push({
-                text: '📱 <strong class="text-amber-400">Modo Fácil Móvil:</strong> Ajuste de altura y eliminación completa del scroll vertical en el Dashboard para visualización a pantalla única.',
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA BOTE: Sincronización del Cálculo Oficial de Caja Real
-            items.push({
-                text: '💰 <strong class="text-amber-400">Auditoría del Bote:</strong> Sincronización dinámica de la fórmula de Cálculo de Caja Real con las tarjetas contables de saldos, premios, cuotas, penalizaciones y sellados.',
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA 1.d: VELOCIDAD Y ANUNCIOS DE SOCIOS EN TELETIPO
-            items.push({
-                text: '📢 <strong class="text-amber-400">Novedad Teletipo:</strong> Ya puedes ajustar la velocidad de la cinta y publicar anuncios de socios en las primeras posiciones (1 por semana, 3 días de vigencia) desde Administración.',
-                url: 'admin_2.html'
-            });
-
-            // NOTICIA 1.c: MEJORA ERGONOMÍA MÓVIL - Menú Superior
-            items.push({
-                text: '📱 <strong class="text-amber-400">Mejora Móvil:</strong> Menú superior y botones de acción (actualizar y cerrar sesión) reajustados para visualización perfecta en cualquier móvil sin cortes.',
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA 1.b: NOVEDAD RESULTADOS - Matriz Panorámica en PC
-            items.push({
-                text: '🗂️ <strong class="text-amber-400">Mejora Resultados:</strong> Matriz Panorámica optimizada exclusivamente para jornadas disputadas y nuevos tooltips visuales integrados.',
-                url: 'jornadas_2.html'
-            });
-
-            // NOTICIA 2: NOVEDAD WEB - Maula Hero
-            items.push({
-                text: `🎮 <strong class="text-amber-400">¡Novedad en la Web!:</strong> Maula Hero: subida de nivel ágil cada 25s o por puntos conseguidos, pausa de celebración y barra dual de progreso.`,
-                url: 'juego.html'
-            });
-
-            // NOTICIA 2.b: NOVEDAD WEB - Tarjeta personal del Socio Conectado
-            items.push({
-                text: `👤 <strong class="text-amber-400">Novedad Dashboard:</strong> Nueva tarjeta del Socio Conectado a pantalla completa con aciertos, puesto en clasificación, saldo de bote personal y alerta de PIG.`,
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA 2.c: NOVEDAD WEB - Avisos Emergentes Directos
-            items.push({
-                text: `💬 <strong class="text-amber-400">Novedad Web:</strong> Avisos emergentes automáticos al conectarse para informar de saldo deudor, quiniela pendiente o responsabilidades semanales.`,
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA 2.d: NOVEDAD HOJA DE MARCELO - Reconstrucción Histórica
-            items.push({
-                text: `📑 <strong class="text-emerald-400">Oficial en el Bote:</strong> Ya disponible para todos los socios la <strong>Hoja de Marcelo</strong> con auditoría completa de botes, sumas, restas, caja real y selector histórico.`,
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA 2.e: SEPARADOR DE MILES EN CANTIDADES
-            items.push({
-                text: `💶 <strong class="text-amber-400">Mejora Visual:</strong> Todas las cantidades y botes de la web cuentan ahora con separador de miles con punto (ej. 1.028,30 €) para mayor claridad.`,
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA 2.f: EXPERIMENTAL MODO FÁCIL
-            items.push({
-                text: `⚡ <strong class="text-amber-400">En Desarrollo:</strong> Tarjetas de balance y tesorería optimizadas en cuadrícula ergonómica compacta (2-2-1) en móviles.`,
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA 2.g: ACTUALIZACIÓN IMPORTADOR DE PARTIDOS
-            items.push({
-                text: `⚽ <strong class="text-amber-400">Importador de Partidos:</strong> Actualizado con detección dinámica de boletos oficiales y calendario completo de próximas jornadas en 1 clic.`,
-                url: 'jornadas_2.html'
-            });
-
-            // NOTICIA 2.d: CAJA REAL OFICIAL Y BALANCE CONTABLE
-            items.push({
-                text: `💰 <strong class="text-amber-400">Caja Real Oficial:</strong> Fijada en <strong>${cajaFmt}</strong> (suma de tarjetas: Saldos + Premios + Cuotas + Penalizaciones − Sellados).`,
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA 2.c: QUINIELA DE DOBLES JORNADA 18
-            items.push({
-                text: `✌️ <strong class="text-purple-400">Quiniela de Dobles J.18:</strong> Responsables oficiales asignados: <strong>Samu</strong> (ganador único J.16 tras desempate) y <strong>Rafa</strong> (premio oficial de 5,61 € en dobles J.16).`,
-                url: 'pronosticos_2.html'
-            });
-
-            // NOTICIA 2.g: RESULTADO PIG JORNADA 16
-            items.push({
-                text: `🐷 <strong class="text-pink-400">Resultado PIG J.16 (El Clásico):</strong> Barcelona 1 - 2 Real Madrid. 5 acertantes exentos de multa y 14 socios penalizados (-1,00 € al Bote).`,
-                url: 'jornadas_2.html'
-            });
-
-            // NOTICIA REGLAMENTO: NUEVA REGLA QUINIELA DE DOBLES
-            items.push({
-                text: `📜 <strong class="text-amber-400">Reglamento Dobles:</strong> Sella dobles el ganador único previo. Si quien hizo los dobles previos obtuvo premio económico oficial, también sella dobles (2 boletos si son distintos).`,
-                url: 'pronosticos_2.html'
-            });
-
-            // NOTICIA DASHBOARD: DESEMPATE EN VIVO EN DOBLES
-            items.push({
-                text: `👑 <strong class="text-amber-400">Dashboard en Vivo:</strong> La ventana de Dobles resuelve en directo el desempate por historial para presentar al único ganador provisional.`,
-                url: 'dashboard_2.html'
-            });
-
-            // NOTICIA PRONÓSTICOS: COLUMNA MAULA YA OPERATIVA
-            items.push({
-                text: `⭐ <strong class="text-amber-400">Columna Maula ya operativa:</strong> Ya puedes consultar la quiniela colectiva en la tabla de pronósticos, con selección por expertos históricos y congelación inmutable para toda la jornada.`,
-                url: 'pronosticos_2.html'
-            });
-
-            // NOTICIA 2.d: NOVEDAD EN BOTE - Tarjeta Balance y Desglose Contable
-            items.push({
-                text: `💰 <strong class="text-emerald-400">Novedad en Bote:</strong> Nueva tarjeta con el balance contable completo: saldos de socios, premios, cuotas, penalizaciones y sellados.`,
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA 2.e: NOVEDAD EN BOTE - Fila de totales en Detalle de la Jornada
-            items.push({
-                text: `📊 <strong class="text-amber-400">Novedad en Bote:</strong> Nueva fila de totales al pie de la tabla Detalle de la Jornada (aciertos, cuotas, penalizaciones, premios y saldos).`,
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA: IMPORTACIÓN DE ANÁLISIS MUNDO DEPORTIVO EN QUINIELA
-            items.push({
-                text: `📰 <strong class="text-cyan-400">Novedad Quiniela:</strong> Nuevo botón 'Importar Análisis MD' en el panel de Quiniela para sincronizar y consultar en 1 clic los análisis, porcentajes 1X2 y clasificaciones de Mundo Deportivo.`,
-                url: 'jornadas_2.html'
-            });
-
-            // NOTICIA 2.e2: NOVEDAD EN BOTE - Explorador de Premios
-            items.push({
-                text: `🎁 <strong class="text-amber-400">Novedad en Bote:</strong> Nuevo explorador de premios obtenidos: vista agrupada por socio, por jornada o desglosada (ordenada por jornada, cantidad o socio).`,
-                url: 'bote_2.html'
-            });
-
-            // NOTICIA 2.f: AUDITORÍA FLUJO DE CAJA
-            items.push({
-                text: `📈 <strong class="text-amber-400">Flujo de Caja del Bote:</strong> Corregidas y auditadas las columnas de penalizaciones y cuotas reales de la tesorería.`,
-                url: 'bote_2.html'
-            });
 
             // NOTICIAS 2 Y 3: MARCADORES Y RESULTADOS COMPLETOS DE LA JORNADA EN CURSO O RECIENTE
             if (activeMatchJ && Array.isArray(activeMatchJ.matches)) {

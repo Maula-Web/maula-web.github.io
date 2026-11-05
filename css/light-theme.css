@@ -3362,3 +3362,13 @@ html.light-theme #md-analysis-sidebar .bg-slate-900 {
     color: #831843 !important;
 }
 
+
+
+/* Marcas de ayuda de sellado en Modo Claro */
+.light-theme .help-mark-x {
+    color: #0369a1 !important;
+    background: rgba(224, 242, 254, 0.9) !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 5px rgba(2, 132, 199, 0.5) !important;
+    text-shadow: none !important;
+}
