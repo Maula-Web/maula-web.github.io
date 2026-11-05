@@ -1686,6 +1686,51 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 65. ARQUITECTURA DEL RECORDATORIO SEMANAL DE TELEGRAM Y ERRADICACIÓN DE ENVÍOS MASIVOS DESDE CLIENTE (v2.57)
+- **Problema de Envíos Masivos (Spam de más de 25 mensajes)**:
+  - En versiones previas, `js/utils.js` ejecutaba un `setTimeout` de 3 segundos que invocaba `window.TelegramService.checkThursdayReminder()` cada vez que cualquier visitante o socio entraba a la web.
+  - Al ingresar un socio ordinario un jueves por la tarde, el bot de Telegram despachaba el mensaje correctamente usando la API HTTP pública.
+  - Sin embargo, la persistencia de la marca `thursdayReminderSent: true` en Firestore fallaba silenciosamente debido a que los socios normales carecen de permisos de escritura en la colección `jornadas`.
+  - En consecuencia, en la base de datos la jornada permanecía con `thursdayReminderSent: false`, provocando que cada nueva visita o recarga disparase otro mensaje a Telegram.
+  - Adicionalmente, el selector de jornada buscaba en el array de jornadas devuelto por Firestore sin ordenar y con un margen amplio de 6 días, lo que provocaba que se seleccionara erróneamente la Jornada 21 (miércoles siguiente) antes que la Jornada 20 (domingo inmediato).
+- **Solución y Reestructuración Integral**:
+  - **Desacoplamiento y Neutralización en el Cliente (`js/telegram-service.js`, `js/utils.js`)**:
+    * Se eliminó el `setTimeout` de invocación en `js/utils.js`.
+    * La función `checkThursdayReminder()` en `js/telegram-service.js` quedó neutralizada permanentemente (`return;` inmediato). Los clientes web tienen terminantemente prohibido disparar recordatorios grupales programados.
+  - **Centralización en Cron Servidor Oficial (`scripts/thursday_reminder_cron.js`, `.github/workflows/thursday_reminder.yml`)**:
+    * El recordatorio de Telegram de los jueves a las 16:30 se despacha de forma exclusiva y centralizada desde GitHub Actions mediante Node.js con Service Account de Firebase (`FIREBASE_SERVICE_ACCOUNT`).
+    * Comprobación estricta de deduplicación en `push_log` (`type: 'telegram_thursday_reminder'`) y actualización atómica de `thursdayReminderSent: true` y `thursdayReminderDate: todayMadridStr` en el documento oficial de la jornada en Firestore.
+    * Algoritmo de selección cronológica exacta: ordena las jornadas activas de la temporada ascendentemente y selecciona la **primera jornada pendiente de disputarse** (`isFinished(j) === false`, es decir, con menos de 14 resultados oficiales disputados).
+    * Detección automática de PIG (`hasPigMatch`): si la jornada objetivo cuenta con partido PIG, añade la advertencia específica correspondiente.
+  - **Ciclo de Caché PWA y Cache-Busting Universal (`service-worker.js`)**:
+    * Salto de versión de Service Worker a `maulas-pwa-v2.57` para forzar la purga de cachés antiguas.
+    * Estrategia de recarga directa desde red (`cache: 'reload'`) para scripts críticos (`utils.js`, `telegram-service.js`).
+    * Incorporación de parámetros de versión (`?v=20261105c`) en los archivos HTML del proyecto para evitar lecturas de copias locales obsoletas.
+    * Ejecución preventiva en Firestore marcando `thursdayReminderSent: true` en todas las jornadas activas para bloquear clientes antiguos con caché persistente.
+
+---
+
+## 66. CONTROL OBLIGATORIO Y ADVERTENCIAS AL SALIR O GRABAR EL PARTIDO DE INTERÉS GENERAL (PIG)
+- **Principio Reglamentario**:
+  - En cualquier jornada que cuente con un Partido de Interés General (PIG 🐷: enfrentamiento directo entre Real Madrid, FC Barcelona o Atlético de Madrid), el pronóstico para dicho partido es de **cumplimentación obligatoria** para todos los socios de la peña antes del cierre del plazo.
+- **Implementación Técnica (`js/pronosticos.js`, `pronosticos_2.html`, `css/light-theme.css`)**:
+  - **Detección Centralizada (`getPigMatchInfo` e `isPigFilledForCurrentBoleto`)**:
+    * `getPigMatchInfo(jornada)`: examina la jornada e identifica el partido PIG ordinal o de Pleno al 15 (`idx === 14`).
+    * `isPigFilledForCurrentBoleto(jornada)`: evalúa en tiempo real si el socio actual tiene marcado un signo válido para el PIG, contrastando tanto el DOM del formulario activo como los pronósticos guardados en Firestore.
+  - **Bloqueo y Advertencia al Grabar (`saveForecast` y `saveDoubles`)**:
+    * Si la jornada tiene PIG y el socio intenta pulsar *Guardar Pronóstico Base* o *Guardar Quiniela de Dobles* sin haber rellenado el PIG, la acción se detiene y se muestra un mensaje bloqueante:
+      `⚠️ ¡ATENCIÓN! Esta jornada incluye Partido de Interés General (PIG 🐷: [Equipo Local] vs [Equipo Visitante]) y no lo has rellenado. Recuerda que tienes que rellenar el PIG antes de grabar tu quiniela.`
+  - **Control al Salir del Boleto (`window.closeEditorModal`, `selJornada`, `selMember`, enlaces salientes)**:
+    * En el modal de edición de boleto (`pronosticos_2.html`), al pulsar el botón *Cerrar*, el aspa `✕` o el fondo si el PIG no está relleno, `window.closeEditorModal` intercepta la salida y advierte con confirmación interactiva:
+      `⚠️ ¡ATENCIÓN! Esta jornada incluye Partido de Interés General (PIG 🐷: [Equipos]) y aún NO lo has rellenado. Recuerda que tienes que rellenar el PIG. ¿Deseas salir del boleto de todos modos sin rellenar el PIG?`
+    * Si el socio cancela, permanece en el boleto para completarlo. Si confirma su salida, se emite un aviso toast de advertencia.
+    * Igualmente, si el socio cambia de jornada o de socio en los desplegables o pulsa un enlace de navegación del menú teniendo el boleto abierto con PIG incompleto, se dispara el recordatorio preventivo.
+  - **Banner Visual en el Editor y Soporte Dual (`#modal-editor-pig-banner`)**:
+    * En la cabecera del editor de quiniela se despliega una barra identificativa animada (`🐷 Partido de Interés General... ¡Es obligatorio rellenarlo!`).
+    * Diseñada y adaptada con soporte dual idóneo: frambuesa y rosa pastel en Modo Claro (`css/light-theme.css`) y fucsia translúcido en Modo Oscuro.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
