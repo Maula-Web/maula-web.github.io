@@ -3345,3 +3345,20 @@ html.light-theme #md-analysis-sidebar .bg-slate-900 {
     background-color: #f8fafc !important;
     border-color: #e2e8f0 !important;
 }
+
+
+/* Banner PIG dentro del modal de edición de boleto en Modo Claro */
+.light-theme #modal-editor-pig-banner {
+    background-color: #fdf2f8 !important;
+    border-color: #f472b6 !important;
+    color: #9d174d !important;
+}
+.light-theme #modal-editor-pig-banner span {
+    color: #9d174d !important;
+}
+.light-theme #modal-editor-pig-banner .bg-pink-500\/30 {
+    background-color: #fce7f3 !important;
+    border-color: #f472b6 !important;
+    color: #831843 !important;
+}
+

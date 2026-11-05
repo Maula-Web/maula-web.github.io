@@ -1810,6 +1810,13 @@
                             <p id="modal-editor-subtitle" class="text-[11px] sm:text-xs text-slate-400 truncate mt-0.5">
                                 Rellena los 15 signos del pronóstico individual
                             </p>
+                            <div id="modal-editor-pig-banner" class="hidden mt-1.5 px-3 py-1.5 rounded-xl bg-pink-500/20 border border-pink-500/40 text-xs font-bold text-pink-300 flex items-center justify-between gap-2 shadow-sm">
+                                <div class="flex items-center gap-1.5 min-w-0 truncate">
+                                    <span class="text-base shrink-0">🐷</span>
+                                    <span id="modal-editor-pig-text" class="truncate">Esta jornada incluye Partido de Interés General (PIG). ¡Recuerda rellenarlo!</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] uppercase font-black bg-pink-500/30 text-pink-200 border border-pink-500/50 shrink-0">Obligatorio</span>
+                            </div>
                         </div>
                     </div>
 
@@ -2528,9 +2535,27 @@
             }
         };
 
-        window.closeEditorModal = function() {
+        window.closeEditorModal = function(force = false) {
             const modal = document.getElementById('modal-editor-boleto');
-            if (modal) modal.style.display = 'none';
+            if (!modal || modal.style.display === 'none') return;
+
+            // Recordatorio de PIG si el socio no lo ha rellenado al salir del boleto
+            if (!force && window.app && typeof window.app.isPigFilledForCurrentBoleto === 'function') {
+                const j = window.app.jornadas ? window.app.jornadas.find(jor => String(jor.id) === String(window.app.currentJornadaId)) : null;
+                if (j && !window.app.isPigFilledForCurrentBoleto(j)) {
+                    const pigInfo = (typeof window.app.getPigMatchInfo === 'function') ? window.app.getPigMatchInfo(j) : null;
+                    const pigText = pigInfo ? `${pigInfo.home} vs ${pigInfo.away}` : '';
+                    const stay = confirm(`⚠️ ¡ATENCIÓN! Esta jornada incluye Partido de Interés General (PIG 🐷${pigText ? ': ' + pigText : ''}) y aún NO lo has rellenado.\n\nRecuerda que tienes que rellenar el PIG.\n\n¿Deseas salir del boleto de todos modos sin rellenar el PIG?`);
+                    if (!stay) {
+                        return; // Se queda en el boleto para rellenarlo
+                    }
+                    if (window.AppUtils && typeof window.AppUtils.showToast === 'function') {
+                        window.AppUtils.showToast(`🐷 Recuerda: Tienes pendiente rellenar el PIG (${pigText})`, 'warning');
+                    }
+                }
+            }
+
+            modal.style.display = 'none';
             document.body.style.overflow = '';
             
             // Refrescar tabla vertical
@@ -3538,6 +3563,21 @@
                         const d15Divider = this.doublesContainer.querySelector('.p-divider-p15');
                         if (d15Row) d15Row.style.display = hasPig15 ? 'flex' : 'none';
                         if (d15Divider) d15Divider.style.display = hasPig15 ? 'flex' : 'none';
+                    }
+
+                    // Actualizar banner visual de PIG en cabecera del modal
+                    const pigBanner = document.getElementById('modal-editor-pig-banner');
+                    const pigTextEl = document.getElementById('modal-editor-pig-text');
+                    const pigInfo = (typeof this.getPigMatchInfo === 'function') ? this.getPigMatchInfo(j) : null;
+                    if (pigBanner) {
+                        if (pigInfo) {
+                            pigBanner.classList.remove('hidden');
+                            if (pigTextEl) {
+                                pigTextEl.textContent = `Partido de Interés General (${pigInfo.displayIdx}: ${pigInfo.home} vs ${pigInfo.away}). ¡Es obligatorio rellenarlo!`;
+                            }
+                        } else {
+                            pigBanner.classList.add('hidden');
+                        }
                     }
                 }
                 

@@ -309,6 +309,11 @@ class PronosticoManager {
     bindEvents() {
         if (this.selMember) {
             this.selMember.addEventListener('change', (e) => {
+                const currentJ = this.jornadas ? this.jornadas.find(j => String(j.id) === String(this.currentJornadaId)) : null;
+                if (currentJ && !this.isPigFilledForCurrentBoleto(currentJ)) {
+                    const pigInf = this.getPigMatchInfo(currentJ);
+                    alert(`⚠️ ¡ATENCIÓN! Esta jornada incluye Partido de Interés General (PIG 🐷: ${pigInf ? (pigInf.home + ' vs ' + pigInf.away) : ''}) y no has rellenado el PIG para este socio.\n\nRecuerda que tienes que rellenar el PIG.`);
+                }
                 this.currentMemberId = e.target.value;
                 this.loadForecast();
             });
@@ -316,11 +321,36 @@ class PronosticoManager {
 
         if (this.selJornada) {
             this.selJornada.addEventListener('change', (e) => {
+                const prevJ = this.jornadas ? this.jornadas.find(j => String(j.id) === String(this.currentJornadaId)) : null;
+                if (prevJ && !this.isPigFilledForCurrentBoleto(prevJ)) {
+                    const pigInf = this.getPigMatchInfo(prevJ);
+                    alert(`⚠️ ¡ATENCIÓN! La Jornada ${prevJ.number} incluye Partido de Interés General (PIG 🐷: ${pigInf ? (pigInf.home + ' vs ' + pigInf.away) : ''}) y aún no lo has rellenado.\n\nRecuerda que tienes que rellenar el PIG.`);
+                }
                 this.currentJornadaId = e.target.value;
                 this.loadForecast();
             });
         }
 
+        
+        // Advertencia si el socio intenta salir de la página o pulsar un enlace teniendo el PIG pendiente
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const modal = document.getElementById('modal-editor-boleto');
+                const isBoletoOpen = (modal && modal.style.display !== 'none') || (this.container && !this.container.classList.contains('hidden'));
+                if (!isBoletoOpen) return;
+
+                const currentJ = this.jornadas ? this.jornadas.find(j => String(j.id) === String(this.currentJornadaId)) : null;
+                if (currentJ && !this.isPigFilledForCurrentBoleto(currentJ)) {
+                    const pigInf = this.getPigMatchInfo(currentJ);
+                    const pigText = pigInf ? `${pigInf.home} vs ${pigInf.away}` : '';
+                    const proceed = confirm(`⚠️ ¡ATENCIÓN! Esta jornada incluye Partido de Interés General (PIG 🐷: ${pigText}) y aún NO lo has rellenado.\n\nRecuerda que tienes que rellenar el PIG.\n\n¿Deseas salir del boleto sin rellenar el PIG?`);
+                    if (!proceed) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            });
+        });
         this.btnSave.addEventListener('click', () => this.saveForecast());
         if (this.btnClearForecast) {
             this.btnClearForecast.addEventListener('click', () => this.handleClearForecast());
@@ -1316,6 +1346,74 @@ class PronosticoManager {
         container.appendChild(x);
     }
 
+    getPigMatchInfo(jornada) {
+        if (!jornada || !jornada.matches || !Array.isArray(jornada.matches)) return null;
+        for (let idx = 0; idx < jornada.matches.length; idx++) {
+            const m = jornada.matches[idx];
+            if (m && typeof AppUtils !== 'undefined' && AppUtils.isPigMatch && AppUtils.isPigMatch(m.home, m.away)) {
+                return {
+                    index: idx,
+                    displayIdx: idx === 14 ? 'P15' : (idx + 1),
+                    match: m,
+                    home: m.home,
+                    away: m.away,
+                    isPleno: idx === 14
+                };
+            }
+        }
+        if (jornada.isPig && jornada.matches[14]) {
+            const m15 = jornada.matches[14];
+            return {
+                index: 14,
+                displayIdx: 'P15',
+                match: m15,
+                home: m15.home,
+                away: m15.away,
+                isPleno: true
+            };
+        }
+        return null;
+    }
+
+    isPigFilledForCurrentBoleto(jornada) {
+        const targetJ = jornada || (this.jornadas ? this.jornadas.find(j => String(j.id) === String(this.currentJornadaId)) : null);
+        if (!targetJ) return true;
+
+        const pigInfo = this.getPigMatchInfo(targetJ);
+        if (!pigInfo) return true; // No es jornada PIG
+
+        // Si la jornada ya finalizó, no se exige
+        const { isFinished } = (typeof this.isJornadaLocked === 'function') ? this.isJornadaLocked(targetJ) : { isFinished: false };
+        if (isFinished) return true;
+
+        // 1. Comprobar en el formulario base actual del DOM
+        if (this.container) {
+            const row = this.container.querySelector(`.p-options[data-idx="${pigInfo.index}"]`);
+            if (row) {
+                const sel = row.querySelector('.selected');
+                if (sel && sel.textContent && sel.textContent.trim() !== '' && sel.textContent.trim() !== '-') {
+                    return true;
+                }
+            }
+        }
+
+        // 2. Comprobar si ya está guardado en pronósticos de la base de datos
+        if (this.pronosticos && this.currentMemberId) {
+            const existing = this.pronosticos.find(p => 
+                (String(p.jId) === String(targetJ.id) || String(p.jornadaId) === String(targetJ.id)) &&
+                (String(p.mId) === String(this.currentMemberId) || String(p.memberId) === String(this.currentMemberId))
+            );
+            if (existing && existing.selection && existing.selection[pigInfo.index]) {
+                const val = String(existing.selection[pigInfo.index]).trim();
+                if (val !== '' && val !== '-') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     async saveForecast() {
         try {
             console.log("🔵 PASO 1: saveForecast iniciado");
@@ -1367,6 +1465,16 @@ class PronosticoManager {
                 return;
             }
             console.log("Jornada encontrada:", jornada.number);
+
+            // Verificación específica PIG al grabar
+            const pigInfo = this.getPigMatchInfo(jornada);
+            if (pigInfo && !isFullyEmpty) {
+                const pigVal = selection[pigInfo.index];
+                if (!pigVal || String(pigVal).trim() === '' || String(pigVal).trim() === '-') {
+                    alert(`⚠️ ¡ATENCIÓN! Esta jornada incluye Partido de Interés General (PIG 🐷: ${pigInfo.home} vs ${pigInfo.away}) y no lo has rellenado.\n\nRecuerda que tienes que rellenar el PIG antes de grabar tu quiniela.`);
+                    return;
+                }
+            }
 
             console.log("🔵 PASO 5: Comprobando estado de bloqueo");
             const { isLockedRef, hasStarted, isFinished, areAllCompleted } = this.isJornadaLocked(jornada);
@@ -3419,6 +3527,11 @@ class PronosticoManager {
         });
 
         if (missing) {
+            const pigInfoDoubles = this.getPigMatchInfo(jornada);
+            if (pigInfoDoubles && (!selection[pigInfoDoubles.index] || String(selection[pigInfoDoubles.index]).trim() === '')) {
+                alert(`⚠️ ¡ATENCIÓN! Esta jornada incluye Partido de Interés General (PIG 🐷: ${pigInfoDoubles.home} vs ${pigInfoDoubles.away}) y no lo has rellenado en la quiniela de dobles.\n\nRecuerda que tienes que rellenar el PIG antes de grabar.`);
+                return;
+            }
             alert('Debes rellenar todos los signos (incluido el Pleno al 15).');
             return;
         }
