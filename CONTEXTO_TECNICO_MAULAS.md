@@ -1770,7 +1770,8 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
     * Se eliminaron todos los avisos hardcodeados antiguos de semanas y meses anteriores (anuncios de versiones v2.54, resultados de jornadas 16 y 18, estrenos de juegos y balances antiguos).
     * El teletipo queda reservado a:
       1. Avisos de socios vigentes (<= 5 días de antigüedad).
-      2. Datos y métricas en tiempo real de la competición (jornada en juego/próxima, marcadores en directo, podio general, líder, sellador, caja real, alerta PIG, límite de sellado, envíos y premios acumulados).
+      2. Avisos de novedades de la web expresamente autorizados por el administrador en el array `webNews` (como el aviso `ayuda-sellado-marcas-20261105` de las marcas X sobre los boletos de ayuda de sellado), los cuales se filtran automáticamente por antigüedad máxima de 5 días tanto desde `createdAt` como desde su primera visualización en `localStorage` (`maulas_news_first_seen`).
+      3. Datos y métricas en tiempo real de la competición (jornada en juego/próxima, marcadores en directo, podio general, líder, sellador, caja real, alerta PIG, límite de sellado, envíos y premios acumulados).
 
 ---
 

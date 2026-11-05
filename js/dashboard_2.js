@@ -1887,6 +1887,30 @@ class Dashboard2AppController {
             items.push({ text: `⚽ <strong class="text-amber-400">Temporada 2026-2027:</strong> Competición oficial en marcha.`, action: 'jornadas' });
         }
 
+        // ANUNCIOS DE NOVEDADES DE LA WEB (Vigencia máxima estricta: 5 días)
+        const webNews = [
+            {
+                id: 'ayuda-sellado-marcas-20261105',
+                createdAt: 1793898975000, // 2026-11-05T18:16:15+01:00
+                text: '📌 <strong class="text-cyan-400">Novedad en Ayuda de Sellado:</strong> Los boletos de ayuda (físico y web oficial) muestran ahora marcadas con X las casillas exactas de la quiniela de dobles de la semana.',
+                action: 'sellador'
+            }
+        ];
+        let seenMap = {};
+        try { seenMap = JSON.parse(localStorage.getItem('maulas_news_first_seen') || '{}'); } catch (e) {}
+        let seenDirty = false;
+        webNews.forEach(n => {
+            if (!seenMap[n.id]) { seenMap[n.id] = now; seenDirty = true; }
+            const ageFromCreated = now >= n.createdAt ? (now - n.createdAt) : 0;
+            const ageFromSeen = now >= seenMap[n.id] ? (now - seenMap[n.id]) : 0;
+            if (ageFromCreated <= MAX_ANUNCIO_AGE_MS && ageFromSeen <= MAX_ANUNCIO_AGE_MS) {
+                items.push({ text: n.text, action: n.action });
+            }
+        });
+        if (seenDirty) {
+            try { localStorage.setItem('maulas_news_first_seen', JSON.stringify(seenMap)); } catch (e) {}
+        }
+
         // 3. Líder de aciertos en vivo / Ganador de la jornada
         if (isNextInProgress && liveWinnerHits !== null && liveWinnerHits >= 0) {
             items.push({ text: `👑 <strong class="text-amber-300">Líder provisional en directo:</strong> ${liveWinnerName} encabeza la jornada con ${liveWinnerHits} aciertos.`, action: 'dobles' });
