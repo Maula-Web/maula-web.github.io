@@ -52,7 +52,7 @@
                     this.playedJornadas = this.jornadas.filter(j => {
                         const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '' && j.matches[0].result !== undefined;
                         const d = AppUtils.parseDate(j.date);
-                        const isValidDate = d && AppUtils.isSunday(d);
+                        const isValidDate = d !== null;
                         return hasResult && isValidDate;
                     });
                     this.totalJornadas = this.playedJornadas.length;

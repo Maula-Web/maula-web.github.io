@@ -3189,7 +3189,7 @@
                     .filter(j => {
                         if (!j || !j.active) return false;
                         const d = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
-                        return d && (window.AppUtils ? window.AppUtils.isSunday(d) : true);
+                        return d !== null && !isNaN(d.getTime());
                     })
                     .sort((a, b) => a.number - b.number)
                     .find(j => {

@@ -121,7 +121,8 @@ async function run() {
                 const existingNumbers = new Set();
                 allSnap.forEach(doc => {
                     const data = doc.data();
-                    if (data && data.number) existingNumbers.add(parseInt(data.number, 10));
+                    const s = data.season || '2026-2027';
+                    if (s === '2026-2027' && data && data.number) existingNumbers.add(parseInt(data.number, 10));
                 });
 
                 for (const uJ of upcomingList) {

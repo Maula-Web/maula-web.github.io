@@ -212,7 +212,7 @@ class Jornadas2AppController {
             .filter(j => {
                 if (j.date && j.date.toLowerCase() !== 'por definir') {
                     const d = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
-                    if (d && window.AppUtils && !window.AppUtils.isSunday(d)) return false;
+                    if (!d || isNaN(d.getTime())) return false;
                 }
                 return true;
             })

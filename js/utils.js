@@ -402,9 +402,22 @@ var AppUtils = window.AppUtils || {
      */
     calculateDeadline(dateStr) {
         const d = dateStr instanceof Date ? dateStr : this.parseDate(dateStr);
-        if (!d) return null;
+        if (!d || isNaN(d.getTime())) return null;
         const deadline = new Date(d.getTime());
-        deadline.setDate(d.getDate() - 3); // Jueves si la jornada es domingo
+        const day = d.getDay(); // 0 = Domingo, 1 = Lunes, 2 = Martes, 3 = Miércoles, 4 = Jueves, 5 = Viernes, 6 = Sábado
+        if (day === 0) {
+            deadline.setDate(d.getDate() - 3); // Jueves anterior para jornada de domingo
+        } else if (day === 6) {
+            deadline.setDate(d.getDate() - 2); // Jueves anterior para jornada de sábado
+        } else if (day === 3) {
+            deadline.setDate(d.getDate() - 1); // Martes anterior para jornada de miércoles
+        } else if (day === 2) {
+            deadline.setDate(d.getDate() - 1); // Lunes anterior para jornada de martes
+        } else if (day === 4) {
+            deadline.setDate(d.getDate() - 1); // Miércoles anterior para jornada de jueves
+        } else {
+            deadline.setDate(d.getDate() - 1); // 1 día antes a las 17:00h
+        }
         deadline.setHours(17, 0, 0, 0);
         return deadline;
     },

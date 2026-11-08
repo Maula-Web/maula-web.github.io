@@ -187,7 +187,7 @@ class ResumenManager {
         const activeJornadas = this.jornadas.filter(j => {
             const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
             const d = AppUtils.parseDate(j.date);
-            const isValidDate = d && AppUtils.isSunday(d);
+            const isValidDate = d !== null;
             
             const jSeason = j.season || '2026-2027';
             const seasonMatch = jSeason === this.currentSeason;

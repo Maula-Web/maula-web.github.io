@@ -53,7 +53,7 @@ class DashboardManager {
             const playedJornadas = this.jornadas.filter(j => {
                 const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
                 const d = AppUtils.parseDate(j.date);
-                const isValidDate = d && AppUtils.isSunday(d);
+                const isValidDate = d !== null;
                 return hasResult && isValidDate;
             }).sort((a, b) => a.number - b.number);
 
@@ -418,7 +418,8 @@ class DashboardManager {
                     this.startCountdown(deadline);
 
                     // Format deadline date: "Jueves dd/mm"
-                    const dayName = "Jueves";
+                    const daysMap = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                    const dayName = daysMap[deadline.getDay()] || 'Jueves';
                     const dateFormatted = deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
 
                     deadlineHtml = `
@@ -881,7 +882,7 @@ class DashboardManager {
             .filter(j => {
                 if (!j.active) return false;
                 const d = AppUtils.parseDate(j.date);
-                return d && AppUtils.isSunday(d);
+                return d !== null;
             })
             .sort((a, b) => a.number - b.number)
             .find(j => {

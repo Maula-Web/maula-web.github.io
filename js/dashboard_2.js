@@ -163,13 +163,12 @@ class Dashboard2AppController {
      */
     renderDashboard() {
         try {
-            // 1. Jornadas disputadas oficiales (domingos con resultado en partido 0)
+            // 1. Jornadas disputadas oficiales (activas con resultado en primer partido)
             const playedJornadas = this.jornadas.filter(j => {
-                const hasResult = j.matches && j.matches[0] && j.matches[0].result !== '';
-                const d = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
-                const isValidDate = d && (window.AppUtils ? window.AppUtils.isSunday(d) : true);
-                return hasResult && isValidDate;
-            }).sort((a, b) => a.number - b.number);
+                if (j.active === false) return false;
+                const hasResult = j.matches && j.matches[0] && j.matches[0].result && j.matches[0].result !== '' && j.matches[0].result !== '-';
+                return hasResult;
+            }).sort((a, b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
 
             const playedCount = playedJornadas.length;
 
@@ -956,7 +955,14 @@ class Dashboard2AppController {
             }
             const isMobile = window.innerWidth < 640;
             if (title) title.textContent = isMobile ? `Jornada ${nextJ.number}` : `Jornada ${nextJ.number} - ${nextJ.date}`;
-            if (sub) sub.textContent = 'Plazo para tener todas las quinielas rellenas en la web: Jueves a las 17:00h.';
+            const matchDate = window.AppUtils ? window.AppUtils.parseDate(nextJ.date) : new Date(nextJ.date);
+            const deadline = matchDate && window.AppUtils ? window.AppUtils.calculateDeadline(matchDate) : null;
+            let deadlineDayName = 'Jueves';
+            if (deadline) {
+                const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                deadlineDayName = days[deadline.getDay()] || 'Jueves';
+            }
+            if (sub) sub.textContent = `Plazo para tener todas las quinielas rellenas en la web: ${deadlineDayName} a las 17:00h.`;
         } else {
             if (title) title.textContent = 'Temporada 2026-2027';
             if (sub) sub.textContent = 'Todas las jornadas oficiales disputadas hasta la fecha.';
@@ -979,10 +985,14 @@ class Dashboard2AppController {
         const deadline = window.AppUtils ? window.AppUtils.calculateDeadline(matchDate) : new Date(matchDate.getTime() - 3 * 24 * 3600 * 1000);
 
         const elDeadline = document.getElementById('cd-deadline-label');
-        if (elDeadline) {
+        if (elDeadline && deadline) {
             const isMobile = window.innerWidth < 640;
+            const daysShort = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const daysLong = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const dShort = daysShort[deadline.getDay()] || 'Jue';
+            const dLong = daysLong[deadline.getDay()] || 'Jueves';
             const dateFormatted = deadline.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
-            elDeadline.textContent = isMobile ? `Jue ${dateFormatted} · 17h` : `Jueves ${dateFormatted} · 17:00h`;
+            elDeadline.textContent = isMobile ? `${dShort} ${dateFormatted} · 17h` : `${dLong} ${dateFormatted} · 17:00h`;
         }
 
         if (this.countdownInterval) clearInterval(this.countdownInterval);
@@ -2422,13 +2432,10 @@ class Dashboard2AppController {
     }
 
     getNextJornadaData() {
+        if (!this.jornadas || !Array.isArray(this.jornadas) || this.jornadas.length === 0) return null;
         return this.jornadas
-            .filter(j => {
-                if (!j.active) return false;
-                const d = window.AppUtils ? window.AppUtils.parseDate(j.date) : new Date(j.date);
-                return d && (window.AppUtils ? window.AppUtils.isSunday(d) : true);
-            })
-            .sort((a, b) => a.number - b.number)
+            .filter(j => j && j.active !== false)
+            .sort((a, b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0))
             .find(j => {
                 if (!j.matches || !Array.isArray(j.matches) || j.matches.length === 0) return true;
                 const filledResults = j.matches.filter(m => {
