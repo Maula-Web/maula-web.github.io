@@ -1,143 +1,143 @@
 {
   "success": true,
   "source": "El País Sorteos",
-  "dateStr": "domingo 01/11/2026",
+  "dateStr": "domingo 08/11/2026",
   "matches": [
     {
       "num": 1,
-      "home": "Levante (m)",
-      "away": "At. Madrid (m)",
+      "home": "Málaga (m)",
+      "away": "Racing De Santander (m)",
       "result": "2"
     },
     {
       "num": 2,
-      "home": "Rayo Vallecano (m)",
-      "away": "Celta (m)",
-      "result": "1"
+      "home": "Osasuna (m)",
+      "away": "Athletic Club (m)",
+      "result": "X"
     },
     {
       "num": 3,
-      "home": "Betis (m)",
-      "away": "Málaga (m)",
-      "result": "1"
-    },
-    {
-      "num": 4,
-      "home": "Barcelona (m)",
-      "away": "Alavés (m)",
-      "result": "1"
-    },
-    {
-      "num": 5,
-      "home": "Getafe (m)",
-      "away": "Sevilla (m)",
-      "result": "1"
-    },
-    {
-      "num": 6,
-      "home": "Racing Santander (m)",
+      "home": "Valencia (m)",
       "away": "Real Madrid (m)",
       "result": "2"
     },
     {
-      "num": 7,
+      "num": 4,
       "home": "Elche (m)",
-      "away": "Valencia (m)",
+      "away": "Betis (m)",
       "result": "2"
     },
     {
-      "num": 8,
-      "home": "Eibar (m)",
-      "away": "Almería (m)",
+      "num": 5,
+      "home": "Real Sociedad (m)",
+      "away": "Rayo Vallecano (m)",
+      "result": "1"
+    },
+    {
+      "num": 6,
+      "home": "Celta (m)",
+      "away": "Levante (m)",
       "result": "X"
     },
     {
+      "num": 7,
+      "home": "Villarreal (m)",
+      "away": "Getafe (m)",
+      "result": "1"
+    },
+    {
+      "num": 8,
+      "home": "Cádiz (m)",
+      "away": "R. Oviedo (m)",
+      "result": "2"
+    },
+    {
       "num": 9,
-      "home": "Eldense (m)",
-      "away": "Granada (m)",
+      "home": "Girona (m)",
+      "away": "Almería (m)",
       "result": "2"
     },
     {
       "num": 10,
-      "home": "Burgos (m)",
-      "away": "Castellón (m)",
-      "result": "X"
+      "home": "Sporting (m)",
+      "away": "R. Valladolid (m)",
+      "result": "2"
     },
     {
       "num": 11,
-      "home": "Alavés (f)",
-      "away": "Real Sociedad (f)",
+      "home": "Athletic Club (f)",
+      "away": "Real Madrid (f)",
       "result": "X"
     },
     {
       "num": 12,
-      "home": "Madrid CFF (f)",
-      "away": "Deportivo (f)",
-      "result": "1"
+      "home": "Logroño (f)",
+      "away": "Sevilla (f)",
+      "result": "X"
     },
     {
       "num": 13,
-      "home": "Sevilla (f)",
-      "away": "Real Madrid (f)",
+      "home": "Eibar (f)",
+      "away": "Real Sociedad (f)",
       "result": "2"
     },
     {
       "num": 14,
       "home": "Tenerife (f)",
-      "away": "Athletic Club (f)",
+      "away": "Alavés (f)",
       "result": "1"
     },
     {
       "num": 15,
-      "home": "Athletic Club (m)",
-      "away": "Real Sociedad (m)",
-      "result": "2-1"
+      "home": "At. Madrid (m)",
+      "away": "Barcelona (m)",
+      "result": "1-2"
     }
   ],
   "prizes": {
-    "10": 0,
-    "11": 2.94,
-    "12": 16.02,
-    "13": 144.12,
-    "14": 5979.25,
-    "15": 83350.51
+    "10": 3.41,
+    "11": 14.48,
+    "12": 110.13,
+    "13": 1369.75,
+    "14": 90099,
+    "15": 1647986.55
   },
   "prizesDetails": [
     {
       "category": "15",
       "label": "Pleno al 15",
-      "winners": 26,
-      "amount": 83350.51
+      "winners": 1,
+      "amount": 1647986.55
     },
     {
       "category": "14",
       "label": "1� (14 Aciertos)",
-      "winners": 96,
-      "amount": 5979.25
+      "winners": 6,
+      "amount": 90099
     },
     {
       "category": "13",
       "label": "2� (13 Aciertos)",
-      "winners": 1867,
-      "amount": 144.12
+      "winners": 185,
+      "amount": 1369.75
     },
     {
       "category": "12",
       "label": "3� (12 Aciertos)",
-      "winners": 16798,
-      "amount": 16.02
+      "winners": 2301,
+      "amount": 110.13
     },
     {
       "category": "11",
       "label": "4� (11 Aciertos)",
-      "winners": 91671,
-      "amount": 2.94
+      "winners": 17496,
+      "amount": 14.48
     },
     {
       "category": "10",
       "label": "5� (10 Aciertos)",
-      "winners": 321020,
-      "amount": 0
+      "winners": 89116,
+      "amount": 3.41
     }
   ]
 }

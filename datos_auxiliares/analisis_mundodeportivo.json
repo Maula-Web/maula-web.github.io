@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-09T01:25:20.361Z",
+  "updatedAt": "2026-11-09T02:08:54.864Z",
   "available": false,
   "matchCountWithTarget": 15,
   "isMidweek": true,
@@ -316,8 +316,8 @@
       "comment": "El comentario se publicará una vez haya concluido la jornada, que lo hará este lunes con el encuentro que disputa el Granada en feudo del Deportivo.",
       "percentages": {
         "quinielista": {
-          "1": 28,
-          "2": 49,
+          "1": 27,
+          "2": 50,
           "X": 23
         },
         "lae": null,
