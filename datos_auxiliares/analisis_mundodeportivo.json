@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-11T17:32:30.744Z",
+  "updatedAt": "2026-11-11T23:47:57.594Z",
   "available": false,
   "matchCountWithTarget": 15,
   "isMidweek": true,
@@ -71,9 +71,9 @@
       "comment": "Defender el liderato es el próximo reto de un Almería lanzado tras imponerse por la mínima en Montilivi. Los de García Pimienta encadenan diez jornadas invictos, con ocho triunfos y dos empates, aunque cuentan con un partido más que el Castellón, segundo clasificado. Su fortaleza como locales refuerza la candidatura: nadie les ha ganado y solo el Oviedo logró arañar un punto. El Andorra afronta una visita de máxima exigencia con dos frentes abiertos. Carles Manso debe levantar a un vestuario golpeado por lo sucedido en Tenerife. A su desafío anímico se añade la urgencia clasificatoria del cuadro del Principat, inmerso en la pelea por la permanencia y con tres encuentros seguidos sin vencer.",
       "percentages": {
         "quinielista": {
-          "1": 91,
+          "1": 90,
           "2": 3,
-          "X": 6
+          "X": 7
         },
         "lae": {
           "1": 74,
@@ -108,9 +108,9 @@
           "X": 18
         },
         "real": {
-          "1": 54,
-          "2": 23,
-          "X": 23
+          "1": 52,
+          "2": 24,
+          "X": 24
         }
       },
       "recommended": "1"
@@ -152,8 +152,8 @@
       "comment": "El Tenerife volverá a competir tras el durísimo golpe por la muerte de Jesús de Miguel en el partido que le enfrentó al Andorra. El cuadro tinerfeño tendrá que hacer de tripas corazón para sobreponerse a tal pérdida. Va decimocuarto en la tabla tras cuatro empates seguidos. El Ceuta es el colista de la Segunda División con un único triunfo en 13 partidos. Ahora suma cinco derrotas consecutivas, una dinámica que acabó con el cese del técnico José Juan Romero. Los dirigentes del cuadro ceutí buscan un revulsivo para hacer reaccionar al equipo. Lejos de su campo, el Ceuta lleva cinco derrotas y un empate.",
       "percentages": {
         "quinielista": {
-          "1": 84,
-          "2": 6,
+          "1": 83,
+          "2": 7,
           "X": 10
         },
         "lae": {
@@ -189,8 +189,8 @@
           "X": 26
         },
         "real": {
-          "1": 53,
-          "2": 21,
+          "1": 52,
+          "2": 22,
           "X": 26
         }
       },
@@ -216,9 +216,9 @@
           "X": 18
         },
         "real": {
-          "1": 57,
+          "1": 56,
           "2": 19,
-          "X": 24
+          "X": 25
         }
       },
       "recommended": "1X"
@@ -233,8 +233,8 @@
       "comment": "Tres derrotas seguidas sin marcar un solo gol dejan al Eldense, decimoquinto, ante la urgencia de reencontrarse con la victoria y poner distancia con el descenso. Los azulgranas cayeron por 2-0 ante el Albacete y la UD Las Palmas y por 0-2 frente al Granada. Quien viaja hasta Elda es el Sabadell, decimotercero, que acumula cuatro jornadas sin ganar, con dos X y dos derrotas. El lunes volvió hizo tablas sin goles en casa ante la Real Sociedad B. Lejos de su estadio, los arlequinados suman una victoria, tres empates y tres derrotas.",
       "percentages": {
         "quinielista": {
-          "1": 37,
-          "2": 28,
+          "1": 38,
+          "2": 27,
           "X": 35
         },
         "lae": {
@@ -260,8 +260,8 @@
       "comment": "El comentario de este partido resta pendiente del que ambas selecciones jugarán el jueves.",
       "percentages": {
         "quinielista": {
-          "1": 49,
-          "2": 26,
+          "1": 48,
+          "2": 27,
           "X": 25
         },
         "lae": {
@@ -270,9 +270,9 @@
           "X": 27
         },
         "real": {
-          "1": 44,
-          "2": 29,
-          "X": 27
+          "1": 45,
+          "2": 30,
+          "X": 25
         }
       },
       "recommended": "1X2"
@@ -341,8 +341,8 @@
       "comment": "El Sevilla volvió a empatar la pasada jornada y ya van cuatro equis en las últimas cinco jornadas y, en global, seis sin ganar. Una racha que lo deja cerca del descenso, con el que tiene un margen de dos puntos. En su estadio, por si fuera poco, ha demostrado no sentirse, por ahora, nada cómodo. Un punto de doce es la evidencia. Y recibe al Atlético de Madrid, un grande que va encontrando su mejor versión después de un inicio irregular de campeonato. De momento, encadena cinco fechas sin perder, con cuatro victorias incluidas. La última, por goleada el pasado lunes contra el Badalona. De visitante, dos salidas seguidas puntuando.",
       "percentages": {
         "quinielista": {
-          "1": 11,
-          "2": 72,
+          "1": 10,
+          "2": 73,
           "X": 17
         },
         "lae": {
@@ -368,9 +368,9 @@
       "comment": "El Valencia perdió los primeros ocho partidos de la liga y, para algunos, ya estaba desahuciado. Sin embargo, dos triunfos seguidos, el último este lunes en el duelo que cerraba la jornada, fue el primero a domicilio, en feudo de un competitivo Deportivo. Tres puntos más que demuestran la fe de un recién ascendido que mira con otros ojos el objetivo de la permanencia. En descenso, puede salir de la zona roja si gana al Granada, sexto el curso pasado y que, en este, tras un arranque errático, parecía enderezar el rumbo. Un punto de nueve ha frenado su escalada. La nota positiva, que compite de forma notable.",
       "percentages": {
         "quinielista": {
-          "1": 23,
-          "2": 52,
-          "X": 25
+          "1": 24,
+          "2": 50,
+          "X": 26
         },
         "lae": {
           "1": 39,
@@ -397,7 +397,7 @@
         "quinielista": {
           "1": 2,
           "2": 54,
-          "X": 11
+          "X": 12
         },
         "lae": {
           "1": 6,
