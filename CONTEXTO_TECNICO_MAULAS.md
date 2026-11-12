@@ -1775,6 +1775,19 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 69. ELIMINACIÓN DE JORNADAS NO DISPUTADAS Y LIMPIEZA DE PRONÓSTICOS ASOCIADOS (JORNADA 21)
+- **Regla de Negocio**:
+  - La Peña Maulas compite únicamente en las jornadas oficiales de fin de semana estipuladas por el calendario de la peña. Las jornadas intersemanales o extraordinarias (como la Jornada 21 del 11/11/2026 de Segunda División / Liga F) que puedan ser autogeneradas por scrapers o APIs externas no forman parte de la competición oficial de la peña y deben ser eliminadas del sistema.
+  - Al suprimir una jornada no disputada, deben eliminarse atómicamente todos los pronósticos base (`pronosticos`) y quinielas de dobles (`pronosticos_extra`) que algún socio haya podido rellenar anticipadamente para dicha jornada, evitando distorsiones en balances, sellados, clasificaciones o recordatorios automáticos.
+- **Implementación Técnica**:
+  - **Eliminación en Firestore**:
+    * Jornada suprimida: documento `jornadas/Qupnz0oxG4D5UAQCfbBN` (Jornada 21, temporada 2026-2027, fecha 11/11/2026).
+    * Pronósticos suprimidos: documentos `pronosticos/1794187516651_2` (Socio 2) y `pronosticos/1794187516651_3` (Socio 3).
+  - **Sincronización de Caché Local**:
+    * Depurado el archivo `datos_auxiliares/proximas_jornadas_cache.json` para retirar la entrada de la Jornada 21 y evitar que procesos auxiliares vuelvan a cargarla como jornada próxima activa.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:
