@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-11T23:47:57.594Z",
+  "updatedAt": "2026-11-12T04:44:22.838Z",
   "available": false,
   "matchCountWithTarget": 15,
   "isMidweek": true,
@@ -17,15 +17,11 @@
       "comment": "El Valladolid toma aire y mira hacia arriba tras enlazar dos triunfos que le sitúan en la zona media y amplían su margen sobre el descenso. El éxito en El Molinón supuso su primera victoria a domicilio. Ahora, la afición de Pucela quiere prolongar la dinámica en el Nuevo Zorrilla frente a un Castellón que ocupa la segunda plaza. Los de Pablo Hernández regresan este sábado tras aplazar su último compromiso por el luto ante la muerte de Jesús de Miguel, quien vistió su camiseta durante dos temporadas y media. Hasta este parón, los ´orelluts´ habían firmado ocho victorias, tres empates y una derrota. Sus cinco goles encajados retratan la solidez de un rival que pondrá a prueba la reacción local.",
       "percentages": {
         "quinielista": {
-          "1": 22,
-          "2": 54,
-          "X": 24
+          "1": 18,
+          "2": 68,
+          "X": 14
         },
-        "lae": {
-          "1": 32,
-          "2": 44,
-          "X": 24
-        },
+        "lae": null,
         "real": {
           "1": 33,
           "2": 40,
@@ -41,22 +37,18 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "SÁBADO, 16:15",
-      "comment": "Cuatro puntos frente a Girona y Sabadell permiten al Sanse respirar con una unidad de margen sobre el descenso. Su empate en la Nova Creu Alta prolongó a dos jornadas la racha sin derrotas y confirmó su buen pulso ante los clubes catalanes. Los de Jon Ansotegi buscan ahora su segundo triunfo en Zubieta, donde el sábado se medirán a un Sporting muyo irregular. Los rojiblancos fallaron el domingo contra el Valladolid en casa, pese a salir como favoritos, y dejaron escapar la ocasión de meterse entre los seis primeros. Nicolás Larcamón necesita una respuesta firme de sus jugadores para recuperar terreno. Lejos de su estadio, los asturianos aún no conocen el empate esta temporada.",
+      "comment": "La previa de este partido se publicará el lunes, una vez finalice el Sabadell-Real Sociedad B.",
       "percentages": {
         "quinielista": {
-          "1": 27,
-          "2": 46,
-          "X": 27
-        },
-        "lae": {
-          "1": 30,
+          "1": 31,
           "2": 44,
-          "X": 26
+          "X": 25
         },
+        "lae": null,
         "real": {
-          "1": 38,
+          "1": 40,
           "2": 33,
-          "X": 29
+          "X": 27
         }
       },
       "recommended": "X2"
@@ -71,18 +63,14 @@
       "comment": "Defender el liderato es el próximo reto de un Almería lanzado tras imponerse por la mínima en Montilivi. Los de García Pimienta encadenan diez jornadas invictos, con ocho triunfos y dos empates, aunque cuentan con un partido más que el Castellón, segundo clasificado. Su fortaleza como locales refuerza la candidatura: nadie les ha ganado y solo el Oviedo logró arañar un punto. El Andorra afronta una visita de máxima exigencia con dos frentes abiertos. Carles Manso debe levantar a un vestuario golpeado por lo sucedido en Tenerife. A su desafío anímico se añade la urgencia clasificatoria del cuadro del Principat, inmerso en la pelea por la permanencia y con tres encuentros seguidos sin vencer.",
       "percentages": {
         "quinielista": {
-          "1": 90,
-          "2": 3,
-          "X": 7
+          "1": 95,
+          "2": 1,
+          "X": 4
         },
-        "lae": {
-          "1": 74,
-          "2": 13,
-          "X": 13
-        },
+        "lae": null,
         "real": {
-          "1": 57,
-          "2": 20,
+          "1": 56,
+          "2": 21,
           "X": 23
         }
       },
@@ -98,19 +86,15 @@
       "comment": "La pelea por el ascenso aprieta y el Mallorca necesita vencer para seguir a rebufo de las dos primeras plazas. Los ´bermellones´ llegan tras un fin de semana sin competir por la suspensión de su visita al Andorra. Su última derrota fue ante el Almería en Son Moix, a finales de septiembre, y desde entonces encadenan cinco jornadas sin perder. El Córdoba, con el ánimo al alza, también aterriza con argumentos para dar batalla: goleó al Ceuta el pasado sábado (3-0) y acumula cuatro citas invicto, con tres triunfos y un empate que le permiten mantener a tiro los puestos de promoción. Fuera del Arcángel, el conjunto andaluz ha cosechado siete puntos en sus siete desplazamientos.",
       "percentages": {
         "quinielista": {
-          "1": 84,
-          "2": 5,
-          "X": 11
+          "1": 94,
+          "2": 2,
+          "X": 4
         },
-        "lae": {
-          "1": 67,
-          "2": 15,
-          "X": 18
-        },
+        "lae": null,
         "real": {
-          "1": 52,
-          "2": 24,
-          "X": 24
+          "1": 56,
+          "2": 21,
+          "X": 23
         }
       },
       "recommended": "1"
@@ -122,21 +106,17 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "SÁBADO, 21:00",
-      "comment": "Raúl González aterriza en el banquillo del Oviedo con un duelo directo como punto de partida. Su debut llegará este sábado ante el Girona, con ambos conjuntos en una situación pareja y los asturianos a un punto del play-off. El Grupo Pachuca decidió prescindir de Julián Calero incluso después de ganar en Cádiz el pasado fin de semana: el rendimiento no colmaba sus expectativas y la confianza en el proyecto se había agotado. Enfrente, Quique Álvarez busca soluciones para un ataque que ha perdido mordiente en nueve días. Los catalanes encadenan dos partidos sin marcar, saldados con derrotas. Urge recuperar el gol para frenar la caída y seguir peleando por subir.",
+      "comment": "El Oviedo acelera hacia el ´play-off´ tras sumar diez de los últimos quince puntos. Tres triunfos y un empate impulsan a los azules, cuyo tropiezo en esas cinco jornadas llegó ante la UD Las Palmas en el Tartiere (2-3). En casa también cedieron frente al Leganés, en la segunda fecha del campeonato. Reciben a un Girona que persigue el regreso a Primera, pero ha visto frenadas sus aspiraciones frente a Real Sociedad B y Almería. Nueve días han bastado para alejar a los catalanes de la zona de promoción. La falta de gol amenaza con convertirse en un lastre para las ambiciones del conjunto que dirige Quique Álvarez, que no ha marcado en sus dos últimos compromisos.",
       "percentages": {
         "quinielista": {
-          "1": 42,
-          "2": 26,
-          "X": 32
-        },
-        "lae": {
           "1": 41,
-          "2": 27,
-          "X": 32
+          "2": 28,
+          "X": 31
         },
+        "lae": null,
         "real": {
-          "1": 40,
-          "2": 31,
+          "1": 39,
+          "2": 32,
           "X": 29
         }
       },
@@ -152,15 +132,11 @@
       "comment": "El Tenerife volverá a competir tras el durísimo golpe por la muerte de Jesús de Miguel en el partido que le enfrentó al Andorra. El cuadro tinerfeño tendrá que hacer de tripas corazón para sobreponerse a tal pérdida. Va decimocuarto en la tabla tras cuatro empates seguidos. El Ceuta es el colista de la Segunda División con un único triunfo en 13 partidos. Ahora suma cinco derrotas consecutivas, una dinámica que acabó con el cese del técnico José Juan Romero. Los dirigentes del cuadro ceutí buscan un revulsivo para hacer reaccionar al equipo. Lejos de su campo, el Ceuta lleva cinco derrotas y un empate.",
       "percentages": {
         "quinielista": {
-          "1": 83,
-          "2": 7,
-          "X": 10
+          "1": 88,
+          "2": 6,
+          "X": 6
         },
-        "lae": {
-          "1": 70,
-          "2": 13,
-          "X": 17
-        },
+        "lae": null,
         "real": {
           "1": 49,
           "2": 24,
@@ -176,22 +152,18 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "DOMINGO, 16:15",
-      "comment": "Cinco triunfos en línea avalan el momento del Granada, que quiere seguir sumando una jornada más. El conjunto nazarí anda instalado en zona de play-off. Este fin de semana no pudo competir, ya que su rival era el Tenerife, que el sábado dio el último adiós a Jesús de Miguel. La UD Las Palmas se mueve por la zona media de la clasificación y también vive un buen momento tras dos triunfos seguidos: Real Sociedad B (1-0), Oviedo (2-3) y Eldense (2-0).",
+      "comment": "Cinco triunfos en línea avalan el momento del Granada, que quiere seguir sumando una jornada más. El conjunto nazarí anda instalado en zona de play-off. Este fin de semana no pudo competir, ya que su rival era el Tenerife, que el sábado dio el último adiós a Jesús de Miguel. La UD Las Palmas se mueve por la zona media de la clasificación y también vive un buen momento tras dos triunfos seguidos: Real Sociedad B (1-0) y Oviedo (2-3). Este jueves recibirá al Eldense en un duelo aplazado el domingo debido a la alerta meteorológica por la borrasca Bruna.",
       "percentages": {
         "quinielista": {
-          "1": 59,
-          "2": 14,
-          "X": 27
+          "1": 48,
+          "2": 23,
+          "X": 29
         },
-        "lae": {
-          "1": 54,
-          "2": 20,
-          "X": 26
-        },
+        "lae": null,
         "real": {
-          "1": 52,
-          "2": 22,
-          "X": 26
+          "1": 54,
+          "2": 21,
+          "X": 25
         }
       },
       "recommended": "1"
@@ -206,19 +178,15 @@
       "comment": "El Eibar busca reaccionar para no poner en riesgo su plaza en la zona de play-off. El conjunto armero acumula cuatro jornadas sin conocer la victoria, con dos igualadas y dos derrotas. En el fin de semana no saltó al campo: le tocaba medirse al Castellón, pero el club orellut pidió aplazar el encuentro tras el fallecimiento de Jesús de Miguel, que vistió la camiseta del conjunto de la Plana antes de fichar por el Tenerife. El Cádiz, antepenúltimo en la tabla, sigue sin enderezar el rumbo pese al relevo en el banquillo. Borja Jiménez se estrenó al frente de los gaditanos con un triunfo (3-1 al colista Ceuta), aunque desde entonces ha encajado dos derrotas consecutivas: 2-1 ante el Mallorca y 1-2 frente al Oviedo.",
       "percentages": {
         "quinielista": {
-          "1": 87,
-          "2": 4,
-          "X": 9
+          "1": 89,
+          "2": 3,
+          "X": 8
         },
-        "lae": {
-          "1": 67,
-          "2": 15,
-          "X": 18
-        },
+        "lae": null,
         "real": {
-          "1": 56,
+          "1": 57,
           "2": 19,
-          "X": 25
+          "X": 24
         }
       },
       "recommended": "1X"
@@ -230,21 +198,17 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "DOMINGO, 18:30",
-      "comment": "Tres derrotas seguidas sin marcar un solo gol dejan al Eldense, decimoquinto, ante la urgencia de reencontrarse con la victoria y poner distancia con el descenso. Los azulgranas cayeron por 2-0 ante el Albacete y la UD Las Palmas y por 0-2 frente al Granada. Quien viaja hasta Elda es el Sabadell, decimotercero, que acumula cuatro jornadas sin ganar, con dos X y dos derrotas. El lunes volvió hizo tablas sin goles en casa ante la Real Sociedad B. Lejos de su estadio, los arlequinados suman una victoria, tres empates y tres derrotas.",
+      "comment": "El comentario de este partido resta pendiente del que juega el Sabadell este lunes en casa contra la Real Sociedad B.",
       "percentages": {
         "quinielista": {
-          "1": 38,
-          "2": 27,
-          "X": 35
-        },
-        "lae": {
-          "1": 39,
-          "2": 27,
+          "1": 28,
+          "2": 38,
           "X": 34
         },
+        "lae": null,
         "real": {
-          "1": 40,
-          "2": 30,
+          "1": 39,
+          "2": 31,
           "X": 30
         }
       },
@@ -260,19 +224,15 @@
       "comment": "El comentario de este partido resta pendiente del que ambas selecciones jugarán el jueves.",
       "percentages": {
         "quinielista": {
-          "1": 48,
+          "1": 47,
           "2": 27,
-          "X": 25
+          "X": 26
         },
-        "lae": {
-          "1": 42,
-          "2": 31,
-          "X": 27
-        },
+        "lae": null,
         "real": {
-          "1": 45,
-          "2": 30,
-          "X": 25
+          "1": 54,
+          "2": 20,
+          "X": 26
         }
       },
       "recommended": "1X2"
@@ -287,19 +247,15 @@
       "comment": "El Alavés no disputó su partido de la pasada jornada por visitar al Tenerife, que suspendió su duelo por el fallecimiento de Jesús de Miguel, delantero del equipo masculino. Por ello, el cuadro vasco llega con más descanso y menos ritmo a un duelo importante para salir de abajo. En casa, no obstante, está mostrando un buen nivel, con una sola derrota en cinco duelos (y fue con el todopoderoso Barça). El Eibar, mientras, arrancó muy bien la liga (sumó 10 de primeros 15 puntos), pero ha entrado en terreno pantanoso. Ya acumula cinco jornadas sin ganar, aunque las tres derrotas de esta mala racha han sido por la mínima. Prueba que siempre compite, aquí también lo hará.",
       "percentages": {
         "quinielista": {
-          "1": 39,
-          "2": 29,
-          "X": 32
+          "1": 38,
+          "2": 31,
+          "X": 31
         },
-        "lae": {
-          "1": 35,
-          "2": 33,
-          "X": 32
-        },
+        "lae": null,
         "real": {
           "1": 41,
-          "2": 30,
-          "X": 29
+          "2": 34,
+          "X": 25
         }
       },
       "recommended": "1X"
@@ -314,19 +270,15 @@
       "comment": "Derbi vasco entre dos conjuntos que quieren aspirar a plaza europea. La Real Sociedad la consiguió la temporada pasada, siendo tercero y certificando el crecimiento de un proyecto que no empezó bien el presente curso. Estuvo las cinco primeras jornadas sin ganar, aunque es cierto que lo combinaba con previas continentales. Un desgaste añadido del que le costó acostumbrarse. Ahora firma cinco fechas sin perder, con tres victorias. La última, el pasado sábado en feudo del Eibar y aquí, cuenta con triunfo sobre el Barça. Toda una advertencia que ha respondido el Athletic Club, que viene de empatar contra el Madrid. Si se puede, conviene cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 44,
-          "2": 24,
+          "1": 39,
+          "2": 29,
           "X": 32
         },
-        "lae": {
-          "1": 38,
-          "2": 29,
-          "X": 33
-        },
+        "lae": null,
         "real": {
-          "1": 48,
-          "2": 26,
-          "X": 26
+          "1": 42,
+          "2": 30,
+          "X": 28
         }
       },
       "recommended": "1X2"
@@ -338,22 +290,18 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "DOMINGO, 16:00",
-      "comment": "El Sevilla volvió a empatar la pasada jornada y ya van cuatro equis en las últimas cinco jornadas y, en global, seis sin ganar. Una racha que lo deja cerca del descenso, con el que tiene un margen de dos puntos. En su estadio, por si fuera poco, ha demostrado no sentirse, por ahora, nada cómodo. Un punto de doce es la evidencia. Y recibe al Atlético de Madrid, un grande que va encontrando su mejor versión después de un inicio irregular de campeonato. De momento, encadena cinco fechas sin perder, con cuatro victorias incluidas. La última, por goleada el pasado lunes contra el Badalona. De visitante, dos salidas seguidas puntuando.",
+      "comment": "El Atlético de Madrid disputa su duelo de esta jornada este lunes en casa ante el Badalona. El comentario se publicará una vez se haya disputado dicho encuentro.",
       "percentages": {
         "quinielista": {
-          "1": 10,
-          "2": 73,
-          "X": 17
+          "1": 16,
+          "2": 61,
+          "X": 23
         },
-        "lae": {
-          "1": 19,
-          "2": 62,
-          "X": 19
-        },
+        "lae": null,
         "real": {
-          "1": 19,
-          "2": 59,
-          "X": 22
+          "1": 22,
+          "2": 53,
+          "X": 25
         }
       },
       "recommended": "X2"
@@ -365,22 +313,18 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "DOMINGO, 18:15",
-      "comment": "El Valencia perdió los primeros ocho partidos de la liga y, para algunos, ya estaba desahuciado. Sin embargo, dos triunfos seguidos, el último este lunes en el duelo que cerraba la jornada, fue el primero a domicilio, en feudo de un competitivo Deportivo. Tres puntos más que demuestran la fe de un recién ascendido que mira con otros ojos el objetivo de la permanencia. En descenso, puede salir de la zona roja si gana al Granada, sexto el curso pasado y que, en este, tras un arranque errático, parecía enderezar el rumbo. Un punto de nueve ha frenado su escalada. La nota positiva, que compite de forma notable.",
+      "comment": "El comentario se publicará una vez haya concluido la jornada, que lo hará este lunes con el encuentro que disputa el Granada en feudo del Deportivo.",
       "percentages": {
         "quinielista": {
-          "1": 24,
+          "1": 26,
           "2": 50,
-          "X": 26
+          "X": 24
         },
-        "lae": {
-          "1": 39,
-          "2": 36,
-          "X": 25
-        },
+        "lae": null,
         "real": {
-          "1": 31,
-          "2": 41,
-          "X": 28
+          "1": 22,
+          "2": 53,
+          "X": 25
         }
       },
       "recommended": "1X"
@@ -395,15 +339,11 @@
       "comment": "Se cierra el grupo 3 de la Liga A de la Nations League entre dos de los mejores equipos del mundo. Lo demostraron en el mundial y en el estreno del grupo ofreciendo un partido lleno de alternativas que se llevó España por su mayor efectividad. Y talento, claro. Tras ese encuentro, ambas selecciones han ganado las tres jornadas siguientes. El cuadro español, con media de tres goles a favor, aunque ninguna portería a cero. Inglaterra, mientras, ha ganado las tres citas sin encajar y mostrando más prestaciones defensivas. La duda en esta ocasión son más las rotaciones, aunque con posiblemente el liderato en juego, todo es posible.",
       "percentages": {
         "quinielista": {
-          "1": 2,
-          "2": 54,
-          "X": 12
+          "1": 1,
+          "2": 60,
+          "X": 10
         },
-        "lae": {
-          "1": 6,
-          "2": 49,
-          "X": 22
-        },
+        "lae": null,
         "real": {
           "1": 15,
           "2": 27,
