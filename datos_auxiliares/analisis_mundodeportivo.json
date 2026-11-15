@@ -1,416 +1,316 @@
 {
-  "updatedAt": "2026-11-15T01:29:59.755Z",
-  "available": true,
+  "updatedAt": "2026-11-15T02:12:59.143Z",
+  "available": false,
   "matchCountWithTarget": 15,
-  "isMidweek": false,
-  "detectedJornadaNum": "21",
-  "closingSchedule": "Sábado 14 (13:00)",
-  "reason": "Análisis disponible y verificado para la próxima jornada oficial.",
+  "isMidweek": true,
+  "detectedJornadaNum": "22",
+  "closingSchedule": "Martes 17 (19:30)",
+  "reason": "Los análisis publicados en Mundo Deportivo corresponden a una jornada entre semana (Champions/Copa) y no a la jornada oficial de la Peña Maulas.",
   "matches": [
     {
       "num": 1,
-      "home": "VALLADOLID",
-      "away": "CASTELLÓN",
+      "home": "BOSNIA HERZEGOVINA",
+      "away": "RUMANÍA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "SÁBADO, 14:00",
-      "comment": "El Valladolid toma aire y mira hacia arriba tras enlazar dos triunfos que le sitúan en la zona media y amplían su margen sobre el descenso. El éxito en El Molinón supuso su primera victoria a domicilio. Ahora, la afición de Pucela quiere prolongar la dinámica en el Nuevo Zorrilla frente a un Castellón que ocupa la segunda plaza. Los de Pablo Hernández regresan este sábado tras aplazar su último compromiso por el luto ante la muerte de Jesús de Miguel, quien vistió su camiseta durante dos temporadas y media. Hasta este parón, los ´orelluts´ habían firmado ocho victorias, tres empates y una derrota. Sus cinco goles encajados retratan la solidez de un rival que pondrá a prueba la reacción local.",
+      "schedule": "MARTES, 20:45",
+      "comment": "Rumanía se juega la permanencia ante una Bosnia con los deberes hechos en el Grupo 4 de la Liga B. El equipo de Sergej Barbarez encajó el sábado frente a Suecia su primera derrota en esta Nations League y se despidió del liderato. Eso sí, nadie le puede quitar la segunda plaza ni el billete para el ‘play-off’ de ascenso a la categoría superior, previsto para finales del próximo mes de marzo. Mucho más hay en juego para los visitantes, que llegan con tres puntos tras imponerse por 2-1 a Polonia, su rival directo. Para esquivar el descenso necesitan ganar y que el cuadro de Jan Urban no pase del empate en su última cita. También les sirve que ambos conjuntos cierren con cuatro en su casillero.",
       "percentages": {
         "quinielista": {
-          "1": 26,
-          "2": 50,
-          "X": 24
+          "1": 54,
+          "2": 16,
+          "X": 30
         },
-        "lae": {
-          "1": 28,
-          "2": 47,
-          "X": 25
-        },
+        "lae": null,
         "real": {
-          "1": 31,
-          "2": 43,
+          "1": 51,
+          "2": 23,
           "X": 26
         }
       },
-      "recommended": "X2"
+      "recommended": "1X"
     },
     {
       "num": 2,
-      "home": "R.SOCIEDAD B",
-      "away": "SPORTING",
+      "home": "UCRANIA",
+      "away": "GEORGIA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "SÁBADO, 16:15",
-      "comment": "Cuatro puntos frente a Girona y Sabadell permiten al Sanse respirar con una unidad de margen sobre el descenso. Su empate en la Nova Creu Alta prolongó a dos jornadas la racha sin derrotas y confirmó su buen pulso ante los clubes catalanes. Los de Jon Ansotegi buscan ahora su segundo triunfo en Zubieta, donde el sábado se medirán a un Sporting muyo irregular. Los rojiblancos fallaron el domingo contra el Valladolid en casa, pese a salir como favoritos, y dejaron escapar la ocasión de meterse entre los seis primeros. Nicolás Larcamón necesita una respuesta firme de sus jugadores para recuperar terreno. Lejos de su estadio, los asturianos aún no conocen el empate esta temporada.",
+      "schedule": "MARTES, 20:45",
+      "comment": "Duelo de supervivencia en Kosice, al este de Eslovaquia, donde Ucrania y Georgia se disputan la permanencia en el Grupo 2 de la Liga B. El combinado de Andrea Maldera afronta la cita con una ligera ventaja: suma cuatro puntos tras cinco jornadas y un empate le permite salvar la categoría. Sin embargo, sus tres derrotas consecutivas invitan a desconfiar de un favoritismo que solo parece sustentado por el pésimo balance de su adversario. Los georgianos siguen sin ganar después de cinco partidos y solo han rescatado dos igualadas. Su gran problema aparece en ataque, donde la sequía resulta alarmante: todavía no han estrenado su casillero goleador y necesitan romper este bloqueo para seguir con vida.",
       "percentages": {
         "quinielista": {
-          "1": 42,
-          "2": 33,
-          "X": 25
+          "1": 100,
+          "2": 0,
+          "X": 0
         },
-        "lae": {
-          "1": 26,
-          "2": 47,
-          "X": 27
-        },
+        "lae": null,
         "real": {
-          "1": 44,
-          "2": 28,
+          "1": 43,
+          "2": 29,
           "X": 28
+        }
+      },
+      "recommended": "1X"
+    },
+    {
+      "num": 3,
+      "home": "GALES",
+      "away": "PORTUGAL",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "MARTES, 20:45",
+      "comment": "Cardiff examina a una Portugal herida tras el 1-4 encajado en casa frente a Dinamarca. El arranque de la etapa sin Cristiano ha sido un mazazo y los lusos necesitan reaccionar para recuperar crédito y defender la primera plaza del Grupo A4. Una derrota, unida a una victoria de los de Brian Riemer sobre Noruega, les dejaría sin la cima. También hay mucho en juego para Gales, condenado ya a cerrar la tabla después de caer por 3-1 el sábado ante los noruegos, que suman seis puntos por los tres de los ‘Dragones Rojos’. El equipo de Craig Bellamy busca un resultado que le aleje de los dos peores cuartos de la Liga A, destinados al descenso. Evitar una goleada puede resultar clave para su porvenir.",
+      "percentages": {
+        "quinielista": {
+          "1": 7,
+          "2": 60,
+          "X": 33
+        },
+        "lae": null,
+        "real": {
+          "1": 13,
+          "2": 68,
+          "X": 19
         }
       },
       "recommended": "X2"
     },
     {
-      "num": 3,
-      "home": "ALMERÍA",
-      "away": "ANDORRA FC",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "SÁBADO, 18:30",
-      "comment": "Defender el liderato es el próximo reto de un Almería lanzado tras imponerse por la mínima en Montilivi. Los de García Pimienta encadenan diez jornadas invictos, con ocho triunfos y dos empates, aunque cuentan con un partido más que el Castellón, segundo clasificado. Su fortaleza como locales refuerza la candidatura: nadie les ha ganado y solo el Oviedo logró arañar un punto. El Andorra afronta una visita de máxima exigencia con dos frentes abiertos. Carles Manso debe levantar a un vestuario golpeado por lo sucedido en Tenerife. A su desafío anímico se añade la urgencia clasificatoria del cuadro del Principat, inmerso en la pelea por la permanencia y con tres encuentros seguidos sin vencer.",
-      "percentages": {
-        "quinielista": {
-          "1": 77,
-          "2": 9,
-          "X": 14
-        },
-        "lae": {
-          "1": 84,
-          "2": 7,
-          "X": 9
-        },
-        "real": {
-          "1": 53,
-          "2": 23,
-          "X": 24
-        }
-      },
-      "recommended": "1"
-    },
-    {
       "num": 4,
-      "home": "MALLORCA",
-      "away": "CÓRDOBA",
+      "home": "HUNGRÍA",
+      "away": "IRLANDA N.",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "SÁBADO, 18:30",
-      "comment": "La pelea por el ascenso aprieta y el Mallorca necesita vencer para seguir a rebufo de las dos primeras plazas. Los ´bermellones´ llegan tras un fin de semana sin competir por la suspensión de su visita al Andorra. Su última derrota fue ante el Almería en Son Moix, a finales de septiembre, y desde entonces encadenan cinco jornadas sin perder. El Córdoba, con el ánimo al alza, también aterriza con argumentos para dar batalla: goleó al Ceuta el pasado sábado (3-0) y acumula cuatro citas invicto, con tres triunfos y un empate que le permiten mantener a tiro los puestos de promoción. Fuera del Arcángel, el conjunto andaluz ha cosechado siete puntos en sus siete desplazamientos.",
+      "schedule": "MARTES, 20:45",
+      "comment": "Budapest se prepara para una final por el ascenso directo en el Grupo 2 de la Liga B. Hungría necesita tumbar a Irlanda del Norte para arrebatarle la primera plaza y confía en el empuje del Puskas Arena, donde más de sesenta y siete mil aficionados alentarán a los magiares. El conjunto local parte por detrás en la tabla, aunque jugar en casa alimenta sus opciones de dar el golpe. Los de Michael O’Neill manejan las cuentas más claras: un empate les basta para coronarse y frustrar la fiesta húngara. Su trayectoria invita al optimismo, con tres victorias y dos igualadas, sin una sola derrota. Pero su principal aval está en la defensa: nadie ha logrado batir su portería en dicha competición.",
       "percentages": {
         "quinielista": {
-          "1": 70,
-          "2": 13,
-          "X": 17
+          "1": 40,
+          "2": 30,
+          "X": 30
         },
-        "lae": {
-          "1": 74,
-          "2": 10,
-          "X": 16
-        },
+        "lae": null,
         "real": {
-          "1": 53,
-          "2": 23,
-          "X": 24
-        }
-      },
-      "recommended": "1"
-    },
-    {
-      "num": 5,
-      "home": "R.OVIEDO",
-      "away": "GIRONA",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "SÁBADO, 21:00",
-      "comment": "Raúl González aterriza en el banquillo del Oviedo con un duelo directo como punto de partida. Su debut llegará este sábado ante el Girona, con ambos conjuntos en una situación pareja y los asturianos a un punto del play-off. El Grupo Pachuca decidió prescindir de Julián Calero incluso después de ganar en Cádiz el pasado fin de semana: el rendimiento no colmaba sus expectativas y la confianza en el proyecto se había agotado. Enfrente, Quique Álvarez busca soluciones para un ataque que ha perdido mordiente en nueve días. Los catalanes encadenan dos partidos sin marcar, saldados con derrotas. Urge recuperar el gol para frenar la caída y seguir peleando por subir.",
-      "percentages": {
-        "quinielista": {
-          "1": 45,
-          "2": 29,
-          "X": 26
-        },
-        "lae": {
-          "1": 44,
-          "2": 24,
-          "X": 32
-        },
-        "real": {
-          "1": 39,
-          "2": 32,
+          "1": 49,
+          "2": 22,
           "X": 29
         }
       },
-      "recommended": "1X2"
+      "recommended": "1X"
+    },
+    {
+      "num": 5,
+      "home": "POLONIA",
+      "away": "SUECIA",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "MARTES, 20:45",
+      "comment": "La permanencia pone contra las cuerdas a Polonia en el Tarczynski Arena. Dos tropiezos seguidos han dejado al conjunto local sin margen para confiarse: marcha tercero del Grupo B4 con cuatro puntos, solo uno más que Rumanía, su verdugo en la quinta jornada. Batir a Suecia le garantiza la salvación sin mirar a otro campo. Cualquier otro desenlace, ya sea empate o derrota, le obligará a echar cuentas con lo que suceda a la misma hora en Bosnia. Enfrente estará un líder con el ascenso asegurado y sin presión clasificatoria, pero con un reto pendiente. Graham Potter y sus futbolistas aspiran a cerrar la fase invictos, un aliciente que convierte al cuadro sueco en un rival peligroso para los anfitriones.",
+      "percentages": {
+        "quinielista": {
+          "1": 49,
+          "2": 40,
+          "X": 11
+        },
+        "lae": null,
+        "real": {
+          "1": 42,
+          "2": 31,
+          "X": 27
+        }
+      },
+      "recommended": "X2"
     },
     {
       "num": 6,
-      "home": "TENERIFE",
-      "away": "CEUTA",
+      "home": "REP.IRLANDA",
+      "away": "KOSOVO",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "DOMINGO, 14:00",
-      "comment": "El Tenerife volverá a competir tras el durísimo golpe por la muerte de Jesús de Miguel en el partido que le enfrentó al Andorra. El cuadro tinerfeño tendrá que hacer de tripas corazón para sobreponerse a tal pérdida. Va decimocuarto en la tabla tras cuatro empates seguidos. El Ceuta es el colista de la Segunda División con un único triunfo en 13 partidos. Ahora suma cinco derrotas consecutivas, una dinámica que acabó con el cese del técnico José Juan Romero. Los dirigentes del cuadro ceutí buscan un revulsivo para hacer reaccionar al equipo. Lejos de su campo, el Ceuta lleva cinco derrotas y un empate.",
+      "schedule": "MARTES, 20:45",
+      "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 71,
-          "2": 11,
-          "X": 18
+          "1": 72,
+          "2": 0,
+          "X": 28
         },
-        "lae": {
-          "1": 78,
-          "2": 9,
-          "X": 13
-        },
+        "lae": null,
         "real": {
-          "1": 52,
-          "2": 22,
-          "X": 26
+          "1": 46,
+          "2": 24,
+          "X": 30
         }
       },
-      "recommended": "1X2"
+      "recommended": "1"
     },
     {
       "num": 7,
-      "home": "GRANADA",
-      "away": "LAS PALMAS",
+      "home": "R.MADRID",
+      "away": "INTER",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "DOMINGO, 16:15",
-      "comment": "Cinco triunfos en línea avalan el momento del Granada, que quiere seguir sumando una jornada más. El conjunto nazarí anda instalado en zona de play-off. Este fin de semana no pudo competir, ya que su rival era el Tenerife, que el sábado dio el último adiós a Jesús de Miguel. La UD Las Palmas se mueve por la zona media de la clasificación y también vive un buen momento tras tres triunfos seguidos: Real Sociedad B (1-0), Oviedo (2-3) y Eldense (2-0).",
+      "schedule": "MIÉRCOLES, 18:45",
+      "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 64,
-          "2": 13,
-          "X": 23
+          "1": 72,
+          "2": 28,
+          "X": 0
         },
-        "lae": {
-          "1": 55,
-          "2": 18,
-          "X": 27
-        },
-        "real": {
-          "1": 52,
-          "2": 22,
-          "X": 26
-        }
+        "lae": null,
+        "real": null
       },
       "recommended": "1"
     },
     {
       "num": 8,
-      "home": "EIBAR",
-      "away": "CÁDIZ",
+      "home": "BK HACKEN",
+      "away": "MAN.CITY",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "DOMINGO, 18:30",
-      "comment": "El Eibar busca reaccionar para no poner en riesgo su plaza en la zona de play-off. El conjunto armero acumula cuatro jornadas sin conocer la victoria, con dos igualadas y dos derrotas. En el fin de semana no saltó al campo: le tocaba medirse al Castellón, pero el club orellut pidió aplazar el encuentro tras el fallecimiento de Jesús de Miguel, que vistió la camiseta del conjunto de la Plana antes de fichar por el Tenerife. El Cádiz, antepenúltimo en la tabla, sigue sin enderezar el rumbo pese al relevo en el banquillo. Borja Jiménez se estrenó al frente de los gaditanos con un triunfo (3-1 al colista Ceuta), aunque desde entonces ha encajado dos derrotas consecutivas: 2-1 ante el Mallorca y 1-2 frente al Oviedo.",
+      "schedule": "MIÉRCOLES, 18:45",
+      "comment": "",
       "percentages": {
-        "quinielista": {
-          "1": 83,
-          "2": 5,
-          "X": 12
-        },
-        "lae": {
-          "1": 75,
-          "2": 10,
-          "X": 15
-        },
-        "real": {
-          "1": 58,
-          "2": 18,
-          "X": 24
-        }
+        "quinielista": null,
+        "lae": null,
+        "real": null
       },
-      "recommended": "1X"
+      "recommended": null
     },
     {
       "num": 9,
-      "home": "ELDENSE",
-      "away": "SABADELL",
+      "home": "CHELSEA",
+      "away": "PSG",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "DOMINGO, 18:30",
-      "comment": "Tres derrotas seguidas sin marcar un solo gol dejan al Eldense, decimoquinto, ante la urgencia de reencontrarse con la victoria y poner distancia con el descenso. Los azulgranas cayeron por 2-0 ante el Albacete y la UD Las Palmas y por 0-2 frente al Granada. Quien viaja hasta Elda es el Sabadell, decimotercero, que acumula cuatro jornadas sin ganar, con dos X y dos derrotas. El lunes hizo tablas sin goles en casa ante la Real Sociedad B. Lejos de su estadio, los arlequinados suman una victoria, tres empates y tres derrotas.",
+      "schedule": "MIÉRCOLES, 21:00",
+      "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 44,
-          "2": 26,
-          "X": 30
+          "1": 30,
+          "2": 37,
+          "X": 33
         },
-        "lae": {
+        "lae": null,
+        "real": null
+      },
+      "recommended": "2"
+    },
+    {
+      "num": 10,
+      "home": "JUVENTUS",
+      "away": "LEUVEN",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "MIÉRCOLES, 21:00",
+      "comment": "",
+      "percentages": {
+        "quinielista": {
+          "1": 86,
+          "2": 0,
+          "X": 14
+        },
+        "lae": null,
+        "real": null
+      },
+      "recommended": "1"
+    },
+    {
+      "num": 11,
+      "home": "AUSTRIA WIEN",
+      "away": "B.MUNICH",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "JUEVES, 18:45",
+      "comment": "Uno de los duelos aparentemente más desnivelados de la quinta jornada de la fase liga de la Champions femenina. Y es que el Austria de Viena es colista, con un punto de doce, aunque en casa ha competido mejor de lo que podría pensarse. Además, ha recibido a dos equipos italianos, siempre complicados (empate ante Inter y derrota contra la Juve). El Bayern, sin embargo, es un aspirante que quiere seguir creciendo. Aún imbatido, anda tercero a dos puntos del liderato. De visitante, además, se siente cómodo: firma dos triunfos en dos salidas. Por la distancia de potencial, el choque se decanta hacia las variantes.",
+      "percentages": {
+        "quinielista": null,
+        "lae": null,
+        "real": null
+      },
+      "recommended": "X2"
+    },
+    {
+      "num": 12,
+      "home": "ARSENAL",
+      "away": "OL. LYONNES",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "JUEVES, 21:00",
+      "comment": "Dos aspirantes a todo y campeones de la Champions en los últimos cinco años. Por tanto, dos proyectos consolidados que quieren seguir la estela del Barça, al que el propio Arsenal hizo frena la pasada jornada y pudo igualarle en el Camp Nou. Una evidencia de su innegable potencial. En casa, dos victorias sin encajar. Una prestación defensiva que el Lyon también está llevando a su terreno. Viaja colíder, con cuatro porterías a cero y dos goleadas a domicilio que le permiten estar en primera posición. La llegada al banquillo de Giráldez, ex del Barça, suma intención ofensiva a un equipo que siempre ha funcionado como un bloque. Si se puede, conviene cubrirse.",
+      "percentages": {
+        "quinielista": {
           "1": 39,
           "2": 24,
           "X": 37
         },
-        "real": {
-          "1": 39,
-          "2": 31,
-          "X": 30
-        }
-      },
-      "recommended": "1X2"
-    },
-    {
-      "num": 10,
-      "home": "BÉLGICA",
-      "away": "ITALIA",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "DOMINGO, 20:45",
-      "comment": "La dos selecciones se disputan el liderato en el grupo 1 de la Liga A de la Nations League, y el cruce puede ser decisivo. Bélgica, tercera con nueve puntos, se sitúa a una sola unidad de la cabeza tras imponerse este jueves en Turquía por 1-2, un triunfo de enorme valor. Enfrente estará Italia, que manda en el grupo con diez puntos. La azzurra encadena dos victorias consecutivas y aspira a prolongarlas para dejar atrás los últimos años de sinsabores. El jueves se sacó una victoria de prestigio ante Francia por 3-1. En la primera vuelta, 0-2 para los belgas en tierras italianas.",
-      "percentages": {
-        "quinielista": {
-          "1": 48,
-          "2": 28,
-          "X": 24
-        },
-        "lae": {
-          "1": 40,
-          "2": 32,
-          "X": 28
-        },
-        "real": {
-          "1": 44,
-          "2": 31,
-          "X": 25
-        }
-      },
-      "recommended": "1X2"
-    },
-    {
-      "num": 11,
-      "home": "ALAVÉS",
-      "away": "EIBAR",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "SÁBADO, 18:00",
-      "comment": "El Alavés no disputó su partido de la pasada jornada por visitar al Tenerife, que suspendió su duelo por el fallecimiento de Jesús de Miguel, delantero del equipo masculino. Por ello, el cuadro vasco llega con más descanso y menos ritmo a un duelo importante para salir de abajo. En casa, no obstante, está mostrando un buen nivel, con una sola derrota en cinco duelos (y fue con el todopoderoso Barça). El Eibar, mientras, arrancó muy bien la liga (sumó 10 de primeros 15 puntos), pero ha entrado en terreno pantanoso. Ya acumula cinco jornadas sin ganar, aunque las tres derrotas de esta mala racha han sido por la mínima. Prueba que siempre compite, aquí también lo hará.",
-      "percentages": {
-        "quinielista": {
-          "1": 51,
-          "2": 21,
-          "X": 28
-        },
-        "lae": {
-          "1": 35,
-          "2": 31,
-          "X": 34
-        },
-        "real": {
-          "1": 44,
-          "2": 27,
-          "X": 29
-        }
-      },
-      "recommended": "1X"
-    },
-    {
-      "num": 12,
-      "home": "R.SOCIEDAD",
-      "away": "ATH.CLUB",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "DOMINGO, 12:00",
-      "comment": "Derbi vasco entre dos conjuntos que quieren aspirar a plaza europea. La Real Sociedad la consiguió la temporada pasada, siendo tercero y certificando el crecimiento de un proyecto que no empezó bien el presente curso. Estuvo las cinco primeras jornadas sin ganar, aunque es cierto que lo combinaba con previas continentales. Un desgaste añadido del que le costó acostumbrarse. Ahora firma cinco fechas sin perder, con tres victorias. La última, el pasado sábado en feudo del Eibar y aquí, cuenta con triunfo sobre el Barça. Toda una advertencia que ha respondido el Athletic Club, que viene de empatar contra el Madrid. Si se puede, conviene cubrirse.",
-      "percentages": {
-        "quinielista": {
-          "1": 58,
-          "2": 16,
-          "X": 26
-        },
-        "lae": {
-          "1": 39,
-          "2": 27,
-          "X": 34
-        },
-        "real": {
-          "1": 50,
-          "2": 24,
-          "X": 26
-        }
+        "lae": null,
+        "real": null
       },
       "recommended": "1X2"
     },
     {
       "num": 13,
-      "home": "SEVILLA",
-      "away": "AT.MADRID",
+      "home": "BARCELONA",
+      "away": "SERVETTE",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "DOMINGO, 16:00",
-      "comment": "El Sevilla volvió a empatar la pasada jornada y ya van cuatro equis en las últimas cinco jornadas y, en global, seis sin ganar. Una racha que lo deja cerca del descenso, con el que tiene un margen de dos puntos. En su estadio, por si fuera poco, ha demostrado no sentirse, por ahora, nada cómodo. Un punto de doce es la evidencia. Y recibe al Atlético de Madrid, un grande que va encontrando su mejor versión después de un inicio irregular de campeonato. De momento, encadena cinco fechas sin perder, con cuatro victorias incluidas. La última, por goleada el pasado lunes contra el Badalona. De visitante, dos salidas seguidas puntuando.",
+      "schedule": "JUEVES, 21:00",
+      "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 5,
-          "2": 83,
-          "X": 12
+          "1": 100,
+          "2": 0,
+          "X": 0
         },
-        "lae": {
-          "1": 12,
-          "2": 73,
-          "X": 15
-        },
-        "real": {
-          "1": 17,
-          "2": 61,
-          "X": 22
-        }
+        "lae": null,
+        "real": null
       },
-      "recommended": "X2"
+      "recommended": "1"
     },
     {
       "num": 14,
-      "home": "VALENCIA",
-      "away": "GRANADA",
+      "home": "BENFICA",
+      "away": "ROMA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "DOMINGO, 18:15",
-      "comment": "El Valencia perdió los primeros ocho partidos de la liga y, para algunos, ya estaba desahuciado. Sin embargo, dos triunfos seguidos, el último este lunes en el duelo que cerraba la jornada, fue el primero a domicilio, en feudo de un competitivo Deportivo. Tres puntos más que demuestran la fe de un recién ascendido que mira con otros ojos el objetivo de la permanencia. En descenso, puede salir de la zona roja si gana al Granada, sexto el curso pasado y que, en este, tras un arranque errático, parecía enderezar el rumbo. Un punto de nueve ha frenado su escalada. La nota positiva, que compite de forma notable.",
+      "schedule": "JUEVES, 21:00",
+      "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 29,
-          "2": 45,
-          "X": 26
+          "1": 42,
+          "2": 9,
+          "X": 49
         },
-        "lae": {
-          "1": 38,
-          "2": 37,
-          "X": 25
-        },
-        "real": {
-          "1": 33,
-          "2": 38,
-          "X": 29
-        }
+        "lae": null,
+        "real": null
       },
-      "recommended": "1X"
+      "recommended": "X"
     },
     {
       "num": 15,
-      "home": "ESPAÑA",
-      "away": "INGLATERRA",
+      "home": "DINAMARCA",
+      "away": "NORUEGA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "DOMINGO, 20:45",
-      "comment": "Se cierra el grupo 3 de la Liga A de la Nations League entre dos de los mejores equipos del mundo. Lo demostraron en el mundial y en el estreno del grupo ofreciendo un partido lleno de alternativas que se llevó España por su mayor efectividad. Y talento, claro. Tras ese encuentro, ambas selecciones han ganado las tres jornadas siguientes. El cuadro español, con media de tres goles a favor, aunque ninguna portería a cero. Inglaterra, mientras, ha ganado las tres citas sin encajar y mostrando más prestaciones defensivas. La duda en esta ocasión son más las rotaciones, aunque con posiblemente el liderato en juego, todo es posible.",
+      "schedule": "MARTES, 20:45",
+      "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 2,
-          "2": 48,
-          "X": 18
+          "1": 0,
+          "2": 32,
+          "X": 63
         },
-        "lae": {
-          "1": 3,
-          "2": 53,
-          "X": 19
-        },
+        "lae": null,
         "real": {
-          "1": 18,
-          "2": 26,
-          "X": 31
+          "1": 26,
+          "2": 24,
+          "X": 35
         }
       },
-      "recommended": "2-2"
+      "recommended": null
     },
     {
       "num": 16,
