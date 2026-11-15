@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2026-11-13T02:21:17.438Z",
-  "available": false,
-  "matchCountWithTarget": 0,
+  "updatedAt": "2026-11-15T01:29:59.755Z",
+  "available": true,
+  "matchCountWithTarget": 15,
   "isMidweek": false,
   "detectedJornadaNum": "21",
   "closingSchedule": "Sábado 14 (13:00)",
-  "reason": "Los análisis de la próxima jornada aún no han sido publicados por Mundo Deportivo.",
+  "reason": "Análisis disponible y verificado para la próxima jornada oficial.",
   "matches": [
     {
       "num": 1,
@@ -17,19 +17,19 @@
       "comment": "El Valladolid toma aire y mira hacia arriba tras enlazar dos triunfos que le sitúan en la zona media y amplían su margen sobre el descenso. El éxito en El Molinón supuso su primera victoria a domicilio. Ahora, la afición de Pucela quiere prolongar la dinámica en el Nuevo Zorrilla frente a un Castellón que ocupa la segunda plaza. Los de Pablo Hernández regresan este sábado tras aplazar su último compromiso por el luto ante la muerte de Jesús de Miguel, quien vistió su camiseta durante dos temporadas y media. Hasta este parón, los ´orelluts´ habían firmado ocho victorias, tres empates y una derrota. Sus cinco goles encajados retratan la solidez de un rival que pondrá a prueba la reacción local.",
       "percentages": {
         "quinielista": {
-          "1": 23,
-          "2": 51,
-          "X": 26
+          "1": 26,
+          "2": 50,
+          "X": 24
         },
         "lae": {
-          "1": 30,
-          "2": 45,
+          "1": 28,
+          "2": 47,
           "X": 25
         },
         "real": {
           "1": 31,
-          "2": 42,
-          "X": 27
+          "2": 43,
+          "X": 26
         }
       },
       "recommended": "X2"
@@ -44,19 +44,19 @@
       "comment": "Cuatro puntos frente a Girona y Sabadell permiten al Sanse respirar con una unidad de margen sobre el descenso. Su empate en la Nova Creu Alta prolongó a dos jornadas la racha sin derrotas y confirmó su buen pulso ante los clubes catalanes. Los de Jon Ansotegi buscan ahora su segundo triunfo en Zubieta, donde el sábado se medirán a un Sporting muyo irregular. Los rojiblancos fallaron el domingo contra el Valladolid en casa, pese a salir como favoritos, y dejaron escapar la ocasión de meterse entre los seis primeros. Nicolás Larcamón necesita una respuesta firme de sus jugadores para recuperar terreno. Lejos de su estadio, los asturianos aún no conocen el empate esta temporada.",
       "percentages": {
         "quinielista": {
-          "1": 28,
-          "2": 46,
-          "X": 26
+          "1": 42,
+          "2": 33,
+          "X": 25
         },
         "lae": {
-          "1": 28,
-          "2": 45,
+          "1": 26,
+          "2": 47,
           "X": 27
         },
         "real": {
-          "1": 38,
-          "2": 33,
-          "X": 29
+          "1": 44,
+          "2": 28,
+          "X": 28
         }
       },
       "recommended": "X2"
@@ -71,19 +71,19 @@
       "comment": "Defender el liderato es el próximo reto de un Almería lanzado tras imponerse por la mínima en Montilivi. Los de García Pimienta encadenan diez jornadas invictos, con ocho triunfos y dos empates, aunque cuentan con un partido más que el Castellón, segundo clasificado. Su fortaleza como locales refuerza la candidatura: nadie les ha ganado y solo el Oviedo logró arañar un punto. El Andorra afronta una visita de máxima exigencia con dos frentes abiertos. Carles Manso debe levantar a un vestuario golpeado por lo sucedido en Tenerife. A su desafío anímico se añade la urgencia clasificatoria del cuadro del Principat, inmerso en la pelea por la permanencia y con tres encuentros seguidos sin vencer.",
       "percentages": {
         "quinielista": {
-          "1": 91,
-          "2": 2,
-          "X": 7
+          "1": 77,
+          "2": 9,
+          "X": 14
         },
         "lae": {
-          "1": 78,
-          "2": 11,
-          "X": 11
+          "1": 84,
+          "2": 7,
+          "X": 9
         },
         "real": {
-          "1": 58,
-          "2": 19,
-          "X": 23
+          "1": 53,
+          "2": 23,
+          "X": 24
         }
       },
       "recommended": "1"
@@ -98,19 +98,19 @@
       "comment": "La pelea por el ascenso aprieta y el Mallorca necesita vencer para seguir a rebufo de las dos primeras plazas. Los ´bermellones´ llegan tras un fin de semana sin competir por la suspensión de su visita al Andorra. Su última derrota fue ante el Almería en Son Moix, a finales de septiembre, y desde entonces encadenan cinco jornadas sin perder. El Córdoba, con el ánimo al alza, también aterriza con argumentos para dar batalla: goleó al Ceuta el pasado sábado (3-0) y acumula cuatro citas invicto, con tres triunfos y un empate que le permiten mantener a tiro los puestos de promoción. Fuera del Arcángel, el conjunto andaluz ha cosechado siete puntos en sus siete desplazamientos.",
       "percentages": {
         "quinielista": {
-          "1": 83,
-          "2": 5,
-          "X": 12
-        },
-        "lae": {
           "1": 70,
           "2": 13,
           "X": 17
         },
+        "lae": {
+          "1": 74,
+          "2": 10,
+          "X": 16
+        },
         "real": {
-          "1": 49,
-          "2": 26,
-          "X": 25
+          "1": 53,
+          "2": 23,
+          "X": 24
         }
       },
       "recommended": "1"
@@ -125,19 +125,19 @@
       "comment": "Raúl González aterriza en el banquillo del Oviedo con un duelo directo como punto de partida. Su debut llegará este sábado ante el Girona, con ambos conjuntos en una situación pareja y los asturianos a un punto del play-off. El Grupo Pachuca decidió prescindir de Julián Calero incluso después de ganar en Cádiz el pasado fin de semana: el rendimiento no colmaba sus expectativas y la confianza en el proyecto se había agotado. Enfrente, Quique Álvarez busca soluciones para un ataque que ha perdido mordiente en nueve días. Los catalanes encadenan dos partidos sin marcar, saldados con derrotas. Urge recuperar el gol para frenar la caída y seguir peleando por subir.",
       "percentages": {
         "quinielista": {
+          "1": 45,
+          "2": 29,
+          "X": 26
+        },
+        "lae": {
           "1": 44,
           "2": 24,
           "X": 32
         },
-        "lae": {
-          "1": 42,
-          "2": 26,
-          "X": 32
-        },
         "real": {
-          "1": 40,
+          "1": 39,
           "2": 32,
-          "X": 28
+          "X": 29
         }
       },
       "recommended": "1X2"
@@ -152,19 +152,19 @@
       "comment": "El Tenerife volverá a competir tras el durísimo golpe por la muerte de Jesús de Miguel en el partido que le enfrentó al Andorra. El cuadro tinerfeño tendrá que hacer de tripas corazón para sobreponerse a tal pérdida. Va decimocuarto en la tabla tras cuatro empates seguidos. El Ceuta es el colista de la Segunda División con un único triunfo en 13 partidos. Ahora suma cinco derrotas consecutivas, una dinámica que acabó con el cese del técnico José Juan Romero. Los dirigentes del cuadro ceutí buscan un revulsivo para hacer reaccionar al equipo. Lejos de su campo, el Ceuta lleva cinco derrotas y un empate.",
       "percentages": {
         "quinielista": {
-          "1": 80,
-          "2": 6,
-          "X": 14
+          "1": 71,
+          "2": 11,
+          "X": 18
         },
         "lae": {
-          "1": 73,
-          "2": 11,
-          "X": 16
+          "1": 78,
+          "2": 9,
+          "X": 13
         },
         "real": {
-          "1": 50,
-          "2": 23,
-          "X": 27
+          "1": 52,
+          "2": 22,
+          "X": 26
         }
       },
       "recommended": "1X2"
@@ -176,21 +176,21 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "DOMINGO, 16:15",
-      "comment": "Cinco triunfos en línea avalan el momento del Granada, que quiere seguir sumando una jornada más. El conjunto nazarí anda instalado en zona de play-off. Este fin de semana no pudo competir, ya que su rival era el Tenerife, que el sábado dio el último adiós a Jesús de Miguel. La UD Las Palmas se mueve por la zona media de la clasificación y también vive un buen momento tras dos triunfos seguidos: Real Sociedad B (1-0), Oviedo (2-3) y Eldense (2-0).",
+      "comment": "Cinco triunfos en línea avalan el momento del Granada, que quiere seguir sumando una jornada más. El conjunto nazarí anda instalado en zona de play-off. Este fin de semana no pudo competir, ya que su rival era el Tenerife, que el sábado dio el último adiós a Jesús de Miguel. La UD Las Palmas se mueve por la zona media de la clasificación y también vive un buen momento tras tres triunfos seguidos: Real Sociedad B (1-0), Oviedo (2-3) y Eldense (2-0).",
       "percentages": {
         "quinielista": {
-          "1": 62,
-          "2": 12,
-          "X": 26
+          "1": 64,
+          "2": 13,
+          "X": 23
         },
         "lae": {
-          "1": 54,
-          "2": 20,
-          "X": 26
+          "1": 55,
+          "2": 18,
+          "X": 27
         },
         "real": {
-          "1": 53,
-          "2": 21,
+          "1": 52,
+          "2": 22,
           "X": 26
         }
       },
@@ -206,14 +206,14 @@
       "comment": "El Eibar busca reaccionar para no poner en riesgo su plaza en la zona de play-off. El conjunto armero acumula cuatro jornadas sin conocer la victoria, con dos igualadas y dos derrotas. En el fin de semana no saltó al campo: le tocaba medirse al Castellón, pero el club orellut pidió aplazar el encuentro tras el fallecimiento de Jesús de Miguel, que vistió la camiseta del conjunto de la Plana antes de fichar por el Tenerife. El Cádiz, antepenúltimo en la tabla, sigue sin enderezar el rumbo pese al relevo en el banquillo. Borja Jiménez se estrenó al frente de los gaditanos con un triunfo (3-1 al colista Ceuta), aunque desde entonces ha encajado dos derrotas consecutivas: 2-1 ante el Mallorca y 1-2 frente al Oviedo.",
       "percentages": {
         "quinielista": {
-          "1": 88,
-          "2": 4,
-          "X": 8
+          "1": 83,
+          "2": 5,
+          "X": 12
         },
         "lae": {
-          "1": 70,
-          "2": 13,
-          "X": 17
+          "1": 75,
+          "2": 10,
+          "X": 15
         },
         "real": {
           "1": 58,
@@ -230,21 +230,21 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "DOMINGO, 18:30",
-      "comment": "Tres derrotas seguidas sin marcar un solo gol dejan al Eldense, decimoquinto, ante la urgencia de reencontrarse con la victoria y poner distancia con el descenso. Los azulgranas cayeron por 2-0 ante el Albacete y la UD Las Palmas y por 0-2 frente al Granada. Quien viaja hasta Elda es el Sabadell, decimotercero, que acumula cuatro jornadas sin ganar, con dos X y dos derrotas. El lunes volvió hizo tablas sin goles en casa ante la Real Sociedad B. Lejos de su estadio, los arlequinados suman una victoria, tres empates y tres derrotas.",
+      "comment": "Tres derrotas seguidas sin marcar un solo gol dejan al Eldense, decimoquinto, ante la urgencia de reencontrarse con la victoria y poner distancia con el descenso. Los azulgranas cayeron por 2-0 ante el Albacete y la UD Las Palmas y por 0-2 frente al Granada. Quien viaja hasta Elda es el Sabadell, decimotercero, que acumula cuatro jornadas sin ganar, con dos X y dos derrotas. El lunes hizo tablas sin goles en casa ante la Real Sociedad B. Lejos de su estadio, los arlequinados suman una victoria, tres empates y tres derrotas.",
       "percentages": {
         "quinielista": {
-          "1": 39,
-          "2": 25,
-          "X": 36
+          "1": 44,
+          "2": 26,
+          "X": 30
         },
         "lae": {
           "1": 39,
-          "2": 26,
-          "X": 35
+          "2": 24,
+          "X": 37
         },
         "real": {
-          "1": 40,
-          "2": 30,
+          "1": 39,
+          "2": 31,
           "X": 30
         }
       },
@@ -257,22 +257,22 @@
       "homeRank": "",
       "awayRank": "",
       "schedule": "DOMINGO, 20:45",
-      "comment": "El comentario de este partido resta pendiente del que ambas selecciones jugarán el jueves.",
+      "comment": "La dos selecciones se disputan el liderato en el grupo 1 de la Liga A de la Nations League, y el cruce puede ser decisivo. Bélgica, tercera con nueve puntos, se sitúa a una sola unidad de la cabeza tras imponerse este jueves en Turquía por 1-2, un triunfo de enorme valor. Enfrente estará Italia, que manda en el grupo con diez puntos. La azzurra encadena dos victorias consecutivas y aspira a prolongarlas para dejar atrás los últimos años de sinsabores. El jueves se sacó una victoria de prestigio ante Francia por 3-1. En la primera vuelta, 0-2 para los belgas en tierras italianas.",
       "percentages": {
         "quinielista": {
           "1": 48,
-          "2": 27,
-          "X": 25
+          "2": 28,
+          "X": 24
         },
         "lae": {
-          "1": 41,
-          "2": 31,
+          "1": 40,
+          "2": 32,
           "X": 28
         },
         "real": {
-          "1": 43,
+          "1": 44,
           "2": 31,
-          "X": 26
+          "X": 25
         }
       },
       "recommended": "1X2"
@@ -287,18 +287,18 @@
       "comment": "El Alavés no disputó su partido de la pasada jornada por visitar al Tenerife, que suspendió su duelo por el fallecimiento de Jesús de Miguel, delantero del equipo masculino. Por ello, el cuadro vasco llega con más descanso y menos ritmo a un duelo importante para salir de abajo. En casa, no obstante, está mostrando un buen nivel, con una sola derrota en cinco duelos (y fue con el todopoderoso Barça). El Eibar, mientras, arrancó muy bien la liga (sumó 10 de primeros 15 puntos), pero ha entrado en terreno pantanoso. Ya acumula cinco jornadas sin ganar, aunque las tres derrotas de esta mala racha han sido por la mínima. Prueba que siempre compite, aquí también lo hará.",
       "percentages": {
         "quinielista": {
-          "1": 41,
-          "2": 26,
-          "X": 33
+          "1": 51,
+          "2": 21,
+          "X": 28
         },
         "lae": {
           "1": 35,
-          "2": 32,
-          "X": 33
+          "2": 31,
+          "X": 34
         },
         "real": {
-          "1": 41,
-          "2": 30,
+          "1": 44,
+          "2": 27,
           "X": 29
         }
       },
@@ -314,18 +314,18 @@
       "comment": "Derbi vasco entre dos conjuntos que quieren aspirar a plaza europea. La Real Sociedad la consiguió la temporada pasada, siendo tercero y certificando el crecimiento de un proyecto que no empezó bien el presente curso. Estuvo las cinco primeras jornadas sin ganar, aunque es cierto que lo combinaba con previas continentales. Un desgaste añadido del que le costó acostumbrarse. Ahora firma cinco fechas sin perder, con tres victorias. La última, el pasado sábado en feudo del Eibar y aquí, cuenta con triunfo sobre el Barça. Toda una advertencia que ha respondido el Athletic Club, que viene de empatar contra el Madrid. Si se puede, conviene cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 46,
-          "2": 21,
-          "X": 33
+          "1": 58,
+          "2": 16,
+          "X": 26
         },
         "lae": {
-          "1": 37,
-          "2": 29,
+          "1": 39,
+          "2": 27,
           "X": 34
         },
         "real": {
-          "1": 48,
-          "2": 26,
+          "1": 50,
+          "2": 24,
           "X": 26
         }
       },
@@ -341,18 +341,18 @@
       "comment": "El Sevilla volvió a empatar la pasada jornada y ya van cuatro equis en las últimas cinco jornadas y, en global, seis sin ganar. Una racha que lo deja cerca del descenso, con el que tiene un margen de dos puntos. En su estadio, por si fuera poco, ha demostrado no sentirse, por ahora, nada cómodo. Un punto de doce es la evidencia. Y recibe al Atlético de Madrid, un grande que va encontrando su mejor versión después de un inicio irregular de campeonato. De momento, encadena cinco fechas sin perder, con cuatro victorias incluidas. La última, por goleada el pasado lunes contra el Badalona. De visitante, dos salidas seguidas puntuando.",
       "percentages": {
         "quinielista": {
-          "1": 9,
-          "2": 76,
-          "X": 15
+          "1": 5,
+          "2": 83,
+          "X": 12
         },
         "lae": {
-          "1": 16,
-          "2": 66,
-          "X": 18
+          "1": 12,
+          "2": 73,
+          "X": 15
         },
         "real": {
-          "1": 19,
-          "2": 59,
+          "1": 17,
+          "2": 61,
           "X": 22
         }
       },
@@ -368,19 +368,19 @@
       "comment": "El Valencia perdió los primeros ocho partidos de la liga y, para algunos, ya estaba desahuciado. Sin embargo, dos triunfos seguidos, el último este lunes en el duelo que cerraba la jornada, fue el primero a domicilio, en feudo de un competitivo Deportivo. Tres puntos más que demuestran la fe de un recién ascendido que mira con otros ojos el objetivo de la permanencia. En descenso, puede salir de la zona roja si gana al Granada, sexto el curso pasado y que, en este, tras un arranque errático, parecía enderezar el rumbo. Un punto de nueve ha frenado su escalada. La nota positiva, que compite de forma notable.",
       "percentages": {
         "quinielista": {
-          "1": 26,
-          "2": 47,
-          "X": 27
+          "1": 29,
+          "2": 45,
+          "X": 26
         },
         "lae": {
           "1": 38,
-          "2": 36,
-          "X": 26
+          "2": 37,
+          "X": 25
         },
         "real": {
-          "1": 31,
-          "2": 41,
-          "X": 28
+          "1": 33,
+          "2": 38,
+          "X": 29
         }
       },
       "recommended": "1X"
@@ -396,18 +396,18 @@
       "percentages": {
         "quinielista": {
           "1": 2,
-          "2": 54,
-          "X": 12
+          "2": 48,
+          "X": 18
         },
         "lae": {
-          "1": 5,
-          "2": 50,
-          "X": 20
+          "1": 3,
+          "2": 53,
+          "X": 19
         },
         "real": {
-          "1": 16,
-          "2": 27,
-          "X": 29
+          "1": 18,
+          "2": 26,
+          "X": 31
         }
       },
       "recommended": "2-2"
@@ -696,43 +696,69 @@
         "pos": 1,
         "team": "Almería",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/85.png?width=44&amp;height=44",
-        "pts": 29,
-        "pj": 13,
-        "pg": 9,
+        "pts": 32,
+        "pj": 14,
+        "pg": 10,
         "pe": 2,
         "pp": 2,
-        "gf": 24,
-        "gc": 10,
-        "dif": 14
+        "gf": 26,
+        "gc": 11,
+        "dif": 15
       },
       {
         "pos": 2,
         "team": "Castellón",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/122.png?width=44&amp;height=44",
-        "pts": 27,
-        "pj": 12,
-        "pg": 8,
+        "pts": 30,
+        "pj": 13,
+        "pg": 9,
         "pe": 3,
         "pp": 1,
-        "gf": 23,
+        "gf": 24,
         "gc": 5,
-        "dif": 18
+        "dif": 19
       },
       {
         "pos": 3,
-        "team": "Burgos CF",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/261.png?width=44&amp;height=44",
+        "team": "Girona",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/648.png?width=44&amp;height=44",
         "pts": 24,
-        "pj": 13,
+        "pj": 14,
         "pg": 7,
         "pe": 3,
-        "pp": 3,
-        "gf": 19,
-        "gc": 14,
-        "dif": 5
+        "pp": 4,
+        "gf": 24,
+        "gc": 13,
+        "dif": 11
       },
       {
         "pos": 4,
+        "team": "Burgos CF",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/261.png?width=44&amp;height=44",
+        "pts": 24,
+        "pj": 14,
+        "pg": 7,
+        "pe": 3,
+        "pp": 4,
+        "gf": 20,
+        "gc": 17,
+        "dif": 3
+      },
+      {
+        "pos": 5,
+        "team": "Mallorca",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/11.png?width=44&amp;height=44",
+        "pts": 23,
+        "pj": 13,
+        "pg": 6,
+        "pe": 5,
+        "pp": 2,
+        "gf": 18,
+        "gc": 10,
+        "dif": 8
+      },
+      {
+        "pos": 6,
         "team": "Eibar",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/108.png?width=44&amp;height=44",
         "pts": 23,
@@ -745,7 +771,7 @@
         "dif": 7
       },
       {
-        "pos": 5,
+        "pos": 7,
         "team": "Granada",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/347.png?width=44&amp;height=44",
         "pts": 23,
@@ -758,59 +784,46 @@
         "dif": 6
       },
       {
-        "pos": 6,
-        "team": "Mallorca",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/11.png?width=44&amp;height=44",
-        "pts": 22,
-        "pj": 12,
-        "pg": 6,
-        "pe": 4,
-        "pp": 2,
-        "gf": 15,
-        "gc": 7,
-        "dif": 8
-      },
-      {
-        "pos": 7,
+        "pos": 8,
         "team": "Sporting",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/76.png?width=44&amp;height=44",
-        "pts": 22,
-        "pj": 13,
+        "pts": 23,
+        "pj": 14,
         "pg": 7,
-        "pe": 1,
+        "pe": 2,
         "pp": 5,
-        "gf": 14,
-        "gc": 15,
+        "gf": 16,
+        "gc": 17,
         "dif": -1
-      },
-      {
-        "pos": 8,
-        "team": "Girona",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/648.png?width=44&amp;height=44",
-        "pts": 21,
-        "pj": 13,
-        "pg": 6,
-        "pe": 3,
-        "pp": 4,
-        "gf": 22,
-        "gc": 12,
-        "dif": 10
       },
       {
         "pos": 9,
         "team": "Oviedo",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/14.png?width=44&amp;height=44",
         "pts": 21,
-        "pj": 13,
+        "pj": 14,
         "pg": 6,
         "pe": 3,
-        "pp": 4,
-        "gf": 19,
-        "gc": 16,
-        "dif": 3
+        "pp": 5,
+        "gf": 20,
+        "gc": 18,
+        "dif": 2
       },
       {
         "pos": 10,
+        "team": "Córdoba",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/342.png?width=44&amp;height=44",
+        "pts": 20,
+        "pj": 14,
+        "pg": 6,
+        "pe": 2,
+        "pp": 6,
+        "gf": 25,
+        "gc": 25,
+        "dif": 0
+      },
+      {
+        "pos": 11,
         "team": "Las Palmas",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/9.png?width=44&amp;height=44",
         "pts": 20,
@@ -823,30 +836,17 @@
         "dif": -2
       },
       {
-        "pos": 11,
-        "team": "Córdoba",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/342.png?width=44&amp;height=44",
-        "pts": 19,
-        "pj": 13,
-        "pg": 6,
-        "pe": 1,
-        "pp": 6,
-        "gf": 22,
-        "gc": 22,
-        "dif": 0
-      },
-      {
         "pos": 12,
         "team": "Real Valladolid",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/18.png?width=44&amp;height=44",
         "pts": 18,
-        "pj": 13,
+        "pj": 14,
         "pg": 5,
         "pe": 3,
-        "pp": 5,
+        "pp": 6,
         "gf": 22,
-        "gc": 20,
-        "dif": 2
+        "gc": 21,
+        "dif": 1
       },
       {
         "pos": 13,
@@ -876,6 +876,19 @@
       },
       {
         "pos": 15,
+        "team": "Leganés",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/132.png?width=44&amp;height=44",
+        "pts": 15,
+        "pj": 14,
+        "pg": 4,
+        "pe": 3,
+        "pp": 7,
+        "gf": 14,
+        "gc": 24,
+        "dif": -10
+      },
+      {
+        "pos": 16,
         "team": "Eldense",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/672.png?width=44&amp;height=44",
         "pts": 14,
@@ -888,7 +901,7 @@
         "dif": -6
       },
       {
-        "pos": 16,
+        "pos": 17,
         "team": "Celta Fortuna",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/688323abe51b982.png?width=44&amp;height=44",
         "pts": 13,
@@ -901,43 +914,30 @@
         "dif": -6
       },
       {
-        "pos": 17,
+        "pos": 18,
         "team": "R. Sociedad B",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/318.png?width=44&amp;height=44",
-        "pts": 12,
-        "pj": 13,
+        "pts": 13,
+        "pj": 14,
         "pg": 3,
-        "pe": 3,
+        "pe": 4,
         "pp": 7,
-        "gf": 15,
-        "gc": 22,
+        "gf": 17,
+        "gc": 24,
         "dif": -7
-      },
-      {
-        "pos": 18,
-        "team": "Leganés",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/132.png?width=44&amp;height=44",
-        "pts": 12,
-        "pj": 13,
-        "pg": 3,
-        "pe": 3,
-        "pp": 7,
-        "gf": 11,
-        "gc": 23,
-        "dif": -12
       },
       {
         "pos": 19,
         "team": "Andorra",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/5026.png?width=44&amp;height=44",
         "pts": 11,
-        "pj": 12,
+        "pj": 13,
         "pg": 3,
         "pe": 2,
-        "pp": 7,
-        "gf": 17,
-        "gc": 22,
-        "dif": -5
+        "pp": 8,
+        "gf": 18,
+        "gc": 24,
+        "dif": -6
       },
       {
         "pos": 20,
