@@ -1788,6 +1788,33 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 70. BLINDAJE DE IMPORTACIÓN DE JORNADAS: REGLA DEL DOMINGO Y REGLA DE PRIMERA DIVISIÓN
+- **Regla de Negocio**:
+  - La Peña Maulas compite **exclusivamente** en jornadas de La Quiniela que cumplan dos condiciones obligatorias e irrenunciables:
+    1. **Regla del Domingo**: La jornada debe disputarse en fin de semana con fecha oficial de cierre en **Domingo** (`getDay() === 0`). Se descartan expresamente todas las jornadas intersemanales (martes, miércoles, jueves) de Copa del Rey, Champions League, Europa League, etc.
+    2. **Regla de Primera División**: La jornada debe pertenecer a la competición principal española (**LaLiga EA Sports 2026-2027**). Debe contener al menos **5 equipos** oficiales de 1ª División en los 15 partidos del boleto. Se descartan automáticamente jornadas compuestas exclusivamente por Segunda División, Liga Femenina (Liga F), filiales/reservas (B) o parones internacionales de selecciones (Nations League/clasificatorios) sin Primera División.
+- **Causa Raíz Diagnosticada**:
+  - El auto-importador desatendido (`scripts/auto_import_quiniela.js` en GitHub Actions) y el scraper (`functions/quinielaScraper.js`) consultaban fuentes oficiales (SELAE / Eduardo Losilla) incorporando a Firestore cualquier sorteo venidero sin validar si era domingo ni verificar la presencia de Primera División.
+  - La función `AppUtils.isLaLigaTeam(name)` realizaba una coincidencia laxa por subcadenas (`includes`), provocando falsos positivos con equipos de Liga Femenina (ej: "Sevilla (f)", "Levante (f)", "Athletic Club (f)") y filiales ("Real Sociedad B"), permitiendo que jornadas como la J.21 (11/11/2026, Segunda + Liga F) o J.22 (15/11/2026, Nations League) fueran clasificadas erróneamente como válidas.
+  - La tabla `KNOWN_DATES` en `js/quiniela-service.js` contenía fechas de miércoles (15, 17, 19, 21) y asignaba la Jornada 23 al miércoles 18/11/2026 en lugar del domingo 22/11/2026.
+- **Implementación y Blindaje Técnico**:
+  - **Limpieza de Base de Datos (Firestore)**:
+    * Se eliminaron los 4 documentos erróneos generados por importaciones desatendidas: J.17 (Copa del Rey, 28/10), J.19 (Champions League, 04/11), J.21 (Segunda/Liga F, 11/11) y J.22 (Nations League, 15/11).
+    * Se auditó que 0 socios habían enviado pronósticos en dichos documentos.
+  - **Actualización de `js/utils.js`**:
+    * `isLaLigaTeam(name)`: Excluye de inmediato cualquier equipo con marcadores femeninos (`(f)`, `(fem)`, `femenin`, `women`) o filiales (`(b)`, `filial`, `promesas`, `fortuna`, `\b[b]\b`). Valida con límites de palabra (`\b` / regex) los 20 clubes de Primera División 2026-2027 (incluidos los ascendidos Racing Santander, RC Deportivo y Málaga CF; y excluyendo los descendidos Girona, Mallorca, Oviedo, etc.).
+    * `hasPrimeraTeams(matches, minCount = 5)`: Helper centralizado que cuenta y valida presencia mínima de 1ª División.
+    * `isSundayDate(dateInput)`: Parseo flexible y verificación estricta de `getDay() === 0`.
+    * Soporte universal: exportado tanto para cliente web (`window.AppUtils`) como para entornos Node.js (`module.exports = { AppUtils }`).
+  - **Blindaje en Scrapers y Servicios (`functions/quinielaScraper.js`, `js/quiniela-service.js`, `scripts/auto_import_quiniela.js`)**:
+    * En `quinielaScraper.js` (`fetchUpcomingQuinielaJornadas`), cualquier jornada de SELAE o Losilla que no sea domingo o no sume >= 5 equipos de 1ª División queda descartada con log explicativo antes de entrar en la lista candidata.
+    * En `quiniela-service.js` (`fetchUpcomingFromEduardoLosilla`), se corrigió la fecha oficial de la J.23 al domingo **22/11/2026**, se eliminaron fechas intersemanales y se añadió el doble filtro dominical y de 1ª División.
+    * En `auto_import_quiniela.js`, se añadió una barrera defensiva adicional previa a `newDocRef.set(...)` en Firestore que aborta cualquier inserción de jornadas no dominicales o sin 1ª División.
+  - **Sincronización de Caché (`datos_auxiliares/proximas_jornadas_cache.json`)**:
+    * Actualizado el archivo local con las únicas 4 jornadas oficiales válidas: J.16 (25/10/2026), J.18 (01/11/2026), J.20 (08/11/2026) y J.23 (22/11/2026).
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

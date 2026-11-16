@@ -135,8 +135,15 @@ class QuinielaService {
             if (localRes && localRes.ok) {
                 const localData = await localRes.json();
                 if (Array.isArray(localData) && localData.length > 0) {
-                    console.log('[QuinielaService] Usando próximas jornadas desde archivo sincronizado.');
-                    return localData.sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
+                    const filtered = localData.filter(j => {
+                        const isSun = j.isSunday === true || (typeof window !== 'undefined' && window.AppUtils && window.AppUtils.isSundayDate ? window.AppUtils.isSundayDate(j.dateStr) : true);
+                        const hasPrim = (typeof window !== 'undefined' && window.AppUtils && window.AppUtils.hasPrimeraTeams) ? window.AppUtils.hasPrimeraTeams(j.matches, 5) : true;
+                        return isSun && hasPrim;
+                    });
+                    if (filtered.length > 0) {
+                        console.log('[QuinielaService] Usando próximas jornadas desde archivo sincronizado.');
+                        return filtered.sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
+                    }
                 }
             }
         } catch (e) {
@@ -160,7 +167,7 @@ class QuinielaService {
     }
 
     static async fetchUpcomingFromEduardoLosilla(customCandidates = null) {
-        let candidateNumbers = customCandidates;
+        let candidateNumbers = Array.isArray(customCandidates) ? customCandidates : null;
         if (!candidateNumbers || candidateNumbers.length === 0) {
             let maxJ = 16;
             if (typeof window !== 'undefined' && window.JornadasApp && Array.isArray(window.JornadasApp.jornadas) && window.JornadasApp.jornadas.length > 0) {
@@ -168,23 +175,18 @@ class QuinielaService {
                 if (nums.length > 0) maxJ = Math.max(...nums);
             }
             candidateNumbers = [];
-            for (let n = Math.max(1, maxJ); n <= maxJ + 6; n++) {
+            for (let n = Math.max(1, maxJ); n <= maxJ + 8; n++) {
                 candidateNumbers.push(n);
             }
         }
 
         const KNOWN_DATES = {
             14: '18/10/2026',
-            15: '21/10/2026',
             16: '25/10/2026',
-            17: '28/10/2026',
             18: '01/11/2026',
-            19: '04/11/2026',
             20: '08/11/2026',
-            21: '11/11/2026',
-            22: '15/11/2026',
-            23: '18/11/2026',
-            24: '22/11/2026'
+            23: '22/11/2026',
+            25: '29/11/2026'
         };
 
         const results = [];
@@ -228,7 +230,27 @@ class QuinielaService {
                     );
                     if (hasPlaceholders) continue;
 
-                    // Consultar horarios para comprobar si es jornada de fin de semana (DOM/SAB)
+                    // REGLA 1: Validar si los partidos contienen presencia de Primera División (Mínimo 5 equipos)
+                    const hasPrimera = (typeof window !== 'undefined' && window.AppUtils && typeof window.AppUtils.hasPrimeraTeams === 'function')
+                        ? window.AppUtils.hasPrimeraTeams(matches, 5)
+                        : (function() {
+                            let pCount = 0;
+                            const pTeams = ['real madrid', 'barcelona', 'atlético', 'atletico', 'at. madrid', 'sevilla', 'betis', 'real sociedad', 'athletic', 'valencia', 'villarreal', 'osasuna', 'celta', 'rayo', 'getafe', 'alavés', 'alaves', 'espanyol', 'elche', 'levante', 'racing', 'deportivo', 'málaga', 'malaga'];
+                            matches.forEach(m => {
+                                const h = (m.home || '').toLowerCase();
+                                const a = (m.away || '').toLowerCase();
+                                if (!h.includes('(f)') && !h.includes('(b)') && pTeams.some(t => h.includes(t))) pCount++;
+                                if (!a.includes('(f)') && !a.includes('(b)') && pTeams.some(t => a.includes(t))) pCount++;
+                            });
+                            return pCount >= 5;
+                        })();
+
+                    if (!hasPrimera) {
+                        // Descartar jornadas de Segunda, Selecciones o Liga F sin Primera División
+                        continue;
+                    }
+
+                    // REGLA 2: Consultar horarios para comprobar si es jornada de fin de semana (DOM/SAB)
                     let isSunday = true;
                     try {
                         const ctrlH = (typeof AbortController !== 'undefined') ? new AbortController() : null;
@@ -245,30 +267,38 @@ class QuinielaService {
                             }
                         }
                     } catch(eH) {
-                        isSunday = (jNum % 2 === 0);
+                        isSunday = true;
                     }
 
                     // Calcular o asignar fecha oficial
                     let dateStr = KNOWN_DATES[jNum] || '';
                     if (!dateStr) {
-                        if (isSunday && jNum % 2 === 0) {
-                            const weeksDiff = (jNum - 16) / 2;
-                            const d = new Date(2026, 9, 25);
-                            d.setDate(d.getDate() + (weeksDiff * 7));
-                            dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-                        } else {
-                            const weeksDiff = Math.floor((jNum - 16) / 2);
-                            const d = new Date(2026, 9, 28);
-                            d.setDate(d.getDate() + (weeksDiff * 7));
-                            dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-                        }
+                        const weeksDiff = jNum - 20;
+                        const d = new Date(2026, 10, 8); // 08/11/2026 (J.20)
+                        d.setDate(d.getDate() + (weeksDiff * 7));
+                        dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                    }
+
+                    // Verificar que la fecha oficial corresponda estrictamente a un Domingo
+                    const isSundayByDate = (typeof window !== 'undefined' && window.AppUtils && typeof window.AppUtils.isSundayDate === 'function')
+                        ? window.AppUtils.isSundayDate(dateStr)
+                        : (function() {
+                            const parts = dateStr.split('/');
+                            if (parts.length !== 3) return false;
+                            const dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+                            return dt.getDay() === 0;
+                        })();
+
+                    if (!isSunday || !isSundayByDate) {
+                        // Descartar jornadas intersemanales (Copa, Champions, etc.)
+                        continue;
                     }
 
                     results.push({
                         number: jNum,
                         dateStr: dateStr,
                         season: '2026-2027',
-                        isSunday: isSunday,
+                        isSunday: true,
                         source: 'Eduardo Losilla Oficial',
                         matches: matches
                     });
@@ -464,6 +494,30 @@ class QuinielaService {
 }
 
 QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
+    {
+        number: 23,
+        dateStr: "22/11/2026",
+        season: "2026-2027",
+        isSunday: true,
+        source: "Eduardo Losilla Oficial",
+        matches: [
+            { position: 1, home: "Alavés", away: "Deportivo", result: "" },
+            { position: 2, home: "Rayo Vallecano", away: "Valencia", result: "" },
+            { position: 3, home: "Real Madrid", away: "Celta", result: "" },
+            { position: 4, home: "Barcelona", away: "Villarreal", result: "" },
+            { position: 5, home: "Racing Santander", away: "Real Sociedad", result: "" },
+            { position: 6, home: "Osasuna", away: "Málaga", result: "" },
+            { position: 7, home: "Getafe", away: "Atlético de Madrid", result: "" },
+            { position: 8, home: "Tenerife", away: "Mallorca", result: "" },
+            { position: 9, home: "Sporting de Gijón", away: "Las Palmas", result: "" },
+            { position: 10, home: "Girona", away: "Eibar", result: "" },
+            { position: 11, home: "Eibar (f)", away: "Atlético de Madrid (f)", result: "" },
+            { position: 12, home: "Granada (f)", away: "Real Madrid (f)", result: "" },
+            { position: 13, home: "Real Sociedad (f)", away: "Sevilla (f)", result: "" },
+            { position: 14, home: "Tenerife (f)", away: "Madrid CFF (f)", result: "" },
+            { position: 15, home: "Sevilla", away: "Betis", result: "" }
+        ]
+    },
     {
         number: 18,
         dateStr: "01/11/2026",

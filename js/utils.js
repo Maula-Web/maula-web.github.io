@@ -24,6 +24,10 @@ if (!String.prototype.toSpanishFormat) {
     };
 }
 
+if (typeof window === 'undefined') {
+    global.window = global;
+}
+
 
 // --- HIGH-PERFORMANCE STATIC LOOKUP TABLES & CACHES ---
 const TEAM_LOGOS_MAP = {
@@ -229,7 +233,7 @@ const TEAM_NORMALIZE_MAP = {
 };
 const TEAM_NORMALIZE_CACHE = new Map();
 
-var AppUtils = window.AppUtils || {
+var AppUtils = (typeof window !== 'undefined' ? window.AppUtils : null) || {
 
     currentTeams: null, // Dynamic list from Firestore
     activeSeason: '2026-2027',
@@ -423,22 +427,74 @@ var AppUtils = window.AppUtils || {
     },
 
     /**
-     * Checks if a team string is likely a 1st Division Team (LaLiga EA)
-     * Used for filtering
+     * Checks if a team string is likely a 1st Division Team (LaLiga EA 2026-2027)
+     * Used for filtering. Excludes women's teams (Liga F) and reserves (B/filiales).
      */
     isLaLigaTeam(name) {
-        // Lista de equipos de Primera División 2026-2027
-        // Bajan: Real Oviedo, Girona, Mallorca
+        if (!name) return false;
+        const lower = String(name).toLowerCase().trim();
+
+        // 1. Excluir expresamente equipos femeninos (Liga F), filiales/reservas (B) y selecciones
+        if (
+            lower.includes('(f)') ||
+            lower.includes('(fem)') ||
+            lower.includes('femenin') ||
+            lower.includes('women') ||
+            lower.includes('filial') ||
+            lower.includes('promesas') ||
+            lower.includes('fortuna') ||
+            /\b(b)\b/i.test(lower) ||
+            /\s+b$/i.test(lower)
+        ) {
+            return false;
+        }
+
+        // 2. Lista de equipos de Primera División 2026-2027
+        // Bajan: Real Oviedo, Girona, Mallorca, Valladolid, Leganés, Las Palmas, Cádiz, Granada, Almería
         // Suben: Real Racing Club, RC Deportivo, Málaga CF
         const keywords = [
-            'real madrid', 'barcelona', 'atlético', 'at. madrid', 'sevilla', 'betis',
-            'real sociedad', 'athletic', 'valencia', 'villarreal', 'osasuna',
-            'celta', 'rayo', 'getafe', 'alavés', 'espanyol', 'elche',
-            'levante', 'bilbao', 'racing', 'deportivo', 'málaga', 'malaga'
+            'real madrid', 'barcelona', 'atlético de madrid', 'atletico de madrid', 'at. madrid', 'at madrid', 'atlético', 'atletico',
+            'sevilla', 'betis', 'real betis',
+            'real sociedad', 'athletic club', 'athletic', 'valencia', 'villarreal', 'osasuna',
+            'celta', 'celta de vigo', 'rayo vallecano', 'rayo', 'getafe',
+            'alavés', 'alaves', 'deportivo alavés', 'deportivo alaves',
+            'espanyol', 'rcd espanyol', 'elche',
+            'levante', 'bilbao',
+            // Ascendidos 2026-2027:
+            'racing santander', 'real racing club', 'racing',
+            'rc deportivo', 'deportivo de la coruña', 'deportivo de la coruna', 'deportivo',
+            'málaga', 'malaga', 'málaga cf'
         ];
+
         const norm = this.normalizeName(name);
-        // Simple inclusion check on normalized strings
-        return keywords.some(k => norm.includes(this.normalizeName(k)));
+        return keywords.some(k => {
+            const cleanK = this.normalizeName(k);
+            const regex = new RegExp('(?:^|\\s|[-_/])' + cleanK.replace('.', '\\.') + '(?:$|\\s|[-_/])', 'i');
+            return regex.test(norm) || norm === cleanK;
+        });
+    },
+
+    /**
+     * Valida si un listado de partidos contiene suficiente presencia de Primera División
+     * Por defecto mínimo 5 equipos (LaLiga EA Sports estándar tiene entre 10 y 20)
+     */
+    hasPrimeraTeams(matches, minCount = 5) {
+        if (!matches || !Array.isArray(matches) || matches.length === 0) return false;
+        let count = 0;
+        matches.forEach(m => {
+            if (m && m.home && this.isLaLigaTeam(m.home)) count++;
+            if (m && m.away && this.isLaLigaTeam(m.away)) count++;
+        });
+        return count >= minCount;
+    },
+
+    /**
+     * Valida si una fecha (String 'DD/MM/YYYY', 'YYYY-MM-DD' o Date) corresponde a un Domingo
+     */
+    isSundayDate(dateInput) {
+        if (!dateInput) return false;
+        const dt = this.parseDate(dateInput);
+        return dt ? dt.getDay() === 0 : false;
     },
 
     /**
@@ -670,13 +726,16 @@ var AppUtils = window.AppUtils || {
     }
 };
 
-window.AppUtils = AppUtils;
+if (typeof window !== 'undefined') {
+    window.AppUtils = AppUtils;
+}
 
 /**
  * Global UI Features (Clock & Connectivity Status)
  * Injected automatically since utils.js is present on all pages.
  */
-document.addEventListener('DOMContentLoaded', async () => {
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', async () => {
     // Create Clock Element
     const clockId = 'maulas-global-clock';
     if (!document.getElementById(clockId)) {
@@ -748,9 +807,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Start
         updateClock();
         setInterval(updateClock, 1000);
-
     }
 });
+}
 
 // =========================================================================
 // GESTOR DE VERSIONES DE LA APLICACIÓN (V1 CLÁSICA <-> PRO)
@@ -1397,7 +1456,7 @@ window.AppUIMode = {
 };
 
 // Inicializar de inmediato para evitar parpadeos
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && window.location) {
     if (window.AppVersion) {
         window.AppVersion.checkAccessGuard();
         window.AppVersion.updateVisibility();
@@ -1534,4 +1593,8 @@ if (typeof window !== 'undefined') {
     window.formatEuro = AppUtils.formatEuro;
     window.formatMoney = AppUtils.formatEuro;
     window.formatCurrency = AppUtils.formatEuro;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { AppUtils };
 }

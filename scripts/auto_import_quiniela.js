@@ -110,8 +110,16 @@ async function run() {
         console.log('----------------------------------------------------');
 
         const { fetchUpcomingQuinielaJornadas } = require('../functions/quinielaScraper');
+        const { AppUtils } = require('../js/utils');
+
         if (typeof fetchUpcomingQuinielaJornadas === 'function') {
-            const upcomingList = await fetchUpcomingQuinielaJornadas();
+            const rawUpcoming = await fetchUpcomingQuinielaJornadas();
+            // Filtrar estrictamente por regla de domingo y regla de 1ª división
+            const upcomingList = (rawUpcoming || []).filter(uJ => {
+                const isSunday = uJ.isSunday || (AppUtils ? AppUtils.isSundayDate(uJ.dateStr) : true);
+                const hasPrimera = AppUtils ? AppUtils.hasPrimeraTeams(uJ.matches, 5) : true;
+                return isSunday && hasPrimera;
+            });
             console.log(`ℹ️ Detectadas ${upcomingList.length} jornadas válidas en el calendario (domingo + 1ª división).`);
 
             if (serviceAccount && upcomingList.length > 0) {
@@ -126,6 +134,12 @@ async function run() {
                 });
 
                 for (const uJ of upcomingList) {
+                    // Verificación de seguridad adicional
+                    if (AppUtils && (!AppUtils.isSundayDate(uJ.dateStr) || !AppUtils.hasPrimeraTeams(uJ.matches, 5))) {
+                        console.log(`⛔ Bloqueando Jornada ${uJ.number} (${uJ.dateStr}): No cumple regla del Domingo o Primera División.`);
+                        continue;
+                    }
+
                     if (!existingNumbers.has(uJ.number)) {
                         console.log(`🆕 Incorporando automáticamente nueva Jornada ${uJ.number} (${uJ.dateStr})...`);
                         const newDocRef = db.collection('jornadas').doc();
@@ -147,7 +161,7 @@ async function run() {
                 }
             }
 
-            // Guardar copia local en JSON
+            // Guardar copia local en JSON filtrada y garantizada
             const outDir = path.join(__dirname, '../datos_auxiliares');
             if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
             const outFile = path.join(outDir, 'proximas_jornadas_cache.json');

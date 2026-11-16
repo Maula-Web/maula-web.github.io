@@ -300,6 +300,40 @@ async function parseSELAEResults() {
  *  1. SELAE API Oficial (BuscadorSorteos de Loterías del Estado)
  *  2. CombinacionGanadora.com (Convocatorias de domingos futuros)
  */
+function hasPrimeraTeamsScraper(matches, minCount = 5) {
+    if (!matches || !Array.isArray(matches) || matches.length === 0) return false;
+    try {
+        const path = require('path');
+        const { AppUtils } = require(path.join(__dirname, '../js/utils.js'));
+        if (AppUtils && typeof AppUtils.hasPrimeraTeams === 'function') {
+            return AppUtils.hasPrimeraTeams(matches, minCount);
+        }
+    } catch (e) { }
+
+    let count = 0;
+    const pTeams = [
+        'real madrid', 'barcelona', 'atlético', 'atletico', 'at. madrid', 'sevilla', 'betis',
+        'real sociedad', 'athletic', 'valencia', 'villarreal', 'osasuna',
+        'celta', 'rayo', 'getafe', 'alavés', 'alaves', 'espanyol', 'elche',
+        'levante', 'racing', 'deportivo', 'málaga', 'malaga'
+    ];
+    matches.forEach(m => {
+        const h = (m.home || '').toLowerCase();
+        const a = (m.away || '').toLowerCase();
+        if (!h.includes('(f)') && !h.includes('(b)') && !h.includes('femenin') && pTeams.some(t => h.includes(t))) count++;
+        if (!a.includes('(f)') && !a.includes('(b)') && !a.includes('femenin') && pTeams.some(t => a.includes(t))) count++;
+    });
+    return count >= minCount;
+}
+
+/**
+ * Consulta las próximas jornadas convocadas por SELAE y Eduardo Losilla.
+ * REGLAS PEÑA MAULAS:
+ *  1. Solo jornadas de Domingo (o fin de semana asociadas al domingo).
+ *  2. Con presencia mayoritaria de Primera División (LaLiga EA Sports >= 5 equipos).
+ * Se descartan expresamente jornadas de Copa intersemanales, Champions, Segunda en solitario,
+ * Liga Femenina o parones internacionales de selecciones sin Primera División.
+ */
 async function fetchUpcomingQuinielaJornadas() {
     // 1. Fuente Primaria de Próximas: SELAE API Oficial
     try {
@@ -323,6 +357,14 @@ async function fetchUpcomingQuinielaJornadas() {
                     if (!fMatch) continue;
 
                     const dateObj = new Date(parseInt(fMatch[1], 10), parseInt(fMatch[2], 10) - 1, parseInt(fMatch[3], 10));
+                    const isSunday = (sorteo.dia_semana || '').toLowerCase().includes('domingo') || dateObj.getDay() === 0;
+
+                    // REGLA 1: Solo jornadas que se jueguen en Domingo
+                    if (!isSunday) {
+                        console.log(`[quinielaScraper] Descartando J.${jNum} de SELAE: No es domingo (${fechaRaw}).`);
+                        continue;
+                    }
+
                     const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
 
                     const rawPartidos = sorteo.partidos || [];
@@ -335,16 +377,22 @@ async function fetchUpcomingQuinielaJornadas() {
                         result: p.signo || ''
                     }));
 
+                    // REGLA 2: Debe contener presencia de Primera División (>= 5 equipos)
+                    if (!hasPrimeraTeamsScraper(matches, 5)) {
+                        console.log(`[quinielaScraper] Descartando J.${jNum} de SELAE: Sin suficientes equipos de 1ª División.`);
+                        continue;
+                    }
+
                     validJornadas.push({
                         number: jNum,
                         dateStr: formattedDate,
                         season: sorteo.temporada || '2026-2027',
-                        isSunday: (sorteo.dia_semana || '').toLowerCase().includes('domingo') || dateObj.getDay() === 0,
+                        isSunday: true,
                         matches: matches.slice(0, 15)
                     });
                 }
                 if (validJornadas.length > 0) {
-                    console.log(`[quinielaScraper] ✅ SELAE API devolvió ${validJornadas.length} jornadas.`);
+                    console.log(`[quinielaScraper] ✅ SELAE API devolvió ${validJornadas.length} jornadas válidas.`);
                     return validJornadas;
                 }
             }
@@ -355,15 +403,23 @@ async function fetchUpcomingQuinielaJornadas() {
 
     // 2. Fuente Secundaria: Eduardo Losilla Oficial en vivo
     try {
-        console.log('[quinielaScraper] SELAE sin sorteos futuros. Consultando fuente secundaria Eduardo Losilla...');
+        console.log('[quinielaScraper] SELAE sin sorteos futuros válidos. Consultando fuente secundaria Eduardo Losilla...');
         const path = require('path');
         const quinielaServicePath = path.join(__dirname, '../js/quiniela-service.js');
         const { QuinielaService } = require(quinielaServicePath);
         if (QuinielaService && typeof QuinielaService.fetchUpcomingFromEduardoLosilla === 'function') {
             const losillaList = await QuinielaService.fetchUpcomingFromEduardoLosilla();
             if (Array.isArray(losillaList) && losillaList.length > 0) {
-                console.log(`[quinielaScraper] ✅ Obtenidas ${losillaList.length} próximas jornadas desde Eduardo Losilla.`);
-                return losillaList;
+                // Doble filtro de seguridad: domingo + 1ª división
+                const validLosilla = losillaList.filter(item => {
+                    const isSun = item.isSunday === true || (item.dateStr && parseDateHelper(item.dateStr)?.getDay() === 0);
+                    const hasPrim = hasPrimeraTeamsScraper(item.matches, 5);
+                    return isSun && hasPrim;
+                });
+                if (validLosilla.length > 0) {
+                    console.log(`[quinielaScraper] ✅ Obtenidas ${validLosilla.length} próximas jornadas válidas (domingo + 1ª div) desde Eduardo Losilla.`);
+                    return validLosilla;
+                }
             }
         }
     } catch (e2) {
