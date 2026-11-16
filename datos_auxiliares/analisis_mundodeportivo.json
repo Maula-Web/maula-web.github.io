@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-16T12:11:12.451Z",
+  "updatedAt": "2026-11-16T23:06:01.263Z",
   "available": false,
-  "matchCountWithTarget": 15,
+  "matchCountWithTarget": 0,
   "isMidweek": true,
   "detectedJornadaNum": "22",
   "closingSchedule": "Martes 17 (19:30)",
@@ -17,8 +17,8 @@
       "comment": "Rumanía se juega la permanencia ante una Bosnia con los deberes hechos en el Grupo 4 de la Liga B. El equipo de Sergej Barbarez encajó el sábado frente a Suecia su primera derrota en esta Nations League y se despidió del liderato. Eso sí, nadie le puede quitar la segunda plaza ni el billete para el ‘play-off’ de ascenso a la categoría superior, previsto para finales del próximo mes de marzo. Mucho más hay en juego para los visitantes, que llegan con tres puntos tras imponerse por 2-1 a Polonia, su rival directo. Para esquivar el descenso necesitan ganar y que el cuadro de Jan Urban no pase del empate en su última cita. También les sirve que ambos conjuntos cierren con cuatro en su casillero.",
       "percentages": {
         "quinielista": {
-          "1": 57,
-          "2": 14,
+          "1": 54,
+          "2": 17,
           "X": 29
         },
         "lae": {
@@ -27,8 +27,8 @@
           "X": 25
         },
         "real": {
-          "1": 50,
-          "2": 24,
+          "1": 49,
+          "2": 25,
           "X": 26
         }
       },
@@ -44,9 +44,9 @@
       "comment": "Duelo de supervivencia en Kosice, al este de Eslovaquia, donde Ucrania y Georgia se disputan la permanencia en el Grupo 2 de la Liga B. El combinado de Andrea Maldera afronta la cita con una ligera ventaja: suma cuatro puntos tras cinco jornadas y un empate le permite salvar la categoría. Sin embargo, sus tres derrotas consecutivas invitan a desconfiar de un favoritismo que solo parece sustentado por el pésimo balance de su adversario. Los georgianos siguen sin ganar después de cinco partidos y solo han rescatado dos igualadas. Su gran problema aparece en ataque, donde la sequía resulta alarmante: todavía no han estrenado su casillero goleador y necesitan romper este bloqueo para seguir con vida.",
       "percentages": {
         "quinielista": {
-          "1": 65,
-          "2": 10,
-          "X": 25
+          "1": 63,
+          "2": 11,
+          "X": 26
         },
         "lae": {
           "1": 55,
@@ -54,8 +54,8 @@
           "X": 27
         },
         "real": {
-          "1": 42,
-          "2": 29,
+          "1": 43,
+          "2": 28,
           "X": 29
         }
       },
@@ -71,9 +71,9 @@
       "comment": "Cardiff examina a una Portugal herida tras el 1-4 encajado en casa frente a Dinamarca. El arranque de la etapa sin Cristiano ha sido un mazazo y los lusos necesitan reaccionar para recuperar crédito y defender la primera plaza del Grupo A4. Una derrota, unida a una victoria de los de Brian Riemer sobre Noruega, les dejaría sin la cima. También hay mucho en juego para Gales, condenado ya a cerrar la tabla después de caer por 3-1 el sábado ante los noruegos, que suman seis puntos por los tres de los ‘Dragones Rojos’. El equipo de Craig Bellamy busca un resultado que le aleje de los dos peores cuartos de la Liga A, destinados al descenso. Evitar una goleada puede resultar clave para su porvenir.",
       "percentages": {
         "quinielista": {
-          "1": 5,
-          "2": 79,
-          "X": 16
+          "1": 6,
+          "2": 77,
+          "X": 17
         },
         "lae": {
           "1": 21,
@@ -82,8 +82,8 @@
         },
         "real": {
           "1": 14,
-          "2": 66,
-          "X": 20
+          "2": 67,
+          "X": 19
         }
       },
       "recommended": "X2"
@@ -98,9 +98,9 @@
       "comment": "Budapest se prepara para una final por el ascenso directo en el Grupo 2 de la Liga B. Hungría necesita tumbar a Irlanda del Norte para arrebatarle la primera plaza y confía en el empuje del Puskas Arena, donde más de sesenta y siete mil aficionados alentarán a los magiares. El conjunto local parte por detrás en la tabla, aunque jugar en casa alimenta sus opciones de dar el golpe. Los de Michael O’Neill manejan las cuentas más claras: un empate les basta para coronarse y frustrar la fiesta húngara. Su trayectoria invita al optimismo, con tres victorias y dos igualadas, sin una sola derrota. Pero su principal aval está en la defensa: nadie ha logrado batir su portería en dicha competición.",
       "percentages": {
         "quinielista": {
-          "1": 49,
+          "1": 48,
           "2": 18,
-          "X": 33
+          "X": 34
         },
         "lae": {
           "1": 50,
@@ -135,9 +135,9 @@
           "X": 24
         },
         "real": {
-          "1": 42,
+          "1": 41,
           "2": 32,
-          "X": 26
+          "X": 27
         }
       },
       "recommended": "X2"
@@ -153,8 +153,8 @@
       "percentages": {
         "quinielista": {
           "1": 58,
-          "2": 12,
-          "X": 30
+          "2": 13,
+          "X": 29
         },
         "lae": {
           "1": 56,
@@ -179,8 +179,8 @@
       "comment": "La Champions femenina entra en su quinta jornada de la fase liga con el Real Madrid instalado en la séptima plaza. Las madridistas estrenaron el casillero de victorias con un 3-0 al París el martes, después de firmar una X en los otros tres partidos: 1-1 en casa ante el PSG, el mismo resultado en el campo del Manchester City y 2-2 en Múnich frente al Bayern. Enfrente estará el Inter, decimotercero y fuera de las plazas que dan acceso al play-off de octavos de final. Las transalpinas (cuatro puntos) llegan golpeadas por dos derrotas severas, 6-0 ante el Lyon y 1-4 contra el Manchester City. Su única alegría hasta ahora fue el 1-0 al Hacken en Milán.",
       "percentages": {
         "quinielista": {
-          "1": 87,
-          "2": 4,
+          "1": 88,
+          "2": 3,
           "X": 9
         },
         "lae": {
@@ -233,9 +233,9 @@
       "comment": "Dos puntos separan al Chelsea del liderato de la fase liga de la Champions femenina, y las blues llegan a la quinta jornada sin conocer todavía la derrota: acumulan dos triunfos y dos empates. Su último compromiso fue un 0-0 en el campo del Hacken. En su estadio, en cambio, han respondido con pleno de victorias: 2-0 a la Roma y 1-0 al Austria de Viena. Hoy ocupan la quinta plaza. Enfrente estará el PSG, que se desplaza a Londres como décimo clasificado. Su objetivo será sacudirse la derrota del martes ante el Bayern (1-2). Como visitantes llevan dos empates: 1-1, ante el City y el Real Madrid.",
       "percentages": {
         "quinielista": {
-          "1": 58,
+          "1": 62,
           "2": 14,
-          "X": 28
+          "X": 24
         },
         "lae": {
           "1": 49,
@@ -260,8 +260,8 @@
       "comment": "Con seis puntos en el saco y un duro correctivo reciente: así afronta la Juventus la quinta jornada de la Champions femenina. Lo hace desde la octava plaza y con un balance de dos triunfos y dos derrotas. La última fue un 6-0 ante el Lyon, que cortó una racha previa de dos victorias, 0-3 al Hacken y 1-4 al Austria de Viena. El Leuven belga, penúltimo, aún no sabe lo que es ganar: suma dos empates y dos derrotas. Lejos de su estadio, sus dos partidos se han saldado con goleadas en contra, 5-0 frente al PSG y 5-1 ante el Servette.",
       "percentages": {
         "quinielista": {
-          "1": 91,
-          "2": 2,
+          "1": 90,
+          "2": 3,
           "X": 7
         },
         "lae": {
@@ -314,9 +314,9 @@
       "comment": "Dos aspirantes a todo y campeones de la Champions en los últimos cinco años. Por tanto, dos proyectos consolidados que quieren seguir la estela del Barça, al que el propio Arsenal hizo frena la pasada jornada y pudo igualarle en el Camp Nou. Una evidencia de su innegable potencial. En casa, dos victorias sin encajar. Una prestación defensiva que el Lyon también está llevando a su terreno. Viaja colíder, con cuatro porterías a cero y dos goleadas a domicilio que le permiten estar en primera posición. La llegada al banquillo de Giráldez, ex del Barça, suma intención ofensiva a un equipo que siempre ha funcionado como un bloque. Si se puede, conviene cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 39,
-          "2": 34,
-          "X": 27
+          "1": 37,
+          "2": 35,
+          "X": 28
         },
         "lae": {
           "1": 41,
@@ -368,9 +368,9 @@
       "comment": "Un partido entre dos equipos que quieren seguir creciendo, aunque el Benfica está un par de pasos por delante de la Roma. El cuadro portugués ya sabe competir ante los mejores, pero le cuesta sacar resultados (en esta Champions ya ha perdido con Bayern y Arsenal), aunque una de sus virtudes es que se muestra fiable: gana a quien tiene que ganar. Por ello es favorito contra la Roma, un club que mejora y que tiene opciones de acceder a octavos (se clasifican del quinto al duodécimo de la fase liga). De momento, cuatro puntos de doce, habiendo sumado uno a domicilio. Viaja con poco que perder con un duelo que se decanta del lado local.",
       "percentages": {
         "quinielista": {
-          "1": 49,
-          "2": 22,
-          "X": 29
+          "1": 51,
+          "2": 21,
+          "X": 28
         },
         "lae": {
           "1": 45,
@@ -396,8 +396,8 @@
       "percentages": {
         "quinielista": {
           "1": 7,
-          "2": 29,
-          "X": 52
+          "2": 32,
+          "X": 49
         },
         "lae": {
           "1": 10,
@@ -905,13 +905,13 @@
         "team": "Celta Fortuna",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/688323abe51b982.png?width=44&amp;height=44",
         "pts": 13,
-        "pj": 13,
+        "pj": 14,
         "pg": 3,
         "pe": 4,
-        "pp": 6,
+        "pp": 7,
         "gf": 19,
-        "gc": 25,
-        "dif": -6
+        "gc": 26,
+        "dif": -7
       },
       {
         "pos": 18,
@@ -928,6 +928,19 @@
       },
       {
         "pos": 19,
+        "team": "Albacete",
+        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/103.png?width=44&amp;height=44",
+        "pts": 13,
+        "pj": 14,
+        "pg": 4,
+        "pe": 1,
+        "pp": 9,
+        "gf": 14,
+        "gc": 24,
+        "dif": -10
+      },
+      {
+        "pos": 20,
         "team": "Cádiz",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/91.png?width=44&amp;height=44",
         "pts": 11,
@@ -940,7 +953,7 @@
         "dif": -2
       },
       {
-        "pos": 20,
+        "pos": 21,
         "team": "Andorra",
         "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/5026.png?width=44&amp;height=44",
         "pts": 11,
@@ -951,19 +964,6 @@
         "gf": 18,
         "gc": 24,
         "dif": -6
-      },
-      {
-        "pos": 21,
-        "team": "Albacete",
-        "logo": "https://static.prisa.com/aside/resizer/resize/img/sports/football/teams/103.png?width=44&amp;height=44",
-        "pts": 10,
-        "pj": 13,
-        "pg": 3,
-        "pe": 1,
-        "pp": 9,
-        "gf": 13,
-        "gc": 24,
-        "dif": -11
       },
       {
         "pos": 22,
