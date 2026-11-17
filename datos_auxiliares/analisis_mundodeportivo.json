@@ -1,416 +1,296 @@
 {
-  "updatedAt": "2026-11-17T15:05:01.580Z",
-  "available": false,
-  "matchCountWithTarget": 0,
-  "isMidweek": true,
-  "detectedJornadaNum": "22",
-  "closingSchedule": "Martes 17 (19:30)",
-  "reason": "Los análisis publicados en Mundo Deportivo corresponden a una jornada entre semana (Champions/Copa) y no a la jornada oficial de la Peña Maulas.",
+  "updatedAt": "2026-11-17T23:13:51.433Z",
+  "available": true,
+  "matchCountWithTarget": 15,
+  "isMidweek": false,
+  "detectedJornadaNum": "23",
+  "closingSchedule": "Sábado 21 (13:00)",
+  "reason": "Análisis disponible y verificado para la próxima jornada oficial.",
   "matches": [
     {
       "num": 1,
-      "home": "BOSNIA HERZEGOVINA",
-      "away": "RUMANÍA",
+      "home": "ALAVÉS",
+      "away": "DEPORTIVO",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 20:45",
-      "comment": "Rumanía se juega la permanencia ante una Bosnia con los deberes hechos en el Grupo 4 de la Liga B. El equipo de Sergej Barbarez encajó el sábado frente a Suecia su primera derrota en esta Nations League y se despidió del liderato. Eso sí, nadie le puede quitar la segunda plaza ni el billete para el ‘play-off’ de ascenso a la categoría superior, previsto para finales del próximo mes de marzo. Mucho más hay en juego para los visitantes, que llegan con tres puntos tras imponerse por 2-1 a Polonia, su rival directo. Para esquivar el descenso necesitan ganar y que el cuadro de Jan Urban no pase del empate en su última cita. También les sirve que ambos conjuntos cierren con cuatro en su casillero.",
+      "schedule": "SÁBADO, 14:00",
+      "comment": "Del sueño europeo al frenazo. El Alavés arrancó el curso por encima de cualquier pronóstico, pero su triunfo sobre Osasuna a comienzos de septiembre marcó el punto de inflexión. Desde entonces acumula ocho jornadas sin celebrar una victoria: cinco derrotas y tres empates. La duodécima plaza disimula el peligro, con el descenso a solo tres puntos. Más acorde con el guión marcha un Deportivo que figura por delante de los vitorianos. Los gallegos tienen un balance de tres victorias y otras tantas derrotas, aunque su especialidad son las tablas: llevan seis, una menos que el Celta, equipo que les supera en ese apartado. A domicilio, su único golpe ganador llegó en el campo del submarino amarillo.",
       "percentages": {
-        "quinielista": {
-          "1": 50,
-          "2": 22,
-          "X": 28
-        },
-        "lae": {
-          "1": 53,
-          "2": 22,
-          "X": 25
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 44,
-          "2": 29,
-          "X": 27
+          "1": 43,
+          "2": 28,
+          "X": 29
         }
       },
       "recommended": "1X"
     },
     {
       "num": 2,
-      "home": "UCRANIA",
-      "away": "GEORGIA",
+      "home": "RAYO",
+      "away": "VALENCIA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 20:45",
-      "comment": "Duelo de supervivencia en Kosice, al este de Eslovaquia, donde Ucrania y Georgia se disputan la permanencia en el Grupo 2 de la Liga B. El combinado de Andrea Maldera afronta la cita con una ligera ventaja: suma cuatro puntos tras cinco jornadas y un empate le permite salvar la categoría. Sin embargo, sus tres derrotas consecutivas invitan a desconfiar de un favoritismo que solo parece sustentado por el pésimo balance de su adversario. Los georgianos siguen sin ganar después de cinco partidos y solo han rescatado dos igualadas. Su gran problema aparece en ataque, donde la sequía resulta alarmante: todavía no han estrenado su casillero goleador y necesitan romper este bloqueo para seguir con vida.",
+      "schedule": "SÁBADO, 16:15",
+      "comment": "Vallecas acoge un pulso con la permanencia como única bandera. El Valencia llega penúltimo y con más urgencias que un Rayo que tampoco puede respirar tranquilo: apenas ha ganado uno de sus cinco últimos partidos. Los de Beñat San José se aferran al recuerdo del reciente 3-0 al Celta en casa, una goleada que señala el camino para convertir su estadio en el sostén de la salvación. Por otro lado, los hombres de Javier Aguirre quieren pasar página tras caer frente al Real Madrid en Mestalla. Su referencia está en el Martínez Valero, escenario de una victoria que pretenden repetir aquí para aliviar su delicada situación. Un nuevo golpe a domicilio supondría el segundo triunfo desde la llegada del técnico mexicano.",
       "percentages": {
-        "quinielista": {
-          "1": 61,
-          "2": 13,
-          "X": 26
-        },
-        "lae": {
-          "1": 59,
-          "2": 16,
-          "X": 25
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 45,
-          "2": 26,
-          "X": 29
+          "1": 49,
+          "2": 24,
+          "X": 27
         }
       },
       "recommended": "1X"
     },
     {
       "num": 3,
-      "home": "GALES",
-      "away": "PORTUGAL",
+      "home": "R.MADRID",
+      "away": "CELTA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 20:45",
-      "comment": "Cardiff examina a una Portugal herida tras el 1-4 encajado en casa frente a Dinamarca. El arranque de la etapa sin Cristiano ha sido un mazazo y los lusos necesitan reaccionar para recuperar crédito y defender la primera plaza del Grupo A4. Una derrota, unida a una victoria de los de Brian Riemer sobre Noruega, les dejaría sin la cima. También hay mucho en juego para Gales, condenado ya a cerrar la tabla después de caer por 3-1 el sábado ante los noruegos, que suman seis puntos por los tres de los ‘Dragones Rojos’. El equipo de Craig Bellamy busca un resultado que le aleje de los dos peores cuartos de la Liga A, destinados al descenso. Evitar una goleada puede resultar clave para su porvenir.",
+      "schedule": "SÁBADO, 21:00",
+      "comment": "El Bernabéu recupera a un Madrid lanzado después de un mes de viajes. Los blancos reciben al Celta con pleno de puntos en casa y ocho triunfos seguidos en el bolsillo. La derrota del Metropolitano, a finales de septiembre, dio paso a una reacción rotunda: tres victorias europeas y cinco en LaLiga EA Sports para estrechar el cerco sobre el Barça, al que tumbaron en el Camp Nou. Mourinho ha armado un bloque cada vez más firme, muy solidario y demoledor arriba. Con semejante aval, rascar algo del feudo madridista se presenta como un desafío enorme para los gallegos. Su balance lejos de casa ofrece una pista: todavía no han ganado, aunque han sacado cuatro empates y solo han sufrido una derrota.",
       "percentages": {
-        "quinielista": {
-          "1": 6,
-          "2": 77,
-          "X": 17
-        },
-        "lae": {
-          "1": 18,
-          "2": 66,
-          "X": 16
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 13,
-          "2": 68,
-          "X": 19
+          "1": 79,
+          "2": 7,
+          "X": 14
         }
       },
-      "recommended": "X2"
+      "recommended": "1"
     },
     {
       "num": 4,
-      "home": "HUNGRÍA",
-      "away": "IRLANDA N.",
+      "home": "BARCELONA",
+      "away": "VILLARREAL",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 20:45",
-      "comment": "Budapest se prepara para una final por el ascenso directo en el Grupo 2 de la Liga B. Hungría necesita tumbar a Irlanda del Norte para arrebatarle la primera plaza y confía en el empuje del Puskas Arena, donde más de sesenta y siete mil aficionados alentarán a los magiares. El conjunto local parte por detrás en la tabla, aunque jugar en casa alimenta sus opciones de dar el golpe. Los de Michael O’Neill manejan las cuentas más claras: un empate les basta para coronarse y frustrar la fiesta húngara. Su trayectoria invita al optimismo, con tres victorias y dos igualadas, sin una sola derrota. Pero su principal aval está en la defensa: nadie ha logrado batir su portería en dicha competición.",
+      "schedule": "DOMINGO, 14:00",
+      "comment": "El liderato azulgrana no admite despistes. Once victorias y una derrota, sin un solo empate, apenas conceden al Barça tres puntos de renta sobre su perseguidor. Flick sabe que cualquier resbalón puede salir caro y ahora recibe a un Villarreal que acostumbra a incomodar en el Camp Nou. Los amarillos atraviesan un momento gris, pero necesitan sumar para seguir enganchados a la pelea por Europa. El conjunto azulgrana llega reforzado tras asaltar el feudo del At. Madrid antes del parón de selecciones. Aquel golpe sostuvo su primera plaza y calmó las dudas que habían provocado los tropiezos frente al PSG y al Real Madrid, dos exámenes que pusieron bajo sospecha su capacidad para competir contra los grandes.",
       "percentages": {
-        "quinielista": {
-          "1": 50,
-          "2": 17,
-          "X": 33
-        },
-        "lae": {
-          "1": 52,
-          "2": 21,
-          "X": 27
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 50,
-          "2": 22,
-          "X": 28
+          "1": 78,
+          "2": 9,
+          "X": 13
         }
       },
-      "recommended": "1X"
+      "recommended": "1"
     },
     {
       "num": 5,
-      "home": "POLONIA",
-      "away": "SUECIA",
+      "home": "RACING S.",
+      "away": "R.SOCIEDAD",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 20:45",
-      "comment": "La permanencia pone contra las cuerdas a Polonia en el Tarczynski Arena. Dos tropiezos seguidos han dejado al conjunto local sin margen para confiarse: marcha tercero del Grupo B4 con cuatro puntos, solo uno más que Rumanía, su verdugo en la quinta jornada. Batir a Suecia le garantiza la salvación sin mirar a otro campo. Cualquier otro desenlace, ya sea empate o derrota, le obligará a echar cuentas con lo que suceda a la misma hora en Bosnia. Enfrente estará un líder con el ascenso asegurado y sin presión clasificatoria, pero con un reto pendiente. Graham Potter y sus futbolistas aspiran a cerrar la fase invictos, un aliciente que convierte al cuadro sueco en un rival peligroso para los anfitriones.",
+      "schedule": "DOMINGO, 16:15",
+      "comment": "Casi blindado en el Sardinero, el Racing prepara un examen de altura ante una Real Sociedad al alza. Los cántabros han sumado en casa once de sus catorce puntos y únicamente el Real Madrid ha logrado conquistar su estadio. Ese refugio sostiene a un equipo que viene de ganar en La Rosaleda y alcanzar la mitad de la clasificación, aunque el descenso sigue a cuatro puntos. La visita donostiarra amenaza con poner a prueba su resistencia. Matarazzo ha enderezado un arranque con dudas y tiene a los suyos en puestos de Europa League. Una sola derrota en las seis últimas citas ligueras confirma la reacción de una Real que, fuera del Reale Arena, desconoce el término medio: gana o pierde.",
       "percentages": {
-        "quinielista": {
-          "1": 38,
-          "2": 35,
-          "X": 27
-        },
-        "lae": {
-          "1": 33,
-          "2": 40,
-          "X": 27
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 45,
-          "2": 30,
-          "X": 25
+          "1": 30,
+          "2": 46,
+          "X": 24
         }
       },
       "recommended": "X2"
     },
     {
       "num": 6,
-      "home": "REP.IRLANDA",
-      "away": "KOSOVO",
+      "home": "OSASUNA",
+      "away": "MÁLAGA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 20:45",
-      "comment": "Con la segunda plaza en juego dentro del grupo 3 de la Liga B de la UEFA Nations League, Kosovo sale a defender su posición con seis puntos en su casillero. Su rendimiento reciente es de tres empates seguidos, y en cinco jornadas apenas ha podido ganar una vez: fue, precisamente, ante la República de Irlanda en Pristina, en la primera vuelta, por 1-0 con un tanto del exjugador del Mallorca Muriqi. Los irlandeses, terceros con cinco puntos, llegan tras caer por 1-0 en Austria, y tampoco han conocido más que una victoria en el torneo: la que lograron el 27 de septiembre frente a Israel (0-3)",
+      "schedule": "DOMINGO, 18:30",
+      "comment": "Con solo dos puntos de colchón sobre el descenso, Osasuna necesita convertir El Sadar en un bastión. El regreso de Jagoba Arrasate al banquillo todavía no ha supuesto un ascenso en la clasificación: en cuatro encuentros suma una victoria, un empate y dos derrotas, las dos lejos de casa. Los rojillos son decimosextos y llegan tras empatar a uno ante su afición frente al Athletic en la última jornada disputada. El Málaga se fue al parón en la cola de la tabla en su regreso a la élite. El conjunto andaluz sigue siendo el único equipo sin victorias y atraviesa una mala dinámica, con un solo punto de los últimos doce en juego. Funes, el técnico del ascenso, continúa a la búsqueda de la fórmula del triunfo en Primera División.",
       "percentages": {
-        "quinielista": {
-          "1": 55,
-          "2": 16,
-          "X": 29
-        },
-        "lae": {
-          "1": 60,
-          "2": 16,
-          "X": 24
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 47,
-          "2": 24,
-          "X": 29
+          "1": 54,
+          "2": 20,
+          "X": 26
         }
       },
-      "recommended": "X2"
+      "recommended": "1"
     },
     {
       "num": 7,
-      "home": "R.MADRID",
-      "away": "INTER",
+      "home": "GETAFE",
+      "away": "AT.MADRID",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 18:45",
-      "comment": "La Champions femenina entra en su quinta jornada de la fase liga con el Real Madrid instalado en la séptima plaza. Las madridistas estrenaron el casillero de victorias con un 3-0 al París el martes, después de firmar una X en los otros tres partidos: 1-1 en casa ante el PSG, el mismo resultado en el campo del Manchester City y 2-2 en Múnich frente al Bayern. Enfrente estará el Inter, decimotercero y fuera de las plazas que dan acceso al play-off de octavos de final. Las transalpinas (cuatro puntos) llegan golpeadas por dos derrotas severas, 6-0 ante el Lyon y 1-4 contra el Manchester City. Su única alegría hasta ahora fue el 1-0 al Hacken en Milán.",
+      "schedule": "DOMINGO, 21:00",
+      "comment": "A los de Bordalás les cuesta enlazar resultados que los impulsen hacia la parte noble de la clasificación: el Getafe es decimoquinto y solo le separan dos puntos del primer equipo que ocupa plaza de descenso. Antes del parón por las selecciones cayó por 2-0 en Villarreal, aunque en su último compromiso en el Coliseum sí se llevó el triunfo, un 3-1 al Sevilla. Enfrente estará un Atlético que cedió por 1-2 ante el Barça en la última cita previa al parón, un cara a cara por el liderato. El equipo de Simeone debe reponerse para recobrar el ritmo que le permitió ligar siete victorias consecutivas en el campeonato de la regularidad. Hoy marcha tercero, a dos puntos del Real Madrid y a cinco del Barcelona",
       "percentages": {
-        "quinielista": {
-          "1": 87,
-          "2": 3,
-          "X": 10
-        },
-        "lae": {
-          "1": 72,
-          "2": 13,
-          "X": 15
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 72,
-          "2": 10,
-          "X": 18
-        }
-      },
-      "recommended": "1"
-    },
-    {
-      "num": 8,
-      "home": "BK HACKEN",
-      "away": "MAN.CITY",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "MIÉRCOLES, 18:45",
-      "comment": "Con apenas dos puntos en cuatro jornadas, el Hacken sueco ocupa el decimoquinto puesto de la fase liga de la Champions femenina. Las dos unidades las lograron en los dos últimos compromisos, ambos con reparto de puntos: 1-1 ante el París en la capital francesa y 0-0 en casa frente al Chelsea. Antes, las suecas habían arrancado con dos derrotas ante equipos italianos: 1-0 contra el Inter y 0-3 frente a la Juventus. El City, sexto clasificado, todavía está invicto, con una victoria y tres empates en su casillero. El triunfo lo cosechó el martes pasado en el campo del Inter, por un claro 1-4. Previamente había firmado tablas con el PSG y el Madrid en su estadio (1-1 en ambos partidos) y con el Bayern en Múnich en Alemania (2-2).",
-      "percentages": {
-        "quinielista": {
-          "1": 4,
-          "2": 86,
-          "X": 10
-        },
-        "lae": {
-          "1": 15,
-          "2": 71,
-          "X": 14
-        },
-        "real": {
-          "1": 10,
-          "2": 73,
-          "X": 17
+          "1": 17,
+          "2": 58,
+          "X": 25
         }
       },
       "recommended": "X2"
     },
     {
-      "num": 9,
-      "home": "CHELSEA",
-      "away": "PSG",
+      "num": 8,
+      "home": "TENERIFE",
+      "away": "MALLORCA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 21:00",
-      "comment": "Dos puntos separan al Chelsea del liderato de la fase liga de la Champions femenina, y las blues llegan a la quinta jornada sin conocer todavía la derrota: acumulan dos triunfos y dos empates. Su último compromiso fue un 0-0 en el campo del Hacken. En su estadio, en cambio, han respondido con pleno de victorias: 2-0 a la Roma y 1-0 al Austria de Viena. Hoy ocupan la quinta plaza. Enfrente estará el PSG, que se desplaza a Londres como décimo clasificado. Su objetivo será sacudirse la derrota del martes ante el Bayern (1-2). Como visitantes llevan dos empates: 1-1, ante el City y el Real Madrid.",
+      "schedule": "SÁBADO, 21:00",
+      "comment": "Tras el golpe de la muerte de Jesús de Miguel, el Tenerife, decimotercero en Segunda División, regresó a la competición el domingo y pudo dedicarle la victoria: un 2-0 ante el colista Ceuta. Ahora el conjunto chicharrero busca seguir recomponiéndose de tan duro revés humano, de nuevo ante su afición. Visita el feudo tinerfeño un Mallorca que marcha séptimo, a un solo punto de las plazas de play-off. Los baleares acumulan seis jornadas sin conocer la derrota, con cuatro empates y dos triunfos. Fuera de Son Moix encadenan tres igualadas seguidas y cuatro en seis salidas, y su cuenta como visitantes la completan un triunfo y una derrota.",
       "percentages": {
-        "quinielista": {
-          "1": 66,
-          "2": 12,
-          "X": 22
-        },
-        "lae": {
-          "1": 54,
-          "2": 23,
-          "X": 23
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 74,
-          "2": 9,
-          "X": 17
+          "1": 30,
+          "2": 41,
+          "X": 29
         }
       },
-      "recommended": "1"
+      "recommended": "1X2"
+    },
+    {
+      "num": 9,
+      "home": "SPORTING",
+      "away": "LAS PALMAS",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "DOMINGO, 16:15",
+      "comment": "Alcanzar la zona de play-off pasa, para el Sporting, por no dejar escapar puntos ante su gente. El conjunto asturiano marcha octavo, a un solo punto de las plazas con premio, aunque llega de una racha muy irregular: dos derrotas, un empate y una única victoria en las cuatro últimas jornadas. El equipo de Larcamón necesita elevar su nivel. Por el otro lado asoma la UD Las Palmas, undécima, que cayó por 1-0 en Granada después de enlazar tres triunfos consecutivos, dos de ellos bajo la dirección de su nuevo técnico, el catalán Albert Sánchez. Lejos de su feudo, el equipo insular suma tres victorias y cuatro derrotas, y ha perdido en tres de sus cuatro últimos desplazamientos.",
+      "percentages": {
+        "quinielista": null,
+        "lae": null,
+        "real": {
+          "1": 48,
+          "2": 25,
+          "X": 27
+        }
+      },
+      "recommended": "1X"
     },
     {
       "num": 10,
-      "home": "JUVENTUS",
-      "away": "LEUVEN",
+      "home": "GIRONA",
+      "away": "EIBAR",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MIÉRCOLES, 21:00",
-      "comment": "Con seis puntos en el saco y un duro correctivo reciente: así afronta la Juventus la quinta jornada de la Champions femenina. Lo hace desde la octava plaza y con un balance de dos triunfos y dos derrotas. La última fue un 6-0 ante el Lyon, que cortó una racha previa de dos victorias, 0-3 al Hacken y 1-4 al Austria de Viena. El Leuven belga, penúltimo, aún no sabe lo que es ganar: suma dos empates y dos derrotas. Lejos de su estadio, sus dos partidos se han saldado con goleadas en contra, 5-0 frente al PSG y 5-1 ante el Servette.",
+      "schedule": "DOMINGO, 18:30",
+      "comment": "Un choque de postín entre aspirantes se jugará en Montilivi. Tras dos tropiezos seguidos, el Girona recobró el pulso el sábado con un 1-2 en la visita al Oviedo, en el estreno de Raúl González Blanco en el banquillo asturiano. Cuartos en la clasificación, los gerundenses van a por el quinto triunfo de la campaña como locales. Les rinde visita el Eibar, quinto con idéntico botín de 24 puntos, aunque con una sequía de cinco jornadas sin saborear la victoria: tres X y dos derrotas. Los armeros llegan al duelo tras dos igualadas consecutivas en Ipurua, calcadas en el marcador, 1-1 frente al Almería y 1-1 ante el Cádiz.",
       "percentages": {
-        "quinielista": {
-          "1": 89,
-          "2": 3,
-          "X": 8
-        },
-        "lae": {
-          "1": 76,
-          "2": 10,
-          "X": 14
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 67,
-          "2": 13,
-          "X": 20
+          "1": 52,
+          "2": 23,
+          "X": 25
         }
       },
       "recommended": "1X"
     },
     {
       "num": 11,
-      "home": "AUSTRIA WIEN",
-      "away": "B.MUNICH",
+      "home": "EIBAR",
+      "away": "AT.MADRID",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "JUEVES, 18:45",
-      "comment": "Uno de los duelos aparentemente más desnivelados de la quinta jornada de la fase liga de la Champions femenina. Y es que el Austria de Viena es colista, con un punto de doce, aunque en casa ha competido mejor de lo que podría pensarse. Además, ha recibido a dos equipos italianos, siempre complicados (empate ante Inter y derrota contra la Juve). El Bayern, sin embargo, es un aspirante que quiere seguir creciendo. Aún imbatido, anda tercero a dos puntos del liderato. De visitante, además, se siente cómodo: firma dos triunfos en dos salidas. Por la distancia de potencial, el choque se decanta hacia las variantes.",
+      "schedule": "SÁBADO, 17:00",
+      "comment": "El Eibar hizo un excelente inicio de liga, pero se ha desinflado con el paso de las semanas. Va por seis jornadas sin ganar y vuelve a la zona media de la tabla, con tres puntos de margen sobre el descenso. Eso sí, siempre compite y en casa ya ha sido capaz de derrotar a Athletic y Espanyol. Esta vez recibe al Atlético, uno de los equipos más en forma. Después de un arranque dubitativo, también por enfrentarse a los más grandes, ha ido conjuntando las piezas y va encontrando su mejor nivel. Además, aprovechando los tropiezos de Barça y Madrid, no quiere descartar nada. De momento, seis fechas sin perder, con cinco victorias incluidas y tres salidas seguidas puntuando.",
       "percentages": {
-        "quinielista": {
-          "1": 2,
-          "2": 92,
-          "X": 6
-        },
-        "lae": {
-          "1": 14,
-          "2": 73,
-          "X": 13
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 11,
-          "2": 73,
-          "X": 16
+          "1": 14,
+          "2": 64,
+          "X": 22
         }
       },
       "recommended": "X2"
     },
     {
       "num": 12,
-      "home": "ARSENAL",
-      "away": "OL. LYONNES",
+      "home": "GRANADA",
+      "away": "R.MADRID",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "JUEVES, 21:00",
-      "comment": "Dos aspirantes a todo y campeones de la Champions en los últimos cinco años. Por tanto, dos proyectos consolidados que quieren seguir la estela del Barça, al que el propio Arsenal hizo frena la pasada jornada y pudo igualarle en el Camp Nou. Una evidencia de su innegable potencial. En casa, dos victorias sin encajar. Una prestación defensiva que el Lyon también está llevando a su terreno. Viaja colíder, con cuatro porterías a cero y dos goleadas a domicilio que le permiten estar en primera posición. La llegada al banquillo de Giráldez, ex del Barça, suma intención ofensiva a un equipo que siempre ha funcionado como un bloque. Si se puede, conviene cubrirse.",
+      "schedule": "DOMINGO, 12:00",
+      "comment": "El Granada arrancaba el curso tras dos temporadas en línea muy ascendente y en la parte alta de la tabla. Sin embargo, este curso va irregular y encadena cuatro jornadas sin ganar, y en casa también lleva cuatro apariciones sin imponerse. Además, le cuesta anotar goles, así que, a pesar de competir, parte con desventaja ante un Madrid con mucho potencial ofensivo. Eso sí, atrás está dejando más dudas de las que debería. La evidencia, el empate del pasado fin de semana en casa ante el Badalona. El segundo empate consecutivo blanco que ha evitado que pudiera acercarse más al Barça, que también tropezó en Coruña.",
       "percentages": {
-        "quinielista": {
-          "1": 35,
-          "2": 37,
-          "X": 28
-        },
-        "lae": {
-          "1": 42,
-          "2": 33,
-          "X": 25
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 38,
-          "2": 39,
-          "X": 23
+          "1": 12,
+          "2": 70,
+          "X": 18
         }
       },
-      "recommended": "1X2"
+      "recommended": "X2"
     },
     {
       "num": 13,
-      "home": "BARCELONA",
-      "away": "SERVETTE",
+      "home": "R.SOCIEDAD",
+      "away": "SEVILLA",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "JUEVES, 21:00",
-      "comment": "La superioridad indiscutible del Barça describe uno de los fijos de la quiniela. Cualquier variante, no obstante, sería más que una sorpresa y daría buenos dividendos, pero se hace difícil pensar que el Servette pueda competir contra uno de los aspirantes a todo. Y eso que viene mejorando, compitiendo contra rivales de nivel medio-bajo de esta Champions, como el triunfo solvente sobre el Leuven y perdiendo por la mínima en Roma. Sin embargo, aquí visita a un rival que este domingo empató en Coruña en el descuento, y en Europa viene de ceder un empate ante el Arsenal. Por todo, concederá todavía menos y el uno se intuye claro.",
+      "schedule": "DOMINGO, 12:00",
+      "comment": "La Real Sociedad, después de un comienzo de curso combinando las previas europeas, había cogido vuelo en liga, pero el pasado domingo cayó aquí goleado con el Athletic Club en un derbi vasco que frena en seco su escalada. Aún más cerca del descenso que de la parte noble, se las ve con un Sevilla que tampoco se parece al de otros años. Entonces consolidado en la parte media-alta, este curso ha arrancado mal y se encuentra un punto por encima del descenso. Y es que encadena siete jornadas sin ganar, aunque fuera se siente más cómodo: cuatro salidas seguidas sin perder, las tres últimas selladas con empate.",
       "percentages": {
-        "quinielista": {
-          "1": 97,
-          "2": 1,
-          "X": 2
-        },
-        "lae": {
-          "1": 81,
-          "2": 9,
-          "X": 10
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 83,
-          "2": 1,
-          "X": 16
-        }
-      },
-      "recommended": "1"
-    },
-    {
-      "num": 14,
-      "home": "BENFICA",
-      "away": "ROMA",
-      "homeRank": "",
-      "awayRank": "",
-      "schedule": "JUEVES, 21:00",
-      "comment": "Un partido entre dos equipos que quieren seguir creciendo, aunque el Benfica está un par de pasos por delante de la Roma. El cuadro portugués ya sabe competir ante los mejores, pero le cuesta sacar resultados (en esta Champions ya ha perdido con Bayern y Arsenal), aunque una de sus virtudes es que se muestra fiable: gana a quien tiene que ganar. Por ello es favorito contra la Roma, un club que mejora y que tiene opciones de acceder a octavos (se clasifican del quinto al duodécimo de la fase liga). De momento, cuatro puntos de doce, habiendo sumado uno a domicilio. Viaja con poco que perder con un duelo que se decanta del lado local.",
-      "percentages": {
-        "quinielista": {
-          "1": 50,
-          "2": 23,
-          "X": 27
-        },
-        "lae": {
-          "1": 46,
-          "2": 25,
-          "X": 29
-        },
-        "real": {
-          "1": 43,
-          "2": 33,
-          "X": 24
+          "1": 53,
+          "2": 22,
+          "X": 25
         }
       },
       "recommended": "1X"
     },
     {
-      "num": 15,
-      "home": "DINAMARCA",
-      "away": "NORUEGA",
+      "num": 14,
+      "home": "TENERIFE",
+      "away": "MADRID CFF",
       "homeRank": "",
       "awayRank": "",
-      "schedule": "MARTES, 20:45",
-      "comment": "Se cierra el grupo 4 de la Liga A de la Nations League con dos selecciones que tienen calidad y potencial para ofrecer un duelo con numerosos guiones. Dinamarca llega de imponerse en suelo portugués (1-4) y ganarse la ventaja del empate, que le daría el pase a los cuartos. Noruega, por su parte, goleó a Gales y aquí debe ganar si quiere ser segundo. Haaland y Odegaard lideran un conjunto que ya fue protagonista en el mundial, pero peca de irregularidad. En las cinco jornadas disputadas ha sido incapaz de dejar la portería a cero, y tiene una media de casi dos goles por aparición. En el estreno, por cierto, ya se impuso 3-2.",
+      "schedule": "DOMINGO, 17:00",
+      "comment": "El Tenerife no empezó nada bien, con dos puntos sobre doce que contrastaban con las excelentes sensaciones que dejó la temporada pasada. Sin embargo, reaccionó y ya se parece al equipo del curso pasado, con cinco victorias en las últimas seis jornadas. Y ya está quinto, con un partido pendiente. El Madrid CFF, por su parte, es una de las buenas sensaciones de la liga, pero las dos últimas derrotas han frenado una trayectoria que ya no era una sorpresa. A domicilio, no obstante, le queda margen de mejora. Un punto en sus últimas cuatro salidas es la prueba. Y aquí topará con un rival que ha ganado las dos últimas apariciones.",
       "percentages": {
-        "quinielista": {
-          "1": 10,
-          "2": 32,
-          "X": 47
-        },
-        "lae": {
-          "1": 7,
-          "2": 40,
-          "X": 38
-        },
+        "quinielista": null,
+        "lae": null,
         "real": {
-          "1": 27,
-          "2": 23,
-          "X": 35
+          "1": 41,
+          "2": 29,
+          "X": 30
         }
       },
-      "recommended": "1-2"
+      "recommended": "1"
+    },
+    {
+      "num": 15,
+      "home": "SEVILLA",
+      "away": "BETIS",
+      "homeRank": "",
+      "awayRank": "",
+      "schedule": "SÁBADO, 18:30",
+      "comment": "Derbi andaluz por excelencia entre dos equipos que compiten bien y que miden aspiraciones. El Sevilla, con una sola victoria en las últimas seis jornadas, sigue mostrando un excelente gen combativo, especialmente en casa, donde a excepción de las visitas de Barça y Atlético, ha sabido minimizar a sus rivales. Y con tres porterías a cero en cuatro partidos. El Betis, mientras, sigue creciendo y consolidado en zona Champions. Además, ya ha demostrado que sabe ganar sin jugar bien. A domicilio, una sola derrota en seis salidas, la mitad de ellas sin recibir gol. En los seis últimos precedentes aquí, marcadores ajustados y solamente una vez se vieron más de dos goles.",
+      "percentages": {
+        "quinielista": null,
+        "lae": null,
+        "real": {
+          "1": 29,
+          "2": 22,
+          "X": 36
+        }
+      },
+      "recommended": "1-1"
     },
     {
       "num": 16,
