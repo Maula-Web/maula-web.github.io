@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-17T23:13:51.433Z",
+  "updatedAt": "2026-11-18T14:44:45.435Z",
   "available": true,
   "matchCountWithTarget": 15,
   "isMidweek": false,
@@ -16,7 +16,11 @@
       "schedule": "SÁBADO, 14:00",
       "comment": "Del sueño europeo al frenazo. El Alavés arrancó el curso por encima de cualquier pronóstico, pero su triunfo sobre Osasuna a comienzos de septiembre marcó el punto de inflexión. Desde entonces acumula ocho jornadas sin celebrar una victoria: cinco derrotas y tres empates. La duodécima plaza disimula el peligro, con el descenso a solo tres puntos. Más acorde con el guión marcha un Deportivo que figura por delante de los vitorianos. Los gallegos tienen un balance de tres victorias y otras tantas derrotas, aunque su especialidad son las tablas: llevan seis, una menos que el Celta, equipo que les supera en ese apartado. A domicilio, su único golpe ganador llegó en el campo del submarino amarillo.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 40,
+          "2": 22,
+          "X": 38
+        },
         "lae": null,
         "real": {
           "1": 43,
@@ -35,7 +39,11 @@
       "schedule": "SÁBADO, 16:15",
       "comment": "Vallecas acoge un pulso con la permanencia como única bandera. El Valencia llega penúltimo y con más urgencias que un Rayo que tampoco puede respirar tranquilo: apenas ha ganado uno de sus cinco últimos partidos. Los de Beñat San José se aferran al recuerdo del reciente 3-0 al Celta en casa, una goleada que señala el camino para convertir su estadio en el sostén de la salvación. Por otro lado, los hombres de Javier Aguirre quieren pasar página tras caer frente al Real Madrid en Mestalla. Su referencia está en el Martínez Valero, escenario de una victoria que pretenden repetir aquí para aliviar su delicada situación. Un nuevo golpe a domicilio supondría el segundo triunfo desde la llegada del técnico mexicano.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 38,
+          "2": 28,
+          "X": 34
+        },
         "lae": null,
         "real": {
           "1": 49,
@@ -54,7 +62,11 @@
       "schedule": "SÁBADO, 21:00",
       "comment": "El Bernabéu recupera a un Madrid lanzado después de un mes de viajes. Los blancos reciben al Celta con pleno de puntos en casa y ocho triunfos seguidos en el bolsillo. La derrota del Metropolitano, a finales de septiembre, dio paso a una reacción rotunda: tres victorias europeas y cinco en LaLiga EA Sports para estrechar el cerco sobre el Barça, al que tumbaron en el Camp Nou. Mourinho ha armado un bloque cada vez más firme, muy solidario y demoledor arriba. Con semejante aval, rascar algo del feudo madridista se presenta como un desafío enorme para los gallegos. Su balance lejos de casa ofrece una pista: todavía no han ganado, aunque han sacado cuatro empates y solo han sufrido una derrota.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 92,
+          "2": 2,
+          "X": 6
+        },
         "lae": null,
         "real": {
           "1": 79,
@@ -73,11 +85,15 @@
       "schedule": "DOMINGO, 14:00",
       "comment": "El liderato azulgrana no admite despistes. Once victorias y una derrota, sin un solo empate, apenas conceden al Barça tres puntos de renta sobre su perseguidor. Flick sabe que cualquier resbalón puede salir caro y ahora recibe a un Villarreal que acostumbra a incomodar en el Camp Nou. Los amarillos atraviesan un momento gris, pero necesitan sumar para seguir enganchados a la pelea por Europa. El conjunto azulgrana llega reforzado tras asaltar el feudo del At. Madrid antes del parón de selecciones. Aquel golpe sostuvo su primera plaza y calmó las dudas que habían provocado los tropiezos frente al PSG y al Real Madrid, dos exámenes que pusieron bajo sospecha su capacidad para competir contra los grandes.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 84,
+          "2": 6,
+          "X": 10
+        },
         "lae": null,
         "real": {
-          "1": 78,
-          "2": 9,
+          "1": 79,
+          "2": 8,
           "X": 13
         }
       },
@@ -92,7 +108,11 @@
       "schedule": "DOMINGO, 16:15",
       "comment": "Casi blindado en el Sardinero, el Racing prepara un examen de altura ante una Real Sociedad al alza. Los cántabros han sumado en casa once de sus catorce puntos y únicamente el Real Madrid ha logrado conquistar su estadio. Ese refugio sostiene a un equipo que viene de ganar en La Rosaleda y alcanzar la mitad de la clasificación, aunque el descenso sigue a cuatro puntos. La visita donostiarra amenaza con poner a prueba su resistencia. Matarazzo ha enderezado un arranque con dudas y tiene a los suyos en puestos de Europa League. Una sola derrota en las seis últimas citas ligueras confirma la reacción de una Real que, fuera del Reale Arena, desconoce el término medio: gana o pierde.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 21,
+          "2": 50,
+          "X": 29
+        },
         "lae": null,
         "real": {
           "1": 30,
@@ -111,7 +131,11 @@
       "schedule": "DOMINGO, 18:30",
       "comment": "Con solo dos puntos de colchón sobre el descenso, Osasuna necesita convertir El Sadar en un bastión. El regreso de Jagoba Arrasate al banquillo todavía no ha supuesto un ascenso en la clasificación: en cuatro encuentros suma una victoria, un empate y dos derrotas, las dos lejos de casa. Los rojillos son decimosextos y llegan tras empatar a uno ante su afición frente al Athletic en la última jornada disputada. El Málaga se fue al parón en la cola de la tabla en su regreso a la élite. El conjunto andaluz sigue siendo el único equipo sin victorias y atraviesa una mala dinámica, con un solo punto de los últimos doce en juego. Funes, el técnico del ascenso, continúa a la búsqueda de la fórmula del triunfo en Primera División.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 68,
+          "2": 11,
+          "X": 21
+        },
         "lae": null,
         "real": {
           "1": 54,
@@ -130,7 +154,11 @@
       "schedule": "DOMINGO, 21:00",
       "comment": "A los de Bordalás les cuesta enlazar resultados que los impulsen hacia la parte noble de la clasificación: el Getafe es decimoquinto y solo le separan dos puntos del primer equipo que ocupa plaza de descenso. Antes del parón por las selecciones cayó por 2-0 en Villarreal, aunque en su último compromiso en el Coliseum sí se llevó el triunfo, un 3-1 al Sevilla. Enfrente estará un Atlético que cedió por 1-2 ante el Barça en la última cita previa al parón, un cara a cara por el liderato. El equipo de Simeone debe reponerse para recobrar el ritmo que le permitió ligar siete victorias consecutivas en el campeonato de la regularidad. Hoy marcha tercero, a dos puntos del Real Madrid y a cinco del Barcelona",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 6,
+          "2": 81,
+          "X": 13
+        },
         "lae": null,
         "real": {
           "1": 17,
@@ -149,7 +177,11 @@
       "schedule": "SÁBADO, 21:00",
       "comment": "Tras el golpe de la muerte de Jesús de Miguel, el Tenerife, decimotercero en Segunda División, regresó a la competición el domingo y pudo dedicarle la victoria: un 2-0 ante el colista Ceuta. Ahora el conjunto chicharrero busca seguir recomponiéndose de tan duro revés humano, de nuevo ante su afición. Visita el feudo tinerfeño un Mallorca que marcha séptimo, a un solo punto de las plazas de play-off. Los baleares acumulan seis jornadas sin conocer la derrota, con cuatro empates y dos triunfos. Fuera de Son Moix encadenan tres igualadas seguidas y cuatro en seis salidas, y su cuenta como visitantes la completan un triunfo y una derrota.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 25,
+          "2": 40,
+          "X": 35
+        },
         "lae": null,
         "real": {
           "1": 30,
@@ -168,11 +200,15 @@
       "schedule": "DOMINGO, 16:15",
       "comment": "Alcanzar la zona de play-off pasa, para el Sporting, por no dejar escapar puntos ante su gente. El conjunto asturiano marcha octavo, a un solo punto de las plazas con premio, aunque llega de una racha muy irregular: dos derrotas, un empate y una única victoria en las cuatro últimas jornadas. El equipo de Larcamón necesita elevar su nivel. Por el otro lado asoma la UD Las Palmas, undécima, que cayó por 1-0 en Granada después de enlazar tres triunfos consecutivos, dos de ellos bajo la dirección de su nuevo técnico, el catalán Albert Sánchez. Lejos de su feudo, el equipo insular suma tres victorias y cuatro derrotas, y ha perdido en tres de sus cuatro últimos desplazamientos.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 53,
+          "2": 16,
+          "X": 31
+        },
         "lae": null,
         "real": {
-          "1": 48,
-          "2": 25,
+          "1": 47,
+          "2": 26,
           "X": 27
         }
       },
@@ -187,7 +223,11 @@
       "schedule": "DOMINGO, 18:30",
       "comment": "Un choque de postín entre aspirantes se jugará en Montilivi. Tras dos tropiezos seguidos, el Girona recobró el pulso el sábado con un 1-2 en la visita al Oviedo, en el estreno de Raúl González Blanco en el banquillo asturiano. Cuartos en la clasificación, los gerundenses van a por el quinto triunfo de la campaña como locales. Les rinde visita el Eibar, quinto con idéntico botín de 24 puntos, aunque con una sequía de cinco jornadas sin saborear la victoria: tres X y dos derrotas. Los armeros llegan al duelo tras dos igualadas consecutivas en Ipurua, calcadas en el marcador, 1-1 frente al Almería y 1-1 ante el Cádiz.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 60,
+          "2": 13,
+          "X": 27
+        },
         "lae": null,
         "real": {
           "1": 52,
@@ -206,7 +246,11 @@
       "schedule": "SÁBADO, 17:00",
       "comment": "El Eibar hizo un excelente inicio de liga, pero se ha desinflado con el paso de las semanas. Va por seis jornadas sin ganar y vuelve a la zona media de la tabla, con tres puntos de margen sobre el descenso. Eso sí, siempre compite y en casa ya ha sido capaz de derrotar a Athletic y Espanyol. Esta vez recibe al Atlético, uno de los equipos más en forma. Después de un arranque dubitativo, también por enfrentarse a los más grandes, ha ido conjuntando las piezas y va encontrando su mejor nivel. Además, aprovechando los tropiezos de Barça y Madrid, no quiere descartar nada. De momento, seis fechas sin perder, con cinco victorias incluidas y tres salidas seguidas puntuando.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 7,
+          "2": 79,
+          "X": 14
+        },
         "lae": null,
         "real": {
           "1": 14,
@@ -225,12 +269,16 @@
       "schedule": "DOMINGO, 12:00",
       "comment": "El Granada arrancaba el curso tras dos temporadas en línea muy ascendente y en la parte alta de la tabla. Sin embargo, este curso va irregular y encadena cuatro jornadas sin ganar, y en casa también lleva cuatro apariciones sin imponerse. Además, le cuesta anotar goles, así que, a pesar de competir, parte con desventaja ante un Madrid con mucho potencial ofensivo. Eso sí, atrás está dejando más dudas de las que debería. La evidencia, el empate del pasado fin de semana en casa ante el Badalona. El segundo empate consecutivo blanco que ha evitado que pudiera acercarse más al Barça, que también tropezó en Coruña.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 1,
+          "2": 94,
+          "X": 5
+        },
         "lae": null,
         "real": {
-          "1": 12,
-          "2": 70,
-          "X": 18
+          "1": 9,
+          "2": 76,
+          "X": 15
         }
       },
       "recommended": "X2"
@@ -244,12 +292,16 @@
       "schedule": "DOMINGO, 12:00",
       "comment": "La Real Sociedad, después de un comienzo de curso combinando las previas europeas, había cogido vuelo en liga, pero el pasado domingo cayó aquí goleado con el Athletic Club en un derbi vasco que frena en seco su escalada. Aún más cerca del descenso que de la parte noble, se las ve con un Sevilla que tampoco se parece al de otros años. Entonces consolidado en la parte media-alta, este curso ha arrancado mal y se encuentra un punto por encima del descenso. Y es que encadena siete jornadas sin ganar, aunque fuera se siente más cómodo: cuatro salidas seguidas sin perder, las tres últimas selladas con empate.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 64,
+          "2": 11,
+          "X": 25
+        },
         "lae": null,
         "real": {
-          "1": 53,
-          "2": 22,
-          "X": 25
+          "1": 59,
+          "2": 18,
+          "X": 23
         }
       },
       "recommended": "1X"
@@ -263,12 +315,16 @@
       "schedule": "DOMINGO, 17:00",
       "comment": "El Tenerife no empezó nada bien, con dos puntos sobre doce que contrastaban con las excelentes sensaciones que dejó la temporada pasada. Sin embargo, reaccionó y ya se parece al equipo del curso pasado, con cinco victorias en las últimas seis jornadas. Y ya está quinto, con un partido pendiente. El Madrid CFF, por su parte, es una de las buenas sensaciones de la liga, pero las dos últimas derrotas han frenado una trayectoria que ya no era una sorpresa. A domicilio, no obstante, le queda margen de mejora. Un punto en sus últimas cuatro salidas es la prueba. Y aquí topará con un rival que ha ganado las dos últimas apariciones.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 59,
+          "2": 16,
+          "X": 25
+        },
         "lae": null,
         "real": {
-          "1": 41,
-          "2": 29,
-          "X": 30
+          "1": 50,
+          "2": 24,
+          "X": 26
         }
       },
       "recommended": "1"
@@ -282,7 +338,11 @@
       "schedule": "SÁBADO, 18:30",
       "comment": "Derbi andaluz por excelencia entre dos equipos que compiten bien y que miden aspiraciones. El Sevilla, con una sola victoria en las últimas seis jornadas, sigue mostrando un excelente gen combativo, especialmente en casa, donde a excepción de las visitas de Barça y Atlético, ha sabido minimizar a sus rivales. Y con tres porterías a cero en cuatro partidos. El Betis, mientras, sigue creciendo y consolidado en zona Champions. Además, ya ha demostrado que sabe ganar sin jugar bien. A domicilio, una sola derrota en seis salidas, la mitad de ellas sin recibir gol. En los seis últimos precedentes aquí, marcadores ajustados y solamente una vez se vieron más de dos goles.",
       "percentages": {
-        "quinielista": null,
+        "quinielista": {
+          "1": 11,
+          "2": 31,
+          "X": 50
+        },
         "lae": null,
         "real": {
           "1": 29,
