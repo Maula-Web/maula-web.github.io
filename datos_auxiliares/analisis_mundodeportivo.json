@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-19T04:53:12.042Z",
+  "updatedAt": "2026-11-19T22:49:08.151Z",
   "available": true,
   "matchCountWithTarget": 15,
   "isMidweek": false,
@@ -17,11 +17,15 @@
       "comment": "Del sueño europeo al frenazo. El Alavés arrancó el curso por encima de cualquier pronóstico, pero su triunfo sobre Osasuna a comienzos de septiembre marcó el punto de inflexión. Desde entonces acumula ocho jornadas sin celebrar una victoria: cinco derrotas y tres empates. La duodécima plaza disimula el peligro, con el descenso a solo tres puntos. Más acorde con el guión marcha un Deportivo que figura por delante de los vitorianos. Los gallegos tienen un balance de tres victorias y otras tantas derrotas, aunque su especialidad son las tablas: llevan seis, una menos que el Celta, equipo que les supera en ese apartado. A domicilio, su único golpe ganador llegó en el campo del submarino amarillo.",
       "percentages": {
         "quinielista": {
-          "1": 40,
-          "2": 24,
-          "X": 36
+          "1": 38,
+          "2": 25,
+          "X": 37
         },
-        "lae": null,
+        "lae": {
+          "1": 42,
+          "2": 23,
+          "X": 35
+        },
         "real": {
           "1": 43,
           "2": 28,
@@ -40,11 +44,15 @@
       "comment": "Vallecas acoge un pulso con la permanencia como única bandera. El Valencia llega penúltimo y con más urgencias que un Rayo que tampoco puede respirar tranquilo: apenas ha ganado uno de sus cinco últimos partidos. Los de Beñat San José se aferran al recuerdo del reciente 3-0 al Celta en casa, una goleada que señala el camino para convertir su estadio en el sostén de la salvación. Por otro lado, los hombres de Javier Aguirre quieren pasar página tras caer frente al Real Madrid en Mestalla. Su referencia está en el Martínez Valero, escenario de una victoria que pretenden repetir aquí para aliviar su delicada situación. Un nuevo golpe a domicilio supondría el segundo triunfo desde la llegada del técnico mexicano.",
       "percentages": {
         "quinielista": {
-          "1": 43,
-          "2": 24,
-          "X": 33
+          "1": 41,
+          "2": 23,
+          "X": 36
         },
-        "lae": null,
+        "lae": {
+          "1": 46,
+          "2": 24,
+          "X": 30
+        },
         "real": {
           "1": 49,
           "2": 24,
@@ -63,14 +71,18 @@
       "comment": "El Bernabéu recupera a un Madrid lanzado después de un mes de viajes. Los blancos reciben al Celta con pleno de puntos en casa y ocho triunfos seguidos en el bolsillo. La derrota del Metropolitano, a finales de septiembre, dio paso a una reacción rotunda: tres victorias europeas y cinco en LaLiga EA Sports para estrechar el cerco sobre el Barça, al que tumbaron en el Camp Nou. Mourinho ha armado un bloque cada vez más firme, muy solidario y demoledor arriba. Con semejante aval, rascar algo del feudo madridista se presenta como un desafío enorme para los gallegos. Su balance lejos de casa ofrece una pista: todavía no han ganado, aunque han sacado cuatro empates y solo han sufrido una derrota.",
       "percentages": {
         "quinielista": {
-          "1": 93,
-          "2": 2,
+          "1": 90,
+          "2": 4,
+          "X": 6
+        },
+        "lae": {
+          "1": 90,
+          "2": 5,
           "X": 5
         },
-        "lae": null,
         "real": {
-          "1": 80,
-          "2": 7,
+          "1": 81,
+          "2": 6,
           "X": 13
         }
       },
@@ -90,10 +102,14 @@
           "2": 5,
           "X": 9
         },
-        "lae": null,
+        "lae": {
+          "1": 85,
+          "2": 6,
+          "X": 9
+        },
         "real": {
-          "1": 79,
-          "2": 8,
+          "1": 78,
+          "2": 9,
           "X": 13
         }
       },
@@ -110,14 +126,18 @@
       "percentages": {
         "quinielista": {
           "1": 21,
-          "2": 51,
-          "X": 28
+          "2": 47,
+          "X": 32
         },
-        "lae": null,
+        "lae": {
+          "1": 21,
+          "2": 48,
+          "X": 31
+        },
         "real": {
           "1": 30,
-          "2": 46,
-          "X": 24
+          "2": 47,
+          "X": 23
         }
       },
       "recommended": "X2"
@@ -133,14 +153,18 @@
       "percentages": {
         "quinielista": {
           "1": 72,
-          "2": 9,
-          "X": 19
+          "2": 10,
+          "X": 18
         },
-        "lae": null,
+        "lae": {
+          "1": 69,
+          "2": 11,
+          "X": 20
+        },
         "real": {
-          "1": 53,
+          "1": 52,
           "2": 21,
-          "X": 26
+          "X": 27
         }
       },
       "recommended": "1"
@@ -155,11 +179,15 @@
       "comment": "A los de Bordalás les cuesta enlazar resultados que los impulsen hacia la parte noble de la clasificación: el Getafe es decimoquinto y solo le separan dos puntos del primer equipo que ocupa plaza de descenso. Antes del parón por las selecciones cayó por 2-0 en Villarreal, aunque en su último compromiso en el Coliseum sí se llevó el triunfo, un 3-1 al Sevilla. Enfrente estará un Atlético que cedió por 1-2 ante el Barça en la última cita previa al parón, un cara a cara por el liderato. El equipo de Simeone debe reponerse para recobrar el ritmo que le permitió ligar siete victorias consecutivas en el campeonato de la regularidad. Hoy marcha tercero, a dos puntos del Real Madrid y a cinco del Barcelona",
       "percentages": {
         "quinielista": {
-          "1": 5,
-          "2": 81,
-          "X": 14
+          "1": 4,
+          "2": 80,
+          "X": 16
         },
-        "lae": null,
+        "lae": {
+          "1": 10,
+          "2": 75,
+          "X": 15
+        },
         "real": {
           "1": 16,
           "2": 60,
@@ -178,14 +206,18 @@
       "comment": "Tras el golpe de la muerte de Jesús de Miguel, el Tenerife, decimotercero en Segunda División, regresó a la competición el domingo y pudo dedicarle la victoria: un 2-0 ante el colista Ceuta. Ahora el conjunto chicharrero busca seguir recomponiéndose de tan duro revés humano, de nuevo ante su afición. Visita el feudo tinerfeño un Mallorca que marcha séptimo, a un solo punto de las plazas de play-off. Los baleares acumulan seis jornadas sin conocer la derrota, con cuatro empates y dos triunfos. Fuera de Son Moix encadenan tres igualadas seguidas y cuatro en seis salidas, y su cuenta como visitantes la completan un triunfo y una derrota.",
       "percentages": {
         "quinielista": {
-          "1": 27,
-          "2": 39,
-          "X": 34
+          "1": 28,
+          "2": 36,
+          "X": 36
         },
-        "lae": null,
+        "lae": {
+          "1": 28,
+          "2": 37,
+          "X": 35
+        },
         "real": {
-          "1": 29,
-          "2": 42,
+          "1": 28,
+          "2": 43,
           "X": 29
         }
       },
@@ -201,14 +233,18 @@
       "comment": "Alcanzar la zona de play-off pasa, para el Sporting, por no dejar escapar puntos ante su gente. El conjunto asturiano marcha octavo, a un solo punto de las plazas con premio, aunque llega de una racha muy irregular: dos derrotas, un empate y una única victoria en las cuatro últimas jornadas. El equipo de Larcamón necesita elevar su nivel. Por el otro lado asoma la UD Las Palmas, undécima, que cayó por 1-0 en Granada después de enlazar tres triunfos consecutivos, dos de ellos bajo la dirección de su nuevo técnico, el catalán Albert Sánchez. Lejos de su feudo, el equipo insular suma tres victorias y cuatro derrotas, y ha perdido en tres de sus cuatro últimos desplazamientos.",
       "percentages": {
         "quinielista": {
-          "1": 52,
-          "2": 16,
-          "X": 32
-        },
-        "lae": null,
-        "real": {
           "1": 47,
-          "2": 26,
+          "2": 19,
+          "X": 34
+        },
+        "lae": {
+          "1": 49,
+          "2": 20,
+          "X": 31
+        },
+        "real": {
+          "1": 45,
+          "2": 28,
           "X": 27
         }
       },
@@ -224,11 +260,15 @@
       "comment": "Un choque de postín entre aspirantes se jugará en Montilivi. Tras dos tropiezos seguidos, el Girona recobró el pulso el sábado con un 1-2 en la visita al Oviedo, en el estreno de Raúl González Blanco en el banquillo asturiano. Cuartos en la clasificación, los gerundenses van a por el quinto triunfo de la campaña como locales. Les rinde visita el Eibar, quinto con idéntico botín de 24 puntos, aunque con una sequía de cinco jornadas sin saborear la victoria: tres X y dos derrotas. Los armeros llegan al duelo tras dos igualadas consecutivas en Ipurua, calcadas en el marcador, 1-1 frente al Almería y 1-1 ante el Cádiz.",
       "percentages": {
         "quinielista": {
-          "1": 58,
-          "2": 15,
-          "X": 27
+          "1": 52,
+          "2": 17,
+          "X": 31
         },
-        "lae": null,
+        "lae": {
+          "1": 59,
+          "2": 15,
+          "X": 26
+        },
         "real": {
           "1": 52,
           "2": 23,
@@ -247,15 +287,19 @@
       "comment": "El Eibar hizo un excelente inicio de liga, pero se ha desinflado con el paso de las semanas. Va por seis jornadas sin ganar y vuelve a la zona media de la tabla, con tres puntos de margen sobre el descenso. Eso sí, siempre compite y en casa ya ha sido capaz de derrotar a Athletic y Espanyol. Esta vez recibe al Atlético, uno de los equipos más en forma. Después de un arranque dubitativo, también por enfrentarse a los más grandes, ha ido conjuntando las piezas y va encontrando su mejor nivel. Además, aprovechando los tropiezos de Barça y Madrid, no quiere descartar nada. De momento, seis fechas sin perder, con cinco victorias incluidas y tres salidas seguidas puntuando.",
       "percentages": {
         "quinielista": {
-          "1": 6,
-          "2": 83,
-          "X": 11
+          "1": 8,
+          "2": 76,
+          "X": 16
         },
-        "lae": null,
-        "real": {
+        "lae": {
           "1": 11,
-          "2": 70,
-          "X": 19
+          "2": 73,
+          "X": 16
+        },
+        "real": {
+          "1": 12,
+          "2": 68,
+          "X": 20
         }
       },
       "recommended": "X2"
@@ -270,15 +314,19 @@
       "comment": "El Granada arrancaba el curso tras dos temporadas en línea muy ascendente y en la parte alta de la tabla. Sin embargo, este curso va irregular y encadena cuatro jornadas sin ganar, y en casa también lleva cuatro apariciones sin imponerse. Además, le cuesta anotar goles, así que, a pesar de competir, parte con desventaja ante un Madrid con mucho potencial ofensivo. Eso sí, atrás está dejando más dudas de las que debería. La evidencia, el empate del pasado fin de semana en casa ante el Badalona. El segundo empate consecutivo blanco que ha evitado que pudiera acercarse más al Barça, que también tropezó en Coruña.",
       "percentages": {
         "quinielista": {
-          "1": 3,
-          "2": 91,
-          "X": 6
+          "1": 2,
+          "2": 93,
+          "X": 5
         },
-        "lae": null,
-        "real": {
+        "lae": {
           "1": 9,
-          "2": 76,
-          "X": 15
+          "2": 82,
+          "X": 9
+        },
+        "real": {
+          "1": 10,
+          "2": 74,
+          "X": 16
         }
       },
       "recommended": "X2"
@@ -293,15 +341,19 @@
       "comment": "La Real Sociedad, después de un comienzo de curso combinando las previas europeas, había cogido vuelo en liga, pero el pasado domingo cayó aquí goleado con el Athletic Club en un derbi vasco que frena en seco su escalada. Aún más cerca del descenso que de la parte noble, se las ve con un Sevilla que tampoco se parece al de otros años. Entonces consolidado en la parte media-alta, este curso ha arrancado mal y se encuentra un punto por encima del descenso. Y es que encadena siete jornadas sin ganar, aunque fuera se siente más cómodo: cuatro salidas seguidas sin perder, las tres últimas selladas con empate.",
       "percentages": {
         "quinielista": {
-          "1": 63,
-          "2": 10,
-          "X": 27
+          "1": 59,
+          "2": 12,
+          "X": 29
         },
-        "lae": null,
+        "lae": {
+          "1": 66,
+          "2": 11,
+          "X": 23
+        },
         "real": {
-          "1": 57,
-          "2": 19,
-          "X": 24
+          "1": 62,
+          "2": 16,
+          "X": 22
         }
       },
       "recommended": "1X"
@@ -316,14 +368,18 @@
       "comment": "El Tenerife no empezó nada bien, con dos puntos sobre doce que contrastaban con las excelentes sensaciones que dejó la temporada pasada. Sin embargo, reaccionó y ya se parece al equipo del curso pasado, con cinco victorias en las últimas seis jornadas. Y ya está quinto, con un partido pendiente. El Madrid CFF, por su parte, es una de las buenas sensaciones de la liga, pero las dos últimas derrotas han frenado una trayectoria que ya no era una sorpresa. A domicilio, no obstante, le queda margen de mejora. Un punto en sus últimas cuatro salidas es la prueba. Y aquí topará con un rival que ha ganado las dos últimas apariciones.",
       "percentages": {
         "quinielista": {
-          "1": 55,
-          "2": 15,
+          "1": 49,
+          "2": 18,
+          "X": 33
+        },
+        "lae": {
+          "1": 42,
+          "2": 28,
           "X": 30
         },
-        "lae": null,
         "real": {
-          "1": 53,
-          "2": 22,
+          "1": 54,
+          "2": 21,
           "X": 25
         }
       },
@@ -339,11 +395,15 @@
       "comment": "Derbi andaluz por excelencia entre dos equipos que compiten bien y que miden aspiraciones. El Sevilla, con una sola victoria en las últimas seis jornadas, sigue mostrando un excelente gen combativo, especialmente en casa, donde a excepción de las visitas de Barça y Atlético, ha sabido minimizar a sus rivales. Y con tres porterías a cero en cuatro partidos. El Betis, mientras, sigue creciendo y consolidado en zona Champions. Además, ya ha demostrado que sabe ganar sin jugar bien. A domicilio, una sola derrota en seis salidas, la mitad de ellas sin recibir gol. En los seis últimos precedentes aquí, marcadores ajustados y solamente una vez se vieron más de dos goles.",
       "percentages": {
         "quinielista": {
-          "1": 7,
-          "2": 27,
-          "X": 60
+          "1": 8,
+          "2": 35,
+          "X": 53
         },
-        "lae": null,
+        "lae": {
+          "1": 8,
+          "2": 31,
+          "X": 57
+        },
         "real": {
           "1": 29,
           "2": 22,
