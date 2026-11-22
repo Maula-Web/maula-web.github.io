@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-22T01:53:36.886Z",
+  "updatedAt": "2026-11-22T02:42:49.162Z",
   "available": false,
   "matchCountWithTarget": 0,
   "isMidweek": true,
@@ -17,14 +17,14 @@
       "comment": "Repetir el ocho de ocho del curso pasado ya es imposible para el Arsenal. El 2-2 firmado en el Allianz Arena cortó su pleno, pero mantiene a los londinenses en una posición envidiable: terceros con diez puntos, a dos de la cabeza. Ahora les visita un Dortmund que marcha por detrás, lastrado por su tropiezo en Noruega frente al Bodo/Glimt. Los alemanes han ganado el resto de sus partidos, aunque con un patrón que invita a la cautela: triunfos por un solo gol de margen y sin dejar su portería a cero. La exigencia sube de golpe en el Emirates, un escenario que apenas concede alegrías a sus visitantes. Solo el PSG ha logrado asaltarlo en los últimos años, todo un reto para el cuadro germano.",
       "percentages": {
         "quinielista": {
-          "1": 85,
-          "2": 7,
+          "1": 88,
+          "2": 4,
           "X": 8
         },
         "lae": null,
         "real": {
-          "1": 68,
-          "2": 13,
+          "1": 69,
+          "2": 12,
           "X": 19
         }
       },
@@ -40,9 +40,9 @@
       "comment": "Ganar empieza a ser una obligación para Feyenoord y Oporto. Un triunfo y tres derrotas dibujan el mismo panorama para dos aspirantes que, a estas alturas, estarían eliminados. El choque exige sumar para evitar que las tres jornadas finales se conviertan en una carrera al límite; incluso un empate permitiría mantener el pulso. De Kuip ha visto las dos caras del cuadro neerlandés: primero celebró un ajustado 3-2 frente al sorprendente Como y después asistió al golpe del Inter, que regresó a Milán con un contundente 0-3. Los portugueses, por su parte, llegan tras estrenar su casillero con el 4-1 al Nápoles, un respiro después de tres tropiezos que les habían dejado sin puntos.",
       "percentages": {
         "quinielista": {
-          "1": 48,
-          "2": 31,
-          "X": 21
+          "1": 52,
+          "2": 29,
+          "X": 19
         },
         "lae": null,
         "real": {
@@ -69,9 +69,9 @@
         },
         "lae": null,
         "real": {
-          "1": 75,
+          "1": 76,
           "2": 10,
-          "X": 15
+          "X": 14
         }
       },
       "recommended": "1"
@@ -86,9 +86,9 @@
       "comment": "Roma cambió el paso del Real Madrid. Ese 3-1 convertido en 3-4 lanzó a los blancos, que comparten el mando con el PSG tras ganar todos sus partidos. La mejor diferencia de goles mantiene a los parisinos en lo más alto e impide que el liderato tenga dueño español. El Bernabéu recibe el martes a un PSV que ofrece pocos argumentos para creer en la campanada. Los neerlandeses estrenaron su casillero de triunfos en su última salida, en Oporto. Con cuatro puntos, figuran en un atasco de seis equipos y ocupan la última posición que da acceso a la repesca al término de la fase de Liga. Los de Peter Bosz reciben un tanto por encuentro, mientras que su producción ofensiva se reduce a tres goles.",
       "percentages": {
         "quinielista": {
-          "1": 100,
-          "2": 0,
-          "X": 0
+          "1": 90,
+          "2": 5,
+          "X": 5
         },
         "lae": null,
         "real": {
@@ -110,8 +110,8 @@
       "percentages": {
         "quinielista": {
           "1": 0,
-          "2": 92,
-          "X": 8
+          "2": 86,
+          "X": 14
         },
         "lae": null,
         "real": {
@@ -151,15 +151,15 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 38,
-          "2": 33,
-          "X": 29
+          "1": 35,
+          "2": 45,
+          "X": 20
         },
         "lae": null,
         "real": {
-          "1": 32,
+          "1": 31,
           "2": 43,
-          "X": 25
+          "X": 26
         }
       },
       "recommended": "2"
@@ -174,9 +174,9 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 54,
-          "2": 44,
-          "X": 2
+          "1": 33,
+          "2": 54,
+          "X": 13
         },
         "lae": null,
         "real": {
@@ -197,9 +197,9 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 73,
+          "1": 81,
           "2": 2,
-          "X": 25
+          "X": 17
         },
         "lae": null,
         "real": {
@@ -220,9 +220,9 @@
       "comment": "",
       "percentages": {
         "quinielista": {
-          "1": 100,
+          "1": 95,
           "2": 0,
-          "X": 0
+          "X": 5
         },
         "lae": null,
         "real": {
@@ -244,8 +244,8 @@
       "percentages": {
         "quinielista": {
           "1": 35,
-          "2": 42,
-          "X": 23
+          "2": 39,
+          "X": 26
         },
         "lae": null,
         "real": {
@@ -266,14 +266,14 @@
       "comment": "El Sporting es de esos equipos bajo el radar de los aspirantes, pero con tres victorias en cuatro jornadas se ha colocado con puntuación de top-8. Sin embargo, su única derrota fue aquí en casa ante un rival teóricamente inferior como el LASK. Una sorpresa que evidencia las dificultades de la Champions que el United ya ha vivido en sus propias carnes. Especialmente a domicilio, cayendo con claridad en sus dos salidas. Eso y la mala temporada en Premier (arrancaba el fin de semana en descenso) han llevado un cambio en el banquillo. Y ha llegado Pochettino, con la misión de coger aire y ser un bloque competitivo.",
       "percentages": {
         "quinielista": {
-          "1": 83,
-          "2": 11,
-          "X": 6
+          "1": 62,
+          "2": 20,
+          "X": 18
         },
         "lae": null,
         "real": {
-          "1": 37,
-          "2": 37,
+          "1": 38,
+          "2": 36,
           "X": 26
         }
       },
@@ -312,9 +312,9 @@
       "comment": "Competir en Europa suele ser un esfuerzo muy exigente para clubes de grandes ligas. Si no, que se lo digan al Crystal Palace inglés, que ha sumado en tres de cuatro fechas en citas continentales, pero llega colista de la Premier. Cinco derrotas seguidas que lo obligan a reaccionar y a mejorar, pues antes del parón, empató aquí en el descuento ante el Hoffenheim alemán, con un estilo parecido a la Real Sociedad. Los de Matarazzo, de menos a más en la Europa League, han sumado en sus dos salidas, con un estilo atrevido que puede hacer daño en transición, aunque anda pendiente de recuperar efectivos. Al menos toca cubrir las variantes.",
       "percentages": {
         "quinielista": {
-          "1": 40,
-          "2": 56,
-          "X": 4
+          "1": 50,
+          "2": 36,
+          "X": 14
         },
         "lae": null,
         "real": {
@@ -336,8 +336,8 @@
       "percentages": {
         "quinielista": {
           "1": 0,
-          "2": 21,
-          "X": 4
+          "2": 24,
+          "X": 2
         },
         "lae": null,
         "real": {
