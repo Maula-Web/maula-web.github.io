@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-23T02:12:36.988Z",
+  "updatedAt": "2026-11-23T03:18:08.217Z",
   "available": false,
   "matchCountWithTarget": 0,
   "isMidweek": true,
@@ -63,14 +63,14 @@
       "comment": "Solo el intratable PSG ha conseguido frenar al Manchester City en esta Champions. Aquel 2-4 es la única mancha de un recorrido firme: los ingleses han ganado todos sus demás compromisos, suman nueve puntos y ocupan plaza entre los ocho mejores. El Etihad ofrece ahora otra ocasión para afianzar el billete directo a octavos y ahorrarse el peaje de la repesca. Delante aparece un Nápoles que vive una realidad mucho más amarga. Los de Massimiliano Allegri apenas han celebrado un triunfo y han perdido el resto de sus citas. Sus dos salidas dejaron heridas profundas, con un 3-1 en Villarreal y un 4-1 frente al Oporto. Mejorar lejos de casa resulta vital para que los italianos puedan levantar el vuelo.",
       "percentages": {
         "quinielista": {
-          "1": 90,
-          "2": 4,
+          "1": 91,
+          "2": 3,
           "X": 6
         },
         "lae": null,
         "real": {
-          "1": 76,
-          "2": 9,
+          "1": 75,
+          "2": 10,
           "X": 15
         }
       },
@@ -92,8 +92,8 @@
         },
         "lae": null,
         "real": {
-          "1": 81,
-          "2": 8,
+          "1": 82,
+          "2": 7,
           "X": 11
         }
       },
@@ -110,14 +110,14 @@
       "percentages": {
         "quinielista": {
           "1": 5,
-          "2": 84,
-          "X": 11
+          "2": 83,
+          "X": 12
         },
         "lae": null,
         "real": {
           "1": 9,
-          "2": 76,
-          "X": 15
+          "2": 77,
+          "X": 14
         }
       },
       "recommended": "2"
@@ -208,8 +208,8 @@
         "lae": null,
         "real": {
           "1": 67,
-          "2": 15,
-          "X": 18
+          "2": 16,
+          "X": 17
         }
       },
       "recommended": "1"
@@ -271,8 +271,8 @@
       "percentages": {
         "quinielista": {
           "1": 44,
-          "2": 32,
-          "X": 24
+          "2": 33,
+          "X": 23
         },
         "lae": null,
         "real": {
@@ -293,14 +293,14 @@
       "comment": "El Celta vuelve a cita continental tras caer en el tramo final en el Bernabéu en duelo liguero. En Europa League, no obstante, debe recuperar terreno después de perder tres de sus cuatro encuentros, incluidos los dos en casa (ante Juventus y Union belga). Dos derrotas que demuestran la falta de efectividad arriba y la falta de contundencia en defensa. Un equilibrio que deberá encontrar contra un Bournemouth que es uno de los tres líderes invictos, un cuadro inglés con mucho físico, capaz de enormes esfuerzos y sin bajar ritmo a pesar de las rotaciones. Como ya demostró en el debut, cuando ya ganó en feudo de la Real Sociedad.",
       "percentages": {
         "quinielista": {
-          "1": 26,
+          "1": 25,
           "2": 53,
-          "X": 21
+          "X": 22
         },
         "lae": null,
         "real": {
-          "1": 25,
-          "2": 48,
+          "1": 24,
+          "2": 49,
           "X": 27
         }
       },
@@ -322,8 +322,8 @@
         },
         "lae": null,
         "real": {
-          "1": 46,
-          "2": 29,
+          "1": 47,
+          "2": 28,
           "X": 25
         }
       },
@@ -341,7 +341,7 @@
         "quinielista": {
           "1": 1,
           "2": 24,
-          "X": 7
+          "X": 6
         },
         "lae": null,
         "real": {
