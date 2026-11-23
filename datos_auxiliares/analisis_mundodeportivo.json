@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-23T04:32:19.349Z",
+  "updatedAt": "2026-11-23T16:44:30.061Z",
   "available": false,
   "matchCountWithTarget": 0,
   "isMidweek": true,
@@ -17,14 +17,18 @@
       "comment": "Repetir el ocho de ocho del curso pasado ya es imposible para el Arsenal. El 2-2 firmado en el Allianz Arena cortó su pleno, pero mantiene a los londinenses en una posición envidiable: terceros con diez puntos, a dos de la cabeza. Ahora les visita un Dortmund que marcha por detrás, lastrado por su tropiezo en Noruega frente al Bodo/Glimt. Los alemanes han ganado el resto de sus partidos, aunque con un patrón que invita a la cautela: triunfos por un solo gol de margen y sin dejar su portería a cero. La exigencia sube de golpe en el Emirates, un escenario que apenas concede alegrías a sus visitantes. Solo el PSG ha logrado asaltarlo en los últimos años, todo un reto para el cuadro germano.",
       "percentages": {
         "quinielista": {
-          "1": 78,
+          "1": 76,
           "2": 6,
-          "X": 16
+          "X": 18
         },
-        "lae": null,
+        "lae": {
+          "1": 70,
+          "2": 13,
+          "X": 17
+        },
         "real": {
-          "1": 69,
-          "2": 12,
+          "1": 68,
+          "2": 13,
           "X": 19
         }
       },
@@ -40,11 +44,15 @@
       "comment": "Ganar empieza a ser una obligación para Feyenoord y Oporto. Un triunfo y tres derrotas dibujan el mismo panorama para dos aspirantes que, a estas alturas, estarían eliminados. El choque exige sumar para evitar que las tres jornadas finales se conviertan en una carrera al límite; incluso un empate permitiría mantener el pulso. De Kuip ha visto las dos caras del cuadro neerlandés: primero celebró un ajustado 3-2 frente al sorprendente Como y después asistió al golpe del Inter, que regresó a Milán con un contundente 0-3. Los portugueses, por su parte, llegan tras estrenar su casillero con el 4-1 al Nápoles, un respiro después de tres tropiezos que les habían dejado sin puntos.",
       "percentages": {
         "quinielista": {
-          "1": 32,
-          "2": 42,
-          "X": 26
+          "1": 29,
+          "2": 43,
+          "X": 28
         },
-        "lae": null,
+        "lae": {
+          "1": 32,
+          "2": 37,
+          "X": 31
+        },
         "real": {
           "1": 34,
           "2": 40,
@@ -63,11 +71,15 @@
       "comment": "Solo el intratable PSG ha conseguido frenar al Manchester City en esta Champions. Aquel 2-4 es la única mancha de un recorrido firme: los ingleses han ganado todos sus demás compromisos, suman nueve puntos y ocupan plaza entre los ocho mejores. El Etihad ofrece ahora otra ocasión para afianzar el billete directo a octavos y ahorrarse el peaje de la repesca. Delante aparece un Nápoles que vive una realidad mucho más amarga. Los de Massimiliano Allegri apenas han celebrado un triunfo y han perdido el resto de sus citas. Sus dos salidas dejaron heridas profundas, con un 3-1 en Villarreal y un 4-1 frente al Oporto. Mejorar lejos de casa resulta vital para que los italianos puedan levantar el vuelo.",
       "percentages": {
         "quinielista": {
-          "1": 84,
-          "2": 7,
-          "X": 9
+          "1": 89,
+          "2": 4,
+          "X": 7
         },
-        "lae": null,
+        "lae": {
+          "1": 73,
+          "2": 12,
+          "X": 15
+        },
         "real": {
           "1": 75,
           "2": 10,
@@ -86,11 +98,15 @@
       "comment": "Roma cambió el paso del Real Madrid. Ese 3-1 convertido en 3-4 lanzó a los blancos, que comparten el mando con el PSG tras ganar todos sus partidos. La mejor diferencia de goles mantiene a los parisinos en lo más alto e impide que el liderato tenga dueño español. El Bernabéu recibe el martes a un PSV que ofrece pocos argumentos para creer en la campanada. Los neerlandeses estrenaron su casillero de triunfos en su última salida, en Oporto. Con cuatro puntos, figuran en un atasco de seis equipos y ocupan la última posición que da acceso a la repesca al término de la fase de Liga. Los de Peter Bosz reciben un tanto por encuentro, mientras que su producción ofensiva se reduce a tres goles.",
       "percentages": {
         "quinielista": {
-          "1": 94,
-          "2": 3,
-          "X": 3
+          "1": 95,
+          "2": 1,
+          "X": 4
         },
-        "lae": null,
+        "lae": {
+          "1": 77,
+          "2": 11,
+          "X": 12
+        },
         "real": {
           "1": 81,
           "2": 8,
@@ -109,14 +125,18 @@
       "comment": "Bratislava ofrece al Betis una ocasión ideal para acelerar hacia los octavos. Los verdiblancos suman nueve puntos, los mismos que otros ocho aspirantes a entrar entre los ocho primeros y ahorrarse la repesca. Al margen del balance goleador, tan solo PSG, Real Madrid y Arsenal han cosechado más. Ahora toca visitar al Slovan, farolillo rojo y víctima propicia sobre el papel: ha perdido todos sus encuentros, apenas ha anotado un tanto y ha recibido diecisiete. A Yaya Touré, antiguo jugador del Barça, se le está haciendo cuesta arriba el torneo con su equipo. La diferencia de nivel favorece claramente a los béticos, pero exige refrendo en el campo. Regresar sin los tres puntos supondría un batacazo.",
       "percentages": {
         "quinielista": {
+          "1": 6,
+          "2": 82,
+          "X": 12
+        },
+        "lae": {
+          "1": 18,
+          "2": 61,
+          "X": 21
+        },
+        "real": {
           "1": 8,
           "2": 77,
-          "X": 15
-        },
-        "lae": null,
-        "real": {
-          "1": 9,
-          "2": 76,
           "X": 15
         }
       },
@@ -136,7 +156,11 @@
           "2": 97,
           "X": 2
         },
-        "lae": null,
+        "lae": {
+          "1": 16,
+          "2": 73,
+          "X": 11
+        },
         "real": {
           "1": 3,
           "2": 81,
@@ -156,10 +180,14 @@
       "percentages": {
         "quinielista": {
           "1": 21,
-          "2": 55,
-          "X": 24
+          "2": 54,
+          "X": 25
         },
-        "lae": null,
+        "lae": {
+          "1": 26,
+          "2": 48,
+          "X": 26
+        },
         "real": {
           "1": 31,
           "2": 44,
@@ -178,14 +206,18 @@
       "comment": "Con la Champions convertida en su mejor escaparate, el Brujas, segundo en la liga belga, quiere prolongar su buena racha continental. Los belgas buscan su cuarto triunfo seguido en Europa tras imponerse al Inter (3-4), al Lens (3-0) y al PSV (1-2). Hasta ahora solo han probado el sabor de la derrota una vez: 2-3 frente al Aston Villa. Se medirá a un Liverpool en plena progresión en la Premier, que el domingo removió la herida del Manchester United con un 4-0 y que presenta el mismo casillero de nueve puntos en la competición europea. Los Reds se despidieron de la última jornada con un revés ante el Fenerbahce (3-2), después de un tramo de tres victorias consecutivas: 2-1 al Atlético, 3-0 al LASK y 4-3 al Villarreal.",
       "percentages": {
         "quinielista": {
-          "1": 29,
-          "2": 52,
-          "X": 19
+          "1": 23,
+          "2": 55,
+          "X": 22
         },
-        "lae": null,
+        "lae": {
+          "1": 27,
+          "2": 50,
+          "X": 23
+        },
         "real": {
-          "1": 22,
-          "2": 57,
+          "1": 21,
+          "2": 58,
           "X": 21
         }
       },
@@ -202,13 +234,17 @@
       "percentages": {
         "quinielista": {
           "1": 78,
-          "2": 6,
-          "X": 16
+          "2": 7,
+          "X": 15
         },
-        "lae": null,
+        "lae": {
+          "1": 69,
+          "2": 13,
+          "X": 18
+        },
         "real": {
-          "1": 67,
-          "2": 16,
+          "1": 68,
+          "2": 15,
           "X": 17
         }
       },
@@ -224,11 +260,15 @@
       "comment": "Con la tercera Champions consecutiva en el punto de mira, el PSG avanza firme en el torneo: eso es lo que dejan ver sus cuatro primeras jornadas. Los de Luis Enrique encabezan la tabla con el pleno de doce puntos, fruto de cuatro triunfos de enorme solvencia: 6-1 frente al Slovan de Bratislava, 2-4 sobre el Manchester City, 4-2 ante el Barça y 0-6 contra el Villarreal. Quien intentará frenarlo es una Roma de resultados cambiantes, con un botín de solo cuatro puntos. Los romanistas igualaron a uno en el campo del Fenerbahce, cedieron en su estadio ante el Real Madrid (3-4), reaccionaron con un 4-2 al Slovan de Bratislava y volvieron a caer en Old Trafford frente al Manchester United (3-2).",
       "percentages": {
         "quinielista": {
-          "1": 89,
-          "2": 3,
-          "X": 8
+          "1": 92,
+          "2": 2,
+          "X": 6
         },
-        "lae": null,
+        "lae": {
+          "1": 75,
+          "2": 11,
+          "X": 14
+        },
         "real": {
           "1": 72,
           "2": 12,
@@ -247,11 +287,15 @@
       "comment": "Separados por un punto, en la mitad baja de la tabla, pero manteniendo el objetivo de acceder a la fase de represa. Así se ven las caras en la quinta jornada el Shakhtar, un equipo que compite, y el Fenerbahce, un plantel con nombres que sigue mostrándose irregular. En el estreno fue capaz de ganar al Liverpool, pero en su única salida fue goleada en su visita al Aston Villa. Aquí visita un campo neutral donde el conjunto ucraniano ha ganado al AEK griego y ha perdido por la mínima, sin merecerlo, contra el Sporting portugués. El bloque es más local y las individualidades, más del lado visitante. Por tanto, si se puede, conviene cubrirse.",
       "percentages": {
         "quinielista": {
-          "1": 35,
-          "2": 31,
-          "X": 34
+          "1": 34,
+          "2": 35,
+          "X": 31
         },
-        "lae": null,
+        "lae": {
+          "1": 36,
+          "2": 32,
+          "X": 32
+        },
         "real": {
           "1": 36,
           "2": 37,
@@ -270,11 +314,15 @@
       "comment": "El Sporting es de esos equipos bajo el radar de los aspirantes, pero con tres victorias en cuatro jornadas se ha colocado con puntuación de top-8. Sin embargo, su única derrota fue aquí en casa ante un rival teóricamente inferior como el LASK. Una sorpresa que evidencia las dificultades de la Champions que el United ya ha vivido en sus propias carnes. Especialmente a domicilio, cayendo con claridad en sus dos salidas. Eso y la mala temporada en Premier (arrancaba el fin de semana en descenso) han llevado un cambio en el banquillo. Y ha llegado Pochettino, con la misión de coger aire y ser un bloque competitivo.",
       "percentages": {
         "quinielista": {
-          "1": 40,
-          "2": 33,
+          "1": 43,
+          "2": 31,
+          "X": 26
+        },
+        "lae": {
+          "1": 42,
+          "2": 31,
           "X": 27
         },
-        "lae": null,
         "real": {
           "1": 38,
           "2": 36,
@@ -293,15 +341,19 @@
       "comment": "El Celta vuelve a cita continental tras caer en el tramo final en el Bernabéu en duelo liguero. En Europa League, no obstante, debe recuperar terreno después de perder tres de sus cuatro encuentros, incluidos los dos en casa (ante Juventus y Union belga). Dos derrotas que demuestran la falta de efectividad arriba y la falta de contundencia en defensa. Un equilibrio que deberá encontrar contra un Bournemouth que es uno de los tres líderes invictos, un cuadro inglés con mucho físico, capaz de enormes esfuerzos y sin bajar ritmo a pesar de las rotaciones. Como ya demostró en el debut, cuando ya ganó en feudo de la Real Sociedad.",
       "percentages": {
         "quinielista": {
-          "1": 29,
-          "2": 52,
-          "X": 19
+          "1": 26,
+          "2": 50,
+          "X": 24
         },
-        "lae": null,
+        "lae": {
+          "1": 36,
+          "2": 42,
+          "X": 22
+        },
         "real": {
           "1": 25,
-          "2": 48,
-          "X": 27
+          "2": 49,
+          "X": 26
         }
       },
       "recommended": "12"
@@ -317,10 +369,14 @@
       "percentages": {
         "quinielista": {
           "1": 44,
-          "2": 29,
-          "X": 27
+          "2": 32,
+          "X": 24
         },
-        "lae": null,
+        "lae": {
+          "1": 45,
+          "2": 27,
+          "X": 28
+        },
         "real": {
           "1": 46,
           "2": 29,
@@ -339,15 +395,19 @@
       "comment": "El Atlético de Madrid cayó en su última aparición en Champions aquí contra el Bayern (0-2), aunque compitió bien, pero estuvo lejos de mostrar el potencial ofensivo que atesora. Sí se vio ante el United (2-0) en el otro partido en el Metropolitano, con su única portería a cero en cuatro jornadas. El Viking es un rival teóricamente inferior, pero viaja con los mismos puntos (4) y poca presión. Eso sí, en sus dos salidas cayó en encuentros con alternativas, goles de ambos y marcadores generosos (los dos 3-1, en visitas al Stuttgart y Aston Villa). En casa también fue así, evidenciando un conjunto valiente que presupone un duelo abierto.",
       "percentages": {
         "quinielista": {
-          "1": 0,
-          "2": 20,
-          "X": 8
+          "1": 1,
+          "2": 24,
+          "X": 6
         },
-        "lae": null,
+        "lae": {
+          "1": 5,
+          "2": 34,
+          "X": 18
+        },
         "real": {
           "1": 2,
-          "2": 17,
-          "X": 9
+          "2": 16,
+          "X": 8
         }
       },
       "recommended": "M-1"
