@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-24T03:34:27.038Z",
+  "updatedAt": "2026-11-24T05:44:10.027Z",
   "available": false,
   "matchCountWithTarget": 0,
   "isMidweek": true,
@@ -352,8 +352,8 @@
         },
         "real": {
           "1": 25,
-          "2": 49,
-          "X": 26
+          "2": 48,
+          "X": 27
         }
       },
       "recommended": "12"
@@ -369,8 +369,8 @@
       "percentages": {
         "quinielista": {
           "1": 43,
-          "2": 30,
-          "X": 27
+          "2": 31,
+          "X": 26
         },
         "lae": {
           "1": 45,
