@@ -20,7 +20,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-init.js"></script>
     <script src="js/db-service.js"></script>
-    <script src="js/utils.js?v=20261105c"></script>
+    <script src="js/utils.js?v=20261125b"></script>
     <script src="js/scoring.js"></script>
     <script src="js/data_loader.js"></script>
     <script src="js/sellado-service.js"></script>
@@ -2539,10 +2539,21 @@ function procesarConsultaRespuesta(ticketId, jornada, isTest) {
                 '22X212211'
             ],
 
-            async cargarDatosMundoDeportivo() {
-                if (this.mdAnalysisData) return this.mdAnalysisData;
+            async cargarDatosMundoDeportivo(force = false) {
+                if (!force && this.mdAnalysisData && this.mdAnalysisData.available === true) return this.mdAnalysisData;
                 try {
-                    const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?v=${Date.now()}`);
+                    if (window.AppUtils && typeof window.AppUtils.fetchMDAnalysis === 'function') {
+                        const data = await window.AppUtils.fetchMDAnalysis({
+                            forceLive: Boolean(force),
+                            jornadas: this.jornadaObj ? [this.jornadaObj] : []
+                        });
+                        if (data) {
+                            this.mdAnalysisData = data;
+                            this.log(`[Mundo Deportivo] Datos y probabilidades cargados (Jornada ${data.detectedJornadaNum || '--'}).`);
+                            return this.mdAnalysisData;
+                        }
+                    }
+                    const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?v=${Date.now()}`, { cache: 'no-store' });
                     if (res.ok) {
                         this.mdAnalysisData = await res.json();
                         this.log('[Mundo Deportivo] Datos y probabilidades cargados correctamente.');

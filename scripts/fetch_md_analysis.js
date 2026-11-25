@@ -83,24 +83,17 @@ async function scrapeMDAnalysis() {
     const jNumMatch = html.match(/<h2 class="title-ticket blue">\s*Jornada\s*<span class="js-num-jornada">(\d+)<\/span>/i);
     const jNum = jNumMatch ? jNumMatch[1] : null;
 
-    // Detección precisa de cierre de La Quiniela (evitar capturar el cierre de El Quinigol o La Primitiva)
+    // Detección precisa de cierre de La Quiniela dentro de su propio <header> (evitar capturar El Quinigol o La Primitiva)
     let jClose = null;
-    const quinielaCloseMatch = html.match(/LA QUINIELA[\s\S]*?Horario de CIERRE[\s\S]*?<p class="[^"]*">([\s\S]*?)<\/p>/i);
-    if (quinielaCloseMatch) {
-        const rawP = quinielaCloseMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        const mPart = rawP.match(/([a-záéíóú]+\s+\d+\s*\([^)]+\))/i);
-        jClose = mPart ? mPart[1] : rawP;
+    const quinielaHeader = html.match(/<header[^>]*>\s*<h2>\s*<span>\s*LA QUINIELA\s*<\/span>[\s\S]*?<\/header>/i);
+    if (quinielaHeader) {
+        const cleanHdr = quinielaHeader[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        const mDay = cleanHdr.match(/((?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+\d+\s*\([^)]+\))/i);
+        if (mDay) jClose = mDay[1].trim();
     }
     if (!jClose) {
-        const altClose = html.match(/Horario de CIERRE\s*<br>\s*de La Quiniela[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
-        if (altClose) jClose = altClose[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    }
-    if (!jClose) {
-        // Fallback genérico solo si no contiene El Quinigol
-        const genericMatch = html.match(/Horario CIERRE\s*>\s*([^<]+)/i);
-        if (genericMatch && !/quinigol/i.test(html.slice(Math.max(0, genericMatch.index - 100), genericMatch.index))) {
-            jClose = genericMatch[1].trim();
-        }
+        const altClose = html.match(/Horario de CIERRE[\s\S]{0,120}?de La Quiniela[\s\S]{0,600}?((?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+\d+\s*\([^)]+\))/i);
+        if (altClose) jClose = altClose[1].replace(/\s+/g, ' ').trim();
     }
 
     const articleRegex = /<article class="comment-block js-comment-block[^"]*">([\s\S]*?)<\/article>/gi;
@@ -113,6 +106,7 @@ async function scrapeMDAnalysis() {
         const titleMatch = block.match(/<h2 class="title-comment">([\s\S]*?)<\/h2>/i);
         const headerNumMatch = block.match(/data-comment="(\d+)"/i);
         const num = headerNumMatch ? parseInt(headerNumMatch[1], 10) : (analysisList.length + 1);
+        if (num < 1 || num > 15) continue;
 
         let homeTeam = '';
         let awayTeam = '';
@@ -121,18 +115,21 @@ async function scrapeMDAnalysis() {
 
         if (titleMatch) {
             const rawTitle = titleMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-            // Formato típico: "1. RAYO (13º) - ATH.CLUB (14º)"
+            // Formato típico: "1. RAYO (13º) - ATH.CLUB (14º)" o "1. BETIS (4 º ) - RAYO (16 º )"
             const parts = rawTitle.split('-');
             if (parts.length >= 2) {
                 homeTeam = parts[0].replace(/^\d+[\.\s]*/, '').replace(/\(.*?\)/g, '').trim();
-                awayTeam = parts[1].replace(/\(.*?\)/g, '').trim();
+                awayTeam = parts.slice(1).join('-').replace(/\(.*?\)/g, '').trim();
 
-                const hRankMatch = parts[0].match(/\((\d+)º?\)/);
+                const hRankMatch = parts[0].match(/\((\d+)\s*º?\s*\)/);
                 if (hRankMatch) homeRank = hRankMatch[1] + 'º';
-                const aRankMatch = parts[1].match(/\((\d+)º?\)/);
+                const aRankMatch = parts.slice(1).join('-').match(/\((\d+)\s*º?\s*\)/);
                 if (aRankMatch) awayRank = aRankMatch[1] + 'º';
             }
         }
+
+        // Descartar bloques promocionales finales sin equipos
+        if (!homeTeam || !awayTeam) continue;
 
         const dateMatch = block.match(/<p class="date">([^<]+)<\/p>/i);
         const dateStr = dateMatch ? dateMatch[1].trim() : '';

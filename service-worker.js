@@ -60,7 +60,7 @@ try {
     console.warn('[service-worker.js] Aviso cargando Firebase Messaging en SW:', e);
 }
 
-const CACHE_NAME = 'maulas-pwa-v2.58';
+const CACHE_NAME = 'maulas-pwa-v2.59';
 
 // Recursos críticos para precachear (App Shell completo)
 const CORE_ASSETS = [
@@ -198,8 +198,15 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Forzar siempre búsqueda en red para scripts clave
-    if (url.pathname.includes('utils.js') || url.pathname.includes('telegram-service.js')) {
+    // Forzar siempre búsqueda en red para scripts clave y datos dinámicos auxiliares
+    if (
+        url.pathname.includes('utils.js') ||
+        url.pathname.includes('telegram-service.js') ||
+        url.pathname.includes('jornadas_2.js') ||
+        url.pathname.includes('pronosticos.js') ||
+        url.pathname.includes('quiniela-service.js') ||
+        url.pathname.includes('datos_auxiliares/')
+    ) {
         event.respondWith(
             fetch(req, { cache: 'reload' })
                 .then(networkResp => {

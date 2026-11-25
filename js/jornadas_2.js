@@ -2032,17 +2032,26 @@ class Jornadas2AppController {
             if (btn) btn.disabled = true;
             if (spinner) spinner.classList.remove('hidden');
             if (icon) icon.classList.add('hidden');
-            if (text) text.textContent = 'Sincronizando...';
-            if (statusBox) statusBox.textContent = 'Consultando última versión sincronizada...';
+            if (text) text.textContent = 'Importando en directo...';
+            if (statusBox) statusBox.textContent = 'Conectando en directo con Mundo Deportivo y Eduardo Losilla...';
             sessionStorage.removeItem('maulas_md_analysis');
+            sessionStorage.removeItem('maulas_md_live_attempted');
         }
 
         try {
-            const url = `datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status} al leer analisis_mundodeportivo.json`);
-
-            const data = await res.json();
+            let data = null;
+            if (window.AppUtils && typeof window.AppUtils.fetchMDAnalysis === 'function') {
+                data = await window.AppUtils.fetchMDAnalysis({
+                    forceLive: Boolean(force),
+                    jornadas: Array.isArray(this.jornadas) ? this.jornadas : []
+                });
+            }
+            if (!data) {
+                const url = `datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`;
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status} al leer analisis_mundodeportivo.json`);
+                data = await res.json();
+            }
             try {
                 sessionStorage.setItem('maulas_md_analysis', JSON.stringify(data));
             } catch (e) {}

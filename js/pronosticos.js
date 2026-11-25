@@ -3935,16 +3935,29 @@ class PronosticoManager {
 
     async loadMDAnalysisData(force = false) {
         try {
+            if (window.AppUtils && typeof window.AppUtils.fetchMDAnalysis === 'function') {
+                const data = await window.AppUtils.fetchMDAnalysis({
+                    forceLive: Boolean(force),
+                    jornadas: Array.isArray(this.jornadas) ? this.jornadas : []
+                });
+                if (data) {
+                    this.mdAnalysisData = data;
+                    return;
+                }
+            }
             if (!force) {
                 const cached = sessionStorage.getItem('maulas_md_analysis');
                 if (cached) {
                     try {
-                        this.mdAnalysisData = JSON.parse(cached);
-                        return;
+                        const parsed = JSON.parse(cached);
+                        if (parsed && parsed.available === true && parsed.isMidweek !== true) {
+                            this.mdAnalysisData = parsed;
+                            return;
+                        }
                     } catch(e) {}
                 }
             }
-            const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`);
+            const res = await fetch(`datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`, { cache: 'no-store' });
             if (res.ok) {
                 this.mdAnalysisData = await res.json();
                 try {

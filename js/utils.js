@@ -723,6 +723,413 @@ var AppUtils = (typeof window !== 'undefined' ? window.AppUtils : null) || {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-50%) translateY(12px)';
         }, 3200);
+    },
+
+    // =========================================================================
+    // MOTOR EN VIVO Y SINCRONIZACIÓN MULTICAPA DE ANÁLISIS MUNDO DEPORTIVO
+    // =========================================================================
+
+    areMDTeamsSimilar(teamA, teamB) {
+        if (!teamA || !teamB) return false;
+        const clean = s => String(s).toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/\(f\)/gi, '')
+            .replace(/[^a-z0-9]/g, '');
+        const a = clean(teamA);
+        const b = clean(teamB);
+        if (!a || !b) return false;
+        if (a === b || a.includes(b) || b.includes(a)) return true;
+
+        const aliases = [
+            ['atletico', 'atmadrid', 'atm'],
+            ['realmadrid', 'rmadrid', 'madrid'],
+            ['barcelona', 'barca', 'fcb'],
+            ['athletic', 'athclub', 'athbilbao', 'bilbao'],
+            ['realsociedad', 'rsociedad', 'laerealsociedad'],
+            ['rayovallecano', 'rayo'],
+            ['celta', 'celtadevigo'],
+            ['espanyol', 'rcdespanyol'],
+            ['valladolid', 'realvalladolid'],
+            ['zaragoza', 'realzaragoza'],
+            ['racing', 'racingsantander'],
+            ['sporting', 'sportinggijon'],
+            ['deportivo', 'depor', 'deportivolacoruna'],
+            ['castellon', 'cdcastellon'],
+            ['albacete', 'albacitebp'],
+            ['cadiz', 'cadizcf'],
+            ['cordoba', 'cordobacf'],
+            ['granada', 'granadacf'],
+            ['almeria', 'udalmeria'],
+            ['huesca', 'sdhuesca'],
+            ['burgos', 'burgoscf'],
+            ['eibar', 'sdeibar'],
+            ['mirandes', 'cdmirandes'],
+            ['ferrol', 'racingferrol'],
+            ['levante', 'udlevante'],
+            ['elche', 'elchecf'],
+            ['malaga', 'malagacf'],
+            ['eldense', 'cdeldense'],
+            ['cartagena', 'fccartagena'],
+            ['tenerife', 'cdtenerife'],
+            ['ceuta', 'adceuta'],
+            ['andorra', 'andorrafc']
+        ];
+        for (const group of aliases) {
+            if (group.some(al => a.includes(al)) && group.some(al => b.includes(al))) return true;
+        }
+        return false;
+    },
+
+    parseMDAnalysisHTML(html) {
+        if (!html || typeof html !== 'string') return null;
+
+        const jNumMatch = html.match(/<h2 class="title-ticket blue">\s*Jornada\s*<span class="js-num-jornada">(\d+)<\/span>/i);
+        const jNum = jNumMatch ? jNumMatch[1] : null;
+
+        // Extraer horario de cierre específico de La Quiniela dentro de su propio <header> (evitando El Quinigol y La Primitiva)
+        let jClose = null;
+        const quinielaHeader = html.match(/<header[^>]*>\s*<h2>\s*<span>\s*LA QUINIELA\s*<\/span>[\s\S]*?<\/header>/i);
+        if (quinielaHeader) {
+            const cleanHdr = quinielaHeader[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            const mDay = cleanHdr.match(/((?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+\d+\s*\([^)]+\))/i);
+            if (mDay) jClose = mDay[1].trim();
+        }
+        if (!jClose) {
+            const altClose = html.match(/Horario de CIERRE[\s\S]{0,120}?de La Quiniela[\s\S]{0,600}?((?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+\d+\s*\([^)]+\))/i);
+            if (altClose) jClose = altClose[1].replace(/\s+/g, ' ').trim();
+        }
+
+        const articleRegex = /<article class="comment-block js-comment-block[^"]*">([\s\S]*?)<\/article>/gi;
+        let matchArt;
+        const analysisList = [];
+        const seenNums = new Set();
+
+        while ((matchArt = articleRegex.exec(html)) !== null) {
+            const block = matchArt[1];
+            const titleMatch = block.match(/<h2 class="title-comment">([\s\S]*?)<\/h2>/i);
+            const headerNumMatch = block.match(/data-comment="(\d+)"/i);
+            const num = headerNumMatch ? parseInt(headerNumMatch[1], 10) : (analysisList.length + 1);
+            if (num < 1 || num > 15 || seenNums.has(num)) continue;
+
+            let homeTeam = '';
+            let awayTeam = '';
+            let homeRank = '';
+            let awayRank = '';
+
+            if (titleMatch) {
+                const rawTitle = titleMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+                const parts = rawTitle.split('-');
+                if (parts.length >= 2) {
+                    homeTeam = parts[0].replace(/^\d+[\.\s]*/, '').replace(/\(.*?\)/g, '').trim();
+                    awayTeam = parts.slice(1).join('-').replace(/\(.*?\)/g, '').trim();
+
+                    const hRankMatch = parts[0].match(/\((\d+)\s*º?\s*\)/);
+                    if (hRankMatch) homeRank = hRankMatch[1] + 'º';
+                    const aRankMatch = parts.slice(1).join('-').match(/\((\d+)\s*º?\s*\)/);
+                    if (aRankMatch) awayRank = aRankMatch[1] + 'º';
+                }
+            }
+
+            // Descartar bloques promocionales vacíos sin equipos
+            if (!homeTeam || !awayTeam) continue;
+            seenNums.add(num);
+
+            const dateMatch = block.match(/<p class="date">([^<]+)<\/p>/i);
+            const dateStr = dateMatch ? dateMatch[1].trim() : '';
+
+            const commentMatch = block.match(/<p class="comment-element">([\s\S]*?)<\/p>/i);
+            const comment = commentMatch ? commentMatch[1].replace(/<[^>]+>/g, ' ').trim().replace(/\s+/g, ' ') : '';
+
+            const qMatch = block.match(/% en quinielista<\/th>\s*<td>(\d+)<\/td>\s*<td>(\d+)<\/td>\s*<td>(\d+)<\/td>/i);
+            const lMatch = block.match(/% en lae<\/th>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>/i);
+            const rMatch = block.match(/probabilidad real<\/th>\s*<td>(\d+)<\/td>\s*<td>(\d+)<\/td>\s*<td>(\d+)<\/td>/i);
+
+            let recommended = '';
+            if (num === 15) {
+                const p15RecMatches = block.match(/<td class="bg-blue[^"]*">([012M])<\/td>/gi) || [];
+                if (p15RecMatches.length >= 2) {
+                    const hRec = p15RecMatches[0].replace(/<[^>]+>/g, '').trim();
+                    const aRec = p15RecMatches[1].replace(/<[^>]+>/g, '').trim();
+                    recommended = `${hRec}-${aRec}`;
+                }
+            } else {
+                const recRowMatch = block.match(/recomendado<\/th>([\s\S]*?)<\/tr>/i);
+                if (recRowMatch) {
+                    const cells = recRowMatch[1].match(/<td class="bg-blue[^"]*">([^<]*)<\/td>/gi) || [];
+                    cells.forEach(c => {
+                        const val = c.replace(/<[^>]+>/g, '').trim();
+                        if (val) recommended += val;
+                    });
+                }
+                if (!recommended && num < 15) {
+                    const pReal = rMatch ? { '1': parseInt(rMatch[1], 10), 'X': parseInt(rMatch[2], 10), '2': parseInt(rMatch[3], 10) } : null;
+                    const pQuin = qMatch ? { '1': parseInt(qMatch[1], 10), 'X': parseInt(qMatch[2], 10), '2': parseInt(qMatch[3], 10) } : null;
+                    const p = pReal || pQuin;
+                    if (p) {
+                        const maxVal = Math.max(p['1'] || 0, p['X'] || 0, p['2'] || 0);
+                        if (maxVal > 0) {
+                            if (p['1'] === maxVal) recommended = '1';
+                            else if (p['2'] === maxVal) recommended = '2';
+                            else if (p['X'] === maxVal) recommended = 'X';
+                        }
+                    }
+                }
+            }
+
+            analysisList.push({
+                num,
+                home: homeTeam,
+                away: awayTeam,
+                homeRank,
+                awayRank,
+                schedule: dateStr,
+                comment,
+                percentages: {
+                    quinielista: qMatch ? { '1': parseInt(qMatch[1], 10), 'X': parseInt(qMatch[2], 10), '2': parseInt(qMatch[3], 10) } : null,
+                    lae: (lMatch && lMatch[1] && lMatch[1].trim() !== '-' && !isNaN(parseInt(lMatch[1], 10)))
+                        ? { '1': parseInt(lMatch[1], 10), 'X': parseInt(lMatch[2], 10), '2': parseInt(lMatch[3], 10) }
+                        : null,
+                    real: rMatch ? { '1': parseInt(rMatch[1], 10), 'X': parseInt(rMatch[2], 10), '2': parseInt(rMatch[3], 10) } : null
+                },
+                recommended: recommended || null
+            });
+        }
+
+        if (!jNum || analysisList.length < 14) return null;
+        return {
+            detectedJornadaNum: String(jNum),
+            closingSchedule: jClose,
+            matches: analysisList.sort((a, b) => a.num - b.num)
+        };
+    },
+
+    async enrichMDWithLosillaAPI(mdData) {
+        if (!mdData || !mdData.detectedJornadaNum || !Array.isArray(mdData.matches)) return mdData;
+        const jNum = mdData.detectedJornadaNum;
+        try {
+            const [resP, resA] = await Promise.allSettled([
+                fetch(`https://api.eduardolosilla.es/v1/xml2/porcentajes?jornada=${jNum}`),
+                fetch(`https://api.eduardolosilla.es/v1/xml2/analisis?jornada=${jNum}`)
+            ]);
+            if (resP.status === 'fulfilled' && resP.value.ok) {
+                const xmlP = await resP.value.text();
+                for (const m of xmlP.matchAll(/<partido\s+num="(\d+)"[^>]*porc_1="([^"]+)"\s+porc_X="([^"]+)"\s+porc_2="([^"]+)"/gi)) {
+                    const num = parseInt(m[1], 10);
+                    const target = mdData.matches.find(x => x.num === num);
+                    if (target && (!target.percentages || !target.percentages.quinielista)) {
+                        target.percentages = target.percentages || {};
+                        target.percentages.quinielista = {
+                            '1': Math.round(parseFloat(m[2]) || 0),
+                            'X': Math.round(parseFloat(m[3]) || 0),
+                            '2': Math.round(parseFloat(m[4]) || 0)
+                        };
+                    }
+                }
+            }
+            if (resA.status === 'fulfilled' && resA.value.ok) {
+                const xmlA = await resA.value.text();
+                for (const m of xmlA.matchAll(/<partido\s+num="(\d+)"\s+uno="(\d+)"\s+equis="(\d+)"\s+dos="(\d+)"/gi)) {
+                    const num = parseInt(m[1], 10);
+                    const target = mdData.matches.find(x => x.num === num);
+                    if (target && (!target.percentages || !target.percentages.real)) {
+                        target.percentages = target.percentages || {};
+                        target.percentages.real = {
+                            '1': parseInt(m[2], 10) || 0,
+                            'X': parseInt(m[3], 10) || 0,
+                            '2': parseInt(m[4], 10) || 0
+                        };
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('[AppUtils] Enriquecimiento opcional Losilla omitido:', e.message);
+        }
+        return mdData;
+    },
+
+    buildValidatedMDAnalysisPayload(mdData, candidateJornadas = [], standings = null) {
+        if (!mdData || !Array.isArray(mdData.matches) || mdData.matches.length < 14) return null;
+
+        let weekendMatchCount = 0;
+        let midweekMatchCount = 0;
+        mdData.matches.forEach(m => {
+            if (/s[aá]bado|domingo/i.test(m.schedule || '')) weekendMatchCount++;
+            if (/martes|mi[eé]rcoles|jueves/i.test(m.schedule || '')) midweekMatchCount++;
+        });
+
+        const isMidweek = (weekendMatchCount === 0 && midweekMatchCount > 0) ||
+            (Boolean(mdData.closingSchedule && /martes|mi[eé]rcoles|jueves/i.test(mdData.closingSchedule)) && weekendMatchCount === 0);
+
+        let matchCount = 0;
+        if (Array.isArray(candidateJornadas) && candidateJornadas.length > 0) {
+            for (const tJornada of candidateJornadas) {
+                if (!tJornada || !Array.isArray(tJornada.matches)) continue;
+                let currentMatched = 0;
+                tJornada.matches.forEach(tMatch => {
+                    const found = mdData.matches.some(m =>
+                        (this.areMDTeamsSimilar(m.home, tMatch.home) && this.areMDTeamsSimilar(m.away, tMatch.away)) ||
+                        (this.areMDTeamsSimilar(m.home, tMatch.away) && this.areMDTeamsSimilar(m.away, tMatch.home))
+                    );
+                    if (found) currentMatched++;
+                });
+                if (currentMatched > matchCount) matchCount = currentMatched;
+                if (currentMatched >= 8) break;
+            }
+        }
+
+        const hasPrimera = this.hasPrimeraTeams(mdData.matches, 5);
+        if (matchCount < 8 && !isMidweek && hasPrimera) {
+            matchCount = mdData.matches.length;
+        }
+
+        const isAvailable = !isMidweek && (matchCount >= 8 || hasPrimera);
+
+        return {
+            updatedAt: new Date().toISOString(),
+            available: isAvailable,
+            matchCountWithTarget: matchCount,
+            isMidweek,
+            detectedJornadaNum: String(mdData.detectedJornadaNum),
+            closingSchedule: mdData.closingSchedule || null,
+            reason: isAvailable
+                ? 'Análisis disponible y verificado en directo desde Mundo Deportivo.'
+                : (isMidweek
+                    ? 'Los análisis publicados en Mundo Deportivo corresponden a una jornada entre semana (Champions/Copa) y no a la jornada oficial de la Peña Maulas.'
+                    : 'Los análisis de la próxima jornada aún no han sido publicados por Mundo Deportivo.'),
+            matches: mdData.matches,
+            standings: standings || { primera: [], segunda: [] }
+        };
+    },
+
+    async scrapeMDLiveFromBrowser(candidateJornadas = [], existingStandings = null) {
+        const mdUrl = 'https://www.mundodeportivo.com/servicios/quiniela';
+        const attempts = [
+            {
+                url: `https://r.jina.ai/${mdUrl}`,
+                headers: { 'X-Return-Format': 'html', 'X-No-Cache': 'true' }
+            },
+            {
+                url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(mdUrl)}`,
+                headers: {}
+            }
+        ];
+
+        for (const attempt of attempts) {
+            try {
+                const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                const timer = ctrl ? setTimeout(() => ctrl.abort(), 14000) : null;
+                const res = await fetch(attempt.url, {
+                    headers: attempt.headers,
+                    signal: ctrl ? ctrl.signal : undefined,
+                    cache: 'no-store'
+                });
+                if (timer) clearTimeout(timer);
+                if (!res.ok) continue;
+
+                const html = await res.text();
+                const parsed = this.parseMDAnalysisHTML(html);
+                if (parsed && parsed.matches && parsed.matches.length >= 14) {
+                    await this.enrichMDWithLosillaAPI(parsed);
+                    const payload = this.buildValidatedMDAnalysisPayload(parsed, candidateJornadas, existingStandings);
+                    if (payload) {
+                        // Persistir en Firestore (config/md_analysis) para que todos los socios y dispositivos reciban la versión fresca
+                        if (typeof window !== 'undefined' && window.db && typeof window.db.collection === 'function') {
+                            try {
+                                await window.db.collection('config').doc('md_analysis').set(payload);
+                            } catch (eDb) {
+                                console.warn('[AppUtils] No se pudo persistir md_analysis en Firestore:', eDb.message);
+                            }
+                        }
+                        return payload;
+                    }
+                }
+            } catch (e) {
+                console.warn('[AppUtils] Intento de raspado en vivo fallido:', attempt.url, e.message);
+            }
+        }
+        return null;
+    },
+
+    async fetchMDAnalysis({ forceLive = false, jornadas = [] } = {}) {
+        const scoreData = (d) => {
+            if (!d || !Array.isArray(d.matches) || d.matches.length === 0) return -1;
+            const jNum = parseInt(d.detectedJornadaNum, 10) || 0;
+            const availBonus = (d.available === true && d.isMidweek !== true) ? 100000 : 0;
+            const ts = d.updatedAt ? (new Date(d.updatedAt).getTime() / 1e12) : 0;
+            return availBonus + (jNum * 100) + ts;
+        };
+
+        const fetchJsonWithTimeout = async (url, ms = 4000) => {
+            const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            const timer = ctrl ? setTimeout(() => ctrl.abort(), ms) : null;
+            try {
+                const res = await fetch(url, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined });
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) {
+                return null;
+            } finally {
+                if (timer) clearTimeout(timer);
+            }
+        };
+
+        const fetchFirestoreMD = async () => {
+            if (typeof window === 'undefined' || !window.db || typeof window.db.collection !== 'function') return null;
+            try {
+                const snap = await window.db.collection('config').doc('md_analysis').get();
+                return snap && snap.exists ? snap.data() : null;
+            } catch (e) {
+                return null;
+            }
+        };
+
+        const rawGithubUrl = `https://raw.githubusercontent.com/Maula-Web/maula-web.github.io/main/datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`;
+        const localUrl = `datos_auxiliares/analisis_mundodeportivo.json?t=${Date.now()}`;
+
+        // 1. Consultar fuentes sincronizadas (Firestore + GitHub Raw directo de rama main + archivo local)
+        const [cloudData, rawRepoData, localData] = await Promise.all([
+            fetchFirestoreMD(),
+            fetchJsonWithTimeout(rawGithubUrl, 4500),
+            fetchJsonWithTimeout(localUrl, 3500)
+        ]);
+
+        const candidates = [cloudData, rawRepoData, localData].filter(Boolean);
+        candidates.sort((a, b) => scoreData(b) - scoreData(a));
+        let best = candidates[0] || null;
+
+        const fallbackStandings = (best && best.standings && Array.isArray(best.standings.primera) && best.standings.primera.length > 0)
+            ? best.standings
+            : (candidates.find(c => c.standings && Array.isArray(c.standings.primera) && c.standings.primera.length > 0)?.standings || { primera: [], segunda: [] });
+
+        // 2. Si el usuario pulsó explícitamente "Actualizar / Sincronizar Ahora" (forceLive === true),
+        //    o si ninguna fuente almacenada tiene aún la jornada de fin de semana disponible, raspar Mundo Deportivo en directo
+        let shouldScrapeLive = forceLive;
+        if (!shouldScrapeLive && (!best || best.available !== true || best.isMidweek === true)) {
+            if (typeof sessionStorage === 'undefined' || !sessionStorage.getItem('maulas_md_live_attempted')) {
+                shouldScrapeLive = true;
+                try { sessionStorage.setItem('maulas_md_live_attempted', '1'); } catch (e) {}
+            }
+        }
+
+        if (shouldScrapeLive) {
+            const liveData = await this.scrapeMDLiveFromBrowser(jornadas, fallbackStandings);
+            if (liveData && (forceLive || scoreData(liveData) >= scoreData(best))) {
+                best = liveData;
+            } else if (best && typeof window !== 'undefined' && window.db && typeof window.db.collection === 'function') {
+                // Si el raspado en vivo no superó a rawRepoData pero Firestore estaba atrasado, actualizar Firestore
+                if (!cloudData || scoreData(best) > scoreData(cloudData)) {
+                    try { await window.db.collection('config').doc('md_analysis').set(best); } catch (e) {}
+                }
+            }
+        }
+
+        if (best && typeof sessionStorage !== 'undefined') {
+            try {
+                sessionStorage.setItem('maulas_md_analysis', JSON.stringify(best));
+            } catch (e) {}
+        }
+
+        return best;
     }
 };
 

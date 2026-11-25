@@ -1830,8 +1830,11 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
   - **Resolución Dinámica de Próximas Jornadas (`scripts/fetch_md_analysis.js`, `js/quiniela-service.js`)**:
     * Si la caché local no cuenta con jornadas futuras vigentes, el bot consulta automáticamente a Eduardo Losilla en vivo para regenerar la lista de próximas jornadas dominicales válidas (incluyendo J.25 y J.27).
     * Incorporada la Jornada 25 en `QuinielaService.BUILTIN_UPCOMING_JORNADAS`.
-  - **Sincronización Inmediata al Pulsar el Botón (`js/jornadas_2.js`)**:
-    * La función `refreshMDAnalysis(force = true)` limpia la caché de sesión y consulta el archivo con parámetro de timestamp anti-caché (`?t=...`), permitiendo al usuario verificar al instante en el modal los 15/15 partidos, el cierre del sábado y los pronósticos recomendados de la Jornada 25.
+  - **Sincronización Multicapa y Raspado en Vivo al Pulsar el Botón (`js/utils.js`, `js/jornadas_2.js`, `js/pronosticos.js`, `sandbox_sellado.html`)**:
+    * Se implementó en `AppUtils` el motor universal `fetchMDAnalysis({ forceLive, jornadas })` y `scrapeMDLiveFromBrowser()`:
+      1. **Raspado en Vivo desde el Navegador (`forceLive = true`)**: Al pulsar *"Actualizar / Sincronizar Ahora"* (`btn-sync-md-data`), el navegador raspa directamente en tiempo real el HTML actual de Mundo Deportivo vía pasarela CORS (`r.jina.ai` con `X-Return-Format: html`), enriquece porcentajes desde la API oficial de Eduardo Losilla (`api.eduardolosilla.es`), descarta bloques promocionales vacíos (filtrando estrictamente `P1..P15`), extrae los puestos clasificatorios (`homeRank`/`awayRank`) y persiste el resultado inmediatamente en **Firestore (`config/md_analysis`)** para que todos los socios y dispositivos lo reciban al instante.
+      2. **Resiliencia ante Caídas de GitHub Pages**: En la carga normal (`forceLive = false`), consulta en paralelo Firestore (`config/md_analysis`), el repositorio directo de GitHub (`raw.githubusercontent.com/.../main/...`, inmune a retrasos o errores HTTP 500 de despliegue en GitHub Pages) y el archivo local `datos_auxiliares/analisis_mundodeportivo.json`, eligiendo siempre la jornada dominical válida más reciente.
+      3. **Service Worker (`service-worker.js` v2.59) y Automatización (`update_data.yml`)**: Se configuró estrategia *Network-First* para `datos_auxiliares/` y scripts principales, y se incorporó `node scripts/fetch_md_analysis.js` al flujo periódico de lunes a jueves en `.github/workflows/update_data.yml`.
 
 ---
 
