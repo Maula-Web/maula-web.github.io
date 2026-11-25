@@ -1,302 +1,5 @@
 [
   {
-    "number": 16,
-    "dateStr": "25/10/2026",
-    "season": "2026-2027",
-    "isSunday": true,
-    "source": "Eduardo Losilla Oficial",
-    "matches": [
-      {
-        "position": 1,
-        "home": "RAYO",
-        "away": "ELCHE",
-        "result": ""
-      },
-      {
-        "position": 2,
-        "home": "VALENCIA",
-        "away": "VILLARREAL",
-        "result": ""
-      },
-      {
-        "position": 3,
-        "home": "AT.MADRID",
-        "away": "DEPORTIVO",
-        "result": ""
-      },
-      {
-        "position": 4,
-        "home": "ATH.CLUB",
-        "away": "GETAFE",
-        "result": ""
-      },
-      {
-        "position": 5,
-        "home": "CELTA",
-        "away": "BETIS",
-        "result": ""
-      },
-      {
-        "position": 6,
-        "home": "R.SOCIEDAD",
-        "away": "LEVANTE",
-        "result": ""
-      },
-      {
-        "position": 7,
-        "home": "SEVILLA",
-        "away": "OSASUNA",
-        "result": ""
-      },
-      {
-        "position": 8,
-        "home": "LEGANÉS",
-        "away": "MALLORCA",
-        "result": ""
-      },
-      {
-        "position": 9,
-        "home": "ALMERÍA",
-        "away": "R.OVIEDO",
-        "result": ""
-      },
-      {
-        "position": 10,
-        "home": "SABADELL",
-        "away": "TENERIFE",
-        "result": ""
-      },
-      {
-        "position": 11,
-        "home": "LOGROÑO (f)",
-        "away": "BADALONA W. (f)",
-        "result": ""
-      },
-      {
-        "position": 12,
-        "home": "DEPORTIVO (f)",
-        "away": "ALAVÉS (f)",
-        "result": ""
-      },
-      {
-        "position": 13,
-        "home": "EIBAR (f)",
-        "away": "MADRID CFF (f)",
-        "result": ""
-      },
-      {
-        "position": 14,
-        "home": "Real Madrid (f)",
-        "away": "TENERIFE (f)",
-        "result": ""
-      },
-      {
-        "position": 15,
-        "home": "Barcelona",
-        "away": "Real Madrid",
-        "result": ""
-      }
-    ]
-  },
-  {
-    "number": 18,
-    "dateStr": "01/11/2026",
-    "season": "2026-2027",
-    "isSunday": true,
-    "source": "Eduardo Losilla Oficial",
-    "matches": [
-      {
-        "position": 1,
-        "home": "LEVANTE",
-        "away": "AT.MADRID",
-        "result": ""
-      },
-      {
-        "position": 2,
-        "home": "RAYO",
-        "away": "CELTA",
-        "result": ""
-      },
-      {
-        "position": 3,
-        "home": "BETIS",
-        "away": "MÁLAGA",
-        "result": ""
-      },
-      {
-        "position": 4,
-        "home": "Barcelona",
-        "away": "ALAVÉS",
-        "result": ""
-      },
-      {
-        "position": 5,
-        "home": "GETAFE",
-        "away": "SEVILLA",
-        "result": ""
-      },
-      {
-        "position": 6,
-        "home": "RACING S.",
-        "away": "Real Madrid",
-        "result": ""
-      },
-      {
-        "position": 7,
-        "home": "ELCHE",
-        "away": "VALENCIA",
-        "result": ""
-      },
-      {
-        "position": 8,
-        "home": "EIBAR",
-        "away": "ALMERÍA",
-        "result": ""
-      },
-      {
-        "position": 9,
-        "home": "ELDENSE",
-        "away": "GRANADA",
-        "result": ""
-      },
-      {
-        "position": 10,
-        "home": "BURGOS",
-        "away": "CASTELLÓN",
-        "result": ""
-      },
-      {
-        "position": 11,
-        "home": "ALAVÉS (f)",
-        "away": "R.SOCIEDAD (f)",
-        "result": ""
-      },
-      {
-        "position": 12,
-        "home": "MADRID CFF (f)",
-        "away": "DEPORTIVO (f)",
-        "result": ""
-      },
-      {
-        "position": 13,
-        "home": "SEVILLA (f)",
-        "away": "Real Madrid (f)",
-        "result": ""
-      },
-      {
-        "position": 14,
-        "home": "TENERIFE (f)",
-        "away": "ATH.CLUB (f)",
-        "result": ""
-      },
-      {
-        "position": 15,
-        "home": "ATH.CLUB",
-        "away": "R.SOCIEDAD",
-        "result": ""
-      }
-    ]
-  },
-  {
-    "number": 20,
-    "dateStr": "08/11/2026",
-    "season": "2026-2027",
-    "isSunday": true,
-    "source": "Eduardo Losilla Oficial",
-    "matches": [
-      {
-        "position": 1,
-        "home": "MÁLAGA",
-        "away": "RACING S.",
-        "result": ""
-      },
-      {
-        "position": 2,
-        "home": "OSASUNA",
-        "away": "ATH.CLUB",
-        "result": ""
-      },
-      {
-        "position": 3,
-        "home": "VALENCIA",
-        "away": "Real Madrid",
-        "result": ""
-      },
-      {
-        "position": 4,
-        "home": "ELCHE",
-        "away": "BETIS",
-        "result": ""
-      },
-      {
-        "position": 5,
-        "home": "R.SOCIEDAD",
-        "away": "RAYO",
-        "result": ""
-      },
-      {
-        "position": 6,
-        "home": "CELTA",
-        "away": "LEVANTE",
-        "result": ""
-      },
-      {
-        "position": 7,
-        "home": "VILLARREAL",
-        "away": "GETAFE",
-        "result": ""
-      },
-      {
-        "position": 8,
-        "home": "CÁDIZ",
-        "away": "R.OVIEDO",
-        "result": ""
-      },
-      {
-        "position": 9,
-        "home": "GIRONA",
-        "away": "ALMERÍA",
-        "result": ""
-      },
-      {
-        "position": 10,
-        "home": "SPORTING",
-        "away": "VALLADOLID",
-        "result": ""
-      },
-      {
-        "position": 11,
-        "home": "ATH.CLUB (f)",
-        "away": "Real Madrid (f)",
-        "result": ""
-      },
-      {
-        "position": 12,
-        "home": "LOGROÑO (f)",
-        "away": "SEVILLA (f)",
-        "result": ""
-      },
-      {
-        "position": 13,
-        "home": "EIBAR (f)",
-        "away": "R.SOCIEDAD (f)",
-        "result": ""
-      },
-      {
-        "position": 14,
-        "home": "TENERIFE (f)",
-        "away": "ALAVÉS (f)",
-        "result": ""
-      },
-      {
-        "position": 15,
-        "home": "AT.MADRID",
-        "away": "Barcelona",
-        "result": ""
-      }
-    ]
-  },
-  {
     "number": 23,
     "dateStr": "22/11/2026",
     "season": "2026-2027",
@@ -305,92 +8,290 @@
     "matches": [
       {
         "position": 1,
-        "home": "ALAVÉS",
-        "away": "DEPORTIVO",
+        "home": "Alavés",
+        "away": "Deportivo",
         "result": ""
       },
       {
         "position": 2,
-        "home": "RAYO",
-        "away": "VALENCIA",
+        "home": "Rayo Vallecano",
+        "away": "Valencia",
         "result": ""
       },
       {
         "position": 3,
         "home": "Real Madrid",
-        "away": "CELTA",
+        "away": "Celta",
         "result": ""
       },
       {
         "position": 4,
         "home": "Barcelona",
-        "away": "VILLARREAL",
+        "away": "Villarreal",
         "result": ""
       },
       {
         "position": 5,
-        "home": "RACING S.",
-        "away": "R.SOCIEDAD",
+        "home": "Racing Santander",
+        "away": "Real Sociedad",
         "result": ""
       },
       {
         "position": 6,
-        "home": "OSASUNA",
-        "away": "MÁLAGA",
+        "home": "Osasuna",
+        "away": "Málaga",
         "result": ""
       },
       {
         "position": 7,
-        "home": "GETAFE",
-        "away": "AT.MADRID",
+        "home": "Getafe",
+        "away": "Atlético de Madrid",
         "result": ""
       },
       {
         "position": 8,
-        "home": "TENERIFE",
-        "away": "MALLORCA",
+        "home": "Tenerife",
+        "away": "Mallorca",
         "result": ""
       },
       {
         "position": 9,
-        "home": "SPORTING",
-        "away": "LAS PALMAS",
+        "home": "Sporting de Gijón",
+        "away": "Las Palmas",
         "result": ""
       },
       {
         "position": 10,
-        "home": "GIRONA",
-        "away": "EIBAR",
+        "home": "Girona",
+        "away": "Eibar",
         "result": ""
       },
       {
         "position": 11,
-        "home": "EIBAR (f)",
-        "away": "AT.MADRID (f)",
+        "home": "Eibar (f)",
+        "away": "Atlético de Madrid (f)",
         "result": ""
       },
       {
         "position": 12,
-        "home": "GRANADA (f)",
+        "home": "Granada (f)",
         "away": "Real Madrid (f)",
         "result": ""
       },
       {
         "position": 13,
-        "home": "R.SOCIEDAD (f)",
-        "away": "SEVILLA (f)",
+        "home": "Real Sociedad (f)",
+        "away": "Sevilla (f)",
         "result": ""
       },
       {
         "position": 14,
-        "home": "TENERIFE (f)",
-        "away": "MADRID CFF (f)",
+        "home": "Tenerife (f)",
+        "away": "Madrid CFF (f)",
         "result": ""
       },
       {
         "position": 15,
-        "home": "SEVILLA",
-        "away": "BETIS",
+        "home": "Sevilla",
+        "away": "Betis",
+        "result": ""
+      }
+    ]
+  },
+  {
+    "number": 25,
+    "dateStr": "29/11/2026",
+    "season": "2026-2027",
+    "isSunday": true,
+    "source": "Eduardo Losilla Oficial",
+    "matches": [
+      {
+        "position": 1,
+        "home": "Betis",
+        "away": "Rayo Vallecano",
+        "result": ""
+      },
+      {
+        "position": 2,
+        "home": "Málaga",
+        "away": "Athletic Club",
+        "result": ""
+      },
+      {
+        "position": 3,
+        "home": "Elche",
+        "away": "Atlético de Madrid",
+        "result": ""
+      },
+      {
+        "position": 4,
+        "home": "Real Madrid",
+        "away": "Alavés",
+        "result": ""
+      },
+      {
+        "position": 5,
+        "home": "Valencia",
+        "away": "Osasuna",
+        "result": ""
+      },
+      {
+        "position": 6,
+        "home": "Deportivo",
+        "away": "Barcelona",
+        "result": ""
+      },
+      {
+        "position": 7,
+        "home": "Celta",
+        "away": "Villarreal",
+        "result": ""
+      },
+      {
+        "position": 8,
+        "home": "Real Sociedad",
+        "away": "Sevilla",
+        "result": ""
+      },
+      {
+        "position": 9,
+        "home": "Las Palmas",
+        "away": "Andorra Fc",
+        "result": ""
+      },
+      {
+        "position": 10,
+        "home": "Albacete",
+        "away": "Tenerife",
+        "result": ""
+      },
+      {
+        "position": 11,
+        "home": "Eibar",
+        "away": "Burgos",
+        "result": ""
+      },
+      {
+        "position": 12,
+        "home": "Granada",
+        "away": "Ceuta",
+        "result": ""
+      },
+      {
+        "position": 13,
+        "home": "Mallorca",
+        "away": "Castellón",
+        "result": ""
+      },
+      {
+        "position": 14,
+        "home": "Almería",
+        "away": "Sporting de Gijón",
+        "result": ""
+      },
+      {
+        "position": 15,
+        "home": "Espanyol",
+        "away": "Getafe",
+        "result": ""
+      }
+    ]
+  },
+  {
+    "number": 27,
+    "dateStr": "27/12/2026",
+    "season": "2026-2027",
+    "isSunday": true,
+    "source": "Eduardo Losilla Oficial",
+    "matches": [
+      {
+        "position": 1,
+        "home": "Racing Santander",
+        "away": "Deportivo",
+        "result": ""
+      },
+      {
+        "position": 2,
+        "home": "Rayo Vallecano",
+        "away": "Levante",
+        "result": ""
+      },
+      {
+        "position": 3,
+        "home": "Villarreal",
+        "away": "Real Sociedad",
+        "result": ""
+      },
+      {
+        "position": 4,
+        "home": "Barcelona",
+        "away": "Celta",
+        "result": ""
+      },
+      {
+        "position": 5,
+        "home": "Osasuna",
+        "away": "Elche",
+        "result": ""
+      },
+      {
+        "position": 6,
+        "home": "Athletic Club",
+        "away": "Real Madrid",
+        "result": ""
+      },
+      {
+        "position": 7,
+        "home": "Getafe",
+        "away": "Valencia",
+        "result": ""
+      },
+      {
+        "position": 8,
+        "home": "Atlético de Madrid",
+        "away": "Betis",
+        "result": ""
+      },
+      {
+        "position": 9,
+        "home": "Burgos",
+        "away": "Cádiz",
+        "result": ""
+      },
+      {
+        "position": 10,
+        "home": "Castellón",
+        "away": "Almería",
+        "result": ""
+      },
+      {
+        "position": 11,
+        "home": "Ceuta",
+        "away": "Albacete",
+        "result": ""
+      },
+      {
+        "position": 12,
+        "home": "Córdoba",
+        "away": "Las Palmas",
+        "result": ""
+      },
+      {
+        "position": 13,
+        "home": "Sabadell",
+        "away": "Eibar",
+        "result": ""
+      },
+      {
+        "position": 14,
+        "home": "Sporting de Gijón",
+        "away": "Granada",
+        "result": ""
+      },
+      {
+        "position": 15,
+        "home": "Sevilla",
+        "away": "Málaga",
         "result": ""
       }
     ]

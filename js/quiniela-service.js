@@ -495,6 +495,30 @@ class QuinielaService {
 
 QuinielaService.BUILTIN_UPCOMING_JORNADAS = [
     {
+        number: 25,
+        dateStr: "29/11/2026",
+        season: "2026-2027",
+        isSunday: true,
+        source: "Eduardo Losilla Oficial",
+        matches: [
+            { position: 1, home: "Betis", away: "Rayo Vallecano", result: "" },
+            { position: 2, home: "Málaga", away: "Athletic Club", result: "" },
+            { position: 3, home: "Elche", away: "Atlético de Madrid", result: "" },
+            { position: 4, home: "Real Madrid", away: "Alavés", result: "" },
+            { position: 5, home: "Valencia", away: "Osasuna", result: "" },
+            { position: 6, home: "Deportivo", away: "Barcelona", result: "" },
+            { position: 7, home: "Celta", away: "Villarreal", result: "" },
+            { position: 8, home: "Real Sociedad", away: "Sevilla", result: "" },
+            { position: 9, home: "Las Palmas", away: "Andorra", result: "" },
+            { position: 10, home: "Albacete", away: "Tenerife", result: "" },
+            { position: 11, home: "Eibar", away: "Burgos", result: "" },
+            { position: 12, home: "Granada", away: "Ceuta", result: "" },
+            { position: 13, home: "Mallorca", away: "Castellón", result: "" },
+            { position: 14, home: "Almería", away: "Sporting de Gijón", result: "" },
+            { position: 15, home: "Espanyol", away: "Getafe", result: "" }
+        ]
+    },
+    {
         number: 23,
         dateStr: "22/11/2026",
         season: "2026-2027",

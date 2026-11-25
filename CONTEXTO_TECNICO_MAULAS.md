@@ -1815,6 +1815,26 @@ Se eliminaron los umbrales variables y se homogeneizó en toda la plataforma la 
 
 ---
 
+## 71. RESOLUCIÓN DE HORARIO DE CIERRE Y DETECCIÓN DE JORNADAS EN SCRAPER DE MUNDO DEPORTIVO (JORNADA 25)
+- **Regla de Negocio**:
+  - Los análisis tácticos, porcentajes 1X2 y recomendaciones de partidos extraídos de Mundo Deportivo deben corresponder estrictamente a la jornada oficial de fin de semana (LaLiga EA Sports) de la Peña Maulas.
+  - El sistema no debe confundir los horarios de cierre de otros juegos (como El Quinigol o La Primitiva) con los de La Quiniela.
+  - Cuando el usuario acceda al modal o pulse el botón de sincronización/importación de datos de Mundo Deportivo en la web, el sistema debe refrescar la información inmediatamente mostrando los 15 partidos coincidentes y las recomendaciones actualizadas.
+- **Causa Raíz Diagnosticada**:
+  1. En `scripts/fetch_md_analysis.js`, la expresión regular `/Horario CIERRE\s*>\s*([^<]+)/i` capturaba el cierre de la sección de **El Quinigol** (`Martes 01 (01:00)`) en lugar del cierre de **La Quiniela** (`Sábado 28 (12:30)-DNP1X2 / (13:00)-Particulares`). Al encontrar la palabra "Martes", marcaba erróneamente `isMidweek: true` y `available: false`, bloqueando la visualización de la Jornada 25.
+  2. El catálogo local `datos_auxiliares/proximas_jornadas_cache.json` contenía jornadas hasta la J.23 (22/11/2026), ya vencidas en la fecha actual (25/11/2026). Al no encontrar jornadas futuras en la caché local, el validador no encontraba la Jornada 25 (29/11/2026) y reportaba 0/15 partidos coincidentes.
+- **Implementación y Correcciones Técnicas**:
+  - **Ajuste del Selector de Cierre (`scripts/fetch_md_analysis.js`)**:
+    * Se implementó un selector específico para la cabecera de La Quiniela (`LA QUINIELA COMBINACIONES DESTACADAS`), aislando su horario de cierre oficial (`Sábado 28 12:30/13:00`) y descartando secciones de otros sorteos.
+    * Se incorporó una comprobación defensiva analizando los días de juego de los 15 partidos analizados: si los partidos se juegan en sábado y domingo, se garantiza que `isMidweek` sea `false`.
+  - **Resolución Dinámica de Próximas Jornadas (`scripts/fetch_md_analysis.js`, `js/quiniela-service.js`)**:
+    * Si la caché local no cuenta con jornadas futuras vigentes, el bot consulta automáticamente a Eduardo Losilla en vivo para regenerar la lista de próximas jornadas dominicales válidas (incluyendo J.25 y J.27).
+    * Incorporada la Jornada 25 en `QuinielaService.BUILTIN_UPCOMING_JORNADAS`.
+  - **Sincronización Inmediata al Pulsar el Botón (`js/jornadas_2.js`)**:
+    * La función `refreshMDAnalysis(force = true)` limpia la caché de sesión y consulta el archivo con parámetro de timestamp anti-caché (`?t=...`), permitiendo al usuario verificar al instante en el modal los 15/15 partidos, el cierre del sábado y los pronósticos recomendados de la Jornada 25.
+
+---
+
 ## Recomendación de Flujo para la IA
 
 Cuando le pidas a una IA que retome el proyecto, la mejor instrucción es:

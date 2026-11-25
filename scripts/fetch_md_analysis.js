@@ -79,11 +79,29 @@ async function scrapeMDAnalysis() {
 
     const html = await res.text();
 
-    // Detección de jornada y cierre
+    // Detección de jornada y cierre específico de La Quiniela
     const jNumMatch = html.match(/<h2 class="title-ticket blue">\s*Jornada\s*<span class="js-num-jornada">(\d+)<\/span>/i);
-    const jCloseMatch = html.match(/Horario CIERRE\s*>\s*([^<]+)/i);
     const jNum = jNumMatch ? jNumMatch[1] : null;
-    const jClose = jCloseMatch ? jCloseMatch[1].trim() : null;
+
+    // Detección precisa de cierre de La Quiniela (evitar capturar el cierre de El Quinigol o La Primitiva)
+    let jClose = null;
+    const quinielaCloseMatch = html.match(/LA QUINIELA[\s\S]*?Horario de CIERRE[\s\S]*?<p class="[^"]*">([\s\S]*?)<\/p>/i);
+    if (quinielaCloseMatch) {
+        const rawP = quinielaCloseMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        const mPart = rawP.match(/([a-záéíóú]+\s+\d+\s*\([^)]+\))/i);
+        jClose = mPart ? mPart[1] : rawP;
+    }
+    if (!jClose) {
+        const altClose = html.match(/Horario de CIERRE\s*<br>\s*de La Quiniela[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
+        if (altClose) jClose = altClose[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+    if (!jClose) {
+        // Fallback genérico solo si no contiene El Quinigol
+        const genericMatch = html.match(/Horario CIERRE\s*>\s*([^<]+)/i);
+        if (genericMatch && !/quinigol/i.test(html.slice(Math.max(0, genericMatch.index - 100), genericMatch.index))) {
+            jClose = genericMatch[1].trim();
+        }
+    }
 
     const articleRegex = /<article class="comment-block js-comment-block[^"]*">([\s\S]*?)<\/article>/gi;
     let matchArt;
@@ -239,20 +257,38 @@ async function main() {
         }
     }
 
-    if (targetJornadas.length === 0) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const hasFuture = targetJornadas.some(j => {
+        if (!j || !j.isSunday || !j.dateStr) return false;
+        const parts = j.dateStr.split('/');
+        if (parts.length !== 3) return false;
+        const jDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        return jDate.getTime() >= (today.getTime() - 24 * 3600 * 1000);
+    });
+
+    if (!hasFuture || targetJornadas.length === 0) {
         try {
             const { QuinielaService } = require('../js/quiniela-service');
-            if (QuinielaService && Array.isArray(QuinielaService.BUILTIN_UPCOMING_JORNADAS)) {
+            if (QuinielaService && typeof QuinielaService.fetchUpcomingFromEduardoLosilla === 'function') {
+                console.log('🔄 [MD Bot] La caché local no contiene jornadas futuras vigentes. Consultando Eduardo Losilla...');
+                const liveUpcoming = await QuinielaService.fetchUpcomingFromEduardoLosilla([23, 24, 25, 26, 27]);
+                if (Array.isArray(liveUpcoming) && liveUpcoming.length > 0) {
+                    targetJornadas = liveUpcoming;
+                    fs.writeFileSync(cacheJornadasPath, JSON.stringify(liveUpcoming, null, 2), 'utf8');
+                    console.log(`✅ [MD Bot] Calendario de próximas jornadas actualizado con ${liveUpcoming.length} jornadas válidas.`);
+                }
+            }
+            if (targetJornadas.length === 0 && QuinielaService && Array.isArray(QuinielaService.BUILTIN_UPCOMING_JORNADAS)) {
                 targetJornadas = QuinielaService.BUILTIN_UPCOMING_JORNADAS;
             }
         } catch (e) {
-            console.warn('⚠️ Error al cargar QuinielaService.BUILTIN_UPCOMING_JORNADAS:', e.message);
+            console.warn('⚠️ Error al cargar próximas jornadas actualizadas:', e.message);
         }
     }
 
     // Identificar próxima jornada oficial de fin de semana (domingo)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
     const nextSundayJornada = targetJornadas.find(j => {
         if (!j || !j.isSunday || !j.dateStr) return false;
         const parts = j.dateStr.split('/');
@@ -323,8 +359,19 @@ async function main() {
     }
 
     // 3. Verificación de Jornada Próxima de la Peña Maulas (usando targetJornadas ya cargado)
-    // Comprobar si el cierre es entre semana (Martes / Miércoles / Jueves)
-    const isMidweek = mdData && mdData.closingSchedule && /martes|mi[eé]rcoles|jueves/i.test(mdData.closingSchedule);
+    // Comprobar si la jornada es entre semana (Martes / Miércoles / Jueves)
+    // Evaluando tanto el cierre oficial como los horarios de los partidos analizados
+    let weekendMatchCount = 0;
+    let midweekMatchCount = 0;
+    if (mdData && Array.isArray(mdData.matches)) {
+        mdData.matches.forEach(m => {
+            if (/s[aá]bado|domingo/i.test(m.schedule || '')) weekendMatchCount++;
+            if (/martes|mi[eé]rcoles|jueves/i.test(m.schedule || '')) midweekMatchCount++;
+        });
+    }
+
+    const isMidweek = (weekendMatchCount === 0 && midweekMatchCount > 0) ||
+                      (mdData && mdData.closingSchedule && /martes|mi[eé]rcoles|jueves/i.test(mdData.closingSchedule) && weekendMatchCount === 0);
 
     let isAvailableForTarget = false;
     let matchCount = 0;
