@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-25T16:27:30.226Z",
+  "updatedAt": "2026-11-26T13:20:07.680Z",
   "available": true,
   "matchCountWithTarget": 15,
   "isMidweek": false,
@@ -17,11 +17,15 @@
       "comment": "La Cartuja pone a prueba a un Rayo que empieza a ser candidato al descenso. El Valencia se llevó los puntos de Vallecas en su último compromiso liguero y los franjirrojos apenas han celebrado una victoria en sus seis últimos partidos. Fuera de casa, su balance se reduce a dos empates y ninguna victoria. El Betis afronta la cita desde la cuarta plaza, con el billete para la próxima Champions a su alcance pese al golpe del derbi. A los de Pellegrini se les escapó la victoria en el descuento del Sánchez Pizjuán, pero el regreso a su estadio les ofrece otra ocasión para pasar página y volver a ganar ante su afición. Hasta ahora, solo el Barça ha conseguido asaltar el feudo verdiblanco.",
       "percentages": {
         "quinielista": {
-          "1": 75,
-          "2": 8,
-          "X": 17
+          "1": 79,
+          "2": 6,
+          "X": 15
         },
-        "lae": null,
+        "lae": {
+          "1": 77,
+          "2": 8,
+          "X": 15
+        },
         "real": {
           "1": 60,
           "2": 18,
@@ -40,14 +44,18 @@
       "comment": "Trece jornadas y ni una alegría para el Málaga. La Rosaleda espera el primer triunfo de un colista que solo ha rescatado cinco empates y ya ha encajado ocho derrotas. La distancia hasta la permanencia empieza a pesar, si bien los blanquiazules aún tienen margen para enderezar el rumbo. La ocasión llega ante un Athletic que tampoco atraviesa su mejor momento. Los rojiblancos tropezaron con el Espanyol en San Mamés y llevan dos choques sin ganar. Aun con un partido pendiente, los ´leones´ tienen los puestos continentales a tres puntos. Los andaluces quieren aprovechar las dudas de su rival para sumar de tres por primera vez y dar el primer paso hacia una complicada salvación.",
       "percentages": {
         "quinielista": {
-          "1": 22,
-          "2": 54,
-          "X": 24
+          "1": 19,
+          "2": 56,
+          "X": 25
         },
-        "lae": null,
+        "lae": {
+          "1": 18,
+          "2": 57,
+          "X": 25
+        },
         "real": {
-          "1": 21,
-          "2": 54,
+          "1": 20,
+          "2": 55,
           "X": 25
         }
       },
@@ -63,15 +71,19 @@
       "comment": "Ocho victorias en nueve partidos avalan al Atlético de Madrid antes de visitar el Martínez Valero. Solo el líder frenó a los de Simeone y lo hizo en el Metropolitano. Cinco puntos separan a ambos antes del pulso del próximo miércoles en el Camp Nou, pero los rojiblancos tienen la obligación de sacar adelante la cita de Elche. Los franjiverdes dejaron escapar el triunfo al filo del final en el Ciutat de València y el empate los mantiene en el descenso. Su balance en casa tampoco invita al optimismo. Apenas han sumado un punto ante su afición. A los ´colchoneros´, en cambio, les sienta bien jugar lejos de casa. Han ganado seis de sus siete encuentros ligueros a domicilio en esta liga.",
       "percentages": {
         "quinielista": {
-          "1": 3,
-          "2": 84,
+          "1": 4,
+          "2": 82,
+          "X": 14
+        },
+        "lae": {
+          "1": 10,
+          "2": 77,
           "X": 13
         },
-        "lae": null,
         "real": {
           "1": 15,
-          "2": 64,
-          "X": 21
+          "2": 65,
+          "X": 20
         }
       },
       "recommended": "2"
@@ -87,14 +99,18 @@
       "percentages": {
         "quinielista": {
           "1": 95,
-          "2": 2,
-          "X": 3
+          "2": 1,
+          "X": 4
         },
-        "lae": null,
+        "lae": {
+          "1": 89,
+          "2": 5,
+          "X": 6
+        },
         "real": {
-          "1": 83,
-          "2": 6,
-          "X": 11
+          "1": 85,
+          "2": 5,
+          "X": 10
         }
       },
       "recommended": "1"
@@ -109,14 +125,18 @@
       "comment": "Mestalla aún espera su primera alegría con Javier Aguirre. Athletic Club, Villarreal y Real Madrid pasaron por allí sin que ganara el conjunto local. La segunda victoria con el técnico mexicano llegó en Vallecas y sirvió para sacar al Valencia de la zona de descenso. Ahora le toca a Osasuna visitar todo un estadio histórico al que le quedan unos meses de vida. Los ´rojillos´ respiran algo más tranquilos tras imponerse por la mínima al Málaga la pasada jornada. La vuelta de Jagoba Arrasate ha dado aire al cuadro navarro, que suma dos victorias, un empate y una derrota a sus órdenes. A los navarros, con su nuevo técnico, también les queda una asignatura pendiente: todavía les falta ganar a domicilio.",
       "percentages": {
         "quinielista": {
-          "1": 54,
-          "2": 13,
-          "X": 33
+          "1": 52,
+          "2": 14,
+          "X": 34
         },
-        "lae": null,
+        "lae": {
+          "1": 51,
+          "2": 17,
+          "X": 32
+        },
         "real": {
-          "1": 43,
-          "2": 28,
+          "1": 44,
+          "2": 27,
           "X": 29
         }
       },
@@ -133,14 +153,18 @@
       "percentages": {
         "quinielista": {
           "1": 2,
-          "2": 91,
-          "X": 7
+          "2": 92,
+          "X": 6
         },
-        "lae": null,
+        "lae": {
+          "1": 10,
+          "2": 81,
+          "X": 9
+        },
         "real": {
           "1": 10,
-          "2": 75,
-          "X": 15
+          "2": 76,
+          "X": 14
         }
       },
       "recommended": "2"
@@ -155,11 +179,15 @@
       "comment": "Dos equipos con ganas de escalar posiciones en LaLiga se citan en esta jornada, y ninguno quiere pinchar. El Celta, decimocuarto, acumula cuatro jornadas sin saborear el triunfo, con dos derrotas y dos empates, y su colchón sobre el descenso se reduce a un solo punto, de modo que no admite despistes. Quien le visita es un Villarreal décimo que apenas le saca dos puntos. Los groguets rozaron el premio el domingo pasado en el Spotify Camp Nou, donde se pusieron por delante con un 0-2 y acabaron cediendo por 3-2 ante el Barça. Fuera de La Cerámica, su hoja de servicios muestra dos victorias, dos empates y tres derrotas.Para ambos la semana habrá incluido una cita europea.",
       "percentages": {
         "quinielista": {
-          "1": 33,
-          "2": 36,
-          "X": 31
+          "1": 30,
+          "2": 37,
+          "X": 33
         },
-        "lae": null,
+        "lae": {
+          "1": 30,
+          "2": 37,
+          "X": 33
+        },
         "real": {
           "1": 35,
           "2": 38,
@@ -178,15 +206,19 @@
       "comment": "Tres triunfos consecutivos en Anoeta invitan a la Real Sociedad a soñar con un cuarto. Los donostiarras, quintos, ven la zona Champions a cinco puntos, y llegan al choque tras un doble tropiezo lejos de casa, el último en Santander (3-2). Les espera un Sevilla que pisa sus talones, con tres puntos menos en su casillero. Los de Luis García Plaza han repartido puntos en sus dos últimas comparecencias ligueras, ambas ante su afición: 0-0 frente al Alavés y 1-1 ante el Sevilla. Fuera del Pizjuán, los hispalenses arrastran dos derrotas seguidas, 4-1 contra el Real Madrid y 3-1 ante el Getafe.",
       "percentages": {
         "quinielista": {
-          "1": 56,
-          "2": 12,
-          "X": 32
+          "1": 51,
+          "2": 19,
+          "X": 30
         },
-        "lae": null,
+        "lae": {
+          "1": 52,
+          "2": 18,
+          "X": 30
+        },
         "real": {
-          "1": 44,
+          "1": 45,
           "2": 29,
-          "X": 27
+          "X": 26
         }
       },
       "recommended": "1X"
@@ -201,15 +233,19 @@
       "comment": "Los puestos de play-off están a un solo punto de la UD Las Palmas, y el equipo insular no piensa perderlos de vista. Su último movimiento fue un 0-2 al Sporting en El Molinón, segunda salida consecutiva tras el 1-0 que había encajado en Granada. Ahora, de vuelta en su isla, aspira a enlazar su tercer triunfo seguido como local. Se le presenta un Andorra que no logra arrancar: es penúltimo y solo ha sumado un punto de los últimos quince. Los del Principado se desplazarán hasta Gran Canaria tras dos derrotas consecutivas, 2-1 ante el Almería y 1-3 frente al Leganés.",
       "percentages": {
         "quinielista": {
-          "1": 78,
-          "2": 8,
-          "X": 14
+          "1": 75,
+          "2": 9,
+          "X": 16
         },
-        "lae": null,
+        "lae": {
+          "1": 76,
+          "2": 9,
+          "X": 15
+        },
         "real": {
-          "1": 45,
-          "2": 28,
-          "X": 27
+          "1": 40,
+          "2": 32,
+          "X": 28
         }
       },
       "recommended": "1"
@@ -224,15 +260,19 @@
       "comment": "Salir del pozo pasa, para el Albacete, por recuperar cuanto antes el pulso que le llevó a ganar cuatro partidos seguidos. Antepenúltimo en la tabla y a un punto de la salvación, el equipo manchego llega con el mal sabor de la derrota en Burgos. Le aguarda un Tenerife situado en la decimotercera plaza, cuyas últimas semanas se tiñen de igualadas: cinco empates en seis jornadas. La única excepción fue el 2-0 al Ceuta. Fuera del Heliodoro Rodríguez López, los chicharreros han firmado una victoria, tres empates y dos derrotas.",
       "percentages": {
         "quinielista": {
-          "1": 36,
-          "2": 26,
-          "X": 38
+          "1": 38,
+          "2": 27,
+          "X": 35
         },
-        "lae": null,
+        "lae": {
+          "1": 39,
+          "2": 27,
+          "X": 34
+        },
         "real": {
-          "1": 43,
+          "1": 42,
           "2": 28,
-          "X": 29
+          "X": 30
         }
       },
       "recommended": "1X2"
@@ -247,15 +287,19 @@
       "comment": "El Eibar firmó siete victorias después de perder el debut de la liga y se colocó como líder, pero tras esa fantástica racha inicial ha encadenado seis jornadas sin ganar. En Ipurua, no obstante, ha firmado tres empates que le permiten seguir imbatido, y dos de ellos ante rivales directos como el Almería y el Mallorca. El Burgos, a priori, no se encuentra en ese mismo escalón, pero ha demostrado que quiere aspirar al ascenso. De momento se ha situado en zona de playoff, con una sola derrota en sus últimas seis apariciones, pero de visitante, más irregular de lo debido: dos derrotas en las últimas tres salidas. La temporada pasada aquí, equis sin goles.",
       "percentages": {
         "quinielista": {
-          "1": 55,
-          "2": 14,
+          "1": 51,
+          "2": 18,
           "X": 31
         },
-        "lae": null,
+        "lae": {
+          "1": 50,
+          "2": 18,
+          "X": 32
+        },
         "real": {
           "1": 51,
-          "2": 22,
-          "X": 27
+          "2": 21,
+          "X": 28
         }
       },
       "recommended": "X"
@@ -270,15 +314,19 @@
       "comment": "Duelo de contrastes entre un Granada en playoff de ascenso y un Ceuta que llega colista destacado. El cuadro nazarí es uno de los equipos más en forma: ocho partidos oficiales sin perder, siete en liga. De ellos, seis victorias y un empate, curiosamente el de la pasada fecha en Sabadell. En casa, tres triunfos seguidos y una solvencia propia de un aspirante a subir. En el cuadro visitante, por su parte, no ha surtido los efectos deseados el cambio de entrenador, aunque compite mejor. El pasado lunes cerró la jornada perdiendo con el Almería (2-3), en ascenso directo y sufriendo para ganar. De visitante, sin embargo, un punto en siete viajes.",
       "percentages": {
         "quinielista": {
-          "1": 83,
+          "1": 86,
           "2": 4,
-          "X": 13
+          "X": 10
         },
-        "lae": null,
+        "lae": {
+          "1": 83,
+          "2": 7,
+          "X": 10
+        },
         "real": {
-          "1": 60,
-          "2": 17,
-          "X": 23
+          "1": 57,
+          "2": 18,
+          "X": 25
         }
       },
       "recommended": "1X"
@@ -294,14 +342,18 @@
       "percentages": {
         "quinielista": {
           "1": 36,
+          "2": 32,
+          "X": 32
+        },
+        "lae": {
+          "1": 36,
           "2": 33,
           "X": 31
         },
-        "lae": null,
         "real": {
-          "1": 42,
+          "1": 41,
           "2": 31,
-          "X": 27
+          "X": 28
         }
       },
       "recommended": "1X2"
@@ -316,14 +368,18 @@
       "comment": "El Almería sumó un triunfo sufrido el lunes en feudo del colista Ceuta y conserva el liderato por delante del Castellón. El duelo por el primer puesto, sin embargo, favorece a ambos y les pone con ventaja sobre el playoff, que es el objetivo de un Sporting que ha entrado en fase irregular: tres derrotas en las últimas cinco jornadas. A pesar de ello, a domicilio firma buenos números, siendo uno de los mejores visitantes, con cuatro victorias en siete salidas, y una notable efectividad ofensiva. Eso sí, debe mejorar ante clubes de la mitad alta de la tabla: cinco derrotas en seis encuentros. El Almería, un único empate cedido en seis apariciones en casa.",
       "percentages": {
         "quinielista": {
-          "1": 72,
-          "2": 12,
-          "X": 16
+          "1": 73,
+          "2": 8,
+          "X": 19
         },
-        "lae": null,
+        "lae": {
+          "1": 72,
+          "2": 11,
+          "X": 17
+        },
         "real": {
-          "1": 56,
-          "2": 19,
+          "1": 57,
+          "2": 18,
           "X": 25
         }
       },
@@ -339,15 +395,19 @@
       "comment": "Un pleno que se jugará en lunes, en el duelo que cierra la jornada en Cornellà entre un Espanyol en dinámica positiva y un Getafe con problemas. El club perico ha conseguido cambiar la inercia con la llegada de Sarabia al banquillo. En todo el proceso, tres jornadas sin perder y las tres, sin recibir ni un gol. Una prueba de consistencia propia del cuadro azulón, en cambio muy alejado de ese registro esta temporada. Combinar la Conference y liga no le ha sentado nada bien, aunque el problema de efectividad debe resolverlo para salir del descenso. A domicilio, seis salidas sin anotar y todas, resueltas con derrota.",
       "percentages": {
         "quinielista": {
-          "1": 11,
-          "2": 45,
-          "X": 36
+          "1": 8,
+          "2": 42,
+          "X": 43
         },
-        "lae": null,
+        "lae": {
+          "1": 9,
+          "2": 43,
+          "X": 42
+        },
         "real": {
-          "1": 23,
+          "1": 22,
           "2": 25,
-          "X": 33
+          "X": 34
         }
       },
       "recommended": "2-1"
